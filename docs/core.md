@@ -1,0 +1,46 @@
+# Audio Core 现状（v0.1.0）
+
+更新时间：2026-03-01
+
+## 版本更新说明
+- [v0.1.0](./core/v0.1.0.md)
+
+## 版本信息
+- 内核版本：`0.1.0`
+- C API 可通过 `bag_core_version()` 查询版本字符串。
+
+## 目录与职责
+- `apps/audio_core/core/include/bag/common`
+  - `config.h`：核心配置（采样率、帧长、诊断开关）。
+  - `types.h`：跨模块数据结构（`PcmBlock`、`IrPacket`、`TextResult`）。
+  - `error_code.h`：统一错误码。
+  - `version.h`：核心版本接口。
+- `apps/audio_core/core/include/bag/fsk`
+  - `fsk_codec.h`：FSK 文本编解码接口（`EncodeTextToPcm16` / `DecodePcm16ToText`）。
+- `apps/audio_core/core/include/bag/pipeline`
+  - `pipeline.h`：`IPipeline` 抽象与 `CreatePipeline` 工厂。
+- `apps/audio_core/core/include/bag/phy`、`apps/audio_core/core/include/bag/link`
+  - 预留接口（`IFunPhy`、`IProPhy`、`ILinkLayer`），当前未接入完整实现。
+- `apps/audio_core/api`
+  - `bag_api.h/.cpp`：稳定 C API（供 JNI/CLI 等外部调用）。
+
+## 当前已实现能力
+1. 文本与音频（PCM16）互转的基础 FSK 链路。
+2. Pipeline 最小闭环：`PushPcm -> PollTextResult -> Reset`。
+3. C API 解码器生命周期与推流接口：
+   - `bag_create_decoder`
+   - `bag_push_pcm`
+   - `bag_poll_result`
+   - `bag_reset`
+   - `bag_destroy_decoder`
+   - `bag_core_version`
+
+## 当前边界（v0.1.0）
+1. 以最小可用为目标，重点在单链路打通。
+2. `phy/pro`、`phy/fun`、`link` 仍是接口层，未形成完整协议栈实现。
+3. 尚未包含前向纠错、重传策略、复杂同步与抗噪优化。
+4. 结果置信度目前为简化值，后续可演进为真实质量估计模型。
+
+## 对外集成建议
+1. Android/Windows 等平台通过 `bag_api` 调用 core，避免直接依赖内部实现细节。
+2. 新能力优先加在 `core`，平台层仅做 I/O 与表现层，保持跨平台复用。

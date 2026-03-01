@@ -1,98 +1,97 @@
 # Binary_Audio_Generator
-用于把文字转化为二进制音频
+用于把文字转化为二进制音频（FSK）。
 
-# Audio Generator Configuration (audio_generator_config.json) README
-
-本文件 `audio_generator_config.json` 用于配置音频生成器（`audio_generator.cpp`）的参数。通过修改此文件中的值，您可以自定义生成的WAV音频文件的特性，包括音频质量、哔哔声的音调和时长，以及各种静音间隔。
-
-程序在启动时会自动查找当前目录下的 `audio_generator_config.json` 文件。如果文件不存在或某些参数缺失，程序将使用在C++代码中定义的默认值。
-
-## JSON 文件结构
-
-配置文件主要包含两个顶级对象：`audio_parameters` 和 `durations_ms`。
-
-### 1. `audio_parameters`
-
-此部分包含与音频基本属性相关的参数。
-
-* **`sample_rate`**:
-    * **说明**: 音频的采样率，表示每秒钟采集多少个音频样本点。较高的采样率通常意味着更好的音质，但文件也会更大。
-    * **单位**: 赫兹 (Hz)
-    * **示例值**: `48000` (表示 48kHz)
-
-* **`bits_per_sample`**:
-    * **说明**: 每个音频样本的位数，也称为位深度。它决定了音频动态范围的大小。常见的有16位或24位。
-    * **单位**: 位 (bits)
-    * **示例值**: `16`
-
-* **`num_channels`**:
-    * **说明**: 声道数量。`1` 代表单声道，`2` 代表立体声。当前程序设计为单声道。
-    * **单位**: 无 (整数)
-    * **示例值**: `1`
-
-* **`amplitude`**:
-    * **说明**: 生成哔哔声时的振幅（音量大小）。对于16位音频，最大理论值为 32767。设置较低的值可以避免削波失真。
-    * **单位**: 振幅单位 (通常对应于16位有符号整数的范围，但在此处以浮点数表示峰值)
-    * **示例值**: `25000.0`
-
-* **`frequency`**:
-    * **说明**: 代表二进制数据 '0' 或 '1' 的普通哔哔声的基础频率。
-    * **单位**: 赫兹 (Hz)
-    * **示例值**: `660.0`
-
-* **`end_signal_frequency`**:
-    * **说明**: 在音频序列末尾添加的特殊结束信号音的频率。
-    * **单位**: 赫兹 (Hz)
-    * **示例值**: `330.0`
-    * **注意**: 如果对应的 `end_signal_beep` 持续时间（见下文）设置为0或此参数缺失，则不会生成结束信号音。
-
-### 2. `durations_ms`
-
-此部分定义了各种音频事件（哔哔声和静音）的持续时间。
-
-* **`short_beep`**:
-    * **说明**: 代表二进制 '0' 的短哔哔声的持续时间。
-    * **单位**: 毫秒 (ms)
-    * **示例值**: `80.0`
-
-* **`long_beep`**:
-    * **说明**: 代表二进制 '1' 的长哔哔声的持续时间。
-    * **单位**: 毫秒 (ms)
-    * **示例值**: `150.0`
-
-* **`bit_silence`**:
-    * **说明**: 在每个哔哔声（比特）之后插入的静音的持续时间。
-    * **单位**: 毫秒 (ms)
-    * **示例值**: `40.0`
-
-* **`byte_silence`**:
-    * **说明**: 在输入文本中的每个字节（由空格' '分隔）之间插入的静音的持续时间。此静音会替换掉前一个比特后的 `bit_silence`。
-    * **单位**: 毫秒 (ms)
-    * **示例值**: `180.0`
-
-* **`end_signal_beep`**:
-    * **说明**: 在整个音频序列末尾添加的特殊结束信号音的持续时间。
-    * **单位**: 毫秒 (ms)
-    * **示例值**: `500.0`
-    * **注意**: 如果此值设置为0或参数缺失，即使配置了 `end_signal_frequency`，也不会生成结束信号音。
+## 依赖安装
+```
+pip install -r python/requirements.txt
+```
 
 ## 使用示例
+编码：
+```
+python python/main.py encode --text "Hello" --out data/output_audio/hello.wav
+```
 
-```json
-{
-    "audio_parameters": {
-        "sample_rate": 48000,
-        "bits_per_sample": 16,
-        "num_channels": 1,
-        "amplitude": 25000.0,
-        "frequency": 700.0,
-        "end_signal_frequency": 350.0
-    },
-    "durations_ms": {
-        "short_beep": 75.0,
-        "long_beep": 160.0,
-        "bit_silence": 50.0,
-        "byte_silence": 200.0,
-        "end_signal_beep": 400.0
-    }
-}
+从文本文件编码：
+```
+python python/main.py encode --text-file data/input.txt --out data/output_audio/hello.wav
+```
+
+解码：
+```
+python python/main.py decode --in data/output_audio/output.wav
+```
+
+解码并写入文本文件：
+```
+python python/main.py decode --in data/output_audio/output.wav --out-text data/output_text/output.txt
+```
+
+## C++ 版本（libsndfile + KissFFT）
+内核版本：`0.1.0`（详见 [docs/core.md](./docs/core.md)）
+表现层版本：`0.1.0`（详见 [docs/presentation.md](./docs/presentation.md)）
+
+### 依赖（MSYS2 UCRT64）
+```
+pacman -S --needed \
+  mingw-w64-ucrt-x86_64-gcc \
+  mingw-w64-ucrt-x86_64-cmake \
+  mingw-w64-ucrt-x86_64-ninja \
+  mingw-w64-ucrt-x86_64-pkgconf \
+  mingw-w64-ucrt-x86_64-libsndfile \
+  mingw-w64-ucrt-x86_64-kissfft
+```
+
+### 构建
+```
+cmake -S . -B build -G Ninja
+cmake --build build
+```
+
+### 使用示例
+编码：
+```
+build/binary_audio_cpp.exe encode --text "Hello" --out data/output_audio/hello.wav
+```
+
+从文本文件编码：
+```
+build/binary_audio_cpp.exe encode --text-file data/input.txt --out data/output_audio/hello.wav
+```
+
+解码：
+```
+build/binary_audio_cpp.exe decode --in data/output_audio/output.wav
+```
+
+解码并写入文本文件：
+```
+build/binary_audio_cpp.exe decode --in data/output_audio/output.wav --out-text data/output_text/output.txt
+```
+
+查看 CLI 相关第三方许可证：
+```
+build/binary_audio_cpp.exe licenses
+```
+
+查看 CLI 与内核版本：
+```
+build/binary_audio_cpp.exe version
+```
+
+
+## 致谢
+本项目使用了以下第三方库，感谢其贡献：
+- libsndfile
+- KissFFT
+- NumPy
+- SciPy
+
+## Licenses
+- 本项目：MIT（见 [LICENSE](./LICENSE)）
+- libsndfile：LGPL-2.1-or-later
+- KissFFT：BSD-3-Clause
+- NumPy：BSD-3-Clause
+- SciPy：BSD-3-Clause
+
+说明：第三方库许可证请以上游项目仓库中的 LICENSE 文件为准。

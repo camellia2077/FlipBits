@@ -1,0 +1,66 @@
+data/
+temp/
+
+# CMake / Build
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+Makefile
+build.ninja
+.ninja_deps
+.ninja_log
+
+# C/C++ artifacts
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.pdb
+*.ilk
+*.exp
+*.idb
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.vs/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Android / Gradle
+**/.gradle/
+**/build/
+**/.cxx/
+**/local.properties
+**/captures/
+**/.externalNativeBuild/
+*.apk
+*.aab
+
+# Android Studio
+*.iml
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/caches/
+**/.idea/libraries/
+**/.idea/modules.xml
+**/.idea/navEditor.xml
+**/.idea/assetWizardSettings.xml
