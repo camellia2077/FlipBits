@@ -60,4 +60,12 @@ inline void AssertTrue(bool value, const std::string& message) {
     }
 }
 
+inline void AssertContains(const std::string& haystack,
+                           const std::string& needle,
+                           const std::string& message) {
+    if (haystack.find(needle) == std::string::npos) {
+        Fail(message);
+    }
+}
+
 }  // namespace test
