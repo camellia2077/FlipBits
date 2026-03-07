@@ -1,0 +1,15 @@
+add_library(bag_api STATIC
+    src/bag_api.cpp
+)
+
+target_compile_features(bag_api PUBLIC cxx_std_17)
+target_include_directories(bag_api
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../audio_core/include
+)
+target_link_libraries(bag_api
+    PUBLIC
+        $<LINK_ONLY:bag_core>
+)

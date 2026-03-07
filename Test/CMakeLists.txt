@@ -4,12 +4,11 @@ add_executable(test_unit
 target_include_directories(test_unit
     PRIVATE
         include
-        ../apps/audio_core/core/include
-        ../modules/audio_io/include
 )
 target_link_libraries(test_unit
     PRIVATE
-        audio_core_fsk
+        bag_api
+        bag_core
         audio_io
 )
 add_test(NAME unit_tests COMMAND test_unit)
@@ -20,12 +19,11 @@ add_executable(test_e2e
 target_include_directories(test_e2e
     PRIVATE
         include
-        ../apps/audio_core/core/include
-        ../modules/audio_io/include
 )
 target_link_libraries(test_e2e
     PRIVATE
-        audio_core_fsk
+        bag_api
+        bag_core
         audio_io
 )
 add_test(

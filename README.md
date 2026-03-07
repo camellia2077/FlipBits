@@ -27,9 +27,14 @@ python python/main.py decode --in data/output_audio/output.wav
 python python/main.py decode --in data/output_audio/output.wav --out-text data/output_text/output.txt
 ```
 
-## C++ 版本（libsndfile + KissFFT）
-内核版本：`0.1.0`（详见 [docs/core.md](./docs/core.md)）
-表现层版本：`0.1.0`（详见 [docs/presentation.md](./docs/presentation.md)）
+## C++ 版本（libsndfile）
+内核版本：`0.1.1`（详见 [docs/core.md](./docs/core.md)）
+表现层版本：`0.1.1`（详见 [docs/presentation.md](./docs/presentation.md)）
+
+共享代码目录：
+- `libs/audio_core`：协议、FSK 编解码、pipeline 等核心能力
+- `libs/audio_api`：跨平台稳定 C API
+- `libs/audio_io`：WAV 读写等 I/O 能力
 
 ### 依赖（MSYS2 UCRT64）
 ```
@@ -38,8 +43,7 @@ pacman -S --needed \
   mingw-w64-ucrt-x86_64-cmake \
   mingw-w64-ucrt-x86_64-ninja \
   mingw-w64-ucrt-x86_64-pkgconf \
-  mingw-w64-ucrt-x86_64-libsndfile \
-  mingw-w64-ucrt-x86_64-kissfft
+  mingw-w64-ucrt-x86_64-libsndfile
 ```
 
 ### 构建
@@ -83,14 +87,12 @@ build/binary_audio_cpp.exe version
 ## 致谢
 本项目使用了以下第三方库，感谢其贡献：
 - libsndfile
-- KissFFT
 - NumPy
 - SciPy
 
 ## Licenses
 - 本项目：MIT（见 [LICENSE](./LICENSE)）
 - libsndfile：LGPL-2.1-or-later
-- KissFFT：BSD-3-Clause
 - NumPy：BSD-3-Clause
 - SciPy：BSD-3-Clause
 

@@ -4,27 +4,19 @@ project(audio_android_jni LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(audio_core_fsk STATIC
-    ../../../../../../apps/audio_core/core/src/common/version.cpp
-    ../../../../../../apps/audio_core/core/src/pipeline/pipeline.cpp
-    ../../../../../../apps/audio_core/core/src/fsk/fsk_codec.cpp
-)
-target_include_directories(audio_core_fsk
-    PUBLIC
-        ../../../../../../apps/audio_core/core/include
+get_filename_component(
+    WAVEBITS_ROOT
+    "${CMAKE_CURRENT_LIST_DIR}/../../../../../../"
+    ABSOLUTE
 )
 
-add_library(audio_core_api STATIC
-    ../../../../../../apps/audio_core/api/src/bag_api.cpp
+add_subdirectory(
+    "${WAVEBITS_ROOT}/libs/audio_core"
+    "${CMAKE_CURRENT_BINARY_DIR}/deps/audio_core"
 )
-target_include_directories(audio_core_api
-    PUBLIC
-        ../../../../../../apps/audio_core/api/include
-        ../../../../../../apps/audio_core/core/include
-)
-target_link_libraries(audio_core_api
-    PUBLIC
-        audio_core_fsk
+add_subdirectory(
+    "${WAVEBITS_ROOT}/libs/audio_api"
+    "${CMAKE_CURRENT_BINARY_DIR}/deps/audio_api"
 )
 
 add_library(audio_android_jni SHARED
@@ -32,12 +24,11 @@ add_library(audio_android_jni SHARED
 )
 target_include_directories(audio_android_jni
     PRIVATE
-        ../../../../../../apps/audio_core/api/include
-        ../../../../../../apps/audio_core/core/include
+        "${WAVEBITS_ROOT}/libs/audio_api/include"
 )
 target_link_libraries(audio_android_jni
     PRIVATE
-        audio_core_api
+        bag_api
         android
         log
 )

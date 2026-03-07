@@ -3,17 +3,49 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
-#include "bag/common/version.h"
-#include "decoder.h"
-#include "encoder.h"
+#include "bag_api.h"
+#include "wav_io.h"
 
 namespace {
-constexpr char kCliPresentationVersion[] = "0.1.0";
+constexpr char kCliPresentationVersion[] = "0.1.1";
+constexpr int kDefaultSampleRateHz = 44100;
+
+int default_frame_samples(int sample_rate_hz) {
+    return sample_rate_hz / 20;
+}
+
+bag_encoder_config make_encoder_config() {
+    bag_encoder_config config{};
+    config.sample_rate_hz = kDefaultSampleRateHz;
+    config.frame_samples = default_frame_samples(config.sample_rate_hz);
+    config.enable_diagnostics = 0;
+    config.reserved = 0;
+    return config;
+}
+
+bag_decoder_config make_decoder_config(int sample_rate_hz) {
+    bag_decoder_config config{};
+    config.sample_rate_hz = sample_rate_hz > 0 ? sample_rate_hz : kDefaultSampleRateHz;
+    config.frame_samples = default_frame_samples(config.sample_rate_hz);
+    config.enable_diagnostics = 0;
+    config.reserved = 0;
+    return config;
+}
+
+struct pcm_result_guard {
+    bag_pcm16_result result{};
+
+    ~pcm_result_guard() {
+        bag_free_pcm16_result(&result);
+    }
+};
 
 void print_versions() {
+    const char* version = bag_core_version();
     std::cout << "presentation: v" << kCliPresentationVersion << "\n"
-              << "core: v" << bag::CoreVersion() << "\n";
+              << "core: v" << (version != nullptr ? version : "unknown") << "\n";
 }
 
 void print_usage() {
@@ -95,7 +127,19 @@ int main(int argc, char* argv[]) {
             }
 
             auto output_path = normalize_output_path(out, "output.wav", ".wav");
-            encode_text_to_wav(text, output_path);
+            pcm_result_guard pcm{};
+            const bag_encoder_config config = make_encoder_config();
+            const bag_error_code encode_code = bag_encode_text(&config, text.c_str(), &pcm.result);
+            if (encode_code != BAG_OK) {
+                throw std::runtime_error("Failed to encode text via C API.");
+            }
+
+            const std::vector<int16_t> mono_pcm =
+                pcm.result.sample_count > 0
+                    ? std::vector<int16_t>(
+                          pcm.result.samples, pcm.result.samples + pcm.result.sample_count)
+                    : std::vector<int16_t>{};
+            audio_io::WriteMonoPcm16Wav(output_path, config.sample_rate_hz, mono_pcm);
             std::cout << "Output WAV: " << output_path.string() << "\n";
         } else if (command == "decode") {
             std::string input;
@@ -118,7 +162,32 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
 
-            std::string decoded = decode_wav_to_text(input);
+            const auto wav = audio_io::ReadMonoPcm16Wav(input);
+            const bag_decoder_config config = make_decoder_config(wav.sample_rate_hz);
+            bag_decoder* decoder = nullptr;
+            if (bag_create_decoder(&config, &decoder) != BAG_OK || decoder == nullptr) {
+                throw std::runtime_error("Failed to create decoder via C API.");
+            }
+
+            const bag_error_code push_code =
+                bag_push_pcm(decoder, wav.mono_pcm.data(), wav.mono_pcm.size(), 0);
+            if (push_code != BAG_OK) {
+                bag_destroy_decoder(decoder);
+                throw std::runtime_error("Failed to push PCM via C API.");
+            }
+
+            std::vector<char> text_buffer(4096, '\0');
+            bag_text_result result{};
+            result.buffer = text_buffer.data();
+            result.buffer_size = text_buffer.size();
+
+            const bag_error_code poll_code = bag_poll_result(decoder, &result);
+            bag_destroy_decoder(decoder);
+            if (poll_code != BAG_OK) {
+                throw std::runtime_error("Failed to decode WAV via C API.");
+            }
+
+            std::string decoded(text_buffer.data(), result.text_size);
             if (!out_text.empty()) {
                 auto output_path = normalize_output_path(out_text, "decoded.txt", ".txt");
                 auto parent = output_path.parent_path();

@@ -17,6 +17,13 @@ typedef enum bag_error_code {
 
 typedef struct bag_decoder bag_decoder;
 
+typedef struct bag_encoder_config {
+    int sample_rate_hz;
+    int frame_samples;
+    int enable_diagnostics;
+    int reserved;
+} bag_encoder_config;
+
 typedef struct bag_decoder_config {
     int sample_rate_hz;
     int frame_samples;
@@ -31,6 +38,16 @@ typedef struct bag_text_result {
     int complete;
     float confidence;
 } bag_text_result;
+
+typedef struct bag_pcm16_result {
+    int16_t* samples;
+    size_t sample_count;
+} bag_pcm16_result;
+
+bag_error_code bag_encode_text(const bag_encoder_config* config,
+                               const char* text,
+                               bag_pcm16_result* out_result);
+void bag_free_pcm16_result(bag_pcm16_result* result);
 
 bag_error_code bag_create_decoder(const bag_decoder_config* config, bag_decoder** out_decoder);
 void bag_destroy_decoder(bag_decoder* decoder);

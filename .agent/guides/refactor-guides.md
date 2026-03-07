@@ -1,75 +1,44 @@
 ---
-description: Refactor Guides Description
+description: Agent 专用重构模板
 ---
-# 高内聚、低耦合、减少碎片化重构指南
 
-## 目标
+# Refactor Template
 
-重构不是“减少文件数”，而是让代码按职责组织：
+本文件只定义 agent 做重构时必须遵守的最小规则。
 
-- 高内聚：同一业务变化点尽量落在同一模块。
-- 低耦合：跨层、跨模块依赖最小化，依赖方向稳定。
-- 可维护：读一个功能时，跳转文件数量可控，变更影响面可预测。
+## Hard Rules
 
-## 什么应该合并
+- 重构目标是提升内聚、降低耦合，不是单纯减少文件数
+- 优先按职责边界拆分或合并，避免按“代码行数”做决定
+- 同一变更原因、同一调用路径、同一使用边界的实现可以合并
+- 跨层、跨模块、跨职责的内容不要混放
+- 重构时优先复用已有 `ports`、`use_cases`、`adapters`、`controllers` 边界
+- 不顺手改无关问题
 
-满足以下条件时，优先合并：
+## Merge Rules
 
-- 同一变化轴：文件总是一起改动，且共同服务一个明确能力。
-- 同一使用域：只在同一子模块内部使用，没有独立复用价值。
-- 语义强绑定：拆开后需要来回跳转才能理解完整流程。
-- 非契约文件：主要是实现细节（`*.cpp`、仅内部使用的 helper）。
+- 总是一起修改的文件，可考虑合并
+- 只在单一子模块内部使用的 helper，可考虑下沉或并入主实现
+- 拆开后必须频繁来回跳转才能理解的实现，可考虑合并
 
-典型可合并对象：
+## Split Rules
 
-- 同维度查询器与其批量抓取实现（如 `daily_querier + batch_daily_fetcher`）。
-- 同一格式器下的超小配置实现文件（`*_config.cpp` 并入 `*_formatter.cpp`）。
-- 同类策略碎片（如 `daily_md/daily_tex/daily_typ` 收敛到 `daily_strategies.cpp`）。
-- 重复测试装配代码（如多个测试模块重复的 fixture/build helper）。
+- 一个文件同时承担“入口 + 编排 + 规则 + IO”时，应拆分
+- 一个文件同时服务多个变化原因时，应拆分
+- 一个目录名与实际职责不符时，应重命名或迁移
 
-## 什么不应该合并
+## Refactor Checklist
 
-以下文件默认保持独立，不为“减少文件数”而合并：
+- 变更是否让职责更清晰
+- 依赖方向是否更稳定
+- 命名是否与职责一致
+- 构建、脚本、测试是否已同步
+- 文档是否已同步
 
-- 分层契约：`ports/`、`interfaces/`、`dto/`、`abi/`。
-- 跨模块复用的公共类型与协议定义。
-- 公开 API 边界（被多目标、多层依赖的稳定头文件）。
-- 语义不同、发布节奏不同、测试策略不同的模块。
+## Generic Example
 
-反例：
-
-- 把多个 `I*` 接口并成一个“大接口头”。
-- 把多个 DTO 混成“万能 models.hpp”。
-- 把 domain 规则与 infrastructure 适配实现混在一个文件。
-
-## 快速判定规则
-
-合并前用四问法，全部回答“是”才合并：
-
-1. 这两个文件是否总是一起改？
-2. 它们是否只服务同一个子能力？
-3. 合并后是否不会引入新的跨层依赖？
-4. 合并后是否能减少理解路径而不损伤复用边界？
-
-任意一项为“否”，先不要合并。
-
-## 推荐流程
-
-1. 先定边界：domain/application/infrastructure/api 的依赖方向不变。
-2. 先收敛实现碎片：从 `5~30` 行、仅内部使用的实现文件开始。
-3. 再收敛同类策略/同维度模块：按 daily/monthly/weekly/yearly 等轴聚合。
-4. 最后清理兼容层：删除不再需要的 forwarding header/旧文件。
-5. 每批次必须验证：build、核心测试、suite、层级检查全通过。
-
-## 验证标准（必须）
-
-- `python scripts/run.py build --app tracer_core --build-dir build_fast` 通过。
-- `ctest --test-dir apps/tracer_core/build_fast -R "^time_tracker_core_api_tests$"` 通过。
-- `python test/run.py --suite time_tracer --agent --build-dir build_fast --concise` 通过。
-
-## 评估指标=
-
-- 一个功能主流程的“阅读跳转文件数”下降。
-- 一次需求改动触达文件数下降。
-- 无新增层级违规、无新增循环依赖。
-- 测试可读性提升，重复装配逻辑减少。
+```text
+把“控制器中的业务规则”下沉到 use case。
+把“动态加载逻辑”替换为内建装配。
+把“混合职责的单文件”拆成 config / service / adapter。
+```

@@ -1,62 +1,44 @@
 ---
-description: 
+description: Agent 专用文件命名模板
 ---
 
-# 程序文件命名规范（高置信度：小文件但不合并）
+# File Name Template
 
-## 1. 目标
-- 明确哪些“小文件”属于契约/数据载体，应该保持独立，不因行数少被合并。
-- 通过文件名即可表达职责，降低评审歧义与错误合并概率。
+本文件只定义 agent 新建或重命名文件时必须遵守的最小规则与模板。
 
-## 2. 基础规则
-- 使用 `snake_case`，全小写英文。
-- 文件名优先用“业务域 + 角色”结构：`<domain>_<role>.<ext>`。
-- 禁止含糊命名：`utils.hpp`、`common.hpp`、`temp.hpp`、`misc.hpp`。
+## Hard Rules
 
-## 3. 高置信度不可合并文件（命名规则）
+- 默认使用 `snake_case`
+- 文件名必须表达职责，避免使用 `utils`、`common`、`temp`、`misc` 等模糊命名
+- 优先使用 `<domain>_<role>.<ext>` 结构
+- 接口、数据载体、schema、registry、config 等“职责清晰的小文件”允许独立存在，不因文件短小而强行合并
+- 若文件同时承担多个职责，应拆分而不是继续叠加命名
 
-### 3.1 契约接口（Interface Contract）
-- 规则：`i_<capability>.hpp`
-- 约束：仅声明接口，不写业务实现。
-- 示例：`i_report_formatter.hpp`、`i_data_query_service.hpp`
+## Naming Templates
 
-### 3.2 数据载体（Data Carrier）
-- DTO：`<domain>_dto.hpp` 或 `<domain>_requests.hpp` / `<domain>_responses.hpp`
-- 模型：`<domain>_model(s).hpp`
+- 接口：`i_<capability>.hpp`
+- 配置：`<domain>_config.hpp`
 - 类型集合：`<domain>_types.hpp`
-- 配置载体：`<domain>_config.hpp`
-- 约束：只放字段、轻量校验、无流程逻辑。
-- 示例：`core_requests.hpp`、`project_tree_data.hpp`、`report_types.hpp`
+- 请求/响应：`<domain>_requests.hpp` / `<domain>_responses.hpp`
+- DTO：`<domain>_dto.hpp`
+- 模型：`<domain>_model.hpp` / `<domain>_models.hpp`
+- Schema：`<domain>_schema.<ext>`
+- Registry：`<domain>_registry.<ext>`
+- Manifest：`<domain>_manifest.<ext>`
+- Aliases：`<domain>_aliases.<ext>`
 
-### 3.3 契约元信息（Schema / Manifest / Registry / Aliases）
-- `*_schema.*`：结构/字段约定（如 SQL、JSON）
-- `*_manifest.*`：插件或模块清单
-- `*_registry.*`：注册入口与映射注册
-- `*_aliases.*`：别名常量
-- 示例：`sqlite_schema.hpp`、`plugin_manifest.hpp`、`formatter_registry.hpp`、`sql_aliases.hpp`
+## Split Rules
 
-## 4. 何时允许存在 `.cpp`
-- 默认契约/载体文件只需 `.hpp`。
-- 仅当出现“注册动作、工厂组装、静态映射初始化”时，允许同名 `.cpp`：
-  - `<name>.hpp` + `<name>.cpp`
-  - 例如：`formatter_registry.hpp/.cpp`
+- 仅声明接口时，保留独立头文件
+- 仅承载结构体、枚举、配置、schema 时，保留独立文件
+- 出现流程控制、I/O、数据库读写或复杂业务逻辑时，不应继续塞进“types/config/schema”类文件
 
-## 5. 何时判定为“不应合并”
-- 文件主要内容是：
-  - 接口声明（纯虚类、函数签名）
-  - 常量协议（schema/aliases）
-  - DTO/模型字段定义
-  - 注册入口声明
-- 且不包含复杂流程控制、I/O、数据库读写、业务分支编排。
+## Generic Example
 
-## 6. 推荐与反例
-- 推荐：
-  - `sqlite_schema.hpp`
-  - `plugin_manifest.hpp`
-  - `formatter_registry.hpp`
-  - `report_types.hpp`
-  - `runtime_environment_requirements.hpp`
-- 反例：
-  - `schema_utils.hpp`（角色不清）
-  - `all_contracts.hpp`（职责聚合过度）
-  - `registry_and_manifest.hpp`（多职责混合）
+```text
+i_formatter.hpp
+report_config.hpp
+query_requests.hpp
+storage_schema.hpp
+plugin_registry.cpp
+```

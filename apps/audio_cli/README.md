@@ -8,5 +8,5 @@
 - `windows/cmake`：Windows CLI 构建脚本
 
 版本说明：
-- 表现层版本：`0.1.0`
+- 表现层版本：`0.1.1`
 - 内核版本：运行 `binary_audio_cpp version` 自动读取 `core` 版本并显示。

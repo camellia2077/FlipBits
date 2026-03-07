@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "bag/fsk/fsk_codec.h"
 #include "bag_api.h"
 
 namespace {
@@ -24,10 +23,31 @@ std::string JStringToStdString(JNIEnv* env, jstring value) {
     return out;
 }
 
-bag_decoder_config MakeConfig(int sample_rate_hz, int frame_samples) {
+int NormalizeSampleRate(int sample_rate_hz) {
+    return sample_rate_hz > 0 ? sample_rate_hz : kDefaultSampleRateHz;
+}
+
+int NormalizeFrameSamples(int sample_rate_hz, int frame_samples) {
+    if (frame_samples > 0) {
+        return frame_samples;
+    }
+    const int normalized_sample_rate = NormalizeSampleRate(sample_rate_hz);
+    return normalized_sample_rate > 0 ? normalized_sample_rate / 20 : kDefaultFrameSamples;
+}
+
+bag_encoder_config MakeEncoderConfig(int sample_rate_hz, int frame_samples) {
+    bag_encoder_config config{};
+    config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
+    config.frame_samples = NormalizeFrameSamples(sample_rate_hz, frame_samples);
+    config.enable_diagnostics = 0;
+    config.reserved = 0;
+    return config;
+}
+
+bag_decoder_config MakeDecoderConfig(int sample_rate_hz, int frame_samples) {
     bag_decoder_config config{};
-    config.sample_rate_hz = sample_rate_hz > 0 ? sample_rate_hz : kDefaultSampleRateHz;
-    config.frame_samples = frame_samples > 0 ? frame_samples : kDefaultFrameSamples;
+    config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
+    config.frame_samples = NormalizeFrameSamples(sample_rate_hz, frame_samples);
     config.enable_diagnostics = 0;
     config.reserved = 0;
     return config;
@@ -42,19 +62,21 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeEncodeTextToPcm(
         return env->NewShortArray(0);
     }
 
-    bag::fsk::FskConfig fsk_config{};
-    const bag_decoder_config config = MakeConfig(sample_rate_hz, frame_samples);
-    fsk_config.sample_rate_hz = config.sample_rate_hz;
-    fsk_config.bit_duration_sec =
-        static_cast<double>(config.frame_samples) / static_cast<double>(config.sample_rate_hz);
-    const std::vector<int16_t> pcm = bag::fsk::EncodeTextToPcm16(input, fsk_config);
+    const bag_encoder_config config = MakeEncoderConfig(sample_rate_hz, frame_samples);
+    bag_pcm16_result pcm{};
+    if (bag_encode_text(&config, input.c_str(), &pcm) != BAG_OK) {
+        return env->NewShortArray(0);
+    }
 
-    jshortArray out = env->NewShortArray(static_cast<jsize>(pcm.size()));
-    if (out == nullptr || pcm.empty()) {
+    jshortArray out = env->NewShortArray(static_cast<jsize>(pcm.sample_count));
+    if (out != nullptr && pcm.sample_count > 0) {
+        env->SetShortArrayRegion(
+            out, 0, static_cast<jsize>(pcm.sample_count), reinterpret_cast<const jshort*>(pcm.samples));
+    }
+    bag_free_pcm16_result(&pcm);
+    if (out == nullptr) {
         return out;
     }
-    env->SetShortArrayRegion(
-        out, 0, static_cast<jsize>(pcm.size()), reinterpret_cast<const jshort*>(pcm.data()));
     return out;
 }
 
@@ -69,7 +91,7 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeDecodeGeneratedPcm(
     std::vector<int16_t> buffer(static_cast<size_t>(len), 0);
     env->GetShortArrayRegion(pcm, 0, len, reinterpret_cast<jshort*>(buffer.data()));
 
-    const bag_decoder_config config = MakeConfig(sample_rate_hz, frame_samples);
+    const bag_decoder_config config = MakeDecoderConfig(sample_rate_hz, frame_samples);
     bag_decoder* decoder = nullptr;
     if (bag_create_decoder(&config, &decoder) != BAG_OK || decoder == nullptr) {
         return env->NewStringUTF("");
