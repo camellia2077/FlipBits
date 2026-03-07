@@ -1,5 +1,5 @@
-data/
-temp/
+/data/
+/temp/
 
 # CMake / Build
 build/
