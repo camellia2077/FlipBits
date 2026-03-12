@@ -1,8 +1,9 @@
-# Audio Core 现状（v0.3.0）
+# Audio Core 现状（v0.3.1）
 
 更新时间：2026-03-12
 
 ## 版本更新说明
+- [v0.3.1](./core/v0.3.1.md)
 - [v0.3.0](./core/v0.3.0.md)
 - [v0.2.2](./core/v0.2.2.md)
 - [v0.2.1](./core/v0.2.1.md)
@@ -17,7 +18,7 @@
 - [测试说明](./testing.md)
 
 ## 版本信息
-- 内核版本：`0.3.0`
+- 内核版本：`0.3.1`
 - C API 可通过 `bag_core_version()` 查询版本字符串。
 
 ## 目录与职责
@@ -54,7 +55,7 @@
    - `bag_destroy_decoder`
    - `bag_core_version`
 
-## 当前边界（v0.3.0）
+## 当前边界（v0.3.1）
 1. 以最小可用为目标，重点在单链路打通。
 2. `CreatePipeline` 现为兼容适配层，正式主线已经下沉到 `transport` 与各 mode 模块。
 3. `flash` 当前固定为长期基线模式：原始直通、无 payload/frame 封装、无单帧 `512` 字节上限、只保留 `clean` 路径。
