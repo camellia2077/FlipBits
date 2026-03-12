@@ -4,6 +4,11 @@ project(audio_android_jni LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-O3 -DNDEBUG -ffunction-sections -fdata-sections)
+    add_link_options(-Wl,--gc-sections)
+endif()
+
 get_filename_component(
     WAVEBITS_ROOT
     "${CMAKE_CURRENT_LIST_DIR}/../../../../../../"

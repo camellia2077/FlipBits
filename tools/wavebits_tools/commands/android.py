@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from ..constants import ANDROID_DIR
+from ..constants import ANDROID_GRADLE_ROOT
 from ..paths import gradle_wrapper
 from ..process import run
 
@@ -19,4 +19,4 @@ def cmd_android(args: argparse.Namespace) -> None:
     if args.clean:
         command.append("clean")
     command.append(ANDROID_TASKS[args.action])
-    run(command, cwd=ANDROID_DIR)
+    run(command, cwd=ANDROID_GRADLE_ROOT)

@@ -1,3 +1,6 @@
+import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.gradle.kotlin.dsl.configure
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
@@ -10,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.bag.audioandroid"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "0.1.1"
@@ -27,7 +30,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
+            isJniDebuggable = false
+            ndk {
+                debugSymbolLevel = "NONE"
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -51,6 +60,23 @@ android {
             version = "3.22.1"
         }
     }
+
+    sourceSets {
+        getByName("main").res.directories.add("build/generated/aboutlibraries/res")
+    }
+}
+
+extensions.configure<AboutLibrariesExtension>("aboutLibraries") {
+    android {
+        registerAndroidTasks.set(false)
+    }
+    export {
+        outputFile.set(layout.buildDirectory.file("generated/aboutlibraries/res/raw/aboutlibraries.json"))
+    }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn("exportLibraryDefinitions")
 }
 
 dependencies {

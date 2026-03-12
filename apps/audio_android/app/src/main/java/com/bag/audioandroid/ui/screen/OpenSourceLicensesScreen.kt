@@ -10,10 +10,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.R
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
 
@@ -23,16 +22,7 @@ fun OpenSourceLicensesScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val aboutLibrariesResId = remember(context) {
-        context.resources.getIdentifier("aboutlibraries", "raw", context.packageName)
-    }
-    val libraries = if (aboutLibrariesResId != 0) {
-        val loadedLibraries by rememberLibraries(aboutLibrariesResId)
-        loadedLibraries
-    } else {
-        null
-    }
+    val libraries by rememberLibraries(R.raw.aboutlibraries)
 
     Scaffold(
         topBar = {
@@ -49,7 +39,7 @@ fun OpenSourceLicensesScreen(
     ) { innerPadding ->
         if (libraries == null) {
             Text(
-                text = "未找到许可证清单资源",
+                text = "许可证清单加载中",
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)

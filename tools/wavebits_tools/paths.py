@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from .constants import ANDROID_DIR, DEFAULT_BUILD_DIR, ROOT_DIR
+from .constants import ANDROID_GRADLE_ROOT, DEFAULT_BUILD_DIR, ROOT_DIR
 from .errors import ToolError
 
 
@@ -28,5 +28,5 @@ def cmake_cache_exists(build_dir: Path) -> bool:
 
 def gradle_wrapper() -> list[str]:
     if os.name == "nt":
-        return [str(ANDROID_DIR / "gradlew.bat")]
-    return [str(ANDROID_DIR / "gradlew")]
+        return [str(ANDROID_GRADLE_ROOT / "gradlew.bat")]
+    return [str(ANDROID_GRADLE_ROOT / "gradlew")]

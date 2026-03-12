@@ -1,5 +1,6 @@
 /data/
 /temp/
+/dist/
 
 # CMake / Build
 build/

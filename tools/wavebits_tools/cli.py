@@ -8,11 +8,13 @@ from .commands import (
     cmd_android,
     cmd_build,
     cmd_configure,
+    cmd_export_apk,
     cmd_roundtrip,
     cmd_smoke,
     cmd_test,
     cmd_verify,
 )
+from .commands.verify import format_verify_check_groups
 from .constants import DEFAULT_BUILD_DIR, DEFAULT_GENERATOR, ROOT_DIR
 from .errors import ToolError
 from .paths import ensure_root
@@ -26,6 +28,20 @@ def add_common_build_dir_argument(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def add_host_modules_arguments(parser: argparse.ArgumentParser) -> None:
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--experimental-modules",
+        action="store_true",
+        help="Compatibility alias for the default host modules path. Host builds already enable WAVEBITS_HOST_MODULES=ON by default.",
+    )
+    group.add_argument(
+        "--no-modules",
+        action="store_true",
+        help="Configure or auto-configure the host build with WAVEBITS_HOST_MODULES=OFF to use the legacy header-compatible path.",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="run.py",
@@ -35,6 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     configure_parser = subparsers.add_parser("configure", help="Configure the root CMake build.")
     add_common_build_dir_argument(configure_parser)
+    add_host_modules_arguments(configure_parser)
     configure_parser.add_argument(
         "--generator",
         default=DEFAULT_GENERATOR,
@@ -44,6 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     build_parser_cmd = subparsers.add_parser("build", help="Build the configured CMake tree.")
     add_common_build_dir_argument(build_parser_cmd)
+    add_host_modules_arguments(build_parser_cmd)
     build_parser_cmd.add_argument(
         "--generator",
         default=DEFAULT_GENERATOR,
@@ -64,6 +82,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     test_parser = subparsers.add_parser("test", help="Run ctest for the configured build.")
     add_common_build_dir_argument(test_parser)
+    add_host_modules_arguments(test_parser)
     test_parser.add_argument(
         "--no-output-on-failure",
         dest="output_on_failure",
@@ -89,7 +108,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     test_parser.set_defaults(output_on_failure=True, write_report=True, func=cmd_test)
 
-    android_parser = subparsers.add_parser("android", help="Run the standard Android Gradle entrypoints.")
+    android_parser = subparsers.add_parser(
+        "android",
+        help="Run the standard Android Gradle tasks from the repo root.",
+        description=(
+            "Run Android Gradle tasks from the repository root.\n\n"
+            "Behavior:\n"
+            "- Uses the root Gradle wrapper, not apps/audio_android as a separate Gradle root.\n"
+            "- Resolves the action to the matching :app Gradle task.\n"
+            "- Optionally prepends `clean` before the selected task."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     android_parser.add_argument(
         "action",
         choices=["assemble-debug", "assemble-release", "native-debug"],
@@ -102,11 +132,56 @@ def build_parser() -> argparse.ArgumentParser:
     )
     android_parser.set_defaults(func=cmd_android)
 
+    export_apk_parser = subparsers.add_parser(
+        "export-apk",
+        help="Copy a built Android APK from Gradle outputs into dist/android.",
+        description=(
+            "Export a built Android APK into a stable delivery directory.\n\n"
+            "Behavior:\n"
+            "- Reads Gradle APK metadata from apps/audio_android/app/build/outputs/apk/<variant>/.\n"
+            "- Copies the selected APK into dist/android by default.\n"
+            "- Can optionally build the APK first with --assemble-if-missing."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    export_apk_parser.add_argument(
+        "variant",
+        nargs="?",
+        default="debug",
+        choices=["debug", "release"],
+        help="APK variant to export. Defaults to debug.",
+    )
+    export_apk_parser.add_argument(
+        "--out-dir",
+        help="Optional export directory. Defaults to dist/android/.",
+    )
+    export_apk_parser.add_argument(
+        "--filename",
+        help="Optional exported filename. Defaults to <repo>-android-<variant>-v<version>.apk.",
+    )
+    export_apk_parser.add_argument(
+        "--assemble-if-missing",
+        action="store_true",
+        help="Run the matching Gradle assemble task if the APK metadata is missing.",
+    )
+    export_apk_parser.set_defaults(func=cmd_export_apk)
+
     verify_parser = subparsers.add_parser(
         "verify",
-        help="Run configure + build + ctest, then Android assembleDebug by default.",
+        help="Run static policy checks + configure + build + ctest, then root Gradle :app:assembleDebug by default.",
+        description=(
+            "Run the full verify pipeline.\n\n"
+            f"{format_verify_check_groups()}\n\n"
+            "Behavior:\n"
+            "- Runs static check groups before configure/build/test.\n"
+            "- Builds and tests the selected host build directory.\n"
+            "- Runs root Android assembleDebug unless --skip-android is passed.\n\n"
+            "Use --list-checks to print the current static check groups without building."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     add_common_build_dir_argument(verify_parser)
+    add_host_modules_arguments(verify_parser)
     verify_parser.add_argument(
         "--generator",
         default=DEFAULT_GENERATOR,
@@ -115,7 +190,12 @@ def build_parser() -> argparse.ArgumentParser:
     verify_parser.add_argument(
         "--skip-android",
         action="store_true",
-        help="Skip the Android assembleDebug step.",
+        help="Skip the root Gradle :app:assembleDebug step.",
+    )
+    verify_parser.add_argument(
+        "--list-checks",
+        action="store_true",
+        help="Print the static check groups verify runs before building, then exit.",
     )
     verify_parser.set_defaults(func=cmd_verify)
 
@@ -124,6 +204,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Generate a WAV artifact and decode it back to text via the CLI.",
     )
     add_common_build_dir_argument(roundtrip_parser)
+    add_host_modules_arguments(roundtrip_parser)
     roundtrip_parser.add_argument(
         "--generator",
         default=DEFAULT_GENERATOR,
@@ -149,6 +230,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Generate visible roundtrip artifacts for representative flash/pro/ultra cases.",
     )
     add_common_build_dir_argument(smoke_parser)
+    add_host_modules_arguments(smoke_parser)
     smoke_parser.add_argument(
         "--generator",
         default=DEFAULT_GENERATOR,

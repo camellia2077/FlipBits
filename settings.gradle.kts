@@ -17,5 +17,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "audio_android"
+rootProject.name = "WaveBits"
 include(":app")
+project(":app").projectDir = file("apps/audio_android/app")
