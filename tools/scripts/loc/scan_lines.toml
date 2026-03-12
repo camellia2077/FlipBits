@@ -1,0 +1,74 @@
+# over_inclusive = true：判定逻辑为 大于等于 >=
+# over_inclusive = false：判定逻辑为 严格大于 >
+
+[cpp]
+display_name = "C++"
+default_paths = [
+  "apps/audio_android/app/src/main/cpp",
+  "apps/audio_cli/windows/src",
+  "libs/audio_api",
+  "libs/audio_core",
+  "libs/audio_io",
+  "Test",
+]
+extensions = [".cpp", ".h", ".hpp", ".cppm", ".cc", ".cxx", ".c"]
+ignore_dirs = [
+  ".git",
+  ".gradle",
+  ".idea",
+  ".kotlin",
+  ".vscode",
+  "vs",
+  "bin",
+  "obj",
+  "Debug",
+  "Release",
+  "__pycache__",
+]
+ignore_prefixes = ["dist", "cmake", "out", "build"]
+default_over_threshold = 350
+default_under_threshold = 120
+default_dir_over_files = 16
+over_inclusive = false
+
+[kt]
+display_name = "Kotlin"
+default_paths = [
+  "apps/audio_android/app/src/main/java",
+]
+extensions = [".kt", ".kts"]
+ignore_dirs = [
+  ".git",
+  ".gradle",
+  ".idea",
+  ".kotlin",
+  ".vscode",
+  "build",
+  "__pycache__",
+]
+ignore_prefixes = ["dist", "out"]
+default_over_threshold = 180
+default_under_threshold = 100
+default_dir_over_files = 8
+over_inclusive = false
+
+[py]
+display_name = "Python"
+default_paths = [
+  "tools",
+]
+extensions = [".py"]
+ignore_dirs = [
+  ".git",
+  ".gradle",
+  ".idea",
+  ".kotlin",
+  ".vscode",
+  "build",
+  "__pycache__",
+]
+ignore_prefixes = ["dist", "out"]
+default_over_threshold = 200
+default_under_threshold = 120
+default_dir_over_files = 10
+over_inclusive = false
