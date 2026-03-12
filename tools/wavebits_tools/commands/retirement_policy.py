@@ -245,7 +245,7 @@ def run_phase17_boundary_host_standardization_policy_checks() -> None:
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 17 regression detected in audited boundary-adjacent host files:\n"
+            "Boundary-adjacent host implementation regression detected in audited files:\n"
             f"{joined}"
         )
 
@@ -263,7 +263,7 @@ def run_phase18_compatibility_eviction_policy_checks() -> None:
     ]
     if missing_required:
         failures.append(
-            "Test/unit/unit_tests.cpp missing required Phase 18 coverage tokens: "
+            "Test/unit/unit_tests.cpp missing required wrapper-eviction coverage tokens: "
             + ", ".join(missing_required)
         )
 
@@ -305,7 +305,7 @@ def run_phase18_compatibility_eviction_policy_checks() -> None:
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 18 compatibility-eviction regression detected:\n"
+            "Retired wrapper regression detected:\n"
             f"{joined}"
         )
 
@@ -315,11 +315,11 @@ def run_phase19_bridge_retirement_policy_checks() -> None:
 
     for path in _LEGACY_HEADER_PATHS:
         if not path.exists():
-            failures.append(f"Phase 19 legacy carve-out header missing: {path.relative_to(ROOT_DIR)}")
+            failures.append(f"legacy carve-out header missing: {path.relative_to(ROOT_DIR)}")
 
     for path in _RETIRED_BRIDGE_HEADER_PATHS:
         if path.exists():
-            failures.append(f"retired Phase 19 bridge header still exists: {path.relative_to(ROOT_DIR)}")
+            failures.append(f"retired bridge header still exists: {path.relative_to(ROOT_DIR)}")
 
     for path, required_tokens, forbidden_tokens in (
         (_BAG_API_PATH, _BAG_API_REQUIRED_TOKENS, _BAG_API_FORBIDDEN_TOKENS),
@@ -329,7 +329,7 @@ def run_phase19_bridge_retirement_policy_checks() -> None:
         missing_required = [token for token in required_tokens if token not in content]
         if missing_required:
             failures.append(
-                f"{path.relative_to(ROOT_DIR)} missing required Phase 19 carve-out tokens: "
+                f"{path.relative_to(ROOT_DIR)} missing required legacy carve-out tokens: "
                 + ", ".join(missing_required)
             )
 
@@ -345,7 +345,7 @@ def run_phase19_bridge_retirement_policy_checks() -> None:
         missing_required = [token for token in required_tokens if token not in content]
         if missing_required:
             failures.append(
-                f"{path.relative_to(ROOT_DIR)} missing required Phase 19 legacy includes: "
+                f"{path.relative_to(ROOT_DIR)} missing required legacy includes: "
                 + ", ".join(missing_required)
             )
 
@@ -357,7 +357,7 @@ def run_phase19_bridge_retirement_policy_checks() -> None:
         ]
         if present_retired_tokens:
             failures.append(
-                f"{path.relative_to(ROOT_DIR)} references retired Phase 19 bridge headers: "
+                f"{path.relative_to(ROOT_DIR)} references retired bridge headers: "
                 + ", ".join(present_retired_tokens)
             )
 
@@ -369,13 +369,13 @@ def run_phase19_bridge_retirement_policy_checks() -> None:
             continue
 
         failures.append(
-            f"{path.relative_to(ROOT_DIR)} should not include Phase 19 legacy carve-out headers"
+            f"{path.relative_to(ROOT_DIR)} should not include legacy carve-out headers outside approved owners"
         )
 
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 19 bridge-retirement regression detected:\n"
+            "Legacy carve-out / bridge-retirement regression detected:\n"
             f"{joined}"
         )
 

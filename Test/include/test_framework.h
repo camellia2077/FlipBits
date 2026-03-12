@@ -70,4 +70,14 @@ inline void AssertContains(const std::string& haystack,
     }
 }
 
+template <typename Fn>
+inline void AssertThrows(Fn&& fn, const std::string& message) {
+    try {
+        fn();
+    } catch (...) {
+        return;
+    }
+    Fail(message);
+}
+
 }  // namespace test

@@ -101,6 +101,6 @@ inline std::string BuildTooLongUltraCorpus() {
     return text;
 }
 
-inline constexpr char kExpectedCoreVersion[] = "0.3.0";
+inline constexpr char kExpectedCoreVersion[] = "0.3.1";
 
 }  // namespace test

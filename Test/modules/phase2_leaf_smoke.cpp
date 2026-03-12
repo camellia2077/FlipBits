@@ -1,5 +1,8 @@
 #include "test_std_support.h"
+#include "test_audio_io.h"
+#include "test_fs.h"
 #include "test_framework.h"
+#include "test_vectors.h"
 #include "test_utf8.h"
 
 import audio_io.wav;
@@ -13,19 +16,29 @@ import bag.ultra.codec;
 namespace {
 
 void TestVersionModule() {
-    test::AssertEq(std::string(bag::CoreVersion()), std::string("0.3.0"), "Version module should expose core version.");
+    test::AssertEq(
+        std::string(bag::CoreVersion()),
+        std::string(test::kExpectedCoreVersion),
+        "Version module should expose core version.");
 }
 
-void TestAudioIoModuleRoundTrip() {
-    constexpr const char kAudioIoSmokePath[] = "modules_phase2_audio_io_smoke.wav";
-    const std::vector<std::int16_t> pcm = {0, 1200, -1200, 3276, -3276};
+void TestAudioIoModuleRoundTripContract() {
+    const auto dir = test::MakeTempDir("modules_phase2");
+    for (const auto& test_case : test::AudioIoRoundTripCases()) {
+        const auto path = dir / (std::string(test_case.name) + ".wav");
+        audio_io::WriteMonoPcm16Wav(path, test_case.sample_rate_hz, test_case.mono_pcm);
+        const auto wav = audio_io::ReadMonoPcm16Wav(path);
+        test::AssertAudioIoRoundTripResult(wav, test_case, "Module audio_io boundary");
+    }
+}
 
-    std::remove(kAudioIoSmokePath);
-    audio_io::WriteMonoPcm16Wav(kAudioIoSmokePath, 44100, pcm);
-    const auto wav = audio_io::ReadMonoPcm16Wav(kAudioIoSmokePath);
-    std::remove(kAudioIoSmokePath);
-    test::AssertEq(wav.sample_rate_hz, 44100, "audio_io module should preserve the sample rate.");
-    test::AssertEq(wav.mono_pcm, pcm, "audio_io module should preserve mono PCM content.");
+void TestAudioIoModuleReadMissingFileFails() {
+    const auto missing_path = test::MakeTempDir("modules_phase2") / "missing.wav";
+    test::AssertThrows(
+        [&] {
+            (void)audio_io::ReadMonoPcm16Wav(missing_path);
+        },
+        "Module audio_io boundary should throw when the input file does not exist.");
 }
 
 void TestFlashCodecModule() {
@@ -132,7 +145,8 @@ void TestCompatFrameCodecModule() {
 int main() {
     test::Runner runner;
     runner.Add("ModulesPhase2.VersionModule", TestVersionModule);
-    runner.Add("ModulesPhase2.AudioIoModuleRoundTrip", TestAudioIoModuleRoundTrip);
+    runner.Add("ModulesPhase2.AudioIoModuleRoundTripContract", TestAudioIoModuleRoundTripContract);
+    runner.Add("ModulesPhase2.AudioIoModuleReadMissingFileFails", TestAudioIoModuleReadMissingFileFails);
     runner.Add("ModulesPhase2.FlashCodecModule", TestFlashCodecModule);
     runner.Add("ModulesPhase2.ProCodecModule", TestProCodecModule);
     runner.Add("ModulesPhase2.UltraCodecModule", TestUltraCodecModule);

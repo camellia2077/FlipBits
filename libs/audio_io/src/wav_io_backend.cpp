@@ -1,36 +1,38 @@
-#pragma once
-
 #include <cstdint>
 #include <filesystem>
 #include <stdexcept>
-#include <utility>
 #include <vector>
+
+#include "wav_io_backend.h"
 
 #include <sndfile.h>
 
 namespace audio_io::detail {
+namespace {
 
-inline std::vector<int16_t> ToMono(const std::vector<int16_t>& interleaved, int channels) {
+std::vector<std::int16_t> ToMono(const std::vector<std::int16_t>& interleaved, int channels) {
     if (channels <= 1) {
         return interleaved;
     }
 
-    const size_t frames = interleaved.size() / static_cast<size_t>(channels);
-    std::vector<int16_t> mono(frames, 0);
-    for (size_t frame = 0; frame < frames; ++frame) {
-        int64_t sum = 0;
+    const std::size_t frames = interleaved.size() / static_cast<std::size_t>(channels);
+    std::vector<std::int16_t> mono(frames, 0);
+    for (std::size_t frame = 0; frame < frames; ++frame) {
+        std::int64_t sum = 0;
         for (int ch = 0; ch < channels; ++ch) {
-            sum += interleaved[frame * static_cast<size_t>(channels) + static_cast<size_t>(ch)];
+            sum += interleaved[frame * static_cast<std::size_t>(channels) + static_cast<std::size_t>(ch)];
         }
-        mono[frame] = static_cast<int16_t>(sum / channels);
+        mono[frame] = static_cast<std::int16_t>(sum / channels);
     }
     return mono;
 }
 
-inline void WriteMonoPcm16WavImpl(const std::filesystem::path& output_path,
-                                  int sample_rate_hz,
-                                  const std::vector<int16_t>& pcm) {
-    auto parent = output_path.parent_path();
+}  // namespace
+
+void WriteMonoPcm16WavBackend(const std::filesystem::path& output_path,
+                              int sample_rate_hz,
+                              const std::vector<std::int16_t>& pcm) {
+    const auto parent = output_path.parent_path();
     if (!parent.empty()) {
         std::filesystem::create_directories(parent);
     }
@@ -45,14 +47,17 @@ inline void WriteMonoPcm16WavImpl(const std::filesystem::path& output_path,
         throw std::runtime_error(sf_strerror(nullptr));
     }
 
-    const sf_count_t written = sf_write_short(file, pcm.data(), static_cast<sf_count_t>(pcm.size()));
+    const sf_count_t written = sf_write_short(
+        file,
+        pcm.data(),
+        static_cast<sf_count_t>(pcm.size()));
     sf_close(file);
     if (written != static_cast<sf_count_t>(pcm.size())) {
         throw std::runtime_error("Failed to write full WAV data.");
     }
 }
 
-inline std::pair<int, std::vector<int16_t>> ReadMonoPcm16WavImpl(const std::filesystem::path& input_path) {
+WavIoReadResult ReadMonoPcm16WavBackend(const std::filesystem::path& input_path) {
     SF_INFO info{};
     SNDFILE* file = sf_open(input_path.string().c_str(), SFM_READ, &info);
     if (file == nullptr) {
@@ -60,7 +65,7 @@ inline std::pair<int, std::vector<int16_t>> ReadMonoPcm16WavImpl(const std::file
     }
 
     const sf_count_t total_samples = info.frames * info.channels;
-    std::vector<int16_t> interleaved(static_cast<size_t>(total_samples), 0);
+    std::vector<std::int16_t> interleaved(static_cast<std::size_t>(total_samples), 0);
     const sf_count_t read_count = sf_read_short(file, interleaved.data(), total_samples);
     sf_close(file);
 
@@ -68,7 +73,10 @@ inline std::pair<int, std::vector<int16_t>> ReadMonoPcm16WavImpl(const std::file
         throw std::runtime_error("Failed to read full WAV data.");
     }
 
-    return {info.samplerate, ToMono(interleaved, info.channels)};
+    WavIoReadResult result{};
+    result.sample_rate_hz = info.samplerate;
+    result.mono_pcm = ToMono(interleaved, info.channels);
+    return result;
 }
 
 }  // namespace audio_io::detail

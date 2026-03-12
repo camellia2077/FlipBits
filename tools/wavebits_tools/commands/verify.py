@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Callable
 
 from .android import cmd_android
+from .audio_io_boundary_policy import run_audio_io_boundary_policy_checks
 from .boundary_policy import run_boundary_policy_checks
 from .build import cmd_build
 from .compatibility_policy import run_compatibility_policy_checks
@@ -19,28 +20,33 @@ from ..paths import resolve_build_dir
 VERIFY_CHECK_GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     (
         "module_structure",
-        "Audit named-module implementation units and module-first wiring.",
-        ("core_implementation_modules",),
+        "Guard current named-module implementation units and module-first wiring.",
+        ("named_module_tus", "module_first_wiring"),
     ),
     (
         "boundary",
-        "Guard CLI/JNI/test allowed surfaces and keep module-first tests from regressing.",
-        ("consumer_surfaces", "test_surfaces"),
+        "Guard stable consumer surfaces and keep boundary-first/module-first tests separated.",
+        ("consumer_surfaces", "boundary_first_tests", "module_first_tests"),
     ),
     (
         "host_import_std",
-        "Guard audited host-only import-std coverage in implementation and module interface files.",
-        ("pilot_files", "expansion_files", "core_interfaces", "foundation_modules"),
+        "Guard the current host-only import-std footprint across core, foundation, boundary-adjacent, and audio_io front-ends.",
+        ("core_implementations", "core_interfaces", "foundation_modules", "boundary_hosts", "audio_io_frontends"),
+    ),
+    (
+        "audio_io_boundary",
+        "Guard the permanent audio_io boundary model, private backend split, and sndfile containment.",
+        ("stable_wav_boundary", "private_backend_split", "third_party_containment"),
     ),
     (
         "compatibility",
-        "Guard compatibility headers and direct-consumer standardization from drifting back.",
-        ("compatibility_sources", "direct_consumers", "outer_headers"),
+        "Guard the current compatibility surface, direct consumers, and retired outer headers.",
+        ("compatibility_includes", "direct_consumers", "retired_outer_headers"),
     ),
     (
         "retirement",
-        "Guard boundary-adjacent host wiring, retired wrappers, and explicit legacy carve-out surfaces.",
-        ("boundary_host_impl", "wrapper_eviction", "bridge_retirement"),
+        "Guard boundary-adjacent host wiring, retired wrappers, and legacy carve-out ownership.",
+        ("boundary_hosts", "retired_wrappers", "legacy_carve_outs"),
     ),
 )
 
@@ -48,6 +54,7 @@ VERIFY_STATIC_CHECK_RUNNERS: tuple[tuple[str, Callable[[], None]], ...] = (
     ("module_structure", run_module_structure_policy_checks),
     ("boundary", run_boundary_policy_checks),
     ("host_import_std", run_host_import_std_policy_checks),
+    ("audio_io_boundary", run_audio_io_boundary_policy_checks),
     ("compatibility", run_compatibility_policy_checks),
     ("retirement", run_retirement_policy_checks),
 )
@@ -58,7 +65,7 @@ def _print_verify_banner(message: str) -> None:
 
 
 def format_verify_check_groups() -> str:
-    lines = ["Static check groups run before configure/build/test:"]
+    lines = ["Current static check groups run before configure/build/test:"]
     for name, description, subchecks in VERIFY_CHECK_GROUPS:
         lines.append(f"- {name}: {description}")
         lines.append(f"  Includes: {', '.join(subchecks)}")

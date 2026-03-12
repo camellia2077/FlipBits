@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "test_std_support.h"
+#include "test_audio_io.h"
 #include "test_framework.h"
 #include "test_fs.h"
 #include "test_utf8.h"
@@ -61,25 +62,23 @@ void TestDecodeEmptyInputReturnsEmptyText() {
     test::AssertEq(decoded, std::string(), "Decoding empty input should return empty string.");
 }
 
-void TestWavIoMonoRoundTrip() {
-    const auto config = MakeBfskConfig();
-    const std::string text = "Unit";
-    const auto pcm = bag::flash::EncodeBytesToPcm16(AsBytes(text), config);
-
+void TestWavIoHeaderRoundTripContract() {
     const auto dir = test::MakeTempDir("unit");
-    const auto path = dir / "mono_roundtrip.wav";
-    audio_io::WriteMonoPcm16Wav(path, config.sample_rate_hz, pcm);
+    for (const auto& test_case : test::AudioIoRoundTripCases()) {
+        const auto path = dir / (std::string(test_case.name) + ".wav");
+        audio_io::WriteMonoPcm16Wav(path, test_case.sample_rate_hz, test_case.mono_pcm);
+        const auto read_back = audio_io::ReadMonoPcm16Wav(path);
+        test::AssertAudioIoRoundTripResult(read_back, test_case, "Header audio_io boundary");
+    }
+}
 
-    const auto read_back = audio_io::ReadMonoPcm16Wav(path);
-    test::AssertEq(
-        read_back.sample_rate_hz,
-        config.sample_rate_hz,
-        "Sample rate should be preserved in wav read/write.");
-    test::AssertEq(
-        read_back.mono_pcm.size(),
-        pcm.size(),
-        "Sample count should be preserved in mono wav read/write.");
-    test::AssertEq(read_back.mono_pcm, pcm, "PCM content should be identical after roundtrip.");
+void TestWavIoHeaderReadMissingFileFails() {
+    const auto missing_path = test::MakeTempDir("unit") / "missing.wav";
+    test::AssertThrows(
+        [&] {
+            (void)audio_io::ReadMonoPcm16Wav(missing_path);
+        },
+        "Header audio_io boundary should throw when the input file does not exist.");
 }
 
 void TestSnapshotFirstSamplesStable() {
@@ -255,7 +254,8 @@ int main() {
     runner.Add("Unit.EncodeLengthMatchesExpected", TestEncodeLengthMatchesExpected);
     runner.Add("Unit.EncodeAmplitudeInRange", TestEncodeAmplitudeInRange);
     runner.Add("Unit.DecodeEmptyInputReturnsEmptyText", TestDecodeEmptyInputReturnsEmptyText);
-    runner.Add("Unit.WavIoMonoRoundTrip", TestWavIoMonoRoundTrip);
+    runner.Add("Unit.WavIoHeaderRoundTripContract", TestWavIoHeaderRoundTripContract);
+    runner.Add("Unit.WavIoHeaderReadMissingFileFails", TestWavIoHeaderReadMissingFileFails);
     runner.Add("Unit.SnapshotFirstSamplesStable", TestSnapshotFirstSamplesStable);
     runner.Add("Unit.ProCodecRoundTrip", TestProCodecRoundTrip);
     runner.Add("Unit.ProCodecRejectsInvalidInput", TestProCodecRejectsInvalidInput);

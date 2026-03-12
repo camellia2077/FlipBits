@@ -51,7 +51,7 @@ def run_phase7_import_policy_checks() -> None:
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 7 import policy regression detected in audited source files:\n"
+            "Named-module structure regression detected in audited source files:\n"
             f"{joined}"
         )
 

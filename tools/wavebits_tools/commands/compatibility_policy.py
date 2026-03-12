@@ -91,7 +91,7 @@ def run_phase9_compatibility_header_policy_checks() -> None:
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 9 compatibility-header regression detected in libs/*/src:\n"
+            "Compatibility-only include regression detected in libs/*/src:\n"
             f"{joined}"
         )
 
@@ -108,13 +108,13 @@ def run_phase15_consumer_standardization_policy_checks() -> None:
     for path in _PHASE15_RETIRED_HEADERS:
         if path.exists():
             failures.append(
-                f"{path.relative_to(ROOT_DIR)} should stay retired after Phase 19"
+                f"{path.relative_to(ROOT_DIR)} should stay retired in the current direct-consumer end-state"
             )
 
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 15 regression detected in audited direct consumer files:\n"
+            "Direct-consumer standardization regression detected in audited files:\n"
             f"{joined}"
         )
 
@@ -124,13 +124,13 @@ def run_phase16_outer_header_standardization_policy_checks() -> None:
     for path in _PHASE16_RETIRED_OUTER_HEADERS:
         if path.exists():
             failures.append(
-                f"{path.relative_to(ROOT_DIR)} should stay retired after Phase 19"
+                f"{path.relative_to(ROOT_DIR)} should stay retired in the current compatibility end-state"
             )
 
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 16 regression detected in audited outer compatibility files:\n"
+            "Retired outer compatibility surface regression detected:\n"
             f"{joined}"
         )
 

@@ -5,7 +5,7 @@
 ## 目标
 - 盘点当前仍保留在 `include/` 下的公开头文件。
 - 说明它们为什么还存在，以及哪些属于长期边界，哪些只是兼容层。
-- 避免在后续 modules 收口时误删稳定接口。
+- 避免误删稳定接口，并把长期边界与兼容层清楚分开。
 
 ## 长期边界头
 
@@ -30,14 +30,16 @@
 - 说明：
   - `audio_io.wav` 已存在，但当前 GCC/libstdc++ modules-ts 路径下，不适合强推所有消费端改为 `import audio_io.wav`
   - 因此 `wav_io.h` 继续作为稳定 header boundary 保留
+  - 当前 shared-header implementation chain 已退休；真正的 `sndfile` / 文件系统 owner 收回到 `libs/audio_io/src/wav_io_backend.cpp`
+  - `wav_io.h` 现在只保留稳定声明，不再承担 module/header 双入口共享实现
 
-## Phase 19 结论
+## 当前 `audio_core` 兼容层结论
 - `audio_core` 面向 host / Android / no-modules 的 shared bridge headers 已完成退休。
 - host 默认路径现在直接消费 modules。
 - Android / no-modules / legacy fallback 需要的声明，统一通过 `bag/legacy/**` 暴露。
 - 当前留在 `include/bag/` 主树下的头，已经不再承担 `audio_core` 主线 bridge 语义。
 
-## Phase 19 legacy carve-out surface
+## 当前 legacy carve-out surface
 - `libs/audio_core/include/bag/legacy/common/config.h`
 - `libs/audio_core/include/bag/legacy/common/error_code.h`
 - `libs/audio_core/include/bag/legacy/common/types.h`
@@ -55,14 +57,14 @@
 - `libs/audio_core/include/bag/legacy/ultra/phy_compat.h`
 - `libs/audio_core/include/bag/legacy/ultra/phy_clean.h`
 - 说明：
-  - 这是 `Phase 19` 新增并扩面的显式 declaration surface
+  - 这是当前显式 declaration surface
   - 目标是把 Android / `--no-modules` 需要保留的声明，从共享 host bridge 语义里切出来
   - 当前允许直接 include 这层 surface 的路径收敛为：
     - `libs/audio_api/src/bag_api.cpp`
     - `Test/unit/unit_tests.cpp`
     - `libs/audio_core/src/*.cpp` 的 no-modules fallback
 
-## 已在 Phase 18 退休的 compatibility-only wrappers
+## 已退休的 compatibility-only wrappers
 - `libs/audio_core/include/bag/pro/text_codec.h`
 - `libs/audio_core/src/pro/text_codec.cpp`
 - `libs/audio_core/include/bag/pro/frame_codec.h`
@@ -73,7 +75,7 @@
   - `unit_tests` 已改为直接覆盖 `bag.flash.phy_clean`、`bag.pro.codec`、`bag.transport.compat.frame_codec`
   - `src/fsk/fsk_codec.cpp` 仍保留为 `bag.fsk.codec` 的 module implementation，但不再通过 header wrapper 暴露
 
-## 已在 Phase 19 退休的 shared bridge headers
+## 已退休的 shared bridge headers
 - `libs/audio_core/include/bag/common/config.h`
 - `libs/audio_core/include/bag/common/error_code.h`
 - `libs/audio_core/include/bag/common/types.h`
@@ -91,7 +93,7 @@
 - `libs/audio_core/include/bag/ultra/phy_compat.h`
 - `libs/audio_core/include/bag/ultra/phy_clean.h`
 - 说明：
-  - 这批头在 `Phase 19` 中已完成 owner 切分、consumer evacuation 与最终退休
+  - 这批头已完成 owner 切分、consumer evacuation 与最终退休
   - host 默认路径继续直接 `import bag.*`
   - no-modules / Android 相关声明入口已迁到 `bag/legacy/**`
 
@@ -133,11 +135,11 @@
   - `Test/**`
 - 说明：
   - 测试属于内部验证面，不纳入 consumer-boundary 限制
-  - `Phase 19` 起，legacy branch 优先通过 `bag/legacy/**` 覆盖 Android / no-modules carve-out
+  - 当前 legacy branch 优先通过 `bag/legacy/**` 覆盖 Android / no-modules carve-out
   - modules 路径仍可继续直接 `import bag.*`
 
 ## 收口原则
 - 不要把“compatibility layer inventory”理解成“立刻删头文件”
 - 长期边界头优先保证稳定，不追求 module-only
-- `Phase 19` 起，Android / no-modules 需要的声明入口优先通过 `bag/legacy/**` 显式表达
-- `audio_core` 的 shared bridge headers 已完成收口；下一阶段不应再把它们带回主线
+- Android / no-modules 需要的声明入口优先通过 `bag/legacy/**` 显式表达
+- `audio_core` 的 shared bridge headers 已完成收口；不应再把它们带回主线

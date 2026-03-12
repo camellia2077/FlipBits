@@ -18,12 +18,14 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
 - `build`：执行 `cmake --build`
 - `test`：执行 `ctest`，默认同时输出机器可读 `summary.json` 和人工可读 `run.log`
 - `verify`：执行 `configure + build + test`，默认再跑根目录 `Gradle` 的 `:app:assembleDebug`
-  - 在进入构建前，会先执行 5 组长期语义的静态检查：
+  - 在进入构建前，会先执行 6 组长期语义的静态检查：
     - `module_structure`
     - `boundary`
     - `host_import_std`
+    - `audio_io_boundary`
     - `compatibility`
     - `retirement`
+  - 运行过程中会输出分步 banner，并直接透传 configure/build/test/Android 的实时日志，避免长时间构建看起来像卡死
   - 可使用 `python tools/run.py verify --list-checks` 查看当前分组与子检查项
 - `android`：执行仓库根目录的标准 `Gradle` 任务，模块源码位于 `apps/audio_android/app`
 - `export-apk`：读取 Gradle 的 APK metadata，并将最终 APK 复制到根目录 `dist/android/`
@@ -34,6 +36,9 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
   - 如果同一个 `build/` 目录之前是用别的编译器配置的，`configure` 会自动做一次 `cmake --fresh`
 - `--no-modules`：只作用于 host CMake 链路，显式回退到 `WAVEBITS_HOST_MODULES=OFF` 的 retirement baseline 路径，不再代表长期正式目标
   - 当前 `bag_api.cpp`、`unit_tests` 与 `bag_core` 的 no-modules 实现入口已显式切到 `libs/audio_core/include/bag/legacy/**`
+- 当前长期保留的非-module 边界为：
+  - `libs/audio_api/include/bag_api.h`
+  - `libs/audio_io/include/wav_io.h`
 - `--experimental-modules`：兼容别名；当前 host 默认已经开启 modules
 
 ## Android 入口
@@ -42,6 +47,7 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
   - macOS/Linux：`./gradlew :app:assembleDebug`
 - `apps/audio_android` 不再是独立 `Gradle` root，只保留源码与模块资源。
 - Android Studio / IntelliJ 导入项目时，应直接打开仓库根目录 `C:\code\WaveBits`。
+- Android native 当前固定继续走 `CMake 3.22.1 + C++17 + bag_api.h` 的例外路线，不直接跟随 host modules 主路径。
 
 ## 示例
 

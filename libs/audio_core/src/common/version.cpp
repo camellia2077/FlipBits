@@ -11,7 +11,7 @@ module bag.common.version;
 namespace bag {
 
 const char* CoreVersion() {
-    return "0.3.0";
+    return "0.3.1";
 }
 
 }  // namespace bag

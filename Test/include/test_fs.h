@@ -1,11 +1,13 @@
 #pragma once
 
+#if !defined(WAVEBITS_TEST_IMPORT_STD)
 #include <atomic>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#endif
 
 namespace test {
 

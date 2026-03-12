@@ -194,6 +194,29 @@ _PHASE14_RETIRED_COMMON_HEADERS: tuple[Path, ...] = (
     ROOT_DIR / "libs" / "audio_core" / "include" / "bag" / "common" / "version.h",
 )
 
+_PHASE21_IMPORT_STD_RULES: dict[Path, tuple[str, ...]] = {
+    ROOT_DIR / "libs" / "audio_io" / "CMakeLists.txt": (
+        "WAVEBITS_AUDIO_IO_IMPORT_STD=1",
+        "CXX_MODULE_STD ON",
+    ),
+    ROOT_DIR / "libs" / "audio_io" / "modules" / "audio_io" / "wav.cppm": (
+        "WAVEBITS_AUDIO_IO_IMPORT_STD",
+        "import std;",
+        "std::vector<std::int16_t>",
+    ),
+    ROOT_DIR / "libs" / "audio_io" / "modules" / "audio_io" / "wav_impl.cpp": (
+        "WAVEBITS_AUDIO_IO_IMPORT_STD",
+        "import std;",
+        '#include "../../src/wav_io_backend.h"',
+    ),
+    ROOT_DIR / "libs" / "audio_io" / "src" / "wav_io.cpp": (
+        "WAVEBITS_AUDIO_IO_IMPORT_STD",
+        "import std;",
+        '#include "wav_io.h"',
+        '#include "wav_io_backend.h"',
+    ),
+}
+
 
 def _run_required_token_rules(
     rules: dict[Path, tuple[str, ...]],
@@ -216,21 +239,21 @@ def _run_required_token_rules(
 def run_phase11_import_std_policy_checks() -> None:
     _run_required_token_rules(
         _PHASE11_IMPORT_STD_RULES,
-        error_prefix="Phase 11 import-std regression detected in audited host pilot files:",
+        error_prefix="Host import-std regression detected in audited core implementation files:",
     )
 
 
 def run_phase12_import_std_policy_checks() -> None:
     _run_required_token_rules(
         _PHASE12_IMPORT_STD_RULES,
-        error_prefix="Phase 12 import-std regression detected in audited host expansion files:",
+        error_prefix="Host import-std regression detected in audited expanded implementation and leaf interface files:",
     )
 
 
 def run_phase13_import_std_policy_checks() -> None:
     _run_required_token_rules(
         _PHASE13_IMPORT_STD_RULES,
-        error_prefix="Phase 13 import-std regression detected in audited core interface files:",
+        error_prefix="Host import-std regression detected in audited core interface files:",
     )
 
 
@@ -246,15 +269,22 @@ def run_phase14_import_std_policy_checks() -> None:
     for path in _PHASE14_RETIRED_COMMON_HEADERS:
         if path.exists():
             failures.append(
-                f"{path.relative_to(ROOT_DIR)} should stay retired after Phase 19"
+                f"{path.relative_to(ROOT_DIR)} should stay retired in the current foundation end-state"
             )
 
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 14 regression detected in audited bag.common foundation files:\n"
+            "Foundation module standardization regression detected in audited bag.common files:\n"
             f"{joined}"
         )
+
+
+def run_phase21_import_std_policy_checks() -> None:
+    _run_required_token_rules(
+        _PHASE21_IMPORT_STD_RULES,
+        error_prefix="audio_io host import-std regression detected in audited front-end files:",
+    )
 
 
 def run_host_import_std_policy_checks() -> None:
@@ -262,3 +292,4 @@ def run_host_import_std_policy_checks() -> None:
     run_phase12_import_std_policy_checks()
     run_phase13_import_std_policy_checks()
     run_phase14_import_std_policy_checks()
+    run_phase21_import_std_policy_checks()

@@ -50,16 +50,23 @@
 - 作用：WAV 读写与文件 I/O 边界。
 - 最常先看的文件：
   - `libs/audio_io/modules/audio_io/wav.cppm`
+  - `libs/audio_io/modules/audio_io/wav_impl.cpp`
   - `libs/audio_io/include/wav_io.h`
   - `libs/audio_io/src/wav_io.cpp`
+  - `libs/audio_io/src/wav_io_backend.h`
+  - `libs/audio_io/src/wav_io_backend.cpp`
+- 当前边界：
+  - `wav_io.h` 是长期保留 header boundary
+  - `audio_io.wav` 是 host 内部优先入口
+  - `sndfile` 只允许停留在 `wav_io_backend.cpp`
 
 ## `audio_core` 模块级地图
 
 host 根目录 CMake 构建默认开启 `WAVEBITS_HOST_MODULES=ON`。
 `include/` 下保留下来的大部分公开头文件，现在主要承担 compatibility layer 作用：
 - C++20 host 路径下，优先 `import` 对应 module
-- `Phase 19` 起，`bag_api.cpp` 与 `unit_tests` 的 legacy fallback 改为优先消费 `libs/audio_core/include/bag/legacy/**`
-- `audio_core` 旧的 shared bridge headers 已在 `Phase 19` 退休
+- `bag_api.cpp` 与 `unit_tests` 的 legacy fallback 改为优先消费 `libs/audio_core/include/bag/legacy/**`
+- `audio_core` 旧的 shared bridge headers 已退休
 - 详细分级见：
   - `docs/architecture/compatibility-layer-inventory.md`
 
@@ -130,7 +137,7 @@ host 根目录 CMake 构建默认开启 `WAVEBITS_HOST_MODULES=ON`。
 - 当前语义：
   - host module-first helper
   - 复用 `flash/BFSK` 的字节 <-> PCM 能力
-  - `Phase 18` 已删除旧 `include/bag/fsk/fsk_codec.h` wrapper
+  - 旧 `include/bag/fsk/fsk_codec.h` wrapper 已删除
 
 ## 兼容/遗留文件：通常不要先看
 以下文件当前不属于 clean 主链路的第一阅读入口；只有在处理兼容行为、迁移遗留逻辑或专门修改旧接口时再看：
@@ -143,7 +150,7 @@ host 根目录 CMake 构建默认开启 `WAVEBITS_HOST_MODULES=ON`。
 - `libs/audio_core/src/phy/*`
 - 额外约束：
   - `libs/*/src` 的新实现不应继续新增对这些 compatibility-only 头的依赖
-  - `python tools/run.py verify` 已包含对应静态门禁；`Phase 18` 还会阻止已删除 wrappers 被重新引入
+  - `python tools/run.py verify` 已包含对应静态门禁，并会阻止已删除 wrappers 被重新引入
 
 ## 当前不能直接走 modules 的目标
 - Android native：
@@ -153,11 +160,13 @@ host 根目录 CMake 构建默认开启 `WAVEBITS_HOST_MODULES=ON`。
     - `docs/architecture/android-app-architecture.md`
 - 对外 C ABI：
   - `libs/audio_api/include/bag_api.h` 不能改成 module-only 接口
+- 对外文件 I/O 边界：
+  - `libs/audio_io/include/wav_io.h` 继续作为稳定 header boundary，不改成 module-only 接口
 - 平台消费端：
   - `apps/audio_cli/windows/src/main.cpp`
   - `apps/audio_android/app/src/main/cpp/jni_bridge.cpp`
   - 这些文件应继续只依赖稳定 C ABI，而不是直接 import `libs/audio_core` 内部 modules
-- Android 路线与升级条件见：
+- Android 例外路线说明见：
   - `docs/architecture/android-native-strategy.md`
 
 ## 按任务快速跳转
@@ -227,13 +236,17 @@ host 根目录 CMake 构建默认开启 `WAVEBITS_HOST_MODULES=ON`。
   - Android Studio 直接打开仓库根目录，不打开 `apps/audio_android`
 - Android 应用层结构与调用链见：
   - `docs/architecture/android-app-architecture.md`
-- Android native 默认路线与升级条件见：
+- Android native 当前例外路线说明见：
   - `docs/architecture/android-native-strategy.md`
 
 ### 改 WAV / I/O
 - 先看：
+  - `libs/audio_io/modules/audio_io/wav.cppm`
+  - `libs/audio_io/modules/audio_io/wav_impl.cpp`
   - `libs/audio_io/include/wav_io.h`
   - `libs/audio_io/src/wav_io.cpp`
+  - `libs/audio_io/src/wav_io_backend.h`
+  - `libs/audio_io/src/wav_io_backend.cpp`
 - 再看：
   - `Test/unit/unit_tests.cpp`
   - `Test/artifact/artifact_tests.cpp`

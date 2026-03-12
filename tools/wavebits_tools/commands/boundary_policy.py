@@ -129,7 +129,7 @@ def _run_boundary_rules(
 def run_consumer_boundary_policy_checks() -> None:
     _run_boundary_rules(
         _CONSUMER_SOURCE_RULES,
-        error_prefix="Phase 8 consumer-boundary regression detected:",
+        error_prefix="Consumer boundary regression detected:",
     )
 
 
@@ -168,7 +168,7 @@ def run_phase10_test_boundary_policy_checks() -> None:
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise ToolError(
-            "Phase 10 test-boundary regression detected:\n"
+            "Test boundary regression detected:\n"
             f"{joined}"
         )
 
