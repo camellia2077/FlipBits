@@ -44,6 +44,18 @@ void TestAudioIoModuleRoundTripContract() {
     }
 }
 
+void TestAudioIoModuleBytesRoundTripContract() {
+    for (const auto& test_case : test::AudioIoRoundTripCases()) {
+        const auto wav_bytes = audio_io::SerializeMonoPcm16Wav(test_case.sample_rate_hz, test_case.mono_pcm);
+        const auto parsed = audio_io::ParseMonoPcm16Wav(wav_bytes);
+        test::AssertEq(
+            parsed.status,
+            audio_io::WavPcm16Status::kOk,
+            "Module bytes route should parse canonical mono PCM16 WAV bytes.");
+        test::AssertAudioIoRoundTripResult(parsed.wav, test_case, "Module audio_io bytes boundary");
+    }
+}
+
 void TestAudioIoModuleReadMissingFileFails() {
     const auto missing_path = test::MakeTempDir("modules_phase2") / "missing.wav";
     test::AssertThrows(
@@ -51,6 +63,15 @@ void TestAudioIoModuleReadMissingFileFails() {
             (void)audio_io::ReadMonoPcm16Wav(missing_path);
         },
         "Module audio_io boundary should throw when the input file does not exist.");
+}
+
+void TestAudioIoModuleRejectsInvalidBytes() {
+    const std::vector<std::uint8_t> bad_header = {'N', 'O', 'T', 'W', 'A', 'V', 'E'};
+    const auto parsed = audio_io::ParseMonoPcm16Wav(bad_header);
+    test::AssertEq(
+        parsed.status,
+        audio_io::WavPcm16Status::kInvalidHeader,
+        "Module bytes route should reject invalid RIFF/WAVE bytes.");
 }
 
 void TestFlashCodecModule() {
@@ -346,7 +367,9 @@ int main() {
     test::Runner runner;
     runner.Add("ModulesPhase2.VersionModule", TestVersionModule);
     runner.Add("ModulesPhase2.AudioIoModuleRoundTripContract", TestAudioIoModuleRoundTripContract);
+    runner.Add("ModulesPhase2.AudioIoModuleBytesRoundTripContract", TestAudioIoModuleBytesRoundTripContract);
     runner.Add("ModulesPhase2.AudioIoModuleReadMissingFileFails", TestAudioIoModuleReadMissingFileFails);
+    runner.Add("ModulesPhase2.AudioIoModuleRejectsInvalidBytes", TestAudioIoModuleRejectsInvalidBytes);
     runner.Add("ModulesPhase2.FlashCodecModule", TestFlashCodecModule);
     runner.Add("ModulesPhase2.FlashPhyCleanEncodeLengthMatchesExpected", TestFlashPhyCleanEncodeLengthMatchesExpected);
     runner.Add("ModulesPhase2.FlashPhyCleanAmplitudeInRange", TestFlashPhyCleanAmplitudeInRange);

@@ -1,5 +1,7 @@
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <stdexcept>
 #include <vector>
 
@@ -7,75 +9,71 @@
 
 #include <sndfile.h>
 
+#include "wav_io_bytes_impl.inc"
+
 namespace audio_io::detail {
-namespace {
 
-std::vector<std::int16_t> ToMono(const std::vector<std::int16_t>& interleaved, int channels) {
-    if (channels <= 1) {
-        return interleaved;
-    }
-
-    const std::size_t frames = interleaved.size() / static_cast<std::size_t>(channels);
-    std::vector<std::int16_t> mono(frames, 0);
-    for (std::size_t frame = 0; frame < frames; ++frame) {
-        std::int64_t sum = 0;
-        for (int ch = 0; ch < channels; ++ch) {
-            sum += interleaved[frame * static_cast<std::size_t>(channels) + static_cast<std::size_t>(ch)];
-        }
-        mono[frame] = static_cast<std::int16_t>(sum / channels);
-    }
-    return mono;
+std::vector<std::uint8_t> SerializeMonoPcm16WavBackend(
+    int sample_rate_hz,
+    const std::vector<std::int16_t>& pcm
+) {
+    return bytes_impl::SerializeMonoPcm16WavBytes(sample_rate_hz, pcm);
 }
 
-}  // namespace
+WavPcm16ParseResult ParseMonoPcm16WavBackend(
+    const std::uint8_t* wav_bytes,
+    std::size_t wav_byte_count
+) {
+    return bytes_impl::ParseMonoPcm16WavBytes(wav_bytes, wav_byte_count);
+}
 
 void WriteMonoPcm16WavBackend(const std::filesystem::path& output_path,
                               int sample_rate_hz,
                               const std::vector<std::int16_t>& pcm) {
+    const auto wav_bytes = SerializeMonoPcm16WavBackend(sample_rate_hz, pcm);
+    if (wav_bytes.empty()) {
+        throw std::runtime_error("Failed to serialize mono PCM16 WAV bytes.");
+    }
+
     const auto parent = output_path.parent_path();
     if (!parent.empty()) {
         std::filesystem::create_directories(parent);
     }
 
-    SF_INFO info{};
-    info.samplerate = sample_rate_hz;
-    info.channels = 1;
-    info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-
-    SNDFILE* file = sf_open(output_path.string().c_str(), SFM_WRITE, &info);
-    if (file == nullptr) {
-        throw std::runtime_error(sf_strerror(nullptr));
+    std::ofstream file(output_path, std::ios::binary | std::ios::trunc);
+    if (!file) {
+        throw std::runtime_error("Failed to open WAV output file.");
     }
-
-    const sf_count_t written = sf_write_short(
-        file,
-        pcm.data(),
-        static_cast<sf_count_t>(pcm.size()));
-    sf_close(file);
-    if (written != static_cast<sf_count_t>(pcm.size())) {
+    file.write(
+        reinterpret_cast<const char*>(wav_bytes.data()),
+        static_cast<std::streamsize>(wav_bytes.size()));
+    if (!file) {
         throw std::runtime_error("Failed to write full WAV data.");
     }
 }
 
 WavIoReadResult ReadMonoPcm16WavBackend(const std::filesystem::path& input_path) {
-    SF_INFO info{};
-    SNDFILE* file = sf_open(input_path.string().c_str(), SFM_READ, &info);
-    if (file == nullptr) {
-        throw std::runtime_error(sf_strerror(nullptr));
+    std::ifstream file(input_path, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Failed to open WAV input file.");
     }
 
-    const sf_count_t total_samples = info.frames * info.channels;
-    std::vector<std::int16_t> interleaved(static_cast<std::size_t>(total_samples), 0);
-    const sf_count_t read_count = sf_read_short(file, interleaved.data(), total_samples);
-    sf_close(file);
+    const std::vector<std::uint8_t> wav_bytes{
+        std::istreambuf_iterator<char>(file),
+        std::istreambuf_iterator<char>()};
+    if (!file.eof() && file.fail()) {
+        throw std::runtime_error("Failed to read WAV input file.");
+    }
 
-    if (read_count != total_samples) {
-        throw std::runtime_error("Failed to read full WAV data.");
+    const auto parsed = ParseMonoPcm16WavBackend(wav_bytes.data(), wav_bytes.size());
+    if (parsed.status != WavPcm16Status::kOk) {
+        throw std::runtime_error("Failed to parse mono PCM16 WAV data.");
     }
 
     WavIoReadResult result{};
-    result.sample_rate_hz = info.samplerate;
-    result.mono_pcm = ToMono(interleaved, info.channels);
+    result.sample_rate_hz = parsed.wav.sample_rate_hz;
+    result.channels = parsed.wav.channels;
+    result.mono_pcm = parsed.wav.mono_pcm;
     return result;
 }
 

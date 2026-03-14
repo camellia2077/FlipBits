@@ -161,9 +161,9 @@ const char* bag_validation_issue_message(bag_validation_issue issue) {
     case BAG_VALIDATION_INVALID_FRAME_SAMPLES:
         return "Frame sample count must be greater than 0.";
     case BAG_VALIDATION_INVALID_MODE:
-        return "Unsupported transport mode. Use flash, pro, or ultra.";
+        return "Unsupported transport mode. Use flash, pro, or ultra. Charset rules: flash accepts unrestricted text bytes, pro requires ASCII, ultra is for UTF-8 text.";
     case BAG_VALIDATION_PRO_ASCII_ONLY:
-        return "`pro` mode only supports ASCII input.";
+        return "`pro` mode only supports ASCII input. Use `flash` for unrestricted text bytes or `ultra` for UTF-8 text.";
     case BAG_VALIDATION_PAYLOAD_TOO_LARGE:
         return "Payload exceeds the 512-byte single-frame limit.";
     default:

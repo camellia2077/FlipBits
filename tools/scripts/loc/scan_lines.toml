@@ -11,7 +11,7 @@ default_paths = [
   "libs/audio_io",
   "Test",
 ]
-extensions = [".cpp", ".h", ".hpp", ".cppm", ".cc", ".cxx", ".c"]
+extensions = [".cpp", ".h", ".hpp", ".cppm", ".cc", ".inc",".cxx", ".c"]
 ignore_dirs = [
   ".git",
   ".gradle",

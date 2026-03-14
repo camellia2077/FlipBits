@@ -42,6 +42,20 @@ target_link_libraries(test_artifact
 )
 add_test(NAME artifact_tests COMMAND test_artifact)
 
+add_executable(test_runtime
+    runtime/runtime_tests.cpp
+)
+target_include_directories(test_runtime
+    PRIVATE
+        include
+        ${WAVEBITS_CORE_GENERATED_INCLUDE_DIR}
+)
+target_link_libraries(test_runtime
+    PRIVATE
+        audio_runtime
+)
+add_test(NAME runtime_tests COMMAND test_runtime)
+
 add_executable(test_cli_smoke
     cli/cli_smoke_tests.cpp
 )

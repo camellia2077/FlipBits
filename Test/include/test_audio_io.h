@@ -34,6 +34,10 @@ inline void AssertAudioIoRoundTripResult(const WavLike& wav,
         test_case.sample_rate_hz,
         route_name + " should preserve the sample rate.");
     AssertEq(
+        wav.channels,
+        1,
+        route_name + " should preserve mono channel count.");
+    AssertEq(
         wav.mono_pcm,
         test_case.mono_pcm,
         route_name + " should preserve mono PCM content.");

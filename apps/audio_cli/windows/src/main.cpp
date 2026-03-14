@@ -57,7 +57,12 @@ void print_usage() {
               << "  binary_audio_cpp encode --text-file <FILE> --out <OUTPUT.wav> [--mode flash|pro|ultra]\n"
               << "  binary_audio_cpp decode --in <INPUT.wav> [--out-text <OUTPUT.txt>] [--mode flash|pro|ultra]\n"
               << "  binary_audio_cpp version\n"
-              << "  binary_audio_cpp --version\n";
+              << "  binary_audio_cpp --version\n"
+              << "\n"
+              << "Charset rules:\n"
+              << "  flash : no charset restriction; input is treated as raw bytes.\n"
+              << "  pro   : ASCII only.\n"
+              << "  ultra : for UTF-8 text.\n";
 }
 
 std::string read_text_file(const std::filesystem::path& path) {
