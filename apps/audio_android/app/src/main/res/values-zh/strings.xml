@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">audio_android</string>
+
+    <string name="common_back">返回</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_all">全部</string>
+    <string name="common_unknown">未知</string>
+
+    <string name="tab_audio">音频</string>
+    <string name="tab_library">音频库</string>
+    <string name="tab_config">设置</string>
+
+    <string name="audio_title">音频</string>
+    <string name="audio_input_label">输入文本</string>
+    <string name="audio_action_encode">文本转音频</string>
+    <string name="audio_action_play">播放音频</string>
+    <string name="audio_action_pause">暂停音频</string>
+    <string name="audio_action_previous_track">上一曲</string>
+    <string name="audio_action_next_track">下一曲</string>
+    <string name="audio_action_shuffle_playback">随机播放</string>
+    <string name="audio_action_repeat_one">单曲循环</string>
+    <string name="audio_action_repeat_list">列表循环</string>
+    <string name="audio_action_decode">解析音频</string>
+    <string name="audio_action_clear">清空输入</string>
+    <string name="audio_action_clear_result">清空解析结果</string>
+    <string name="audio_action_export">下载音频</string>
+    <string name="audio_action_open_saved_audio_list">打开已保存音频列表</string>
+    <string name="audio_action_expand_input">展开输入文本</string>
+    <string name="audio_action_collapse_input">收起输入文本</string>
+    <string name="audio_action_expand_result">展开解析结果</string>
+    <string name="audio_action_collapse_result">收起解析结果</string>
+    <string name="audio_status">状态: %1$s</string>
+    <string name="audio_sample_count">样本数: %1$d</string>
+    <string name="audio_result_title">解析结果</string>
+    <string name="audio_result_empty">还没有解析结果。</string>
+    <string name="audio_saved_audio_sheet_title">已保存音频</string>
+    <string name="audio_saved_audio_empty">还没有已保存音频。</string>
+    <string name="saved_audio_filter_empty">当前筛选下还没有已保存音频。</string>
+
+    <string name="transport_mode_flash_label">flash</string>
+    <string name="transport_mode_pro_label">pro</string>
+    <string name="transport_mode_ultra_label">ultra</string>
+    <string name="audio_transport_flash_hint">flash 不限字符集，输入按原始字节处理。</string>
+    <string name="audio_transport_flash_example">你好，安卓</string>
+    <string name="audio_transport_pro_hint">pro 仅允许 ASCII 输入。</string>
+    <string name="audio_transport_pro_example">Hello Android</string>
+    <string name="audio_transport_ultra_hint">ultra 面向 UTF-8 文本。</string>
+    <string name="audio_transport_ultra_example">你好，安卓</string>
+
+    <string name="status_ready_to_encode">请输入文本后点击“文本转音频”</string>
+    <string name="status_input_empty">输入文本为空。</string>
+    <string name="status_mode_audio_generated">%1$s 模式音频已生成，样本数=%2$d</string>
+    <string name="status_playing_mode_audio">正在播放 %1$s 模式音频</string>
+    <string name="status_playback_paused">播放已暂停</string>
+    <string name="status_playback_completed">播放完成</string>
+    <string name="status_playback_stopped">播放已停止</string>
+    <string name="status_playback_failed">播放失败</string>
+    <string name="status_mode_decode_completed">%1$s 模式解析完成</string>
+    <string name="status_current_mode_cleared">已清空当前模式内容</string>
+    <string name="status_result_cleared">已清空解析结果</string>
+    <string name="status_audio_saved">音频已保存：%1$s</string>
+    <string name="status_audio_save_failed">保存音频失败</string>
+    <string name="status_saved_audio_loaded">已加载保存音频：%1$s</string>
+    <string name="status_saved_audio_load_failed">加载保存音频失败</string>
+    <string name="status_playing_saved_audio">正在播放保存音频：%1$s</string>
+    <string name="status_no_audio_for_mode">该模式下还没有生成音频</string>
+
+    <string name="config_title">设置</string>
+    <string name="config_language_title">语言</string>
+    <string name="config_language_subtitle">选择应用语言</string>
+    <string name="config_language_follow_system">跟随系统</string>
+    <string name="config_language_chinese">中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_palette_title">颜色选择</string>
+    <string name="config_palette_selected">已选</string>
+    <string name="config_palette_expand">展开颜色</string>
+    <string name="config_palette_collapse">收起颜色</string>
+    <string name="config_about_title">关于</string>
+    <string name="config_about_subtitle">作者、项目链接与开源许可证入口</string>
+
+    <string name="about_title">关于</string>
+    <string name="about_author">作者：%1$s</string>
+    <string name="about_presentation_version">表现层：v%1$s</string>
+    <string name="about_core_version">内核：v%1$s</string>
+    <string name="about_github">GitHub：%1$s</string>
+    <string name="about_licenses_title">开源许可证</string>
+    <string name="about_licenses_subtitle">查看第三方库和许可证详情</string>
+
+    <string name="licenses_title">开源许可证</string>
+    <string name="licenses_loading">许可证清单加载中</string>
+
+    <string name="library_title">音频库</string>
+    <string name="library_empty">还没有已保存音频。</string>
+    <string name="library_action_share">分享</string>
+    <string name="library_action_rename">重命名</string>
+    <string name="library_action_delete">删除</string>
+    <string name="library_action_select_all">全选</string>
+    <string name="library_action_clear_selection">退出多选</string>
+    <string name="library_action_delete_selected">删除所选</string>
+    <string name="library_selection_count">已选择 %1$d 项</string>
+    <string name="library_share_chooser_title">分享音频</string>
+    <string name="library_rename_title">重命名音频</string>
+    <string name="library_rename_message">重命名 %1$s</string>
+    <string name="library_rename_field_label">音频名称</string>
+    <string name="library_delete_title">删除音频</string>
+    <string name="library_delete_message">删除 %1$s？</string>
+    <string name="library_delete_selected_title">删除音频</string>
+    <string name="library_delete_selected_message">删除选中的 %1$d 个音频文件？</string>
+    <string name="library_status_deleted">已删除保存音频</string>
+    <string name="library_status_deleted_multiple">已删除 %1$d 个音频文件</string>
+    <string name="library_status_delete_failed">删除保存音频失败</string>
+    <string name="library_status_delete_partial">已删除 %1$d/%2$d 个音频文件</string>
+    <string name="library_status_renamed">已重命名保存音频：%1$s</string>
+    <string name="library_status_rename_duplicate">已经存在同名音频文件</string>
+    <string name="library_status_rename_failed">重命名保存音频失败</string>
+    <string name="library_status_share_failed">分享保存音频失败</string>
+
+    <string name="palette_ruby_title">宝石红</string>
+    <string name="palette_orange_title">太阳橙</string>
+    <string name="palette_amber_title">日耀黄</string>
+    <string name="palette_lime_title">青柠绿</string>
+    <string name="palette_emerald_title">祖母绿</string>
+    <string name="palette_teal_title">水青蓝</string>
+    <string name="palette_ocean_title">电光蓝</string>
+    <string name="palette_indigo_title">深靛蓝</string>
+    <string name="palette_violet_title">脉冲紫</string>
+    <string name="palette_magenta_title">亮洋红</string>
+
+    <string name="validation_null_config">缺少配置参数。</string>
+    <string name="validation_null_text">请输入文本。</string>
+    <string name="validation_null_decoder_output">缺少解码输出缓冲区。</string>
+    <string name="validation_invalid_sample_rate">采样率必须大于 0。</string>
+    <string name="validation_invalid_frame_samples">帧大小必须大于 0。</string>
+    <string name="validation_invalid_mode">不支持的传输模式。</string>
+    <string name="validation_pro_ascii_only">pro 模式仅支持 ASCII 输入。</string>
+    <string name="validation_payload_too_large">当前模式下输入文本过大。</string>
+
+    <string name="error_invalid_argument">参数无效。</string>
+    <string name="error_not_ready">解码结果尚未就绪。</string>
+    <string name="error_not_implemented">功能尚未实现。</string>
+    <string name="error_internal">内部错误。</string>
+</resources>

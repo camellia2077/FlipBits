@@ -2,135 +2,134 @@ package com.bag.audioandroid.ui.theme
 
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
+import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.PaletteOption
 
 val MaterialPalettes = listOf(
-    PaletteOption(
-        id = "ocean",
-        title = "Ocean Blue",
-        subtitle = "蓝色主调，清晰稳定",
-        previewColor = Color(0xFF0061A4),
-        scheme = lightColorScheme(
-            primary = Color(0xFF0061A4),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFD1E4FF),
-            onPrimaryContainer = Color(0xFF001D36),
-            secondary = Color(0xFF535F70),
-            tertiary = Color(0xFF6B5778),
-            background = Color(0xFFF7F9FF),
-            surface = Color(0xFFF7F9FF)
-        )
-    ),
-    PaletteOption(
-        id = "teal",
-        title = "Teal Cyan",
-        subtitle = "青色主调，科技感",
-        previewColor = Color(0xFF006A6A),
-        scheme = lightColorScheme(
-            primary = Color(0xFF006A6A),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFF6FF7F6),
-            onPrimaryContainer = Color(0xFF002020),
-            secondary = Color(0xFF4A6363),
-            tertiary = Color(0xFF4D5F7A),
-            background = Color(0xFFF4FBFA),
-            surface = Color(0xFFF4FBFA)
-        )
-    ),
-    PaletteOption(
-        id = "emerald",
-        title = "Emerald Green",
-        subtitle = "绿色主调，偏自然",
-        previewColor = Color(0xFF006E1C),
-        scheme = lightColorScheme(
-            primary = Color(0xFF006E1C),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFF95F990),
-            onPrimaryContainer = Color(0xFF002204),
-            secondary = Color(0xFF52634F),
-            tertiary = Color(0xFF38656A),
-            background = Color(0xFFF6FCF2),
-            surface = Color(0xFFF6FCF2)
-        )
-    ),
-    PaletteOption(
-        id = "amber",
-        title = "Amber Orange",
-        subtitle = "橙色主调，活跃明亮",
-        previewColor = Color(0xFF8A4B00),
-        scheme = lightColorScheme(
-            primary = Color(0xFF8A4B00),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFFFDCC2),
-            onPrimaryContainer = Color(0xFF2D1600),
-            secondary = Color(0xFF725A42),
-            tertiary = Color(0xFF58633B),
-            background = Color(0xFFFFF8F4),
-            surface = Color(0xFFFFF8F4)
-        )
-    ),
-    PaletteOption(
+    vividPalette(
         id = "ruby",
-        title = "Ruby Red",
-        subtitle = "红色主调，强调感强",
-        previewColor = Color(0xFFB3261E),
-        scheme = lightColorScheme(
-            primary = Color(0xFFB3261E),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFFFDAD6),
-            onPrimaryContainer = Color(0xFF410002),
-            secondary = Color(0xFF775653),
-            tertiary = Color(0xFF705C2E),
-            background = Color(0xFFFFF8F7),
-            surface = Color(0xFFFFF8F7)
-        )
+        titleResId = R.string.palette_ruby_title,
+        primary = Color(0xFFC62828),
+        primaryContainer = Color(0xFFFFDAD6),
+        onPrimaryContainer = Color(0xFF410002),
+        secondary = Color(0xFF8B4A47),
+        tertiary = Color(0xFF7A5A12),
+        background = Color(0xFFFFF8F7)
     ),
-    PaletteOption(
+    vividPalette(
+        id = "orange",
+        titleResId = R.string.palette_orange_title,
+        primary = Color(0xFFD95F02),
+        primaryContainer = Color(0xFFFFDBC8),
+        onPrimaryContainer = Color(0xFF341100),
+        secondary = Color(0xFF81523C),
+        tertiary = Color(0xFF715C2D),
+        background = Color(0xFFFFF8F4)
+    ),
+    vividPalette(
+        id = "amber",
+        titleResId = R.string.palette_amber_title,
+        primary = Color(0xFFA96800),
+        primaryContainer = Color(0xFFFFDFAC),
+        onPrimaryContainer = Color(0xFF321D00),
+        secondary = Color(0xFF755A2F),
+        tertiary = Color(0xFF5C6400),
+        background = Color(0xFFFFF9F1)
+    ),
+    vividPalette(
+        id = "lime",
+        titleResId = R.string.palette_lime_title,
+        primary = Color(0xFF5E8E00),
+        primaryContainer = Color(0xFFD9F5A0),
+        onPrimaryContainer = Color(0xFF192A00),
+        secondary = Color(0xFF58653F),
+        tertiary = Color(0xFF3A6D59),
+        background = Color(0xFFFBFCEA)
+    ),
+    vividPalette(
+        id = "emerald",
+        titleResId = R.string.palette_emerald_title,
+        primary = Color(0xFF008A24),
+        primaryContainer = Color(0xFF9EF2A8),
+        onPrimaryContainer = Color(0xFF002107),
+        secondary = Color(0xFF486548),
+        tertiary = Color(0xFF1F6D68),
+        background = Color(0xFFF4FCF4)
+    ),
+    vividPalette(
+        id = "teal",
+        titleResId = R.string.palette_teal_title,
+        primary = Color(0xFF00839B),
+        primaryContainer = Color(0xFFABEEFF),
+        onPrimaryContainer = Color(0xFF001F26),
+        secondary = Color(0xFF496368),
+        tertiary = Color(0xFF4F6090),
+        background = Color(0xFFF2FCFF)
+    ),
+    vividPalette(
+        id = "ocean",
+        titleResId = R.string.palette_ocean_title,
+        primary = Color(0xFF005CE6),
+        primaryContainer = Color(0xFFDCE2FF),
+        onPrimaryContainer = Color(0xFF001944),
+        secondary = Color(0xFF505E7A),
+        tertiary = Color(0xFF6B5778),
+        background = Color(0xFFF7F9FF)
+    ),
+    vividPalette(
         id = "indigo",
-        title = "Indigo",
-        subtitle = "靛蓝主调，偏商务",
-        previewColor = Color(0xFF4355B9),
-        scheme = lightColorScheme(
-            primary = Color(0xFF4355B9),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFDEE1FF),
-            onPrimaryContainer = Color(0xFF001257),
-            secondary = Color(0xFF5C5D72),
-            tertiary = Color(0xFF78536A),
-            background = Color(0xFFF9F8FF),
-            surface = Color(0xFFF9F8FF)
-        )
+        titleResId = R.string.palette_indigo_title,
+        primary = Color(0xFF3D4FD4),
+        primaryContainer = Color(0xFFDFE0FF),
+        onPrimaryContainer = Color(0xFF00135F),
+        secondary = Color(0xFF5A5E7A),
+        tertiary = Color(0xFF7A536A),
+        background = Color(0xFFF8F8FF)
     ),
-    PaletteOption(
-        id = "slate",
-        title = "Slate Gray",
-        subtitle = "中性灰蓝，克制稳重",
-        previewColor = Color(0xFF4A5C67),
-        scheme = lightColorScheme(
-            primary = Color(0xFF4A5C67),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFCDE6F5),
-            onPrimaryContainer = Color(0xFF051E29),
-            secondary = Color(0xFF56606A),
-            tertiary = Color(0xFF6E5867),
-            background = Color(0xFFF8F9FB),
-            surface = Color(0xFFF8F9FB)
-        )
+    vividPalette(
+        id = "violet",
+        titleResId = R.string.palette_violet_title,
+        primary = Color(0xFF7A2CF5),
+        primaryContainer = Color(0xFFE9DCFF),
+        onPrimaryContainer = Color(0xFF280055),
+        secondary = Color(0xFF695A80),
+        tertiary = Color(0xFF8A4E78),
+        background = Color(0xFFFCF7FF)
     ),
-    PaletteOption(
-        id = "earth",
-        title = "Earth Brown",
-        subtitle = "棕色主调，温暖质感",
-        previewColor = Color(0xFF7A5633),
-        scheme = lightColorScheme(
-            primary = Color(0xFF7A5633),
-            onPrimary = Color(0xFFFFFFFF),
-            primaryContainer = Color(0xFFFFDCC1),
-            onPrimaryContainer = Color(0xFF2C1700),
-            secondary = Color(0xFF6B5B4B),
-            tertiary = Color(0xFF52643A),
-            background = Color(0xFFFFF8F4),
-            surface = Color(0xFFFFF8F4)
-        )
+    vividPalette(
+        id = "magenta",
+        titleResId = R.string.palette_magenta_title,
+        primary = Color(0xFFC2188F),
+        primaryContainer = Color(0xFFFFD7F0),
+        onPrimaryContainer = Color(0xFF43002D),
+        secondary = Color(0xFF82526E),
+        tertiary = Color(0xFF8D4D4D),
+        background = Color(0xFFFFF7FB)
     )
 )
+
+private fun vividPalette(
+    id: String,
+    titleResId: Int,
+    primary: Color,
+    primaryContainer: Color,
+    onPrimaryContainer: Color,
+    secondary: Color,
+    tertiary: Color,
+    background: Color
+): PaletteOption =
+    PaletteOption(
+        id = id,
+        titleResId = titleResId,
+        previewColor = primary,
+        scheme = lightColorScheme(
+            primary = primary,
+            onPrimary = Color(0xFFFFFFFF),
+            primaryContainer = primaryContainer,
+            onPrimaryContainer = onPrimaryContainer,
+            secondary = secondary,
+            tertiary = tertiary,
+            background = background,
+            surface = background
+        )
+    )

@@ -10,6 +10,8 @@ configure_file(
 
 set(bag_android_native_package_source_files
     "${CMAKE_CURRENT_LIST_DIR}/bag_api_package.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_io_package.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_runtime_package.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_common_version.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_phy_clean.cpp"
@@ -46,7 +48,9 @@ endif()
 target_include_directories(bag_android_native_package_objects
     PUBLIC
         "${WAVEBITS_ROOT}/libs/audio_api/include"
+        "${WAVEBITS_ROOT}/libs/audio_runtime/include"
     PRIVATE
+        "${WAVEBITS_ROOT}/libs/audio_io/include"
         "${CMAKE_CURRENT_LIST_DIR}/../private_include"
         "${WAVEBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}"
 )

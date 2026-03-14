@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">audio_android</string>
+
+    <string name="common_back">Back</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_all">All</string>
+    <string name="common_unknown">unknown</string>
+
+    <string name="tab_audio">Audio</string>
+    <string name="tab_library">Library</string>
+    <string name="tab_config">Config</string>
+
+    <string name="audio_title">Audio</string>
+    <string name="audio_input_label">Input text</string>
+    <string name="audio_action_encode">Encode to audio</string>
+    <string name="audio_action_play">Play audio</string>
+    <string name="audio_action_pause">Pause audio</string>
+    <string name="audio_action_previous_track">Previous track</string>
+    <string name="audio_action_next_track">Next track</string>
+    <string name="audio_action_shuffle_playback">Shuffle playback</string>
+    <string name="audio_action_repeat_one">Repeat one</string>
+    <string name="audio_action_repeat_list">Repeat list</string>
+    <string name="audio_action_decode">Decode audio</string>
+    <string name="audio_action_clear">Clear input</string>
+    <string name="audio_action_clear_result">Clear decoded text</string>
+    <string name="audio_action_export">Download audio</string>
+    <string name="audio_action_open_saved_audio_list">Open saved audio list</string>
+    <string name="audio_action_expand_input">Expand input text</string>
+    <string name="audio_action_collapse_input">Collapse input text</string>
+    <string name="audio_action_expand_result">Expand decoded text</string>
+    <string name="audio_action_collapse_result">Collapse decoded text</string>
+    <string name="audio_status">Status: %1$s</string>
+    <string name="audio_sample_count">Samples: %1$d</string>
+    <string name="audio_result_title">Decoded text</string>
+    <string name="audio_result_empty">No decoded text yet.</string>
+    <string name="audio_saved_audio_sheet_title">Saved audio</string>
+    <string name="audio_saved_audio_empty">No saved audio yet.</string>
+    <string name="saved_audio_filter_empty">No saved audio matches this filter.</string>
+
+    <string name="transport_mode_flash_label">flash</string>
+    <string name="transport_mode_pro_label">pro</string>
+    <string name="transport_mode_ultra_label">ultra</string>
+    <string name="audio_transport_flash_hint">flash accepts unrestricted text bytes.</string>
+    <string name="audio_transport_flash_example">Hello Android</string>
+    <string name="audio_transport_pro_hint">pro only supports ASCII input.</string>
+    <string name="audio_transport_pro_example">Hello Android</string>
+    <string name="audio_transport_ultra_hint">ultra is for UTF-8 text.</string>
+    <string name="audio_transport_ultra_example">Hello Android</string>
+
+    <string name="status_ready_to_encode">Enter text and tap "Encode to audio"</string>
+    <string name="status_input_empty">Input text is empty.</string>
+    <string name="status_mode_audio_generated">%1$s mode audio generated, samples=%2$d</string>
+    <string name="status_playing_mode_audio">Playing %1$s mode audio</string>
+    <string name="status_playback_paused">Playback paused</string>
+    <string name="status_playback_completed">Playback completed</string>
+    <string name="status_playback_stopped">Playback stopped</string>
+    <string name="status_playback_failed">Playback failed</string>
+    <string name="status_mode_decode_completed">%1$s mode decoding completed</string>
+    <string name="status_current_mode_cleared">Cleared current mode content</string>
+    <string name="status_result_cleared">Decoded text cleared</string>
+    <string name="status_audio_saved">Audio saved: %1$s</string>
+    <string name="status_audio_save_failed">Failed to save audio</string>
+    <string name="status_saved_audio_loaded">Loaded saved audio: %1$s</string>
+    <string name="status_saved_audio_load_failed">Failed to load saved audio</string>
+    <string name="status_playing_saved_audio">Playing saved audio: %1$s</string>
+    <string name="status_no_audio_for_mode">No audio has been generated for this mode yet</string>
+
+    <string name="config_title">Config</string>
+    <string name="config_language_title">Language</string>
+    <string name="config_language_subtitle">Choose the app language</string>
+    <string name="config_language_follow_system">Follow system</string>
+    <string name="config_language_chinese">Chinese</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">Japanese</string>
+    <string name="config_palette_title">Color palettes</string>
+    <string name="config_palette_selected">Selected</string>
+    <string name="config_palette_expand">Expand palettes</string>
+    <string name="config_palette_collapse">Collapse palettes</string>
+    <string name="config_about_title">About</string>
+    <string name="config_about_subtitle">Author, project link, and open-source licenses</string>
+
+    <string name="about_title">About</string>
+    <string name="about_author">Author: %1$s</string>
+    <string name="about_presentation_version">Presentation: v%1$s</string>
+    <string name="about_core_version">Core: v%1$s</string>
+    <string name="about_github">GitHub: %1$s</string>
+    <string name="about_licenses_title">Open Source Licenses</string>
+    <string name="about_licenses_subtitle">View third-party libraries and licenses</string>
+
+    <string name="licenses_title">Open Source Licenses</string>
+    <string name="licenses_loading">Loading license list</string>
+
+    <string name="library_title">Library</string>
+    <string name="library_empty">No saved audio yet.</string>
+    <string name="library_action_share">Share</string>
+    <string name="library_action_rename">Rename</string>
+    <string name="library_action_delete">Delete</string>
+    <string name="library_action_select_all">Select all</string>
+    <string name="library_action_clear_selection">Exit selection</string>
+    <string name="library_action_delete_selected">Delete selected</string>
+    <string name="library_selection_count">%1$d selected</string>
+    <string name="library_share_chooser_title">Share audio</string>
+    <string name="library_rename_title">Rename audio</string>
+    <string name="library_rename_message">Rename %1$s</string>
+    <string name="library_rename_field_label">Audio name</string>
+    <string name="library_delete_title">Delete audio</string>
+    <string name="library_delete_message">Delete %1$s?</string>
+    <string name="library_delete_selected_title">Delete audio</string>
+    <string name="library_delete_selected_message">Delete %1$d selected audio files?</string>
+    <string name="library_status_deleted">Saved audio deleted</string>
+    <string name="library_status_deleted_multiple">Deleted %1$d audio files</string>
+    <string name="library_status_delete_failed">Failed to delete saved audio</string>
+    <string name="library_status_delete_partial">Deleted %1$d of %2$d audio files</string>
+    <string name="library_status_renamed">Saved audio renamed: %1$s</string>
+    <string name="library_status_rename_duplicate">An audio file with that name already exists</string>
+    <string name="library_status_rename_failed">Failed to rename saved audio</string>
+    <string name="library_status_share_failed">Failed to share saved audio</string>
+
+    <string name="palette_ruby_title">Ruby Red</string>
+    <string name="palette_orange_title">Solar Orange</string>
+    <string name="palette_amber_title">Sun Yellow</string>
+    <string name="palette_lime_title">Lime Burst</string>
+    <string name="palette_emerald_title">Emerald Green</string>
+    <string name="palette_teal_title">Aqua Cyan</string>
+    <string name="palette_ocean_title">Electric Blue</string>
+    <string name="palette_indigo_title">Deep Indigo</string>
+    <string name="palette_violet_title">Violet Pulse</string>
+    <string name="palette_magenta_title">Magenta Pop</string>
+
+    <string name="validation_null_config">Configuration is missing.</string>
+    <string name="validation_null_text">Input text is required.</string>
+    <string name="validation_null_decoder_output">Decoder output buffer is missing.</string>
+    <string name="validation_invalid_sample_rate">Sample rate must be greater than 0.</string>
+    <string name="validation_invalid_frame_samples">Frame size must be greater than 0.</string>
+    <string name="validation_invalid_mode">Unsupported transport mode.</string>
+    <string name="validation_pro_ascii_only">pro mode only supports ASCII input.</string>
+    <string name="validation_payload_too_large">Input text is too large for this mode.</string>
+
+    <string name="error_invalid_argument">Invalid argument.</string>
+    <string name="error_not_ready">Decoder result is not ready.</string>
+    <string name="error_not_implemented">Feature is not implemented.</string>
+    <string name="error_internal">Internal error.</string>
+</resources>

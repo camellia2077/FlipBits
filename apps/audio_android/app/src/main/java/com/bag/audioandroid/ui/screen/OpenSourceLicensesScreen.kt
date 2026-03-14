@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
@@ -27,10 +28,10 @@ fun OpenSourceLicensesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Open Source Licenses") },
+                title = { Text(stringResource(R.string.licenses_title)) },
                 navigationIcon = {
                     TextButton(onClick = onBack) {
-                        Text("返回", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.common_back), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             )
@@ -39,7 +40,7 @@ fun OpenSourceLicensesScreen(
     ) { innerPadding ->
         if (libraries == null) {
             Text(
-                text = "许可证清单加载中",
+                text = stringResource(R.string.licenses_loading),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)

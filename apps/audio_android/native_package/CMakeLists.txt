@@ -37,4 +37,5 @@ endif()
 target_include_directories(bag_android_native_packaged
     PUBLIC
         "${WAVEBITS_ROOT}/libs/audio_api/include"
+        "${WAVEBITS_ROOT}/libs/audio_runtime/include"
 )

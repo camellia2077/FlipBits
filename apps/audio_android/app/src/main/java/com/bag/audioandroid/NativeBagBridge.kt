@@ -17,7 +17,7 @@ object NativeBagBridge {
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int
-    ): String
+    ): Int
 
     external fun nativeDecodeGeneratedPcm(
         pcm: ShortArray,
@@ -30,9 +30,7 @@ object NativeBagBridge {
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int
-    ): String
-
-    external fun nativeErrorCodeMessage(code: Int): String
+    ): Int
 
     external fun nativeGetCoreVersion(): String
 }

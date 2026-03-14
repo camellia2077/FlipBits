@@ -1,199 +1,285 @@
 package com.bag.audioandroid.ui
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bag.audioandroid.BuildConfig
-import com.bag.audioandroid.audio.playPcm
+import com.bag.audioandroid.audio.AudioPlaybackCoordinator
+import com.bag.audioandroid.data.AndroidSampleInputTextProvider
+import com.bag.audioandroid.data.PaletteSettingsRepository
 import com.bag.audioandroid.domain.AudioCodecGateway
+import com.bag.audioandroid.domain.PlaybackRuntimeGateway
+import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.domain.SavedAudioRepository
+import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.PaletteOption
+import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class AudioAndroidViewModel(
-    private val audioCodecGateway: AudioCodecGateway
+    audioCodecGateway: AudioCodecGateway,
+    sampleInputTextProvider: AndroidSampleInputTextProvider,
+    paletteSettingsRepository: PaletteSettingsRepository,
+    playbackRuntimeGateway: PlaybackRuntimeGateway,
+    savedAudioRepository: SavedAudioRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AudioAppUiState())
-    val uiState: StateFlow<AudioAppUiState> = _uiState
+    private val uiStateFlow = MutableStateFlow(AudioAppUiState())
+    val uiState: StateFlow<AudioAppUiState> = uiStateFlow
+
+    private val uiTextMapper = BagUiTextMapper()
+    private val sampleInputSessionUpdater = SampleInputSessionUpdater(sampleInputTextProvider)
+    private val sessionStateStore = AudioSessionStateStore(uiStateFlow)
+    private val playbackCoordinator = AudioPlaybackCoordinator()
+    private val playbackSourceCoordinator = PlaybackSourceCoordinator(SAMPLE_RATE_HZ)
+    private val playbackSessionReducer = PlaybackSessionReducer(playbackRuntimeGateway, SAMPLE_RATE_HZ)
+    private val playbackSequenceNavigator = PlaybackSequenceNavigator()
+    private val playbackActions = AudioAndroidPlaybackActions(
+        uiState = uiStateFlow,
+        scope = viewModelScope,
+        sessionStateStore = sessionStateStore,
+        playbackCoordinator = playbackCoordinator,
+        playbackRuntimeGateway = playbackRuntimeGateway,
+        playbackSourceCoordinator = playbackSourceCoordinator,
+        playbackSessionReducer = playbackSessionReducer,
+        sampleRateHz = SAMPLE_RATE_HZ,
+        onPlaybackCompleted = ::handlePlaybackCompleted
+    )
+    private val libraryActions = AudioAndroidLibraryActions(
+        uiState = uiStateFlow,
+        sessionStateStore = sessionStateStore,
+        playbackRuntimeGateway = playbackRuntimeGateway,
+        savedAudioRepository = savedAudioRepository,
+        stopPlayback = playbackActions::stopPlayback
+    )
+    private val sessionActions = AudioAndroidSessionActions(
+        uiState = uiStateFlow,
+        audioCodecGateway = audioCodecGateway,
+        sessionStateStore = sessionStateStore,
+        uiTextMapper = uiTextMapper,
+        playbackRuntimeGateway = playbackRuntimeGateway,
+        savedAudioRepository = savedAudioRepository,
+        sampleRateHz = SAMPLE_RATE_HZ,
+        frameSamples = FRAME_SAMPLES,
+        stopPlayback = playbackActions::stopPlayback,
+        refreshSavedAudioItems = libraryActions::refreshSavedAudioItems
+    )
+    private val chromeActions = AudioAndroidChromeActions(
+        uiState = uiStateFlow,
+        sampleInputSessionUpdater = sampleInputSessionUpdater,
+        paletteSettingsRepository = paletteSettingsRepository,
+        scope = viewModelScope
+    )
 
     init {
-        val coreVersion = audioCodecGateway.getCoreVersion().ifBlank { "unknown" }
-        _uiState.update {
+        val coreVersion = audioCodecGateway.getCoreVersion()
+        val selectedLanguage = AppLanguageOption.fromLanguageTags(
+            AppCompatDelegate.getApplicationLocales().toLanguageTags()
+        )
+        uiStateFlow.update {
             it.copy(
-                presentationVersion = BuildConfig.VERSION_NAME.ifBlank { "unknown" },
-                coreVersion = coreVersion
+                selectedLanguage = selectedLanguage,
+                presentationVersion = BuildConfig.VERSION_NAME.ifBlank { "" },
+                coreVersion = coreVersion.ifBlank { "" },
+                sessions = sampleInputSessionUpdater.initialize(it.sessions, selectedLanguage),
+                currentPlaybackSource = AudioPlaybackSource.Generated(it.transportMode)
             )
         }
+        chromeActions.observeSelectedPalette()
     }
 
     fun onTabSelected(tab: AppTab) {
-        _uiState.update { it.copy(selectedTab = tab) }
+        chromeActions.onTabSelected(tab, libraryActions::refreshSavedAudioItems)
+    }
+
+    fun onLanguageSelected(language: AppLanguageOption) {
+        chromeActions.onLanguageSelected(language)
     }
 
     fun onOpenAboutPage() {
-        _uiState.update { it.copy(showAboutPage = true) }
+        chromeActions.onOpenAboutPage()
     }
 
     fun onCloseAboutPage() {
-        _uiState.update { it.copy(showAboutPage = false) }
+        chromeActions.onCloseAboutPage()
     }
 
     fun onOpenLicensesPage() {
-        _uiState.update { it.copy(showLicensesPage = true, showAboutPage = false) }
+        chromeActions.onOpenLicensesPage()
     }
 
     fun onCloseLicensesPage() {
-        _uiState.update { it.copy(showLicensesPage = false, showAboutPage = true) }
+        chromeActions.onCloseLicensesPage()
     }
 
     fun onPaletteSelected(palette: PaletteOption) {
-        _uiState.update { it.copy(selectedPalette = palette) }
+        chromeActions.onPaletteSelected(palette)
     }
 
     fun onInputTextChange(value: String) {
-        _uiState.update { it.copy(inputText = value) }
+        sessionActions.onInputTextChange(value)
     }
 
     fun onTransportModeSelected(mode: TransportModeOption) {
-        _uiState.update { it.copy(transportMode = mode) }
+        sessionActions.onTransportModeSelected(mode)
     }
 
     fun onEncode() {
-        val current = _uiState.value
-        val validationMessage = audioCodecGateway.validateEncodeRequest(
-            current.inputText,
-            SAMPLE_RATE_HZ,
-            FRAME_SAMPLES,
-            current.transportMode.nativeValue
-        )
-        if (validationMessage.isNotBlank()) {
-            _uiState.update {
-                it.copy(
-                    generatedPcm = shortArrayOf(),
-                    resultText = "",
-                    statusText = validationMessage,
-                    isPlaying = false,
-                    playbackProgress = 0f
-                )
-            }
-            return
-        }
-        val pcm = audioCodecGateway.encodeTextToPcm(
-            current.inputText,
-            SAMPLE_RATE_HZ,
-            FRAME_SAMPLES,
-            current.transportMode.nativeValue
-        )
-        val status = if (pcm.isEmpty()) {
-            if (current.inputText.isBlank()) {
-                "Input text is empty."
-            } else {
-                audioCodecGateway.errorCodeMessage(BAG_INTERNAL_CODE)
-            }
-        } else {
-            "${current.transportMode.wireName} 模式音频已生成，样本数=${pcm.size}"
-        }
-        _uiState.update {
-            it.copy(
-                generatedPcm = pcm,
-                statusText = status,
-                isPlaying = false,
-                playbackProgress = 0f
+        sessionActions.onEncode()
+    }
+
+    fun onTogglePlayback() {
+        playbackActions.onTogglePlayback()
+    }
+
+    fun onPlaybackSequenceModeSelected(mode: PlaybackSequenceMode) {
+        uiStateFlow.update { state ->
+            state.copy(
+                playbackSequenceMode = if (state.playbackSequenceMode == mode) {
+                    PlaybackSequenceMode.Normal
+                } else {
+                    mode
+                }
             )
         }
     }
 
-    fun onPlay() {
-        val current = _uiState.value
-        if (current.generatedPcm.isEmpty()) {
-            _uiState.update { it.copy(statusText = "请先生成音频") }
-            return
-        }
-        if (current.isPlaying) {
-            _uiState.update { it.copy(statusText = "音频正在播放") }
-            return
-        }
-
-        _uiState.update {
-            it.copy(
-                statusText = "正在播放生成音频",
-                isPlaying = true,
-                playbackProgress = 0f
+    fun onSkipToPreviousTrack() {
+        skipToAdjacentSavedTrack { state, currentSource ->
+            playbackSequenceNavigator.previousSavedSource(
+                savedAudioItems = state.savedAudioItems,
+                currentSource = currentSource
             )
         }
-        val pcmCopy = current.generatedPcm.copyOf()
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                playPcm(pcmCopy, SAMPLE_RATE_HZ) { progress ->
-                    _uiState.update { state ->
-                        state.copy(playbackProgress = progress.coerceIn(0f, 1f))
-                    }
-                }
-                _uiState.update {
-                    it.copy(
-                        statusText = "播放完成",
-                        isPlaying = false,
-                        playbackProgress = 1f
-                    )
-                }
-            } catch (_: Exception) {
-                _uiState.update { it.copy(statusText = "播放失败", isPlaying = false) }
-            }
+    }
+
+    fun onSkipToNextTrack() {
+        skipToAdjacentSavedTrack { state, currentSource ->
+            playbackSequenceNavigator.nextSavedSource(
+                savedAudioItems = state.savedAudioItems,
+                currentSource = currentSource
+            )
         }
+    }
+
+    fun onScrubStarted() {
+        playbackActions.onScrubStarted()
+    }
+
+    fun onScrubChanged(targetSamples: Int) {
+        playbackActions.onScrubChanged(targetSamples)
+    }
+
+    fun onScrubFinished() {
+        playbackActions.onScrubFinished()
+    }
+
+    fun onScrubCanceled() {
+        playbackActions.onScrubCanceled()
     }
 
     fun onDecode() {
-        val current = _uiState.value
-        if (current.generatedPcm.isEmpty()) {
-            _uiState.update { it.copy(statusText = "请先生成音频") }
-            return
-        }
-
-        val validationMessage = audioCodecGateway.validateDecodeConfig(
-            SAMPLE_RATE_HZ,
-            FRAME_SAMPLES,
-            current.transportMode.nativeValue
-        )
-        if (validationMessage.isNotBlank()) {
-            _uiState.update { it.copy(statusText = validationMessage) }
-            return
-        }
-
-        val decoded = audioCodecGateway.decodeGeneratedPcm(
-            current.generatedPcm,
-            SAMPLE_RATE_HZ,
-            FRAME_SAMPLES,
-            current.transportMode.nativeValue
-        )
-        val status = if (decoded.isEmpty()) {
-            audioCodecGateway.errorCodeMessage(BAG_INTERNAL_CODE)
-        } else {
-            "${current.transportMode.wireName} 模式解析完成"
-        }
-        _uiState.update { it.copy(resultText = decoded, statusText = status) }
+        sessionActions.onDecode()
     }
 
     fun onClear() {
-        _uiState.update {
-            it.copy(
-                inputText = "",
-                generatedPcm = shortArrayOf(),
-                resultText = "",
-                statusText = "已清空",
-                isPlaying = false,
-                playbackProgress = 0f
-            )
+        sessionActions.onClear()
+    }
+
+    fun onClearResult() {
+        sessionActions.onClearResult()
+    }
+
+    fun onExportAudio() {
+        sessionActions.onExportAudio()
+    }
+
+    fun onOpenSavedAudioSheet() {
+        sessionActions.onOpenSavedAudioSheet()
+    }
+
+    fun onCloseSavedAudioSheet() {
+        sessionActions.onCloseSavedAudioSheet()
+    }
+
+    fun onSavedAudioSelected(itemId: String) {
+        libraryActions.onSavedAudioSelected(itemId)
+    }
+
+    fun onEnterLibrarySelection(itemId: String) {
+        libraryActions.onEnterLibrarySelection(itemId)
+    }
+
+    fun onToggleLibrarySelection(itemId: String) {
+        libraryActions.onToggleLibrarySelection(itemId)
+    }
+
+    fun onSelectAllLibraryItems(itemIds: Collection<String>) {
+        libraryActions.onSelectAllLibraryItems(itemIds)
+    }
+
+    fun onClearLibrarySelection() {
+        libraryActions.onClearLibrarySelection()
+    }
+
+    fun onDeleteSelectedSavedAudio() {
+        libraryActions.onDeleteSelectedSavedAudio()
+    }
+
+    fun onDeleteSavedAudio(itemId: String) {
+        libraryActions.onDeleteSavedAudio(itemId)
+    }
+
+    fun onRenameSavedAudio(itemId: String, newBaseName: String) {
+        libraryActions.onRenameSavedAudio(itemId, newBaseName)
+    }
+
+    fun onShareCurrentSavedAudio() {
+        libraryActions.onShareCurrentSavedAudio()
+    }
+
+    fun onShareSavedAudio(item: SavedAudioItem) {
+        libraryActions.onShareSavedAudio(item)
+    }
+
+    override fun onCleared() {
+        playbackActions.release()
+        super.onCleared()
+    }
+
+    private fun handlePlaybackCompleted(source: AudioPlaybackSource): Boolean {
+        val nextSource = playbackSequenceNavigator.nextSourceForCompletion(uiStateFlow.value, source) ?: return false
+        return when (nextSource) {
+            is AudioPlaybackSource.Generated -> playbackActions.playCurrentFromStart()
+            is AudioPlaybackSource.Saved -> {
+                if (nextSource.itemId != uiStateFlow.value.currentSavedAudioItem?.itemId &&
+                    !libraryActions.prepareSavedAudioSelection(nextSource.itemId)) {
+                    return false
+                }
+                playbackActions.playCurrentFromStart()
+            }
         }
+    }
+
+    private fun skipToAdjacentSavedTrack(
+        resolveTarget: (AudioAppUiState, AudioPlaybackSource) -> AudioPlaybackSource?
+    ) {
+        val currentState = uiStateFlow.value
+        val currentSource = currentState.currentPlaybackSource
+        val targetSource = resolveTarget(currentState, currentSource) as? AudioPlaybackSource.Saved ?: return
+        if (!libraryActions.prepareSavedAudioSelection(targetSource.itemId)) {
+            return
+        }
+        playbackActions.playCurrentFromStart()
     }
 
     private companion object {
         const val SAMPLE_RATE_HZ = 44100
         const val FRAME_SAMPLES = 2205
-        const val BAG_INTERNAL_CODE = 4
     }
 }

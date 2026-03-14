@@ -1,0 +1,31 @@
+package com.bag.audioandroid.ui
+
+import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagApiCodes
+import com.bag.audioandroid.ui.model.UiText
+
+class BagUiTextMapper {
+    fun validationIssue(issue: Int): UiText = when (issue) {
+        BagApiCodes.VALIDATION_NULL_CONFIG -> UiText.Resource(R.string.validation_null_config)
+        BagApiCodes.VALIDATION_NULL_TEXT -> UiText.Resource(R.string.validation_null_text)
+        BagApiCodes.VALIDATION_NULL_DECODER_OUTPUT ->
+            UiText.Resource(R.string.validation_null_decoder_output)
+        BagApiCodes.VALIDATION_INVALID_SAMPLE_RATE ->
+            UiText.Resource(R.string.validation_invalid_sample_rate)
+        BagApiCodes.VALIDATION_INVALID_FRAME_SAMPLES ->
+            UiText.Resource(R.string.validation_invalid_frame_samples)
+        BagApiCodes.VALIDATION_INVALID_MODE -> UiText.Resource(R.string.validation_invalid_mode)
+        BagApiCodes.VALIDATION_PRO_ASCII_ONLY -> UiText.Resource(R.string.validation_pro_ascii_only)
+        BagApiCodes.VALIDATION_PAYLOAD_TOO_LARGE ->
+            UiText.Resource(R.string.validation_payload_too_large)
+        else -> errorCode(BagApiCodes.ERROR_INTERNAL)
+    }
+
+    fun errorCode(code: Int): UiText = when (code) {
+        BagApiCodes.ERROR_INVALID_ARGUMENT -> UiText.Resource(R.string.error_invalid_argument)
+        BagApiCodes.ERROR_NOT_READY -> UiText.Resource(R.string.error_not_ready)
+        BagApiCodes.ERROR_NOT_IMPLEMENTED -> UiText.Resource(R.string.error_not_implemented)
+        BagApiCodes.ERROR_INTERNAL -> UiText.Resource(R.string.error_internal)
+        else -> UiText.Resource(R.string.error_internal)
+    }
+}

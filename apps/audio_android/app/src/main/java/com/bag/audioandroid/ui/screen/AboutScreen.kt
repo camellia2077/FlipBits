@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,14 +33,17 @@ fun AboutScreen(
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
+    val unknownText = stringResource(R.string.common_unknown)
+    val displayPresentationVersion = presentationVersion.ifBlank { unknownText }
+    val displayCoreVersion = coreVersion.ifBlank { unknownText }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("About") },
+                title = { Text(stringResource(R.string.about_title)) },
                 navigationIcon = {
                     TextButton(onClick = onBack) {
-                        Text("返回", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.common_back), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             )
@@ -61,14 +66,14 @@ fun AboutScreen(
                     modifier = Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text("author: camellia2077")
-                    Text("presentation: v$presentationVersion")
-                    Text("core: v$coreVersion")
+                    Text(stringResource(R.string.about_author, AUTHOR_NAME))
+                    Text(stringResource(R.string.about_presentation_version, displayPresentationVersion))
+                    Text(stringResource(R.string.about_core_version, displayCoreVersion))
                     Text(
-                        text = "github: https://github.com/camellia2077/Maze_Generator",
+                        text = stringResource(R.string.about_github, GITHUB_URL),
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable {
-                            uriHandler.openUri("https://github.com/camellia2077/Maze_Generator")
+                            uriHandler.openUri(GITHUB_URL)
                         }
                     )
                 }
@@ -88,8 +93,14 @@ fun AboutScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text("Open Source Licenses", fontWeight = FontWeight.SemiBold)
-                        Text("查看第三方库和许可证详情", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.about_licenses_title),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            stringResource(R.string.about_licenses_subtitle),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                     Text(">", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
@@ -97,3 +108,6 @@ fun AboutScreen(
         }
     }
 }
+
+private const val AUTHOR_NAME = "camellia2077"
+private const val GITHUB_URL = "https://github.com/camellia2077/WaveBits"

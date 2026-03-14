@@ -88,7 +88,7 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeEncodeTextToPcm(
     return out;
 }
 
-extern "C" JNIEXPORT jstring JNICALL
+extern "C" JNIEXPORT jint JNICALL
 Java_com_bag_audioandroid_NativeBagBridge_nativeValidateEncodeRequest(
     JNIEnv* env,
     jobject /*thiz*/,
@@ -100,7 +100,7 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeValidateEncodeRequest(
     bag_encoder_config config = MakeEncoderConfig(sample_rate_hz, frame_samples);
     config.mode = static_cast<bag_transport_mode>(mode);
     const bag_validation_issue issue = bag_validate_encode_request(&config, input.c_str());
-    return env->NewStringUTF(bag_validation_issue_message(issue));
+    return static_cast<jint>(issue);
 }
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -141,7 +141,7 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeDecodeGeneratedPcm(
     return env->NewStringUTF(text_buffer);
 }
 
-extern "C" JNIEXPORT jstring JNICALL
+extern "C" JNIEXPORT jint JNICALL
 Java_com_bag_audioandroid_NativeBagBridge_nativeValidateDecodeConfig(
     JNIEnv* env,
     jobject /*thiz*/,
@@ -151,15 +151,7 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeValidateDecodeConfig(
     bag_decoder_config config = MakeDecoderConfig(sample_rate_hz, frame_samples);
     config.mode = static_cast<bag_transport_mode>(mode);
     const bag_validation_issue issue = bag_validate_decoder_config(&config);
-    return env->NewStringUTF(bag_validation_issue_message(issue));
-}
-
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_bag_audioandroid_NativeBagBridge_nativeErrorCodeMessage(
-    JNIEnv* env,
-    jobject /*thiz*/,
-    jint code) {
-    return env->NewStringUTF(bag_error_code_message(static_cast<bag_error_code>(code)));
+    return static_cast<jint>(issue);
 }
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -167,7 +159,7 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeGetCoreVersion(
     JNIEnv* env, jobject /*thiz*/) {
     const char* version = bag_core_version();
     if (version == nullptr) {
-        return env->NewStringUTF("unknown");
+        return env->NewStringUTF("");
     }
     return env->NewStringUTF(version);
 }

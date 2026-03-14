@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">audio_android</string>
+
+    <string name="common_back">戻る</string>
+    <string name="common_cancel">キャンセル</string>
+    <string name="common_all">すべて</string>
+    <string name="common_unknown">不明</string>
+
+    <string name="tab_audio">オーディオ</string>
+    <string name="tab_library">ライブラリ</string>
+    <string name="tab_config">設定</string>
+
+    <string name="audio_title">オーディオ</string>
+    <string name="audio_input_label">入力テキスト</string>
+    <string name="audio_action_encode">テキストを音声に変換</string>
+    <string name="audio_action_play">音声を再生</string>
+    <string name="audio_action_pause">音声を一時停止</string>
+    <string name="audio_action_previous_track">前の曲</string>
+    <string name="audio_action_next_track">次の曲</string>
+    <string name="audio_action_shuffle_playback">シャッフル再生</string>
+    <string name="audio_action_repeat_one">1曲リピート</string>
+    <string name="audio_action_repeat_list">リストリピート</string>
+    <string name="audio_action_decode">音声を解析</string>
+    <string name="audio_action_clear">入力をクリア</string>
+    <string name="audio_action_clear_result">解析結果をクリア</string>
+    <string name="audio_action_export">音声を保存</string>
+    <string name="audio_action_open_saved_audio_list">保存済み音声リストを開く</string>
+    <string name="audio_action_expand_input">入力テキストを展開</string>
+    <string name="audio_action_collapse_input">入力テキストを折りたたむ</string>
+    <string name="audio_action_expand_result">解析結果を展開</string>
+    <string name="audio_action_collapse_result">解析結果を折りたたむ</string>
+    <string name="audio_status">状態: %1$s</string>
+    <string name="audio_sample_count">サンプル数: %1$d</string>
+    <string name="audio_result_title">解析結果</string>
+    <string name="audio_result_empty">解析結果はまだありません。</string>
+    <string name="audio_saved_audio_sheet_title">保存済み音声</string>
+    <string name="audio_saved_audio_empty">保存済み音声はまだありません。</string>
+    <string name="saved_audio_filter_empty">この絞り込みに一致する保存済み音声はありません。</string>
+
+    <string name="transport_mode_flash_label">flash</string>
+    <string name="transport_mode_pro_label">pro</string>
+    <string name="transport_mode_ultra_label">ultra</string>
+    <string name="audio_transport_flash_hint">flash は文字種を制限せず、入力をそのままバイト列として扱います。</string>
+    <string name="audio_transport_flash_example">こんにちは、アンドロイド</string>
+    <string name="audio_transport_pro_hint">pro は ASCII 入力のみ対応します。</string>
+    <string name="audio_transport_pro_example">Hello Android</string>
+    <string name="audio_transport_ultra_hint">ultra は UTF-8 テキスト向けです。</string>
+    <string name="audio_transport_ultra_example">こんにちは、アンドロイド</string>
+
+    <string name="status_ready_to_encode">テキストを入力してから「テキストを音声に変換」をタップしてください</string>
+    <string name="status_input_empty">入力テキストが空です。</string>
+    <string name="status_mode_audio_generated">%1$s モードの音声を生成しました。サンプル数=%2$d</string>
+    <string name="status_playing_mode_audio">%1$s モードの音声を再生中</string>
+    <string name="status_playback_paused">再生を一時停止しました</string>
+    <string name="status_playback_completed">再生が完了しました</string>
+    <string name="status_playback_stopped">再生を停止しました</string>
+    <string name="status_playback_failed">再生に失敗しました</string>
+    <string name="status_mode_decode_completed">%1$s モードの解析が完了しました</string>
+    <string name="status_current_mode_cleared">現在のモード内容をクリアしました</string>
+    <string name="status_result_cleared">解析結果をクリアしました</string>
+    <string name="status_audio_saved">音声を保存しました: %1$s</string>
+    <string name="status_audio_save_failed">音声の保存に失敗しました</string>
+    <string name="status_saved_audio_loaded">保存済み音声を読み込みました: %1$s</string>
+    <string name="status_saved_audio_load_failed">保存済み音声の読み込みに失敗しました</string>
+    <string name="status_playing_saved_audio">保存済み音声を再生中: %1$s</string>
+    <string name="status_no_audio_for_mode">このモードではまだ音声が生成されていません</string>
+
+    <string name="config_title">設定</string>
+    <string name="config_language_title">言語</string>
+    <string name="config_language_subtitle">アプリの言語を選択</string>
+    <string name="config_language_follow_system">システムに従う</string>
+    <string name="config_language_chinese">中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_palette_title">カラーパレット</string>
+    <string name="config_palette_selected">選択中</string>
+    <string name="config_palette_expand">パレットを展開</string>
+    <string name="config_palette_collapse">パレットを折りたたむ</string>
+    <string name="config_about_title">このアプリについて</string>
+    <string name="config_about_subtitle">作者、プロジェクトリンク、オープンソースライセンス</string>
+
+    <string name="about_title">このアプリについて</string>
+    <string name="about_author">作者: %1$s</string>
+    <string name="about_presentation_version">プレゼンテーション層: v%1$s</string>
+    <string name="about_core_version">コア: v%1$s</string>
+    <string name="about_github">GitHub: %1$s</string>
+    <string name="about_licenses_title">オープンソースライセンス</string>
+    <string name="about_licenses_subtitle">サードパーティライブラリとライセンスを表示</string>
+
+    <string name="licenses_title">オープンソースライセンス</string>
+    <string name="licenses_loading">ライセンス一覧を読み込み中</string>
+
+    <string name="library_title">ライブラリ</string>
+    <string name="library_empty">保存済み音声はまだありません。</string>
+    <string name="library_action_share">共有</string>
+    <string name="library_action_rename">名前変更</string>
+    <string name="library_action_delete">削除</string>
+    <string name="library_action_select_all">すべて選択</string>
+    <string name="library_action_clear_selection">選択を終了</string>
+    <string name="library_action_delete_selected">選択項目を削除</string>
+    <string name="library_selection_count">%1$d 件を選択中</string>
+    <string name="library_share_chooser_title">音声を共有</string>
+    <string name="library_rename_title">音声名を変更</string>
+    <string name="library_rename_message">%1$s の名前を変更</string>
+    <string name="library_rename_field_label">音声名</string>
+    <string name="library_delete_title">音声を削除</string>
+    <string name="library_delete_message">%1$s を削除しますか？</string>
+    <string name="library_delete_selected_title">音声を削除</string>
+    <string name="library_delete_selected_message">選択した音声ファイル %1$d 件を削除しますか？</string>
+    <string name="library_status_deleted">保存済み音声を削除しました</string>
+    <string name="library_status_deleted_multiple">音声ファイルを %1$d 件削除しました</string>
+    <string name="library_status_delete_failed">保存済み音声の削除に失敗しました</string>
+    <string name="library_status_delete_partial">%1$d / %2$d 件の音声ファイルを削除しました</string>
+    <string name="library_status_renamed">保存済み音声の名前を変更しました: %1$s</string>
+    <string name="library_status_rename_duplicate">同名の音声ファイルが既に存在します</string>
+    <string name="library_status_rename_failed">保存済み音声の名前変更に失敗しました</string>
+    <string name="library_status_share_failed">保存済み音声の共有に失敗しました</string>
+
+    <string name="palette_ruby_title">ルビーレッド</string>
+    <string name="palette_orange_title">ソーラーオレンジ</string>
+    <string name="palette_amber_title">サンイエロー</string>
+    <string name="palette_lime_title">ライムバースト</string>
+    <string name="palette_emerald_title">エメラルドグリーン</string>
+    <string name="palette_teal_title">アクアシアン</string>
+    <string name="palette_ocean_title">エレクトリックブルー</string>
+    <string name="palette_indigo_title">ディープインディゴ</string>
+    <string name="palette_violet_title">バイオレットパルス</string>
+    <string name="palette_magenta_title">マゼンタポップ</string>
+
+    <string name="validation_null_config">設定が不足しています。</string>
+    <string name="validation_null_text">入力テキストが必要です。</string>
+    <string name="validation_null_decoder_output">デコーダー出力バッファが不足しています。</string>
+    <string name="validation_invalid_sample_rate">サンプルレートは 0 より大きくする必要があります。</string>
+    <string name="validation_invalid_frame_samples">フレームサイズは 0 より大きくする必要があります。</string>
+    <string name="validation_invalid_mode">未対応の伝送モードです。</string>
+    <string name="validation_pro_ascii_only">pro モードは ASCII 入力のみ対応します。</string>
+    <string name="validation_payload_too_large">このモードでは入力テキストが大きすぎます。</string>
+
+    <string name="error_invalid_argument">引数が無効です。</string>
+    <string name="error_not_ready">デコード結果はまだ準備できていません。</string>
+    <string name="error_not_implemented">この機能はまだ実装されていません。</string>
+    <string name="error_internal">内部エラーです。</string>
+</resources>

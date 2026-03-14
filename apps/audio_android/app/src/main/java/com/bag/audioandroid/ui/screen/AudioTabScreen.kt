@@ -2,115 +2,142 @@ package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.bag.audioandroid.ui.component.ActionButton
+import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.model.asString
+import com.bag.audioandroid.ui.state.PlaybackUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AudioTabScreen(
     transportMode: TransportModeOption,
     onTransportModeSelected: (TransportModeOption) -> Unit,
     inputText: String,
     onInputTextChange: (String) -> Unit,
-    generatedPcm: ShortArray,
     resultText: String,
-    statusText: String,
-    isPlaying: Boolean,
-    playbackProgress: Float,
+    statusText: UiText,
+    playback: PlaybackUiState,
+    playbackSequenceMode: PlaybackSequenceMode,
+    playbackSampleCount: Int,
+    savedAudioItems: List<SavedAudioItem>,
+    showSavedAudioSheet: Boolean,
     onEncode: () -> Unit,
-    onPlay: () -> Unit,
+    onTogglePlayback: () -> Unit,
+    onSkipToPreviousTrack: () -> Unit,
+    onSkipToNextTrack: () -> Unit,
+    onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
+    canSkipPrevious: Boolean,
+    canSkipNext: Boolean,
+    onScrubStarted: () -> Unit,
+    onScrubChanged: (Int) -> Unit,
+    onScrubFinished: () -> Unit,
     onDecode: () -> Unit,
     onClear: () -> Unit,
+    onClearResult: () -> Unit,
+    onExportAudio: () -> Unit,
+    onShareSavedAudio: (() -> Unit)?,
+    onOpenSavedAudioSheet: () -> Unit,
+    onCloseSavedAudioSheet: () -> Unit,
+    onSavedAudioSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val resolvedStatusText = statusText.asString()
+    val displayedSamples = playback.displayedSamples
+    val displayedTime = formatDurationMillis(samplesToMillis(displayedSamples, playback.sampleRateHz))
+    val totalTime = formatDurationMillis(samplesToMillis(playback.totalSamples, playback.sampleRateHz))
+    val scrollState = rememberScrollState()
+    var inputExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
+    var resultExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
+    var savedAudioFilter by remember(transportMode, showSavedAudioSheet) {
+        mutableStateOf(SavedAudioModeFilter.fromTransportMode(transportMode))
+    }
+
+    if (showSavedAudioSheet) {
+        ModalBottomSheet(
+            onDismissRequest = onCloseSavedAudioSheet
+        ) {
+            SavedAudioPickerSheet(
+                savedAudioItems = savedAudioItems,
+                selectedFilter = savedAudioFilter,
+                onFilterSelected = { savedAudioFilter = it },
+                onSavedAudioSelected = onSavedAudioSelected
+            )
+        }
+    }
+
     Column(
-        modifier = modifier,
+        modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Audio",
+            text = stringResource(R.string.audio_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold
         )
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = onInputTextChange,
-            label = { Text("输入文本") },
+        AudioModeSwitcher(
+            transportMode = transportMode,
+            onTransportModeSelected = onTransportModeSelected,
             modifier = Modifier.fillMaxWidth()
         )
-
-        Column(
-            modifier = Modifier.selectableGroup(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "模式",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                TransportModeOption.entries.forEach { option ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.selectable(
-                            selected = transportMode == option,
-                            onClick = { onTransportModeSelected(option) }
-                        )
-                    ) {
-                        RadioButton(
-                            selected = transportMode == option,
-                            onClick = { onTransportModeSelected(option) }
-                        )
-                        Text(option.label)
-                    }
-                }
-            }
-        }
-
-        ActionButton("文本转音频", onEncode)
-        ActionButton("播放音频", onPlay)
-        ActionButton("解析生成音频", onDecode)
-        ActionButton("清空", onClear)
-
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = 2.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(148.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text("状态: $statusText", style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    "播放进度: ${(playbackProgress * 100).toInt()}%${if (isPlaying) " (播放中)" else ""}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                LinearProgressIndicator(
-                    progress = { playbackProgress.coerceIn(0f, 1f) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text("样本数: ${generatedPcm.size}", style = MaterialTheme.typography.bodySmall)
-                Text("解析结果: $resultText", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
+        AudioPlaybackCard(
+            statusText = resolvedStatusText,
+            playbackSampleCount = playbackSampleCount,
+            displayedSamples = displayedSamples,
+            totalSamples = playback.totalSamples,
+            isScrubbing = playback.isScrubbing,
+            displayedTime = displayedTime,
+            totalTime = totalTime,
+            isPlaying = playback.isPlaying,
+            playbackSequenceMode = playbackSequenceMode,
+            onTogglePlayback = onTogglePlayback,
+            onSkipToPreviousTrack = onSkipToPreviousTrack,
+            onSkipToNextTrack = onSkipToNextTrack,
+            onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
+            canSkipPrevious = canSkipPrevious,
+            canSkipNext = canSkipNext,
+            onExportAudio = onExportAudio,
+            onShareSavedAudio = onShareSavedAudio,
+            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
+            onScrubStarted = onScrubStarted,
+            onScrubChanged = onScrubChanged,
+            onScrubFinished = onScrubFinished
+        )
+        AudioInputActionsCard(
+            transportMode = transportMode,
+            inputText = inputText,
+            onInputTextChange = onInputTextChange,
+            onEncode = onEncode,
+            expanded = inputExpanded,
+            onToggleExpanded = { inputExpanded = !inputExpanded }
+        )
+        AudioResultCard(
+            resultText = resultText,
+            expanded = resultExpanded,
+            onToggleExpanded = { resultExpanded = !resultExpanded },
+            onDecode = onDecode,
+            onClearInput = onClear,
+            onClearResult = onClearResult
+        )
     }
 }

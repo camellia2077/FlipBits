@@ -33,13 +33,17 @@ add_subdirectory(
 )
 
 add_library(audio_android_jni SHARED
+    audio_io_jni.cpp
     jni_bridge.cpp
+    playback_runtime_jni.cpp
 )
 
 # Keep the app-side JNI target on the bag_api.h consumer boundary.
 target_include_directories(audio_android_jni
     PRIVATE
+        "${WAVEBITS_ROOT}/apps/audio_android/native_package/private_include"
         "${WAVEBITS_ROOT}/libs/audio_api/include"
+        "${WAVEBITS_ROOT}/libs/audio_runtime/include"
 )
 
 target_link_libraries(audio_android_jni

@@ -9,7 +9,7 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int
-    ): String = NativeBagBridge.nativeValidateEncodeRequest(text, sampleRateHz, frameSamples, mode)
+    ): Int = NativeBagBridge.nativeValidateEncodeRequest(text, sampleRateHz, frameSamples, mode)
 
     override fun encodeTextToPcm(
         text: String,
@@ -22,7 +22,7 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int
-    ): String = NativeBagBridge.nativeValidateDecodeConfig(sampleRateHz, frameSamples, mode)
+    ): Int = NativeBagBridge.nativeValidateDecodeConfig(sampleRateHz, frameSamples, mode)
 
     override fun decodeGeneratedPcm(
         pcm: ShortArray,
@@ -30,8 +30,6 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         frameSamples: Int,
         mode: Int
     ): String = NativeBagBridge.nativeDecodeGeneratedPcm(pcm, sampleRateHz, frameSamples, mode)
-
-    override fun errorCodeMessage(code: Int): String = NativeBagBridge.nativeErrorCodeMessage(code)
 
     override fun getCoreVersion(): String = NativeBagBridge.nativeGetCoreVersion()
 }
