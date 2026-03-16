@@ -36,5 +36,14 @@ interface AudioCodecGateway {
         flashVoicingFlavor: Int
     ): String
 
+    fun analyzeVisualization(
+        pcm: ShortArray,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int
+    ): AudioVisualizationTrack?
+
     fun getCoreVersion(): String
 }

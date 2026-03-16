@@ -87,6 +87,20 @@ bag_error_code ToApiCode(bag::ErrorCode code) {
     }
 }
 
+bag_visualization_region_kind ToApiVisualizationRegionKind(bag::VisualizationRegionKind kind) {
+    switch (kind) {
+    case bag::VisualizationRegionKind::kLeadingShell:
+        return BAG_VISUALIZATION_REGION_LEADING_SHELL;
+    case bag::VisualizationRegionKind::kPayload:
+        return BAG_VISUALIZATION_REGION_PAYLOAD;
+    case bag::VisualizationRegionKind::kTrailingShell:
+        return BAG_VISUALIZATION_REGION_TRAILING_SHELL;
+    case bag::VisualizationRegionKind::kUnknown:
+    default:
+        return BAG_VISUALIZATION_REGION_UNKNOWN;
+    }
+}
+
 bag_validation_issue ToApiValidationIssue(bag::TransportValidationIssue issue) {
     switch (issue) {
     case bag::TransportValidationIssue::kOk:
@@ -280,6 +294,89 @@ void bag_free_pcm16_result(bag_pcm16_result* result) {
     delete[] result->samples;
     result->samples = nullptr;
     result->sample_count = 0;
+}
+
+bag_error_code bag_analyze_visualization(const bag_decoder_config* config,
+                                         const int16_t* samples,
+                                         size_t sample_count,
+                                         bag_visualization_result* out_result) {
+    if (config == nullptr || samples == nullptr || sample_count == 0 || out_result == nullptr) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    out_result->frames = nullptr;
+    out_result->frame_count = 0;
+    out_result->total_samples = 0;
+    out_result->sample_rate_hz = 0;
+    out_result->frame_stride_samples = 0;
+
+    if (bag_validate_decoder_config(config) != BAG_VALIDATION_OK) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    try {
+        const bag::CoreConfig core_config = ToCoreConfig(
+            config->sample_rate_hz,
+            config->frame_samples,
+            config->enable_diagnostics,
+            config->mode,
+            config->flash_signal_profile,
+            config->flash_voicing_flavor,
+            config->reserved);
+        const std::vector<std::int16_t> pcm(samples, samples + sample_count);
+        bag::VisualizationResult visualization{};
+        const bag::ErrorCode analyze_code =
+            bag::AnalyzeVisualization(core_config, pcm, &visualization);
+        if (analyze_code != bag::ErrorCode::kOk) {
+            return ToApiCode(analyze_code);
+        }
+
+        if (visualization.frames.empty()) {
+            out_result->total_samples = visualization.total_samples;
+            out_result->sample_rate_hz = visualization.sample_rate_hz;
+            out_result->frame_stride_samples = visualization.frame_stride_samples;
+            return BAG_OK;
+        }
+
+        auto* frames = new (std::nothrow) bag_visualization_frame[visualization.frames.size()];
+        if (frames == nullptr) {
+            return BAG_INTERNAL;
+        }
+
+        for (std::size_t index = 0; index < visualization.frames.size(); ++index) {
+            const auto& frame = visualization.frames[index];
+            frames[index].sample_offset = frame.sample_offset;
+            frames[index].sample_count = frame.sample_count;
+            frames[index].rms = frame.rms;
+            frames[index].peak = frame.peak;
+            frames[index].brightness = frame.brightness;
+            frames[index].region_kind = ToApiVisualizationRegionKind(frame.region_kind);
+        }
+
+        out_result->frames = frames;
+        out_result->frame_count = visualization.frames.size();
+        out_result->total_samples = visualization.total_samples;
+        out_result->sample_rate_hz = visualization.sample_rate_hz;
+        out_result->frame_stride_samples = visualization.frame_stride_samples;
+        return BAG_OK;
+    } catch (const std::invalid_argument&) {
+        return BAG_INVALID_ARGUMENT;
+    } catch (...) {
+        return BAG_INTERNAL;
+    }
+}
+
+void bag_free_visualization_result(bag_visualization_result* result) {
+    if (result == nullptr) {
+        return;
+    }
+
+    delete[] result->frames;
+    result->frames = nullptr;
+    result->frame_count = 0;
+    result->total_samples = 0;
+    result->sample_rate_hz = 0;
+    result->frame_stride_samples = 0;
 }
 
 bag_error_code bag_create_decoder(const bag_decoder_config* config, bag_decoder** out_decoder) {

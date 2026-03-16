@@ -33,80 +33,15 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 
 @Composable
-internal fun AudioFlashVoicingCard(
-    selectedFlashVoicingStyle: FlashVoicingStyleOption,
-    onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
-    expanded: Boolean,
-    onToggleExpanded: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val selectedStyleLabel = stringResource(selectedFlashVoicingStyle.labelResId)
-
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 2.dp,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            AudioSectionHeader(
-                title = stringResource(R.string.audio_flash_style_title, selectedStyleLabel),
-                expanded = expanded,
-                onToggleExpanded = onToggleExpanded,
-                expandDescription = stringResource(R.string.audio_action_expand_flash_style),
-                collapseDescription = stringResource(R.string.audio_action_collapse_flash_style)
-            )
-            if (expanded) {
-                Text(
-                    text = stringResource(R.string.audio_flash_style_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                FlashVoicingStyleOption.entries.forEach { option ->
-                    val selected = option == selectedFlashVoicingStyle
-                    Surface(
-                        tonalElevation = if (selected) 6.dp else 1.dp,
-                        shadowElevation = if (selected) 2.dp else 0.dp,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onFlashVoicingStyleSelected(option) }
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(option.labelResId),
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            if (selected) {
-                                Text(
-                                    text = stringResource(R.string.config_palette_selected),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 internal fun AudioInputActionsCard(
     transportMode: TransportModeOption,
+    selectedFlashVoicingStyle: FlashVoicingStyleOption,
+    onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
     inputText: String,
     onInputTextChange: (String) -> Unit,
     onEncode: () -> Unit,
-    expanded: Boolean,
-    onToggleExpanded: () -> Unit,
+    flashVoicingExpanded: Boolean,
+    onToggleFlashVoicingExpanded: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -118,29 +53,121 @@ internal fun AudioInputActionsCard(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            AudioSectionHeader(
+            AudioInputCardHeader(
                 title = stringResource(R.string.audio_input_label),
-                expanded = expanded,
-                onToggleExpanded = onToggleExpanded,
-                expandDescription = stringResource(R.string.audio_action_expand_input),
-                collapseDescription = stringResource(R.string.audio_action_collapse_input)
+                transportMode = transportMode,
+                flashVoicingExpanded = flashVoicingExpanded,
+                onToggleFlashVoicingExpanded = onToggleFlashVoicingExpanded
             )
-            if (expanded) {
-                OutlinedTextField(
-                    value = inputText,
-                    onValueChange = onInputTextChange,
-                    label = { Text(stringResource(R.string.audio_input_label)) },
-                    placeholder = { Text(stringResource(transportMode.exampleTextResId)) },
-                    supportingText = { Text(stringResource(transportMode.charsetHintResId)) },
-                    minLines = 1,
-                    maxLines = 8,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 220.dp)
+            if (transportMode == TransportModeOption.Flash && flashVoicingExpanded) {
+                FlashVoicingSelectorSection(
+                    selectedFlashVoicingStyle = selectedFlashVoicingStyle,
+                    onFlashVoicingStyleSelected = onFlashVoicingStyleSelected
                 )
             }
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = onInputTextChange,
+                label = { Text(stringResource(R.string.audio_input_label)) },
+                placeholder = { Text(stringResource(transportMode.exampleTextResId)) },
+                supportingText = { Text(stringResource(transportMode.charsetHintResId)) },
+                minLines = 1,
+                maxLines = 8,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 220.dp)
+            )
 
             ActionButton(stringResource(R.string.audio_action_encode), onEncode)
+        }
+    }
+}
+
+@Composable
+private fun AudioInputCardHeader(
+    title: String,
+    transportMode: TransportModeOption,
+    flashVoicingExpanded: Boolean,
+    onToggleFlashVoicingExpanded: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        if (transportMode == TransportModeOption.Flash) {
+            IconButton(onClick = onToggleFlashVoicingExpanded) {
+                Icon(
+                    imageVector = if (flashVoicingExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    contentDescription = stringResource(
+                        if (flashVoicingExpanded) {
+                            R.string.audio_action_collapse_flash_style
+                        } else {
+                            R.string.audio_action_expand_flash_style
+                        }
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FlashVoicingSelectorSection(
+    selectedFlashVoicingStyle: FlashVoicingStyleOption,
+    onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit
+) {
+    val selectedStyleLabel = stringResource(selectedFlashVoicingStyle.labelResId)
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = stringResource(R.string.audio_flash_style_title, selectedStyleLabel),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = stringResource(R.string.audio_flash_style_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        FlashVoicingStyleOption.entries.forEach { option ->
+            val selected = option == selectedFlashVoicingStyle
+            Surface(
+                tonalElevation = if (selected) 6.dp else 1.dp,
+                shadowElevation = if (selected) 2.dp else 0.dp,
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onFlashVoicingStyleSelected(option) }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(option.labelResId),
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (selected) {
+                        Text(
+                            text = stringResource(R.string.config_palette_selected),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
         }
     }
 }

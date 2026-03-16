@@ -28,6 +28,9 @@ TransportValidationIssue ValidateDecoderConfig(const CoreConfig& config);
 ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<std::int16_t>* out_pcm);
+ErrorCode AnalyzeVisualization(const CoreConfig& config,
+                               const std::vector<std::int16_t>& pcm,
+                               VisualizationResult* out_result);
 std::unique_ptr<ITransportDecoder> CreateTransportDecoder(const CoreConfig& config);
 
 }  // namespace bag

@@ -3,6 +3,7 @@
 
 import bag.flash.phy_clean;
 import bag.flash.signal;
+import bag.flash.visualization;
 import bag.flash.voicing;
 
 namespace {
@@ -484,6 +485,71 @@ void TestFormalRitualChantDecodesWithConfiguredTrim() {
         &decoded_text);
     test::AssertEq(decode_code, bag::ErrorCode::kOk, "configured ritual_chant decode should succeed.");
     test::AssertEq(decoded_text, std::string("Decode"), "configured ritual_chant decode should roundtrip text.");
+}
+
+void TestVisualizationRegionsAlignWithFormalDescriptor() {
+    const auto assert_alignment = [](bag::FlashVoicingFlavor flavor) {
+        auto config = MakeAndroidSizedCoreConfig();
+        config.flash_voicing_flavor = flavor;
+        config.flash_signal_profile = flavor == bag::FlashVoicingFlavor::kRitualChant
+                                          ? bag::FlashSignalProfile::kRitualChant
+                                          : bag::FlashSignalProfile::kCodedBurst;
+
+        std::vector<std::int16_t> pcm;
+        test::AssertEq(
+            bag::flash::EncodeTextToPcm16(config, "Visual", &pcm),
+            bag::ErrorCode::kOk,
+            "Formal flash encode should succeed before visualization/descriptor comparison.");
+
+        bag::VisualizationResult visualization{};
+        test::AssertEq(
+            bag::flash::AnalyzeVisualization(config, pcm, &visualization),
+            bag::ErrorCode::kOk,
+            "Visualization analysis should succeed before descriptor comparison.");
+        test::AssertTrue(
+            !visualization.frames.empty(),
+            "Visualization should expose frames for descriptor comparison.");
+
+        const auto descriptor = bag::flash::DescribeVoicingOutput(
+            pcm.size(),
+            bag::flash::MakeFormalVoicingConfigForFlavor(config, flavor));
+        const int payload_begin = static_cast<int>(descriptor.leading_nonpayload_samples);
+        const int payload_end = payload_begin + static_cast<int>(descriptor.payload_sample_count);
+
+        const auto payload_frame = std::find_if(
+            visualization.frames.begin(),
+            visualization.frames.end(),
+            [](const bag::VisualizationFrame& frame) {
+                return frame.region_kind == bag::VisualizationRegionKind::kPayload;
+            });
+        const auto trailing_frame = std::find_if(
+            visualization.frames.begin(),
+            visualization.frames.end(),
+            [](const bag::VisualizationFrame& frame) {
+                return frame.region_kind == bag::VisualizationRegionKind::kTrailingShell;
+            });
+
+        test::AssertEq(
+            visualization.frames.front().region_kind,
+            bag::VisualizationRegionKind::kLeadingShell,
+            "Visualization should classify the first frame as leading shell.");
+        test::AssertTrue(
+            payload_frame != visualization.frames.end(),
+            "Visualization should expose a payload frame that can be compared against the descriptor.");
+        test::AssertTrue(
+            payload_frame->sample_offset >= payload_begin &&
+                payload_frame->sample_offset + payload_frame->sample_count <= payload_end,
+            "Visualization payload frames should stay inside descriptor payload bounds.");
+        test::AssertTrue(
+            trailing_frame != visualization.frames.end(),
+            "Visualization should expose a trailing-shell frame that can be compared against the descriptor.");
+        test::AssertTrue(
+            trailing_frame->sample_offset >= payload_end,
+            "Visualization trailing-shell frames should begin after descriptor payload end.");
+    };
+
+    assert_alignment(bag::FlashVoicingFlavor::kCodedBurst);
+    assert_alignment(bag::FlashVoicingFlavor::kRitualChant);
 }
 
 void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
@@ -1050,6 +1116,8 @@ int main() {
                TestFormalRitualChantHasLongerShellThanCodedBurst);
     runner.Add("FlashVoicing.FormalRitualChantDecodesWithConfiguredTrim",
                TestFormalRitualChantDecodesWithConfiguredTrim);
+    runner.Add("FlashVoicing.VisualizationRegionsAlignWithFormalDescriptor",
+               TestVisualizationRegionsAlignWithFormalDescriptor);
     runner.Add("FlashVoicing.ExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor",
                TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor);
     runner.Add("FlashVoicing.ExplicitSignalProfileAndFlavorMatchDefaultExplicitPath",

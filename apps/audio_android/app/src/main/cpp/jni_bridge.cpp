@@ -178,6 +178,63 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeValidateDecodeConfig(
     return static_cast<jint>(issue);
 }
 
+extern "C" JNIEXPORT jfloatArray JNICALL
+Java_com_bag_audioandroid_NativeBagBridge_nativeAnalyzeVisualization(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jshortArray pcm,
+    jint sample_rate_hz,
+    jint frame_samples,
+    jint mode,
+    jint flash_signal_profile,
+    jint flash_voicing_flavor) {
+    if (pcm == nullptr) {
+        return env->NewFloatArray(0);
+    }
+
+    const jsize len = env->GetArrayLength(pcm);
+    if (len <= 0) {
+        return env->NewFloatArray(0);
+    }
+
+    std::vector<int16_t> buffer(static_cast<size_t>(len), 0);
+    env->GetShortArrayRegion(pcm, 0, len, reinterpret_cast<jshort*>(buffer.data()));
+
+    bag_decoder_config config =
+        MakeDecoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
+    config.mode = static_cast<bag_transport_mode>(mode);
+
+    bag_visualization_result visualization{};
+    if (bag_analyze_visualization(&config, buffer.data(), buffer.size(), &visualization) != BAG_OK) {
+        return env->NewFloatArray(0);
+    }
+
+    const size_t packed_count = static_cast<size_t>(4) + visualization.frame_count * static_cast<size_t>(6);
+    std::vector<jfloat> packed(packed_count, 0.0f);
+    packed[0] = static_cast<jfloat>(visualization.frame_count);
+    packed[1] = static_cast<jfloat>(visualization.total_samples);
+    packed[2] = static_cast<jfloat>(visualization.sample_rate_hz);
+    packed[3] = static_cast<jfloat>(visualization.frame_stride_samples);
+
+    for (size_t index = 0; index < visualization.frame_count; ++index) {
+        const size_t base = static_cast<size_t>(4) + index * static_cast<size_t>(6);
+        const bag_visualization_frame& frame = visualization.frames[index];
+        packed[base + 0] = static_cast<jfloat>(frame.sample_offset);
+        packed[base + 1] = static_cast<jfloat>(frame.sample_count);
+        packed[base + 2] = frame.rms;
+        packed[base + 3] = frame.peak;
+        packed[base + 4] = frame.brightness;
+        packed[base + 5] = static_cast<jfloat>(frame.region_kind);
+    }
+
+    jfloatArray out = env->NewFloatArray(static_cast<jsize>(packed.size()));
+    if (out != nullptr && !packed.empty()) {
+        env->SetFloatArrayRegion(out, 0, static_cast<jsize>(packed.size()), packed.data());
+    }
+    bag_free_visualization_result(&visualization);
+    return out;
+}
+
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_bag_audioandroid_NativeBagBridge_nativeGetCoreVersion(
     JNIEnv* env, jobject /*thiz*/) {

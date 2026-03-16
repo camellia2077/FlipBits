@@ -10,6 +10,7 @@ import bag.common.error_code;
 import bag.common.version;
 import bag.flash.codec;
 import bag.flash.signal;
+import bag.flash.visualization;
 import bag.flash.voicing;
 import bag.flash.phy_clean;
 import bag.pro.codec;
@@ -69,6 +70,10 @@ std::size_t FormalFlashTrailingSamples(const bag::CoreConfig& config) {
     return config.frame_samples > 0
                ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
                : static_cast<std::size_t>(0);
+}
+
+int ExpectedVisualizationStride(const bag::CoreConfig& config) {
+    return std::max(1, config.frame_samples / 4);
 }
 
 std::vector<std::uint8_t> AsBytes(const std::string& text) {
@@ -552,6 +557,120 @@ void TestFlashVoicingStyledOutputKeepsPayloadShape() {
         "Flash voicing styled output max sample should remain in PCM16 range.");
 }
 
+void TestFlashVisualizationFramesCoverFormalOutput() {
+    const auto config = MakeFlashCoreConfig();
+    std::vector<std::int16_t> pcm;
+    test::AssertEq(
+        bag::flash::EncodeTextToPcm16(config, "Visual", &pcm),
+        bag::ErrorCode::kOk,
+        "Flash formal encode should succeed before visualization analysis.");
+
+    bag::VisualizationResult visualization{};
+    test::AssertEq(
+        bag::flash::AnalyzeVisualization(config, pcm, &visualization),
+        bag::ErrorCode::kOk,
+        "Flash visualization analysis should succeed.");
+    test::AssertEq(
+        visualization.total_samples,
+        static_cast<int>(pcm.size()),
+        "Visualization total sample count should match the input PCM.");
+    test::AssertEq(
+        visualization.sample_rate_hz,
+        config.sample_rate_hz,
+        "Visualization sample rate should match the flash config.");
+    test::AssertEq(
+        visualization.frame_stride_samples,
+        ExpectedVisualizationStride(config),
+        "Visualization should use quarter-frame buckets.");
+    test::AssertTrue(
+        !visualization.frames.empty(),
+        "Visualization should emit at least one frame.");
+
+    int covered_samples = 0;
+    int expected_offset = 0;
+    bool has_payload_frame = false;
+    for (const auto& frame : visualization.frames) {
+        test::AssertEq(
+            frame.sample_offset,
+            expected_offset,
+            "Visualization frames should remain contiguous.");
+        test::AssertTrue(frame.sample_count > 0, "Visualization frames should not be empty.");
+        test::AssertTrue(frame.rms >= 0.0f && frame.rms <= 1.0f, "Visualization RMS should stay normalized.");
+        test::AssertTrue(frame.peak >= 0.0f && frame.peak <= 1.0f, "Visualization peak should stay normalized.");
+        test::AssertTrue(
+            frame.brightness >= 0.0f && frame.brightness <= 1.0f,
+            "Visualization brightness should stay normalized.");
+        has_payload_frame = has_payload_frame || frame.region_kind == bag::VisualizationRegionKind::kPayload;
+        covered_samples += frame.sample_count;
+        expected_offset += frame.sample_count;
+    }
+    test::AssertEq(
+        covered_samples,
+        static_cast<int>(pcm.size()),
+        "Visualization frames should cover the full PCM without gaps.");
+    test::AssertEq(
+        visualization.frames.front().region_kind,
+        bag::VisualizationRegionKind::kLeadingShell,
+        "The first visualization frame should map to the leading shell.");
+    test::AssertEq(
+        visualization.frames.back().region_kind,
+        bag::VisualizationRegionKind::kTrailingShell,
+        "The last visualization frame should map to the trailing shell.");
+    test::AssertTrue(
+        has_payload_frame,
+        "Visualization should expose at least one payload-classified frame.");
+}
+
+void TestFlashVisualizationRitualShellStartsPayloadLaterThanCodedBurst() {
+    const auto coded_config = MakeFlashCoreConfig();
+    const auto ritual_config = MakeRitualFlashCoreConfig();
+    std::vector<std::int16_t> coded_pcm;
+    std::vector<std::int16_t> ritual_pcm;
+
+    test::AssertEq(
+        bag::flash::EncodeTextToPcm16(coded_config, "Visual", &coded_pcm),
+        bag::ErrorCode::kOk,
+        "coded_burst formal encode should succeed before visualization comparison.");
+    test::AssertEq(
+        bag::flash::EncodeTextToPcm16(ritual_config, "Visual", &ritual_pcm),
+        bag::ErrorCode::kOk,
+        "ritual_chant formal encode should succeed before visualization comparison.");
+
+    bag::VisualizationResult coded_visualization{};
+    bag::VisualizationResult ritual_visualization{};
+    test::AssertEq(
+        bag::flash::AnalyzeVisualization(coded_config, coded_pcm, &coded_visualization),
+        bag::ErrorCode::kOk,
+        "coded_burst visualization should succeed.");
+    test::AssertEq(
+        bag::flash::AnalyzeVisualization(ritual_config, ritual_pcm, &ritual_visualization),
+        bag::ErrorCode::kOk,
+        "ritual_chant visualization should succeed.");
+
+    const auto coded_payload_frame = std::find_if(
+        coded_visualization.frames.begin(),
+        coded_visualization.frames.end(),
+        [](const bag::VisualizationFrame& frame) {
+            return frame.region_kind == bag::VisualizationRegionKind::kPayload;
+        });
+    const auto ritual_payload_frame = std::find_if(
+        ritual_visualization.frames.begin(),
+        ritual_visualization.frames.end(),
+        [](const bag::VisualizationFrame& frame) {
+            return frame.region_kind == bag::VisualizationRegionKind::kPayload;
+        });
+
+    test::AssertTrue(
+        coded_payload_frame != coded_visualization.frames.end(),
+        "coded_burst visualization should expose a payload frame.");
+    test::AssertTrue(
+        ritual_payload_frame != ritual_visualization.frames.end(),
+        "ritual_chant visualization should expose a payload frame.");
+    test::AssertTrue(
+        ritual_payload_frame->sample_offset > coded_payload_frame->sample_offset,
+        "ritual_chant visualization should push the first payload frame later than coded_burst.");
+}
+
 void TestProCodecModule() {
     std::vector<std::uint8_t> payload;
     test::AssertEq(
@@ -804,6 +923,10 @@ int main() {
     runner.Add(
         "ModulesLeaf.FlashVoicingStyledOutputKeepsPayloadShape",
         TestFlashVoicingStyledOutputKeepsPayloadShape);
+    runner.Add("ModulesLeaf.FlashVisualizationFramesCoverFormalOutput",
+               TestFlashVisualizationFramesCoverFormalOutput);
+    runner.Add("ModulesLeaf.FlashVisualizationRitualShellStartsPayloadLaterThanCodedBurst",
+               TestFlashVisualizationRitualShellStartsPayloadLaterThanCodedBurst);
     runner.Add("ModulesLeaf.ProCodecModule", TestProCodecModule);
     runner.Add("ModulesLeaf.ProCodecRejectsInvalidInput", TestProCodecRejectsInvalidInput);
     runner.Add("ModulesLeaf.UltraCodecModule", TestUltraCodecModule);

@@ -35,6 +35,9 @@ struct FlashVoicingResult {
 FlashVoicingDescriptor DescribeVoicingOutput(std::size_t total_sample_count,
                                              const FlashVoicingConfig& config = {});
 
+FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
+                                                    FlashVoicingFlavor flavor);
+
 std::vector<std::int16_t> TrimToPayloadPcm(const std::vector<std::int16_t>& voiced_pcm,
                                            const FlashVoicingDescriptor& descriptor);
 

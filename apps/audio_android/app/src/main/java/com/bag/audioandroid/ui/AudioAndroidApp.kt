@@ -157,6 +157,8 @@ fun AudioAndroidApp() {
                     resultText = currentSession.resultText,
                     statusText = currentSession.statusText,
                     playback = uiState.currentPlayback,
+                    visualizationTrack = uiState.currentGeneratedVisualization,
+                    currentVisualizationFrame = uiState.currentVisualizationFrame,
                     playbackSequenceMode = uiState.playbackSequenceMode,
                     playbackSampleCount = uiState.currentPlaybackSampleCount,
                     savedAudioItems = uiState.savedAudioItems,

@@ -1,5 +1,7 @@
 package com.bag.audioandroid.ui.state
 
+import com.bag.audioandroid.domain.AudioVisualizationFrame
+import com.bag.audioandroid.domain.AudioVisualizationTrack
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
@@ -50,6 +52,34 @@ data class AudioAppUiState(
                 ?.pcm
                 ?.size
                 ?: 0
+        }
+
+    val currentGeneratedVisualization: AudioVisualizationTrack?
+        get() = when (val source = currentPlaybackSource) {
+            is AudioPlaybackSource.Generated -> if (source.mode == TransportModeOption.Flash) {
+                sessions.getValue(source.mode).generatedVisualization
+            } else {
+                null
+            }
+            is AudioPlaybackSource.Saved -> null
+        }
+
+    val currentVisualizationFrame: AudioVisualizationFrame?
+        get() {
+            val track = currentGeneratedVisualization ?: return null
+            if (track.frames.isEmpty()) {
+                return null
+            }
+            val targetSamples = currentPlayback.displayedSamples
+            return track.frames.firstOrNull { frame ->
+                val frameBegin = frame.sampleOffset
+                val frameEnd = frame.sampleOffset + frame.sampleCount
+                targetSamples in frameBegin until frameEnd
+            } ?: if (targetSamples <= track.frames.first().sampleOffset) {
+                track.frames.first()
+            } else {
+                track.frames.last()
+            }
         }
 
     val currentSavedAudioItem: SavedAudioItem?

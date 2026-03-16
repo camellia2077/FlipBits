@@ -40,5 +40,14 @@ object NativeBagBridge {
         flashVoicingFlavor: Int
     ): Int
 
+    external fun nativeAnalyzeVisualization(
+        pcm: ShortArray,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int
+    ): FloatArray
+
     external fun nativeGetCoreVersion(): String
 }

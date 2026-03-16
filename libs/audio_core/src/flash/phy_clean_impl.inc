@@ -36,41 +36,6 @@ FlashVoicingFlavor NormalizeFormalVoicingFlavor(FlashVoicingFlavor flavor) {
     }
 }
 
-FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
-                                                    FlashVoicingFlavor flavor) {
-    FlashVoicingConfig voicing{};
-    voicing.sample_rate_hz = config.sample_rate_hz;
-    voicing.attack_ratio = 0.08;
-    voicing.release_ratio = 0.08;
-    voicing.second_harmonic_gain = 0.10;
-    voicing.third_harmonic_gain = 0.03;
-    voicing.boundary_click_gain = 0.02;
-    voicing.enable_preamble = true;
-    voicing.enable_epilogue = true;
-    switch (NormalizeFormalVoicingFlavor(flavor)) {
-    case FlashVoicingFlavor::kRitualChant:
-        voicing.preamble_sample_count =
-            config.frame_samples > 0 ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(16)
-                                     : static_cast<std::size_t>(0);
-        voicing.epilogue_sample_count =
-            config.frame_samples > 0 ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(8)
-                                     : static_cast<std::size_t>(0);
-        break;
-    case FlashVoicingFlavor::kCodedBurst:
-    default:
-        voicing.preamble_sample_count =
-            config.frame_samples > 0
-                ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
-                : static_cast<std::size_t>(0);
-        voicing.epilogue_sample_count =
-            config.frame_samples > 0
-                ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
-                : static_cast<std::size_t>(0);
-        break;
-    }
-    return voicing;
-}
-
 bool IsFormalVoicingCompatible(const FlashVoicingResult& voiced_payload,
                                std::size_t clean_payload_sample_count,
                                const FlashVoicingConfig& config) {

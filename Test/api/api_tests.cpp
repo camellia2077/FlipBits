@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -71,6 +72,14 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
     return text.size() * static_cast<std::size_t>(8) * payload_samples_per_bit +
            leading_nonpayload_samples +
            trailing_nonpayload_samples;
+}
+
+bag_visualization_result AnalyzeVisualizationViaApi(const bag_decoder_config& config,
+                                                    const bag_pcm16_result& pcm) {
+    bag_visualization_result result{};
+    const auto analyze_code = bag_analyze_visualization(&config, pcm.samples, pcm.sample_count, &result);
+    test::AssertEq(analyze_code, BAG_OK, "Visualization analysis should succeed.");
+    return result;
 }
 
 DecodeResult DecodeViaApi(const bag_decoder_config& config, const bag_pcm16_result& pcm) {
@@ -427,6 +436,125 @@ void TestApiFlashDecodeRequiresMatchingConfig() {
     bag_free_pcm16_result(&ritual_pcm);
 }
 
+void TestApiFlashVisualizationProducesFrameTrack() {
+    const auto config_case = test::ConfigCases().front();
+    const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH);
+    const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_FLASH);
+    const std::string text = "Visual";
+
+    bag_pcm16_result pcm{};
+    test::AssertEq(
+        bag_encode_text(&encoder_config, text.c_str(), &pcm),
+        BAG_OK,
+        "Flash encode should succeed before visualization analysis.");
+
+    auto visualization = AnalyzeVisualizationViaApi(decoder_config, pcm);
+    test::AssertTrue(visualization.frames != nullptr, "Visualization frames should be allocated for flash PCM.");
+    test::AssertTrue(visualization.frame_count > 0, "Visualization should produce at least one frame.");
+    test::AssertEq(
+        visualization.total_samples,
+        static_cast<int>(pcm.sample_count),
+        "Visualization total sample count should match the analyzed PCM.");
+    test::AssertEq(
+        visualization.sample_rate_hz,
+        config_case.sample_rate_hz,
+        "Visualization sample rate should mirror the decoder config.");
+    test::AssertEq(
+        visualization.frame_stride_samples,
+        std::max(1, config_case.frame_samples / 4),
+        "Visualization stride should use the fixed quarter-frame bucket.");
+    test::AssertEq(
+        visualization.frames[0].region_kind,
+        BAG_VISUALIZATION_REGION_LEADING_SHELL,
+        "Flash visualization should classify the first frame as leading shell.");
+
+    bool has_payload_frame = false;
+    for (std::size_t index = 0; index < visualization.frame_count; ++index) {
+        const auto& frame = visualization.frames[index];
+        if (frame.region_kind == BAG_VISUALIZATION_REGION_PAYLOAD) {
+            has_payload_frame = true;
+        }
+        test::AssertTrue(frame.rms >= 0.0f && frame.rms <= 1.0f, "Visualization RMS must stay normalized.");
+        test::AssertTrue(frame.peak >= 0.0f && frame.peak <= 1.0f, "Visualization peak must stay normalized.");
+        test::AssertTrue(
+            frame.brightness >= 0.0f && frame.brightness <= 1.0f,
+            "Visualization brightness must stay normalized.");
+    }
+    test::AssertTrue(has_payload_frame, "Flash visualization should classify at least one frame as payload.");
+
+    bag_free_visualization_result(&visualization);
+    bag_free_pcm16_result(&pcm);
+}
+
+void TestApiVisualizationReturnsNotImplementedOutsideFlash() {
+    const auto config_case = test::ConfigCases().front();
+
+    {
+        const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_PRO);
+        const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_PRO);
+        bag_pcm16_result pcm{};
+        test::AssertEq(
+            bag_encode_text(&encoder_config, "PRO", &pcm),
+            BAG_OK,
+            "Pro encode should succeed before visualization availability check.");
+        bag_visualization_result visualization{};
+        test::AssertEq(
+            bag_analyze_visualization(&decoder_config, pcm.samples, pcm.sample_count, &visualization),
+            BAG_NOT_IMPLEMENTED,
+            "Visualization should report not implemented for pro mode.");
+        bag_free_pcm16_result(&pcm);
+    }
+
+    {
+        const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_ULTRA);
+        const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_ULTRA);
+        bag_pcm16_result pcm{};
+        const auto ultra_text = test::Utf8Literal(u8"超");
+        test::AssertEq(
+            bag_encode_text(&encoder_config, ultra_text.c_str(), &pcm),
+            BAG_OK,
+            "Ultra encode should succeed before visualization availability check.");
+        bag_visualization_result visualization{};
+        test::AssertEq(
+            bag_analyze_visualization(&decoder_config, pcm.samples, pcm.sample_count, &visualization),
+            BAG_NOT_IMPLEMENTED,
+            "Visualization should report not implemented for ultra mode.");
+        bag_free_pcm16_result(&pcm);
+    }
+}
+
+void TestApiVisualizationRejectsInvalidArgumentsAndFreesSafely() {
+    const auto config_case = test::ConfigCases().front();
+    const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_FLASH);
+    bag_visualization_result visualization{};
+
+    test::AssertEq(
+        bag_analyze_visualization(nullptr, nullptr, 0, &visualization),
+        BAG_INVALID_ARGUMENT,
+        "Visualization should reject a null decoder config.");
+    test::AssertEq(
+        bag_analyze_visualization(&decoder_config, nullptr, 0, &visualization),
+        BAG_INVALID_ARGUMENT,
+        "Visualization should reject null samples.");
+    test::AssertEq(
+        bag_analyze_visualization(&decoder_config, nullptr, 0, nullptr),
+        BAG_INVALID_ARGUMENT,
+        "Visualization should reject a null output result.");
+
+    visualization.frames = new bag_visualization_frame[3];
+    visualization.frame_count = 3;
+    visualization.total_samples = 12;
+    visualization.sample_rate_hz = 44100;
+    visualization.frame_stride_samples = 120;
+    bag_free_visualization_result(&visualization);
+    test::AssertTrue(visualization.frames == nullptr, "Visualization free should clear the frame pointer.");
+    test::AssertEq(visualization.frame_count, static_cast<size_t>(0), "Visualization free should clear the frame count.");
+    test::AssertEq(visualization.total_samples, 0, "Visualization free should clear total samples.");
+    test::AssertEq(visualization.sample_rate_hz, 0, "Visualization free should clear sample rate.");
+    test::AssertEq(visualization.frame_stride_samples, 0, "Visualization free should clear stride.");
+    bag_free_visualization_result(&visualization);
+}
+
 void TestApiFreePcmResultIsIdempotent() {
     const auto config_case = test::ConfigCases().front();
     const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_PRO);
@@ -551,6 +679,11 @@ int main() {
     runner.Add("Api.BoundarySuccessCases", TestApiBoundarySuccessCases);
     runner.Add("Api.FlashConfigAffectsLengthAndRoundTrip", TestApiFlashConfigAffectsLengthAndRoundTrip);
     runner.Add("Api.FlashDecodeRequiresMatchingConfig", TestApiFlashDecodeRequiresMatchingConfig);
+    runner.Add("Api.FlashVisualizationProducesFrameTrack", TestApiFlashVisualizationProducesFrameTrack);
+    runner.Add("Api.VisualizationReturnsNotImplementedOutsideFlash",
+               TestApiVisualizationReturnsNotImplementedOutsideFlash);
+    runner.Add("Api.VisualizationRejectsInvalidArgumentsAndFreesSafely",
+               TestApiVisualizationRejectsInvalidArgumentsAndFreesSafely);
     runner.Add("Api.FreePcmResultIsIdempotent", TestApiFreePcmResultIsIdempotent);
     runner.Add("Api.VersionMatchesRelease", TestApiVersionMatchesRelease);
     runner.Add("Api.ValidationHelpers", TestApiValidationHelpers);

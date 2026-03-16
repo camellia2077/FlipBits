@@ -31,6 +31,13 @@ typedef enum bag_flash_voicing_flavor {
     BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT = 1
 } bag_flash_voicing_flavor;
 
+typedef enum bag_visualization_region_kind {
+    BAG_VISUALIZATION_REGION_UNKNOWN = 0,
+    BAG_VISUALIZATION_REGION_LEADING_SHELL = 1,
+    BAG_VISUALIZATION_REGION_PAYLOAD = 2,
+    BAG_VISUALIZATION_REGION_TRAILING_SHELL = 3
+} bag_visualization_region_kind;
+
 typedef enum bag_validation_issue {
     BAG_VALIDATION_OK = 0,
     BAG_VALIDATION_NULL_CONFIG = 1,
@@ -81,6 +88,23 @@ typedef struct bag_pcm16_result {
     size_t sample_count;
 } bag_pcm16_result;
 
+typedef struct bag_visualization_frame {
+    int sample_offset;
+    int sample_count;
+    float rms;
+    float peak;
+    float brightness;
+    bag_visualization_region_kind region_kind;
+} bag_visualization_frame;
+
+typedef struct bag_visualization_result {
+    bag_visualization_frame* frames;
+    size_t frame_count;
+    int total_samples;
+    int sample_rate_hz;
+    int frame_stride_samples;
+} bag_visualization_result;
+
 const char* bag_transport_mode_name(bag_transport_mode mode);
 int bag_try_parse_transport_mode(const char* raw_mode, bag_transport_mode* out_mode);
 bag_validation_issue bag_validate_encode_request(const bag_encoder_config* config, const char* text);
@@ -92,6 +116,11 @@ bag_error_code bag_encode_text(const bag_encoder_config* config,
                                const char* text,
                                bag_pcm16_result* out_result);
 void bag_free_pcm16_result(bag_pcm16_result* result);
+bag_error_code bag_analyze_visualization(const bag_decoder_config* config,
+                                         const int16_t* samples,
+                                         size_t sample_count,
+                                         bag_visualization_result* out_result);
+void bag_free_visualization_result(bag_visualization_result* result);
 
 bag_error_code bag_create_decoder(const bag_decoder_config* config, bag_decoder** out_decoder);
 void bag_destroy_decoder(bag_decoder* decoder);
