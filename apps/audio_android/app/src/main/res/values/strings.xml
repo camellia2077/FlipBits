@@ -30,10 +30,14 @@
     <string name="audio_action_collapse_input">Collapse input text</string>
     <string name="audio_action_expand_result">Expand decoded text</string>
     <string name="audio_action_collapse_result">Collapse decoded text</string>
+    <string name="audio_action_expand_flash_style">Expand flash voicing style</string>
+    <string name="audio_action_collapse_flash_style">Collapse flash voicing style</string>
     <string name="audio_status">Status: %1$s</string>
     <string name="audio_sample_count">Samples: %1$d</string>
     <string name="audio_result_title">Decoded text</string>
     <string name="audio_result_empty">No decoded text yet.</string>
+    <string name="audio_flash_style_title">Flash voicing style: %1$s</string>
+    <string name="audio_flash_style_hint">Applies to the next generated audio. Existing generated audio keeps the style it was created with.</string>
     <string name="audio_saved_audio_sheet_title">Saved audio</string>
     <string name="audio_saved_audio_empty">No saved audio yet.</string>
     <string name="saved_audio_filter_empty">No saved audio matches this filter.</string>
@@ -77,6 +81,12 @@
     <string name="config_palette_selected">Selected</string>
     <string name="config_palette_expand">Expand palettes</string>
     <string name="config_palette_collapse">Collapse palettes</string>
+    <string name="config_flash_style_title">flash voicing style</string>
+    <string name="config_flash_style_subtitle">Choose how generated flash audio should sound.</string>
+    <string name="config_flash_style_coded_burst_label">coded burst</string>
+    <string name="config_flash_style_coded_burst_description">Dense grouped bursts for machine-like signaling.</string>
+    <string name="config_flash_style_ritual_chant_label">ritual chant</string>
+    <string name="config_flash_style_ritual_chant_description">Smoother resonant phrasing for a ceremonial command tone.</string>
     <string name="config_about_title">About</string>
     <string name="config_about_subtitle">Author, project link, and open-source licenses</string>
 
@@ -134,6 +144,8 @@
     <string name="validation_invalid_sample_rate">Sample rate must be greater than 0.</string>
     <string name="validation_invalid_frame_samples">Frame size must be greater than 0.</string>
     <string name="validation_invalid_mode">Unsupported transport mode.</string>
+    <string name="validation_invalid_flash_signal_profile">Unsupported flash signal profile.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Unsupported flash voicing flavor.</string>
     <string name="validation_pro_ascii_only">pro mode only supports ASCII input.</string>
     <string name="validation_payload_too_large">Input text is too large for this mode.</string>
 

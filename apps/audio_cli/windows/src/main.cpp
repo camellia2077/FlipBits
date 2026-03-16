@@ -23,6 +23,8 @@ bag_encoder_config make_encoder_config(bag_transport_mode mode) {
     config.frame_samples = default_frame_samples(config.sample_rate_hz);
     config.enable_diagnostics = 0;
     config.mode = mode;
+    config.flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST;
+    config.flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST;
     config.reserved = 0;
     return config;
 }
@@ -33,6 +35,8 @@ bag_decoder_config make_decoder_config(int sample_rate_hz, bag_transport_mode mo
     config.frame_samples = default_frame_samples(config.sample_rate_hz);
     config.enable_diagnostics = 0;
     config.mode = mode;
+    config.flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST;
+    config.flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST;
     config.reserved = 0;
     return config;
 }

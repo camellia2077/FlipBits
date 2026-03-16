@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -33,6 +34,8 @@ import com.bag.audioandroid.ui.state.PlaybackUiState
 fun AudioTabScreen(
     transportMode: TransportModeOption,
     onTransportModeSelected: (TransportModeOption) -> Unit,
+    selectedFlashVoicingStyle: FlashVoicingStyleOption,
+    onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
     inputText: String,
     onInputTextChange: (String) -> Unit,
     resultText: String,
@@ -67,6 +70,7 @@ fun AudioTabScreen(
     val displayedTime = formatDurationMillis(samplesToMillis(displayedSamples, playback.sampleRateHz))
     val totalTime = formatDurationMillis(samplesToMillis(playback.totalSamples, playback.sampleRateHz))
     val scrollState = rememberScrollState()
+    var flashVoicingExpanded by rememberSaveable(transportMode) { mutableStateOf(false) }
     var inputExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
     var resultExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
     var savedAudioFilter by remember(transportMode, showSavedAudioSheet) {
@@ -100,6 +104,15 @@ fun AudioTabScreen(
             onTransportModeSelected = onTransportModeSelected,
             modifier = Modifier.fillMaxWidth()
         )
+        if (transportMode == TransportModeOption.Flash) {
+            AudioFlashVoicingCard(
+                selectedFlashVoicingStyle = selectedFlashVoicingStyle,
+                onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
+                expanded = flashVoicingExpanded,
+                onToggleExpanded = { flashVoicingExpanded = !flashVoicingExpanded },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         AudioPlaybackCard(
             statusText = resolvedStatusText,
             playbackSampleCount = playbackSampleCount,

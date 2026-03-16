@@ -7,6 +7,8 @@ import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,20 +47,38 @@ internal class AudioAndroidSessionActions(
         }
     }
 
+    private fun resolveFlashPresetForEncode(current: AudioAppUiState): FlashVoicingStyleOption =
+        if (current.transportMode == TransportModeOption.Flash) {
+            current.selectedFlashVoicingStyle
+        } else {
+            FlashVoicingStyleOption.CodedBurst
+        }
+
+    private fun resolveFlashPresetForDecode(current: AudioAppUiState): FlashVoicingStyleOption =
+        if (current.transportMode == TransportModeOption.Flash) {
+            current.currentSession.generatedFlashVoicingStyle ?: current.selectedFlashVoicingStyle
+        } else {
+            FlashVoicingStyleOption.CodedBurst
+        }
+
     fun onEncode() {
         stopPlayback()
         val current = uiState.value
         val session = current.currentSession
+        val flashPreset = resolveFlashPresetForEncode(current)
         val validationIssue = audioCodecGateway.validateEncodeRequest(
             session.inputText,
             sampleRateHz,
             frameSamples,
-            current.transportMode.nativeValue
+            current.transportMode.nativeValue,
+            flashPreset.signalProfileValue,
+            flashPreset.voicingFlavorValue
         )
         if (validationIssue != BagApiCodes.VALIDATION_OK) {
             sessionStateStore.updateCurrentSession {
                 it.copy(
                     generatedPcm = shortArrayOf(),
+                    generatedFlashVoicingStyle = null,
                     resultText = "",
                     statusText = uiTextMapper.validationIssue(validationIssue),
                     playback = playbackRuntimeGateway.cleared()
@@ -71,7 +91,9 @@ internal class AudioAndroidSessionActions(
             session.inputText,
             sampleRateHz,
             frameSamples,
-            current.transportMode.nativeValue
+            current.transportMode.nativeValue,
+            flashPreset.signalProfileValue,
+            flashPreset.voicingFlavorValue
         )
         val status = if (pcm.isEmpty()) {
             if (session.inputText.isBlank()) {
@@ -88,6 +110,11 @@ internal class AudioAndroidSessionActions(
         sessionStateStore.updateCurrentSession {
             it.copy(
                 generatedPcm = pcm,
+                generatedFlashVoicingStyle = if (current.transportMode == TransportModeOption.Flash && pcm.isNotEmpty()) {
+                    current.selectedFlashVoicingStyle
+                } else {
+                    null
+                },
                 resultText = "",
                 statusText = status,
                 playback = if (pcm.isEmpty()) {
@@ -112,10 +139,13 @@ internal class AudioAndroidSessionActions(
             return
         }
 
+        val flashPreset = resolveFlashPresetForDecode(current)
         val validationIssue = audioCodecGateway.validateDecodeConfig(
             sampleRateHz,
             frameSamples,
-            current.transportMode.nativeValue
+            current.transportMode.nativeValue,
+            flashPreset.signalProfileValue,
+            flashPreset.voicingFlavorValue
         )
         if (validationIssue != BagApiCodes.VALIDATION_OK) {
             sessionStateStore.updateCurrentSession {
@@ -128,7 +158,9 @@ internal class AudioAndroidSessionActions(
             session.generatedPcm,
             sampleRateHz,
             frameSamples,
-            current.transportMode.nativeValue
+            current.transportMode.nativeValue,
+            flashPreset.signalProfileValue,
+            flashPreset.voicingFlavorValue
         )
         val status = if (decoded.isEmpty()) {
             uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)

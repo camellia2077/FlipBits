@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
-private val Context.paletteSettingsDataStore by preferencesDataStore(name = "palette_settings")
+private val Context.appSettingsDataStore by preferencesDataStore(name = "app_settings")
 
-class PaletteSettingsRepository(
+class AppSettingsRepository(
     private val appContext: Context
 ) {
     val selectedPaletteId: Flow<String?> =
-        appContext.paletteSettingsDataStore.data
+        appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
                     emit(emptyPreferences())
@@ -27,13 +27,31 @@ class PaletteSettingsRepository(
             }
             .map { preferences -> preferences[Keys.SelectedPaletteId] }
 
+    val selectedFlashVoicingStyleId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences -> preferences[Keys.SelectedFlashVoicingStyleId] }
+
     suspend fun setSelectedPaletteId(paletteId: String) {
-        appContext.paletteSettingsDataStore.edit { preferences ->
+        appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedPaletteId] = paletteId
+        }
+    }
+
+    suspend fun setSelectedFlashVoicingStyleId(styleId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedFlashVoicingStyleId] = styleId
         }
     }
 
     private object Keys {
         val SelectedPaletteId: Preferences.Key<String> = stringPreferencesKey("palette_id")
+        val SelectedFlashVoicingStyleId: Preferences.Key<String> = stringPreferencesKey("flash_voicing_style")
     }
 }

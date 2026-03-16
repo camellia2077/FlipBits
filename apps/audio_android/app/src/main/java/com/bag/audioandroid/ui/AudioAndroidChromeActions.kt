@@ -1,9 +1,10 @@
 package com.bag.audioandroid.ui
 
 import androidx.appcompat.app.AppCompatDelegate
-import com.bag.audioandroid.data.PaletteSettingsRepository
+import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
+import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 internal class AudioAndroidChromeActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
     private val sampleInputSessionUpdater: SampleInputSessionUpdater,
-    private val paletteSettingsRepository: PaletteSettingsRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     private val scope: CoroutineScope
 ) {
     fun onTabSelected(
@@ -77,13 +78,20 @@ internal class AudioAndroidChromeActions(
     fun onPaletteSelected(palette: PaletteOption) {
         uiState.update { it.copy(selectedPalette = palette) }
         scope.launch {
-            paletteSettingsRepository.setSelectedPaletteId(palette.id)
+            appSettingsRepository.setSelectedPaletteId(palette.id)
+        }
+    }
+
+    fun onFlashVoicingStyleSelected(style: FlashVoicingStyleOption) {
+        uiState.update { it.copy(selectedFlashVoicingStyle = style) }
+        scope.launch {
+            appSettingsRepository.setSelectedFlashVoicingStyleId(style.id)
         }
     }
 
     fun observeSelectedPalette() {
         scope.launch {
-            paletteSettingsRepository.selectedPaletteId
+            appSettingsRepository.selectedPaletteId
                 .distinctUntilChanged()
                 .collect { paletteId ->
                     val palette = MaterialPalettes.firstOrNull { it.id == paletteId } ?: MaterialPalettes.first()
@@ -92,6 +100,23 @@ internal class AudioAndroidChromeActions(
                             state
                         } else {
                             state.copy(selectedPalette = palette)
+                        }
+                    }
+                }
+        }
+    }
+
+    fun observeSelectedFlashVoicingStyle() {
+        scope.launch {
+            appSettingsRepository.selectedFlashVoicingStyleId
+                .distinctUntilChanged()
+                .collect { styleId ->
+                    val style = FlashVoicingStyleOption.fromId(styleId)
+                    uiState.update { state ->
+                        if (state.selectedFlashVoicingStyle == style) {
+                            state
+                        } else {
+                            state.copy(selectedFlashVoicingStyle = style)
                         }
                     }
                 }

@@ -35,22 +35,32 @@ int NormalizeFrameSamples(int sample_rate_hz, int frame_samples) {
     return normalized_sample_rate > 0 ? normalized_sample_rate / 20 : kDefaultFrameSamples;
 }
 
-bag_encoder_config MakeEncoderConfig(int sample_rate_hz, int frame_samples) {
+bag_encoder_config MakeEncoderConfig(int sample_rate_hz,
+                                     int frame_samples,
+                                     int flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                                     int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
     bag_encoder_config config{};
     config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
     config.frame_samples = NormalizeFrameSamples(sample_rate_hz, frame_samples);
     config.enable_diagnostics = 0;
     config.mode = BAG_TRANSPORT_FLASH;
+    config.flash_signal_profile = static_cast<bag_flash_signal_profile>(flash_signal_profile);
+    config.flash_voicing_flavor = static_cast<bag_flash_voicing_flavor>(flash_voicing_flavor);
     config.reserved = 0;
     return config;
 }
 
-bag_decoder_config MakeDecoderConfig(int sample_rate_hz, int frame_samples) {
+bag_decoder_config MakeDecoderConfig(int sample_rate_hz,
+                                     int frame_samples,
+                                     int flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                                     int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
     bag_decoder_config config{};
     config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
     config.frame_samples = NormalizeFrameSamples(sample_rate_hz, frame_samples);
     config.enable_diagnostics = 0;
     config.mode = BAG_TRANSPORT_FLASH;
+    config.flash_signal_profile = static_cast<bag_flash_signal_profile>(flash_signal_profile);
+    config.flash_voicing_flavor = static_cast<bag_flash_voicing_flavor>(flash_voicing_flavor);
     config.reserved = 0;
     return config;
 }
@@ -63,15 +73,20 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeEncodeTextToPcm(
     jstring text,
     jint sample_rate_hz,
     jint frame_samples,
-    jint mode) {
+    jint mode,
+    jint flash_signal_profile,
+    jint flash_voicing_flavor) {
     const std::string input = JStringToStdString(env, text);
     if (input.empty()) {
         return env->NewShortArray(0);
     }
 
-    bag_encoder_config config = MakeEncoderConfig(sample_rate_hz, frame_samples);
+    bag_encoder_config config =
+        MakeEncoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
     config.mode = static_cast<bag_transport_mode>(mode);
     bag_pcm16_result pcm{};
+    // Android keeps reusing the stable bag_api encode path. Any formal flash
+    // voicing stays internal to core instead of widening JNI/Kotlin surfaces.
     if (bag_encode_text(&config, input.c_str(), &pcm) != BAG_OK) {
         return env->NewShortArray(0);
     }
@@ -95,9 +110,12 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeValidateEncodeRequest(
     jstring text,
     jint sample_rate_hz,
     jint frame_samples,
-    jint mode) {
+    jint mode,
+    jint flash_signal_profile,
+    jint flash_voicing_flavor) {
     const std::string input = JStringToStdString(env, text);
-    bag_encoder_config config = MakeEncoderConfig(sample_rate_hz, frame_samples);
+    bag_encoder_config config =
+        MakeEncoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
     config.mode = static_cast<bag_transport_mode>(mode);
     const bag_validation_issue issue = bag_validate_encode_request(&config, input.c_str());
     return static_cast<jint>(issue);
@@ -110,7 +128,9 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeDecodeGeneratedPcm(
     jshortArray pcm,
     jint sample_rate_hz,
     jint frame_samples,
-    jint mode) {
+    jint mode,
+    jint flash_signal_profile,
+    jint flash_voicing_flavor) {
     if (pcm == nullptr) {
         return env->NewStringUTF("");
     }
@@ -119,7 +139,8 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeDecodeGeneratedPcm(
     std::vector<int16_t> buffer(static_cast<size_t>(len), 0);
     env->GetShortArrayRegion(pcm, 0, len, reinterpret_cast<jshort*>(buffer.data()));
 
-    bag_decoder_config config = MakeDecoderConfig(sample_rate_hz, frame_samples);
+    bag_decoder_config config =
+        MakeDecoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
     config.mode = static_cast<bag_transport_mode>(mode);
     bag_decoder* decoder = nullptr;
     if (bag_create_decoder(&config, &decoder) != BAG_OK || decoder == nullptr) {
@@ -147,8 +168,11 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeValidateDecodeConfig(
     jobject /*thiz*/,
     jint sample_rate_hz,
     jint frame_samples,
-    jint mode) {
-    bag_decoder_config config = MakeDecoderConfig(sample_rate_hz, frame_samples);
+    jint mode,
+    jint flash_signal_profile,
+    jint flash_voicing_flavor) {
+    bag_decoder_config config =
+        MakeDecoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
     config.mode = static_cast<bag_transport_mode>(mode);
     const bag_validation_issue issue = bag_validate_decoder_config(&config);
     return static_cast<jint>(issue);

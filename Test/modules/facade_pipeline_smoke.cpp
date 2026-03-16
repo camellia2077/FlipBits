@@ -127,10 +127,10 @@ void TestPipelineRoundTrip() {
 
 int main() {
     test::Runner runner;
-    runner.Add("ModulesPhase4.TransportFacadeValidation", TestTransportFacadeValidation);
-    runner.Add("ModulesPhase4.TransportFacadeFlashRoundTrip", TestTransportFacadeFlashRoundTrip);
-    runner.Add("ModulesPhase4.TransportFacadeProRoundTrip", TestTransportFacadeProRoundTrip);
-    runner.Add("ModulesPhase4.TransportFacadeUltraRoundTrip", TestTransportFacadeUltraRoundTrip);
-    runner.Add("ModulesPhase4.PipelineRoundTrip", TestPipelineRoundTrip);
+    runner.Add("ModulesFacadePipeline.TransportFacadeValidation", TestTransportFacadeValidation);
+    runner.Add("ModulesFacadePipeline.TransportFacadeFlashRoundTrip", TestTransportFacadeFlashRoundTrip);
+    runner.Add("ModulesFacadePipeline.TransportFacadeProRoundTrip", TestTransportFacadeProRoundTrip);
+    runner.Add("ModulesFacadePipeline.TransportFacadeUltraRoundTrip", TestTransportFacadeUltraRoundTrip);
+    runner.Add("ModulesFacadePipeline.PipelineRoundTrip", TestPipelineRoundTrip);
     return runner.Run();
 }

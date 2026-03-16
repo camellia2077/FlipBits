@@ -4,30 +4,26 @@ export module bag.flash.phy_clean;
 
 import std;
 
-export import bag.common.config;
+export import bag.flash.signal;
+export import bag.flash.voicing;
 export import bag.common.error_code;
 export import bag.transport.decoder;
 
 export namespace bag::flash {
 
-struct BfskConfig {
-    double low_freq_hz = 400.0;
-    double high_freq_hz = 800.0;
-    double bit_duration_sec = 0.05;
-    int sample_rate_hz = 44100;
-    double amplitude = 0.8;
-};
-
-BfskConfig MakeBfskConfig(const CoreConfig& config);
-
-std::vector<std::int16_t> EncodeBytesToPcm16(const std::vector<std::uint8_t>& bytes,
-                                             const BfskConfig& config = {});
-std::vector<std::uint8_t> DecodePcm16ToBytes(const std::vector<std::int16_t>& pcm,
-                                             const BfskConfig& config = {});
-
+ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(const CoreConfig& config,
+                                                      const std::string& text,
+                                                      FlashSignalProfile signal_profile,
+                                                      FlashVoicingFlavor flavor,
+                                                      std::vector<std::int16_t>* out_pcm);
 ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<std::int16_t>* out_pcm);
+ErrorCode DecodePcm16ToTextWithSignalProfileAndFlavor(const CoreConfig& config,
+                                                      const std::vector<std::int16_t>& pcm,
+                                                      FlashSignalProfile signal_profile,
+                                                      FlashVoicingFlavor flavor,
+                                                      std::string* out_text);
 ErrorCode DecodePcm16ToText(const CoreConfig& config,
                             const std::vector<std::int16_t>& pcm,
                             std::string* out_text);

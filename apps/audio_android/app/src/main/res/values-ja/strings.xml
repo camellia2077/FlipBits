@@ -30,10 +30,14 @@
     <string name="audio_action_collapse_input">入力テキストを折りたたむ</string>
     <string name="audio_action_expand_result">解析結果を展開</string>
     <string name="audio_action_collapse_result">解析結果を折りたたむ</string>
+    <string name="audio_action_expand_flash_style">flash 音声スタイルを展開</string>
+    <string name="audio_action_collapse_flash_style">flash 音声スタイルを折りたたむ</string>
     <string name="audio_status">状態: %1$s</string>
     <string name="audio_sample_count">サンプル数: %1$d</string>
     <string name="audio_result_title">解析結果</string>
     <string name="audio_result_empty">解析結果はまだありません。</string>
+    <string name="audio_flash_style_title">Flash 音声スタイル: %1$s</string>
+    <string name="audio_flash_style_hint">次回の生成に適用されます。既に生成済みの音声は生成時のスタイルを維持します。</string>
     <string name="audio_saved_audio_sheet_title">保存済み音声</string>
     <string name="audio_saved_audio_empty">保存済み音声はまだありません。</string>
     <string name="saved_audio_filter_empty">この絞り込みに一致する保存済み音声はありません。</string>
@@ -77,6 +81,12 @@
     <string name="config_palette_selected">選択中</string>
     <string name="config_palette_expand">パレットを展開</string>
     <string name="config_palette_collapse">パレットを折りたたむ</string>
+    <string name="config_flash_style_title">flash 音声スタイル</string>
+    <string name="config_flash_style_subtitle">生成する flash 音声の聞こえ方を選択します。</string>
+    <string name="config_flash_style_coded_burst_label">coded burst</string>
+    <string name="config_flash_style_coded_burst_description">高密度にまとまった機械的なバースト感を強めます。</string>
+    <string name="config_flash_style_ritual_chant_label">ritual chant</string>
+    <string name="config_flash_style_ritual_chant_description">より連続的で共鳴感のある儀式的な響きにします。</string>
     <string name="config_about_title">このアプリについて</string>
     <string name="config_about_subtitle">作者、プロジェクトリンク、オープンソースライセンス</string>
 
@@ -134,6 +144,8 @@
     <string name="validation_invalid_sample_rate">サンプルレートは 0 より大きくする必要があります。</string>
     <string name="validation_invalid_frame_samples">フレームサイズは 0 より大きくする必要があります。</string>
     <string name="validation_invalid_mode">未対応の伝送モードです。</string>
+    <string name="validation_invalid_flash_signal_profile">未対応の flash シグナルプロファイルです。</string>
+    <string name="validation_invalid_flash_voicing_flavor">未対応の flash ボイシングフレーバーです。</string>
     <string name="validation_pro_ascii_only">pro モードは ASCII 入力のみ対応します。</string>
     <string name="validation_payload_too_large">このモードでは入力テキストが大きすぎます。</string>
 

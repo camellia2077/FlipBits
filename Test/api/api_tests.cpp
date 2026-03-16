@@ -15,25 +15,62 @@ struct DecodeResult {
 };
 
 bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
-                                     bag_transport_mode mode = BAG_TRANSPORT_FLASH) {
+                                     bag_transport_mode mode = BAG_TRANSPORT_FLASH,
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
     bag_encoder_config config{};
     config.sample_rate_hz = config_case.sample_rate_hz;
     config.frame_samples = config_case.frame_samples;
     config.enable_diagnostics = 0;
     config.mode = mode;
+    config.flash_signal_profile = flash_signal_profile;
+    config.flash_voicing_flavor = flash_voicing_flavor;
     config.reserved = 0;
     return config;
 }
 
 bag_decoder_config MakeDecoderConfig(const test::ConfigCase& config_case,
-                                     bag_transport_mode mode = BAG_TRANSPORT_FLASH) {
+                                     bag_transport_mode mode = BAG_TRANSPORT_FLASH,
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
     bag_decoder_config config{};
     config.sample_rate_hz = config_case.sample_rate_hz;
     config.frame_samples = config_case.frame_samples;
     config.enable_diagnostics = 0;
     config.mode = mode;
+    config.flash_signal_profile = flash_signal_profile;
+    config.flash_voicing_flavor = flash_voicing_flavor;
     config.reserved = 0;
     return config;
+}
+
+std::size_t RoundHalfUpFrameScale(int frame_samples, int numerator, int denominator) {
+    return frame_samples > 0
+               ? static_cast<std::size_t>((frame_samples * numerator + (denominator / 2)) / denominator)
+               : static_cast<std::size_t>(0);
+}
+
+std::size_t ExpectedFlashSampleCount(const std::string& text,
+                                     const test::ConfigCase& config_case,
+                                     bag_flash_signal_profile flash_signal_profile,
+                                     bag_flash_voicing_flavor flash_voicing_flavor) {
+    const std::size_t frame_samples =
+        config_case.frame_samples > 0 ? static_cast<std::size_t>(config_case.frame_samples) : static_cast<std::size_t>(0);
+    const std::size_t payload_samples_per_bit =
+        flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT
+            ? RoundHalfUpFrameScale(config_case.frame_samples, 3, 1)
+            : frame_samples;
+    const std::size_t leading_nonpayload_samples =
+        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
+            ? frame_samples * static_cast<std::size_t>(16)
+            : frame_samples * static_cast<std::size_t>(3);
+    const std::size_t trailing_nonpayload_samples =
+        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
+            ? frame_samples * static_cast<std::size_t>(8)
+            : frame_samples * static_cast<std::size_t>(3);
+    return text.size() * static_cast<std::size_t>(8) * payload_samples_per_bit +
+           leading_nonpayload_samples +
+           trailing_nonpayload_samples;
 }
 
 DecodeResult DecodeViaApi(const bag_decoder_config& config, const bag_pcm16_result& pcm) {
@@ -290,6 +327,106 @@ void TestApiBoundarySuccessCases() {
     }
 }
 
+void TestApiFlashConfigAffectsLengthAndRoundTrip() {
+    const std::string text = "Length";
+
+    for (const auto& config_case : test::ConfigCases()) {
+        const auto coded_encoder =
+            MakeEncoderConfig(
+                config_case,
+                BAG_TRANSPORT_FLASH,
+                BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+        const auto coded_decoder =
+            MakeDecoderConfig(
+                config_case,
+                BAG_TRANSPORT_FLASH,
+                BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+        const auto ritual_encoder =
+            MakeEncoderConfig(
+                config_case,
+                BAG_TRANSPORT_FLASH,
+                BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+                BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+        const auto ritual_decoder =
+            MakeDecoderConfig(
+                config_case,
+                BAG_TRANSPORT_FLASH,
+                BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+                BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+
+        bag_pcm16_result coded_pcm{};
+        bag_pcm16_result ritual_pcm{};
+        test::AssertEq(
+            bag_encode_text(&coded_encoder, text.c_str(), &coded_pcm),
+            BAG_OK,
+            "coded_burst flash encode should succeed through the C API.");
+        test::AssertEq(
+            bag_encode_text(&ritual_encoder, text.c_str(), &ritual_pcm),
+            BAG_OK,
+            "ritual_chant flash encode should succeed through the C API.");
+        test::AssertEq(
+            coded_pcm.sample_count,
+            ExpectedFlashSampleCount(
+                text,
+                config_case,
+                BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+                BAG_FLASH_VOICING_FLAVOR_CODED_BURST),
+            "coded_burst C API flash length should stay on the baseline explicit configuration.");
+        test::AssertEq(
+            ritual_pcm.sample_count,
+            ExpectedFlashSampleCount(
+                text,
+                config_case,
+                BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+                BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT),
+            "ritual_chant C API flash length should include the longer timing and shell configuration.");
+        test::AssertTrue(
+            ritual_pcm.sample_count > coded_pcm.sample_count,
+            "ritual_chant flash output should be longer than coded_burst for the same text.");
+
+        const auto coded_decoded = DecodeViaApi(coded_decoder, coded_pcm);
+        const auto ritual_decoded = DecodeViaApi(ritual_decoder, ritual_pcm);
+        test::AssertEq(coded_decoded.code, BAG_OK, "coded_burst flash decode should succeed.");
+        test::AssertEq(ritual_decoded.code, BAG_OK, "ritual_chant flash decode should succeed.");
+        test::AssertEq(coded_decoded.text, text, "coded_burst flash decode should preserve text.");
+        test::AssertEq(ritual_decoded.text, text, "ritual_chant flash decode should preserve text.");
+
+        bag_free_pcm16_result(&coded_pcm);
+        bag_free_pcm16_result(&ritual_pcm);
+    }
+}
+
+void TestApiFlashDecodeRequiresMatchingConfig() {
+    const auto config_case = test::ConfigCases().front();
+    const auto ritual_encoder =
+        MakeEncoderConfig(
+            config_case,
+            BAG_TRANSPORT_FLASH,
+            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+    const auto wrong_decoder =
+        MakeDecoderConfig(
+            config_case,
+            BAG_TRANSPORT_FLASH,
+            BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
+            BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+    const std::string text = "Mismatch";
+
+    bag_pcm16_result ritual_pcm{};
+    test::AssertEq(
+        bag_encode_text(&ritual_encoder, text.c_str(), &ritual_pcm),
+        BAG_OK,
+        "ritual_chant flash encode should succeed before wrong-style decode validation.");
+
+    const auto decoded = DecodeViaApi(wrong_decoder, ritual_pcm);
+    test::AssertTrue(
+        decoded.code != BAG_OK || decoded.text != text,
+        "Decoding ritual flash PCM with coded_burst signal/flavor should not look like a valid roundtrip.");
+    bag_free_pcm16_result(&ritual_pcm);
+}
+
 void TestApiFreePcmResultIsIdempotent() {
     const auto config_case = test::ConfigCases().front();
     const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_PRO);
@@ -373,6 +510,27 @@ void TestApiValidationHelpers() {
         bag_validate_decoder_config(&invalid_decoder),
         BAG_VALIDATION_INVALID_MODE,
         "Decoder validation helper should reject unknown modes.");
+
+    auto invalid_flash_encoder = MakeEncoderConfig(config_case);
+    invalid_flash_encoder.flash_signal_profile = static_cast<bag_flash_signal_profile>(99);
+    test::AssertEq(
+        bag_validate_encode_request(&invalid_flash_encoder, "flash-style"),
+        BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE,
+        "Validation helper should reject unsupported flash signal profiles.");
+    auto invalid_flash_decoder = MakeDecoderConfig(config_case);
+    invalid_flash_decoder.flash_voicing_flavor = static_cast<bag_flash_voicing_flavor>(99);
+    test::AssertEq(
+        bag_validate_decoder_config(&invalid_flash_decoder),
+        BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR,
+        "Decoder validation helper should reject unsupported flash voicing flavors.");
+    test::AssertContains(
+        bag_validation_issue_message(BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE),
+        "signal profile",
+        "Validation helper message should explain the flash signal-profile failure.");
+    test::AssertContains(
+        bag_validation_issue_message(BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR),
+        "voicing flavor",
+        "Validation helper message should explain the flash voicing-flavor failure.");
     test::AssertContains(
         bag_error_code_message(BAG_INTERNAL),
         "Internal",
@@ -391,6 +549,8 @@ int main() {
     runner.Add("Api.PollAndResetLifecycle", TestApiPollAndResetLifecycle);
     runner.Add("Api.ModeSpecificValidation", TestApiModeSpecificValidation);
     runner.Add("Api.BoundarySuccessCases", TestApiBoundarySuccessCases);
+    runner.Add("Api.FlashConfigAffectsLengthAndRoundTrip", TestApiFlashConfigAffectsLengthAndRoundTrip);
+    runner.Add("Api.FlashDecodeRequiresMatchingConfig", TestApiFlashDecodeRequiresMatchingConfig);
     runner.Add("Api.FreePcmResultIsIdempotent", TestApiFreePcmResultIsIdempotent);
     runner.Add("Api.VersionMatchesRelease", TestApiVersionMatchesRelease);
     runner.Add("Api.ValidationHelpers", TestApiValidationHelpers);

@@ -17,6 +17,8 @@ enum class TransportValidationIssue {
     kInvalidMode = 3,
     kProAsciiOnly = 4,
     kPayloadTooLarge = 5,
+    kInvalidFlashSignalProfile = 6,
+    kInvalidFlashVoicingFlavor = 7,
 };
 
 TransportValidationIssue ValidateEncodeRequest(const CoreConfig& config, std::string_view text);

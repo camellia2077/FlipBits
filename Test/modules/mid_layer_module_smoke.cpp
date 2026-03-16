@@ -229,15 +229,15 @@ void TestCompatFrameBytesBridge() {
 
 int main() {
     test::Runner runner;
-    runner.Add("ModulesPhase3.FlashPhyCleanRoundTrip", TestFlashPhyCleanRoundTrip);
-    runner.Add("ModulesPhase3.FlashDecoderContractRoundTrip", TestFlashDecoderContractRoundTrip);
-    runner.Add("ModulesPhase3.ProPhyCleanRoundTrip", TestProPhyCleanRoundTrip);
-    runner.Add("ModulesPhase3.ProDecoderContractRoundTrip", TestProDecoderContractRoundTrip);
-    runner.Add("ModulesPhase3.UltraPhyCleanRoundTrip", TestUltraPhyCleanRoundTrip);
-    runner.Add("ModulesPhase3.UltraDecoderContractRoundTrip", TestUltraDecoderContractRoundTrip);
-    runner.Add("ModulesPhase3.FskCodecRoundTrip", TestFskCodecRoundTrip);
-    runner.Add("ModulesPhase3.ProCompatRoundTrip", TestProCompatRoundTrip);
-    runner.Add("ModulesPhase3.UltraCompatRoundTrip", TestUltraCompatRoundTrip);
-    runner.Add("ModulesPhase3.CompatFrameBytesBridge", TestCompatFrameBytesBridge);
+    runner.Add("ModulesMidLayer.FlashPhyCleanRoundTrip", TestFlashPhyCleanRoundTrip);
+    runner.Add("ModulesMidLayer.FlashDecoderContractRoundTrip", TestFlashDecoderContractRoundTrip);
+    runner.Add("ModulesMidLayer.ProPhyCleanRoundTrip", TestProPhyCleanRoundTrip);
+    runner.Add("ModulesMidLayer.ProDecoderContractRoundTrip", TestProDecoderContractRoundTrip);
+    runner.Add("ModulesMidLayer.UltraPhyCleanRoundTrip", TestUltraPhyCleanRoundTrip);
+    runner.Add("ModulesMidLayer.UltraDecoderContractRoundTrip", TestUltraDecoderContractRoundTrip);
+    runner.Add("ModulesMidLayer.FskCodecRoundTrip", TestFskCodecRoundTrip);
+    runner.Add("ModulesMidLayer.ProCompatRoundTrip", TestProCompatRoundTrip);
+    runner.Add("ModulesMidLayer.UltraCompatRoundTrip", TestUltraCompatRoundTrip);
+    runner.Add("ModulesMidLayer.CompatFrameBytesBridge", TestCompatFrameBytesBridge);
     return runner.Run();
 }

@@ -21,6 +21,16 @@ typedef enum bag_transport_mode {
     BAG_TRANSPORT_ULTRA = 2
 } bag_transport_mode;
 
+typedef enum bag_flash_signal_profile {
+    BAG_FLASH_SIGNAL_PROFILE_CODED_BURST = 0,
+    BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT = 1
+} bag_flash_signal_profile;
+
+typedef enum bag_flash_voicing_flavor {
+    BAG_FLASH_VOICING_FLAVOR_CODED_BURST = 0,
+    BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT = 1
+} bag_flash_voicing_flavor;
+
 typedef enum bag_validation_issue {
     BAG_VALIDATION_OK = 0,
     BAG_VALIDATION_NULL_CONFIG = 1,
@@ -30,7 +40,9 @@ typedef enum bag_validation_issue {
     BAG_VALIDATION_INVALID_FRAME_SAMPLES = 5,
     BAG_VALIDATION_INVALID_MODE = 6,
     BAG_VALIDATION_PRO_ASCII_ONLY = 7,
-    BAG_VALIDATION_PAYLOAD_TOO_LARGE = 8
+    BAG_VALIDATION_PAYLOAD_TOO_LARGE = 8,
+    BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE = 9,
+    BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR = 10
 } bag_validation_issue;
 
 typedef struct bag_decoder bag_decoder;
@@ -40,6 +52,8 @@ typedef struct bag_encoder_config {
     int frame_samples;
     int enable_diagnostics;
     bag_transport_mode mode;
+    bag_flash_signal_profile flash_signal_profile;
+    bag_flash_voicing_flavor flash_voicing_flavor;
     int reserved;
 } bag_encoder_config;
 
@@ -48,6 +62,8 @@ typedef struct bag_decoder_config {
     int frame_samples;
     int enable_diagnostics;
     bag_transport_mode mode;
+    bag_flash_signal_profile flash_signal_profile;
+    bag_flash_voicing_flavor flash_voicing_flavor;
     int reserved;
 } bag_decoder_config;
 

@@ -30,10 +30,14 @@
     <string name="audio_action_collapse_input">收起输入文本</string>
     <string name="audio_action_expand_result">展开解析结果</string>
     <string name="audio_action_collapse_result">收起解析结果</string>
+    <string name="audio_action_expand_flash_style">展开 flash 发声风格</string>
+    <string name="audio_action_collapse_flash_style">收起 flash 发声风格</string>
     <string name="audio_status">状态: %1$s</string>
     <string name="audio_sample_count">样本数: %1$d</string>
     <string name="audio_result_title">解析结果</string>
     <string name="audio_result_empty">还没有解析结果。</string>
+    <string name="audio_flash_style_title">Flash 发声风格: %1$s</string>
+    <string name="audio_flash_style_hint">作用于下一次生成；已生成音频保持生成时风格。</string>
     <string name="audio_saved_audio_sheet_title">已保存音频</string>
     <string name="audio_saved_audio_empty">还没有已保存音频。</string>
     <string name="saved_audio_filter_empty">当前筛选下还没有已保存音频。</string>
@@ -77,6 +81,12 @@
     <string name="config_palette_selected">已选</string>
     <string name="config_palette_expand">展开颜色</string>
     <string name="config_palette_collapse">收起颜色</string>
+    <string name="config_flash_style_title">flash 音色风格</string>
+    <string name="config_flash_style_subtitle">选择 flash 生成音频的听感风格。</string>
+    <string name="config_flash_style_coded_burst_label">报码突发</string>
+    <string name="config_flash_style_coded_burst_description">更偏高密度分组脉冲，像机器报码。</string>
+    <string name="config_flash_style_ritual_chant_label">仪式吟唱</string>
+    <string name="config_flash_style_ritual_chant_description">更偏连续共鸣和仪式化语气。</string>
     <string name="config_about_title">关于</string>
     <string name="config_about_subtitle">作者、项目链接与开源许可证入口</string>
 
@@ -134,6 +144,8 @@
     <string name="validation_invalid_sample_rate">采样率必须大于 0。</string>
     <string name="validation_invalid_frame_samples">帧大小必须大于 0。</string>
     <string name="validation_invalid_mode">不支持的传输模式。</string>
+    <string name="validation_invalid_flash_signal_profile">不支持的 flash 信号 profile。</string>
+    <string name="validation_invalid_flash_voicing_flavor">不支持的 flash 发声 flavor。</string>
     <string name="validation_pro_ascii_only">pro 模式仅支持 ASCII 输入。</string>
     <string name="validation_payload_too_large">当前模式下输入文本过大。</string>
 

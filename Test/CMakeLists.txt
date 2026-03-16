@@ -81,54 +81,64 @@ function(wavebits_configure_module_test target_name)
     set_property(TARGET ${target_name} PROPERTY CXX_MODULE_STD ON)
 endfunction()
 
-add_executable(test_modules_phase0
-    modules/phase0_smoke.cpp
+add_executable(test_flash_voicing
+    voicing/flash_voicing_tests.cpp
 )
-target_link_libraries(test_modules_phase0
+target_link_libraries(test_flash_voicing
+    PRIVATE
+        bag_core
+)
+wavebits_configure_module_test(test_flash_voicing)
+add_test(NAME flash_voicing_tests COMMAND test_flash_voicing)
+
+add_executable(test_modules_foundation
+    modules/foundation_module_smoke.cpp
+)
+target_link_libraries(test_modules_foundation
     PRIVATE
         bag_core
         audio_io
 )
-wavebits_configure_module_test(test_modules_phase0)
-add_test(NAME modules_phase0_smoke COMMAND test_modules_phase0)
+wavebits_configure_module_test(test_modules_foundation)
+add_test(NAME modules_foundation_smoke COMMAND test_modules_foundation)
 
-add_executable(test_modules_phase2
-    modules/phase2_leaf_smoke.cpp
+add_executable(test_modules_leaf
+    modules/leaf_module_smoke.cpp
 )
-target_link_libraries(test_modules_phase2
+target_link_libraries(test_modules_leaf
     PRIVATE
         bag_core
         audio_io
 )
-wavebits_configure_module_test(test_modules_phase2)
-add_test(NAME modules_phase2_leaf_smoke COMMAND test_modules_phase2)
+wavebits_configure_module_test(test_modules_leaf)
+add_test(NAME modules_leaf_smoke COMMAND test_modules_leaf)
 
-add_executable(test_modules_phase3
-    modules/phase3_mid_layer_smoke.cpp
+add_executable(test_modules_mid_layer
+    modules/mid_layer_module_smoke.cpp
 )
-target_link_libraries(test_modules_phase3
+target_link_libraries(test_modules_mid_layer
     PRIVATE
         bag_core
 )
-wavebits_configure_module_test(test_modules_phase3)
-add_test(NAME modules_phase3_mid_layer_smoke COMMAND test_modules_phase3)
+wavebits_configure_module_test(test_modules_mid_layer)
+add_test(NAME modules_mid_layer_smoke COMMAND test_modules_mid_layer)
 
-add_executable(test_modules_phase4
-    modules/phase4_facade_pipeline_smoke.cpp
+add_executable(test_modules_facade_pipeline
+    modules/facade_pipeline_smoke.cpp
 )
-target_link_libraries(test_modules_phase4
+target_link_libraries(test_modules_facade_pipeline
     PRIVATE
         bag_core
 )
-wavebits_configure_module_test(test_modules_phase4)
-add_test(NAME modules_phase4_facade_pipeline_smoke COMMAND test_modules_phase4)
+wavebits_configure_module_test(test_modules_facade_pipeline)
+add_test(NAME modules_facade_pipeline_smoke COMMAND test_modules_facade_pipeline)
 
-add_executable(test_modules_phase10
-    modules/phase10_internal_cutover.cpp
+add_executable(test_modules_end_to_end
+    modules/end_to_end_module_smoke.cpp
 )
-target_link_libraries(test_modules_phase10
+target_link_libraries(test_modules_end_to_end
     PRIVATE
         bag_core
 )
-wavebits_configure_module_test(test_modules_phase10)
-add_test(NAME modules_phase10_internal_cutover COMMAND test_modules_phase10)
+wavebits_configure_module_test(test_modules_end_to_end)
+add_test(NAME modules_end_to_end_smoke COMMAND test_modules_end_to_end)

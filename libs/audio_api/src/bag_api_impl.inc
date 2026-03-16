@@ -11,6 +11,8 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz,
                              int frame_samples,
                              int enable_diagnostics,
                              bag_transport_mode mode,
+                             bag_flash_signal_profile flash_signal_profile,
+                             bag_flash_voicing_flavor flash_voicing_flavor,
                              int reserved) {
     bag::CoreConfig core_config{};
     core_config.sample_rate_hz = sample_rate_hz;
@@ -28,6 +30,28 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz,
         break;
     default:
         core_config.mode = static_cast<bag::TransportMode>(-1);
+        break;
+    }
+    switch (flash_signal_profile) {
+    case BAG_FLASH_SIGNAL_PROFILE_CODED_BURST:
+        core_config.flash_signal_profile = bag::FlashSignalProfile::kCodedBurst;
+        break;
+    case BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT:
+        core_config.flash_signal_profile = bag::FlashSignalProfile::kRitualChant;
+        break;
+    default:
+        core_config.flash_signal_profile = static_cast<bag::FlashSignalProfile>(-1);
+        break;
+    }
+    switch (flash_voicing_flavor) {
+    case BAG_FLASH_VOICING_FLAVOR_CODED_BURST:
+        core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kCodedBurst;
+        break;
+    case BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT:
+        core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kRitualChant;
+        break;
+    default:
+        core_config.flash_voicing_flavor = static_cast<bag::FlashVoicingFlavor>(-1);
         break;
     }
     core_config.reserved = reserved;
@@ -77,6 +101,10 @@ bag_validation_issue ToApiValidationIssue(bag::TransportValidationIssue issue) {
         return BAG_VALIDATION_PRO_ASCII_ONLY;
     case bag::TransportValidationIssue::kPayloadTooLarge:
         return BAG_VALIDATION_PAYLOAD_TOO_LARGE;
+    case bag::TransportValidationIssue::kInvalidFlashSignalProfile:
+        return BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE;
+    case bag::TransportValidationIssue::kInvalidFlashVoicingFlavor:
+        return BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR;
     default:
         return BAG_VALIDATION_INVALID_MODE;
     }
@@ -130,6 +158,8 @@ bag_validation_issue bag_validate_encode_request(const bag_encoder_config* confi
             config->frame_samples,
             config->enable_diagnostics,
             config->mode,
+            config->flash_signal_profile,
+            config->flash_voicing_flavor,
             config->reserved),
         text));
 }
@@ -143,6 +173,8 @@ bag_validation_issue bag_validate_decoder_config(const bag_decoder_config* confi
         config->frame_samples,
         config->enable_diagnostics,
         config->mode,
+        config->flash_signal_profile,
+        config->flash_voicing_flavor,
         config->reserved)));
 }
 
@@ -166,6 +198,10 @@ const char* bag_validation_issue_message(bag_validation_issue issue) {
         return "`pro` mode only supports ASCII input. Use `flash` for unrestricted text bytes or `ultra` for UTF-8 text.";
     case BAG_VALIDATION_PAYLOAD_TOO_LARGE:
         return "Payload exceeds the 512-byte single-frame limit.";
+    case BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE:
+        return "Unsupported flash signal profile. Use coded_burst or ritual_chant.";
+    case BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR:
+        return "Unsupported flash voicing flavor. Use coded_burst or ritual_chant.";
     default:
         return "Unknown validation issue.";
     }
@@ -207,6 +243,8 @@ bag_error_code bag_encode_text(const bag_encoder_config* config,
             config->frame_samples,
             config->enable_diagnostics,
             config->mode,
+            config->flash_signal_profile,
+            config->flash_voicing_flavor,
             config->reserved);
         std::vector<std::int16_t> pcm;
         const bag::ErrorCode encode_code =
@@ -259,6 +297,8 @@ bag_error_code bag_create_decoder(const bag_decoder_config* config, bag_decoder*
         config->frame_samples,
         config->enable_diagnostics,
         config->mode,
+        config->flash_signal_profile,
+        config->flash_voicing_flavor,
         config->reserved));
     if (!decoder->decoder) {
         delete decoder;

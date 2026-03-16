@@ -15,6 +15,10 @@ class BagUiTextMapper {
         BagApiCodes.VALIDATION_INVALID_FRAME_SAMPLES ->
             UiText.Resource(R.string.validation_invalid_frame_samples)
         BagApiCodes.VALIDATION_INVALID_MODE -> UiText.Resource(R.string.validation_invalid_mode)
+        BagApiCodes.VALIDATION_INVALID_FLASH_SIGNAL_PROFILE ->
+            UiText.Resource(R.string.validation_invalid_flash_signal_profile)
+        BagApiCodes.VALIDATION_INVALID_FLASH_VOICING_FLAVOR ->
+            UiText.Resource(R.string.validation_invalid_flash_voicing_flavor)
         BagApiCodes.VALIDATION_PRO_ASCII_ONLY -> UiText.Resource(R.string.validation_pro_ascii_only)
         BagApiCodes.VALIDATION_PAYLOAD_TOO_LARGE ->
             UiText.Resource(R.string.validation_payload_too_large)

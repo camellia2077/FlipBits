@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui.state
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
@@ -18,6 +19,7 @@ data class AudioAppUiState(
     val presentationVersion: String = "",
     val coreVersion: String = "",
     val selectedPalette: PaletteOption = MaterialPalettes.first(),
+    val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.CodedBurst,
     val transportMode: TransportModeOption = TransportModeOption.Flash,
     val sessions: Map<TransportModeOption, ModeAudioSessionState> = defaultModeSessions(),
     val currentPlaybackSource: AudioPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),

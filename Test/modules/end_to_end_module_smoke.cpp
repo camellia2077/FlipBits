@@ -165,7 +165,7 @@ void TestFlashPhyCleanRoundTrip() {
         "Flash clean module should roundtrip UTF-8 text.");
 }
 
-void TestTransportFacadeEncodeMatchesCleanModes() {
+void TestTransportFacadeEncodeMatchesReferenceModes() {
     const auto flash_pcm = EncodeForModeFacade(
         bag::TransportMode::kFlash,
         test::Utf8Literal(u8"你好，WaveBits"));
@@ -174,7 +174,7 @@ void TestTransportFacadeEncodeMatchesCleanModes() {
         EncodeForModeReference(
             bag::TransportMode::kFlash,
             test::Utf8Literal(u8"你好，WaveBits")),
-        "Flash transport facade module should delegate to the flash clean path.");
+        "Flash transport facade module should delegate to the formal flash signal+voicing path.");
 
     const auto pro_pcm = EncodeForModeFacade(bag::TransportMode::kPro, "Hello-123");
     test::AssertEq(
@@ -472,20 +472,20 @@ void TestTransportDecoderRoundTripAcrossModes() {
 
 int main() {
     test::Runner runner;
-    runner.Add("ModulesPhase10.FlashCodecRoundTrip", TestFlashCodecRoundTrip);
-    runner.Add("ModulesPhase10.FlashPhyCleanRoundTrip", TestFlashPhyCleanRoundTrip);
-    runner.Add("ModulesPhase10.TransportFacadeEncodeMatchesCleanModes", TestTransportFacadeEncodeMatchesCleanModes);
-    runner.Add("ModulesPhase10.TransportFacadeValidation", TestTransportFacadeValidation);
-    runner.Add("ModulesPhase10.ProPhyCleanRoundTrip", TestProPhyCleanRoundTrip);
-    runner.Add("ModulesPhase10.ProPayloadUsesRawAsciiBytes", TestProPayloadUsesRawAsciiBytes);
-    runner.Add("ModulesPhase10.UltraTextCodecRoundTrip", TestUltraTextCodecRoundTrip);
-    runner.Add("ModulesPhase10.UltraPhyCleanRoundTrip", TestUltraPhyCleanRoundTrip);
-    runner.Add("ModulesPhase10.UltraPayloadUsesUtf8Bytes", TestUltraPayloadUsesUtf8Bytes);
-    runner.Add("ModulesPhase10.PipelinePushPollLifecycle", TestPipelinePushPollLifecycle);
-    runner.Add("ModulesPhase10.PipelineResetClearsPendingState", TestPipelineResetClearsPendingState);
-    runner.Add("ModulesPhase10.PipelineFlashUtf8RoundTrip", TestPipelineFlashUtf8RoundTrip);
-    runner.Add("ModulesPhase10.PipelineProRoundTrip", TestPipelineProRoundTrip);
-    runner.Add("ModulesPhase10.PipelineUltraRoundTrip", TestPipelineUltraRoundTrip);
-    runner.Add("ModulesPhase10.TransportDecoderRoundTripAcrossModes", TestTransportDecoderRoundTripAcrossModes);
+    runner.Add("ModulesEndToEnd.FlashCodecRoundTrip", TestFlashCodecRoundTrip);
+    runner.Add("ModulesEndToEnd.FlashPhyCleanRoundTrip", TestFlashPhyCleanRoundTrip);
+    runner.Add("ModulesEndToEnd.TransportFacadeEncodeMatchesReferenceModes", TestTransportFacadeEncodeMatchesReferenceModes);
+    runner.Add("ModulesEndToEnd.TransportFacadeValidation", TestTransportFacadeValidation);
+    runner.Add("ModulesEndToEnd.ProPhyCleanRoundTrip", TestProPhyCleanRoundTrip);
+    runner.Add("ModulesEndToEnd.ProPayloadUsesRawAsciiBytes", TestProPayloadUsesRawAsciiBytes);
+    runner.Add("ModulesEndToEnd.UltraTextCodecRoundTrip", TestUltraTextCodecRoundTrip);
+    runner.Add("ModulesEndToEnd.UltraPhyCleanRoundTrip", TestUltraPhyCleanRoundTrip);
+    runner.Add("ModulesEndToEnd.UltraPayloadUsesUtf8Bytes", TestUltraPayloadUsesUtf8Bytes);
+    runner.Add("ModulesEndToEnd.PipelinePushPollLifecycle", TestPipelinePushPollLifecycle);
+    runner.Add("ModulesEndToEnd.PipelineResetClearsPendingState", TestPipelineResetClearsPendingState);
+    runner.Add("ModulesEndToEnd.PipelineFlashUtf8RoundTrip", TestPipelineFlashUtf8RoundTrip);
+    runner.Add("ModulesEndToEnd.PipelineProRoundTrip", TestPipelineProRoundTrip);
+    runner.Add("ModulesEndToEnd.PipelineUltraRoundTrip", TestPipelineUltraRoundTrip);
+    runner.Add("ModulesEndToEnd.TransportDecoderRoundTripAcrossModes", TestTransportDecoderRoundTripAcrossModes);
     return runner.Run();
 }

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.data.AndroidSampleInputTextProvider
-import com.bag.audioandroid.data.PaletteSettingsRepository
+import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioItem
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.update
 class AudioAndroidViewModel(
     audioCodecGateway: AudioCodecGateway,
     sampleInputTextProvider: AndroidSampleInputTextProvider,
-    paletteSettingsRepository: PaletteSettingsRepository,
+    appSettingsRepository: AppSettingsRepository,
     playbackRuntimeGateway: PlaybackRuntimeGateway,
     savedAudioRepository: SavedAudioRepository
 ) : ViewModel() {
@@ -72,7 +72,7 @@ class AudioAndroidViewModel(
     private val chromeActions = AudioAndroidChromeActions(
         uiState = uiStateFlow,
         sampleInputSessionUpdater = sampleInputSessionUpdater,
-        paletteSettingsRepository = paletteSettingsRepository,
+        appSettingsRepository = appSettingsRepository,
         scope = viewModelScope
     )
 
@@ -91,6 +91,7 @@ class AudioAndroidViewModel(
             )
         }
         chromeActions.observeSelectedPalette()
+        chromeActions.observeSelectedFlashVoicingStyle()
     }
 
     fun onTabSelected(tab: AppTab) {
@@ -119,6 +120,10 @@ class AudioAndroidViewModel(
 
     fun onPaletteSelected(palette: PaletteOption) {
         chromeActions.onPaletteSelected(palette)
+    }
+
+    fun onFlashVoicingStyleSelected(style: com.bag.audioandroid.ui.model.FlashVoicingStyleOption) {
+        chromeActions.onFlashVoicingStyleSelected(style)
     }
 
     fun onInputTextChange(value: String) {

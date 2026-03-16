@@ -23,6 +23,12 @@ TransportValidationIssue ValidateCommonConfig(const CoreConfig& config) {
     if (!IsValidTransportMode(config.mode)) {
         return TransportValidationIssue::kInvalidMode;
     }
+    if (!IsValidFlashSignalProfile(config.flash_signal_profile)) {
+        return TransportValidationIssue::kInvalidFlashSignalProfile;
+    }
+    if (!IsValidFlashVoicingFlavor(config.flash_voicing_flavor)) {
+        return TransportValidationIssue::kInvalidFlashVoicingFlavor;
+    }
     return TransportValidationIssue::kOk;
 }
 

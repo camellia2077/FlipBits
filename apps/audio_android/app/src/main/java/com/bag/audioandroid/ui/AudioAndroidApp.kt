@@ -22,11 +22,11 @@ import com.bag.audioandroid.data.AndroidIntentAudioShareGateway
 import com.bag.audioandroid.data.NativeAudioCodecGateway
 import com.bag.audioandroid.data.NativeAudioIoGateway
 import com.bag.audioandroid.data.AndroidSampleInputTextProvider
+import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.data.DefaultSavedAudioRepository
 import com.bag.audioandroid.data.MediaStoreAudioExportGateway
 import com.bag.audioandroid.data.MediaStoreSavedAudioLibraryGateway
 import com.bag.audioandroid.data.NativePlaybackRuntimeGateway
-import com.bag.audioandroid.data.PaletteSettingsRepository
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.screen.AboutScreen
@@ -61,20 +61,20 @@ fun AudioAndroidApp() {
             audioShareGateway = audioShareGateway
         )
     }
-    val paletteSettingsRepository = remember(appContext) {
-        PaletteSettingsRepository(appContext)
+    val appSettingsRepository = remember(appContext) {
+        AppSettingsRepository(appContext)
     }
     val factory = remember(
         audioCodecGateway,
         sampleInputTextProvider,
-        paletteSettingsRepository,
+        appSettingsRepository,
         playbackRuntimeGateway,
         savedAudioRepository
     ) {
         AudioAndroidViewModelFactory(
             audioCodecGateway,
             sampleInputTextProvider,
-            paletteSettingsRepository,
+            appSettingsRepository,
             playbackRuntimeGateway,
             savedAudioRepository
         )
@@ -150,6 +150,8 @@ fun AudioAndroidApp() {
                 AppTab.Audio -> AudioTabScreen(
                     transportMode = uiState.transportMode,
                     onTransportModeSelected = viewModel::onTransportModeSelected,
+                    selectedFlashVoicingStyle = uiState.selectedFlashVoicingStyle,
+                    onFlashVoicingStyleSelected = viewModel::onFlashVoicingStyleSelected,
                     inputText = currentSession.inputText,
                     onInputTextChange = viewModel::onInputTextChange,
                     resultText = currentSession.resultText,
