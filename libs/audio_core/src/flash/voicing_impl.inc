@@ -27,6 +27,65 @@ constexpr double kInvocationPulseGain = 0.18;
 constexpr double kClosurePulseGain = 0.20;
 constexpr double kClosureTailGain = 0.11;
 
+float LerpProgress(float begin, float end, float ratio) {
+    return begin + (end - begin) * std::clamp(ratio, 0.0f, 1.0f);
+}
+
+void ThrowIfEncodeCancelled(const EncodeProgressSink* progress_sink) {
+    if (ShouldCancelEncode(progress_sink)) {
+        throw EncodeCancelled{};
+    }
+}
+
+constexpr std::size_t kProgressReportStrideSamples = 256;
+
+void ReportCompletedSampleProgress(const EncodeProgressSink* progress_sink,
+                                   EncodeProgressPhase phase,
+                                   float progress_begin,
+                                   float progress_end,
+                                   std::size_t completed_samples,
+                                   std::size_t total_samples) {
+    const float ratio =
+        total_samples == 0
+            ? 1.0f
+            : static_cast<float>(std::min(completed_samples, total_samples)) /
+                static_cast<float>(total_samples);
+    ReportEncodeProgress(
+        progress_sink,
+        phase,
+        LerpProgress(progress_begin, progress_end, ratio));
+}
+
+void MaybeReportCompletedSampleProgress(const EncodeProgressSink* progress_sink,
+                                        EncodeProgressPhase phase,
+                                        float progress_begin,
+                                        float progress_end,
+                                        std::size_t completed_samples,
+                                        std::size_t total_samples,
+                                        std::size_t* last_reported_samples,
+                                        bool force = false) {
+    if (last_reported_samples == nullptr) {
+        return;
+    }
+
+    const std::size_t clamped_completed_samples =
+        total_samples == 0 ? 0 : std::min(completed_samples, total_samples);
+    if (!force &&
+        clamped_completed_samples < total_samples &&
+        clamped_completed_samples - *last_reported_samples < kProgressReportStrideSamples) {
+        return;
+    }
+
+    ReportCompletedSampleProgress(
+        progress_sink,
+        phase,
+        progress_begin,
+        progress_end,
+        clamped_completed_samples,
+        total_samples);
+    *last_reported_samples = clamped_completed_samples;
+}
+
 struct SanitizedVoicingConfig {
     int sample_rate_hz = 0;
     double attack_ratio = 0.0;
@@ -323,29 +382,33 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
     switch (NormalizeVoicingFlavor(flavor)) {
     case FlashVoicingFlavor::kRitualChant:
         return VoicingStyleTraits{
-            .nibble_boundary_accent_factor = 0.05,
-            .byte_boundary_click_scale = 0.42,
-            .preamble_grouped_burst_mix = 0.42,
-            .preamble_invocation_shell_mix = 1.45,
-            .epilogue_grouped_burst_mix = 0.34,
-            .epilogue_closure_shell_mix = 1.38,
-            .preamble_rise_ratio = 0.12,
-            .preamble_fall_ratio = 0.18,
-            .epilogue_rise_ratio = 0.08,
-            .epilogue_fall_ratio = 0.26,
-            .epilogue_decay_exponent = 2.0,
-            .payload_release_scale = 1.75,
-            .payload_envelope_floor = 0.56,
-            .metallic_layer_gain_scale = 0.62,
-            .chant_resonance_gain = 0.038,
-            .tremolo_depth_scale = 0.62,
-            .tremolo_freq_hz = 4.4,
-            .spectral_band_mix_scale = 0.78,
-            .spectral_softclip_mix_scale = 0.72,
+            .nibble_boundary_accent_factor = 0.12,
+            .byte_boundary_click_scale = 0.68,
+            .preamble_grouped_burst_mix = 0.26,
+            .preamble_invocation_shell_mix = 1.12,
+            .epilogue_grouped_burst_mix = 0.22,
+            .epilogue_closure_shell_mix = 1.08,
+            .preamble_rise_ratio = 0.09,
+            .preamble_fall_ratio = 0.15,
+            .epilogue_rise_ratio = 0.06,
+            .epilogue_fall_ratio = 0.18,
+            .epilogue_decay_exponent = 3.4,
+            .payload_release_scale = 1.10,
+            .payload_envelope_floor = 0.12,
+            .metallic_layer_gain_scale = 0.18,
+            .chant_resonance_gain = 0.008,
+            .tremolo_depth_scale = 0.15,
+            .tremolo_freq_hz = 5.4,
+            .spectral_band_mix_scale = 0.24,
+            .spectral_softclip_mix_scale = 0.20,
             .preamble_cadence_profile = FixedShellCadenceProfile::kRitualChant,
             .epilogue_cadence_profile = FixedShellCadenceProfile::kRitualChant,
             .preamble_phrase_mask_mix = 1.0,
             .epilogue_phrase_mask_mix = 1.0,
+            .preamble_terminal_mute_begin = 0.88,
+            .preamble_terminal_mute_end = 1.0,
+            .epilogue_terminal_mute_begin = 0.84,
+            .epilogue_terminal_mute_end = 1.0,
         };
     case FlashVoicingFlavor::kCodedBurst:
     default:
@@ -662,7 +725,12 @@ double ComputeProtocolAckChirp(size_t local_index,
 
 void ApplySpectralTexture(std::vector<int16_t>* pcm,
                           int sample_rate_hz,
-                          const VoicingStyleTraits& style_traits) {
+                          const VoicingStyleTraits& style_traits,
+                          const EncodeProgressSink* progress_sink = nullptr,
+                          float progress_begin = 0.0f,
+                          float progress_end = 1.0f,
+                          std::size_t completed_samples_before = 0,
+                          std::size_t total_work_samples = 0) {
     if (pcm == nullptr || pcm->empty() || sample_rate_hz <= 0) {
         return;
     }
@@ -671,8 +739,12 @@ void ApplySpectralTexture(std::vector<int16_t>* pcm,
     const double band_alpha = ComputeOnePoleAlpha(2200.0, sample_rate_hz);
     double low_state = 0.0;
     double band_state = 0.0;
+    std::size_t last_reported_samples = completed_samples_before;
 
     for (std::size_t index = 0; index < pcm->size(); ++index) {
+        if (index > 0 && index % kProgressReportStrideSamples == 0) {
+            ThrowIfEncodeCancelled(progress_sink);
+        }
         const double dry = static_cast<double>((*pcm)[index]) / kPcmScale;
         low_state += low_alpha * (dry - low_state);
         const double band_input = dry - low_state;
@@ -686,7 +758,25 @@ void ApplySpectralTexture(std::vector<int16_t>* pcm,
             saturated * (kSpectralSoftClipMix * style_traits.spectral_softclip_mix_scale);
         (*pcm)[index] = static_cast<int16_t>(
             std::lround(std::clamp(textured, -1.0, 1.0) * kPcmScale));
+        MaybeReportCompletedSampleProgress(
+            progress_sink,
+            EncodeProgressPhase::kPostprocessing,
+            progress_begin,
+            progress_end,
+            completed_samples_before + index + 1,
+            total_work_samples,
+            &last_reported_samples);
     }
+
+    MaybeReportCompletedSampleProgress(
+        progress_sink,
+        EncodeProgressPhase::kPostprocessing,
+        progress_begin,
+        progress_end,
+        completed_samples_before + pcm->size(),
+        total_work_samples,
+        &last_reported_samples,
+        true);
 }
 
 double ComputeBoundaryClick(double gain,
@@ -937,15 +1027,15 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
                                                     FlashVoicingFlavor flavor) {
     FlashVoicingConfig voicing{};
     voicing.sample_rate_hz = config.sample_rate_hz;
-    voicing.attack_ratio = 0.08;
-    voicing.release_ratio = 0.08;
-    voicing.second_harmonic_gain = 0.10;
-    voicing.third_harmonic_gain = 0.03;
-    voicing.boundary_click_gain = 0.02;
-    voicing.enable_preamble = true;
-    voicing.enable_epilogue = true;
     switch (NormalizeVoicingFlavor(flavor)) {
     case FlashVoicingFlavor::kRitualChant:
+        voicing.attack_ratio = 0.05;
+        voicing.release_ratio = 0.05;
+        voicing.second_harmonic_gain = 0.05;
+        voicing.third_harmonic_gain = 0.01;
+        voicing.boundary_click_gain = 0.015;
+        voicing.enable_preamble = true;
+        voicing.enable_epilogue = true;
         voicing.preamble_sample_count =
             config.frame_samples > 0 ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(16)
                                      : static_cast<std::size_t>(0);
@@ -955,6 +1045,13 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
         break;
     case FlashVoicingFlavor::kCodedBurst:
     default:
+        voicing.attack_ratio = 0.08;
+        voicing.release_ratio = 0.08;
+        voicing.second_harmonic_gain = 0.10;
+        voicing.third_harmonic_gain = 0.03;
+        voicing.boundary_click_gain = 0.02;
+        voicing.enable_preamble = true;
+        voicing.enable_epilogue = true;
         voicing.preamble_sample_count =
             config.frame_samples > 0
                 ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
@@ -1001,18 +1098,27 @@ std::vector<int16_t> TrimToPayloadPcm(const std::vector<int16_t>& voiced_pcm,
 
 FlashVoicingResult ApplyVoicingToPayload(const std::vector<int16_t>& clean_payload_pcm,
                                          const FlashPayloadLayout& payload_layout,
-                                         const FlashVoicingConfig& config) {
+                                         const FlashVoicingConfig& config,
+                                         const EncodeProgressSink* progress_sink,
+                                         float progress_begin,
+                                         float progress_end) {
     return ApplyVoicingToPayloadWithFlavor(
         clean_payload_pcm,
         payload_layout,
         FlashVoicingFlavor::kCodedBurst,
-        config);
+        config,
+        progress_sink,
+        progress_begin,
+        progress_end);
 }
 
 FlashVoicingResult ApplyVoicingToPayloadWithFlavor(const std::vector<int16_t>& clean_payload_pcm,
                                                    const FlashPayloadLayout& payload_layout,
                                                    FlashVoicingFlavor flavor,
-                                                   const FlashVoicingConfig& config) {
+                                                   const FlashVoicingConfig& config,
+                                                   const EncodeProgressSink* progress_sink,
+                                                   float progress_begin,
+                                                   float progress_end) {
     ValidatePayloadLayout(clean_payload_pcm, payload_layout);
     const SanitizedVoicingConfig sanitized = SanitizeVoicingConfig(config);
     const VoicingStyleTraits style_traits = MakeFlavorTraits(flavor);
@@ -1027,16 +1133,56 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(const std::vector<int16_t>& c
             descriptor.trailing_nonpayload_samples,
         0);
 
+    const std::size_t spectral_texture_work =
+        ShouldApplySpectralTexture(config) ? result.pcm.size() : static_cast<std::size_t>(0);
+    const std::size_t total_postprocess_work =
+        descriptor.leading_nonpayload_samples +
+        descriptor.payload_sample_count +
+        descriptor.trailing_nonpayload_samples +
+        spectral_texture_work;
+
+    ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin);
+    ThrowIfEncodeCancelled(progress_sink);
+    if (total_postprocess_work == 0) {
+        ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing, progress_end);
+        result.descriptor = descriptor;
+        return result;
+    }
+
+    std::size_t completed_postprocess_work = 0;
+    std::size_t last_reported_postprocess_work = 0;
     for (size_t local_index = 0; local_index < descriptor.leading_nonpayload_samples; ++local_index) {
+        if (local_index > 0 && local_index % kProgressReportStrideSamples == 0) {
+            ThrowIfEncodeCancelled(progress_sink);
+        }
         const double sample = RenderFixedPreambleSample(
             local_index,
             descriptor.leading_nonpayload_samples,
             style_traits,
             sanitized.sample_rate_hz);
         result.pcm[local_index] = static_cast<int16_t>(std::lround(sample * kPcmScale));
+        ++completed_postprocess_work;
+        MaybeReportCompletedSampleProgress(
+            progress_sink,
+            EncodeProgressPhase::kPostprocessing,
+            progress_begin,
+            progress_end,
+            completed_postprocess_work,
+            total_postprocess_work,
+            &last_reported_postprocess_work);
     }
+    MaybeReportCompletedSampleProgress(
+        progress_sink,
+        EncodeProgressPhase::kPostprocessing,
+        progress_begin,
+        progress_end,
+        completed_postprocess_work,
+        total_postprocess_work,
+        &last_reported_postprocess_work,
+        true);
 
     for (size_t chunk_index = 0; chunk_index < payload_layout.chunks.size(); ++chunk_index) {
+        ThrowIfEncodeCancelled(progress_sink);
         const FlashPayloadChunk& chunk = payload_layout.chunks[chunk_index];
         auto [attack_count, release_count] = FitAttackReleaseCounts(
             chunk.sample_count,
@@ -1103,10 +1249,31 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(const std::vector<int16_t>& c
                 1.0);
             result.pcm[sample_index] =
                 static_cast<int16_t>(std::lround(voiced_sample * kPcmScale));
+            ++completed_postprocess_work;
+            MaybeReportCompletedSampleProgress(
+                progress_sink,
+                EncodeProgressPhase::kPostprocessing,
+                progress_begin,
+                progress_end,
+                completed_postprocess_work,
+                total_postprocess_work,
+                &last_reported_postprocess_work);
         }
+        MaybeReportCompletedSampleProgress(
+            progress_sink,
+            EncodeProgressPhase::kPostprocessing,
+            progress_begin,
+            progress_end,
+            completed_postprocess_work,
+            total_postprocess_work,
+            &last_reported_postprocess_work,
+            true);
     }
 
     for (size_t local_index = 0; local_index < descriptor.trailing_nonpayload_samples; ++local_index) {
+        if (local_index > 0 && local_index % kProgressReportStrideSamples == 0) {
+            ThrowIfEncodeCancelled(progress_sink);
+        }
         const double sample = RenderFixedEpilogueSample(
             local_index,
             descriptor.trailing_nonpayload_samples,
@@ -1115,12 +1282,41 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(const std::vector<int16_t>& c
         const size_t sample_index =
             descriptor.leading_nonpayload_samples + descriptor.payload_sample_count + local_index;
         result.pcm[sample_index] = static_cast<int16_t>(std::lround(sample * kPcmScale));
+        ++completed_postprocess_work;
+        MaybeReportCompletedSampleProgress(
+            progress_sink,
+            EncodeProgressPhase::kPostprocessing,
+            progress_begin,
+            progress_end,
+            completed_postprocess_work,
+            total_postprocess_work,
+            &last_reported_postprocess_work);
     }
+    MaybeReportCompletedSampleProgress(
+        progress_sink,
+        EncodeProgressPhase::kPostprocessing,
+        progress_begin,
+        progress_end,
+        completed_postprocess_work,
+        total_postprocess_work,
+        &last_reported_postprocess_work,
+        true);
 
     result.descriptor = descriptor;
+    ThrowIfEncodeCancelled(progress_sink);
     if (ShouldApplySpectralTexture(config)) {
-        ApplySpectralTexture(&result.pcm, sanitized.sample_rate_hz, style_traits);
+        ApplySpectralTexture(
+            &result.pcm,
+            sanitized.sample_rate_hz,
+            style_traits,
+            progress_sink,
+            progress_begin,
+            progress_end,
+            completed_postprocess_work,
+            total_postprocess_work);
+        completed_postprocess_work += spectral_texture_work;
     }
+    ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing, progress_end);
     return result;
 }
 

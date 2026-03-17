@@ -12,7 +12,6 @@ set(bag_core_sources
     src/flash/codec.cpp
     src/flash/phy_clean.cpp
     src/flash/signal.cpp
-    src/flash/visualization.cpp
     src/flash/voicing.cpp
     src/fsk/fsk_codec.cpp
     src/pro/codec.cpp
@@ -50,7 +49,6 @@ target_sources(
             modules/bag/flash/codec.cppm
             modules/bag/flash/phy_clean.cppm
             modules/bag/flash/signal.cppm
-            modules/bag/flash/visualization.cppm
             modules/bag/flash/voicing.cppm
             modules/bag/fsk/codec.cppm
             modules/bag/pro/codec.cppm

@@ -59,6 +59,13 @@ TransportValidationIssue ValidateDecoderConfig(const CoreConfig& config) {
 ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<int16_t>* out_pcm) {
+    return EncodeTextToPcm16(config, text, out_pcm, nullptr);
+}
+
+ErrorCode EncodeTextToPcm16(const CoreConfig& config,
+                            const std::string& text,
+                            std::vector<int16_t>* out_pcm,
+                            const EncodeProgressSink* progress_sink) {
     if (out_pcm == nullptr) {
         return ErrorCode::kInvalidArgument;
     }
@@ -68,38 +75,11 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config,
 
     switch (config.mode) {
     case TransportMode::kFlash:
-        return bag::flash::EncodeTextToPcm16(config, text, out_pcm);
+        return bag::flash::EncodeTextToPcm16(config, text, out_pcm, progress_sink);
     case TransportMode::kPro:
-        return bag::pro::EncodeTextToPcm16(config, text, out_pcm);
+        return bag::pro::EncodeTextToPcm16(config, text, out_pcm, progress_sink);
     case TransportMode::kUltra:
-        return bag::ultra::EncodeTextToPcm16(config, text, out_pcm);
-    default:
-        return ErrorCode::kInvalidArgument;
-    }
-}
-
-ErrorCode AnalyzeVisualization(const CoreConfig& config,
-                               const std::vector<int16_t>& pcm,
-                               VisualizationResult* out_result) {
-    if (out_result == nullptr) {
-        return ErrorCode::kInvalidArgument;
-    }
-    out_result->frames.clear();
-    out_result->total_samples = 0;
-    out_result->sample_rate_hz = 0;
-    out_result->frame_stride_samples = 0;
-
-    const TransportValidationIssue config_issue = ValidateDecoderConfig(config);
-    if (config_issue != TransportValidationIssue::kOk) {
-        return ErrorCode::kInvalidArgument;
-    }
-
-    switch (config.mode) {
-    case TransportMode::kFlash:
-        return bag::flash::AnalyzeVisualization(config, pcm, out_result);
-    case TransportMode::kPro:
-    case TransportMode::kUltra:
-        return ErrorCode::kNotImplemented;
+        return bag::ultra::EncodeTextToPcm16(config, text, out_pcm, progress_sink);
     default:
         return ErrorCode::kInvalidArgument;
     }

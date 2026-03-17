@@ -10,12 +10,31 @@ std::vector<std::uint8_t> SerializeMonoPcm16Wav(
     return detail::SerializeMonoPcm16WavBackend(sample_rate_hz, pcm);
 }
 
+std::vector<std::uint8_t> SerializeMonoPcm16WavWithMetadata(
+    int sample_rate_hz,
+    const std::vector<std::int16_t>& pcm,
+    const WaveBitsAudioMetadata& metadata
+) {
+    return detail::SerializeMonoPcm16WavWithMetadataBackend(sample_rate_hz, pcm, metadata);
+}
+
 WavPcm16ParseResult ParseMonoPcm16Wav(const std::uint8_t* wav_bytes, std::size_t wav_byte_count) {
     return detail::ParseMonoPcm16WavBackend(wav_bytes, wav_byte_count);
 }
 
 WavPcm16ParseResult ParseMonoPcm16Wav(const std::vector<std::uint8_t>& wav_bytes) {
     return ParseMonoPcm16Wav(wav_bytes.data(), wav_bytes.size());
+}
+
+WaveBitsAudioMetadataParseResult ParseWaveBitsAudioMetadata(
+    const std::uint8_t* wav_bytes,
+    std::size_t wav_byte_count
+) {
+    return detail::ParseWaveBitsAudioMetadataBackend(wav_bytes, wav_byte_count);
+}
+
+WaveBitsAudioMetadataParseResult ParseWaveBitsAudioMetadata(const std::vector<std::uint8_t>& wav_bytes) {
+    return ParseWaveBitsAudioMetadata(wav_bytes.data(), wav_bytes.size());
 }
 
 void WriteMonoPcm16Wav(const std::filesystem::path& output_path,

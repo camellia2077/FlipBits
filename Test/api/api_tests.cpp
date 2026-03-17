@@ -1,5 +1,8 @@
 #include <algorithm>
+#include <array>
+#include <chrono>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "bag_api.h"
@@ -13,6 +16,14 @@ struct DecodeResult {
     bag_error_code code = BAG_INTERNAL;
     std::string text;
     bag_transport_mode mode = BAG_TRANSPORT_FLASH;
+};
+
+struct EncodeJobCompletion {
+    bag_encode_job_progress final_progress{};
+    bool saw_running = false;
+    bool saw_postprocessing = false;
+    bool saw_phase_regression = false;
+    int progress_advance_count = 0;
 };
 
 bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
@@ -74,14 +85,6 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
            trailing_nonpayload_samples;
 }
 
-bag_visualization_result AnalyzeVisualizationViaApi(const bag_decoder_config& config,
-                                                    const bag_pcm16_result& pcm) {
-    bag_visualization_result result{};
-    const auto analyze_code = bag_analyze_visualization(&config, pcm.samples, pcm.sample_count, &result);
-    test::AssertEq(analyze_code, BAG_OK, "Visualization analysis should succeed.");
-    return result;
-}
-
 DecodeResult DecodeViaApi(const bag_decoder_config& config, const bag_pcm16_result& pcm) {
     bag_decoder* decoder = nullptr;
     const auto create_code = bag_create_decoder(&config, &decoder);
@@ -104,6 +107,80 @@ DecodeResult DecodeViaApi(const bag_decoder_config& config, const bag_pcm16_resu
     out.text.assign(text_buffer.data(), result.text_size);
     out.mode = result.mode;
     return out;
+}
+
+bool IsEncodeJobTerminal(bag_encode_job_state state) {
+    return state == BAG_ENCODE_JOB_SUCCEEDED ||
+           state == BAG_ENCODE_JOB_FAILED ||
+           state == BAG_ENCODE_JOB_CANCELLED;
+}
+
+void AssertPcmResultsEqual(const bag_pcm16_result& lhs,
+                           const bag_pcm16_result& rhs,
+                           const std::string& message) {
+    test::AssertEq(lhs.sample_count, rhs.sample_count, message + " sample count should match.");
+    const bool samples_match =
+        lhs.sample_count == rhs.sample_count &&
+        (lhs.sample_count == 0 ||
+         std::equal(lhs.samples, lhs.samples + lhs.sample_count, rhs.samples));
+    test::AssertTrue(samples_match, message + " samples should match exactly.");
+}
+
+EncodeJobCompletion WaitForEncodeJobTerminal(bag_encode_job* job,
+                                            bool cancel_when_running = false) {
+    test::AssertTrue(job != nullptr, "Job handle should not be null while waiting for completion.");
+
+    EncodeJobCompletion completion{};
+    float previous_progress = 0.0f;
+    bool first_poll = true;
+    bool cancel_requested = false;
+    bag_encode_job_phase previous_phase = BAG_ENCODE_JOB_PHASE_PREPARING_INPUT;
+    for (int attempt = 0; attempt < 20000; ++attempt) {
+        bag_encode_job_progress progress{};
+        test::AssertEq(
+            bag_poll_encode_text_job(job, &progress),
+            BAG_OK,
+            "Polling an active encode job should succeed.");
+        if (!first_poll) {
+            test::AssertTrue(
+                progress.progress_0_to_1 + 1e-6f >= previous_progress,
+                "Encode job progress should stay monotonic.");
+            if (progress.progress_0_to_1 > previous_progress + 1e-6f) {
+                ++completion.progress_advance_count;
+            }
+            completion.saw_phase_regression =
+                completion.saw_phase_regression ||
+                static_cast<int>(progress.phase) < static_cast<int>(previous_phase);
+        }
+        first_poll = false;
+        previous_progress = progress.progress_0_to_1;
+        previous_phase = progress.phase;
+        completion.saw_running = completion.saw_running || progress.state == BAG_ENCODE_JOB_RUNNING;
+        completion.saw_postprocessing =
+            completion.saw_postprocessing || progress.phase == BAG_ENCODE_JOB_PHASE_POSTPROCESSING;
+
+        if (cancel_when_running && !cancel_requested && progress.state == BAG_ENCODE_JOB_RUNNING) {
+            test::AssertEq(
+                bag_cancel_encode_text_job(job),
+                BAG_OK,
+                "Cancelling a running encode job should succeed.");
+            cancel_requested = true;
+        }
+
+        if (IsEncodeJobTerminal(progress.state)) {
+            completion.final_progress = progress;
+            return completion;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    test::Fail("Encode job did not reach a terminal state before timeout.");
+    return completion;
+}
+
+std::string BuildLongJobText() {
+    return std::string(256, 'J');
 }
 
 void AssertRoundTripAcrossCorpus(const std::vector<test::CorpusCase>& corpus,
@@ -177,6 +254,56 @@ void TestApiEncodeRejectsInvalidArguments() {
         bag_encode_text(&invalid_config, "A", &pcm),
         BAG_INVALID_ARGUMENT,
         "Unknown encoder mode should be rejected.");
+}
+
+void TestApiEncodeJobRejectsInvalidArguments() {
+    const auto config_case = test::ConfigCases().front();
+    const auto encoder_config = MakeEncoderConfig(config_case);
+    bag_encode_job* job = nullptr;
+    bag_encode_job_progress progress{};
+    bag_pcm16_result pcm{};
+
+    test::AssertEq(
+        bag_start_encode_text_job(nullptr, "A", &job),
+        BAG_INVALID_ARGUMENT,
+        "Null encoder config should be rejected for async jobs.");
+    test::AssertEq(
+        bag_start_encode_text_job(&encoder_config, nullptr, &job),
+        BAG_INVALID_ARGUMENT,
+        "Null text should be rejected for async jobs.");
+    test::AssertEq(
+        bag_start_encode_text_job(&encoder_config, "A", nullptr),
+        BAG_INVALID_ARGUMENT,
+        "Null output job pointer should be rejected for async jobs.");
+
+    auto invalid_config = encoder_config;
+    invalid_config.sample_rate_hz = 0;
+    test::AssertEq(
+        bag_start_encode_text_job(&invalid_config, "A", &job),
+        BAG_INVALID_ARGUMENT,
+        "Invalid configs should not create async jobs.");
+    test::AssertTrue(job == nullptr, "Invalid async job start should not leave a job handle behind.");
+
+    test::AssertEq(
+        bag_poll_encode_text_job(nullptr, &progress),
+        BAG_INVALID_ARGUMENT,
+        "Polling with a null job should be rejected.");
+    test::AssertEq(
+        bag_poll_encode_text_job(job, nullptr),
+        BAG_INVALID_ARGUMENT,
+        "Polling with a null output should be rejected.");
+    test::AssertEq(
+        bag_cancel_encode_text_job(nullptr),
+        BAG_INVALID_ARGUMENT,
+        "Cancelling a null job should be rejected.");
+    test::AssertEq(
+        bag_take_encode_text_job_result(nullptr, &pcm),
+        BAG_INVALID_ARGUMENT,
+        "Taking a result from a null job should be rejected.");
+    test::AssertEq(
+        bag_take_encode_text_job_result(job, nullptr),
+        BAG_INVALID_ARGUMENT,
+        "Taking a result into a null PCM result should be rejected.");
 }
 
 void TestApiCreateDecoderRejectsInvalidArguments() {
@@ -336,6 +463,221 @@ void TestApiBoundarySuccessCases() {
     }
 }
 
+void TestApiEncodeJobSuccessAndProgressAcrossModes() {
+    const auto config_case = test::ConfigCases().front();
+    const std::string text = "job-progress";
+
+    const std::array<bag_transport_mode, 3> modes = {
+        BAG_TRANSPORT_FLASH,
+        BAG_TRANSPORT_PRO,
+        BAG_TRANSPORT_ULTRA,
+    };
+    for (const bag_transport_mode mode : modes) {
+        const auto encoder_config = MakeEncoderConfig(config_case, mode);
+
+        bag_encode_job* job = nullptr;
+        test::AssertEq(
+            bag_start_encode_text_job(&encoder_config, text.c_str(), &job),
+            BAG_OK,
+            "Starting an async encode job should succeed for each transport mode.");
+        const EncodeJobCompletion completion = WaitForEncodeJobTerminal(job);
+        test::AssertEq(
+            completion.final_progress.state,
+            BAG_ENCODE_JOB_SUCCEEDED,
+            "Async encode jobs should reach the succeeded terminal state.");
+        test::AssertEq(
+            completion.final_progress.terminal_code,
+            BAG_OK,
+            "Successful async encode jobs should publish an OK terminal code.");
+        test::AssertEq(
+            completion.final_progress.progress_0_to_1,
+            1.0f,
+            "Successful async encode jobs should finish at 100% progress.");
+        test::AssertTrue(
+            !completion.saw_phase_regression,
+            "Encode job phases should not move backwards while polling.");
+        if (mode == BAG_TRANSPORT_FLASH) {
+            test::AssertTrue(
+                completion.saw_postprocessing,
+                "Flash encode jobs should report a postprocessing phase.");
+        } else {
+            test::AssertTrue(
+                !completion.saw_postprocessing,
+                "Non-flash encode jobs should not report a postprocessing phase.");
+        }
+
+        bag_pcm16_result expected_pcm{};
+        bag_pcm16_result actual_pcm{};
+        bag_pcm16_result repeated_pcm{};
+        test::AssertEq(
+            bag_encode_text(&encoder_config, text.c_str(), &expected_pcm),
+            BAG_OK,
+            "The synchronous encode baseline should succeed for async-job comparisons.");
+        test::AssertEq(
+            bag_take_encode_text_job_result(job, &actual_pcm),
+            BAG_OK,
+            "Succeeded async jobs should expose their PCM result.");
+        test::AssertEq(
+            bag_take_encode_text_job_result(job, &repeated_pcm),
+            BAG_OK,
+            "Succeeded async jobs should allow the result to be taken repeatedly.");
+        AssertPcmResultsEqual(
+            expected_pcm,
+            actual_pcm,
+            "Async job PCM should match the one-shot encode output.");
+        AssertPcmResultsEqual(
+            expected_pcm,
+            repeated_pcm,
+            "Repeated async job result retrieval should stay stable.");
+
+        bag_encode_job_progress repeated_progress{};
+        test::AssertEq(
+            bag_poll_encode_text_job(job, &repeated_progress),
+            BAG_OK,
+            "Polling after completion should remain safe.");
+        test::AssertEq(
+            repeated_progress.state,
+            BAG_ENCODE_JOB_SUCCEEDED,
+            "Polling after success should stay in the succeeded state.");
+        test::AssertEq(
+            bag_cancel_encode_text_job(job),
+            BAG_OK,
+            "Cancelling a completed async encode job should stay idempotently OK.");
+
+        bag_free_pcm16_result(&expected_pcm);
+        bag_free_pcm16_result(&actual_pcm);
+        bag_free_pcm16_result(&repeated_pcm);
+        bag_destroy_encode_text_job(job);
+    }
+}
+
+void TestApiEncodeJobImmediateCancel() {
+    const auto config_case = test::ConfigCases().front();
+    const auto encoder_config =
+        MakeEncoderConfig(
+            config_case,
+            BAG_TRANSPORT_FLASH,
+            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+
+    bag_encode_job* job = nullptr;
+    test::AssertEq(
+        bag_start_encode_text_job(&encoder_config, BuildLongJobText().c_str(), &job),
+        BAG_OK,
+        "Starting a long async flash job should succeed before immediate cancel.");
+    test::AssertEq(
+        bag_cancel_encode_text_job(job),
+        BAG_OK,
+        "Immediate cancel should succeed.");
+    test::AssertEq(
+        bag_cancel_encode_text_job(job),
+        BAG_OK,
+        "Repeated immediate cancel should stay idempotently OK.");
+
+    const EncodeJobCompletion completion = WaitForEncodeJobTerminal(job);
+    test::AssertEq(
+        completion.final_progress.state,
+        BAG_ENCODE_JOB_CANCELLED,
+        "Immediately cancelled jobs should report a cancelled terminal state.");
+    test::AssertEq(
+        completion.final_progress.terminal_code,
+        BAG_CANCELLED,
+        "Immediately cancelled jobs should expose the cancelled terminal code.");
+
+    bag_pcm16_result pcm{};
+    test::AssertEq(
+        bag_take_encode_text_job_result(job, &pcm),
+        BAG_CANCELLED,
+        "Cancelled jobs should not expose a PCM result.");
+    test::AssertTrue(pcm.samples == nullptr, "Cancelled jobs should not allocate a PCM buffer.");
+    test::AssertEq(pcm.sample_count, static_cast<size_t>(0), "Cancelled jobs should report no PCM samples.");
+
+    bag_destroy_encode_text_job(job);
+}
+
+void TestApiEncodeJobCancelWhileRunning() {
+    const auto config_case = test::ConfigCases().front();
+    const auto encoder_config =
+        MakeEncoderConfig(
+            config_case,
+            BAG_TRANSPORT_FLASH,
+            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+
+    bag_encode_job* job = nullptr;
+    test::AssertEq(
+        bag_start_encode_text_job(&encoder_config, BuildLongJobText().c_str(), &job),
+        BAG_OK,
+        "Starting a long async flash job should succeed before running cancel.");
+
+    const EncodeJobCompletion completion = WaitForEncodeJobTerminal(job, true);
+    test::AssertTrue(completion.saw_running, "The long async job should have entered the running state.");
+    test::AssertEq(
+        completion.final_progress.state,
+        BAG_ENCODE_JOB_CANCELLED,
+        "Cancelling while running should report the cancelled terminal state.");
+    test::AssertEq(
+        completion.final_progress.terminal_code,
+        BAG_CANCELLED,
+        "Cancelling while running should publish the cancelled terminal code.");
+
+    bag_pcm16_result pcm{};
+    test::AssertEq(
+        bag_take_encode_text_job_result(job, &pcm),
+        BAG_CANCELLED,
+        "Running-cancelled jobs should not expose a PCM result.");
+    bag_destroy_encode_text_job(job);
+}
+
+void TestApiEncodeJobDestroyWhileRunningIsSafe() {
+    const auto config_case = test::ConfigCases().front();
+    const auto encoder_config =
+        MakeEncoderConfig(
+            config_case,
+            BAG_TRANSPORT_FLASH,
+            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
+            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+
+    bag_encode_job* job = nullptr;
+    test::AssertEq(
+        bag_start_encode_text_job(&encoder_config, BuildLongJobText().c_str(), &job),
+        BAG_OK,
+        "Starting a long async flash job should succeed before destroy.");
+    bag_destroy_encode_text_job(job);
+}
+
+void TestApiEncodeJobPublishesMultipleIntermediateProgressUpdates() {
+    const auto config_case = test::ConfigCases().front();
+    const std::string long_text(4096, 'P');
+    const std::array<bag_transport_mode, 3> modes = {
+        BAG_TRANSPORT_FLASH,
+        BAG_TRANSPORT_PRO,
+        BAG_TRANSPORT_ULTRA,
+    };
+
+    for (const bag_transport_mode mode : modes) {
+        const auto encoder_config = MakeEncoderConfig(config_case, mode);
+        bag_encode_job* job = nullptr;
+        test::AssertEq(
+            bag_start_encode_text_job(&encoder_config, long_text.c_str(), &job),
+            BAG_OK,
+            "Starting a long async encode job should succeed for progress sampling tests.");
+
+        const EncodeJobCompletion completion = WaitForEncodeJobTerminal(job);
+        test::AssertEq(
+            completion.final_progress.state,
+            BAG_ENCODE_JOB_SUCCEEDED,
+            "Long async encode jobs should complete successfully.");
+        test::AssertTrue(
+            completion.progress_advance_count >= 3,
+            "Long async encode jobs should publish multiple intermediate progress updates.");
+        test::AssertTrue(
+            !completion.saw_phase_regression,
+            "Long async encode jobs should keep phase order monotonic.");
+        bag_destroy_encode_text_job(job);
+    }
+}
+
 void TestApiFlashConfigAffectsLengthAndRoundTrip() {
     const std::string text = "Length";
 
@@ -434,125 +776,6 @@ void TestApiFlashDecodeRequiresMatchingConfig() {
         decoded.code != BAG_OK || decoded.text != text,
         "Decoding ritual flash PCM with coded_burst signal/flavor should not look like a valid roundtrip.");
     bag_free_pcm16_result(&ritual_pcm);
-}
-
-void TestApiFlashVisualizationProducesFrameTrack() {
-    const auto config_case = test::ConfigCases().front();
-    const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH);
-    const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_FLASH);
-    const std::string text = "Visual";
-
-    bag_pcm16_result pcm{};
-    test::AssertEq(
-        bag_encode_text(&encoder_config, text.c_str(), &pcm),
-        BAG_OK,
-        "Flash encode should succeed before visualization analysis.");
-
-    auto visualization = AnalyzeVisualizationViaApi(decoder_config, pcm);
-    test::AssertTrue(visualization.frames != nullptr, "Visualization frames should be allocated for flash PCM.");
-    test::AssertTrue(visualization.frame_count > 0, "Visualization should produce at least one frame.");
-    test::AssertEq(
-        visualization.total_samples,
-        static_cast<int>(pcm.sample_count),
-        "Visualization total sample count should match the analyzed PCM.");
-    test::AssertEq(
-        visualization.sample_rate_hz,
-        config_case.sample_rate_hz,
-        "Visualization sample rate should mirror the decoder config.");
-    test::AssertEq(
-        visualization.frame_stride_samples,
-        std::max(1, config_case.frame_samples / 4),
-        "Visualization stride should use the fixed quarter-frame bucket.");
-    test::AssertEq(
-        visualization.frames[0].region_kind,
-        BAG_VISUALIZATION_REGION_LEADING_SHELL,
-        "Flash visualization should classify the first frame as leading shell.");
-
-    bool has_payload_frame = false;
-    for (std::size_t index = 0; index < visualization.frame_count; ++index) {
-        const auto& frame = visualization.frames[index];
-        if (frame.region_kind == BAG_VISUALIZATION_REGION_PAYLOAD) {
-            has_payload_frame = true;
-        }
-        test::AssertTrue(frame.rms >= 0.0f && frame.rms <= 1.0f, "Visualization RMS must stay normalized.");
-        test::AssertTrue(frame.peak >= 0.0f && frame.peak <= 1.0f, "Visualization peak must stay normalized.");
-        test::AssertTrue(
-            frame.brightness >= 0.0f && frame.brightness <= 1.0f,
-            "Visualization brightness must stay normalized.");
-    }
-    test::AssertTrue(has_payload_frame, "Flash visualization should classify at least one frame as payload.");
-
-    bag_free_visualization_result(&visualization);
-    bag_free_pcm16_result(&pcm);
-}
-
-void TestApiVisualizationReturnsNotImplementedOutsideFlash() {
-    const auto config_case = test::ConfigCases().front();
-
-    {
-        const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_PRO);
-        const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_PRO);
-        bag_pcm16_result pcm{};
-        test::AssertEq(
-            bag_encode_text(&encoder_config, "PRO", &pcm),
-            BAG_OK,
-            "Pro encode should succeed before visualization availability check.");
-        bag_visualization_result visualization{};
-        test::AssertEq(
-            bag_analyze_visualization(&decoder_config, pcm.samples, pcm.sample_count, &visualization),
-            BAG_NOT_IMPLEMENTED,
-            "Visualization should report not implemented for pro mode.");
-        bag_free_pcm16_result(&pcm);
-    }
-
-    {
-        const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_ULTRA);
-        const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_ULTRA);
-        bag_pcm16_result pcm{};
-        const auto ultra_text = test::Utf8Literal(u8"超");
-        test::AssertEq(
-            bag_encode_text(&encoder_config, ultra_text.c_str(), &pcm),
-            BAG_OK,
-            "Ultra encode should succeed before visualization availability check.");
-        bag_visualization_result visualization{};
-        test::AssertEq(
-            bag_analyze_visualization(&decoder_config, pcm.samples, pcm.sample_count, &visualization),
-            BAG_NOT_IMPLEMENTED,
-            "Visualization should report not implemented for ultra mode.");
-        bag_free_pcm16_result(&pcm);
-    }
-}
-
-void TestApiVisualizationRejectsInvalidArgumentsAndFreesSafely() {
-    const auto config_case = test::ConfigCases().front();
-    const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_FLASH);
-    bag_visualization_result visualization{};
-
-    test::AssertEq(
-        bag_analyze_visualization(nullptr, nullptr, 0, &visualization),
-        BAG_INVALID_ARGUMENT,
-        "Visualization should reject a null decoder config.");
-    test::AssertEq(
-        bag_analyze_visualization(&decoder_config, nullptr, 0, &visualization),
-        BAG_INVALID_ARGUMENT,
-        "Visualization should reject null samples.");
-    test::AssertEq(
-        bag_analyze_visualization(&decoder_config, nullptr, 0, nullptr),
-        BAG_INVALID_ARGUMENT,
-        "Visualization should reject a null output result.");
-
-    visualization.frames = new bag_visualization_frame[3];
-    visualization.frame_count = 3;
-    visualization.total_samples = 12;
-    visualization.sample_rate_hz = 44100;
-    visualization.frame_stride_samples = 120;
-    bag_free_visualization_result(&visualization);
-    test::AssertTrue(visualization.frames == nullptr, "Visualization free should clear the frame pointer.");
-    test::AssertEq(visualization.frame_count, static_cast<size_t>(0), "Visualization free should clear the frame count.");
-    test::AssertEq(visualization.total_samples, 0, "Visualization free should clear total samples.");
-    test::AssertEq(visualization.sample_rate_hz, 0, "Visualization free should clear sample rate.");
-    test::AssertEq(visualization.frame_stride_samples, 0, "Visualization free should clear stride.");
-    bag_free_visualization_result(&visualization);
 }
 
 void TestApiFreePcmResultIsIdempotent() {
@@ -673,17 +896,20 @@ int main() {
     runner.Add("Api.ProRoundTripAcrossCorpusAndConfigs", TestApiProRoundTripAcrossCorpusAndConfigs);
     runner.Add("Api.UltraRoundTripAcrossCorpusAndConfigs", TestApiUltraRoundTripAcrossCorpusAndConfigs);
     runner.Add("Api.EncodeRejectsInvalidArguments", TestApiEncodeRejectsInvalidArguments);
+    runner.Add("Api.EncodeJobRejectsInvalidArguments", TestApiEncodeJobRejectsInvalidArguments);
     runner.Add("Api.CreateDecoderRejectsInvalidArguments", TestApiCreateDecoderRejectsInvalidArguments);
     runner.Add("Api.PollAndResetLifecycle", TestApiPollAndResetLifecycle);
     runner.Add("Api.ModeSpecificValidation", TestApiModeSpecificValidation);
     runner.Add("Api.BoundarySuccessCases", TestApiBoundarySuccessCases);
+    runner.Add("Api.EncodeJobSuccessAndProgressAcrossModes", TestApiEncodeJobSuccessAndProgressAcrossModes);
+    runner.Add("Api.EncodeJobImmediateCancel", TestApiEncodeJobImmediateCancel);
+    runner.Add("Api.EncodeJobCancelWhileRunning", TestApiEncodeJobCancelWhileRunning);
+    runner.Add("Api.EncodeJobDestroyWhileRunningIsSafe", TestApiEncodeJobDestroyWhileRunningIsSafe);
+    runner.Add(
+        "Api.EncodeJobPublishesMultipleIntermediateProgressUpdates",
+        TestApiEncodeJobPublishesMultipleIntermediateProgressUpdates);
     runner.Add("Api.FlashConfigAffectsLengthAndRoundTrip", TestApiFlashConfigAffectsLengthAndRoundTrip);
     runner.Add("Api.FlashDecodeRequiresMatchingConfig", TestApiFlashDecodeRequiresMatchingConfig);
-    runner.Add("Api.FlashVisualizationProducesFrameTrack", TestApiFlashVisualizationProducesFrameTrack);
-    runner.Add("Api.VisualizationReturnsNotImplementedOutsideFlash",
-               TestApiVisualizationReturnsNotImplementedOutsideFlash);
-    runner.Add("Api.VisualizationRejectsInvalidArgumentsAndFreesSafely",
-               TestApiVisualizationRejectsInvalidArgumentsAndFreesSafely);
     runner.Add("Api.FreePcmResultIsIdempotent", TestApiFreePcmResultIsIdempotent);
     runner.Add("Api.VersionMatchesRelease", TestApiVersionMatchesRelease);
     runner.Add("Api.ValidationHelpers", TestApiValidationHelpers);

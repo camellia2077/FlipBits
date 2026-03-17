@@ -2,6 +2,22 @@ struct bag_decoder {
     std::unique_ptr<bag::ITransportDecoder> decoder;
 };
 
+struct bag_encode_job {
+    bag::CoreConfig core_config;
+    std::string text;
+    mutable std::mutex result_mutex;
+    std::vector<std::int16_t> result_pcm;
+    std::atomic<bag_encode_job_state> state = BAG_ENCODE_JOB_QUEUED;
+    std::atomic<bag_encode_job_phase> phase = BAG_ENCODE_JOB_PHASE_PREPARING_INPUT;
+    std::atomic<float> progress_0_to_1 = 0.0f;
+    std::atomic<bag_error_code> terminal_code = BAG_NOT_READY;
+    std::atomic<bool> cancel_requested = false;
+    // The repo is moving on a C++23 toolchain, but this job stays on
+    // std::thread + cancel_requested because the actual Android NDK/libc++
+    // environment is not consistently reliable for std::jthread/stop_token.
+    std::thread worker;
+};
+
 namespace {
 inline constexpr const char kModeFlash[] = "flash";
 inline constexpr const char kModePro[] = "pro";
@@ -81,23 +97,149 @@ bag_error_code ToApiCode(bag::ErrorCode code) {
         return BAG_NOT_READY;
     case bag::ErrorCode::kNotImplemented:
         return BAG_NOT_IMPLEMENTED;
+    case bag::ErrorCode::kCancelled:
+        return BAG_CANCELLED;
     case bag::ErrorCode::kInternal:
     default:
         return BAG_INTERNAL;
     }
 }
 
-bag_visualization_region_kind ToApiVisualizationRegionKind(bag::VisualizationRegionKind kind) {
-    switch (kind) {
-    case bag::VisualizationRegionKind::kLeadingShell:
-        return BAG_VISUALIZATION_REGION_LEADING_SHELL;
-    case bag::VisualizationRegionKind::kPayload:
-        return BAG_VISUALIZATION_REGION_PAYLOAD;
-    case bag::VisualizationRegionKind::kTrailingShell:
-        return BAG_VISUALIZATION_REGION_TRAILING_SHELL;
-    case bag::VisualizationRegionKind::kUnknown:
+bag_encode_job_phase ToApiJobPhase(bag::EncodeProgressPhase phase) {
+    switch (phase) {
+    case bag::EncodeProgressPhase::kPreparingInput:
+        return BAG_ENCODE_JOB_PHASE_PREPARING_INPUT;
+    case bag::EncodeProgressPhase::kRenderingPcm:
+        return BAG_ENCODE_JOB_PHASE_RENDERING_PCM;
+    case bag::EncodeProgressPhase::kPostprocessing:
+        return BAG_ENCODE_JOB_PHASE_POSTPROCESSING;
+    case bag::EncodeProgressPhase::kFinalizing:
     default:
-        return BAG_VISUALIZATION_REGION_UNKNOWN;
+        return BAG_ENCODE_JOB_PHASE_FINALIZING;
+    }
+}
+
+void UpdateMonotonicProgress(std::atomic<float>* progress_0_to_1, float candidate) {
+    if (progress_0_to_1 == nullptr) {
+        return;
+    }
+
+    candidate = std::clamp(candidate, 0.0f, 1.0f);
+    float current = progress_0_to_1->load();
+    while (candidate > current &&
+           !progress_0_to_1->compare_exchange_weak(current, candidate)) {
+    }
+}
+
+void OnEncodeJobProgress(void* user_data,
+                         bag::EncodeProgressPhase phase,
+                         float progress_0_to_1) {
+    auto* job = static_cast<bag_encode_job*>(user_data);
+    if (job == nullptr) {
+        return;
+    }
+
+    job->phase.store(ToApiJobPhase(phase));
+    UpdateMonotonicProgress(&job->progress_0_to_1, progress_0_to_1);
+}
+
+bool ShouldCancelEncodeJob(void* user_data) {
+    auto* job = static_cast<bag_encode_job*>(user_data);
+    return job != nullptr && job->cancel_requested.load();
+}
+
+bag_error_code CopyPcmToApiResult(const std::vector<std::int16_t>& pcm,
+                                  bag_pcm16_result* out_result) {
+    if (out_result == nullptr) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    out_result->samples = nullptr;
+    out_result->sample_count = 0;
+    if (pcm.empty()) {
+        return BAG_OK;
+    }
+
+    auto* samples = new (std::nothrow) std::int16_t[pcm.size()];
+    if (samples == nullptr) {
+        return BAG_INTERNAL;
+    }
+
+    std::copy_n(pcm.data(), pcm.size(), samples);
+    out_result->samples = samples;
+    out_result->sample_count = pcm.size();
+    return BAG_OK;
+}
+
+void ClearEncodeJobResult(bag_encode_job* job) {
+    if (job == nullptr) {
+        return;
+    }
+
+    const std::lock_guard lock(job->result_mutex);
+    job->result_pcm.clear();
+}
+
+void CompleteEncodeJobSuccess(bag_encode_job* job, std::vector<std::int16_t>&& pcm) {
+    {
+        const std::lock_guard lock(job->result_mutex);
+        job->result_pcm = std::move(pcm);
+    }
+    job->phase.store(BAG_ENCODE_JOB_PHASE_FINALIZING);
+    UpdateMonotonicProgress(&job->progress_0_to_1, 1.0f);
+    job->terminal_code.store(BAG_OK);
+    job->state.store(BAG_ENCODE_JOB_SUCCEEDED);
+}
+
+void CompleteEncodeJobFailure(bag_encode_job* job,
+                              bag_error_code terminal_code,
+                              bag_encode_job_state state) {
+    ClearEncodeJobResult(job);
+    job->terminal_code.store(terminal_code);
+    job->state.store(state);
+}
+
+void JoinEncodeJobWorker(bag_encode_job* job) {
+    if (job != nullptr && job->worker.joinable()) {
+        job->worker.join();
+    }
+}
+
+void RunEncodeTextJobWorker(bag_encode_job* job) {
+    if (job == nullptr) {
+        return;
+    }
+
+    job->state.store(BAG_ENCODE_JOB_RUNNING);
+    job->phase.store(BAG_ENCODE_JOB_PHASE_PREPARING_INPUT);
+    job->progress_0_to_1.store(0.0f);
+    job->terminal_code.store(BAG_NOT_READY);
+
+    const bag::EncodeProgressSink progress_sink{
+        .user_data = job,
+        .on_progress = &OnEncodeJobProgress,
+        .should_cancel = &ShouldCancelEncodeJob,
+    };
+
+    try {
+        std::vector<std::int16_t> pcm;
+        const bag::ErrorCode encode_code =
+            bag::EncodeTextToPcm16(job->core_config, job->text, &pcm, &progress_sink);
+        switch (encode_code) {
+        case bag::ErrorCode::kOk:
+            CompleteEncodeJobSuccess(job, std::move(pcm));
+            break;
+        case bag::ErrorCode::kCancelled:
+            CompleteEncodeJobFailure(job, BAG_CANCELLED, BAG_ENCODE_JOB_CANCELLED);
+            break;
+        default:
+            CompleteEncodeJobFailure(job, ToApiCode(encode_code), BAG_ENCODE_JOB_FAILED);
+            break;
+        }
+    } catch (const std::invalid_argument&) {
+        CompleteEncodeJobFailure(job, BAG_INVALID_ARGUMENT, BAG_ENCODE_JOB_FAILED);
+    } catch (...) {
+        CompleteEncodeJobFailure(job, BAG_INTERNAL, BAG_ENCODE_JOB_FAILED);
     }
 }
 
@@ -231,6 +373,8 @@ const char* bag_error_code_message(bag_error_code code) {
         return "Result not ready.";
     case BAG_NOT_IMPLEMENTED:
         return "Not implemented.";
+    case BAG_CANCELLED:
+        return "Cancelled.";
     case BAG_INTERNAL:
     default:
         return "Internal error.";
@@ -244,10 +388,9 @@ bag_error_code bag_encode_text(const bag_encoder_config* config,
         return BAG_INVALID_ARGUMENT;
     }
 
-    out_result->samples = nullptr;
-    out_result->sample_count = 0;
-
     if (bag_validate_encode_request(config, text) != BAG_VALIDATION_OK) {
+        out_result->samples = nullptr;
+        out_result->sample_count = 0;
         return BAG_INVALID_ARGUMENT;
     }
 
@@ -264,26 +407,116 @@ bag_error_code bag_encode_text(const bag_encoder_config* config,
         const bag::ErrorCode encode_code =
             bag::EncodeTextToPcm16(core_config, text, &pcm);
         if (encode_code != bag::ErrorCode::kOk) {
+            out_result->samples = nullptr;
+            out_result->sample_count = 0;
             return ToApiCode(encode_code);
         }
-        if (pcm.empty()) {
-            return BAG_OK;
-        }
+        return CopyPcmToApiResult(pcm, out_result);
+    } catch (const std::invalid_argument&) {
+        out_result->samples = nullptr;
+        out_result->sample_count = 0;
+        return BAG_INVALID_ARGUMENT;
+    } catch (...) {
+        out_result->samples = nullptr;
+        out_result->sample_count = 0;
+        return BAG_INTERNAL;
+    }
+}
 
-        auto* samples = new (std::nothrow) std::int16_t[pcm.size()];
-        if (samples == nullptr) {
+bag_error_code bag_start_encode_text_job(const bag_encoder_config* config,
+                                         const char* text,
+                                         bag_encode_job** out_job) {
+    if (config == nullptr || text == nullptr || out_job == nullptr) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    *out_job = nullptr;
+    if (bag_validate_encode_request(config, text) != BAG_VALIDATION_OK) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    bag_encode_job* job = nullptr;
+    try {
+        job = new (std::nothrow) bag_encode_job{};
+        if (job == nullptr) {
             return BAG_INTERNAL;
         }
 
-        std::copy_n(pcm.data(), pcm.size(), samples);
-        out_result->samples = samples;
-        out_result->sample_count = pcm.size();
+        job->core_config = ToCoreConfig(
+            config->sample_rate_hz,
+            config->frame_samples,
+            config->enable_diagnostics,
+            config->mode,
+            config->flash_signal_profile,
+            config->flash_voicing_flavor,
+            config->reserved);
+        job->text = text;
+        job->worker = std::thread([job]() {
+            RunEncodeTextJobWorker(job);
+        });
+        *out_job = job;
         return BAG_OK;
-    } catch (const std::invalid_argument&) {
-        return BAG_INVALID_ARGUMENT;
     } catch (...) {
+        delete job;
+        *out_job = nullptr;
         return BAG_INTERNAL;
     }
+}
+
+bag_error_code bag_poll_encode_text_job(const bag_encode_job* job,
+                                        bag_encode_job_progress* out_progress) {
+    if (job == nullptr || out_progress == nullptr) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    out_progress->state = job->state.load();
+    out_progress->phase = job->phase.load();
+    out_progress->progress_0_to_1 = std::clamp(job->progress_0_to_1.load(), 0.0f, 1.0f);
+    out_progress->terminal_code = job->terminal_code.load();
+    return BAG_OK;
+}
+
+bag_error_code bag_cancel_encode_text_job(bag_encode_job* job) {
+    if (job == nullptr) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    job->cancel_requested.store(true);
+    return BAG_OK;
+}
+
+bag_error_code bag_take_encode_text_job_result(const bag_encode_job* job,
+                                               bag_pcm16_result* out_result) {
+    if (job == nullptr || out_result == nullptr) {
+        return BAG_INVALID_ARGUMENT;
+    }
+
+    const bag_encode_job_state state = job->state.load();
+    if (state == BAG_ENCODE_JOB_SUCCEEDED) {
+        const std::lock_guard lock(job->result_mutex);
+        return CopyPcmToApiResult(job->result_pcm, out_result);
+    }
+
+    out_result->samples = nullptr;
+    out_result->sample_count = 0;
+    if (state == BAG_ENCODE_JOB_CANCELLED) {
+        return BAG_CANCELLED;
+    }
+    if (state == BAG_ENCODE_JOB_FAILED) {
+        const bag_error_code terminal_code = job->terminal_code.load();
+        return terminal_code == BAG_NOT_READY ? BAG_INTERNAL : terminal_code;
+    }
+    return BAG_NOT_READY;
+}
+
+void bag_destroy_encode_text_job(bag_encode_job* job) {
+    if (job == nullptr) {
+        return;
+    }
+
+    job->cancel_requested.store(true);
+    JoinEncodeJobWorker(job);
+    delete job;
 }
 
 void bag_free_pcm16_result(bag_pcm16_result* result) {
@@ -294,89 +527,6 @@ void bag_free_pcm16_result(bag_pcm16_result* result) {
     delete[] result->samples;
     result->samples = nullptr;
     result->sample_count = 0;
-}
-
-bag_error_code bag_analyze_visualization(const bag_decoder_config* config,
-                                         const int16_t* samples,
-                                         size_t sample_count,
-                                         bag_visualization_result* out_result) {
-    if (config == nullptr || samples == nullptr || sample_count == 0 || out_result == nullptr) {
-        return BAG_INVALID_ARGUMENT;
-    }
-
-    out_result->frames = nullptr;
-    out_result->frame_count = 0;
-    out_result->total_samples = 0;
-    out_result->sample_rate_hz = 0;
-    out_result->frame_stride_samples = 0;
-
-    if (bag_validate_decoder_config(config) != BAG_VALIDATION_OK) {
-        return BAG_INVALID_ARGUMENT;
-    }
-
-    try {
-        const bag::CoreConfig core_config = ToCoreConfig(
-            config->sample_rate_hz,
-            config->frame_samples,
-            config->enable_diagnostics,
-            config->mode,
-            config->flash_signal_profile,
-            config->flash_voicing_flavor,
-            config->reserved);
-        const std::vector<std::int16_t> pcm(samples, samples + sample_count);
-        bag::VisualizationResult visualization{};
-        const bag::ErrorCode analyze_code =
-            bag::AnalyzeVisualization(core_config, pcm, &visualization);
-        if (analyze_code != bag::ErrorCode::kOk) {
-            return ToApiCode(analyze_code);
-        }
-
-        if (visualization.frames.empty()) {
-            out_result->total_samples = visualization.total_samples;
-            out_result->sample_rate_hz = visualization.sample_rate_hz;
-            out_result->frame_stride_samples = visualization.frame_stride_samples;
-            return BAG_OK;
-        }
-
-        auto* frames = new (std::nothrow) bag_visualization_frame[visualization.frames.size()];
-        if (frames == nullptr) {
-            return BAG_INTERNAL;
-        }
-
-        for (std::size_t index = 0; index < visualization.frames.size(); ++index) {
-            const auto& frame = visualization.frames[index];
-            frames[index].sample_offset = frame.sample_offset;
-            frames[index].sample_count = frame.sample_count;
-            frames[index].rms = frame.rms;
-            frames[index].peak = frame.peak;
-            frames[index].brightness = frame.brightness;
-            frames[index].region_kind = ToApiVisualizationRegionKind(frame.region_kind);
-        }
-
-        out_result->frames = frames;
-        out_result->frame_count = visualization.frames.size();
-        out_result->total_samples = visualization.total_samples;
-        out_result->sample_rate_hz = visualization.sample_rate_hz;
-        out_result->frame_stride_samples = visualization.frame_stride_samples;
-        return BAG_OK;
-    } catch (const std::invalid_argument&) {
-        return BAG_INVALID_ARGUMENT;
-    } catch (...) {
-        return BAG_INTERNAL;
-    }
-}
-
-void bag_free_visualization_result(bag_visualization_result* result) {
-    if (result == nullptr) {
-        return;
-    }
-
-    delete[] result->frames;
-    result->frames = nullptr;
-    result->frame_count = 0;
-    result->total_samples = 0;
-    result->sample_rate_hz = 0;
-    result->frame_stride_samples = 0;
 }
 
 bag_error_code bag_create_decoder(const bag_decoder_config* config, bag_decoder** out_decoder) {

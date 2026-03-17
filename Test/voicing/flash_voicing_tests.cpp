@@ -3,7 +3,6 @@
 
 import bag.flash.phy_clean;
 import bag.flash.signal;
-import bag.flash.visualization;
 import bag.flash.voicing;
 
 namespace {
@@ -404,40 +403,93 @@ void TestRitualChantDiffersButDecodesLikeCodedBurst() {
         "Ritual chant should decode to the same bytes as coded_burst.");
 }
 
-void TestRitualChantKeepsMoreTailEnergyThanCodedBurst() {
-    const auto config = MakeStyledConfig();
-    const auto layout = MakePayloadLayout("A");
-    const auto clean_payload = MakeCleanPayload("A");
-    const auto coded_burst =
-        bag::flash::ApplyVoicingToPayloadWithFlavor(
-            clean_payload,
-            layout,
+void TestFormalRitualChantPayloadTailStaysCloseToCodedBurst() {
+    const auto config = MakeAndroidSizedCoreConfig();
+    const auto signal_profile = bag::FlashSignalProfile::kRitualChant;
+    const auto signal_config =
+        bag::flash::MakeBfskConfigForSignalProfile(config, signal_profile);
+    const auto payload_layout = bag::flash::BuildPayloadLayout(AsBytes("A"), signal_config);
+
+    std::vector<std::int16_t> coded_burst_pcm;
+    std::vector<std::int16_t> ritual_chant_pcm;
+    const auto coded_burst_encode_code =
+        bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
+            config,
+            "A",
+            signal_profile,
             bag::FlashVoicingFlavor::kCodedBurst,
-            config);
-    const auto ritual_chant =
-        bag::flash::ApplyVoicingToPayloadWithFlavor(
-            clean_payload,
-            layout,
+            &coded_burst_pcm);
+    const auto ritual_chant_encode_code =
+        bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
+            config,
+            "A",
+            signal_profile,
             bag::FlashVoicingFlavor::kRitualChant,
-            config);
+            &ritual_chant_pcm);
 
-    const auto coded_trimmed =
-        bag::flash::TrimToPayloadPcm(coded_burst.pcm, coded_burst.descriptor);
-    const auto ritual_trimmed =
-        bag::flash::TrimToPayloadPcm(ritual_chant.pcm, ritual_chant.descriptor);
-    const auto& first_chunk = layout.chunks.front();
-    const std::size_t tail_begin =
-        first_chunk.sample_offset + (first_chunk.sample_count * static_cast<std::size_t>(3)) / static_cast<std::size_t>(4);
-    const std::size_t tail_end = first_chunk.sample_offset + first_chunk.sample_count;
+    test::AssertEq(coded_burst_encode_code, bag::ErrorCode::kOk, "coded_burst formal encode should succeed.");
+    test::AssertEq(ritual_chant_encode_code, bag::ErrorCode::kOk, "ritual_chant formal encode should succeed.");
 
+    const auto coded_trimmed = bag::flash::TrimToPayloadPcm(
+        coded_burst_pcm,
+        bag::flash::DescribeVoicingOutput(
+            coded_burst_pcm.size(),
+            bag::flash::MakeFormalVoicingConfigForFlavor(
+                config,
+                bag::FlashVoicingFlavor::kCodedBurst)));
+    const auto ritual_trimmed = bag::flash::TrimToPayloadPcm(
+        ritual_chant_pcm,
+        bag::flash::DescribeVoicingOutput(
+            ritual_chant_pcm.size(),
+            bag::flash::MakeFormalVoicingConfigForFlavor(
+                config,
+                bag::FlashVoicingFlavor::kRitualChant)));
+
+    test::AssertEq(
+        coded_trimmed.size(),
+        payload_layout.payload_sample_count,
+        "coded_burst payload trimming should preserve the ritual signal-profile payload length.");
+    test::AssertEq(
+        ritual_trimmed.size(),
+        payload_layout.payload_sample_count,
+        "ritual_chant payload trimming should preserve the ritual signal-profile payload length.");
+    test::AssertTrue(
+        ritual_trimmed != coded_trimmed,
+        "ritual_chant payload should remain distinct from coded_burst under the same signal profile.");
+
+    const auto& first_chunk = payload_layout.chunks.front();
+    const auto [body_offset_begin, body_offset_end] =
+        FractionalRange(first_chunk.sample_count, 0.25, 0.625);
+    const auto [tail_offset_begin, tail_offset_end] =
+        FractionalRange(first_chunk.sample_count, 0.875, 1.0);
+    const std::size_t body_begin = first_chunk.sample_offset + body_offset_begin;
+    const std::size_t body_end = first_chunk.sample_offset + body_offset_end;
+    const std::size_t tail_begin = first_chunk.sample_offset + tail_offset_begin;
+    const std::size_t tail_end = first_chunk.sample_offset + tail_offset_end;
+
+    const double coded_body_energy =
+        AverageAbsoluteSample(coded_trimmed, body_begin, body_end);
+    const double ritual_body_energy =
+        AverageAbsoluteSample(ritual_trimmed, body_begin, body_end);
     const double coded_tail_energy =
         AverageAbsoluteSample(coded_trimmed, tail_begin, tail_end);
     const double ritual_tail_energy =
         AverageAbsoluteSample(ritual_trimmed, tail_begin, tail_end);
+    const double coded_tail_ratio =
+        coded_tail_energy / std::max(coded_body_energy, 1.0);
+    const double ritual_tail_ratio =
+        ritual_tail_energy / std::max(ritual_body_energy, 1.0);
+    const double coded_tail_brightness =
+        AverageNormalizedFirstDifference(coded_trimmed, tail_begin, tail_end);
+    const double ritual_tail_brightness =
+        AverageNormalizedFirstDifference(ritual_trimmed, tail_begin, tail_end);
 
     test::AssertTrue(
-        ritual_tail_energy > coded_tail_energy,
-        "Ritual chant should keep more tail energy so adjacent bits feel less abruptly separated.");
+        ritual_tail_ratio <= coded_tail_ratio * 1.25,
+        "ritual_chant payload tail should stay close to coded_burst instead of blooming into a long sustain.");
+    test::AssertTrue(
+        ritual_tail_brightness <= coded_tail_brightness * 1.15,
+        "ritual_chant payload tail should remain close to coded_burst brightness after the aggressive convergence tuning.");
 }
 
 void TestFormalRitualChantHasLongerShellThanCodedBurst() {
@@ -485,71 +537,6 @@ void TestFormalRitualChantDecodesWithConfiguredTrim() {
         &decoded_text);
     test::AssertEq(decode_code, bag::ErrorCode::kOk, "configured ritual_chant decode should succeed.");
     test::AssertEq(decoded_text, std::string("Decode"), "configured ritual_chant decode should roundtrip text.");
-}
-
-void TestVisualizationRegionsAlignWithFormalDescriptor() {
-    const auto assert_alignment = [](bag::FlashVoicingFlavor flavor) {
-        auto config = MakeAndroidSizedCoreConfig();
-        config.flash_voicing_flavor = flavor;
-        config.flash_signal_profile = flavor == bag::FlashVoicingFlavor::kRitualChant
-                                          ? bag::FlashSignalProfile::kRitualChant
-                                          : bag::FlashSignalProfile::kCodedBurst;
-
-        std::vector<std::int16_t> pcm;
-        test::AssertEq(
-            bag::flash::EncodeTextToPcm16(config, "Visual", &pcm),
-            bag::ErrorCode::kOk,
-            "Formal flash encode should succeed before visualization/descriptor comparison.");
-
-        bag::VisualizationResult visualization{};
-        test::AssertEq(
-            bag::flash::AnalyzeVisualization(config, pcm, &visualization),
-            bag::ErrorCode::kOk,
-            "Visualization analysis should succeed before descriptor comparison.");
-        test::AssertTrue(
-            !visualization.frames.empty(),
-            "Visualization should expose frames for descriptor comparison.");
-
-        const auto descriptor = bag::flash::DescribeVoicingOutput(
-            pcm.size(),
-            bag::flash::MakeFormalVoicingConfigForFlavor(config, flavor));
-        const int payload_begin = static_cast<int>(descriptor.leading_nonpayload_samples);
-        const int payload_end = payload_begin + static_cast<int>(descriptor.payload_sample_count);
-
-        const auto payload_frame = std::find_if(
-            visualization.frames.begin(),
-            visualization.frames.end(),
-            [](const bag::VisualizationFrame& frame) {
-                return frame.region_kind == bag::VisualizationRegionKind::kPayload;
-            });
-        const auto trailing_frame = std::find_if(
-            visualization.frames.begin(),
-            visualization.frames.end(),
-            [](const bag::VisualizationFrame& frame) {
-                return frame.region_kind == bag::VisualizationRegionKind::kTrailingShell;
-            });
-
-        test::AssertEq(
-            visualization.frames.front().region_kind,
-            bag::VisualizationRegionKind::kLeadingShell,
-            "Visualization should classify the first frame as leading shell.");
-        test::AssertTrue(
-            payload_frame != visualization.frames.end(),
-            "Visualization should expose a payload frame that can be compared against the descriptor.");
-        test::AssertTrue(
-            payload_frame->sample_offset >= payload_begin &&
-                payload_frame->sample_offset + payload_frame->sample_count <= payload_end,
-            "Visualization payload frames should stay inside descriptor payload bounds.");
-        test::AssertTrue(
-            trailing_frame != visualization.frames.end(),
-            "Visualization should expose a trailing-shell frame that can be compared against the descriptor.");
-        test::AssertTrue(
-            trailing_frame->sample_offset >= payload_end,
-            "Visualization trailing-shell frames should begin after descriptor payload end.");
-    };
-
-    assert_alignment(bag::FlashVoicingFlavor::kCodedBurst);
-    assert_alignment(bag::FlashVoicingFlavor::kRitualChant);
 }
 
 void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
@@ -1110,14 +1097,12 @@ int main() {
                TestFlavorVoicingMatchesExplicitRitualConfiguration);
     runner.Add("FlashVoicing.RitualChantDiffersButDecodesLikeCodedBurst",
                TestRitualChantDiffersButDecodesLikeCodedBurst);
-    runner.Add("FlashVoicing.RitualChantKeepsMoreTailEnergyThanCodedBurst",
-               TestRitualChantKeepsMoreTailEnergyThanCodedBurst);
+    runner.Add("FlashVoicing.FormalRitualChantPayloadTailStaysCloseToCodedBurst",
+               TestFormalRitualChantPayloadTailStaysCloseToCodedBurst);
     runner.Add("FlashVoicing.FormalRitualChantHasLongerShellThanCodedBurst",
                TestFormalRitualChantHasLongerShellThanCodedBurst);
     runner.Add("FlashVoicing.FormalRitualChantDecodesWithConfiguredTrim",
                TestFormalRitualChantDecodesWithConfiguredTrim);
-    runner.Add("FlashVoicing.VisualizationRegionsAlignWithFormalDescriptor",
-               TestVisualizationRegionsAlignWithFormalDescriptor);
     runner.Add("FlashVoicing.ExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor",
                TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor);
     runner.Add("FlashVoicing.ExplicitSignalProfileAndFlavorMatchDefaultExplicitPath",

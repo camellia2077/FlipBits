@@ -8,6 +8,90 @@ namespace {
 
 constexpr double kPi = 3.14159265358979323846;
 
+float LerpProgress(float begin, float end, float ratio) {
+    return begin + (end - begin) * std::clamp(ratio, 0.0f, 1.0f);
+}
+
+constexpr std::size_t kProgressReportStrideSamples = 256;
+constexpr std::size_t kSymbolsPerPayloadByteForProgress = 2;
+
+void ReportCompletedSampleProgress(const EncodeProgressSink* progress_sink,
+                                   EncodeProgressPhase phase,
+                                   float progress_begin,
+                                   float progress_end,
+                                   std::size_t completed_samples,
+                                   std::size_t total_samples) {
+    const float ratio =
+        total_samples == 0
+            ? 1.0f
+            : static_cast<float>(std::min(completed_samples, total_samples)) /
+                static_cast<float>(total_samples);
+    ReportEncodeProgress(
+        progress_sink,
+        phase,
+        LerpProgress(progress_begin, progress_end, ratio));
+}
+
+void MaybeReportCompletedSampleProgress(const EncodeProgressSink* progress_sink,
+                                        EncodeProgressPhase phase,
+                                        float progress_begin,
+                                        float progress_end,
+                                        std::size_t completed_samples,
+                                        std::size_t total_samples,
+                                        std::size_t* last_reported_samples,
+                                        bool force = false) {
+    if (last_reported_samples == nullptr) {
+        return;
+    }
+
+    const std::size_t clamped_completed_samples =
+        total_samples == 0 ? 0 : std::min(completed_samples, total_samples);
+    if (!force &&
+        clamped_completed_samples < total_samples &&
+        clamped_completed_samples - *last_reported_samples < kProgressReportStrideSamples) {
+        return;
+    }
+
+    ReportCompletedSampleProgress(
+        progress_sink,
+        phase,
+        progress_begin,
+        progress_end,
+        clamped_completed_samples,
+        total_samples);
+    *last_reported_samples = clamped_completed_samples;
+}
+
+std::size_t NonZeroWork(std::size_t work) {
+    return std::max(work, static_cast<std::size_t>(1));
+}
+
+struct UltraEncodeWorkBudget {
+    std::size_t prepare_payload_work = 1;
+    std::size_t prepare_symbol_work = 1;
+    std::size_t render_work = 1;
+    std::size_t finalize_work = 1;
+    std::size_t total_work = 4;
+};
+
+UltraEncodeWorkBudget BuildEncodeWorkBudget(std::size_t payload_size,
+                                            int symbol_samples) {
+    const std::size_t symbol_count =
+        payload_size * kSymbolsPerPayloadByteForProgress;
+
+    UltraEncodeWorkBudget budget{};
+    budget.prepare_payload_work = NonZeroWork(payload_size);
+    budget.prepare_symbol_work = NonZeroWork(symbol_count);
+    budget.render_work = NonZeroWork(symbol_count * static_cast<std::size_t>(std::max(symbol_samples, 0)));
+    budget.finalize_work = 1;
+    budget.total_work =
+        budget.prepare_payload_work +
+        budget.prepare_symbol_work +
+        budget.render_work +
+        budget.finalize_work;
+    return budget;
+}
+
 bool IsValidConfig(const Mfsk16Config& config) {
     return config.sample_rate_hz > 0 && config.symbol_samples > 0 && config.amplitude > 0.0;
 }
@@ -108,14 +192,32 @@ Mfsk16Config MakeMfsk16Config(const CoreConfig& config) {
 
 ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
                                const Mfsk16Config& config,
-                               std::vector<int16_t>* out_pcm) {
+                               std::vector<int16_t>* out_pcm,
+                               const EncodeProgressSink* progress_sink,
+                               float progress_begin,
+                               float progress_end) {
     if (out_pcm == nullptr || !IsValidConfig(config)) {
         return ErrorCode::kInvalidArgument;
     }
 
     out_pcm->clear();
     out_pcm->reserve(symbols.size() * static_cast<size_t>(config.symbol_samples));
-    for (uint8_t symbol : symbols) {
+    const std::size_t total_samples =
+        symbols.size() * static_cast<std::size_t>(config.symbol_samples);
+    ReportEncodeProgress(progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin);
+    if (total_samples == 0) {
+        ReportEncodeProgress(progress_sink, EncodeProgressPhase::kRenderingPcm, progress_end);
+        return ErrorCode::kOk;
+    }
+
+    std::size_t rendered_samples = 0;
+    std::size_t last_reported_samples = 0;
+    for (size_t symbol_index = 0; symbol_index < symbols.size(); ++symbol_index) {
+        if (ShouldCancelEncode(progress_sink)) {
+            out_pcm->clear();
+            return ErrorCode::kCancelled;
+        }
+        const uint8_t symbol = symbols[symbol_index];
         if (symbol > 0x0F) {
             return ErrorCode::kInvalidArgument;
         }
@@ -127,9 +229,28 @@ ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
             const double sample = config.amplitude * std::sin(omega * time);
             const double clamped = std::max(-1.0, std::min(1.0, sample));
             out_pcm->push_back(static_cast<int16_t>(clamped * 32767.0));
+            ++rendered_samples;
+            MaybeReportCompletedSampleProgress(
+                progress_sink,
+                EncodeProgressPhase::kRenderingPcm,
+                progress_begin,
+                progress_end,
+                rendered_samples,
+                total_samples,
+                &last_reported_samples);
         }
+        MaybeReportCompletedSampleProgress(
+            progress_sink,
+            EncodeProgressPhase::kRenderingPcm,
+            progress_begin,
+            progress_end,
+            rendered_samples,
+            total_samples,
+            &last_reported_samples,
+            true);
     }
 
+    ReportEncodeProgress(progress_sink, EncodeProgressPhase::kRenderingPcm, progress_end);
     return ErrorCode::kOk;
 }
 
@@ -191,16 +312,71 @@ ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
 ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<int16_t>* out_pcm) {
+    return EncodeTextToPcm16(config, text, out_pcm, nullptr);
+}
+
+ErrorCode EncodeTextToPcm16(const CoreConfig& config,
+                            const std::string& text,
+                            std::vector<int16_t>* out_pcm,
+                            const EncodeProgressSink* progress_sink) {
     if (out_pcm == nullptr) {
         return ErrorCode::kInvalidArgument;
     }
 
+    ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPreparingInput, 0.0f);
+    if (ShouldCancelEncode(progress_sink)) {
+        return ErrorCode::kCancelled;
+    }
     std::vector<uint8_t> payload;
     const ErrorCode payload_code = EncodeTextToPayload(text, &payload);
     if (payload_code != ErrorCode::kOk) {
         return payload_code;
     }
-    return EncodePayloadToPcm16(payload, MakeMfsk16Config(config), out_pcm);
+    const UltraEncodeWorkBudget work_budget =
+        BuildEncodeWorkBudget(payload.size(), config.frame_samples);
+    std::size_t completed_work = work_budget.prepare_payload_work;
+    ReportEncodeProgress(
+        progress_sink,
+        EncodeProgressPhase::kPreparingInput,
+        static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work));
+    if (ShouldCancelEncode(progress_sink)) {
+        return ErrorCode::kCancelled;
+    }
+    std::vector<uint8_t> symbols;
+    const ErrorCode symbols_code = EncodePayloadToSymbols(payload, &symbols);
+    if (symbols_code != ErrorCode::kOk) {
+        return symbols_code;
+    }
+    completed_work += work_budget.prepare_symbol_work;
+    ReportEncodeProgress(
+        progress_sink,
+        EncodeProgressPhase::kPreparingInput,
+        static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work));
+    const float render_progress_begin =
+        static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work);
+    const float render_progress_end =
+        static_cast<float>(completed_work + work_budget.render_work) /
+        static_cast<float>(work_budget.total_work);
+    const ErrorCode encode_code = EncodeSymbolsToPcm16(
+        symbols,
+        MakeMfsk16Config(config),
+        out_pcm,
+        progress_sink,
+        render_progress_begin,
+        render_progress_end);
+    if (encode_code != ErrorCode::kOk) {
+        return encode_code;
+    }
+    completed_work += work_budget.render_work;
+    ReportEncodeProgress(
+        progress_sink,
+        EncodeProgressPhase::kFinalizing,
+        static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work));
+    if (ShouldCancelEncode(progress_sink)) {
+        return ErrorCode::kCancelled;
+    }
+    ReportEncodeProgress(progress_sink, EncodeProgressPhase::kFinalizing, 1.0f);
+    return ErrorCode::kOk;
 }
 
 ErrorCode DecodePcm16ToText(const CoreConfig& config,

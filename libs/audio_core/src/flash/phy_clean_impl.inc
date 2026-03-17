@@ -57,6 +57,56 @@ std::vector<int16_t> TrimFormalPayloadPcmForFlavor(const CoreConfig& config,
     return TrimToPayloadPcm(pcm, descriptor);
 }
 
+bool UsesSpectralTexture(const FlashVoicingConfig& config) {
+    return config.attack_ratio > 0.0 ||
+           config.release_ratio > 0.0 ||
+           config.second_harmonic_gain > 0.0 ||
+           config.third_harmonic_gain > 0.0;
+}
+
+std::size_t NonZeroWork(std::size_t work) {
+    return std::max(work, static_cast<std::size_t>(1));
+}
+
+struct FlashEncodeWorkBudget {
+    std::size_t prepare_text_work = 1;
+    std::size_t prepare_layout_work = 1;
+    std::size_t render_work = 1;
+    std::size_t postprocess_work = 1;
+    std::size_t finalize_work = 1;
+    std::size_t total_work = 5;
+};
+
+FlashEncodeWorkBudget BuildFlashEncodeWorkBudget(const std::vector<uint8_t>& bytes,
+                                                 const BfskConfig& signal_config,
+                                                 const FlashVoicingConfig& voicing_config) {
+    const std::size_t bit_count = bytes.size() * static_cast<std::size_t>(8);
+    const std::size_t payload_sample_count = bit_count * signal_config.samples_per_bit;
+    const std::size_t leading_nonpayload_samples =
+        voicing_config.enable_preamble ? voicing_config.preamble_sample_count : static_cast<std::size_t>(0);
+    const std::size_t trailing_nonpayload_samples =
+        voicing_config.enable_epilogue ? voicing_config.epilogue_sample_count : static_cast<std::size_t>(0);
+    const std::size_t voiced_total_samples =
+        leading_nonpayload_samples + payload_sample_count + trailing_nonpayload_samples;
+    const std::size_t spectral_texture_work =
+        UsesSpectralTexture(voicing_config) ? voiced_total_samples : static_cast<std::size_t>(0);
+
+    FlashEncodeWorkBudget budget{};
+    budget.prepare_text_work = NonZeroWork(bytes.size());
+    budget.prepare_layout_work = NonZeroWork(bit_count);
+    budget.render_work = NonZeroWork(payload_sample_count);
+    budget.postprocess_work =
+        NonZeroWork(voiced_total_samples + spectral_texture_work);
+    budget.finalize_work = 1;
+    budget.total_work =
+        budget.prepare_text_work +
+        budget.prepare_layout_work +
+        budget.render_work +
+        budget.postprocess_work +
+        budget.finalize_work;
+    return budget;
+}
+
 class FlashDecoder final : public ITransportDecoder {
 public:
     explicit FlashDecoder(CoreConfig config) : config_(config) {}
@@ -116,12 +166,20 @@ private:
 ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<int16_t>* out_pcm) {
+    return EncodeTextToPcm16(config, text, out_pcm, nullptr);
+}
+
+ErrorCode EncodeTextToPcm16(const CoreConfig& config,
+                            const std::string& text,
+                            std::vector<int16_t>* out_pcm,
+                            const EncodeProgressSink* progress_sink) {
     return EncodeTextToPcm16WithSignalProfileAndFlavor(
         config,
         text,
         config.flash_signal_profile,
         config.flash_voicing_flavor,
-        out_pcm);
+        out_pcm,
+        progress_sink);
 }
 
 ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(const CoreConfig& config,
@@ -129,6 +187,21 @@ ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(const CoreConfig& config,
                                                       FlashSignalProfile signal_profile,
                                                       FlashVoicingFlavor flavor,
                                                       std::vector<int16_t>* out_pcm) {
+    return EncodeTextToPcm16WithSignalProfileAndFlavor(
+        config,
+        text,
+        signal_profile,
+        flavor,
+        out_pcm,
+        nullptr);
+}
+
+ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(const CoreConfig& config,
+                                                      const std::string& text,
+                                                      FlashSignalProfile signal_profile,
+                                                      FlashVoicingFlavor flavor,
+                                                      std::vector<int16_t>* out_pcm,
+                                                      const EncodeProgressSink* progress_sink) {
     if (out_pcm == nullptr) {
         return ErrorCode::kInvalidArgument;
     }
@@ -146,29 +219,77 @@ ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(const CoreConfig& config,
     }
 
     try {
+        ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPreparingInput, 0.0f);
+        if (ShouldCancelEncode(progress_sink)) {
+            return ErrorCode::kCancelled;
+        }
         const FlashSignalProfile normalized_signal_profile =
             NormalizeFormalSignalProfile(signal_profile);
         const FlashVoicingFlavor normalized_flavor =
             NormalizeFormalVoicingFlavor(flavor);
         const BfskConfig signal_config =
             MakeBfskConfigForSignalProfile(config, normalized_signal_profile);
-        const FlashPayloadLayout payload_layout = BuildPayloadLayout(bytes, signal_config);
-        const std::vector<int16_t> clean_payload_pcm = EncodeBytesToPcm16(bytes, signal_config);
         const FlashVoicingConfig formal_voicing =
             MakeFormalVoicingConfigForFlavor(config, normalized_flavor);
+        const FlashEncodeWorkBudget work_budget =
+            BuildFlashEncodeWorkBudget(bytes, signal_config, formal_voicing);
+        std::size_t completed_work = work_budget.prepare_text_work;
+        ReportEncodeProgress(
+            progress_sink,
+            EncodeProgressPhase::kPreparingInput,
+            static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work));
+        if (ShouldCancelEncode(progress_sink)) {
+            return ErrorCode::kCancelled;
+        }
+        const FlashPayloadLayout payload_layout = BuildPayloadLayout(bytes, signal_config);
+        completed_work += work_budget.prepare_layout_work;
+        ReportEncodeProgress(
+            progress_sink,
+            EncodeProgressPhase::kPreparingInput,
+            static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work));
+        if (ShouldCancelEncode(progress_sink)) {
+            return ErrorCode::kCancelled;
+        }
+        const float render_progress_begin =
+            static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work);
+        const float render_progress_end =
+            static_cast<float>(completed_work + work_budget.render_work) /
+            static_cast<float>(work_budget.total_work);
+        const std::vector<int16_t> clean_payload_pcm =
+            EncodeBytesToPcm16(bytes, signal_config, progress_sink, render_progress_begin, render_progress_end);
+        completed_work += work_budget.render_work;
+        const float postprocess_progress_begin =
+            static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work);
+        const float postprocess_progress_end =
+            static_cast<float>(completed_work + work_budget.postprocess_work) /
+            static_cast<float>(work_budget.total_work);
         const FlashVoicingResult voiced_payload =
             ApplyVoicingToPayloadWithFlavor(
                 clean_payload_pcm,
                 payload_layout,
                 normalized_flavor,
-                formal_voicing);
+                formal_voicing,
+                progress_sink,
+                postprocess_progress_begin,
+                postprocess_progress_end);
+        completed_work += work_budget.postprocess_work;
 
         if (!IsFormalVoicingCompatible(voiced_payload, clean_payload_pcm.size(), formal_voicing)) {
             return ErrorCode::kInternal;
         }
 
+        ReportEncodeProgress(
+            progress_sink,
+            EncodeProgressPhase::kFinalizing,
+            static_cast<float>(completed_work) / static_cast<float>(work_budget.total_work));
+        if (ShouldCancelEncode(progress_sink)) {
+            return ErrorCode::kCancelled;
+        }
         *out_pcm = voiced_payload.pcm;
+        ReportEncodeProgress(progress_sink, EncodeProgressPhase::kFinalizing, 1.0f);
         return ErrorCode::kOk;
+    } catch (const EncodeCancelled&) {
+        return ErrorCode::kCancelled;
     } catch (...) {
         return ErrorCode::kInvalidArgument;
     }

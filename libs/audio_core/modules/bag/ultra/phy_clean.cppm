@@ -4,8 +4,7 @@ export module bag.ultra.phy_clean;
 
 import std;
 
-export import bag.common.config;
-export import bag.common.error_code;
+export import bag.common.types;
 export import bag.transport.decoder;
 
 export namespace bag::ultra {
@@ -25,7 +24,10 @@ Mfsk16Config MakeMfsk16Config(const CoreConfig& config);
 
 ErrorCode EncodeSymbolsToPcm16(const std::vector<std::uint8_t>& symbols,
                                const Mfsk16Config& config,
-                               std::vector<std::int16_t>* out_pcm);
+                               std::vector<std::int16_t>* out_pcm,
+                               const EncodeProgressSink* progress_sink = nullptr,
+                               float progress_begin = 0.0f,
+                               float progress_end = 1.0f);
 ErrorCode DecodePcm16ToSymbols(const std::vector<std::int16_t>& pcm,
                                const Mfsk16Config& config,
                                std::vector<std::uint8_t>* out_symbols);
@@ -40,6 +42,10 @@ ErrorCode DecodePcm16ToPayload(const std::vector<std::int16_t>& pcm,
 ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<std::int16_t>* out_pcm);
+ErrorCode EncodeTextToPcm16(const CoreConfig& config,
+                            const std::string& text,
+                            std::vector<std::int16_t>* out_pcm,
+                            const EncodeProgressSink* progress_sink);
 ErrorCode DecodePcm16ToText(const CoreConfig& config,
                             const std::vector<std::int16_t>& pcm,
                             std::string* out_text);
