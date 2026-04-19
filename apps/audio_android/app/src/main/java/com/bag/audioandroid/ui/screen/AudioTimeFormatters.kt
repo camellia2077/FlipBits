@@ -8,12 +8,16 @@ internal fun formatSavedAudioTime(savedAtEpochSeconds: Long): String {
     if (savedAtEpochSeconds <= 0L) {
         return ""
     }
-    return Instant.ofEpochSecond(savedAtEpochSeconds)
+    return Instant
+        .ofEpochSecond(savedAtEpochSeconds)
         .atZone(ZoneId.systemDefault())
         .format(SAVED_AUDIO_TIME_FORMATTER)
 }
 
-internal fun samplesToMillis(samples: Int, sampleRateHz: Int): Long {
+internal fun samplesToMillis(
+    samples: Int,
+    sampleRateHz: Int,
+): Long {
     if (samples <= 0 || sampleRateHz <= 0) {
         return 0L
     }

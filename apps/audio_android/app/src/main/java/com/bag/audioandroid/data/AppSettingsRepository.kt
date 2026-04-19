@@ -14,7 +14,7 @@ import java.io.IOException
 private val Context.appSettingsDataStore by preferencesDataStore(name = "app_settings")
 
 class AppSettingsRepository(
-    private val appContext: Context
+    private val appContext: Context,
 ) {
     val selectedPaletteId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -24,8 +24,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }
-            .map { preferences -> preferences[Keys.SelectedPaletteId] }
+            }.map { preferences -> preferences[Keys.SelectedPaletteId] }
 
     val selectedFlashVoicingStyleId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -35,8 +34,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }
-            .map { preferences -> preferences[Keys.SelectedFlashVoicingStyleId] }
+            }.map { preferences -> preferences[Keys.SelectedFlashVoicingStyleId] }
 
     val selectedThemeModeId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -46,8 +44,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }
-            .map { preferences -> preferences[Keys.SelectedThemeModeId] }
+            }.map { preferences -> preferences[Keys.SelectedThemeModeId] }
 
     val selectedPlaybackSequenceModeId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -57,8 +54,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }
-            .map { preferences -> preferences[Keys.SelectedPlaybackSequenceModeId] }
+            }.map { preferences -> preferences[Keys.SelectedPlaybackSequenceModeId] }
 
     suspend fun setSelectedPaletteId(paletteId: String) {
         appContext.appSettingsDataStore.edit { preferences ->

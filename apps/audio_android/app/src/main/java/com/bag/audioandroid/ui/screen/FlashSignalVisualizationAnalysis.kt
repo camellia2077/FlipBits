@@ -12,7 +12,7 @@ import kotlin.math.sqrt
 internal enum class FskDominantTone {
     Low,
     High,
-    Unknown
+    Unknown,
 }
 
 internal data class FskEnergyBucket(
@@ -20,7 +20,7 @@ internal data class FskEnergyBucket(
     val highStrength: Float,
     val amplitude: Float,
     val dominantTone: FskDominantTone,
-    val confidence: Float
+    val confidence: Float,
 )
 
 internal fun buildFskEnergyBuckets(
@@ -28,7 +28,7 @@ internal fun buildFskEnergyBuckets(
     sampleRateHz: Int,
     currentSample: Float,
     windowSampleCount: Int,
-    targetBucketCount: Int
+    targetBucketCount: Int,
 ): List<FskEnergyBucket> {
     if (pcm.isEmpty() || sampleRateHz <= 0) {
         return emptyList()
@@ -50,57 +50,69 @@ internal fun buildFskEnergyBuckets(
         if (endIndexExclusive - startIndex < FlashSignalMinimumAnalysisSamples) {
             rawBuckets += RawFskEnergyBucket(0f, 0f, 0f)
         } else {
-            val lowPower = goertzelPower(
-                pcm = pcm,
-                startIndex = startIndex,
-                endIndexExclusive = endIndexExclusive,
-                sampleRateHz = sampleRateHz,
-                targetFrequencyHz = FlashSignalLowToneHz
-            )
-            val highPower = goertzelPower(
-                pcm = pcm,
-                startIndex = startIndex,
-                endIndexExclusive = endIndexExclusive,
-                sampleRateHz = sampleRateHz,
-                targetFrequencyHz = FlashSignalHighToneHz
-            )
-            val amplitude = peakAmplitude(
-                pcm = pcm,
-                startIndex = startIndex,
-                endIndexExclusive = endIndexExclusive
-            )
-            rawBuckets += RawFskEnergyBucket(
-                lowPower = lowPower,
-                highPower = highPower,
-                amplitude = amplitude
-            )
+            val lowPower =
+                goertzelPower(
+                    pcm = pcm,
+                    startIndex = startIndex,
+                    endIndexExclusive = endIndexExclusive,
+                    sampleRateHz = sampleRateHz,
+                    targetFrequencyHz = FlashSignalLowToneHz,
+                )
+            val highPower =
+                goertzelPower(
+                    pcm = pcm,
+                    startIndex = startIndex,
+                    endIndexExclusive = endIndexExclusive,
+                    sampleRateHz = sampleRateHz,
+                    targetFrequencyHz = FlashSignalHighToneHz,
+                )
+            val amplitude =
+                peakAmplitude(
+                    pcm = pcm,
+                    startIndex = startIndex,
+                    endIndexExclusive = endIndexExclusive,
+                )
+            rawBuckets +=
+                RawFskEnergyBucket(
+                    lowPower = lowPower,
+                    highPower = highPower,
+                    amplitude = amplitude,
+                )
         }
     }
 
     val maxPower = rawBuckets.maxOfOrNull { max(it.lowPower, it.highPower) }?.coerceAtLeast(1e-6f) ?: 1f
     return rawBuckets.map { bucket ->
-        val lowStrength = (sqrt((bucket.lowPower / maxPower).coerceIn(0f, 1f).toDouble()).toFloat() *
-            (0.34f + 0.66f * bucket.amplitude)).coerceIn(0f, 1f)
-        val highStrength = (sqrt((bucket.highPower / maxPower).coerceIn(0f, 1f).toDouble()).toFloat() *
-            (0.34f + 0.66f * bucket.amplitude)).coerceIn(0f, 1f)
+        val lowStrength =
+            (
+                sqrt((bucket.lowPower / maxPower).coerceIn(0f, 1f).toDouble()).toFloat() *
+                    (0.34f + 0.66f * bucket.amplitude)
+            ).coerceIn(0f, 1f)
+        val highStrength =
+            (
+                sqrt((bucket.highPower / maxPower).coerceIn(0f, 1f).toDouble()).toFloat() *
+                    (0.34f + 0.66f * bucket.amplitude)
+            ).coerceIn(0f, 1f)
         val powerSum = bucket.lowPower + bucket.highPower
-        val confidence = if (powerSum > 1e-6f) {
-            abs(bucket.highPower - bucket.lowPower) / powerSum
-        } else {
-            0f
-        }
-        val dominantTone = when {
-            bucket.amplitude < FlashSignalSilenceThreshold -> FskDominantTone.Unknown
-            confidence < FlashSignalConfidenceThreshold -> FskDominantTone.Unknown
-            bucket.highPower > bucket.lowPower -> FskDominantTone.High
-            else -> FskDominantTone.Low
-        }
+        val confidence =
+            if (powerSum > 1e-6f) {
+                abs(bucket.highPower - bucket.lowPower) / powerSum
+            } else {
+                0f
+            }
+        val dominantTone =
+            when {
+                bucket.amplitude < FlashSignalSilenceThreshold -> FskDominantTone.Unknown
+                confidence < FlashSignalConfidenceThreshold -> FskDominantTone.Unknown
+                bucket.highPower > bucket.lowPower -> FskDominantTone.High
+                else -> FskDominantTone.Low
+            }
         FskEnergyBucket(
             lowStrength = lowStrength,
             highStrength = highStrength,
             amplitude = bucket.amplitude,
             dominantTone = dominantTone,
-            confidence = confidence.coerceIn(0f, 1f)
+            confidence = confidence.coerceIn(0f, 1f),
         )
     }
 }
@@ -108,7 +120,7 @@ internal fun buildFskEnergyBuckets(
 private data class RawFskEnergyBucket(
     val lowPower: Float,
     val highPower: Float,
-    val amplitude: Float
+    val amplitude: Float,
 )
 
 private fun goertzelPower(
@@ -116,7 +128,7 @@ private fun goertzelPower(
     startIndex: Int,
     endIndexExclusive: Int,
     sampleRateHz: Int,
-    targetFrequencyHz: Double
+    targetFrequencyHz: Double,
 ): Float {
     val sampleCount = endIndexExclusive - startIndex
     if (sampleCount < 2 || sampleRateHz <= 0) {
@@ -140,7 +152,7 @@ private fun goertzelPower(
 private fun peakAmplitude(
     pcm: ShortArray,
     startIndex: Int,
-    endIndexExclusive: Int
+    endIndexExclusive: Int,
 ): Float {
     var peak = 0f
     for (index in startIndex until endIndexExclusive) {
@@ -156,9 +168,7 @@ internal const val FlashSignalSilenceThreshold = 0.02f
 internal const val FlashSignalConfidenceThreshold = 0.12f
 internal const val FlashSignalMinimumAnalysisSamples = 96
 
-internal fun flashSignalActiveWindowBucketCount(
-    flashVoicingStyle: FlashVoicingStyleOption?
-): Int {
+internal fun flashSignalActiveWindowBucketCount(flashVoicingStyle: FlashVoicingStyleOption?): Int {
     // Keep ritual_chant wider because it moves more slowly and benefits from a
     // longer scan-head window. Keep coded_burst tighter because it moves fast
     // and reads more clearly as a short 3-bar burst.

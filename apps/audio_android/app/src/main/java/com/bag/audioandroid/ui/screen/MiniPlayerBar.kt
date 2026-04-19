@@ -39,59 +39,62 @@ internal fun MiniPlayerBar(
     onTogglePlayback: () -> Unit,
     onOpenSavedAudioSheet: () -> Unit,
     onOpenDetails: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         shape = MaterialTheme.shapes.large,
         tonalElevation = 6.dp,
         shadowElevation = 4.dp,
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onOpenDetails)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpenDetails),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             MiniPlayerLeadingIcon(model = model)
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
                     text = miniPlayerTitle(model),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = miniPlayerSubtitle(model),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             IconButton(onClick = onOpenSavedAudioSheet) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
-                    contentDescription = stringResource(R.string.audio_action_open_saved_audio_list)
+                    contentDescription = stringResource(R.string.audio_action_open_saved_audio_list),
                 )
             }
             FilledIconButton(
                 onClick = onTogglePlayback,
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                colors =
+                    IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                    contentDescription = stringResource(
-                        if (isPlaying) R.string.audio_action_pause else R.string.audio_action_play
-                    )
+                    contentDescription =
+                        stringResource(
+                            if (isPlaying) R.string.audio_action_pause else R.string.audio_action_play,
+                        ),
                 )
             }
         }
@@ -102,21 +105,23 @@ internal fun MiniPlayerBar(
 private fun MiniPlayerLeadingIcon(model: MiniPlayerUiModel) {
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.primaryContainer
+        color = MaterialTheme.colorScheme.primaryContainer,
     ) {
         Box(
-            modifier = Modifier
-                .size(42.dp)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(42.dp)
+                    .padding(8.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = when (model) {
-                    is MiniPlayerUiModel.Generated -> Icons.Rounded.GraphicEq
-                    is MiniPlayerUiModel.Saved -> Icons.Rounded.LibraryMusic
-                },
+                imageVector =
+                    when (model) {
+                        is MiniPlayerUiModel.Generated -> Icons.Rounded.GraphicEq
+                        is MiniPlayerUiModel.Saved -> Icons.Rounded.LibraryMusic
+                    },
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
     }
@@ -125,10 +130,11 @@ private fun MiniPlayerLeadingIcon(model: MiniPlayerUiModel) {
 @Composable
 private fun miniPlayerTitle(model: MiniPlayerUiModel): String =
     when (model) {
-        is MiniPlayerUiModel.Generated -> stringResource(
-            R.string.audio_mini_player_generated_title,
-            stringResource(model.mode.labelResId)
-        )
+        is MiniPlayerUiModel.Generated ->
+            stringResource(
+                R.string.audio_mini_player_generated_title,
+                stringResource(model.mode.labelResId),
+            )
 
         is MiniPlayerUiModel.Saved -> model.displayName
     }
@@ -139,28 +145,30 @@ private fun miniPlayerSubtitle(model: MiniPlayerUiModel): String =
         is MiniPlayerUiModel.Generated -> {
             val duration = formatDurationMillis(model.durationMs)
             if (model.mode == com.bag.audioandroid.ui.model.TransportModeOption.Flash &&
-                model.flashVoicingStyle != null) {
+                model.flashVoicingStyle != null
+            ) {
                 stringResource(
                     R.string.audio_mini_player_generated_flash_subtitle,
                     stringResource(model.flashVoicingStyle.labelResId),
-                    duration
+                    duration,
                 )
             } else {
                 stringResource(R.string.audio_mini_player_duration_only, duration)
             }
         }
 
-        is MiniPlayerUiModel.Saved -> stringResource(
-            if (model.modeWireName == "flash" && model.flashVoicingStyle != null) {
-                R.string.audio_mini_player_generated_flash_subtitle
-            } else {
-                R.string.audio_mini_player_saved_subtitle
-            },
-            if (model.modeWireName == "flash" && model.flashVoicingStyle != null) {
-                stringResource(model.flashVoicingStyle.labelResId)
-            } else {
-                stringResource(SavedAudioModeFilter.labelResIdForModeWireName(model.modeWireName))
-            },
-            formatDurationMillis(model.durationMs)
-        )
+        is MiniPlayerUiModel.Saved ->
+            stringResource(
+                if (model.modeWireName == "flash" && model.flashVoicingStyle != null) {
+                    R.string.audio_mini_player_generated_flash_subtitle
+                } else {
+                    R.string.audio_mini_player_saved_subtitle
+                },
+                if (model.modeWireName == "flash" && model.flashVoicingStyle != null) {
+                    stringResource(model.flashVoicingStyle.labelResId)
+                } else {
+                    stringResource(SavedAudioModeFilter.labelResIdForModeWireName(model.modeWireName))
+                },
+                formatDurationMillis(model.durationMs),
+            )
     }

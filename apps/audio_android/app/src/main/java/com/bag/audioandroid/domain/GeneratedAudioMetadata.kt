@@ -12,7 +12,7 @@ data class GeneratedAudioMetadata(
     val frameSamples: Int,
     val pcmSampleCount: Int,
     val appVersion: String,
-    val coreVersion: String
+    val coreVersion: String,
 ) {
     companion object {
         const val CURRENT_VERSION = 3

@@ -34,7 +34,7 @@ internal fun safelyPlayTrack(track: AudioTrack) {
 
 internal fun setPlaybackHeadPositionSafely(
     track: AudioTrack,
-    sampleIndex: Int
+    sampleIndex: Int,
 ): Boolean =
     try {
         if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {

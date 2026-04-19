@@ -11,10 +11,8 @@ object NativeAudioIoBridge {
     external fun nativeEncodeMonoPcm16ToWavBytes(
         sampleRateHz: Int,
         pcm: ShortArray,
-        metadata: GeneratedAudioMetadata?
+        metadata: GeneratedAudioMetadata?,
     ): ByteArray
 
-    external fun nativeDecodeMonoPcm16WavBytes(
-        wavBytes: ByteArray
-    ): DecodedAudioData
+    external fun nativeDecodeMonoPcm16WavBytes(wavBytes: ByteArray): DecodedAudioData
 }

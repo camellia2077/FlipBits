@@ -43,6 +43,7 @@ target_include_directories(audio_android_jni
     PRIVATE
         "${WAVEBITS_ROOT}/apps/audio_android/native_package/private_include"
         "${WAVEBITS_ROOT}/libs/audio_api/include"
+        "${WAVEBITS_ROOT}/libs/audio_io/include"
         "${WAVEBITS_ROOT}/libs/audio_runtime/include"
 )
 

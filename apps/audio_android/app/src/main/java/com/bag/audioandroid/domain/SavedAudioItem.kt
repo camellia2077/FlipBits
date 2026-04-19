@@ -9,5 +9,5 @@ data class SavedAudioItem(
     val modeWireName: String,
     val durationMs: Long,
     val savedAtEpochSeconds: Long,
-    val flashVoicingStyle: FlashVoicingStyleOption? = null
+    val flashVoicingStyle: FlashVoicingStyleOption? = null,
 )

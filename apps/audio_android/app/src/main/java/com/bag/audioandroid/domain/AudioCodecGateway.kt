@@ -7,7 +7,7 @@ interface AudioCodecGateway {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): Int
 
     suspend fun encodeTextToPcm(
@@ -17,7 +17,7 @@ interface AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-        onProgress: (EncodeProgressUpdate) -> Unit = {}
+        onProgress: (EncodeProgressUpdate) -> Unit = {},
     ): EncodeAudioResult
 
     fun validateDecodeConfig(
@@ -25,7 +25,7 @@ interface AudioCodecGateway {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): Int
 
     fun decodeGeneratedPcm(
@@ -34,7 +34,7 @@ interface AudioCodecGateway {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): String
 
     fun getCoreVersion(): String

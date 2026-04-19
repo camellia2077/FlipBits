@@ -19,7 +19,7 @@ internal fun DrawScope.drawToneTracks(
     activeToneColor: Color,
     inactiveToneColor: Color,
     centerLineColor: Color,
-    glowPulse: Float
+    glowPulse: Float,
 ) {
     val laneGap = 10.dp.toPx()
     val laneHeight = (innerHeight - laneGap).coerceAtLeast(1f) / 2f
@@ -30,7 +30,7 @@ internal fun DrawScope.drawToneTracks(
         color = centerLineColor,
         start = Offset(leftPadding, upperTop + laneHeight + laneGap / 2f),
         end = Offset(leftPadding + innerWidth, upperTop + laneHeight + laneGap / 2f),
-        strokeWidth = 1.dp.toPx()
+        strokeWidth = 1.dp.toPx(),
     )
     val activeWindowEndExclusive =
         (scanHeadBucketIndex + activeWindowBucketCount).coerceAtMost(buckets.size)
@@ -39,44 +39,48 @@ internal fun DrawScope.drawToneTracks(
         val isActiveBucket = index in scanHeadBucketIndex until activeWindowEndExclusive
         val x = leftPadding + bucketWidth * index.toFloat()
         val contentWidth = (bucketWidth - 1.dp.toPx()).coerceAtLeast(1.6f)
-        val highAlpha = when (bucket.dominantTone) {
-            FskDominantTone.High -> 0.30f + bucket.highStrength * (0.54f + 0.08f * glowPulse)
-            FskDominantTone.Unknown -> 0.06f + bucket.highStrength * 0.20f
-            FskDominantTone.Low -> 0.08f + bucket.highStrength * 0.18f
-        }
-        val lowAlpha = when (bucket.dominantTone) {
-            FskDominantTone.Low -> 0.30f + bucket.lowStrength * (0.54f + 0.08f * glowPulse)
-            FskDominantTone.Unknown -> 0.06f + bucket.lowStrength * 0.20f
-            FskDominantTone.High -> 0.08f + bucket.lowStrength * 0.18f
-        }
+        val highAlpha =
+            when (bucket.dominantTone) {
+                FskDominantTone.High -> 0.30f + bucket.highStrength * (0.54f + 0.08f * glowPulse)
+                FskDominantTone.Unknown -> 0.06f + bucket.highStrength * 0.20f
+                FskDominantTone.Low -> 0.08f + bucket.highStrength * 0.18f
+            }
+        val lowAlpha =
+            when (bucket.dominantTone) {
+                FskDominantTone.Low -> 0.30f + bucket.lowStrength * (0.54f + 0.08f * glowPulse)
+                FskDominantTone.Unknown -> 0.06f + bucket.lowStrength * 0.20f
+                FskDominantTone.High -> 0.08f + bucket.lowStrength * 0.18f
+            }
         val highHeight = laneHeight * (0.24f + 0.66f * bucket.highStrength)
         val lowHeight = laneHeight * (0.24f + 0.66f * bucket.lowStrength)
-        val highColor = toneBucketColor(
-            isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.High,
-            activeColor = activeToneColor,
-            inactiveColor = inactiveToneColor,
-            alpha = highAlpha,
-            strength = bucket.highStrength
-        )
-        val lowColor = toneBucketColor(
-            isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.Low,
-            activeColor = activeToneColor,
-            inactiveColor = inactiveToneColor,
-            alpha = lowAlpha,
-            strength = bucket.lowStrength
-        )
+        val highColor =
+            toneBucketColor(
+                isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.High,
+                activeColor = activeToneColor,
+                inactiveColor = inactiveToneColor,
+                alpha = highAlpha,
+                strength = bucket.highStrength,
+            )
+        val lowColor =
+            toneBucketColor(
+                isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.Low,
+                activeColor = activeToneColor,
+                inactiveColor = inactiveToneColor,
+                alpha = lowAlpha,
+                strength = bucket.lowStrength,
+            )
 
         drawRoundRect(
             color = highColor,
             topLeft = Offset(x, upperTop + (laneHeight - highHeight) / 2f),
             size = Size(contentWidth, highHeight),
-            cornerRadius = CornerRadius(contentWidth / 2f, contentWidth / 2f)
+            cornerRadius = CornerRadius(contentWidth / 2f, contentWidth / 2f),
         )
         drawRoundRect(
             color = lowColor,
             topLeft = Offset(x, lowerTop + (laneHeight - lowHeight) / 2f),
             size = Size(contentWidth, lowHeight),
-            cornerRadius = CornerRadius(contentWidth / 2f, contentWidth / 2f)
+            cornerRadius = CornerRadius(contentWidth / 2f, contentWidth / 2f),
         )
     }
 }
@@ -93,7 +97,7 @@ internal fun DrawScope.drawToneEnergy(
     activeToneColor: Color,
     inactiveToneColor: Color,
     centerLineColor: Color,
-    glowPulse: Float
+    glowPulse: Float,
 ) {
     val centerY = topPadding + innerHeight / 2f
     val upperGap = 3.dp.toPx()
@@ -105,7 +109,7 @@ internal fun DrawScope.drawToneEnergy(
         color = centerLineColor,
         start = Offset(leftPadding, centerY),
         end = Offset(leftPadding + innerWidth, centerY),
-        strokeWidth = 1.dp.toPx()
+        strokeWidth = 1.dp.toPx(),
     )
     val activeWindowEndExclusive =
         (scanHeadBucketIndex + activeWindowBucketCount).coerceAtMost(buckets.size)
@@ -115,42 +119,46 @@ internal fun DrawScope.drawToneEnergy(
         val x = leftPadding + bucketWidth * index.toFloat() + bucketWidth / 2f
         val highHeight = maxEnergyHeight * bucket.highStrength
         val lowHeight = maxEnergyHeight * bucket.lowStrength
-        val highAlpha = if (bucket.dominantTone == FskDominantTone.High) {
-            0.42f + 0.42f * glowPulse + bucket.confidence * 0.12f
-        } else {
-            0.18f + bucket.highStrength * 0.24f
-        }
-        val lowAlpha = if (bucket.dominantTone == FskDominantTone.Low) {
-            0.42f + 0.42f * glowPulse + bucket.confidence * 0.12f
-        } else {
-            0.18f + bucket.lowStrength * 0.24f
-        }
-        val highColor = toneBucketColor(
-            isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.High,
-            activeColor = activeToneColor,
-            inactiveColor = inactiveToneColor,
-            alpha = highAlpha,
-            strength = bucket.highStrength
-        )
-        val lowColor = toneBucketColor(
-            isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.Low,
-            activeColor = activeToneColor,
-            inactiveColor = inactiveToneColor,
-            alpha = lowAlpha,
-            strength = bucket.lowStrength
-        )
+        val highAlpha =
+            if (bucket.dominantTone == FskDominantTone.High) {
+                0.42f + 0.42f * glowPulse + bucket.confidence * 0.12f
+            } else {
+                0.18f + bucket.highStrength * 0.24f
+            }
+        val lowAlpha =
+            if (bucket.dominantTone == FskDominantTone.Low) {
+                0.42f + 0.42f * glowPulse + bucket.confidence * 0.12f
+            } else {
+                0.18f + bucket.lowStrength * 0.24f
+            }
+        val highColor =
+            toneBucketColor(
+                isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.High,
+                activeColor = activeToneColor,
+                inactiveColor = inactiveToneColor,
+                alpha = highAlpha,
+                strength = bucket.highStrength,
+            )
+        val lowColor =
+            toneBucketColor(
+                isActive = isActiveBucket && bucket.dominantTone == FskDominantTone.Low,
+                activeColor = activeToneColor,
+                inactiveColor = inactiveToneColor,
+                alpha = lowAlpha,
+                strength = bucket.lowStrength,
+            )
 
         drawLine(
             color = highColor,
             start = Offset(x, centerY - upperGap),
             end = Offset(x, centerY - upperGap - highHeight),
-            strokeWidth = strokeWidth
+            strokeWidth = strokeWidth,
         )
         drawLine(
             color = lowColor,
             start = Offset(x, centerY + lowerGap),
             end = Offset(x, centerY + lowerGap + lowHeight),
-            strokeWidth = strokeWidth
+            strokeWidth = strokeWidth,
         )
     }
 }
@@ -160,13 +168,12 @@ private fun toneBucketColor(
     activeColor: Color,
     inactiveColor: Color,
     alpha: Float,
-    strength: Float
-): Color {
-    return if (isActive) {
+    strength: Float,
+): Color =
+    if (isActive) {
         activeColor.copy(alpha = alpha.coerceIn(0f, 1f))
     } else {
         inactiveColor.copy(
-            alpha = (0.18f + 0.28f * strength + 0.12f * alpha.coerceIn(0f, 1f)).coerceIn(0f, 0.55f)
+            alpha = (0.18f + 0.28f * strength + 0.12f * alpha.coerceIn(0f, 1f)).coerceIn(0f, 0.55f),
         )
     }
-}

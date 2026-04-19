@@ -15,23 +15,26 @@ internal class AudioPlaybackUiStateSync(
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
     private val playbackSourceCoordinator: PlaybackSourceCoordinator,
     private val playbackSessionReducer: PlaybackSessionReducer,
-    private val sampleRateHz: Int
+    private val sampleRateHz: Int,
 ) {
     fun updatePlaybackState(
         source: AudioPlaybackSource,
-        transform: (PlaybackUiState) -> PlaybackUiState
+        transform: (PlaybackUiState) -> PlaybackUiState,
     ) {
         when (source) {
-            is AudioPlaybackSource.Generated -> sessionStateStore.updateSession(source.mode) {
-                it.copy(playback = transform(it.playback))
-            }
+            is AudioPlaybackSource.Generated ->
+                sessionStateStore.updateSession(source.mode) {
+                    it.copy(playback = transform(it.playback))
+                }
 
-            is AudioPlaybackSource.Saved -> uiState.update { state ->
-                val selectedSavedAudio = state.selectedSavedAudio
-                    ?.takeIf { it.item.itemId == source.itemId }
-                    ?: return@update state
-                state.copy(selectedSavedAudio = selectedSavedAudio.copy(playback = transform(selectedSavedAudio.playback)))
-            }
+            is AudioPlaybackSource.Saved ->
+                uiState.update { state ->
+                    val selectedSavedAudio =
+                        state.selectedSavedAudio
+                            ?.takeIf { it.item.itemId == source.itemId }
+                            ?: return@update state
+                    state.copy(selectedSavedAudio = selectedSavedAudio.copy(playback = transform(selectedSavedAudio.playback)))
+                }
         }
     }
 
@@ -44,23 +47,35 @@ internal class AudioPlaybackUiStateSync(
     fun playbackStatusPlaying(source: AudioPlaybackSource): UiText =
         when (source) {
             is AudioPlaybackSource.Generated -> playbackSessionReducer.playingStatus(source.mode)
-            is AudioPlaybackSource.Saved -> UiText.Resource(
-                R.string.status_playing_saved_audio,
-                listOf(uiState.value.selectedSavedAudio?.item?.displayName.orEmpty())
-            )
+            is AudioPlaybackSource.Saved ->
+                UiText.Resource(
+                    R.string.status_playing_saved_audio,
+                    listOf(
+                        uiState.value.selectedSavedAudio
+                            ?.item
+                            ?.displayName
+                            .orEmpty(),
+                    ),
+                )
         }
 
-    fun applyPlaybackProgress(source: AudioPlaybackSource, playedSamples: Int, totalSamples: Int) {
+    fun applyPlaybackProgress(
+        source: AudioPlaybackSource,
+        playedSamples: Int,
+        totalSamples: Int,
+    ) {
         updatePlaybackState(source) { currentPlayback ->
-            val playbackBase = if (currentPlayback.totalSamples == 0 && totalSamples > 0) {
-                val resolvedSampleRateHz = when (source) {
-                    is AudioPlaybackSource.Generated -> sampleRateHz
-                    is AudioPlaybackSource.Saved -> uiState.value.selectedSavedAudio?.sampleRateHz ?: sampleRateHz
+            val playbackBase =
+                if (currentPlayback.totalSamples == 0 && totalSamples > 0) {
+                    val resolvedSampleRateHz =
+                        when (source) {
+                            is AudioPlaybackSource.Generated -> sampleRateHz
+                            is AudioPlaybackSource.Saved -> uiState.value.selectedSavedAudio?.sampleRateHz ?: sampleRateHz
+                        }
+                    playbackRuntimeGateway.load(totalSamples, resolvedSampleRateHz)
+                } else {
+                    currentPlayback
                 }
-                playbackRuntimeGateway.load(totalSamples, resolvedSampleRateHz)
-            } else {
-                currentPlayback
-            }
             playbackRuntimeGateway.progress(playbackBase, playedSamples)
         }
     }

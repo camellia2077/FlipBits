@@ -6,7 +6,7 @@ import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.PlaybackUiState
 
 class PlaybackSourceCoordinator(
-    private val generatedSampleRateHz: Int
+    private val generatedSampleRateHz: Int,
 ) {
     fun resolveTarget(state: AudioAppUiState): PlaybackTarget? =
         when (val source = state.currentPlaybackSource) {
@@ -19,20 +19,21 @@ class PlaybackSourceCoordinator(
                         source = source,
                         pcm = session.generatedPcm,
                         sampleRateHz = generatedSampleRateHz,
-                        playback = session.playback
+                        playback = session.playback,
                     )
                 }
             }
 
             is AudioPlaybackSource.Saved -> {
-                val selectedSavedAudio = state.selectedSavedAudio
-                    ?.takeIf { it.item.itemId == source.itemId }
-                    ?: return null
+                val selectedSavedAudio =
+                    state.selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?: return null
                 PlaybackTarget(
                     source = source,
                     pcm = selectedSavedAudio.pcm,
                     sampleRateHz = selectedSavedAudio.sampleRateHz,
-                    playback = selectedSavedAudio.playback
+                    playback = selectedSavedAudio.playback,
                 )
             }
         }
@@ -43,22 +44,27 @@ class PlaybackSourceCoordinator(
             is AudioPlaybackSource.Saved -> "saved:${source.itemId}"
         }
 
-    fun sourceForKey(state: AudioAppUiState, sourceKey: String): AudioPlaybackSource? {
+    fun sourceForKey(
+        state: AudioAppUiState,
+        sourceKey: String,
+    ): AudioPlaybackSource? {
         val currentSource = state.currentPlaybackSource
         if (sourceKey(currentSource) == sourceKey) {
             return currentSource
         }
 
-        val generatedMode = TransportModeOption.entries.firstOrNull {
-            sourceKey(AudioPlaybackSource.Generated(it)) == sourceKey
-        }
+        val generatedMode =
+            TransportModeOption.entries.firstOrNull {
+                sourceKey(AudioPlaybackSource.Generated(it)) == sourceKey
+            }
         if (generatedMode != null) {
             return AudioPlaybackSource.Generated(generatedMode)
         }
 
-        val selectedSavedAudio = state.selectedSavedAudio
-            ?.takeIf { sourceKey(AudioPlaybackSource.Saved(it.item.itemId)) == sourceKey }
-            ?: return null
+        val selectedSavedAudio =
+            state.selectedSavedAudio
+                ?.takeIf { sourceKey(AudioPlaybackSource.Saved(it.item.itemId)) == sourceKey }
+                ?: return null
         return AudioPlaybackSource.Saved(selectedSavedAudio.item.itemId)
     }
 
@@ -66,6 +72,6 @@ class PlaybackSourceCoordinator(
         val source: AudioPlaybackSource,
         val pcm: ShortArray,
         val sampleRateHz: Int,
-        val playback: PlaybackUiState
+        val playback: PlaybackUiState,
     )
 }

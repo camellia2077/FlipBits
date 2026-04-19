@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.TransportModeOption
-import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import kotlin.random.Random
 
 @RunWith(RobolectricTestRunner::class)
 class AndroidSampleInputTextProviderTest {
@@ -22,19 +22,19 @@ class AndroidSampleInputTextProviderTest {
 
         assertEquals(
             "红袍守夜人正在点亮旧星图",
-            provider.defaultSample(TransportModeOption.Flash, AppLanguageOption.Chinese).text
+            provider.defaultSample(TransportModeOption.Flash, AppLanguageOption.Chinese).text,
         )
         assertEquals(
             "紅袍守夜人正在點亮舊星圖",
-            provider.defaultSample(TransportModeOption.Flash, AppLanguageOption.TraditionalChinese).text
+            provider.defaultSample(TransportModeOption.Flash, AppLanguageOption.TraditionalChinese).text,
         )
         assertEquals(
             "The red-robed keepers are lighting the old star chart",
-            provider.defaultSample(TransportModeOption.Ultra, AppLanguageOption.English).text
+            provider.defaultSample(TransportModeOption.Ultra, AppLanguageOption.English).text,
         )
         assertEquals(
             "赤衣の守人たちが古い星図に灯をともしている",
-            provider.defaultSample(TransportModeOption.Flash, AppLanguageOption.Japanese).text
+            provider.defaultSample(TransportModeOption.Flash, AppLanguageOption.Japanese).text,
         )
 
         AppLanguageOption.entries.forEach { language ->
@@ -46,16 +46,18 @@ class AndroidSampleInputTextProviderTest {
 
     @Test
     fun `random sample avoids returning the excluded sample id`() {
-        val provider = AndroidSampleInputTextProvider(
-            appContext = context,
-            random = FixedIndexRandom(0)
-        )
+        val provider =
+            AndroidSampleInputTextProvider(
+                appContext = context,
+                random = FixedIndexRandom(0),
+            )
 
-        val sample = provider.randomSample(
-            mode = TransportModeOption.Flash,
-            language = AppLanguageOption.English,
-            excludingSampleId = "old_star_chart"
-        )
+        val sample =
+            provider.randomSample(
+                mode = TransportModeOption.Flash,
+                language = AppLanguageOption.English,
+                excludingSampleId = "old_star_chart",
+            )
 
         assertEquals("sealed_engine", sample.id)
         assertEquals("In the depths of the bell tower, the sealed engine slowly awakens", sample.text)
@@ -63,7 +65,7 @@ class AndroidSampleInputTextProviderTest {
 }
 
 private class FixedIndexRandom(
-    private val fixedIndex: Int
+    private val fixedIndex: Int,
 ) : Random() {
     override fun nextBits(bitCount: Int): Int = 0
 

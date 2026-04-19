@@ -46,40 +46,44 @@ internal fun PlayerDetailSheetContent(
     onScrubStarted: () -> Unit,
     onScrubChanged: (Int) -> Unit,
     onScrubFinished: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val isFlashMode = when (miniPlayerModel) {
-        is MiniPlayerUiModel.Generated ->
-            miniPlayerModel.mode == com.bag.audioandroid.ui.model.TransportModeOption.Flash
-        is MiniPlayerUiModel.Saved ->
-            miniPlayerModel.modeWireName == "flash"
-    }
-    val flashVoicingStyle: FlashVoicingStyleOption? = when (miniPlayerModel) {
-        is MiniPlayerUiModel.Generated -> miniPlayerModel.flashVoicingStyle
-        is MiniPlayerUiModel.Saved -> miniPlayerModel.flashVoicingStyle
-    }
+    val isFlashMode =
+        when (miniPlayerModel) {
+            is MiniPlayerUiModel.Generated ->
+                miniPlayerModel.mode == com.bag.audioandroid.ui.model.TransportModeOption.Flash
+            is MiniPlayerUiModel.Saved ->
+                miniPlayerModel.modeWireName == "flash"
+        }
+    val flashVoicingStyle: FlashVoicingStyleOption? =
+        when (miniPlayerModel) {
+            is MiniPlayerUiModel.Generated -> miniPlayerModel.flashVoicingStyle
+            is MiniPlayerUiModel.Saved -> miniPlayerModel.flashVoicingStyle
+        }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState)
-            .padding(horizontal = 24.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         PlayerDetailSummarySection(
             miniPlayerModel = miniPlayerModel,
             canExportGeneratedAudio = canExportGeneratedAudio,
             onExportGeneratedAudio = onExportGeneratedAudio,
-            onShareSavedAudio = onShareSavedAudio
+            onShareSavedAudio = onShareSavedAudio,
         )
         if (miniPlayerModel is MiniPlayerUiModel.Generated ||
-            (miniPlayerModel is MiniPlayerUiModel.Saved && miniPlayerModel.modeWireName == "flash")) {
+            (miniPlayerModel is MiniPlayerUiModel.Saved && miniPlayerModel.modeWireName == "flash")
+        ) {
             PlayerDetailDecodedSection(
                 decodedText = decodedText.orEmpty(),
                 isCodecBusy = isCodecBusy,
                 onDecodeAudio = onDecodeAudio,
-                onClearDecodedText = onClearDecodedText
+                onClearDecodedText = onClearDecodedText,
             )
         }
         AudioPlaybackProgressSection(
@@ -95,7 +99,7 @@ internal fun PlayerDetailSheetContent(
             isPlaying = isPlaying,
             onScrubStarted = onScrubStarted,
             onScrubChanged = onScrubChanged,
-            onScrubFinished = onScrubFinished
+            onScrubFinished = onScrubFinished,
         )
         AudioPlaybackTransportControls(
             isPlaying = isPlaying,
@@ -106,7 +110,7 @@ internal fun PlayerDetailSheetContent(
             onSkipToPreviousTrack = onSkipToPreviousTrack,
             onSkipToNextTrack = onSkipToNextTrack,
             onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
-            onOpenSavedAudioSheet = onOpenSavedAudioSheet
+            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
         )
         if (miniPlayerModel is MiniPlayerUiModel.Saved) {
             savedAudioItem?.let { PlayerDetailSavedInfoSection(item = it) }

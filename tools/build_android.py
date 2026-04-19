@@ -34,13 +34,14 @@ def assemble_task(variant: str) -> str:
 
 
 def apk_path(root: Path, variant: str) -> Path:
-    return root / "apps" / "audio_android" / "app" / "build" / "outputs" / "apk" / variant / f"app-{variant}.apk"
+    return root / "app" / "build" / "outputs" / "apk" / variant / f"app-{variant}.apk"
 
 
 def main() -> int:
     args = parse_args()
-    root = Path(__file__).resolve().parent.parent
-    wrapper = gradle_wrapper(root)
+    repo_root = Path(__file__).resolve().parent.parent
+    android_root = repo_root / "apps" / "audio_android"
+    wrapper = gradle_wrapper(android_root)
     if not wrapper.exists():
         print(f"Gradle wrapper not found: {wrapper}", file=sys.stderr)
         return 1
@@ -51,9 +52,9 @@ def main() -> int:
 
     print(f"Building Android {args.variant} variant...")
     print(" ".join(command))
-    subprocess.run(command, cwd=root, check=True)
+    subprocess.run(command, cwd=android_root, check=True)
 
-    output_apk = apk_path(root, args.variant)
+    output_apk = apk_path(android_root, args.variant)
     if output_apk.exists():
         print(f"APK: {output_apk}")
     else:

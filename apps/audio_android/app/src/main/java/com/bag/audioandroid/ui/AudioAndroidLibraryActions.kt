@@ -12,26 +12,28 @@ internal class AudioAndroidLibraryActions(
     sessionStateStore: AudioSessionStateStore,
     playbackRuntimeGateway: PlaybackRuntimeGateway,
     savedAudioRepository: SavedAudioRepository,
-    stopPlayback: () -> Unit
+    stopPlayback: () -> Unit,
 ) {
     private val setCurrentStatusText: (UiText) -> Unit = { statusText ->
         sessionStateStore.updateCurrentSession {
             it.copy(statusText = statusText)
         }
     }
-    private val selectionActions = AudioSavedAudioSelectionActions(
-        uiState = uiState,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        savedAudioRepository = savedAudioRepository,
-        stopPlayback = stopPlayback,
-        setCurrentStatusText = setCurrentStatusText
-    )
-    private val mutationActions = AudioSavedAudioMutationActions(
-        uiState = uiState,
-        savedAudioRepository = savedAudioRepository,
-        stopPlayback = stopPlayback,
-        setCurrentStatusText = setCurrentStatusText
-    )
+    private val selectionActions =
+        AudioSavedAudioSelectionActions(
+            uiState = uiState,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            savedAudioRepository = savedAudioRepository,
+            stopPlayback = stopPlayback,
+            setCurrentStatusText = setCurrentStatusText,
+        )
+    private val mutationActions =
+        AudioSavedAudioMutationActions(
+            uiState = uiState,
+            savedAudioRepository = savedAudioRepository,
+            stopPlayback = stopPlayback,
+            setCurrentStatusText = setCurrentStatusText,
+        )
 
     fun onSavedAudioSelected(itemId: String) {
         selectionActions.onSavedAudioSelected(itemId)
@@ -44,12 +46,13 @@ internal class AudioAndroidLibraryActions(
     fun prepareSavedAudioSelection(
         itemId: String,
         switchToAudioTab: Boolean = false,
-        clearLibrarySelection: Boolean = false
-    ): Boolean = selectionActions.prepareSavedAudioSelection(
-        itemId = itemId,
-        switchToAudioTab = switchToAudioTab,
-        clearLibrarySelection = clearLibrarySelection
-    )
+        clearLibrarySelection: Boolean = false,
+    ): Boolean =
+        selectionActions.prepareSavedAudioSelection(
+            itemId = itemId,
+            switchToAudioTab = switchToAudioTab,
+            clearLibrarySelection = clearLibrarySelection,
+        )
 
     fun onEnterLibrarySelection(itemId: String) {
         selectionActions.onEnterLibrarySelection(itemId)
@@ -75,7 +78,10 @@ internal class AudioAndroidLibraryActions(
         mutationActions.onDeleteSavedAudio(itemId)
     }
 
-    fun onRenameSavedAudio(itemId: String, newBaseName: String) {
+    fun onRenameSavedAudio(
+        itemId: String,
+        newBaseName: String,
+    ) {
         mutationActions.onRenameSavedAudio(itemId, newBaseName)
     }
 

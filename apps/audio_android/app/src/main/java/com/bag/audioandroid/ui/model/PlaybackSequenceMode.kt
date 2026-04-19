@@ -5,24 +5,25 @@ import com.bag.audioandroid.R
 
 enum class PlaybackSequenceMode(
     val id: String,
-    @param:StringRes val labelResId: Int
+    @param:StringRes val labelResId: Int,
 ) {
     Normal(
         id = "normal",
-        labelResId = R.string.audio_action_normal_playback
+        labelResId = R.string.audio_action_normal_playback,
     ),
     RepeatOne(
         id = "repeat_one",
-        labelResId = R.string.audio_action_repeat_one
+        labelResId = R.string.audio_action_repeat_one,
     ),
     RepeatList(
         id = "repeat_list",
-        labelResId = R.string.audio_action_repeat_list
+        labelResId = R.string.audio_action_repeat_list,
     ),
     Shuffle(
         id = "shuffle",
-        labelResId = R.string.audio_action_shuffle_playback
-    );
+        labelResId = R.string.audio_action_shuffle_playback,
+    ),
+    ;
 
     fun next(): PlaybackSequenceMode =
         when (this) {
@@ -33,7 +34,6 @@ enum class PlaybackSequenceMode(
         }
 
     companion object {
-        fun fromId(id: String?): PlaybackSequenceMode =
-            entries.firstOrNull { it.id == id } ?: Normal
+        fun fromId(id: String?): PlaybackSequenceMode = entries.firstOrNull { it.id == id } ?: Normal
     }
 }

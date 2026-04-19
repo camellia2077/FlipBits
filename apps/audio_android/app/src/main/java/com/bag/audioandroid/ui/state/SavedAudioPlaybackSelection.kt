@@ -7,5 +7,5 @@ data class SavedAudioPlaybackSelection(
     val pcm: ShortArray,
     val sampleRateHz: Int,
     val playback: PlaybackUiState,
-    val decodedText: String = ""
+    val decodedText: String = "",
 )

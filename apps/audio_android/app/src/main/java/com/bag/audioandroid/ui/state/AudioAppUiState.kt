@@ -1,10 +1,10 @@
 package com.bag.audioandroid.ui.state
 
 import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
-import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
@@ -33,82 +33,95 @@ data class AudioAppUiState(
     val showSavedAudioSheet: Boolean = false,
     val showPlayerDetailSheet: Boolean = false,
     val libraryStatusText: UiText = UiText.Empty,
-    val snackbarMessage: SnackbarMessage? = null
+    val snackbarMessage: SnackbarMessage? = null,
 ) {
     val currentSession: ModeAudioSessionState
         get() = sessions.getValue(transportMode)
 
     val currentPlayback: PlaybackUiState
-        get() = when (val source = currentPlaybackSource) {
-            is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).playback
-            is AudioPlaybackSource.Saved -> selectedSavedAudio
-                ?.takeIf { it.item.itemId == source.itemId }
-                ?.playback
-                ?: PlaybackUiState()
-        }
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).playback
+                is AudioPlaybackSource.Saved ->
+                    selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?.playback
+                        ?: PlaybackUiState()
+            }
 
     val currentPlaybackSampleCount: Int
-        get() = when (val source = currentPlaybackSource) {
-            is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).generatedPcm.size
-            is AudioPlaybackSource.Saved -> selectedSavedAudio
-                ?.takeIf { it.item.itemId == source.itemId }
-                ?.pcm
-                ?.size
-                ?: 0
-        }
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).generatedPcm.size
+                is AudioPlaybackSource.Saved ->
+                    selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?.pcm
+                        ?.size
+                        ?: 0
+            }
 
     val currentPlaybackPcm: ShortArray
-        get() = when (val source = currentPlaybackSource) {
-            is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).generatedPcm
-            is AudioPlaybackSource.Saved -> selectedSavedAudio
-                ?.takeIf { it.item.itemId == source.itemId }
-                ?.pcm
-                ?: shortArrayOf()
-        }
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).generatedPcm
+                is AudioPlaybackSource.Saved ->
+                    selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?.pcm
+                        ?: shortArrayOf()
+            }
 
     val currentSavedAudioItem: SavedAudioItem?
-        get() = when (val source = currentPlaybackSource) {
-            is AudioPlaybackSource.Generated -> null
-            is AudioPlaybackSource.Saved -> selectedSavedAudio
-                ?.takeIf { it.item.itemId == source.itemId }
-                ?.item
-        }
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> null
+                is AudioPlaybackSource.Saved ->
+                    selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?.item
+            }
 
     val currentPlaybackDecodedText: String?
-        get() = when (val source = currentPlaybackSource) {
-            is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).resultText
-            is AudioPlaybackSource.Saved -> selectedSavedAudio
-                ?.takeIf { it.item.itemId == source.itemId }
-                ?.decodedText
-        }
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).resultText
+                is AudioPlaybackSource.Saved ->
+                    selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?.decodedText
+            }
 
     val miniPlayerModel: MiniPlayerUiModel?
-        get() = when (val source = currentPlaybackSource) {
-            is AudioPlaybackSource.Generated -> {
-                val session = sessions.getValue(source.mode)
-                if (session.generatedPcm.isEmpty()) {
-                    null
-                } else {
-                    MiniPlayerUiModel.Generated(
-                        mode = source.mode,
-                        flashVoicingStyle = session.generatedFlashVoicingStyle,
-                        durationMs = samplesToDurationMillis(
-                            sampleCount = currentPlayback.totalSamples.takeIf { it > 0 } ?: session.generatedPcm.size,
-                            sampleRateHz = currentPlayback.sampleRateHz
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> {
+                    val session = sessions.getValue(source.mode)
+                    if (session.generatedPcm.isEmpty()) {
+                        null
+                    } else {
+                        MiniPlayerUiModel.Generated(
+                            mode = source.mode,
+                            flashVoicingStyle = session.generatedFlashVoicingStyle,
+                            durationMs =
+                                samplesToDurationMillis(
+                                    sampleCount = currentPlayback.totalSamples.takeIf { it > 0 } ?: session.generatedPcm.size,
+                                    sampleRateHz = currentPlayback.sampleRateHz,
+                                ),
                         )
-                    )
+                    }
                 }
-            }
 
-            is AudioPlaybackSource.Saved -> currentSavedAudioItem?.let { item ->
-                MiniPlayerUiModel.Saved(
-                    displayName = item.displayName,
-                    modeWireName = item.modeWireName,
-                    flashVoicingStyle = item.flashVoicingStyle,
-                    durationMs = item.durationMs
-                )
+                is AudioPlaybackSource.Saved ->
+                    currentSavedAudioItem?.let { item ->
+                        MiniPlayerUiModel.Saved(
+                            displayName = item.displayName,
+                            modeWireName = item.modeWireName,
+                            flashVoicingStyle = item.flashVoicingStyle,
+                            durationMs = item.durationMs,
+                        )
+                    }
             }
-        }
 
     val canSkipPrevious: Boolean
         get() {
@@ -128,7 +141,10 @@ data class AudioAppUiState(
 private fun defaultModeSessions(): Map<TransportModeOption, ModeAudioSessionState> =
     TransportModeOption.entries.associateWith { ModeAudioSessionState() }
 
-private fun samplesToDurationMillis(sampleCount: Int, sampleRateHz: Int): Long {
+private fun samplesToDurationMillis(
+    sampleCount: Int,
+    sampleRateHz: Int,
+): Long {
     if (sampleCount <= 0 || sampleRateHz <= 0) {
         return 0L
     }

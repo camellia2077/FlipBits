@@ -5,7 +5,7 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 sealed interface AudioExportResult {
     data class Success(
         val displayName: String,
-        val uriString: String
+        val uriString: String,
     ) : AudioExportResult
 
     data object Failed : AudioExportResult
@@ -17,6 +17,6 @@ interface AudioExportGateway {
         inputText: String,
         pcm: ShortArray,
         sampleRateHz: Int,
-        metadata: GeneratedAudioMetadata
+        metadata: GeneratedAudioMetadata,
     ): AudioExportResult
 }

@@ -11,7 +11,7 @@ object NativeBagBridge {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): ShortArray
 
     external fun nativeValidateEncodeRequest(
@@ -20,7 +20,7 @@ object NativeBagBridge {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): Int
 
     external fun nativeStartEncodeTextJob(
@@ -29,7 +29,7 @@ object NativeBagBridge {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): Long
 
     external fun nativePollEncodeTextJob(handle: Long): FloatArray
@@ -46,7 +46,7 @@ object NativeBagBridge {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): String
 
     external fun nativeValidateDecodeConfig(
@@ -54,7 +54,7 @@ object NativeBagBridge {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
+        flashVoicingFlavor: Int,
     ): Int
 
     external fun nativeGetCoreVersion(): String

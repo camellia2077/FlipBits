@@ -14,31 +14,33 @@ import androidx.compose.ui.res.stringResource
 internal fun FlashSignalVisualizationModeSwitcher(
     selectedMode: FlashSignalVisualizationMode,
     onModeSelected: (FlashSignalVisualizationMode) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SingleChoiceSegmentedButtonRow(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         FlashSignalVisualizationMode.entries.forEachIndexed { index, mode ->
             SegmentedButton(
                 selected = selectedMode == mode,
                 onClick = { onModeSelected(mode) },
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = FlashSignalVisualizationMode.entries.size
-                ),
-                colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = MaterialTheme.colorScheme.primary,
-                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
-                    activeBorderColor = MaterialTheme.colorScheme.primary,
-                    inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f)
-                ),
+                shape =
+                    SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = FlashSignalVisualizationMode.entries.size,
+                    ),
+                colors =
+                    SegmentedButtonDefaults.colors(
+                        activeContainerColor = MaterialTheme.colorScheme.primary,
+                        activeContentColor = MaterialTheme.colorScheme.onPrimary,
+                        activeBorderColor = MaterialTheme.colorScheme.primary,
+                        inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
+                    ),
                 modifier = Modifier.weight(1f),
                 label = {
                     Text(text = stringResource(mode.labelResId))
-                }
+                },
             )
         }
     }

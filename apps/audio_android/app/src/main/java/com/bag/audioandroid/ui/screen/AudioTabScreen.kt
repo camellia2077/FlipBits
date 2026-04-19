@@ -40,7 +40,7 @@ fun AudioTabScreen(
     onDecode: () -> Unit,
     onClear: () -> Unit,
     onClearResult: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val isEncodingBusy = isCodecBusy && encodeProgress != null
@@ -52,18 +52,18 @@ fun AudioTabScreen(
 
     Column(
         modifier = modifier.verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
             text = stringResource(R.string.audio_title),
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
         AudioModeSwitcher(
             transportMode = transportMode,
             onTransportModeSelected = onTransportModeSelected,
             enabled = !isCodecBusy,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         AudioInputActionsCard(
             transportMode = transportMode,
@@ -79,7 +79,7 @@ fun AudioTabScreen(
             onEncode = onEncode,
             onCancelEncode = onCancelEncode,
             flashVoicingExpanded = flashVoicingExpanded,
-            onToggleFlashVoicingExpanded = { flashVoicingExpanded = !flashVoicingExpanded }
+            onToggleFlashVoicingExpanded = { flashVoicingExpanded = !flashVoicingExpanded },
         )
         AudioResultCard(
             resultText = resultText,
@@ -89,7 +89,7 @@ fun AudioTabScreen(
             onToggleExpanded = { resultExpanded = !resultExpanded },
             onDecode = onDecode,
             onClearInput = onClear,
-            onClearResult = onClearResult
+            onClearResult = onClearResult,
         )
     }
 }

@@ -16,32 +16,34 @@ internal fun AudioModeSwitcher(
     transportMode: TransportModeOption,
     onTransportModeSelected: (TransportModeOption) -> Unit,
     enabled: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SingleChoiceSegmentedButtonRow(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         TransportModeOption.entries.forEachIndexed { index, option ->
             SegmentedButton(
                 selected = transportMode == option,
                 onClick = { onTransportModeSelected(option) },
                 enabled = enabled,
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = TransportModeOption.entries.size
-                ),
-                colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = MaterialTheme.colorScheme.primary,
-                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
-                    activeBorderColor = MaterialTheme.colorScheme.primary,
-                    inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f)
-                ),
+                shape =
+                    SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = TransportModeOption.entries.size,
+                    ),
+                colors =
+                    SegmentedButtonDefaults.colors(
+                        activeContainerColor = MaterialTheme.colorScheme.primary,
+                        activeContentColor = MaterialTheme.colorScheme.onPrimary,
+                        activeBorderColor = MaterialTheme.colorScheme.primary,
+                        inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
+                    ),
                 modifier = Modifier.weight(1f),
                 label = {
                     Text(stringResource(option.labelResId))
-                }
+                },
             )
         }
     }

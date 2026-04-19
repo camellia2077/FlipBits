@@ -15,31 +15,33 @@ import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 internal fun SavedAudioModeFilterBar(
     selectedFilter: SavedAudioModeFilter,
     onFilterSelected: (SavedAudioModeFilter) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SingleChoiceSegmentedButtonRow(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         SavedAudioModeFilter.entries.forEachIndexed { index, filter ->
             SegmentedButton(
                 selected = selectedFilter == filter,
                 onClick = { onFilterSelected(filter) },
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = SavedAudioModeFilter.entries.size
-                ),
-                colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = MaterialTheme.colorScheme.primary,
-                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
-                    activeBorderColor = MaterialTheme.colorScheme.primary,
-                    inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f)
-                ),
+                shape =
+                    SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = SavedAudioModeFilter.entries.size,
+                    ),
+                colors =
+                    SegmentedButtonDefaults.colors(
+                        activeContainerColor = MaterialTheme.colorScheme.primary,
+                        activeContentColor = MaterialTheme.colorScheme.onPrimary,
+                        activeBorderColor = MaterialTheme.colorScheme.primary,
+                        inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
+                    ),
                 modifier = Modifier.weight(1f),
                 label = {
                     Text(stringResource(filter.labelResId))
-                }
+                },
             )
         }
     }

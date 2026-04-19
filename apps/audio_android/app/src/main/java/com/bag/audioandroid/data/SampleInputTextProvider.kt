@@ -5,24 +5,24 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 
 data class SampleInput(
     val id: String,
-    val text: String
+    val text: String,
 )
 
 interface SampleInputTextProvider {
     fun defaultSample(
         mode: TransportModeOption,
-        language: AppLanguageOption
+        language: AppLanguageOption,
     ): SampleInput
 
     fun randomSample(
         mode: TransportModeOption,
         language: AppLanguageOption,
-        excludingSampleId: String? = null
+        excludingSampleId: String? = null,
     ): SampleInput
 
     fun sampleById(
         mode: TransportModeOption,
         language: AppLanguageOption,
-        sampleId: String
+        sampleId: String,
     ): SampleInput?
 }

@@ -9,17 +9,18 @@ sealed interface UiText {
 
     data class Resource(
         @param:StringRes val resId: Int,
-        val formatArgs: List<Any> = emptyList()
+        val formatArgs: List<Any> = emptyList(),
     ) : UiText
 }
 
 @Composable
-fun UiText.asString(): String = when (this) {
-    UiText.Empty -> ""
-    is UiText.Resource ->
-        if (formatArgs.isEmpty()) {
-            stringResource(resId)
-        } else {
-            stringResource(resId, *formatArgs.toTypedArray())
-        }
-}
+fun UiText.asString(): String =
+    when (this) {
+        UiText.Empty -> ""
+        is UiText.Resource ->
+            if (formatArgs.isEmpty()) {
+                stringResource(resId)
+            } else {
+                stringResource(resId, *formatArgs.toTypedArray())
+            }
+    }

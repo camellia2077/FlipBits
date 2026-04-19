@@ -20,7 +20,7 @@ internal fun RenameSavedAudioDialog(
     initialBaseName: String,
     onDismiss: () -> Unit,
     onValueChange: (String) -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -29,21 +29,21 @@ internal fun RenameSavedAudioDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = stringResource(R.string.library_rename_message, currentDisplayName),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 OutlinedTextField(
                     value = initialBaseName,
                     onValueChange = onValueChange,
                     singleLine = true,
                     label = { Text(stringResource(R.string.library_rename_field_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
-                enabled = initialBaseName.isNotBlank()
+                enabled = initialBaseName.isNotBlank(),
             ) {
                 Text(stringResource(R.string.library_action_rename))
             }
@@ -52,7 +52,7 @@ internal fun RenameSavedAudioDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.common_cancel))
             }
-        }
+        },
     )
 }
 
@@ -60,7 +60,7 @@ internal fun RenameSavedAudioDialog(
 internal fun DeleteSavedAudioDialog(
     displayName: String,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -68,7 +68,7 @@ internal fun DeleteSavedAudioDialog(
         text = {
             Text(
                 text = stringResource(R.string.library_delete_message, displayName),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         },
         confirmButton = {
@@ -80,7 +80,7 @@ internal fun DeleteSavedAudioDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.common_cancel))
             }
-        }
+        },
     )
 }
 
@@ -88,7 +88,7 @@ internal fun DeleteSavedAudioDialog(
 internal fun DeleteSelectedSavedAudioDialog(
     selectedCount: Int,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -96,7 +96,7 @@ internal fun DeleteSelectedSavedAudioDialog(
         text = {
             Text(
                 text = stringResource(R.string.library_delete_selected_message, selectedCount),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         },
         confirmButton = {
@@ -108,6 +108,6 @@ internal fun DeleteSelectedSavedAudioDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.common_cancel))
             }
-        }
+        },
     )
 }

@@ -45,7 +45,7 @@ fun LibraryTabScreen(
     onDeleteSavedAudio: (String) -> Unit,
     onRenameSavedAudio: (String, String) -> Unit,
     onShareSavedAudio: (SavedAudioItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var renameTarget by remember { mutableStateOf<SavedAudioItem?>(null) }
     var deleteTarget by remember { mutableStateOf<SavedAudioItem?>(null) }
@@ -53,12 +53,14 @@ fun LibraryTabScreen(
     var showBulkDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var selectedFilterName by rememberSaveable { mutableStateOf(SavedAudioModeFilter.All.name) }
     val selectedFilter = SavedAudioModeFilter.valueOf(selectedFilterName)
-    val filteredItems = remember(savedAudioItems, selectedFilter) {
-        savedAudioItems.filter(selectedFilter::matches)
-    }
-    val filteredItemIds = remember(filteredItems) {
-        filteredItems.map { it.itemId }
-    }
+    val filteredItems =
+        remember(savedAudioItems, selectedFilter) {
+            savedAudioItems.filter(selectedFilter::matches)
+        }
+    val filteredItemIds =
+        remember(filteredItems) {
+            filteredItems.map { it.itemId }
+        }
     val filteredSelectedCount = librarySelection.selectedItemIds.intersect(filteredItemIds.toSet()).size
 
     renameTarget?.let { item ->
@@ -74,7 +76,7 @@ fun LibraryTabScreen(
                 onRenameSavedAudio(item.itemId, renameValue)
                 renameTarget = null
                 renameValue = ""
-            }
+            },
         )
     }
 
@@ -85,7 +87,7 @@ fun LibraryTabScreen(
             onConfirm = {
                 onDeleteSavedAudio(item.itemId)
                 deleteTarget = null
-            }
+            },
         )
     }
 
@@ -96,13 +98,13 @@ fun LibraryTabScreen(
             onConfirm = {
                 onDeleteSelectedSavedAudio()
                 showBulkDeleteDialog = false
-            }
+            },
         )
     }
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (librarySelection.isSelectionMode) {
             LibrarySelectionActionsRow(
@@ -110,22 +112,22 @@ fun LibraryTabScreen(
                 canSelectAll = filteredSelectedCount < filteredItems.size,
                 onSelectAll = { onSelectAllLibraryItems(filteredItemIds) },
                 onDeleteSelected = { showBulkDeleteDialog = true },
-                onClearSelection = onClearLibrarySelection
+                onClearSelection = onClearLibrarySelection,
             )
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = stringResource(R.string.library_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 IconButton(onClick = onImportAudio) {
                     Icon(
                         imageVector = Icons.Rounded.FileOpen,
-                        contentDescription = stringResource(R.string.library_action_import)
+                        contentDescription = stringResource(R.string.library_action_import),
                     )
                 }
             }
@@ -137,7 +139,7 @@ fun LibraryTabScreen(
                 if (librarySelection.isSelectionMode) {
                     onClearLibrarySelection()
                 }
-            }
+            },
         )
 
         val resolvedStatus = statusText.asString()
@@ -145,25 +147,25 @@ fun LibraryTabScreen(
             Text(
                 text = resolvedStatus,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         if (savedAudioItems.isEmpty()) {
             Text(
                 text = stringResource(R.string.library_empty),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else if (filteredItems.isEmpty()) {
             Text(
                 text = stringResource(R.string.saved_audio_filter_empty),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(filteredItems, key = { it.itemId }) { item ->
                     LibrarySavedAudioRow(
@@ -183,7 +185,7 @@ fun LibraryTabScreen(
                             renameTarget = item
                             renameValue = item.displayName.removeSuffix(".wav")
                         },
-                        onDelete = { deleteTarget = item }
+                        onDelete = { deleteTarget = item },
                     )
                 }
             }

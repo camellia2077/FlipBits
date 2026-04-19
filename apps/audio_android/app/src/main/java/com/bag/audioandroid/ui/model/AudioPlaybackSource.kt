@@ -2,10 +2,10 @@ package com.bag.audioandroid.ui.model
 
 sealed interface AudioPlaybackSource {
     data class Generated(
-        val mode: TransportModeOption
+        val mode: TransportModeOption,
     ) : AudioPlaybackSource
 
     data class Saved(
-        val itemId: String
+        val itemId: String,
     ) : AudioPlaybackSource
 }

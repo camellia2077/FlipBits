@@ -17,30 +17,33 @@ fun ActionButton(
     text: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = if (enabled) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant
-        },
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled) { onClick() }
+        color =
+            if (enabled) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(enabled = enabled) { onClick() },
     ) {
         Row(
             modifier = Modifier.padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = text,
-                color = if (enabled) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                color =
+                    if (enabled) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
             )
         }
     }

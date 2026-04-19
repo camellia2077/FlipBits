@@ -8,7 +8,7 @@ internal fun runStaticPlaybackLoop(
     pcm: ShortArray,
     playbackStartOffsetSamples: Int = 0,
     reportedTotalSamples: Int = pcm.size,
-    onProgressChanged: (Int, Int) -> Unit = { _, _ -> }
+    onProgressChanged: (Int, Int) -> Unit = { _, _ -> },
 ): PlaybackResult {
     val bufferedSamples = pcm.size
     track.write(pcm, 0, pcm.size)
@@ -30,8 +30,9 @@ internal fun runStaticPlaybackLoop(
             Thread.sleep(PlaybackProgressUpdateIntervalMs)
             continue
         }
-        val reportedProgress = (playbackStartOffsetSamples + track.playbackHeadPosition)
-            .coerceIn(0, reportedTotalSamples)
+        val reportedProgress =
+            (playbackStartOffsetSamples + track.playbackHeadPosition)
+                .coerceIn(0, reportedTotalSamples)
         onProgressChanged(reportedProgress, reportedTotalSamples)
         Thread.sleep(PlaybackProgressUpdateIntervalMs)
     }

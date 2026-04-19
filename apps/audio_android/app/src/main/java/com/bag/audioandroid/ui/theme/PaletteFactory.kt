@@ -17,7 +17,7 @@ internal fun vividPalette(
     tertiary: Color,
     background: Color,
     dark: DarkPaletteSeed,
-    onPrimaryContainer: Color = Color(0xFF201A1B)
+    onPrimaryContainer: Color = Color(0xFF201A1B),
 ): PaletteOption {
     val lightSecondaryContainer = lerp(primaryContainer, secondary, 0.14f)
     val lightTertiaryContainer = lerp(primaryContainer, tertiary, 0.14f)
@@ -32,43 +32,45 @@ internal fun vividPalette(
         family = family,
         titleResId = titleResId,
         previewColor = primary,
-        lightScheme = lightColorScheme(
-            primary = primary,
-            onPrimary = Color.White,
-            primaryContainer = primaryContainer,
-            onPrimaryContainer = onPrimaryContainer,
-            secondary = secondary,
-            onSecondary = Color.White,
-            secondaryContainer = lightSecondaryContainer,
-            onSecondaryContainer = onPrimaryContainer,
-            tertiary = tertiary,
-            onTertiary = Color.White,
-            tertiaryContainer = lightTertiaryContainer,
-            onTertiaryContainer = onPrimaryContainer,
-            background = background,
-            surface = background
-        ),
-        darkScheme = darkColorScheme(
-            primary = dark.primary,
-            onPrimary = Color(0xFF101418),
-            primaryContainer = darkPrimaryContainer,
-            onPrimaryContainer = lerp(primaryContainer, Color.White, 0.06f),
-            secondary = dark.secondary,
-            onSecondary = Color(0xFF101418),
-            secondaryContainer = darkSecondaryContainer,
-            onSecondaryContainer = Color(0xFFF2EAF0),
-            tertiary = dark.tertiary,
-            onTertiary = Color(0xFF101418),
-            tertiaryContainer = darkTertiaryContainer,
-            onTertiaryContainer = Color(0xFFF5EBEF),
-            background = dark.background,
-            onBackground = Color(0xFFEAE2E7),
-            surface = dark.surface,
-            onSurface = Color(0xFFEAE2E7),
-            surfaceVariant = darkSurfaceVariant,
-            onSurfaceVariant = Color(0xFFD3C5CC),
-            outline = darkOutline
-        )
+        lightScheme =
+            lightColorScheme(
+                primary = primary,
+                onPrimary = Color.White,
+                primaryContainer = primaryContainer,
+                onPrimaryContainer = onPrimaryContainer,
+                secondary = secondary,
+                onSecondary = Color.White,
+                secondaryContainer = lightSecondaryContainer,
+                onSecondaryContainer = onPrimaryContainer,
+                tertiary = tertiary,
+                onTertiary = Color.White,
+                tertiaryContainer = lightTertiaryContainer,
+                onTertiaryContainer = onPrimaryContainer,
+                background = background,
+                surface = background,
+            ),
+        darkScheme =
+            darkColorScheme(
+                primary = dark.primary,
+                onPrimary = Color(0xFF101418),
+                primaryContainer = darkPrimaryContainer,
+                onPrimaryContainer = lerp(primaryContainer, Color.White, 0.06f),
+                secondary = dark.secondary,
+                onSecondary = Color(0xFF101418),
+                secondaryContainer = darkSecondaryContainer,
+                onSecondaryContainer = Color(0xFFF2EAF0),
+                tertiary = dark.tertiary,
+                onTertiary = Color(0xFF101418),
+                tertiaryContainer = darkTertiaryContainer,
+                onTertiaryContainer = Color(0xFFF5EBEF),
+                background = dark.background,
+                onBackground = Color(0xFFEAE2E7),
+                surface = dark.surface,
+                onSurface = Color(0xFFEAE2E7),
+                surfaceVariant = darkSurfaceVariant,
+                onSurfaceVariant = Color(0xFFD3C5CC),
+                outline = darkOutline,
+            ),
     )
 }
 
@@ -77,7 +79,7 @@ internal data class DarkPaletteSeed(
     val surface: Color,
     val primary: Color,
     val secondary: Color,
-    val tertiary: Color
+    val tertiary: Color,
 )
 
 internal fun darkSeed(
@@ -85,12 +87,12 @@ internal fun darkSeed(
     surface: Color,
     primary: Color,
     secondary: Color,
-    tertiary: Color
+    tertiary: Color,
 ): DarkPaletteSeed =
     DarkPaletteSeed(
         background = background,
         surface = surface,
         primary = primary,
         secondary = secondary,
-        tertiary = tertiary
+        tertiary = tertiary,
     )

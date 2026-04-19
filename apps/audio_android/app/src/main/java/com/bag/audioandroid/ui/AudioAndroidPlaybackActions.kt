@@ -16,33 +16,36 @@ internal class AudioAndroidPlaybackActions(
     playbackSourceCoordinator: PlaybackSourceCoordinator,
     playbackSessionReducer: PlaybackSessionReducer,
     sampleRateHz: Int,
-    onPlaybackCompleted: (AudioPlaybackSource) -> Boolean
+    onPlaybackCompleted: (AudioPlaybackSource) -> Boolean,
 ) {
-    private val playbackUiStateSync = AudioPlaybackUiStateSync(
-        uiState = uiState,
-        sessionStateStore = sessionStateStore,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        playbackSourceCoordinator = playbackSourceCoordinator,
-        playbackSessionReducer = playbackSessionReducer,
-        sampleRateHz = sampleRateHz
-    )
-    private val commandActions = AudioPlaybackCommandActions(
-        uiState = uiState,
-        scope = scope,
-        playbackCoordinator = playbackCoordinator,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        playbackSourceCoordinator = playbackSourceCoordinator,
-        playbackUiStateSync = playbackUiStateSync,
-        onPlaybackCompleted = onPlaybackCompleted
-    )
-    private val scrubActions = AudioPlaybackScrubActions(
-        uiState = uiState,
-        playbackCoordinator = playbackCoordinator,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        playbackSourceCoordinator = playbackSourceCoordinator,
-        playbackUiStateSync = playbackUiStateSync,
-        startPlaybackFromTarget = commandActions::startPlaybackFromTarget
-    )
+    private val playbackUiStateSync =
+        AudioPlaybackUiStateSync(
+            uiState = uiState,
+            sessionStateStore = sessionStateStore,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            playbackSourceCoordinator = playbackSourceCoordinator,
+            playbackSessionReducer = playbackSessionReducer,
+            sampleRateHz = sampleRateHz,
+        )
+    private val commandActions =
+        AudioPlaybackCommandActions(
+            uiState = uiState,
+            scope = scope,
+            playbackCoordinator = playbackCoordinator,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            playbackSourceCoordinator = playbackSourceCoordinator,
+            playbackUiStateSync = playbackUiStateSync,
+            onPlaybackCompleted = onPlaybackCompleted,
+        )
+    private val scrubActions =
+        AudioPlaybackScrubActions(
+            uiState = uiState,
+            playbackCoordinator = playbackCoordinator,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            playbackSourceCoordinator = playbackSourceCoordinator,
+            playbackUiStateSync = playbackUiStateSync,
+            startPlaybackFromTarget = commandActions::startPlaybackFromTarget,
+        )
 
     fun onTogglePlayback() {
         commandActions.onTogglePlayback()
@@ -72,6 +75,5 @@ internal class AudioAndroidPlaybackActions(
         commandActions.release()
     }
 
-    fun playCurrentFromStart(): Boolean =
-        commandActions.playCurrentFromStart()
+    fun playCurrentFromStart(): Boolean = commandActions.playCurrentFromStart()
 }

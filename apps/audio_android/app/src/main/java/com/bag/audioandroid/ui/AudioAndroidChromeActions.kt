@@ -23,11 +23,11 @@ internal class AudioAndroidChromeActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
     private val sampleInputSessionUpdater: SampleInputSessionUpdater,
     private val appSettingsRepository: AppSettingsRepository,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) {
     fun onTabSelected(
         tab: AppTab,
-        refreshSavedAudioItems: () -> Unit
+        refreshSavedAudioItems: () -> Unit,
     ) {
         if (tab == AppTab.Library) {
             refreshSavedAudioItems()
@@ -35,11 +35,12 @@ internal class AudioAndroidChromeActions(
         uiState.update { state ->
             state.copy(
                 selectedTab = tab,
-                librarySelection = if (tab == AppTab.Library) {
-                    state.librarySelection
-                } else {
-                    LibrarySelectionUiState()
-                }
+                librarySelection =
+                    if (tab == AppTab.Library) {
+                        state.librarySelection
+                    } else {
+                        LibrarySelectionUiState()
+                    },
             )
         }
     }
@@ -52,11 +53,12 @@ internal class AudioAndroidChromeActions(
         uiState.update { state ->
             state.copy(
                 selectedLanguage = language,
-                sessions = sampleInputSessionUpdater.refreshForLanguageChange(
-                    state.sessions,
-                    previousLanguage,
-                    language
-                )
+                sessions =
+                    sampleInputSessionUpdater.refreshForLanguageChange(
+                        state.sessions,
+                        previousLanguage,
+                        language,
+                    ),
             )
         }
         AppCompatDelegate.setApplicationLocales(language.toLocaleList())

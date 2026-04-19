@@ -35,7 +35,7 @@ internal class AudioSessionEncodeActions(
     private val sampleRateHz: Int,
     private val frameSamples: Int,
     private val stopPlayback: () -> Unit,
-    private val workerDispatcher: CoroutineDispatcher
+    private val workerDispatcher: CoroutineDispatcher,
 ) {
     private var encodeJob: Job? = null
 
@@ -46,14 +46,15 @@ internal class AudioSessionEncodeActions(
             return
         }
 
-        val request = EncodeRequest(
-            mode = current.transportMode,
-            inputText = session.inputText,
-            selectedFlashVoicingStyle = current.selectedFlashVoicingStyle,
-            flashPreset = resolveFlashPreset(current),
-            appVersion = current.presentationVersion.ifBlank { "unknown" },
-            coreVersion = current.coreVersion.ifBlank { "unknown" }
-        )
+        val request =
+            EncodeRequest(
+                mode = current.transportMode,
+                inputText = session.inputText,
+                selectedFlashVoicingStyle = current.selectedFlashVoicingStyle,
+                flashPreset = resolveFlashPreset(current),
+                appVersion = current.presentationVersion.ifBlank { "unknown" },
+                coreVersion = current.coreVersion.ifBlank { "unknown" },
+            )
 
         stopPlayback()
         sessionStateStore.updateSession(request.mode) {
@@ -62,33 +63,36 @@ internal class AudioSessionEncodeActions(
                 encodeProgress = 0f,
                 encodePhase = AudioEncodePhase.PreparingInput,
                 isEncodeCancelling = false,
-                statusText = uiTextMapper.encodePhaseStatus(
-                    request.mode.wireName,
-                    AudioEncodePhase.PreparingInput
-                )
+                statusText =
+                    uiTextMapper.encodePhaseStatus(
+                        request.mode.wireName,
+                        AudioEncodePhase.PreparingInput,
+                    ),
             )
         }
 
-        val launchedJob = scope.launch {
-            val runningJob = currentCoroutineContext()[Job]
-            try {
-                val result = withContext(workerDispatcher) {
-                    performEncode(request)
-                }
-                applyEncodeResult(request, result)
-            } catch (cancelled: CancellationException) {
-                val sessionAfterCancel = uiState.value.sessions.getValue(request.mode)
-                if (sessionAfterCancel.isEncodeCancelling) {
-                    applyEncodeCancelled(request.mode)
-                } else {
-                    throw cancelled
-                }
-            } finally {
-                if (encodeJob === runningJob) {
-                    encodeJob = null
+        val launchedJob =
+            scope.launch {
+                val runningJob = currentCoroutineContext()[Job]
+                try {
+                    val result =
+                        withContext(workerDispatcher) {
+                            performEncode(request)
+                        }
+                    applyEncodeResult(request, result)
+                } catch (cancelled: CancellationException) {
+                    val sessionAfterCancel = uiState.value.sessions.getValue(request.mode)
+                    if (sessionAfterCancel.isEncodeCancelling) {
+                        applyEncodeCancelled(request.mode)
+                    } else {
+                        throw cancelled
+                    }
+                } finally {
+                    if (encodeJob === runningJob) {
+                        encodeJob = null
+                    }
                 }
             }
-        }
         encodeJob = launchedJob
     }
 
@@ -103,10 +107,11 @@ internal class AudioSessionEncodeActions(
             it.copy(
                 isEncodeCancelling = true,
                 encodePhase = it.encodePhase,
-                statusText = UiText.Resource(
-                    R.string.status_mode_audio_canceling,
-                    listOf(mode.wireName)
-                )
+                statusText =
+                    UiText.Resource(
+                        R.string.status_mode_audio_canceling,
+                        listOf(mode.wireName),
+                    ),
             )
         }
         encodeJob?.cancel()
@@ -120,30 +125,32 @@ internal class AudioSessionEncodeActions(
         }
 
     private suspend fun performEncode(request: EncodeRequest): EncodeResult {
-        val validationIssue = audioCodecGateway.validateEncodeRequest(
-            request.inputText,
-            sampleRateHz,
-            frameSamples,
-            request.mode.nativeValue,
-            request.flashPreset.signalProfileValue,
-            request.flashPreset.voicingFlavorValue
-        )
-        if (validationIssue != BagApiCodes.VALIDATION_OK) {
-            return EncodeResult.ValidationFailure(validationIssue)
-        }
-
-        return when (
-            val gatewayResult = audioCodecGateway.encodeTextToPcm(
+        val validationIssue =
+            audioCodecGateway.validateEncodeRequest(
                 request.inputText,
                 sampleRateHz,
                 frameSamples,
                 request.mode.nativeValue,
                 request.flashPreset.signalProfileValue,
                 request.flashPreset.voicingFlavorValue,
-                onProgress = { update ->
-                    applyEncodeProgress(request.mode, update)
-                }
             )
+        if (validationIssue != BagApiCodes.VALIDATION_OK) {
+            return EncodeResult.ValidationFailure(validationIssue)
+        }
+
+        return when (
+            val gatewayResult =
+                audioCodecGateway.encodeTextToPcm(
+                    request.inputText,
+                    sampleRateHz,
+                    frameSamples,
+                    request.mode.nativeValue,
+                    request.flashPreset.signalProfileValue,
+                    request.flashPreset.voicingFlavorValue,
+                    onProgress = { update ->
+                        applyEncodeProgress(request.mode, update)
+                    },
+                )
         ) {
             is EncodeAudioResult.Success -> EncodeResult.Success(gatewayResult.pcm)
             EncodeAudioResult.Cancelled -> EncodeResult.Cancelled
@@ -151,7 +158,10 @@ internal class AudioSessionEncodeActions(
         }
     }
 
-    private fun applyEncodeProgress(mode: TransportModeOption, update: EncodeProgressUpdate) {
+    private fun applyEncodeProgress(
+        mode: TransportModeOption,
+        update: EncodeProgressUpdate,
+    ) {
         val clampedProgress = update.progress0To1.coerceIn(0f, 1f)
         sessionStateStore.updateSession(mode) { session ->
             if (session.isEncodeCancelling) {
@@ -159,19 +169,22 @@ internal class AudioSessionEncodeActions(
             }
             if (session.encodePhase == update.phase) {
                 session.copy(
-                    encodeProgress = clampedProgress
+                    encodeProgress = clampedProgress,
                 )
             } else {
                 session.copy(
                     encodeProgress = clampedProgress,
                     encodePhase = update.phase,
-                    statusText = uiTextMapper.encodePhaseStatus(mode.wireName, update.phase)
+                    statusText = uiTextMapper.encodePhaseStatus(mode.wireName, update.phase),
                 )
             }
         }
     }
 
-    private fun applyEncodeResult(request: EncodeRequest, result: EncodeResult) {
+    private fun applyEncodeResult(
+        request: EncodeRequest,
+        result: EncodeResult,
+    ) {
         when (result) {
             is EncodeResult.ValidationFailure -> {
                 sessionStateStore.updateSession(request.mode) {
@@ -185,7 +198,7 @@ internal class AudioSessionEncodeActions(
                         encodeProgress = null,
                         encodePhase = null,
                         isEncodeCancelling = false,
-                        playback = playbackRuntimeGateway.cleared()
+                        playback = playbackRuntimeGateway.cleared(),
                     )
                 }
             }
@@ -203,47 +216,51 @@ internal class AudioSessionEncodeActions(
                         encodeProgress = null,
                         encodePhase = null,
                         isEncodeCancelling = false,
-                        playback = playbackRuntimeGateway.cleared()
+                        playback = playbackRuntimeGateway.cleared(),
                     )
                 }
             }
 
             is EncodeResult.Success -> {
                 val pcm = result.pcm
-                val status = UiText.Resource(
-                    R.string.status_mode_audio_generated,
-                    listOf(request.mode.wireName, pcm.size)
-                )
+                val status =
+                    UiText.Resource(
+                        R.string.status_mode_audio_generated,
+                        listOf(request.mode.wireName, pcm.size),
+                    )
 
                 sessionStateStore.updateSession(request.mode) {
                     it.copy(
                         generatedPcm = pcm,
-                        generatedAudioMetadata = GeneratedAudioMetadata(
-                            mode = request.mode,
-                            flashVoicingStyle = if (request.mode == TransportModeOption.Flash && pcm.isNotEmpty()) {
+                        generatedAudioMetadata =
+                            GeneratedAudioMetadata(
+                                mode = request.mode,
+                                flashVoicingStyle =
+                                    if (request.mode == TransportModeOption.Flash && pcm.isNotEmpty()) {
+                                        request.selectedFlashVoicingStyle
+                                    } else {
+                                        null
+                                    },
+                                createdAtIsoUtc = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString(),
+                                durationMs = (pcm.size.toLong() * 1000L) / sampleRateHz.toLong(),
+                                frameSamples = frameSamples,
+                                pcmSampleCount = pcm.size,
+                                appVersion = request.appVersion,
+                                coreVersion = request.coreVersion,
+                            ),
+                        generatedFlashVoicingStyle =
+                            if (request.mode == TransportModeOption.Flash && pcm.isNotEmpty()) {
                                 request.selectedFlashVoicingStyle
                             } else {
                                 null
                             },
-                            createdAtIsoUtc = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString(),
-                            durationMs = (pcm.size.toLong() * 1000L) / sampleRateHz.toLong(),
-                            frameSamples = frameSamples,
-                            pcmSampleCount = pcm.size,
-                            appVersion = request.appVersion,
-                            coreVersion = request.coreVersion
-                        ),
-                        generatedFlashVoicingStyle = if (request.mode == TransportModeOption.Flash && pcm.isNotEmpty()) {
-                            request.selectedFlashVoicingStyle
-                        } else {
-                            null
-                        },
                         resultText = "",
                         statusText = status,
                         isCodecBusy = false,
                         encodeProgress = null,
                         encodePhase = null,
                         isEncodeCancelling = false,
-                        playback = playbackRuntimeGateway.load(pcm.size, sampleRateHz)
+                        playback = playbackRuntimeGateway.load(pcm.size, sampleRateHz),
                     )
                 }
                 if (uiState.value.transportMode == request.mode) {
@@ -262,10 +279,11 @@ internal class AudioSessionEncodeActions(
                 encodeProgress = null,
                 encodePhase = null,
                 isEncodeCancelling = false,
-                statusText = UiText.Resource(
-                    R.string.status_mode_audio_cancelled,
-                    listOf(mode.wireName)
-                )
+                statusText =
+                    UiText.Resource(
+                        R.string.status_mode_audio_cancelled,
+                        listOf(mode.wireName),
+                    ),
             )
         }
     }
@@ -276,13 +294,22 @@ internal class AudioSessionEncodeActions(
         val selectedFlashVoicingStyle: FlashVoicingStyleOption,
         val flashPreset: FlashVoicingStyleOption,
         val appVersion: String,
-        val coreVersion: String
+        val coreVersion: String,
     )
 
     private sealed interface EncodeResult {
-        data class ValidationFailure(val validationIssue: Int) : EncodeResult
+        data class ValidationFailure(
+            val validationIssue: Int,
+        ) : EncodeResult
+
         data object Cancelled : EncodeResult
-        data class Failure(val errorCode: Int) : EncodeResult
-        data class Success(val pcm: ShortArray) : EncodeResult
+
+        data class Failure(
+            val errorCode: Int,
+        ) : EncodeResult
+
+        data class Success(
+            val pcm: ShortArray,
+        ) : EncodeResult
     }
 }

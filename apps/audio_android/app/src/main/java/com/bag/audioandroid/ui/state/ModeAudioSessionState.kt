@@ -18,5 +18,5 @@ data class ModeAudioSessionState(
     val encodeProgress: Float? = null,
     val encodePhase: AudioEncodePhase? = null,
     val isEncodeCancelling: Boolean = false,
-    val playback: PlaybackUiState = PlaybackUiState()
+    val playback: PlaybackUiState = PlaybackUiState(),
 )

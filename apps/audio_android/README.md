@@ -1,6 +1,6 @@
 # audio_android
 
-`apps/audio_android` 只作为 Android 模块源码与局部规则入口。
+`apps/audio_android` 是 Android 工程的 `Gradle` root，同时承载 Android 模块源码与局部规则入口。
 
 ## 索引
 
@@ -107,8 +107,8 @@
 
 ## 说明
 
-- Android 官方 `Gradle` 入口固定在仓库根目录，不在 `apps/audio_android/`。
-- Android Studio / IntelliJ 应直接打开仓库根目录，而不是单独打开 `apps/audio_android/`。
+- Android 官方 `Gradle` 入口固定在 `apps/audio_android/`。
+- Android Studio / IntelliJ 应直接打开 `apps/audio_android/`。
 - Android XML 多语言当前以 `app/src/main/res/values/strings.xml` 为英文基线，中文与日语分别位于：
   - `app/src/main/res/values-zh/strings.xml`
   - `app/src/main/res/values-ja/strings.xml`

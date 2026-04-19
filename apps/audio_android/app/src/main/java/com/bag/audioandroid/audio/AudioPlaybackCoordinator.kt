@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicLong
 
 class AudioPlaybackCoordinator(
-    private val audioPlayer: AudioPlayer = AudioPlayer()
+    private val audioPlayer: AudioPlayer = AudioPlayer(),
 ) {
     private val playbackRequestIds = AtomicLong(0L)
 
@@ -19,17 +19,13 @@ class AudioPlaybackCoordinator(
     @Volatile
     private var playbackPaused = false
 
-    fun hasActivePlaybackForOtherSource(sourceKey: String): Boolean =
-        activePlaybackKey != null && activePlaybackKey != sourceKey
+    fun hasActivePlaybackForOtherSource(sourceKey: String): Boolean = activePlaybackKey != null && activePlaybackKey != sourceKey
 
-    fun isPlaybackActiveForSource(sourceKey: String): Boolean =
-        activePlaybackRequestId != null && activePlaybackKey == sourceKey
+    fun isPlaybackActiveForSource(sourceKey: String): Boolean = activePlaybackRequestId != null && activePlaybackKey == sourceKey
 
-    fun hasActivePlaybackForSource(sourceKey: String): Boolean =
-        isPlaybackActiveForSource(sourceKey)
+    fun hasActivePlaybackForSource(sourceKey: String): Boolean = isPlaybackActiveForSource(sourceKey)
 
-    fun isPlaybackPausedForSource(sourceKey: String): Boolean =
-        isPlaybackActiveForSource(sourceKey) && playbackPaused
+    fun isPlaybackPausedForSource(sourceKey: String): Boolean = isPlaybackActiveForSource(sourceKey) && playbackPaused
 
     fun startPlayback(
         scope: CoroutineScope,
@@ -40,7 +36,7 @@ class AudioPlaybackCoordinator(
         onStarted: () -> Unit,
         onProgressChanged: (Int, Int) -> Unit,
         onFinished: (String, PlaybackResult) -> Unit,
-        onFailed: (String) -> Unit
+        onFailed: (String) -> Unit,
     ) {
         val playbackHandle = audioPlayer.prepareForNewPlayback()
         val requestId = beginPlayback(sourceKey)
@@ -48,16 +44,17 @@ class AudioPlaybackCoordinator(
         val pcmCopy = pcm.copyOf()
         scope.launch(Dispatchers.IO) {
             try {
-                val result = audioPlayer.playPcm(
-                    playback = playbackHandle,
-                    pcm = pcmCopy,
-                    sampleRateHz = sampleRateHz,
-                    startSampleIndex = startSampleIndex
-                ) { playedSamples, totalSamples ->
-                    if (isPlaybackActive(requestId, sourceKey)) {
-                        onProgressChanged(playedSamples, totalSamples)
+                val result =
+                    audioPlayer.playPcm(
+                        playback = playbackHandle,
+                        pcm = pcmCopy,
+                        sampleRateHz = sampleRateHz,
+                        startSampleIndex = startSampleIndex,
+                    ) { playedSamples, totalSamples ->
+                        if (isPlaybackActive(requestId, sourceKey)) {
+                            onProgressChanged(playedSamples, totalSamples)
+                        }
                     }
-                }
                 if (!isPlaybackActive(requestId, sourceKey)) {
                     return@launch
                 }
@@ -98,13 +95,15 @@ class AudioPlaybackCoordinator(
             false
         }
 
-    fun updateScrub(sourceKey: String, targetSamples: Int): Boolean =
-        isPlaybackActiveForSource(sourceKey) && targetSamples >= 0
+    fun updateScrub(
+        sourceKey: String,
+        targetSamples: Int,
+    ): Boolean = isPlaybackActiveForSource(sourceKey) && targetSamples >= 0
 
     fun commitScrub(
         sourceKey: String,
         targetSamples: Int,
-        resumeAfterCommit: Boolean
+        resumeAfterCommit: Boolean,
     ): Boolean {
         if (!isPlaybackActiveForSource(sourceKey)) {
             return false
@@ -119,7 +118,10 @@ class AudioPlaybackCoordinator(
         return appliedPosition >= 0
     }
 
-    fun cancelScrub(sourceKey: String, resumeAfterCancel: Boolean): Boolean {
+    fun cancelScrub(
+        sourceKey: String,
+        resumeAfterCancel: Boolean,
+    ): Boolean {
         if (!isPlaybackActiveForSource(sourceKey)) {
             return false
         }
@@ -160,6 +162,8 @@ class AudioPlaybackCoordinator(
         }
     }
 
-    private fun isPlaybackActive(requestId: Long, sourceKey: String): Boolean =
-        activePlaybackRequestId == requestId && activePlaybackKey == sourceKey
+    private fun isPlaybackActive(
+        requestId: Long,
+        sourceKey: String,
+    ): Boolean = activePlaybackRequestId == requestId && activePlaybackKey == sourceKey
 }

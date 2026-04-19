@@ -1,6 +1,5 @@
 package com.bag.audioandroid.ui.screen
 
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
@@ -30,7 +30,7 @@ fun AboutScreen(
     onOpenLicensesPage: () -> Unit,
     presentationVersion: String,
     coreVersion: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
     val unknownText = stringResource(R.string.common_unknown)
@@ -45,26 +45,27 @@ fun AboutScreen(
                     TextButton(onClick = onBack) {
                         Text(stringResource(R.string.common_back), color = MaterialTheme.colorScheme.primary)
                     }
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = 2.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(stringResource(R.string.about_author, AUTHOR_NAME))
                     Text(stringResource(R.string.about_presentation_version, displayPresentationVersion))
@@ -72,9 +73,10 @@ fun AboutScreen(
                     Text(
                         text = stringResource(R.string.about_github, GITHUB_URL),
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            uriHandler.openUri(GITHUB_URL)
-                        }
+                        modifier =
+                            Modifier.clickable {
+                                uriHandler.openUri(GITHUB_URL)
+                            },
                     )
                 }
             }
@@ -82,24 +84,25 @@ fun AboutScreen(
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = 2.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onOpenLicensesPage() }
-                        .padding(horizontal = 12.dp, vertical = 12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpenLicensesPage() }
+                            .padding(horizontal = 12.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(
                             stringResource(R.string.about_licenses_title),
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                         Text(
                             stringResource(R.string.about_licenses_subtitle),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
                     Text(">", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)

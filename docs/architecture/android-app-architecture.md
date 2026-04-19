@@ -81,7 +81,8 @@
   - `audio_io_jni.cpp`
   - `CMakeLists.txt`
   - `native_package/CMakeLists.txt`
-  - `native_package/src/audio_io_package.cpp`
+  - `app/src/main/cpp/audio_io_jni.cpp`
+  - `native_package/src/audio_io_backend_android.cpp`
   - `native_package/src/audio_core_flash_voicing.cpp`
 
 ### 平台音频层
@@ -117,8 +118,8 @@
   - Android 资源文件
 
 ## 构建边界
-- Android 官方 `Gradle` root 在仓库根目录，不在 `apps/audio_android/`。
-- Android Studio / IntelliJ 应直接打开仓库根目录。
+- Android 官方 `Gradle` root 在 `apps/audio_android/`。
+- Android Studio / IntelliJ 应直接打开 `apps/audio_android/`。
 - Android native 当前继续走：
   - `externalNativeBuild`
   - `CMake 4.1.2`
@@ -165,11 +166,11 @@
 
 ### 改 Android 构建 / 导出
 - 先看：
-  - 仓库根目录 `build.gradle.kts`
-  - 仓库根目录 `settings.gradle.kts`
+  - `apps/audio_android/build.gradle.kts`
+  - `apps/audio_android/settings.gradle.kts`
   - `apps/audio_android/app/build.gradle.kts`
-  - `tools/wavebits_tools/commands/android.py`
-  - `tools/wavebits_tools/commands/export_apk.py`
+  - `tools/repo_tooling/commands/android.py`
+  - `tools/repo_tooling/commands/export_apk.py`
 
 ## 是否需要先重构再写文档
 - 当前已经值得先写。

@@ -1,28 +1,48 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.kotlin.dsl.configure
 import java.util.Properties
 
 val wavebitsAndroidModulesSmokeEnabled =
-    providers.gradleProperty("wavebits.android.modulesSmoke")
+    providers
+        .gradleProperty("wavebits.android.modulesSmoke")
         .orNull
         ?.equals("true", ignoreCase = true)
         ?: false
 
-val releaseSigningProperties = Properties().apply {
-    val signingPropertiesFile = project.file("release-signing.properties")
-    if (signingPropertiesFile.exists()) {
-        signingPropertiesFile.inputStream().use(::load)
+val releaseSigningProperties =
+    Properties().apply {
+        val signingPropertiesFile = project.file("release-signing.properties")
+        if (signingPropertiesFile.exists()) {
+            signingPropertiesFile.inputStream().use(::load)
+        }
     }
-}
 
 fun signingProperty(name: String): String =
-    releaseSigningProperties.getProperty(name)
+    releaseSigningProperties
+        .getProperty(name)
         ?.takeIf { it.isNotBlank() }
         ?: error("Missing release signing property: $name")
 
+fun requiredGradleIntProperty(name: String): Int =
+    providers
+        .gradleProperty(name)
+        .orNull
+        ?.toIntOrNull()
+        ?: error("Missing or invalid Gradle integer property: $name")
+
+fun requiredGradleStringProperty(name: String): String =
+    providers
+        .gradleProperty(name)
+        .orNull
+        ?.takeIf { it.isNotBlank() }
+        ?: error("Missing or blank Gradle string property: $name")
+
 plugins {
     id("com.android.application")
+    id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("io.gitlab.arturbosch.detekt")
     id("com.mikepenz.aboutlibraries.plugin")
 }
 
@@ -35,18 +55,22 @@ android {
         applicationId = "com.bag.audioandroid"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.2.1"
+        // Android presentation version now has a single truth source in
+        // apps/audio_android/gradle.properties so release tooling, docs, and
+        // agent workflows do not need to edit this larger build script.
+        versionCode = requiredGradleIntProperty("wavebits.android.versionCode")
+        versionName = requiredGradleStringProperty("wavebits.android.versionName")
         ndk {
             abiFilters += listOf("arm64-v8a")
         }
         externalNativeBuild {
             cmake {
-                val cmakeArguments = mutableListOf(
-                    "-DWAVEBITS_ANDROID_MODULES_SMOKE=${
-                        if (wavebitsAndroidModulesSmokeEnabled) "ON" else "OFF"
-                    }"
-                )
+                val cmakeArguments =
+                    mutableListOf(
+                        "-DWAVEBITS_ANDROID_MODULES_SMOKE=${
+                            if (wavebitsAndroidModulesSmokeEnabled) "ON" else "OFF"
+                        }",
+                    )
                 arguments += cmakeArguments
             }
         }
@@ -80,7 +104,7 @@ android {
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -122,6 +146,34 @@ extensions.configure<AboutLibrariesExtension>("aboutLibraries") {
     export {
         outputFile.set(layout.buildDirectory.file("generated/aboutlibraries/res/raw/aboutlibraries.json"))
     }
+}
+
+ktlint {
+    additionalEditorconfig.put("ktlint_standard_function-naming", "disabled")
+    additionalEditorconfig.put("ktlint_standard_property-naming", "disabled")
+    filter {
+        exclude("**/build/**")
+    }
+}
+
+extensions.configure<DetektExtension>("detekt") {
+    buildUponDefaultConfig = true
+    parallel = true
+    allRules = false
+    basePath = projectDir.absolutePath
+    config.setFrom(files("detekt.yml"))
+    source.setFrom(
+        files(
+            "src/main/java",
+            "src/test/java",
+        ),
+    )
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
+    exclude("**/build/**")
+    exclude("**/generated/**")
 }
 
 tasks.named("preBuild").configure {

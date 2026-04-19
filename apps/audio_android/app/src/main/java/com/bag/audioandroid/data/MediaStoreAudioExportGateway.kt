@@ -15,7 +15,7 @@ import java.util.Locale
 
 class MediaStoreAudioExportGateway(
     context: Context,
-    private val audioIoGateway: AudioIoGateway
+    private val audioIoGateway: AudioIoGateway,
 ) : AudioExportGateway {
     private val contentResolver = context.contentResolver
 
@@ -24,7 +24,7 @@ class MediaStoreAudioExportGateway(
         inputText: String,
         pcm: ShortArray,
         sampleRateHz: Int,
-        metadata: GeneratedAudioMetadata
+        metadata: GeneratedAudioMetadata,
     ): AudioExportResult {
         val wavBytes = audioIoGateway.encodeMonoPcm16ToWavBytes(sampleRateHz, pcm, metadata)
         if (wavBytes.isEmpty()) {
@@ -34,13 +34,14 @@ class MediaStoreAudioExportGateway(
         val baseName = buildBaseName(mode, inputText)
         val displayName = resolveUniqueDisplayName(baseName) ?: return AudioExportResult.Failed
         val collection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Audio.Media.DISPLAY_NAME, displayName)
-            put(MediaStore.Audio.Media.MIME_TYPE, MIME_TYPE_WAV)
-            put(MediaStore.Audio.Media.RELATIVE_PATH, RELATIVE_DIRECTORY)
-            put(MediaStore.Audio.Media.IS_MUSIC, 1)
-            put(MediaStore.Audio.Media.IS_PENDING, 1)
-        }
+        val contentValues =
+            ContentValues().apply {
+                put(MediaStore.Audio.Media.DISPLAY_NAME, displayName)
+                put(MediaStore.Audio.Media.MIME_TYPE, MIME_TYPE_WAV)
+                put(MediaStore.Audio.Media.RELATIVE_PATH, RELATIVE_DIRECTORY)
+                put(MediaStore.Audio.Media.IS_MUSIC, 1)
+                put(MediaStore.Audio.Media.IS_PENDING, 1)
+            }
 
         val uri = contentResolver.insert(collection, contentValues) ?: return AudioExportResult.Failed
         return try {
@@ -52,7 +53,7 @@ class MediaStoreAudioExportGateway(
                 uri,
                 ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) },
                 null,
-                null
+                null,
             )
             AudioExportResult.Success(displayName = displayName, uriString = uri.toString())
         } catch (_: IOException) {
@@ -64,14 +65,18 @@ class MediaStoreAudioExportGateway(
         }
     }
 
-    private fun buildBaseName(mode: TransportModeOption, inputText: String): String {
+    private fun buildBaseName(
+        mode: TransportModeOption,
+        inputText: String,
+    ): String {
         val timestamp = LocalDateTime.now().format(FILE_NAME_TIME_FORMATTER)
         val previewStem = buildPreviewStem(inputText)
-        val stem = if (previewStem.isEmpty()) {
-            "wavebits_${mode.wireName}_${timestamp}"
-        } else {
-            "${previewStem}_${mode.wireName}_${timestamp}"
-        }
+        val stem =
+            if (previewStem.isEmpty()) {
+                "wavebits_${mode.wireName}_$timestamp"
+            } else {
+                "${previewStem}_${mode.wireName}_$timestamp"
+            }
         return "$stem.wav"
     }
 
@@ -102,11 +107,12 @@ class MediaStoreAudioExportGateway(
         return preview.toString().trim().trim('.')
     }
 
-    private fun sanitizeFileNameCodePoint(codePoint: Int): Int? = when {
-        Character.isISOControl(codePoint) -> null
-        codePoint <= Char.MAX_VALUE.code && ILLEGAL_FILE_NAME_CHARACTERS.contains(codePoint.toChar()) -> '_'.code
-        else -> codePoint
-    }
+    private fun sanitizeFileNameCodePoint(codePoint: Int): Int? =
+        when {
+            Character.isISOControl(codePoint) -> null
+            codePoint <= Char.MAX_VALUE.code && ILLEGAL_FILE_NAME_CHARACTERS.contains(codePoint.toChar()) -> '_'.code
+            else -> codePoint
+        }
 
     private fun resolveUniqueDisplayName(baseName: String): String? {
         if (!displayNameExists(baseName)) {

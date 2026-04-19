@@ -21,11 +21,12 @@ fun AudioAndroidApp() {
     val factory = rememberAudioAndroidViewModelFactory(appContext)
     val viewModel: AudioAndroidViewModel = viewModel(factory = factory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val importAudioLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let { viewModel.onImportAudio(it.toString()) }
-    }
+    val importAudioLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            uri?.let { viewModel.onImportAudio(it.toString()) }
+        }
     var savedAudioFilter by rememberSaveable {
         mutableStateOf(defaultSavedAudioFilter(uiState))
     }
@@ -47,14 +48,15 @@ fun AudioAndroidApp() {
         savedAudioFilter = savedAudioFilter,
         onSavedAudioFilterChange = { savedAudioFilter = it },
         onImportAudio = { importAudioLauncher.launch(arrayOf("audio/*")) },
-        viewModel = viewModel
+        viewModel = viewModel,
     )
 }
 
 private fun defaultSavedAudioFilter(uiState: AudioAppUiState): SavedAudioModeFilter =
     when (val source = uiState.currentPlaybackSource) {
         is AudioPlaybackSource.Generated -> SavedAudioModeFilter.fromTransportMode(source.mode)
-        is AudioPlaybackSource.Saved -> SavedAudioModeFilter.entries.firstOrNull {
-            it.mode?.wireName == uiState.currentSavedAudioItem?.modeWireName
-        } ?: SavedAudioModeFilter.All
+        is AudioPlaybackSource.Saved ->
+            SavedAudioModeFilter.entries.firstOrNull {
+                it.mode?.wireName == uiState.currentSavedAudioItem?.modeWireName
+            } ?: SavedAudioModeFilter.All
     }

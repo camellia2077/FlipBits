@@ -12,7 +12,7 @@ internal class AudioSessionEditingActions(
     private val sessionStateStore: AudioSessionStateStore,
     private val sampleInputTextProvider: SampleInputTextProvider,
     private val stopPlayback: () -> Unit,
-    private val refreshSavedAudioItems: () -> Unit
+    private val refreshSavedAudioItems: () -> Unit,
 ) {
     fun onInputTextChange(value: String) {
         sessionStateStore.updateCurrentSession { it.copy(inputText = value, sampleInputId = null) }
@@ -23,15 +23,16 @@ internal class AudioSessionEditingActions(
         if (currentState.currentSession.isCodecBusy) {
             return
         }
-        val sample = sampleInputTextProvider.randomSample(
-            mode = currentState.transportMode,
-            language = currentState.selectedLanguage,
-            excludingSampleId = currentState.currentSession.sampleInputId
-        )
+        val sample =
+            sampleInputTextProvider.randomSample(
+                mode = currentState.transportMode,
+                language = currentState.selectedLanguage,
+                excludingSampleId = currentState.currentSession.sampleInputId,
+            )
         sessionStateStore.updateCurrentSession {
             it.copy(
                 inputText = sample.text,
-                sampleInputId = sample.id
+                sampleInputId = sample.id,
             )
         }
     }
@@ -49,7 +50,7 @@ internal class AudioSessionEditingActions(
                 transportMode = mode,
                 currentPlaybackSource = AudioPlaybackSource.Generated(mode),
                 showSavedAudioSheet = false,
-                showPlayerDetailSheet = false
+                showPlayerDetailSheet = false,
             )
         }
     }

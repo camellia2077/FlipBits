@@ -17,43 +17,49 @@ import com.bag.audioandroid.data.NativePlaybackRuntimeGateway
 internal fun rememberAudioAndroidViewModelFactory(appContext: Context): AudioAndroidViewModelFactory {
     val audioCodecGateway = remember { NativeAudioCodecGateway() }
     val audioIoGateway = remember { NativeAudioIoGateway() }
-    val sampleInputTextProvider = remember(appContext) {
-        AndroidSampleInputTextProvider(appContext)
-    }
+    val sampleInputTextProvider =
+        remember(appContext) {
+            AndroidSampleInputTextProvider(appContext)
+        }
     val playbackRuntimeGateway = remember { NativePlaybackRuntimeGateway() }
-    val audioExportGateway = remember(appContext, audioIoGateway) {
-        MediaStoreAudioExportGateway(appContext, audioIoGateway)
-    }
-    val savedAudioLibraryGateway = remember(appContext, audioIoGateway) {
-        MediaStoreSavedAudioLibraryGateway(appContext, audioIoGateway)
-    }
-    val audioShareGateway = remember(appContext) {
-        AndroidIntentAudioShareGateway(appContext)
-    }
-    val savedAudioRepository = remember(audioExportGateway, savedAudioLibraryGateway, audioShareGateway) {
-        DefaultSavedAudioRepository(
-            audioExportGateway = audioExportGateway,
-            savedAudioLibraryGateway = savedAudioLibraryGateway,
-            audioShareGateway = audioShareGateway
-        )
-    }
-    val appSettingsRepository = remember(appContext) {
-        AppSettingsRepository(appContext)
-    }
+    val audioExportGateway =
+        remember(appContext, audioIoGateway) {
+            MediaStoreAudioExportGateway(appContext, audioIoGateway)
+        }
+    val savedAudioLibraryGateway =
+        remember(appContext, audioIoGateway) {
+            MediaStoreSavedAudioLibraryGateway(appContext, audioIoGateway)
+        }
+    val audioShareGateway =
+        remember(appContext) {
+            AndroidIntentAudioShareGateway(appContext)
+        }
+    val savedAudioRepository =
+        remember(audioExportGateway, savedAudioLibraryGateway, audioShareGateway) {
+            DefaultSavedAudioRepository(
+                audioExportGateway = audioExportGateway,
+                savedAudioLibraryGateway = savedAudioLibraryGateway,
+                audioShareGateway = audioShareGateway,
+            )
+        }
+    val appSettingsRepository =
+        remember(appContext) {
+            AppSettingsRepository(appContext)
+        }
 
     return remember(
         audioCodecGateway,
         sampleInputTextProvider,
         appSettingsRepository,
         playbackRuntimeGateway,
-        savedAudioRepository
+        savedAudioRepository,
     ) {
         AudioAndroidViewModelFactory(
             audioCodecGateway = audioCodecGateway,
             sampleInputTextProvider = sampleInputTextProvider,
             appSettingsRepository = appSettingsRepository,
             playbackRuntimeGateway = playbackRuntimeGateway,
-            savedAudioRepository = savedAudioRepository
+            savedAudioRepository = savedAudioRepository,
         )
     }
 }

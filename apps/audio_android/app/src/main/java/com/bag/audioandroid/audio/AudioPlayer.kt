@@ -4,7 +4,7 @@ import android.media.AudioTrack
 
 enum class PlaybackResult {
     Completed,
-    Stopped
+    Stopped,
 }
 
 class AudioPlayer {
@@ -31,15 +31,14 @@ class AudioPlayer {
         var bufferedSamples = 0
     }
 
-    fun prepareForNewPlayback(): PlaybackHandle =
-        PlaybackHandle().also { currentPlayback = it }
+    fun prepareForNewPlayback(): PlaybackHandle = PlaybackHandle().also { currentPlayback = it }
 
     fun playPcm(
         playback: PlaybackHandle,
         pcm: ShortArray,
         sampleRateHz: Int,
         startSampleIndex: Int = 0,
-        onProgressChanged: (Int, Int) -> Unit = { _, _ -> }
+        onProgressChanged: (Int, Int) -> Unit = { _, _ -> },
     ): PlaybackResult {
         val totalSamples = pcm.size
         val startOffsetSamples = startSampleIndex.coerceIn(0, totalSamples)
@@ -57,15 +56,17 @@ class AudioPlayer {
             playback.pauseRequested = false
             return PlaybackResult.Completed
         }
-        val playbackPcm = if (startOffsetSamples > 0) {
-            pcm.copyOfRange(startOffsetSamples, totalSamples)
-        } else {
-            pcm
-        }
-        val track = createStaticAudioTrack(
-            sampleRateHz = sampleRateHz,
-            sampleCount = playbackPcm.size
-        )
+        val playbackPcm =
+            if (startOffsetSamples > 0) {
+                pcm.copyOfRange(startOffsetSamples, totalSamples)
+            } else {
+                pcm
+            }
+        val track =
+            createStaticAudioTrack(
+                sampleRateHz = sampleRateHz,
+                sampleCount = playbackPcm.size,
+            )
 
         currentPlayback = playback
         playback.track = track
@@ -79,7 +80,7 @@ class AudioPlayer {
                 pcm = playbackPcm,
                 playbackStartOffsetSamples = startOffsetSamples,
                 reportedTotalSamples = totalSamples,
-                onProgressChanged = onProgressChanged
+                onProgressChanged = onProgressChanged,
             )
         } finally {
             releasePlaybackTrack(playback, track)
@@ -91,7 +92,8 @@ class AudioPlayer {
         val track = playback.track ?: return null
         val clampedPosition = sampleIndex.coerceIn(0, playback.totalSamples)
         if (clampedPosition < playback.bufferStartSamples ||
-            clampedPosition > playback.bufferStartSamples + playback.bufferedSamples) {
+            clampedPosition > playback.bufferStartSamples + playback.bufferedSamples
+        ) {
             return null
         }
         val relativePosition = clampedPosition - playback.bufferStartSamples
@@ -126,7 +128,7 @@ class AudioPlayer {
 
     private fun releasePlaybackTrack(
         playback: PlaybackHandle,
-        track: AudioTrack
+        track: AudioTrack,
     ) {
         if (track.playState != AudioTrack.PLAYSTATE_STOPPED) {
             safelyStopTrack(track)

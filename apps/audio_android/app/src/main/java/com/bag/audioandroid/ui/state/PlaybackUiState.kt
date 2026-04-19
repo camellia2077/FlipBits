@@ -7,7 +7,7 @@ data class PlaybackUiState(
     val sampleRateHz: Int = 0,
     val isScrubbing: Boolean = false,
     val scrubPreviewSamples: Int = 0,
-    val resumeAfterScrub: Boolean = false
+    val resumeAfterScrub: Boolean = false,
 ) {
     val displayedSamples: Int
         get() = if (isScrubbing) scrubPreviewSamples else playedSamples

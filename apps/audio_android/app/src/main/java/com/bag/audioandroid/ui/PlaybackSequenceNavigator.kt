@@ -7,42 +7,45 @@ import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlin.random.Random
 
 internal class PlaybackSequenceNavigator(
-    private val random: Random = Random.Default
+    private val random: Random = Random.Default,
 ) {
     fun previousSavedSource(
         savedAudioItems: List<SavedAudioItem>,
         currentSource: AudioPlaybackSource,
-        wrap: Boolean = false
-    ): AudioPlaybackSource? = adjacentSavedSource(
-        savedAudioItems = savedAudioItems,
-        currentSource = currentSource,
-        step = -1,
-        wrap = wrap
-    )
+        wrap: Boolean = false,
+    ): AudioPlaybackSource? =
+        adjacentSavedSource(
+            savedAudioItems = savedAudioItems,
+            currentSource = currentSource,
+            step = -1,
+            wrap = wrap,
+        )
 
     fun nextSavedSource(
         savedAudioItems: List<SavedAudioItem>,
         currentSource: AudioPlaybackSource,
-        wrap: Boolean = false
-    ): AudioPlaybackSource? = adjacentSavedSource(
-        savedAudioItems = savedAudioItems,
-        currentSource = currentSource,
-        step = 1,
-        wrap = wrap
-    )
+        wrap: Boolean = false,
+    ): AudioPlaybackSource? =
+        adjacentSavedSource(
+            savedAudioItems = savedAudioItems,
+            currentSource = currentSource,
+            step = 1,
+            wrap = wrap,
+        )
 
     fun nextSourceForCompletion(
         state: AudioAppUiState,
-        completedSource: AudioPlaybackSource
+        completedSource: AudioPlaybackSource,
     ): AudioPlaybackSource? =
         when (state.playbackSequenceMode) {
             PlaybackSequenceMode.Normal -> null
             PlaybackSequenceMode.RepeatOne -> completedSource
-            PlaybackSequenceMode.RepeatList -> nextSavedSource(
-                savedAudioItems = state.savedAudioItems,
-                currentSource = completedSource,
-                wrap = true
-            )
+            PlaybackSequenceMode.RepeatList ->
+                nextSavedSource(
+                    savedAudioItems = state.savedAudioItems,
+                    currentSource = completedSource,
+                    wrap = true,
+                )
             PlaybackSequenceMode.Shuffle -> randomSavedSource(state.savedAudioItems, completedSource)
         }
 
@@ -50,7 +53,7 @@ internal class PlaybackSequenceNavigator(
         savedAudioItems: List<SavedAudioItem>,
         currentSource: AudioPlaybackSource,
         step: Int,
-        wrap: Boolean
+        wrap: Boolean,
     ): AudioPlaybackSource? {
         if (currentSource !is AudioPlaybackSource.Saved || savedAudioItems.isEmpty()) {
             return null
@@ -60,27 +63,29 @@ internal class PlaybackSequenceNavigator(
             return null
         }
         val targetIndex = currentIndex + step
-        val resolvedIndex = when {
-            targetIndex in savedAudioItems.indices -> targetIndex
-            !wrap -> return null
-            targetIndex < 0 -> savedAudioItems.lastIndex
-            else -> 0
-        }
+        val resolvedIndex =
+            when {
+                targetIndex in savedAudioItems.indices -> targetIndex
+                !wrap -> return null
+                targetIndex < 0 -> savedAudioItems.lastIndex
+                else -> 0
+            }
         return AudioPlaybackSource.Saved(savedAudioItems[resolvedIndex].itemId)
     }
 
     private fun randomSavedSource(
         savedAudioItems: List<SavedAudioItem>,
-        currentSource: AudioPlaybackSource
+        currentSource: AudioPlaybackSource,
     ): AudioPlaybackSource? {
         if (currentSource !is AudioPlaybackSource.Saved || savedAudioItems.isEmpty()) {
             return null
         }
-        val candidates = if (savedAudioItems.size > 1) {
-            savedAudioItems.filterNot { it.itemId == currentSource.itemId }
-        } else {
-            savedAudioItems
-        }
+        val candidates =
+            if (savedAudioItems.size > 1) {
+                savedAudioItems.filterNot { it.itemId == currentSource.itemId }
+            } else {
+                savedAudioItems
+            }
         val nextItem = candidates.randomOrNull(random) ?: return null
         return AudioPlaybackSource.Saved(nextItem.itemId)
     }

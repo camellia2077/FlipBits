@@ -22,23 +22,23 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 internal fun FlashVoicingSelectorSection(
     enabled: Boolean,
     selectedFlashVoicingStyle: FlashVoicingStyleOption,
-    onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit
+    onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
 ) {
     val selectedStyleLabel = stringResource(selectedFlashVoicingStyle.labelResId)
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 text = stringResource(R.string.audio_flash_style_title, selectedStyleLabel),
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
             Text(
                 text = stringResource(R.string.audio_flash_style_hint),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         FlashVoicingStyleOption.entries.forEach { option ->
@@ -47,25 +47,27 @@ internal fun FlashVoicingSelectorSection(
                 tonalElevation = if (selected) 6.dp else 1.dp,
                 shadowElevation = if (selected) 2.dp else 0.dp,
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(enabled = enabled) { onFlashVoicingStyleSelected(option) }
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = enabled) { onFlashVoicingStyleSelected(option) },
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(option.labelResId),
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     if (selected) {
                         Text(
                             text = stringResource(R.string.config_palette_selected),
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

@@ -23,40 +23,40 @@ internal fun LibrarySelectionActionsRow(
     canSelectAll: Boolean,
     onSelectAll: () -> Unit,
     onDeleteSelected: () -> Unit,
-    onClearSelection: () -> Unit
+    onClearSelection: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(R.string.library_selection_count, selectedCount),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         IconButton(
             onClick = onSelectAll,
-            enabled = canSelectAll
+            enabled = canSelectAll,
         ) {
             Icon(
                 imageVector = Icons.Rounded.DoneAll,
-                contentDescription = stringResource(R.string.library_action_select_all)
+                contentDescription = stringResource(R.string.library_action_select_all),
             )
         }
         IconButton(
             onClick = onDeleteSelected,
-            enabled = selectedCount > 0
+            enabled = selectedCount > 0,
         ) {
             Icon(
                 imageVector = Icons.Rounded.Delete,
-                contentDescription = stringResource(R.string.library_action_delete_selected)
+                contentDescription = stringResource(R.string.library_action_delete_selected),
             )
         }
         IconButton(onClick = onClearSelection) {
             Icon(
                 imageVector = Icons.Rounded.Close,
-                contentDescription = stringResource(R.string.library_action_clear_selection)
+                contentDescription = stringResource(R.string.library_action_clear_selection),
             )
         }
     }

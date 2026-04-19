@@ -35,65 +35,66 @@ internal fun LibrarySavedAudioRow(
     onLongClick: () -> Unit,
     onShare: () -> Unit,
     onRename: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = if (isSelectionMode) null else onLongClick
-            )
-            .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = if (isSelectionMode) null else onLongClick,
+                ).padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isSelectionMode) {
                 Checkbox(
                     checked = isSelected,
-                    onCheckedChange = { onClick() }
+                    onCheckedChange = { onClick() },
                 )
             }
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     text = item.displayName,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = "${stringResource(SavedAudioModeFilter.labelResIdForModeWireName(item.modeWireName))} • " +
-                        formatDurationMillis(item.durationMs),
+                    text =
+                        "${stringResource(SavedAudioModeFilter.labelResIdForModeWireName(item.modeWireName))} • " +
+                            formatDurationMillis(item.durationMs),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = formatSavedAudioTime(item.savedAtEpochSeconds),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             if (!isSelectionMode) {
                 IconButton(onClick = onShare) {
                     Icon(
                         imageVector = Icons.Rounded.Share,
-                        contentDescription = stringResource(R.string.library_action_share)
+                        contentDescription = stringResource(R.string.library_action_share),
                     )
                 }
                 IconButton(onClick = onRename) {
                     Icon(
                         imageVector = Icons.Rounded.Edit,
-                        contentDescription = stringResource(R.string.library_action_rename)
+                        contentDescription = stringResource(R.string.library_action_rename),
                     )
                 }
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,
-                        contentDescription = stringResource(R.string.library_action_delete)
+                        contentDescription = stringResource(R.string.library_action_delete),
                     )
                 }
             }

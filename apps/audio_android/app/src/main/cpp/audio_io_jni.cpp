@@ -1,10 +1,11 @@
 #include <jni.h>
 
-#include <cstring>
 #include <cstdint>
+#include <cstring>
+#include <string>
 #include <vector>
 
-#include "android_audio_io/audio_io_package.h"
+#include "audio_io_api.h"
 
 namespace {
 
@@ -24,19 +25,31 @@ std::vector<std::int16_t> ShortArrayToVector(JNIEnv* env, jshortArray pcm_array)
     return pcm;
 }
 
-jobject ToGeneratedAudioMetadata(
-    JNIEnv* env,
-    jint version,
-    jint mode,
-    jboolean has_flash_voicing_style,
-    jint flash_voicing_style,
-    const char* created_at_iso_utc,
-    jlong duration_ms,
-    jint frame_samples,
-    jint pcm_sample_count,
-    const char* app_version,
-    const char* core_version
-) {
+std::string JStringToStdString(JNIEnv* env, jstring value) {
+    if (value == nullptr) {
+        return {};
+    }
+    const char* chars = env->GetStringUTFChars(value, nullptr);
+    if (chars == nullptr) {
+        return {};
+    }
+    const std::string out(chars);
+    env->ReleaseStringUTFChars(value, chars);
+    return out;
+}
+
+audio_io_string_view ToStringView(const std::string& value) {
+    return audio_io_string_view{value.data(), value.size()};
+}
+
+jstring ToJString(JNIEnv* env, const audio_io_owned_string& value) {
+    if (value.data == nullptr || value.size == 0) {
+        return env->NewStringUTF("");
+    }
+    return env->NewStringUTF(value.data);
+}
+
+jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata) {
     jclass metadata_class = env->FindClass("com/bag/audioandroid/domain/GeneratedAudioMetadata");
     jclass transport_mode_class = env->FindClass("com/bag/audioandroid/ui/model/TransportModeOption");
     jclass flash_style_class = env->FindClass("com/bag/audioandroid/ui/model/FlashVoicingStyleOption");
@@ -65,14 +78,14 @@ jobject ToGeneratedAudioMetadata(
     }
 
     jobject mode_object = nullptr;
-    switch (mode) {
-        case 1:
+    switch (metadata.mode) {
+        case AUDIO_IO_METADATA_MODE_FLASH:
             mode_object = env->GetObjectArrayElement(transport_entries, 0);
             break;
-        case 2:
+        case AUDIO_IO_METADATA_MODE_PRO:
             mode_object = env->GetObjectArrayElement(transport_entries, 1);
             break;
-        case 3:
+        case AUDIO_IO_METADATA_MODE_ULTRA:
             mode_object = env->GetObjectArrayElement(transport_entries, 2);
             break;
         default:
@@ -80,12 +93,12 @@ jobject ToGeneratedAudioMetadata(
     }
 
     jobject flash_style_object = nullptr;
-    if (has_flash_voicing_style == JNI_TRUE) {
-        switch (flash_voicing_style) {
-            case 1:
+    if (metadata.has_flash_voicing_style != 0u) {
+        switch (metadata.flash_voicing_style) {
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_CODED_BURST:
                 flash_style_object = env->GetObjectArrayElement(flash_entries, 0);
                 break;
-            case 2:
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT:
                 flash_style_object = env->GetObjectArrayElement(flash_entries, 1);
                 break;
             default:
@@ -101,34 +114,87 @@ jobject ToGeneratedAudioMetadata(
         return nullptr;
     }
 
-    jstring created_at_string = env->NewStringUTF(created_at_iso_utc != nullptr ? created_at_iso_utc : "");
-    jstring app_version_string = env->NewStringUTF(app_version != nullptr ? app_version : "");
-    jstring core_version_string = env->NewStringUTF(core_version != nullptr ? core_version : "");
+    jstring created_at_string = ToJString(env, metadata.created_at_iso_utc);
+    jstring app_version_string = ToJString(env, metadata.app_version);
+    jstring core_version_string = ToJString(env, metadata.core_version);
 
     return env->NewObject(
         metadata_class,
         ctor,
-        version,
+        static_cast<jint>(metadata.version),
         mode_object,
         flash_style_object,
         created_at_string,
-        duration_ms,
-        frame_samples,
-        pcm_sample_count,
+        static_cast<jlong>(metadata.duration_ms),
+        static_cast<jint>(metadata.frame_samples),
+        static_cast<jint>(metadata.pcm_sample_count),
         app_version_string,
         core_version_string);
 }
 
-jshortArray VectorToShortArray(JNIEnv* env, const std::vector<std::int16_t>& pcm_samples) {
-    jshortArray out = env->NewShortArray(static_cast<jsize>(pcm_samples.size()));
-    if (out != nullptr && !pcm_samples.empty()) {
+jshortArray VectorToShortArray(JNIEnv* env, const std::int16_t* pcm_samples, std::size_t sample_count) {
+    jshortArray out = env->NewShortArray(static_cast<jsize>(sample_count));
+    if (out != nullptr && sample_count > 0) {
         env->SetShortArrayRegion(
             out,
             0,
-            static_cast<jsize>(pcm_samples.size()),
-            reinterpret_cast<const jshort*>(pcm_samples.data()));
+            static_cast<jsize>(sample_count),
+            reinterpret_cast<const jshort*>(pcm_samples));
     }
     return out;
+}
+
+audio_io_metadata_mode MapTransportMode(JNIEnv* env, jobject mode_object) {
+    if (mode_object == nullptr) {
+        return AUDIO_IO_METADATA_MODE_UNKNOWN;
+    }
+
+    jclass transport_mode_class = env->FindClass("com/bag/audioandroid/ui/model/TransportModeOption");
+    jmethodID get_wire_name = env->GetMethodID(
+        transport_mode_class,
+        "getWireName",
+        "()Ljava/lang/String;");
+    if (get_wire_name == nullptr) {
+        return AUDIO_IO_METADATA_MODE_UNKNOWN;
+    }
+
+    jstring wire_name = static_cast<jstring>(env->CallObjectMethod(mode_object, get_wire_name));
+    const std::string wire_name_text = JStringToStdString(env, wire_name);
+    if (wire_name_text == "flash") {
+        return AUDIO_IO_METADATA_MODE_FLASH;
+    }
+    if (wire_name_text == "pro") {
+        return AUDIO_IO_METADATA_MODE_PRO;
+    }
+    if (wire_name_text == "ultra") {
+        return AUDIO_IO_METADATA_MODE_ULTRA;
+    }
+    return AUDIO_IO_METADATA_MODE_UNKNOWN;
+}
+
+audio_io_metadata_flash_voicing_style MapFlashVoicingStyle(JNIEnv* env, jobject flash_style_object) {
+    if (flash_style_object == nullptr) {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
+    }
+
+    jclass flash_style_class = env->FindClass("com/bag/audioandroid/ui/model/FlashVoicingStyleOption");
+    jmethodID get_id = env->GetMethodID(
+        flash_style_class,
+        "getId",
+        "()Ljava/lang/String;");
+    if (get_id == nullptr) {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
+    }
+
+    jstring style_id = static_cast<jstring>(env->CallObjectMethod(flash_style_object, get_id));
+    const std::string style_id_text = JStringToStdString(env, style_id);
+    if (style_id_text == "coded_burst") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_CODED_BURST;
+    }
+    if (style_id_text == "ritual_chant") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT;
+    }
+    return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
 }
 
 }  // namespace
@@ -142,9 +208,21 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeEncodeMonoPcm16ToWavBytes(
     jobject metadata_object
 ) {
     const auto pcm_samples = ShortArrayToVector(env, pcm);
-    android_audio_io::EncodedWaveBitsMetadata metadata{};
-    android_audio_io::EncodedWaveBitsMetadata* metadata_ptr = nullptr;
-    if (metadata_object != nullptr) {
+
+    audio_io_byte_buffer wav_bytes{};
+    audio_io_wav_status status = AUDIO_IO_WAV_INVALID_ARGUMENT;
+    std::string created_at_iso_utc;
+    std::string app_version;
+    std::string core_version;
+    audio_io_metadata_view metadata{};
+
+    if (metadata_object == nullptr) {
+        status = audio_io_encode_mono_pcm16_wav(
+            sample_rate_hz,
+            pcm_samples.data(),
+            pcm_samples.size(),
+            &wav_bytes);
+    } else {
         jclass metadata_class = env->GetObjectClass(metadata_object);
         jfieldID version_field = env->GetFieldID(metadata_class, "version", "I");
         jfieldID mode_field = env->GetFieldID(
@@ -191,96 +269,54 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeEncodeMonoPcm16ToWavBytes(
             return env->NewByteArray(0);
         }
 
-        metadata.version = static_cast<std::uint8_t>(env->GetIntField(metadata_object, version_field));
         jobject mode_object = env->GetObjectField(metadata_object, mode_field);
         jobject flash_style_object = env->GetObjectField(metadata_object, flash_style_field);
-        jstring created_at_string = static_cast<jstring>(env->GetObjectField(metadata_object, created_at_field));
-        const jlong duration_ms = env->GetLongField(metadata_object, duration_field);
-        const jint frame_samples = env->GetIntField(metadata_object, frame_samples_field);
-        const jint pcm_sample_count = env->GetIntField(metadata_object, pcm_sample_count_field);
-        jstring app_version_string = static_cast<jstring>(env->GetObjectField(metadata_object, app_version_field));
-        jstring core_version_string = static_cast<jstring>(env->GetObjectField(metadata_object, core_version_field));
+        created_at_iso_utc = JStringToStdString(
+            env,
+            static_cast<jstring>(env->GetObjectField(metadata_object, created_at_field)));
+        app_version = JStringToStdString(
+            env,
+            static_cast<jstring>(env->GetObjectField(metadata_object, app_version_field)));
+        core_version = JStringToStdString(
+            env,
+            static_cast<jstring>(env->GetObjectField(metadata_object, core_version_field)));
 
-        jclass transport_mode_class = env->FindClass("com/bag/audioandroid/ui/model/TransportModeOption");
-        jclass flash_style_class = env->FindClass("com/bag/audioandroid/ui/model/FlashVoicingStyleOption");
-        jmethodID get_wire_name = env->GetMethodID(
-            transport_mode_class,
-            "getWireName",
-            "()Ljava/lang/String;");
-        jmethodID get_id = env->GetMethodID(
-            flash_style_class,
-            "getId",
-            "()Ljava/lang/String;");
-        if (get_wire_name == nullptr ||
-            get_id == nullptr ||
-            mode_object == nullptr) {
-            return env->NewByteArray(0);
-        }
+        metadata.version = static_cast<std::uint8_t>(env->GetIntField(metadata_object, version_field));
+        metadata.mode = MapTransportMode(env, mode_object);
+        metadata.has_flash_voicing_style = flash_style_object != nullptr ? 1u : 0u;
+        metadata.flash_voicing_style = MapFlashVoicingStyle(env, flash_style_object);
+        metadata.created_at_iso_utc = ToStringView(created_at_iso_utc);
+        metadata.duration_ms =
+            static_cast<std::uint32_t>(std::max<jlong>(0, env->GetLongField(metadata_object, duration_field)));
+        metadata.frame_samples =
+            static_cast<std::uint32_t>(std::max<jint>(0, env->GetIntField(metadata_object, frame_samples_field)));
+        metadata.pcm_sample_count =
+            static_cast<std::uint32_t>(std::max<jint>(0, env->GetIntField(metadata_object, pcm_sample_count_field)));
+        metadata.app_version = ToStringView(app_version);
+        metadata.core_version = ToStringView(core_version);
 
-        auto map_mode = [&](jobject mode_enum) -> std::uint8_t {
-            jstring wire_name = static_cast<jstring>(env->CallObjectMethod(mode_enum, get_wire_name));
-            const char* chars = env->GetStringUTFChars(wire_name, nullptr);
-            std::uint8_t mapped = 0;
-            if (std::strcmp(chars, "flash") == 0) {
-                mapped = 1;
-            } else if (std::strcmp(chars, "pro") == 0) {
-                mapped = 2;
-            } else if (std::strcmp(chars, "ultra") == 0) {
-                mapped = 3;
-            }
-            env->ReleaseStringUTFChars(wire_name, chars);
-            return mapped;
-        };
-
-        metadata.mode = map_mode(mode_object);
-        if (created_at_string != nullptr) {
-            const char* chars = env->GetStringUTFChars(created_at_string, nullptr);
-            metadata.created_at_iso_utc = chars != nullptr ? chars : "";
-            if (chars != nullptr) {
-                env->ReleaseStringUTFChars(created_at_string, chars);
-            }
-        }
-        metadata.duration_ms = duration_ms >= 0 ? static_cast<std::uint32_t>(duration_ms) : 0u;
-        metadata.frame_samples = frame_samples >= 0 ? static_cast<std::uint32_t>(frame_samples) : 0u;
-        metadata.pcm_sample_count = pcm_sample_count >= 0 ? static_cast<std::uint32_t>(pcm_sample_count) : 0u;
-        if (app_version_string != nullptr) {
-            const char* chars = env->GetStringUTFChars(app_version_string, nullptr);
-            metadata.app_version = chars != nullptr ? chars : "";
-            if (chars != nullptr) {
-                env->ReleaseStringUTFChars(app_version_string, chars);
-            }
-        }
-        if (core_version_string != nullptr) {
-            const char* chars = env->GetStringUTFChars(core_version_string, nullptr);
-            metadata.core_version = chars != nullptr ? chars : "";
-            if (chars != nullptr) {
-                env->ReleaseStringUTFChars(core_version_string, chars);
-            }
-        }
-        if (flash_style_object != nullptr) {
-            metadata.has_flash_voicing_style = true;
-            jstring style_id = static_cast<jstring>(env->CallObjectMethod(flash_style_object, get_id));
-            const char* chars = env->GetStringUTFChars(style_id, nullptr);
-            if (std::strcmp(chars, "coded_burst") == 0) {
-                metadata.flash_voicing_style = 1;
-            } else if (std::strcmp(chars, "ritual_chant") == 0) {
-                metadata.flash_voicing_style = 2;
-            }
-            env->ReleaseStringUTFChars(style_id, chars);
-        }
-        metadata_ptr = &metadata;
+        status = audio_io_encode_mono_pcm16_wav_with_metadata(
+            sample_rate_hz,
+            pcm_samples.data(),
+            pcm_samples.size(),
+            &metadata,
+            &wav_bytes);
     }
 
-    const auto wav_bytes =
-        android_audio_io::EncodeMonoPcm16ToWavBytes(sample_rate_hz, pcm_samples, metadata_ptr);
-    jbyteArray out = env->NewByteArray(static_cast<jsize>(wav_bytes.size()));
-    if (out != nullptr && !wav_bytes.empty()) {
+    if (status != AUDIO_IO_WAV_OK) {
+        audio_io_free_byte_buffer(&wav_bytes);
+        return env->NewByteArray(0);
+    }
+
+    jbyteArray out = env->NewByteArray(static_cast<jsize>(wav_bytes.size));
+    if (out != nullptr && wav_bytes.size > 0) {
         env->SetByteArrayRegion(
             out,
             0,
-            static_cast<jsize>(wav_bytes.size()),
-            reinterpret_cast<const jbyte*>(wav_bytes.data()));
+            static_cast<jsize>(wav_bytes.size),
+            reinterpret_cast<const jbyte*>(wav_bytes.data));
     }
+    audio_io_free_byte_buffer(&wav_bytes);
     return out;
 }
 
@@ -303,40 +339,40 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeDecodeMonoPcm16WavBytes(
         }
     }
 
-    const auto decoded = android_audio_io::DecodeMonoPcm16WavBytes(wav_bytes);
+    audio_io_decoded_wav decoded{};
+    const auto wav_status = audio_io_decode_mono_pcm16_wav(
+        wav_bytes.data(),
+        wav_bytes.size(),
+        &decoded);
+
     jclass result_class = env->FindClass("com/bag/audioandroid/domain/DecodedAudioData");
     if (result_class == nullptr) {
+        audio_io_free_decoded_wav(&decoded);
         return nullptr;
     }
     jmethodID ctor = env->GetMethodID(
         result_class,
         "<init>",
-        "(III[SLcom/bag/audioandroid/domain/GeneratedAudioMetadata;)V");
+        "(IIII[SLcom/bag/audioandroid/domain/GeneratedAudioMetadata;)V");
     if (ctor == nullptr) {
+        audio_io_free_decoded_wav(&decoded);
         return nullptr;
     }
-    jshortArray pcm_array = VectorToShortArray(env, decoded.pcm_samples);
+
+    jshortArray pcm_array = VectorToShortArray(env, decoded.samples, decoded.sample_count);
     jobject metadata_object = nullptr;
-    if (decoded.metadata_status == android_audio_io::WaveBitsMetadataStatus::kOk) {
-        metadata_object = ToGeneratedAudioMetadata(
-            env,
-            static_cast<jint>(decoded.metadata.version),
-            static_cast<jint>(decoded.metadata.mode),
-            decoded.metadata.has_flash_voicing_style ? JNI_TRUE : JNI_FALSE,
-            static_cast<jint>(decoded.metadata.flash_voicing_style),
-            decoded.metadata.created_at_iso_utc.c_str(),
-            static_cast<jlong>(decoded.metadata.duration_ms),
-            static_cast<jint>(decoded.metadata.frame_samples),
-            static_cast<jint>(decoded.metadata.pcm_sample_count),
-            decoded.metadata.app_version.c_str(),
-            decoded.metadata.core_version.c_str());
+    if (decoded.metadata_status == AUDIO_IO_METADATA_OK) {
+        metadata_object = ToGeneratedAudioMetadata(env, decoded.metadata);
     }
-    return env->NewObject(
+    jobject result = env->NewObject(
         result_class,
         ctor,
-        static_cast<jint>(decoded.status),
+        static_cast<jint>(wav_status),
+        static_cast<jint>(decoded.metadata_status),
         static_cast<jint>(decoded.sample_rate_hz),
         static_cast<jint>(decoded.channels),
         pcm_array,
         metadata_object);
+    audio_io_free_decoded_wav(&decoded);
+    return result;
 }

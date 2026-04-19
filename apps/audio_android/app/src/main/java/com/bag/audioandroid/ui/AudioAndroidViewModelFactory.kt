@@ -1,11 +1,11 @@
 package com.bag.audioandroid.ui
 
-import com.bag.audioandroid.data.SampleInputTextProvider
-import com.bag.audioandroid.domain.PlaybackRuntimeGateway
-import com.bag.audioandroid.data.AppSettingsRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.bag.audioandroid.data.AppSettingsRepository
+import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.domain.AudioCodecGateway
+import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioRepository
 
 class AudioAndroidViewModelFactory(
@@ -13,7 +13,7 @@ class AudioAndroidViewModelFactory(
     private val sampleInputTextProvider: SampleInputTextProvider,
     private val appSettingsRepository: AppSettingsRepository,
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
-    private val savedAudioRepository: SavedAudioRepository
+    private val savedAudioRepository: SavedAudioRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AudioAndroidViewModel::class.java)) {
@@ -23,7 +23,7 @@ class AudioAndroidViewModelFactory(
                 sampleInputTextProvider,
                 appSettingsRepository,
                 playbackRuntimeGateway,
-                savedAudioRepository
+                savedAudioRepository,
             ) as T
         }
         throw IllegalArgumentException("Unsupported ViewModel class: ${modelClass.name}")

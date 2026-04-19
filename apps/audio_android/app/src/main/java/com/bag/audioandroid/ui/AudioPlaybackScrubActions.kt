@@ -13,7 +13,7 @@ internal class AudioPlaybackScrubActions(
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
     private val playbackSourceCoordinator: PlaybackSourceCoordinator,
     private val playbackUiStateSync: AudioPlaybackUiStateSync,
-    private val startPlaybackFromTarget: (PlaybackSourceCoordinator.PlaybackTarget) -> Unit
+    private val startPlaybackFromTarget: (PlaybackSourceCoordinator.PlaybackTarget) -> Unit,
 ) {
     fun onScrubStarted() {
         val current = uiState.value
@@ -65,7 +65,7 @@ internal class AudioPlaybackScrubActions(
         }
         playbackUiStateSync.updatePlaybackState(playbackTarget.source) { committed }
         playbackUiStateSync.setCurrentStatusText(
-            UiText.Resource(R.string.status_playback_paused)
+            UiText.Resource(R.string.status_playback_paused),
         )
     }
 
@@ -88,7 +88,7 @@ internal class AudioPlaybackScrubActions(
                 playbackUiStateSync.playbackStatusPlaying(playbackTarget.source)
             } else {
                 UiText.Resource(R.string.status_playback_paused)
-            }
+            },
         )
     }
 }

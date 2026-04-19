@@ -32,7 +32,7 @@ internal fun AudioPcmWaveform(
     sampleRateHz: Int,
     displayedSamples: Int,
     isPlaying: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (pcm.isEmpty()) {
         return
@@ -44,65 +44,73 @@ internal fun AudioPcmWaveform(
     val glowPulseAnimated by visualTransition.animateFloat(
         initialValue = 0.72f,
         targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pcmWaveformGlowPulse"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "pcmWaveformGlowPulse",
     )
     val driftAnimated by visualTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "pcmWaveformDrift"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(durationMillis = 3200, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+        label = "pcmWaveformDrift",
     )
     val clampedDisplayedSamples = displayedSamples.coerceIn(0, totalSamples)
     val animatedDisplayedSamples by animateFloatAsState(
         targetValue = clampedDisplayedSamples.toFloat(),
         animationSpec = tween(durationMillis = if (isPlaying) 120 else 0, easing = FastOutSlowInEasing),
-        label = "pcmWaveformDisplayedSamples"
+        label = "pcmWaveformDisplayedSamples",
     )
     val glowPulse = if (isPlaying) glowPulseAnimated else 0.82f
     val driftPhase = if (isPlaying) driftAnimated else 0.2f
 
     BoxWithConstraints(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(112.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(112.dp),
     ) {
         val widthPx = with(density) { maxWidth.toPx() }
-        val targetBucketCount = remember(widthPx) {
-            val bucketSpacingPx = with(density) { 3.dp.toPx() }
-            ceil((widthPx / bucketSpacingPx).toDouble())
-                .toInt()
-                .coerceIn(PcmWaveformMinBucketCount, PcmWaveformMaxBucketCount)
-        }
-        val windowSampleCount = remember(sampleRateHz, totalSamples) {
-            sampleRateHz.coerceAtLeast(1).coerceAtMost(max(totalSamples, 1))
-        }
-        val buckets = remember(pcm, targetBucketCount, windowSampleCount, animatedDisplayedSamples) {
-            buildPcmWaveBuckets(
-                pcm = pcm,
-                currentSample = animatedDisplayedSamples,
-                windowSampleCount = windowSampleCount,
-                targetBucketCount = targetBucketCount
-            )
-        }
+        val targetBucketCount =
+            remember(widthPx) {
+                val bucketSpacingPx = with(density) { 3.dp.toPx() }
+                ceil((widthPx / bucketSpacingPx).toDouble())
+                    .toInt()
+                    .coerceIn(PcmWaveformMinBucketCount, PcmWaveformMaxBucketCount)
+            }
+        val windowSampleCount =
+            remember(sampleRateHz, totalSamples) {
+                sampleRateHz.coerceAtLeast(1).coerceAtMost(max(totalSamples, 1))
+            }
+        val buckets =
+            remember(pcm, targetBucketCount, windowSampleCount, animatedDisplayedSamples) {
+                buildPcmWaveBuckets(
+                    pcm = pcm,
+                    currentSample = animatedDisplayedSamples,
+                    windowSampleCount = windowSampleCount,
+                    targetBucketCount = targetBucketCount,
+                )
+            }
 
         val primaryColor = MaterialTheme.colorScheme.primary
         val glowColor = MaterialTheme.colorScheme.onPrimaryContainer
         val baseBackground = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.24f)
         val centerLineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
-        val ambientBrush = Brush.horizontalGradient(
-            colors = listOf(
-                primaryColor.copy(alpha = 0.10f + 0.02f * glowPulse),
-                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.14f + 0.02f * driftPhase),
-                primaryColor.copy(alpha = 0.10f + 0.02f * glowPulse)
+        val ambientBrush =
+            Brush.horizontalGradient(
+                colors =
+                    listOf(
+                        primaryColor.copy(alpha = 0.10f + 0.02f * glowPulse),
+                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.14f + 0.02f * driftPhase),
+                        primaryColor.copy(alpha = 0.10f + 0.02f * glowPulse),
+                    ),
             )
-        )
 
         Canvas(modifier = Modifier.fillMaxWidth().height(112.dp)) {
             if (buckets.isEmpty()) {
@@ -121,94 +129,98 @@ internal fun AudioPcmWaveform(
             val playheadX = leftPadding + innerWidth * PcmWaveformPlayheadAnchorRatio
             val strokeWidth = (innerWidth / buckets.size.toFloat()).coerceAtLeast(1.2f)
             val minBarHeight = 1.4.dp.toPx()
-            val playheadBucket = buckets.minByOrNull { bucket ->
-                abs(
-                    bucketCenterX(
-                        bucket = bucket,
-                        windowCenterSample = animatedDisplayedSamples,
-                        windowSampleCount = windowSampleCount.toFloat(),
-                        leftPadding = leftPadding,
-                        innerWidth = innerWidth
-                    ) - playheadX
-                )
-            }
+            val playheadBucket =
+                buckets.minByOrNull { bucket ->
+                    abs(
+                        bucketCenterX(
+                            bucket = bucket,
+                            windowCenterSample = animatedDisplayedSamples,
+                            windowSampleCount = windowSampleCount.toFloat(),
+                            leftPadding = leftPadding,
+                            innerWidth = innerWidth,
+                        ) - playheadX,
+                    )
+                }
 
             drawRoundRect(
                 color = baseBackground,
                 size = size,
-                cornerRadius = corner
+                cornerRadius = corner,
             )
             drawRoundRect(
                 brush = ambientBrush,
                 size = size,
-                cornerRadius = corner
+                cornerRadius = corner,
             )
             drawLine(
                 color = centerLineColor,
                 start = Offset(leftPadding, centerY),
                 end = Offset(size.width - rightPadding, centerY),
-                strokeWidth = 1.dp.toPx()
+                strokeWidth = 1.dp.toPx(),
             )
 
             buckets.forEach { bucket ->
-                val x = bucketCenterX(
-                    bucket = bucket,
-                    windowCenterSample = animatedDisplayedSamples,
-                    windowSampleCount = windowSampleCount.toFloat(),
-                    leftPadding = leftPadding,
-                    innerWidth = innerWidth
-                )
-                val (topY, bottomY) = bucketVerticalSpan(
-                    bucket = bucket,
-                    centerY = centerY,
-                    maxAmplitudePx = maxAmplitudePx,
-                    minHeightPx = minBarHeight
-                )
+                val x =
+                    bucketCenterX(
+                        bucket = bucket,
+                        windowCenterSample = animatedDisplayedSamples,
+                        windowSampleCount = windowSampleCount.toFloat(),
+                        leftPadding = leftPadding,
+                        innerWidth = innerWidth,
+                    )
+                val (topY, bottomY) =
+                    bucketVerticalSpan(
+                        bucket = bucket,
+                        centerY = centerY,
+                        maxAmplitudePx = maxAmplitudePx,
+                        minHeightPx = minBarHeight,
+                    )
                 val emphasis = 0.24f + bucket.peakAmplitude * 0.56f
 
                 drawLine(
                     color = primaryColor.copy(alpha = (0.12f + emphasis * 0.24f) * glowPulse),
                     start = Offset(x, topY),
                     end = Offset(x, bottomY),
-                    strokeWidth = strokeWidth + 1.6.dp.toPx()
+                    strokeWidth = strokeWidth + 1.6.dp.toPx(),
                 )
                 drawLine(
                     color = primaryColor.copy(alpha = 0.34f + emphasis * 0.24f),
                     start = Offset(x, topY),
                     end = Offset(x, bottomY),
-                    strokeWidth = strokeWidth
+                    strokeWidth = strokeWidth,
                 )
             }
 
             playheadBucket?.let { bucket ->
-                val (topY, bottomY) = bucketVerticalSpan(
-                    bucket = bucket,
-                    centerY = centerY,
-                    maxAmplitudePx = maxAmplitudePx,
-                    minHeightPx = minBarHeight
-                )
+                val (topY, bottomY) =
+                    bucketVerticalSpan(
+                        bucket = bucket,
+                        centerY = centerY,
+                        maxAmplitudePx = maxAmplitudePx,
+                        minHeightPx = minBarHeight,
+                    )
                 val focusY = (topY + bottomY) / 2f
 
                 drawLine(
                     color = glowColor.copy(alpha = 0.82f),
                     start = Offset(playheadX, topPadding),
                     end = Offset(playheadX, size.height - bottomPadding),
-                    strokeWidth = 2.dp.toPx()
+                    strokeWidth = 2.dp.toPx(),
                 )
                 drawCircle(
                     color = glowColor.copy(alpha = 0.14f * glowPulse),
                     radius = 12.dp.toPx(),
-                    center = Offset(playheadX, focusY)
+                    center = Offset(playheadX, focusY),
                 )
                 drawCircle(
                     color = glowColor.copy(alpha = 0.26f * glowPulse),
                     radius = 6.dp.toPx(),
-                    center = Offset(playheadX, focusY)
+                    center = Offset(playheadX, focusY),
                 )
                 drawCircle(
                     color = glowColor.copy(alpha = 0.96f),
                     radius = 2.6.dp.toPx(),
-                    center = Offset(playheadX, focusY)
+                    center = Offset(playheadX, focusY),
                 )
             }
         }
@@ -220,7 +232,7 @@ private fun bucketCenterX(
     windowCenterSample: Float,
     windowSampleCount: Float,
     leftPadding: Float,
-    innerWidth: Float
+    innerWidth: Float,
 ): Float {
     val safeWindowSampleCount = windowSampleCount.coerceAtLeast(1f)
     val windowStart = windowCenterSample - safeWindowSampleCount * PcmWaveformPlayheadAnchorRatio
@@ -233,7 +245,7 @@ private fun bucketVerticalSpan(
     bucket: PcmWaveBucket,
     centerY: Float,
     maxAmplitudePx: Float,
-    minHeightPx: Float
+    minHeightPx: Float,
 ): Pair<Float, Float> {
     var topY = centerY - maxAmplitudePx * bucket.maxAmplitude
     var bottomY = centerY - maxAmplitudePx * bucket.minAmplitude

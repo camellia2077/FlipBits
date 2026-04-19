@@ -11,14 +11,14 @@ internal data class PcmWaveBucket(
     val endSample: Int,
     val minAmplitude: Float,
     val maxAmplitude: Float,
-    val peakAmplitude: Float
+    val peakAmplitude: Float,
 )
 
 internal fun buildPcmWaveBuckets(
     pcm: ShortArray,
     currentSample: Float,
     windowSampleCount: Int,
-    targetBucketCount: Int
+    targetBucketCount: Int,
 ): List<PcmWaveBucket> {
     if (pcm.isEmpty()) {
         return emptyList()
@@ -56,13 +56,14 @@ internal fun buildPcmWaveBuckets(
             }
         }
 
-        buckets += PcmWaveBucket(
-            startSample = floor(bucketStart.toDouble()).toInt(),
-            endSample = ceil(bucketEnd.toDouble()).toInt(),
-            minAmplitude = minAmplitude,
-            maxAmplitude = maxAmplitude,
-            peakAmplitude = peakAmplitude
-        )
+        buckets +=
+            PcmWaveBucket(
+                startSample = floor(bucketStart.toDouble()).toInt(),
+                endSample = ceil(bucketEnd.toDouble()).toInt(),
+                minAmplitude = minAmplitude,
+                maxAmplitude = maxAmplitude,
+                peakAmplitude = peakAmplitude,
+            )
     }
 
     return buckets

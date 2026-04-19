@@ -4,7 +4,7 @@ interface AudioIoGateway {
     fun encodeMonoPcm16ToWavBytes(
         sampleRateHz: Int,
         pcm: ShortArray,
-        metadata: GeneratedAudioMetadata? = null
+        metadata: GeneratedAudioMetadata? = null,
     ): ByteArray
 
     fun decodeMonoPcm16WavBytes(wavBytes: ByteArray): DecodedAudioData

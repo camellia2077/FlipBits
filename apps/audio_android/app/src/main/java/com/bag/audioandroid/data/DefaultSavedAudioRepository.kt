@@ -15,32 +15,28 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 class DefaultSavedAudioRepository(
     private val audioExportGateway: AudioExportGateway,
     private val savedAudioLibraryGateway: SavedAudioLibraryGateway,
-    private val audioShareGateway: AudioShareGateway
+    private val audioShareGateway: AudioShareGateway,
 ) : SavedAudioRepository {
     override fun exportGeneratedAudio(
         mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         sampleRateHz: Int,
-        metadata: GeneratedAudioMetadata
-    ): AudioExportResult =
-        audioExportGateway.exportGeneratedAudio(mode, inputText, pcm, sampleRateHz, metadata)
+        metadata: GeneratedAudioMetadata,
+    ): AudioExportResult = audioExportGateway.exportGeneratedAudio(mode, inputText, pcm, sampleRateHz, metadata)
 
-    override fun listSavedAudio(): List<SavedAudioItem> =
-        savedAudioLibraryGateway.listSavedAudio()
+    override fun listSavedAudio(): List<SavedAudioItem> = savedAudioLibraryGateway.listSavedAudio()
 
-    override fun loadSavedAudio(itemId: String): SavedAudioContent? =
-        savedAudioLibraryGateway.loadSavedAudio(itemId)
+    override fun loadSavedAudio(itemId: String): SavedAudioContent? = savedAudioLibraryGateway.loadSavedAudio(itemId)
 
-    override fun deleteSavedAudio(itemId: String): Boolean =
-        savedAudioLibraryGateway.deleteSavedAudio(itemId)
+    override fun deleteSavedAudio(itemId: String): Boolean = savedAudioLibraryGateway.deleteSavedAudio(itemId)
 
-    override fun renameSavedAudio(itemId: String, newBaseName: String): SavedAudioRenameResult =
-        savedAudioLibraryGateway.renameSavedAudio(itemId, newBaseName)
+    override fun renameSavedAudio(
+        itemId: String,
+        newBaseName: String,
+    ): SavedAudioRenameResult = savedAudioLibraryGateway.renameSavedAudio(itemId, newBaseName)
 
-    override fun importAudio(uriString: String): SavedAudioImportResult =
-        savedAudioLibraryGateway.importAudio(uriString)
+    override fun importAudio(uriString: String): SavedAudioImportResult = savedAudioLibraryGateway.importAudio(uriString)
 
-    override fun shareSavedAudio(item: SavedAudioItem): Boolean =
-        audioShareGateway.shareSavedAudio(item)
+    override fun shareSavedAudio(item: SavedAudioItem): Boolean = audioShareGateway.shareSavedAudio(item)
 }

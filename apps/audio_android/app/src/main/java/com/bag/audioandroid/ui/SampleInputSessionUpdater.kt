@@ -6,17 +6,17 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
 
 class SampleInputSessionUpdater(
-    private val sampleInputTextProvider: SampleInputTextProvider
+    private val sampleInputTextProvider: SampleInputTextProvider,
 ) {
     fun initialize(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
-        language: AppLanguageOption
+        language: AppLanguageOption,
     ): Map<TransportModeOption, ModeAudioSessionState> =
         sessions.mapValues { (mode, session) ->
             sampleInputTextProvider.defaultSample(mode, language).let { sample ->
                 session.copy(
                     inputText = sample.text,
-                    sampleInputId = sample.id
+                    sampleInputId = sample.id,
                 )
             }
         }
@@ -24,7 +24,7 @@ class SampleInputSessionUpdater(
     fun refreshForLanguageChange(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
         previousLanguage: AppLanguageOption,
-        newLanguage: AppLanguageOption
+        newLanguage: AppLanguageOption,
     ): Map<TransportModeOption, ModeAudioSessionState> =
         sessions.mapValues { (mode, session) ->
             session.sampleInputId

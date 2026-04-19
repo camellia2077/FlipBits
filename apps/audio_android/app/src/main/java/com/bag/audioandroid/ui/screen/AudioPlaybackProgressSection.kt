@@ -40,7 +40,7 @@ internal fun AudioPlaybackProgressSection(
     modifier: Modifier = Modifier,
     onScrubStarted: () -> Unit,
     onScrubChanged: (Int) -> Unit,
-    onScrubFinished: () -> Unit
+    onScrubFinished: () -> Unit,
 ) {
     val sliderUpperBound = totalSamples.coerceAtLeast(1)
     var userScrubbing by remember { mutableStateOf(false) }
@@ -51,15 +51,16 @@ internal fun AudioPlaybackProgressSection(
     val shouldAnimateSlider = isPlaying && !isScrubbing && !userScrubbing && totalSamples > 0
     val animatedSliderValue by animateFloatAsState(
         targetValue = clampedDisplayedSamples.toFloat(),
-        animationSpec = if (shouldAnimateSlider) {
-            tween(
-                durationMillis = PlaybackProgressAnimationDurationMs,
-                easing = LinearEasing
-            )
-        } else {
-            snap()
-        },
-        label = "audioPlaybackProgress"
+        animationSpec =
+            if (shouldAnimateSlider) {
+                tween(
+                    durationMillis = PlaybackProgressAnimationDurationMs,
+                    easing = LinearEasing,
+                )
+            } else {
+                snap()
+            },
+        label = "audioPlaybackProgress",
     )
 
     LaunchedEffect(isScrubbing) {
@@ -70,17 +71,18 @@ internal fun AudioPlaybackProgressSection(
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         waveformPcm.takeIf { it.isNotEmpty() }?.let { pcm ->
             if (isFlashMode) {
-                val flashVisualizationMode = FlashSignalVisualizationMode.entries.firstOrNull {
-                    it.name == flashVisualizationModeName
-                } ?: FlashSignalVisualizationMode.ToneTracks
+                val flashVisualizationMode =
+                    FlashSignalVisualizationMode.entries.firstOrNull {
+                        it.name == flashVisualizationModeName
+                    } ?: FlashSignalVisualizationMode.ToneTracks
                 FlashSignalVisualizationModeSwitcher(
                     selectedMode = flashVisualizationMode,
                     onModeSelected = { flashVisualizationModeName = it.name },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 AudioFlashSignalVisualizer(
                     pcm = pcm,
@@ -89,7 +91,7 @@ internal fun AudioPlaybackProgressSection(
                     isPlaying = isPlaying,
                     mode = flashVisualizationMode,
                     flashVoicingStyle = flashVoicingStyle,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             } else {
                 AudioPcmWaveform(
@@ -97,30 +99,31 @@ internal fun AudioPlaybackProgressSection(
                     sampleRateHz = sampleRateHz,
                     displayedSamples = displayedSamples,
                     isPlaying = isPlaying,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = displayedTime,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
             Text(
                 text = totalTime,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
         }
         Slider(
-            value = if (userScrubbing || isScrubbing) {
-                clampedDisplayedSamples.toFloat()
-            } else {
-                animatedSliderValue
-            },
+            value =
+                if (userScrubbing || isScrubbing) {
+                    clampedDisplayedSamples.toFloat()
+                } else {
+                    animatedSliderValue
+                },
             onValueChange = { rawValue ->
                 if (totalSamples <= 0) {
                     return@Slider
@@ -139,12 +142,13 @@ internal fun AudioPlaybackProgressSection(
             },
             enabled = totalSamples > 0,
             valueRange = 0f..sliderUpperBound.toFloat(),
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
-                inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            modifier = Modifier.fillMaxWidth()
+            colors =
+                SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

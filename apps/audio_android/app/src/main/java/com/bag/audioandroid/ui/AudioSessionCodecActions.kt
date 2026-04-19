@@ -18,31 +18,33 @@ internal class AudioSessionCodecActions(
     sampleRateHz: Int,
     frameSamples: Int,
     stopPlayback: () -> Unit,
-    workerDispatcher: CoroutineDispatcher = Dispatchers.Default
+    workerDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
-    private val encodeActions = AudioSessionEncodeActions(
-        uiState = uiState,
-        scope = scope,
-        audioCodecGateway = audioCodecGateway,
-        sessionStateStore = sessionStateStore,
-        uiTextMapper = uiTextMapper,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        sampleRateHz = sampleRateHz,
-        frameSamples = frameSamples,
-        stopPlayback = stopPlayback,
-        workerDispatcher = workerDispatcher
-    )
+    private val encodeActions =
+        AudioSessionEncodeActions(
+            uiState = uiState,
+            scope = scope,
+            audioCodecGateway = audioCodecGateway,
+            sessionStateStore = sessionStateStore,
+            uiTextMapper = uiTextMapper,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            sampleRateHz = sampleRateHz,
+            frameSamples = frameSamples,
+            stopPlayback = stopPlayback,
+            workerDispatcher = workerDispatcher,
+        )
 
-    private val decodeActions = AudioSessionDecodeActions(
-        uiState = uiState,
-        scope = scope,
-        audioCodecGateway = audioCodecGateway,
-        sessionStateStore = sessionStateStore,
-        uiTextMapper = uiTextMapper,
-        sampleRateHz = sampleRateHz,
-        frameSamples = frameSamples,
-        workerDispatcher = workerDispatcher
-    )
+    private val decodeActions =
+        AudioSessionDecodeActions(
+            uiState = uiState,
+            scope = scope,
+            audioCodecGateway = audioCodecGateway,
+            sessionStateStore = sessionStateStore,
+            uiTextMapper = uiTextMapper,
+            sampleRateHz = sampleRateHz,
+            frameSamples = frameSamples,
+            workerDispatcher = workerDispatcher,
+        )
 
     fun onEncode() {
         encodeActions.onEncode()

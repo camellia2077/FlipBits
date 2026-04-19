@@ -47,7 +47,7 @@ internal fun AudioInputActionsCard(
     onCancelEncode: () -> Unit,
     flashVoicingExpanded: Boolean,
     onToggleFlashVoicingExpanded: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val isEncodingBusy = isCodecBusy && encodeProgress != null
     val encodePercent = ((encodeProgress ?: 0f).coerceIn(0f, 1f) * 100f).roundToInt()
@@ -55,31 +55,32 @@ internal fun AudioInputActionsCard(
     Surface(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 2.dp,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AudioInputCardHeader(
                 title = stringResource(R.string.audio_input_label),
                 transportMode = transportMode,
                 enabled = !isCodecBusy,
                 flashVoicingExpanded = flashVoicingExpanded,
-                onToggleFlashVoicingExpanded = onToggleFlashVoicingExpanded
+                onToggleFlashVoicingExpanded = onToggleFlashVoicingExpanded,
             )
             if (transportMode == TransportModeOption.Flash && flashVoicingExpanded) {
                 FlashVoicingSelectorSection(
                     enabled = !isCodecBusy,
                     selectedFlashVoicingStyle = selectedFlashVoicingStyle,
-                    onFlashVoicingStyleSelected = onFlashVoicingStyleSelected
+                    onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
                 )
             }
             AudioInputFieldHeader(
                 enabled = !isCodecBusy,
-                onRandomizeSampleInput = onRandomizeSampleInput
+                onRandomizeSampleInput = onRandomizeSampleInput,
             )
             OutlinedTextField(
                 value = inputText,
@@ -90,48 +91,51 @@ internal fun AudioInputActionsCard(
                 supportingText = { Text(stringResource(transportMode.charsetHintResId)) },
                 minLines = 1,
                 maxLines = 8,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 220.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 220.dp),
             )
             if (isEncodingBusy) {
                 AudioEncodeProgressSection(
                     encodeProgress = requireNotNull(encodeProgress),
-                    encodePhase = encodePhase
+                    encodePhase = encodePhase,
                 )
             }
             if (isEncodingBusy) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     ActionButton(
-                        text = stringResource(
-                            R.string.audio_action_encode_busy_progress,
-                            encodePercent
-                        ),
+                        text =
+                            stringResource(
+                                R.string.audio_action_encode_busy_progress,
+                                encodePercent,
+                            ),
                         onClick = {},
                         enabled = false,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     ActionButton(
-                        text = stringResource(
-                            if (isEncodeCancelling) {
-                                R.string.audio_action_cancel_encode_busy
-                            } else {
-                                R.string.audio_action_cancel_encode
-                            }
-                        ),
+                        text =
+                            stringResource(
+                                if (isEncodeCancelling) {
+                                    R.string.audio_action_cancel_encode_busy
+                                } else {
+                                    R.string.audio_action_cancel_encode
+                                },
+                            ),
                         onClick = onCancelEncode,
                         enabled = !isEncodeCancelling,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                 }
             } else {
                 ActionButton(
                     text = stringResource(R.string.audio_action_encode),
                     onClick = onEncode,
-                    enabled = !isCodecBusy
+                    enabled = !isCodecBusy,
                 )
             }
         }
@@ -144,32 +148,33 @@ private fun AudioInputCardHeader(
     transportMode: TransportModeOption,
     enabled: Boolean,
     flashVoicingExpanded: Boolean,
-    onToggleFlashVoicingExpanded: () -> Unit
+    onToggleFlashVoicingExpanded: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
         Spacer(modifier = Modifier.weight(1f))
         if (transportMode == TransportModeOption.Flash) {
             IconButton(
                 onClick = onToggleFlashVoicingExpanded,
-                enabled = enabled
+                enabled = enabled,
             ) {
                 Icon(
                     imageVector = if (flashVoicingExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                    contentDescription = stringResource(
-                        if (flashVoicingExpanded) {
-                            R.string.audio_action_collapse_flash_style
-                        } else {
-                            R.string.audio_action_expand_flash_style
-                        }
-                    )
+                    contentDescription =
+                        stringResource(
+                            if (flashVoicingExpanded) {
+                                R.string.audio_action_collapse_flash_style
+                            } else {
+                                R.string.audio_action_expand_flash_style
+                            },
+                        ),
                 )
             }
         }
@@ -179,20 +184,20 @@ private fun AudioInputCardHeader(
 @Composable
 private fun AudioInputFieldHeader(
     enabled: Boolean,
-    onRandomizeSampleInput: () -> Unit
+    onRandomizeSampleInput: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(modifier = Modifier.weight(1f))
         IconButton(
             onClick = onRandomizeSampleInput,
-            enabled = enabled
+            enabled = enabled,
         ) {
             Icon(
                 imageVector = Icons.Rounded.Casino,
-                contentDescription = stringResource(R.string.audio_action_randomize_sample_input)
+                contentDescription = stringResource(R.string.audio_action_randomize_sample_input),
             )
         }
     }
@@ -201,30 +206,31 @@ private fun AudioInputFieldHeader(
 @Composable
 private fun AudioEncodeProgressSection(
     encodeProgress: Float,
-    encodePhase: AudioEncodePhase?
+    encodePhase: AudioEncodePhase?,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         encodePhase?.let { phase ->
             Text(
                 text = stringResource(phase.labelResId),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         LinearProgressIndicator(
             progress = { encodeProgress.coerceIn(0f, 1f) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 private val AudioEncodePhase.labelResId: Int
-    get() = when (this) {
-        AudioEncodePhase.PreparingInput -> R.string.audio_encode_phase_preparing_input_label
-        AudioEncodePhase.RenderingPcm -> R.string.audio_encode_phase_rendering_pcm_label
-        AudioEncodePhase.Postprocessing -> R.string.audio_encode_phase_postprocessing_label
-        AudioEncodePhase.Finalizing -> R.string.audio_encode_phase_finalizing_label
-    }
+    get() =
+        when (this) {
+            AudioEncodePhase.PreparingInput -> R.string.audio_encode_phase_preparing_input_label
+            AudioEncodePhase.RenderingPcm -> R.string.audio_encode_phase_rendering_pcm_label
+            AudioEncodePhase.Postprocessing -> R.string.audio_encode_phase_postprocessing_label
+            AudioEncodePhase.Finalizing -> R.string.audio_encode_phase_finalizing_label
+        }

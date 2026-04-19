@@ -1,0 +1,43 @@
+complexity:
+  TooManyFunctions:
+    active: false
+
+  LongMethod:
+    active: true
+    threshold: 100
+
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 10
+
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 20
+
+  ComplexCondition:
+    active: true
+    threshold: 5
+
+naming:
+  FunctionNaming:
+    active: false
+
+  TopLevelPropertyNaming:
+    active: false
+
+style:
+
+  MaxLineLength:
+    active: false
+
+  MagicNumber:
+    active: true
+    # Palette/theme files are mostly literal color data and seed values.
+    # Keeping MagicNumber active everywhere else preserves signal while
+    # avoiding low-value noise from static palette definitions.
+    excludes:
+      - '**/ui/theme/**'
+      - '**/ui/screen/**'
+      - '**/ui/state/**'
+      - '**/src/test/**'

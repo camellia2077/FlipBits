@@ -10,5 +10,5 @@ data class PaletteOption(
     @param:StringRes val titleResId: Int,
     val previewColor: Color,
     val lightScheme: ColorScheme,
-    val darkScheme: ColorScheme
+    val darkScheme: ColorScheme,
 )

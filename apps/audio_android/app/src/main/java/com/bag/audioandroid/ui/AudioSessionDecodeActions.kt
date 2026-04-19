@@ -7,12 +7,12 @@ import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
-import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
-import kotlinx.coroutines.flow.update
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -24,7 +24,7 @@ internal class AudioSessionDecodeActions(
     private val uiTextMapper: BagUiTextMapper,
     private val sampleRateHz: Int,
     private val frameSamples: Int,
-    private val workerDispatcher: CoroutineDispatcher
+    private val workerDispatcher: CoroutineDispatcher,
 ) {
     fun onDecode() {
         val current = uiState.value
@@ -37,7 +37,10 @@ internal class AudioSessionDecodeActions(
         }
     }
 
-    private fun onDecodeGenerated(current: AudioAppUiState, mode: TransportModeOption) {
+    private fun onDecodeGenerated(
+        current: AudioAppUiState,
+        mode: TransportModeOption,
+    ) {
         val session = current.sessions.getValue(mode)
         if (session.generatedPcm.isEmpty()) {
             sessionStateStore.updateSession(mode) {
@@ -45,35 +48,42 @@ internal class AudioSessionDecodeActions(
             }
             return
         }
-        val request = DecodeRequest(
-            mode = mode,
-            generatedPcm = session.generatedPcm,
-            flashPreset = resolveGeneratedFlashPreset(current, mode)
-        )
+        val request =
+            DecodeRequest(
+                mode = mode,
+                generatedPcm = session.generatedPcm,
+                flashPreset = resolveGeneratedFlashPreset(current, mode),
+            )
         sessionStateStore.updateSession(request.mode) {
             it.copy(
                 isCodecBusy = true,
                 encodeProgress = null,
                 encodePhase = null,
-                statusText = UiText.Resource(
-                    R.string.status_mode_audio_decoding,
-                    listOf(request.mode.wireName)
-                )
+                statusText =
+                    UiText.Resource(
+                        R.string.status_mode_audio_decoding,
+                        listOf(request.mode.wireName),
+                    ),
             )
         }
 
         scope.launch {
-            val result = withContext(workerDispatcher) {
-                performDecode(request)
-            }
+            val result =
+                withContext(workerDispatcher) {
+                    performDecode(request)
+                }
             applyGeneratedDecodeResult(request.mode, result)
         }
     }
 
-    private fun onDecodeSaved(current: AudioAppUiState, itemId: String) {
-        val selectedSavedAudio = current.selectedSavedAudio
-            ?.takeIf { it.item.itemId == itemId }
-            ?: return
+    private fun onDecodeSaved(
+        current: AudioAppUiState,
+        itemId: String,
+    ) {
+        val selectedSavedAudio =
+            current.selectedSavedAudio
+                ?.takeIf { it.item.itemId == itemId }
+                ?: return
         val mode = TransportModeOption.fromWireName(selectedSavedAudio.item.modeWireName)
         if (mode == null) {
             sessionStateStore.updateCurrentSession {
@@ -81,24 +91,26 @@ internal class AudioSessionDecodeActions(
             }
             return
         }
-        val request = DecodeRequest(
-            mode = mode,
-            generatedPcm = selectedSavedAudio.pcm,
-            flashPreset = resolveSavedFlashPreset(current, selectedSavedAudio)
-        )
+        val request =
+            DecodeRequest(
+                mode = mode,
+                generatedPcm = selectedSavedAudio.pcm,
+                flashPreset = resolveSavedFlashPreset(current, selectedSavedAudio),
+            )
 
         markSavedDecodeBusy(mode)
         scope.launch {
-            val result = withContext(workerDispatcher) {
-                performDecode(request)
-            }
+            val result =
+                withContext(workerDispatcher) {
+                    performDecode(request)
+                }
             applySavedDecodeResult(itemId, mode, result)
         }
     }
 
     private fun resolveGeneratedFlashPreset(
         current: AudioAppUiState,
-        mode: TransportModeOption
+        mode: TransportModeOption,
     ): FlashVoicingStyleOption =
         if (mode == TransportModeOption.Flash) {
             current.sessions.getValue(mode).generatedFlashVoicingStyle ?: current.selectedFlashVoicingStyle
@@ -108,7 +120,7 @@ internal class AudioSessionDecodeActions(
 
     private fun resolveSavedFlashPreset(
         current: AudioAppUiState,
-        savedAudio: SavedAudioPlaybackSelection
+        savedAudio: SavedAudioPlaybackSelection,
     ): FlashVoicingStyleOption =
         if (savedAudio.item.modeWireName == TransportModeOption.Flash.wireName) {
             savedAudio.item.flashVoicingStyle ?: current.selectedFlashVoicingStyle
@@ -117,29 +129,34 @@ internal class AudioSessionDecodeActions(
         }
 
     private fun performDecode(request: DecodeRequest): DecodeResult {
-        val validationIssue = audioCodecGateway.validateDecodeConfig(
-            sampleRateHz,
-            frameSamples,
-            request.mode.nativeValue,
-            request.flashPreset.signalProfileValue,
-            request.flashPreset.voicingFlavorValue
-        )
+        val validationIssue =
+            audioCodecGateway.validateDecodeConfig(
+                sampleRateHz,
+                frameSamples,
+                request.mode.nativeValue,
+                request.flashPreset.signalProfileValue,
+                request.flashPreset.voicingFlavorValue,
+            )
         if (validationIssue != BagApiCodes.VALIDATION_OK) {
             return DecodeResult.ValidationFailure(validationIssue)
         }
 
-        val decoded = audioCodecGateway.decodeGeneratedPcm(
-            request.generatedPcm,
-            sampleRateHz,
-            frameSamples,
-            request.mode.nativeValue,
-            request.flashPreset.signalProfileValue,
-            request.flashPreset.voicingFlavorValue
-        )
+        val decoded =
+            audioCodecGateway.decodeGeneratedPcm(
+                request.generatedPcm,
+                sampleRateHz,
+                frameSamples,
+                request.mode.nativeValue,
+                request.flashPreset.signalProfileValue,
+                request.flashPreset.voicingFlavorValue,
+            )
         return DecodeResult.Success(decoded)
     }
 
-    private fun applyGeneratedDecodeResult(mode: TransportModeOption, result: DecodeResult) {
+    private fun applyGeneratedDecodeResult(
+        mode: TransportModeOption,
+        result: DecodeResult,
+    ) {
         when (result) {
             is DecodeResult.ValidationFailure -> {
                 sessionStateStore.updateSession(mode) {
@@ -148,20 +165,21 @@ internal class AudioSessionDecodeActions(
                         isCodecBusy = false,
                         encodeProgress = null,
                         encodePhase = null,
-                        isEncodeCancelling = false
+                        isEncodeCancelling = false,
                     )
                 }
             }
 
             is DecodeResult.Success -> {
-                val status = if (result.decoded.isEmpty()) {
-                    uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
-                } else {
-                    UiText.Resource(
-                        R.string.status_mode_decode_completed,
-                        listOf(mode.wireName)
-                    )
-                }
+                val status =
+                    if (result.decoded.isEmpty()) {
+                        uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
+                    } else {
+                        UiText.Resource(
+                            R.string.status_mode_decode_completed,
+                            listOf(mode.wireName),
+                        )
+                    }
                 sessionStateStore.updateSession(mode) {
                     it.copy(
                         resultText = result.decoded,
@@ -169,7 +187,7 @@ internal class AudioSessionDecodeActions(
                         isCodecBusy = false,
                         encodeProgress = null,
                         encodePhase = null,
-                        isEncodeCancelling = false
+                        isEncodeCancelling = false,
                     )
                 }
             }
@@ -182,15 +200,20 @@ internal class AudioSessionDecodeActions(
                 isCodecBusy = true,
                 encodeProgress = null,
                 encodePhase = null,
-                statusText = UiText.Resource(
-                    R.string.status_mode_audio_decoding,
-                    listOf(mode.wireName)
-                )
+                statusText =
+                    UiText.Resource(
+                        R.string.status_mode_audio_decoding,
+                        listOf(mode.wireName),
+                    ),
             )
         }
     }
 
-    private fun applySavedDecodeResult(itemId: String, mode: TransportModeOption, result: DecodeResult) {
+    private fun applySavedDecodeResult(
+        itemId: String,
+        mode: TransportModeOption,
+        result: DecodeResult,
+    ) {
         when (result) {
             is DecodeResult.ValidationFailure -> {
                 sessionStateStore.updateCurrentSession {
@@ -199,26 +222,28 @@ internal class AudioSessionDecodeActions(
                         isCodecBusy = false,
                         encodeProgress = null,
                         encodePhase = null,
-                        isEncodeCancelling = false
+                        isEncodeCancelling = false,
                     )
                 }
             }
 
             is DecodeResult.Success -> {
-                val status = if (result.decoded.isEmpty()) {
-                    uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
-                } else {
-                    UiText.Resource(
-                        R.string.status_mode_decode_completed,
-                        listOf(mode.wireName)
-                    )
-                }
+                val status =
+                    if (result.decoded.isEmpty()) {
+                        uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
+                    } else {
+                        UiText.Resource(
+                            R.string.status_mode_decode_completed,
+                            listOf(mode.wireName),
+                        )
+                    }
                 uiState.update { state ->
-                    val selected = state.selectedSavedAudio
-                        ?.takeIf { it.item.itemId == itemId }
-                        ?: return@update state
+                    val selected =
+                        state.selectedSavedAudio
+                            ?.takeIf { it.item.itemId == itemId }
+                            ?: return@update state
                     state.copy(
-                        selectedSavedAudio = selected.copy(decodedText = result.decoded)
+                        selectedSavedAudio = selected.copy(decodedText = result.decoded),
                     )
                 }
                 sessionStateStore.updateCurrentSession {
@@ -227,7 +252,7 @@ internal class AudioSessionDecodeActions(
                         isCodecBusy = false,
                         encodeProgress = null,
                         encodePhase = null,
-                        isEncodeCancelling = false
+                        isEncodeCancelling = false,
                     )
                 }
             }
@@ -237,11 +262,16 @@ internal class AudioSessionDecodeActions(
     private data class DecodeRequest(
         val mode: TransportModeOption,
         val generatedPcm: ShortArray,
-        val flashPreset: FlashVoicingStyleOption
+        val flashPreset: FlashVoicingStyleOption,
     )
 
     private sealed interface DecodeResult {
-        data class ValidationFailure(val validationIssue: Int) : DecodeResult
-        data class Success(val decoded: String) : DecodeResult
+        data class ValidationFailure(
+            val validationIssue: Int,
+        ) : DecodeResult
+
+        data class Success(
+            val decoded: String,
+        ) : DecodeResult
     }
 }

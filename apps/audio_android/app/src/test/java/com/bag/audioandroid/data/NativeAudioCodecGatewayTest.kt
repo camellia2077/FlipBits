@@ -10,12 +10,13 @@ import org.junit.Test
 class NativeAudioCodecGatewayTest {
     @Test
     fun `poll snapshot parses state phase progress and terminal code`() {
-        val snapshot = floatArrayOf(
-            EncodeJobState.Running.nativeValue.toFloat(),
-            AudioEncodePhase.Postprocessing.nativeValue.toFloat(),
-            0.625f,
-            BagApiCodes.ERROR_NOT_READY.toFloat()
-        ).toEncodeJobSnapshot()
+        val snapshot =
+            floatArrayOf(
+                EncodeJobState.Running.nativeValue.toFloat(),
+                AudioEncodePhase.Postprocessing.nativeValue.toFloat(),
+                0.625f,
+                BagApiCodes.ERROR_NOT_READY.toFloat(),
+            ).toEncodeJobSnapshot()
 
         assertEquals(EncodeJobState.Running, snapshot.state)
         assertEquals(AudioEncodePhase.Postprocessing, snapshot.phase)

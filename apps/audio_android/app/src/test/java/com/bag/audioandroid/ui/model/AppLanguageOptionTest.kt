@@ -8,19 +8,19 @@ class AppLanguageOptionTest {
     fun `fromLanguageTags maps traditional chinese tags separately`() {
         assertEquals(
             AppLanguageOption.TraditionalChinese,
-            AppLanguageOption.fromLanguageTags("zh-TW")
+            AppLanguageOption.fromLanguageTags("zh-TW"),
         )
         assertEquals(
             AppLanguageOption.TraditionalChinese,
-            AppLanguageOption.fromLanguageTags("zh-Hant-HK")
+            AppLanguageOption.fromLanguageTags("zh-Hant-HK"),
         )
         assertEquals(
             AppLanguageOption.Chinese,
-            AppLanguageOption.fromLanguageTags("zh-CN")
+            AppLanguageOption.fromLanguageTags("zh-CN"),
         )
         assertEquals(
             AppLanguageOption.Chinese,
-            AppLanguageOption.fromLanguageTags("zh-Hans")
+            AppLanguageOption.fromLanguageTags("zh-Hans"),
         )
     }
 }

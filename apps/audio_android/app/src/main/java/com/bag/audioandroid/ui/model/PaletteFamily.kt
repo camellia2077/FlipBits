@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.bag.audioandroid.R
 
 enum class PaletteFamily(
-    @param:StringRes val titleResId: Int
+    @param:StringRes val titleResId: Int,
 ) {
     RedsPinks(R.string.palette_family_reds_pinks),
     Oranges(R.string.palette_family_oranges),
@@ -12,5 +12,5 @@ enum class PaletteFamily(
     Greens(R.string.palette_family_greens),
     CyansBlues(R.string.palette_family_cyans_blues),
     PurplesMagentas(R.string.palette_family_purples_magentas),
-    Neutrals(R.string.palette_family_neutrals)
+    Neutrals(R.string.palette_family_neutrals),
 }

@@ -17,14 +17,15 @@ internal class AudioPlaybackCommandActions(
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
     private val playbackSourceCoordinator: PlaybackSourceCoordinator,
     private val playbackUiStateSync: AudioPlaybackUiStateSync,
-    private val onPlaybackCompleted: (AudioPlaybackSource) -> Boolean
+    private val onPlaybackCompleted: (AudioPlaybackSource) -> Boolean,
 ) {
     fun onTogglePlayback() {
         val current = uiState.value
-        val playbackTarget = playbackSourceCoordinator.resolveTarget(current) ?: run {
-            playbackUiStateSync.setCurrentStatusText(UiText.Resource(R.string.status_no_audio_for_mode))
-            return
-        }
+        val playbackTarget =
+            playbackSourceCoordinator.resolveTarget(current) ?: run {
+                playbackUiStateSync.setCurrentStatusText(UiText.Resource(R.string.status_no_audio_for_mode))
+                return
+            }
         val sourceKey = playbackSourceCoordinator.sourceKey(playbackTarget.source)
 
         if (playbackCoordinator.hasActivePlaybackForOtherSource(sourceKey)) {
@@ -47,7 +48,7 @@ internal class AudioPlaybackCommandActions(
                         playbackRuntimeGateway.resumed(it)
                     }
                     playbackUiStateSync.setCurrentStatusText(
-                        playbackUiStateSync.playbackStatusPlaying(playbackTarget.source)
+                        playbackUiStateSync.playbackStatusPlaying(playbackTarget.source),
                     )
                 } else {
                     startPlayback(playbackTarget)
@@ -85,14 +86,15 @@ internal class AudioPlaybackCommandActions(
 
     private fun startPlayback(
         target: PlaybackSourceCoordinator.PlaybackTarget,
-        restartFromBeginning: Boolean = false
+        restartFromBeginning: Boolean = false,
     ) {
         val sourceKey = playbackSourceCoordinator.sourceKey(target.source)
-        val basePlayback = if (restartFromBeginning) {
-            playbackRuntimeGateway.load(target.pcm.size, target.sampleRateHz)
-        } else {
-            target.playback
-        }
+        val basePlayback =
+            if (restartFromBeginning) {
+                playbackRuntimeGateway.load(target.pcm.size, target.sampleRateHz)
+            } else {
+                target.playback
+            }
         val startedPlayback = playbackRuntimeGateway.playStarted(basePlayback)
         playbackCoordinator.startPlayback(
             scope = scope,
@@ -118,7 +120,7 @@ internal class AudioPlaybackCommandActions(
                     PlaybackResult.Stopped -> playbackUiStateSync.applyPlaybackStopped(target.source)
                 }
             },
-            onFailed = playbackUiStateSync::applyPlaybackFailed
+            onFailed = playbackUiStateSync::applyPlaybackFailed,
         )
     }
 }

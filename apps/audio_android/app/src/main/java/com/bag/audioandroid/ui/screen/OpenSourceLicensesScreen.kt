@@ -14,14 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
-import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
+import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OpenSourceLicensesScreen(
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val libraries by rememberLibraries(R.raw.aboutlibraries)
 
@@ -33,25 +33,27 @@ fun OpenSourceLicensesScreen(
                     TextButton(onClick = onBack) {
                         Text(stringResource(R.string.common_back), color = MaterialTheme.colorScheme.primary)
                     }
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         if (libraries == null) {
             Text(
                 text = stringResource(R.string.licenses_loading),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(16.dp),
             )
         } else {
             LibrariesContainer(
                 libraries = libraries,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
             )
         }
     }

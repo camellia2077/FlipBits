@@ -36,7 +36,7 @@ internal fun PlayerDetailDecodedSection(
     isCodecBusy: Boolean,
     onDecodeAudio: () -> Unit,
     onClearDecodedText: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
     val decodedScrollState = rememberScrollState()
@@ -44,55 +44,57 @@ internal fun PlayerDetailDecodedSection(
     Surface(
         shape = MaterialTheme.shapes.large,
         tonalElevation = 2.dp,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = stringResource(R.string.audio_player_detail_decoded_title),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Row {
                     IconButton(
                         onClick = onClearDecodedText,
-                        enabled = decodedText.isNotBlank()
+                        enabled = decodedText.isNotBlank(),
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.DeleteOutline,
-                            contentDescription = stringResource(R.string.audio_action_clear_result)
+                            contentDescription = stringResource(R.string.audio_action_clear_result),
                         )
                     }
                     IconButton(onClick = { expanded = !expanded }) {
                         Icon(
                             imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                            contentDescription = stringResource(
-                                if (expanded) {
-                                    R.string.audio_action_collapse_result
-                                } else {
-                                    R.string.audio_action_expand_result
-                                }
-                            )
+                            contentDescription =
+                                stringResource(
+                                    if (expanded) {
+                                        R.string.audio_action_collapse_result
+                                    } else {
+                                        R.string.audio_action_expand_result
+                                    },
+                                ),
                         )
                     }
                     TextButton(
                         onClick = onDecodeAudio,
-                        enabled = !isCodecBusy
+                        enabled = !isCodecBusy,
                     ) {
                         Text(
-                            text = stringResource(
-                                if (isCodecBusy) {
-                                    R.string.audio_action_decode_busy
-                                } else {
-                                    R.string.audio_action_decode
-                                }
-                            )
+                            text =
+                                stringResource(
+                                    if (isCodecBusy) {
+                                        R.string.audio_action_decode_busy
+                                    } else {
+                                        R.string.audio_action_decode
+                                    },
+                                ),
                         )
                     }
                 }
@@ -103,20 +105,21 @@ internal fun PlayerDetailDecodedSection(
                         text = stringResource(R.string.audio_player_detail_decoded_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 220.dp)
-                            .verticalScroll(decodedScrollState)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 220.dp)
+                                .verticalScroll(decodedScrollState),
                     ) {
                         Text(
                             text = decodedText,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }

@@ -14,21 +14,21 @@ import com.bag.audioandroid.R
 enum class AppTab(
     @param:StringRes val labelResId: Int,
     val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val unselectedIcon: ImageVector,
 ) {
     Audio(
         labelResId = R.string.tab_audio,
         selectedIcon = Icons.Filled.GraphicEq,
-        unselectedIcon = Icons.Outlined.GraphicEq
+        unselectedIcon = Icons.Outlined.GraphicEq,
     ),
     Library(
         labelResId = R.string.tab_library,
         selectedIcon = Icons.Filled.LibraryMusic,
-        unselectedIcon = Icons.Outlined.LibraryMusic
+        unselectedIcon = Icons.Outlined.LibraryMusic,
     ),
     Config(
         labelResId = R.string.tab_config,
         selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings
-    )
+        unselectedIcon = Icons.Outlined.Settings,
+    ),
 }

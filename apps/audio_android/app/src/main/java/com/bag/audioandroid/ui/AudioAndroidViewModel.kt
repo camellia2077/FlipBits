@@ -3,17 +3,17 @@ package com.bag.audioandroid.ui
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.BuildConfig
+import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.SavedAudioRepository
-import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
+import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
@@ -28,7 +28,7 @@ class AudioAndroidViewModel(
     sampleInputTextProvider: SampleInputTextProvider,
     appSettingsRepository: AppSettingsRepository,
     playbackRuntimeGateway: PlaybackRuntimeGateway,
-    savedAudioRepository: SavedAudioRepository
+    savedAudioRepository: SavedAudioRepository,
 ) : ViewModel() {
     private val uiStateFlow = MutableStateFlow(AudioAppUiState())
     val uiState: StateFlow<AudioAppUiState> = uiStateFlow
@@ -40,57 +40,62 @@ class AudioAndroidViewModel(
     private val playbackSourceCoordinator = PlaybackSourceCoordinator(SAMPLE_RATE_HZ)
     private val playbackSessionReducer = PlaybackSessionReducer(playbackRuntimeGateway, SAMPLE_RATE_HZ)
     private val playbackSequenceNavigator = PlaybackSequenceNavigator()
-    private val playbackActions = AudioAndroidPlaybackActions(
-        uiState = uiStateFlow,
-        scope = viewModelScope,
-        sessionStateStore = sessionStateStore,
-        playbackCoordinator = playbackCoordinator,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        playbackSourceCoordinator = playbackSourceCoordinator,
-        playbackSessionReducer = playbackSessionReducer,
-        sampleRateHz = SAMPLE_RATE_HZ,
-        onPlaybackCompleted = ::handlePlaybackCompleted
-    )
-    private val libraryActions = AudioAndroidLibraryActions(
-        uiState = uiStateFlow,
-        sessionStateStore = sessionStateStore,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        savedAudioRepository = savedAudioRepository,
-        stopPlayback = playbackActions::stopPlayback
-    )
-    private val sessionActions = AudioAndroidSessionActions(
-        uiState = uiStateFlow,
-        scope = viewModelScope,
-        audioCodecGateway = audioCodecGateway,
-        sampleInputTextProvider = sampleInputTextProvider,
-        sessionStateStore = sessionStateStore,
-        uiTextMapper = uiTextMapper,
-        playbackRuntimeGateway = playbackRuntimeGateway,
-        savedAudioRepository = savedAudioRepository,
-        sampleRateHz = SAMPLE_RATE_HZ,
-        frameSamples = FRAME_SAMPLES,
-        stopPlayback = playbackActions::stopPlayback,
-        refreshSavedAudioItems = libraryActions::refreshSavedAudioItems
-    )
-    private val chromeActions = AudioAndroidChromeActions(
-        uiState = uiStateFlow,
-        sampleInputSessionUpdater = sampleInputSessionUpdater,
-        appSettingsRepository = appSettingsRepository,
-        scope = viewModelScope
-    )
+    private val playbackActions =
+        AudioAndroidPlaybackActions(
+            uiState = uiStateFlow,
+            scope = viewModelScope,
+            sessionStateStore = sessionStateStore,
+            playbackCoordinator = playbackCoordinator,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            playbackSourceCoordinator = playbackSourceCoordinator,
+            playbackSessionReducer = playbackSessionReducer,
+            sampleRateHz = SAMPLE_RATE_HZ,
+            onPlaybackCompleted = ::handlePlaybackCompleted,
+        )
+    private val libraryActions =
+        AudioAndroidLibraryActions(
+            uiState = uiStateFlow,
+            sessionStateStore = sessionStateStore,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            savedAudioRepository = savedAudioRepository,
+            stopPlayback = playbackActions::stopPlayback,
+        )
+    private val sessionActions =
+        AudioAndroidSessionActions(
+            uiState = uiStateFlow,
+            scope = viewModelScope,
+            audioCodecGateway = audioCodecGateway,
+            sampleInputTextProvider = sampleInputTextProvider,
+            sessionStateStore = sessionStateStore,
+            uiTextMapper = uiTextMapper,
+            playbackRuntimeGateway = playbackRuntimeGateway,
+            savedAudioRepository = savedAudioRepository,
+            sampleRateHz = SAMPLE_RATE_HZ,
+            frameSamples = FRAME_SAMPLES,
+            stopPlayback = playbackActions::stopPlayback,
+            refreshSavedAudioItems = libraryActions::refreshSavedAudioItems,
+        )
+    private val chromeActions =
+        AudioAndroidChromeActions(
+            uiState = uiStateFlow,
+            sampleInputSessionUpdater = sampleInputSessionUpdater,
+            appSettingsRepository = appSettingsRepository,
+            scope = viewModelScope,
+        )
 
     init {
         val coreVersion = audioCodecGateway.getCoreVersion()
-        val selectedLanguage = AppLanguageOption.fromLanguageTags(
-            AppCompatDelegate.getApplicationLocales().toLanguageTags()
-        )
+        val selectedLanguage =
+            AppLanguageOption.fromLanguageTags(
+                AppCompatDelegate.getApplicationLocales().toLanguageTags(),
+            )
         uiStateFlow.update {
             it.copy(
                 selectedLanguage = selectedLanguage,
                 presentationVersion = BuildConfig.VERSION_NAME.ifBlank { "" },
                 coreVersion = coreVersion.ifBlank { "" },
                 sessions = sampleInputSessionUpdater.initialize(it.sessions, selectedLanguage),
-                currentPlaybackSource = AudioPlaybackSource.Generated(it.transportMode)
+                currentPlaybackSource = AudioPlaybackSource.Generated(it.transportMode),
             )
         }
         chromeActions.observeSelectedPalette()
@@ -179,7 +184,7 @@ class AudioAndroidViewModel(
         skipToAdjacentSavedTrack { state, currentSource ->
             playbackSequenceNavigator.previousSavedSource(
                 savedAudioItems = state.savedAudioItems,
-                currentSource = currentSource
+                currentSource = currentSource,
             )
         }
     }
@@ -188,7 +193,7 @@ class AudioAndroidViewModel(
         skipToAdjacentSavedTrack { state, currentSource ->
             playbackSequenceNavigator.nextSavedSource(
                 savedAudioItems = state.savedAudioItems,
-                currentSource = currentSource
+                currentSource = currentSource,
             )
         }
     }
@@ -269,7 +274,10 @@ class AudioAndroidViewModel(
         libraryActions.onDeleteSavedAudio(itemId)
     }
 
-    fun onRenameSavedAudio(itemId: String, newBaseName: String) {
+    fun onRenameSavedAudio(
+        itemId: String,
+        newBaseName: String,
+    ) {
         libraryActions.onRenameSavedAudio(itemId, newBaseName)
     }
 
@@ -292,7 +300,8 @@ class AudioAndroidViewModel(
             is AudioPlaybackSource.Generated -> playbackActions.playCurrentFromStart()
             is AudioPlaybackSource.Saved -> {
                 if (nextSource.itemId != uiStateFlow.value.currentSavedAudioItem?.itemId &&
-                    !libraryActions.prepareSavedAudioSelection(nextSource.itemId)) {
+                    !libraryActions.prepareSavedAudioSelection(nextSource.itemId)
+                ) {
                     return false
                 }
                 playbackActions.playCurrentFromStart()
@@ -300,9 +309,7 @@ class AudioAndroidViewModel(
         }
     }
 
-    private fun skipToAdjacentSavedTrack(
-        resolveTarget: (AudioAppUiState, AudioPlaybackSource) -> AudioPlaybackSource?
-    ) {
+    private fun skipToAdjacentSavedTrack(resolveTarget: (AudioAppUiState, AudioPlaybackSource) -> AudioPlaybackSource?) {
         val currentState = uiStateFlow.value
         val currentSource = currentState.currentPlaybackSource
         val targetSource = resolveTarget(currentState, currentSource) as? AudioPlaybackSource.Saved ?: return

@@ -56,25 +56,25 @@ python tools/run.py android assemble-debug --clean
 导出 Debug APK 到 `dist/android/`：
 
 ```powershell
-python tools/run.py export-apk
+python tools/run.py artifact export-apk
 ```
 
 导出 Release APK 到 `dist/android/`：
 
 ```powershell
-python tools/run.py export-apk release
+python tools/run.py artifact export-apk release
 ```
 
 如果 APK 还没编译出来，可以让脚本自动先编译：
 
 ```powershell
-python tools/run.py export-apk --assemble-if-missing
-python tools/run.py export-apk release --assemble-if-missing
+python tools/run.py artifact export-apk --assemble-if-missing
+python tools/run.py artifact export-apk release --assemble-if-missing
 ```
 
 ## Gradle 原生命令
 
-如需直接走 Gradle，也是在仓库根目录执行：
+如需直接走 Gradle，应在 `apps/audio_android/` 执行：
 
 ```powershell
 .\gradlew.bat :app:assembleDebug

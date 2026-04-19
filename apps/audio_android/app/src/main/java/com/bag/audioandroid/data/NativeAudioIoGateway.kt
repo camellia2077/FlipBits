@@ -9,9 +9,8 @@ class NativeAudioIoGateway : AudioIoGateway {
     override fun encodeMonoPcm16ToWavBytes(
         sampleRateHz: Int,
         pcm: ShortArray,
-        metadata: GeneratedAudioMetadata?
-    ): ByteArray =
-        NativeAudioIoBridge.nativeEncodeMonoPcm16ToWavBytes(sampleRateHz, pcm, metadata)
+        metadata: GeneratedAudioMetadata?,
+    ): ByteArray = NativeAudioIoBridge.nativeEncodeMonoPcm16ToWavBytes(sampleRateHz, pcm, metadata)
 
     override fun decodeMonoPcm16WavBytes(wavBytes: ByteArray): DecodedAudioData =
         NativeAudioIoBridge.nativeDecodeMonoPcm16WavBytes(wavBytes)

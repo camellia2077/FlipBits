@@ -38,48 +38,49 @@ internal fun AudioResultCard(
     onDecode: () -> Unit,
     onClearInput: () -> Unit,
     onClearResult: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val resultScrollState = rememberScrollState()
 
     Surface(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 2.dp,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.audio_result_title),
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = onClearResult,
-                    enabled = resultText.isNotBlank()
+                    enabled = resultText.isNotBlank(),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,
-                        contentDescription = stringResource(R.string.audio_action_clear_result)
+                        contentDescription = stringResource(R.string.audio_action_clear_result),
                     )
                 }
                 IconButton(onClick = onToggleExpanded) {
                     Icon(
                         imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                        contentDescription = stringResource(
-                            if (expanded) {
-                                R.string.audio_action_collapse_result
-                            } else {
-                                R.string.audio_action_expand_result
-                            }
-                        )
+                        contentDescription =
+                            stringResource(
+                                if (expanded) {
+                                    R.string.audio_action_collapse_result
+                                } else {
+                                    R.string.audio_action_expand_result
+                                },
+                            ),
                     )
                 }
             }
@@ -89,44 +90,46 @@ internal fun AudioResultCard(
                         text = stringResource(R.string.audio_result_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 220.dp)
-                            .verticalScroll(resultScrollState)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 220.dp)
+                                .verticalScroll(resultScrollState),
                     ) {
                         Text(
                             text = resultText,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ActionButton(
-                    text = stringResource(
-                        if (isDecodeBusy) {
-                            R.string.audio_action_decode_busy
-                        } else {
-                            R.string.audio_action_decode
-                        }
-                    ),
+                    text =
+                        stringResource(
+                            if (isDecodeBusy) {
+                                R.string.audio_action_decode_busy
+                            } else {
+                                R.string.audio_action_decode
+                            },
+                        ),
                     onClick = onDecode,
                     enabled = !isCodecBusy,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 ActionButton(
                     text = stringResource(R.string.audio_action_clear),
                     onClick = onClearInput,
                     enabled = !isCodecBusy,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
         }

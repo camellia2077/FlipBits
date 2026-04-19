@@ -1,9 +1,9 @@
 package com.bag.audioandroid.data
 
 import com.bag.audioandroid.NativeBagBridge
+import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
-import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
 import kotlinx.coroutines.CancellationException
@@ -18,15 +18,16 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
-    ): Int = NativeBagBridge.nativeValidateEncodeRequest(
-        text,
-        sampleRateHz,
-        frameSamples,
-        mode,
-        flashSignalProfile,
-        flashVoicingFlavor
-    )
+        flashVoicingFlavor: Int,
+    ): Int =
+        NativeBagBridge.nativeValidateEncodeRequest(
+            text,
+            sampleRateHz,
+            frameSamples,
+            mode,
+            flashSignalProfile,
+            flashVoicingFlavor,
+        )
 
     override suspend fun encodeTextToPcm(
         text: String,
@@ -35,16 +36,17 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-        onProgress: (EncodeProgressUpdate) -> Unit
+        onProgress: (EncodeProgressUpdate) -> Unit,
     ): EncodeAudioResult {
-        val handle = NativeBagBridge.nativeStartEncodeTextJob(
-            text,
-            sampleRateHz,
-            frameSamples,
-            mode,
-            flashSignalProfile,
-            flashVoicingFlavor
-        )
+        val handle =
+            NativeBagBridge.nativeStartEncodeTextJob(
+                text,
+                sampleRateHz,
+                frameSamples,
+                mode,
+                flashSignalProfile,
+                flashVoicingFlavor,
+            )
         handle.toStartFailureResultOrNull()?.let { return it }
 
         try {
@@ -54,15 +56,17 @@ class NativeAudioCodecGateway : AudioCodecGateway {
                 onProgress(
                     EncodeProgressUpdate(
                         phase = snapshot.phase,
-                        progress0To1 = snapshot.progress0To1
-                    )
+                        progress0To1 = snapshot.progress0To1,
+                    ),
                 )
                 when (snapshot.state) {
                     EncodeJobState.Queued,
-                    EncodeJobState.Running -> delay(ENCODE_JOB_POLL_INTERVAL_MS)
+                    EncodeJobState.Running,
+                    -> delay(ENCODE_JOB_POLL_INTERVAL_MS)
 
                     EncodeJobState.Succeeded ->
-                        return NativeBagBridge.nativeTakeEncodeTextJobResult(handle)
+                        return NativeBagBridge
+                            .nativeTakeEncodeTextJobResult(handle)
                             .toEncodeSuccessOrFailureResult()
 
                     EncodeJobState.Failed -> return EncodeAudioResult.Failed(snapshot.terminalCode)
@@ -83,14 +87,15 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
-    ): Int = NativeBagBridge.nativeValidateDecodeConfig(
-        sampleRateHz,
-        frameSamples,
-        mode,
-        flashSignalProfile,
-        flashVoicingFlavor
-    )
+        flashVoicingFlavor: Int,
+    ): Int =
+        NativeBagBridge.nativeValidateDecodeConfig(
+            sampleRateHz,
+            frameSamples,
+            mode,
+            flashSignalProfile,
+            flashVoicingFlavor,
+        )
 
     override fun decodeGeneratedPcm(
         pcm: ShortArray,
@@ -98,15 +103,16 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
-        flashVoicingFlavor: Int
-    ): String = NativeBagBridge.nativeDecodeGeneratedPcm(
-        pcm,
-        sampleRateHz,
-        frameSamples,
-        mode,
-        flashSignalProfile,
-        flashVoicingFlavor
-    )
+        flashVoicingFlavor: Int,
+    ): String =
+        NativeBagBridge.nativeDecodeGeneratedPcm(
+            pcm,
+            sampleRateHz,
+            frameSamples,
+            mode,
+            flashSignalProfile,
+            flashVoicingFlavor,
+        )
 
     override fun getCoreVersion(): String = NativeBagBridge.nativeGetCoreVersion()
 
@@ -119,19 +125,21 @@ internal data class EncodeJobSnapshot(
     val state: EncodeJobState,
     val phase: AudioEncodePhase,
     val progress0To1: Float,
-    val terminalCode: Int
+    val terminalCode: Int,
 )
 
-internal enum class EncodeJobState(val nativeValue: Int) {
+internal enum class EncodeJobState(
+    val nativeValue: Int,
+) {
     Queued(0),
     Running(1),
     Succeeded(2),
     Failed(3),
-    Cancelled(4);
+    Cancelled(4),
+    ;
 
     companion object {
-        fun fromNative(value: Int): EncodeJobState =
-            entries.firstOrNull { it.nativeValue == value } ?: Failed
+        fun fromNative(value: Int): EncodeJobState = entries.firstOrNull { it.nativeValue == value } ?: Failed
     }
 }
 
@@ -144,7 +152,7 @@ internal fun FloatArray.toEncodeJobSnapshot(): EncodeJobSnapshot {
         state = EncodeJobState.fromNative(stateValue),
         phase = AudioEncodePhase.fromNative(phaseValue),
         progress0To1 = progress,
-        terminalCode = terminalCode
+        terminalCode = terminalCode,
     )
 }
 
