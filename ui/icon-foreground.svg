@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432">
+  <defs>
+    <clipPath id="fg-left-half">
+      <rect x="36" y="36" width="180" height="360" />
+    </clipPath>
+    <clipPath id="fg-right-half">
+      <rect x="216" y="36" width="180" height="360" />
+    </clipPath>
+    <path id="fg-gear" d="M401.56 188.76L401.56 243.24L391.23 250.67A199.68 199.68 0 0 1 382.22 284.31L387.45 295.92L360.19 343.12L347.51 344.4A199.68 199.68 0 0 1 322.89 369L321.62 381.68L274.42 408.94L262.81 403.71A199.68 199.68 0 0 1 229.16 412.72L221.74 423.04L167.26 423.04L159.84 412.72A199.68 199.68 0 0 1 126.19 403.71L114.58 408.94L67.38 381.68L66.11 369A199.68 199.68 0 0 1 41.49 344.4L28.81 343.12L1.55 295.92L6.78 284.31A199.68 199.68 0 0 1 -2.23 250.67L-12.56 243.24L-12.56 188.76L-2.23 181.33A199.68 199.68 0 0 1 6.78 147.69L1.55 136.08L28.81 88.88L41.49 87.6A199.68 199.68 0 0 1 66.11 63L67.38 50.32L114.58 23.06L126.19 28.29A199.68 199.68 0 0 1 159.84 19.28L167.26 8.96L221.74 8.96L229.16 19.28A199.68 199.68 0 0 1 262.81 28.29L274.42 23.06L321.62 50.32L322.89 63A199.68 199.68 0 0 1 347.51 87.6L360.19 88.88L387.45 136.08L382.22 147.69A199.68 199.68 0 0 1 391.23 181.33Z M194.5 62.5C108.34 62.5 38.5 132.34 38.5 218.5C38.5 304.66 108.34 374.5 194.5 374.5C280.66 374.5 350.5 304.66 350.5 218.5C350.5 132.34 280.66 62.5 194.5 62.5Z" />
+  </defs>
+
+  <g transform="translate(21.5 19.5) scale(0.96)">
+    <circle cx="194.5" cy="218.5" r="156" fill="#9E1B1B" clip-path="url(#fg-left-half)" />
+    <circle cx="194.5" cy="218.5" r="156" fill="#E8E2D0" clip-path="url(#fg-right-half)" />
+
+    <use href="#fg-gear" fill="#E8E2D0" clip-path="url(#fg-left-half)" fill-rule="evenodd" />
+    <use href="#fg-gear" fill="#9E1B1B" clip-path="url(#fg-right-half)" fill-rule="evenodd" />
+    <use href="#fg-gear" fill="none" stroke="#C5A059" stroke-width="7" stroke-linejoin="round" />
+
+    <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M124 178C150 149 188 145 218 159C241 170 261 190 275 218.5C261 247 241 267 218 278C188 292 150 288 124 259" stroke="#E8E2D0" stroke-width="18" clip-path="url(#fg-left-half)" />
+      <path d="M124 178C150 149 188 145 218 159C241 170 261 190 275 218.5C261 247 241 267 218 278C188 292 150 288 124 259" stroke="#9E1B1B" stroke-width="18" clip-path="url(#fg-right-half)" />
+      <path d="M144 218.5H245" stroke="#E8E2D0" stroke-width="15" clip-path="url(#fg-left-half)" />
+      <path d="M144 218.5H245" stroke="#9E1B1B" stroke-width="15" clip-path="url(#fg-right-half)" />
+      <circle cx="194.5" cy="218.5" r="16" fill="#E8E2D0" clip-path="url(#fg-left-half)" />
+      <circle cx="194.5" cy="218.5" r="16" fill="#9E1B1B" clip-path="url(#fg-right-half)" />
+    </g>
+  </g>
+</svg>
