@@ -24,6 +24,11 @@ fun signingProperty(name: String): String =
         ?.takeIf { it.isNotBlank() }
         ?: error("Missing release signing property: $name")
 
+val hasReleaseSigningProperties =
+    listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all {
+        releaseSigningProperties.getProperty(it)?.isNotBlank() == true
+    }
+
 fun requiredGradleIntProperty(name: String): Int =
     providers
         .gradleProperty(name)
@@ -77,11 +82,13 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = project.file(signingProperty("storeFile"))
-            storePassword = signingProperty("storePassword")
-            keyAlias = signingProperty("keyAlias")
-            keyPassword = signingProperty("keyPassword")
+        if (hasReleaseSigningProperties) {
+            create("release") {
+                storeFile = project.file(signingProperty("storeFile"))
+                storePassword = signingProperty("storePassword")
+                keyAlias = signingProperty("keyAlias")
+                keyPassword = signingProperty("keyPassword")
+            }
         }
     }
 
@@ -98,7 +105,9 @@ android {
             isShrinkResources = true
             isDebuggable = false
             isJniDebuggable = false
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigningProperties) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             ndk {
                 debugSymbolLevel = "NONE"
             }
@@ -137,6 +146,13 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+}
+
+if (!hasReleaseSigningProperties) {
+    logger.lifecycle(
+        "Release signing properties are not configured; debug builds stay available, " +
+            "and release signing is enabled only in local/release environments.",
+    )
 }
 
 extensions.configure<AboutLibrariesExtension>("aboutLibraries") {
