@@ -1,13 +1,28 @@
-name: verify-host-modules
+name: ci-host-verify
 
 on:
   pull_request:
+    paths:
+      - ".github/workflows/ci-host-verify.yml"
+      - "CMakeLists.txt"
+      - "Test/**"
+      - "apps/audio_cli/**"
+      - "cmake/**"
+      - "libs/**"
+      - "tools/**"
   push:
-    branches:
-      - main
+    paths:
+      - ".github/workflows/ci-host-verify.yml"
+      - "CMakeLists.txt"
+      - "Test/**"
+      - "apps/audio_cli/**"
+      - "cmake/**"
+      - "libs/**"
+      - "tools/**"
 
 jobs:
-  verify:
+  host-verify:
+    name: Host Verify
     runs-on: windows-latest
     timeout-minutes: 90
 
@@ -51,6 +66,6 @@ jobs:
         shell: pwsh
         run: python tools/run.py verify --list-checks
 
-      - name: Verify default host modules path
+      - name: Verify host default path
         shell: pwsh
         run: python tools/run.py verify --build-dir build/dev --skip-android

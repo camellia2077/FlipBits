@@ -1,0 +1,66 @@
+name: ci-android-assemble
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/ci-android-assemble.yml"
+      - ".github/workflows/ci-android-quality.yml"
+      - "apps/audio_android/**"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "libs/**"
+      - "tools/**"
+  push:
+    paths:
+      - ".github/workflows/ci-android-assemble.yml"
+      - ".github/workflows/ci-android-quality.yml"
+      - "apps/audio_android/**"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "libs/**"
+      - "tools/**"
+
+jobs:
+  android-assemble-debug:
+    name: Android Assemble Debug
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;28.2.13676358" \
+            "cmake;4.1.2"
+
+      - name: Show Android toolchain versions
+        shell: bash
+        run: |
+          python --version
+          java -version
+          sdkmanager --version
+
+      - name: Assemble Android debug build
+        shell: bash
+        run: python tools/run.py android assemble-debug
