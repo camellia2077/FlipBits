@@ -9,7 +9,9 @@ from .common import is_allowed_legacy_include_owner, iter_code_files, legacy_inc
 
 _ROOT_CMAKE_PATH = ROOT_DIR / "CMakeLists.txt"
 _ROOT_SINGLE_LANE_REQUIRED_TOKENS: tuple[str, ...] = (
+    "if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.0)",
     'set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")',
+    'set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "0e5b6991-d74f-4b3d-a41c-cf096e0b2508")',
     "Root host currently supports the single clang++ + Ninja lane only.",
     "Current root host target requires C++23 import std support from the active Clang toolchain.",
     "set(CMAKE_CXX_STANDARD 20)",
