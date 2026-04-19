@@ -260,9 +260,11 @@ class MediaStoreSavedAudioLibraryGateway(
         runCatching {
             contentResolver.openInputStream(uri)?.use { input ->
                 val headerBytes = input.readNBytes(MetadataHeaderReadLimitBytes)
-                audioIoGateway.decodeMonoPcm16WavBytes(headerBytes).takeIf {
-                    it.metadataStatusCode == AudioIoMetadataCodes.STATUS_OK && it.hasReadableMetadata
-                }?.metadata
+                audioIoGateway
+                    .decodeMonoPcm16WavBytes(headerBytes)
+                    .takeIf {
+                        it.metadataStatusCode == AudioIoMetadataCodes.STATUS_OK && it.hasReadableMetadata
+                    }?.metadata
             }
         }.getOrNull()
 
