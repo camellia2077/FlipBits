@@ -8,6 +8,8 @@
   - `docs/architecture/android-app-architecture.md`
 - Android native 策略：
   - `docs/architecture/android-native-strategy.md`
+- Android 双色主题规则：
+  - `docs/design/android-dual-tone-theme.md`
 - Android 子项目规则：
   - `apps/audio_android/AGENTS.md`
 

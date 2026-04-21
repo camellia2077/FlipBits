@@ -6,6 +6,7 @@ import com.bag.audioandroid.R
 enum class PaletteFamily(
     @param:StringRes val titleResId: Int,
 ) {
+    Brand(R.string.palette_family_brand),
     RedsPinks(R.string.palette_family_reds_pinks),
     Oranges(R.string.palette_family_oranges),
     Yellows(R.string.palette_family_yellows),

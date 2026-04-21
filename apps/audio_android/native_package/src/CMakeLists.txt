@@ -1,10 +1,10 @@
-include("${WAVEBITS_ROOT}/cmake/wavebits_core_version.cmake")
+include("${FLIPBITS_ROOT}/cmake/flipbits_core_version.cmake")
 
-set(WAVEBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/include")
-file(MAKE_DIRECTORY "${WAVEBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}/bag/common")
+set(FLIPBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/include")
+file(MAKE_DIRECTORY "${FLIPBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}/bag/common")
 configure_file(
-    "${WAVEBITS_ROOT}/libs/audio_core/include/bag/common/version_generated.h.in"
-    "${WAVEBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}/bag/common/version_generated.h"
+    "${FLIPBITS_ROOT}/libs/audio_core/include/bag/common/version_generated.h.in"
+    "${FLIPBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}/bag/common/version_generated.h"
     @ONLY
 )
 
@@ -22,11 +22,11 @@ set(bag_android_native_package_source_files
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_transport.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_ultra_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_ultra_phy_clean.cpp"
-    "${WAVEBITS_ROOT}/libs/audio_io/src/audio_io_api.cpp"
-    "${WAVEBITS_ROOT}/libs/audio_io/src/wav_io.cpp"
+    "${FLIPBITS_ROOT}/libs/audio_io/src/audio_io_api.cpp"
+    "${FLIPBITS_ROOT}/libs/audio_io/src/wav_io.cpp"
 )
 
-if(WAVEBITS_ANDROID_MODULES_SMOKE)
+if(FLIPBITS_ANDROID_MODULES_SMOKE)
     # Phase 3A leaf batch: let the direct version-owner target provide
     # bag.common.version so Android stops source-owning this leaf implementation.
     list(REMOVE_ITEM bag_android_native_package_source_files
@@ -41,22 +41,26 @@ add_library(bag_android_native_package_objects OBJECT
 target_compile_features(bag_android_native_package_objects PUBLIC cxx_std_23)
 set_target_properties(bag_android_native_package_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-if(WAVEBITS_ANDROID_MODULES_SMOKE)
-    target_compile_definitions(bag_android_native_package_objects PRIVATE WAVEBITS_ANDROID_MODULES_SMOKE=1)
+if(FLIPBITS_ANDROID_MODULES_SMOKE)
+    target_compile_definitions(
+        bag_android_native_package_objects
+        PRIVATE
+            FLIPBITS_ANDROID_MODULES_SMOKE=1
+    )
     target_link_libraries(bag_android_native_package_objects
         PRIVATE
-            wavebits_android_bag_common_version_owner
+            flipbits_android_bag_common_version_owner
     )
 endif()
 
 target_include_directories(bag_android_native_package_objects
     PUBLIC
-        "${WAVEBITS_ROOT}/libs/audio_api/include"
-        "${WAVEBITS_ROOT}/libs/audio_runtime/include"
+        "${FLIPBITS_ROOT}/libs/audio_api/include"
+        "${FLIPBITS_ROOT}/libs/audio_runtime/include"
     PRIVATE
-        "${WAVEBITS_ROOT}/libs/audio_io/include"
-        "${WAVEBITS_ROOT}/libs/audio_io/src"
-        "${WAVEBITS_ROOT}/libs/audio_io/include"
+        "${FLIPBITS_ROOT}/libs/audio_io/include"
+        "${FLIPBITS_ROOT}/libs/audio_io/src"
+        "${FLIPBITS_ROOT}/libs/audio_io/include"
         "${CMAKE_CURRENT_LIST_DIR}/../private_include"
-        "${WAVEBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}"
+        "${FLIPBITS_ANDROID_NATIVE_PACKAGE_GENERATED_INCLUDE_DIR}"
 )

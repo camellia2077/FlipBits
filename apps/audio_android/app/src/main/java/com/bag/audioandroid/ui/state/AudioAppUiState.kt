@@ -4,13 +4,16 @@ import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 
 data class AudioAppUiState(
@@ -21,7 +24,11 @@ data class AudioAppUiState(
     val presentationVersion: String = "",
     val coreVersion: String = "",
     val selectedPalette: PaletteOption = DefaultMaterialPalette,
+    val selectedBrandTheme: BrandThemeOption = DefaultBrandTheme,
+    val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.BrandDualTone,
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
+    val isConfigLanguageExpanded: Boolean = true,
+    val isConfigThemeAppearanceExpanded: Boolean = true,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.CodedBurst,
     val transportMode: TransportModeOption = TransportModeOption.Flash,
     val sessions: Map<TransportModeOption, ModeAudioSessionState> = defaultModeSessions(),

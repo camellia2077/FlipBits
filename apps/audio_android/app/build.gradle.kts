@@ -3,9 +3,9 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.kotlin.dsl.configure
 import java.util.Properties
 
-val wavebitsAndroidModulesSmokeEnabled =
+val flipbitsAndroidModulesSmokeEnabled =
     providers
-        .gradleProperty("wavebits.android.modulesSmoke")
+        .gradleProperty("flipbits.android.modulesSmoke")
         .orNull
         ?.equals("true", ignoreCase = true)
         ?: false
@@ -63,8 +63,8 @@ android {
         // Android presentation version now has a single truth source in
         // apps/audio_android/gradle.properties so release tooling, docs, and
         // agent workflows do not need to edit this larger build script.
-        versionCode = requiredGradleIntProperty("wavebits.android.versionCode")
-        versionName = requiredGradleStringProperty("wavebits.android.versionName")
+        versionCode = requiredGradleIntProperty("flipbits.android.versionCode")
+        versionName = requiredGradleStringProperty("flipbits.android.versionName")
         ndk {
             abiFilters += listOf("arm64-v8a")
         }
@@ -72,8 +72,8 @@ android {
             cmake {
                 val cmakeArguments =
                     mutableListOf(
-                        "-DWAVEBITS_ANDROID_MODULES_SMOKE=${
-                            if (wavebitsAndroidModulesSmokeEnabled) "ON" else "OFF"
+                        "-DFLIPBITS_ANDROID_MODULES_SMOKE=${
+                            if (flipbitsAndroidModulesSmokeEnabled) "ON" else "OFF"
                         }",
                     )
                 arguments += cmakeArguments

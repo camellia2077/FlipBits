@@ -113,4 +113,4 @@ fun AboutScreen(
 }
 
 private const val AUTHOR_NAME = "camellia2077"
-private const val GITHUB_URL = "https://github.com/camellia2077/WaveBits"
+private const val GITHUB_URL = "https://github.com/camellia2077/FlipBits"

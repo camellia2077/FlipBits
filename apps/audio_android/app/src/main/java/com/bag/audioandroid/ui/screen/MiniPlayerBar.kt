@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,10 +40,12 @@ internal fun MiniPlayerBar(
     onTogglePlayback: () -> Unit,
     onOpenSavedAudioSheet: () -> Unit,
     onOpenDetails: () -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
     modifier: Modifier = Modifier,
 ) {
     Surface(
         shape = MaterialTheme.shapes.large,
+        color = containerColor,
         tonalElevation = 6.dp,
         shadowElevation = 4.dp,
         modifier =

@@ -14,9 +14,12 @@ import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,7 +102,11 @@ class AudioAndroidViewModel(
             )
         }
         chromeActions.observeSelectedPalette()
+        chromeActions.observeSelectedBrandTheme()
+        chromeActions.observeSelectedThemeStyle()
         chromeActions.observeSelectedThemeMode()
+        chromeActions.observeConfigLanguageExpanded()
+        chromeActions.observeConfigThemeAppearanceExpanded()
         chromeActions.observeSelectedFlashVoicingStyle()
         chromeActions.observeSelectedPlaybackSequenceMode()
     }
@@ -136,6 +143,22 @@ class AudioAndroidViewModel(
         chromeActions.onThemeModeSelected(themeMode)
     }
 
+    fun onThemeStyleSelected(themeStyle: ThemeStyleOption) {
+        chromeActions.onThemeStyleSelected(themeStyle)
+    }
+
+    fun onBrandThemeSelected(brandTheme: BrandThemeOption) {
+        chromeActions.onBrandThemeSelected(brandTheme)
+    }
+
+    fun onConfigLanguageExpandedChanged(expanded: Boolean) {
+        chromeActions.onConfigLanguageExpandedChanged(expanded)
+    }
+
+    fun onConfigThemeAppearanceExpandedChanged(expanded: Boolean) {
+        chromeActions.onConfigThemeAppearanceExpandedChanged(expanded)
+    }
+
     fun onFlashVoicingStyleSelected(style: com.bag.audioandroid.ui.model.FlashVoicingStyleOption) {
         chromeActions.onFlashVoicingStyleSelected(style)
     }
@@ -156,8 +179,8 @@ class AudioAndroidViewModel(
         sessionActions.onInputTextChange(value)
     }
 
-    fun onRandomizeSampleInput() {
-        sessionActions.onRandomizeSampleInput()
+    fun onRandomizeSampleInput(length: SampleInputLengthOption) {
+        sessionActions.onRandomizeSampleInput(length)
     }
 
     fun onTransportModeSelected(mode: TransportModeOption) {

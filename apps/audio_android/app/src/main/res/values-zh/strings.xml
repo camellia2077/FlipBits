@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">audio</string>
+    <string name="app_name">FlipBits</string>
 
     <string name="common_back">返回</string>
     <string name="common_cancel">取消</string>
@@ -37,8 +37,16 @@
     <string name="audio_action_export">下载音频</string>
     <string name="audio_action_open_saved_audio_list">打开已保存音频列表</string>
     <string name="audio_action_randomize_sample_input">换一条样例文本</string>
+    <string name="audio_action_open_input_editor">打开全屏输入编辑器</string>
+    <string name="audio_sample_length_short">短</string>
+    <string name="audio_sample_length_long">长</string>
     <string name="audio_action_expand_input">展开输入文本</string>
     <string name="audio_action_collapse_input">收起输入文本</string>
+    <string name="audio_input_editor_inline_hint">较长内容会在这里折叠显示，完整查看或编辑请打开 TXT 编辑器。</string>
+    <string name="audio_input_editor_title">编辑输入文本</string>
+    <string name="audio_input_editor_hint">长文本、笔记或仪式感台词可以先在这里完整编辑，再转换成音频。</string>
+    <string name="audio_input_editor_done">完成</string>
+    <string name="audio_input_editor_count">%1$d 个字符</string>
     <string name="audio_action_expand_result">展开解析结果</string>
     <string name="audio_action_collapse_result">收起解析结果</string>
     <string name="audio_action_expand_flash_style">展开 flash 发声风格</string>
@@ -79,6 +87,14 @@
     <string name="audio_sample_thematic_3">第七座火炬已点燃，远门依旧沉默</string>
     <string name="audio_sample_thematic_4">灰烬旷野尽头，巡礼船穿过黑潮</string>
     <string name="audio_sample_thematic_5">铁钟回响之时，外门仍无人应答</string>
+    <string name="audio_sample_thematic_long_1">钟塔记录写道，东方熔炉在黎明前先一步应答，甚至早于屋顶照明被升起的时刻。三名守夜人徒手转动铜轮，灰烬顺着上层通风井缓缓飘落，在石阶上覆出一层薄灰。封印舱室回以低沉而稳定的嗡鸣，持续得太久，以至于值守抄写员开始把那道节律一笔一笔刻进蜡板。直到余音散尽，也没有人打开铁门，可每一份证词都写着同一句话：门后的机器确实醒了。</string>
+    <string name="audio_sample_thematic_long_2">第二更时，门楼灯火被重新修整，外侧锁具又被逐一试过，链式铰接处的积灰也被刮净。远方通道依然没有传回任何声音，可大厅石地却持续发出短促轻震，仿佛下方那台沉睡多年的重型引擎重新记起了自己的工作。守门人把每一次震动都对着水钟记下，随后发现那节奏总会在西侧风压加重时重现。值更结束前，一道新的封蜡被压上内闩，报告最后留下警语：门后的沉默已经不再是空无一物的沉默。</string>
+    <string name="audio_sample_thematic_long_3">熔炉编年提到，红灯被一盏一盏升起，直到整座大厅像压住火光的炭床般发亮，穹顶下仍悬着未散的烟。最后一条链索归于静止后，值守抄写员开始把信号誊录进蜡板，而高处回廊仍不断传来铁钩刮碰的回声。那道信号总共返回了四次，每一次都比前一次微弱，可没有任何记录员能说清声音究竟来自哪一面墙后。卷末只补了一句：铁钟在天亮前始终没有上弦，因为大厅里没有人愿意听见第五次呼唤之后会有什么回应。</string>
+    <string name="audio_sample_thematic_long_4">灰岸巡礼记录里写着一次破月之下的夜航，天幕被炉灰和烟尘遮得发暗。船壳灯火被压低，星图室始终沉默，唯有引擎圣所缓慢而规律的脉动，为甲板下的时辰留下刻度。接近午夜时，掌舵人下令让船首偏转三度，因为有人看见黑潮之间有苍白轮廓缓缓移动，却始终没有任何声音抵达舷侧。天明靠岸之后，记录最后写道：所有灯火都被重新点亮，只有封印匣旁那一盏仍保持熄灭。</string>
+    <string name="audio_sample_pro_long_1">EAST FURNACE ANSWERED BEFORE DAWN. THREE KEEPERS TURNED THE COPPER WHEELS BY HAND WHILE ASH FELL THROUGH THE UPPER VENTS. THE SEALED CHAMBER RETURNED A LOW STEADY HUM, AND THE WATCH SCRIBES MARKED THE RHYTHM INTO WAX TABLETS. FINAL ENTRY STATES THE MACHINE AWAKENED BEYOND THE IRON DOOR.</string>
+    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER LOCKS TESTED AGAIN, HINGES CLEANED OF SOOT. FAR PASSAGE REMAINED SILENT, BUT THE FLOOR SHOOK IN SHORT INTERVALS ABOVE THE ENGINE HALL. PATTERN MATCHED THE WIND AGAINST THE WESTERN WALL. INNER LATCH SEALED AGAIN BEFORE WATCH END.</string>
+    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE NAVE GLOWED LIKE BANKED COALS. OPERATORS COPIED THE SIGNAL INTO WAX TABLETS WHILE IRON HOOKS ECHOED ABOVE THE GALLERIES. FOUR SLOW RETURNS WERE HEARD, EACH WEAKER THAN THE LAST. BELLS LEFT UNWOUND UNTIL DAWN.</string>
+    <string name="audio_sample_pro_long_4">ASH SHORE RECORD. HULL LIGHTS SHADED, CHART ROOM SILENT, ENGINE CHAPEL MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. NO SOUND REACHED THE RAIL. ALL LAMPS RELIT AT LANDING EXCEPT THE ONE BESIDE THE SEALED RELIQUARY.</string>
 
     <string name="status_ready_to_encode">请输入文本后点击“文本转音频”</string>
     <string name="status_input_empty">输入文本为空。</string>
@@ -117,15 +133,34 @@
     <string name="config_language_traditional_chinese">繁体中文</string>
     <string name="config_language_english">English</string>
     <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_expand">展开语言设置</string>
+    <string name="config_language_collapse">收起语言设置</string>
     <string name="config_theme_mode_title">主题模式</string>
     <string name="config_theme_mode_subtitle">选择跟随系统、固定浅色或固定深色。</string>
+    <string name="config_theme_mode_brand_fixed">双色主题使用固定风格，不跟随浅色或深色模式切换。</string>
     <string name="config_theme_mode_follow_system">跟随系统</string>
     <string name="config_theme_mode_light">浅色模式</string>
     <string name="config_theme_mode_dark">深色模式</string>
+    <string name="config_theme_appearance_title">主题外观</string>
+    <string name="config_theme_style_title">主题风格</string>
+    <string name="config_theme_style_subtitle">在可自由切换的 Material 主题系统与固定双色主题之间选择。</string>
+    <string name="config_theme_style_material">Material</string>
+    <string name="config_theme_style_brand_dual_tone">双色主题</string>
+    <string name="config_theme_appearance_expand">展开主题外观设置</string>
+    <string name="config_theme_appearance_collapse">收起主题外观设置</string>
     <string name="config_palette_title">颜色选择</string>
     <string name="config_palette_selected">已选</string>
     <string name="config_palette_expand">展开颜色</string>
     <string name="config_palette_collapse">收起颜色</string>
+    <string name="config_brand_theme_title">双色主题</string>
+    <string name="config_brand_theme_description">每套双色主题都保留自己的固定明暗气质，并使用双色预览来选择。</string>
+    <string name="config_dual_tone_group_sacred_machine">圣机教团</string>
+    <string name="config_dual_tone_group_ancient_dynasty">远古王朝</string>
+    <string name="palette_family_brand">双色主题</string>
     <string name="palette_family_reds_pinks">红粉系</string>
     <string name="palette_family_oranges">橙色系</string>
     <string name="palette_family_yellows">黄色系</string>
@@ -184,6 +219,28 @@
     <string name="library_status_import_unsupported">当前只支持导入单声道 PCM16 WAV 音频</string>
 
     <string name="palette_ruby_title">宝石红</string>
+    <string name="palette_mars_relic_title">火星圣物</string>
+    <string name="brand_theme_mars_relic_title">火星圣物</string>
+    <string name="brand_theme_mars_relic_description">深红与羊皮米白的组合，像仪式档案与祭坛文书。</string>
+    <string name="brand_theme_mars_relic_accessibility">火星圣物主题，深红色搭配羊皮米白色。</string>
+    <string name="brand_theme_black_crimson_rite_title">黑红仪轨</string>
+    <string name="brand_theme_black_crimson_rite_description">煤黑与仪式猩红的搭配，气质冷峻而威压。</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">黑红仪轨主题，近黑色搭配鲜明猩红色。</string>
+    <string name="brand_theme_scarlet_guard_title">猩红卫序</string>
+    <string name="brand_theme_scarlet_guard_description">象牙白与封印猩红，带有秩序感和纹章感。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">猩红卫序主题，浅象牙白搭配深猩红色。</string>
+    <string name="brand_theme_dynasty_revival_title">王朝复苏</string>
+    <string name="brand_theme_dynasty_revival_description">墓穴金属黑与经典反应堆绿，像重新点亮的王朝核心。</string>
+    <string name="brand_theme_dynasty_revival_accessibility">王朝复苏主题，深墓穴金属黑搭配高亮反应堆绿。</string>
+    <string name="brand_theme_sepulcher_cyan_title">墓室青辉</string>
+    <string name="brand_theme_sepulcher_cyan_description">冷墓钢与克制的青绿辉光，气质更安静也更高级。</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">墓室青辉主题，冷深钢灰搭配低饱和青绿色。</string>
+    <string name="brand_theme_tomb_sigil_title">墓印绿火</string>
+    <string name="brand_theme_tomb_sigil_description">偏暖的墓铁暗底与锋利复苏绿，像王朝纹印被重新唤醒。</string>
+    <string name="brand_theme_tomb_sigil_accessibility">墓印绿火主题，深墓铁色搭配鲜明复苏绿。</string>
+    <string name="brand_theme_ancient_alloy_title">远古合金</string>
+    <string name="brand_theme_ancient_alloy_description">旧合金阴影与冷调青绿，像墓穴熔炉里的冷辉。</string>
+    <string name="brand_theme_ancient_alloy_accessibility">远古合金主题，深青铜灰搭配亮青绿色。</string>
     <string name="palette_crimson_title">深绯红</string>
     <string name="palette_rose_title">蔷薇粉</string>
     <string name="palette_sakura_title">樱花粉</string>

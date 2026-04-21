@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 
 @Composable
 internal fun PlayerDetailDecodedSection(
@@ -40,6 +41,7 @@ internal fun PlayerDetailDecodedSection(
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
     val decodedScrollState = rememberScrollState()
+    val accentTokens = appThemeAccentTokens()
 
     Surface(
         shape = MaterialTheme.shapes.large,
@@ -80,6 +82,7 @@ internal fun PlayerDetailDecodedSection(
                                         R.string.audio_action_expand_result
                                     },
                                 ),
+                            tint = accentTokens.disclosureAccentTint,
                         )
                     }
                     TextButton(

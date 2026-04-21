@@ -6,6 +6,7 @@ import android.content.res.Resources
 import androidx.annotation.StringRes
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import java.util.Locale
 import kotlin.random.Random
@@ -17,14 +18,19 @@ class AndroidSampleInputTextProvider(
     override fun defaultSample(
         mode: TransportModeOption,
         language: AppLanguageOption,
-    ): SampleInput = resolveSample(resourcesFor(language), sampleEntries(mode).first())
+    ): SampleInput =
+        resolveSample(
+            resourcesFor(language),
+            sampleEntries(mode, SampleInputLengthOption.Short).first(),
+        )
 
     override fun randomSample(
         mode: TransportModeOption,
         language: AppLanguageOption,
+        length: SampleInputLengthOption,
         excludingSampleId: String?,
     ): SampleInput {
-        val entries = sampleEntries(mode)
+        val entries = sampleEntries(mode, length)
         val candidates =
             if (excludingSampleId != null && entries.size > 1) {
                 entries.filterNot { it.id == excludingSampleId }
@@ -40,7 +46,8 @@ class AndroidSampleInputTextProvider(
         language: AppLanguageOption,
         sampleId: String,
     ): SampleInput? =
-        sampleEntries(mode)
+        sampleEntries(mode, SampleInputLengthOption.Short)
+            .plus(sampleEntries(mode, SampleInputLengthOption.Long))
             .firstOrNull { it.id == sampleId }
             ?.let { resolveSample(resourcesFor(language), it) }
 
@@ -61,6 +68,10 @@ class AndroidSampleInputTextProvider(
                 localizedContext(Locale.forLanguageTag("zh-TW")).resources
             AppLanguageOption.English -> localizedContext(Locale.ENGLISH).resources
             AppLanguageOption.Japanese -> localizedContext(Locale.JAPANESE).resources
+            AppLanguageOption.German -> localizedContext(Locale.GERMAN).resources
+            AppLanguageOption.Russian -> localizedContext(Locale.forLanguageTag("ru")).resources
+            AppLanguageOption.Spanish -> localizedContext(Locale.forLanguageTag("es")).resources
+            AppLanguageOption.Portuguese -> localizedContext(Locale.forLanguageTag("pt")).resources
         }
 
     private fun resolveSample(
@@ -72,10 +83,22 @@ class AndroidSampleInputTextProvider(
             text = resources.getString(entry.resId),
         )
 
-    private fun sampleEntries(mode: TransportModeOption): List<SampleEntry> =
+    private fun sampleEntries(
+        mode: TransportModeOption,
+        length: SampleInputLengthOption,
+    ): List<SampleEntry> =
         when (mode) {
-            TransportModeOption.Flash, TransportModeOption.Ultra -> thematicSamples
-            TransportModeOption.Pro -> proSamples
+            TransportModeOption.Flash, TransportModeOption.Ultra ->
+                when (length) {
+                    SampleInputLengthOption.Short -> thematicSamples
+                    SampleInputLengthOption.Long -> thematicLongSamples
+                }
+
+            TransportModeOption.Pro ->
+                when (length) {
+                    SampleInputLengthOption.Short -> proSamples
+                    SampleInputLengthOption.Long -> proLongSamples
+                }
         }
 
     private data class SampleEntry(
@@ -93,6 +116,14 @@ class AndroidSampleInputTextProvider(
                 SampleEntry("iron_bells", R.string.audio_sample_thematic_5),
             )
 
+        val thematicLongSamples =
+            listOf(
+                SampleEntry("bell_tower_log", R.string.audio_sample_thematic_long_1),
+                SampleEntry("gatehouse_watch", R.string.audio_sample_thematic_long_2),
+                SampleEntry("furnace_chronicle", R.string.audio_sample_thematic_long_3),
+                SampleEntry("pilgrim_record", R.string.audio_sample_thematic_long_4),
+            )
+
         val proSamples =
             listOf(
                 SampleEntry("ash_bells", R.string.audio_transport_pro_example),
@@ -100,6 +131,14 @@ class AndroidSampleInputTextProvider(
                 SampleEntry("red_keepers", R.string.audio_sample_pro_3),
                 SampleEntry("seventh_torch", R.string.audio_sample_pro_4),
                 SampleEntry("iron_spires", R.string.audio_sample_pro_5),
+            )
+
+        val proLongSamples =
+            listOf(
+                SampleEntry("bell_tower_log_pro", R.string.audio_sample_pro_long_1),
+                SampleEntry("gatehouse_watch_pro", R.string.audio_sample_pro_long_2),
+                SampleEntry("furnace_chronicle_pro", R.string.audio_sample_pro_long_3),
+                SampleEntry("pilgrim_record_pro", R.string.audio_sample_pro_long_4),
             )
     }
 }

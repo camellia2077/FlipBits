@@ -17,5 +17,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "WaveBits"
+rootProject.name = "FlipBits"
 include(":app")

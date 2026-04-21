@@ -15,6 +15,7 @@
   - JNI：`app/src/main/cpp/jni_bridge.cpp`、`app/src/main/cpp/audio_io_jni.cpp`
   - WAV 元数据：`libs/audio_io/include/wav_io.h`、`libs/audio_io/src/wav_io_bytes_impl.inc`
   - Palette：`ui/theme/PaletteCatalog.kt`、`ui/theme/PaletteFactory.kt`
+  - 双色主题用色规则：`docs/design/android-dual-tone-theme.md`
 - 修改 `app/src/main/res/values/strings.xml` 中的可见文案时，必须同步检查并更新：
   - `app/src/main/res/values-zh/strings.xml`
   - `app/src/main/res/values-ja/strings.xml`
@@ -24,25 +25,24 @@
   - `data/AndroidSampleInputTextProvider.kt`
   - `ui/SampleInputSessionUpdater.kt`
 - 如果改动涉及保存音频识别，不要再从文件名设计新解析逻辑；优先看 WAV 内嵌 metadata 链路。
-- 如果要修改 Android presentation 版本号，优先改 `apps/audio_android/gradle.properties` 中的 `wavebits.android.versionName` / `wavebits.android.versionCode`；`app/build.gradle.kts` 只负责读取，不再是版本真源。
-- 修改 `apps/audio_android` 下的代码后，最小验证优先运行：
-  - Windows: `.\gradlew.bat :app:assembleDebug`
-  - macOS/Linux: `./gradlew :app:assembleDebug`
-- 需要检查 Android Kotlin 代码质量时，优先运行：
+- 如果要修改 Android presentation 版本号，优先改 `apps/audio_android/gradle.properties` 中的 `flipbits.android.versionName` / `flipbits.android.versionCode`；`app/build.gradle.kts` 只负责读取，不再是版本真源。
+- 编译与测试优先从仓库根目录通过 `python tools/run.py android ...` 执行。
+- 需要自动格式化 Android Kotlin 源码时，优先运行：
+  - `python tools/run.py android ktlint-format`
+  - 注意：这条命令会直接改写 `apps/audio_android/app` 下的 Kotlin 源码
+- 修改 `apps/audio_android` 下的代码后，最小编译验证优先运行：
+  - `python tools/run.py android assemble-debug`
+- 需要做 Android Kotlin 代码质量检查时，优先运行：
   - `python tools/run.py android ktlint-check`
   - `python tools/run.py android detekt`
   - `python tools/run.py android quality`
-- 需要自动格式化 Android Kotlin 源码时，运行：
-  - `python tools/run.py android ktlint-format`
-  - 注意：这条命令会直接改写 `apps/audio_android/app` 下的 Kotlin 源码
-- 修改 Android `Gradle` / `CMake` / JNI / 依赖接线后，建议运行：
-  - Windows: `.\gradlew.bat clean :app:assembleDebug`
-  - macOS/Linux: `./gradlew clean :app:assembleDebug`
-- 需要 release 验证时，运行：
-  - Windows: `.\gradlew.bat :app:assembleRelease`
-  - macOS/Linux: `./gradlew :app:assembleRelease`
+- 修改 Android `Gradle` / `CMake` / JNI / 依赖接线后，建议运行更完整的调试构建验证：
+  - `python tools/run.py android assemble-debug --clean`
+- 需要做 release 构建验证时，运行：
+  - `python tools/run.py android assemble-release`
 - 需要导出 APK 时，优先运行：
   - `python tools/run.py artifact export-apk`
   - `python tools/run.py artifact export-apk release`
 - 需要排查 Android 构建失败时，优先运行：
-  - Windows: `.\gradlew.bat :app:assembleDebug --stacktrace`
+  - `python tools/run.py android assemble-debug`
+  - 如需更详细 Gradle 日志，再进入 `apps/audio_android` 手动补 `--stacktrace`

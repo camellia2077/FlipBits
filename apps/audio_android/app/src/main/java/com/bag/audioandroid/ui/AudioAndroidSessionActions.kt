@@ -6,6 +6,7 @@ import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -60,8 +61,8 @@ internal class AudioAndroidSessionActions(
         editingActions.onInputTextChange(value)
     }
 
-    fun onRandomizeSampleInput() {
-        editingActions.onRandomizeSampleInput()
+    fun onRandomizeSampleInput(length: SampleInputLengthOption) {
+        editingActions.onRandomizeSampleInput(length)
     }
 
     fun onTransportModeSelected(mode: TransportModeOption) {

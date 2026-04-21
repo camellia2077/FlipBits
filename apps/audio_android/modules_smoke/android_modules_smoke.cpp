@@ -1,6 +1,6 @@
 import bag.common.version;
 
-extern "C" int wavebits_android_modules_smoke_anchor() {
+extern "C" int flipbits_android_modules_smoke_anchor() {
     const char* version = bag::CoreVersion();
     if (version == nullptr || version[0] == '\0') {
         return -1;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">audio</string>
+    <string name="app_name">FlipBits</string>
 
     <string name="common_back">戻る</string>
     <string name="common_cancel">キャンセル</string>
@@ -37,8 +37,16 @@
     <string name="audio_action_export">音声を保存</string>
     <string name="audio_action_open_saved_audio_list">保存済み音声リストを開く</string>
     <string name="audio_action_randomize_sample_input">別のサンプル入力に切り替える</string>
+    <string name="audio_action_open_input_editor">全画面入力エディターを開く</string>
+    <string name="audio_sample_length_short">短</string>
+    <string name="audio_sample_length_long">長</string>
     <string name="audio_action_expand_input">入力テキストを展開</string>
     <string name="audio_action_collapse_input">入力テキストを折りたたむ</string>
+    <string name="audio_input_editor_inline_hint">長い内容はここでは折りたたんで表示します。全文の確認や編集は TXT エディターを開いてください。</string>
+    <string name="audio_input_editor_title">入力テキストを編集</string>
+    <string name="audio_input_editor_hint">長文やメモ、儀式めいた文面はここでまとめて整えてから音声へ変換できます。</string>
+    <string name="audio_input_editor_done">完了</string>
+    <string name="audio_input_editor_count">%1$d 文字</string>
     <string name="audio_action_expand_result">解析結果を展開</string>
     <string name="audio_action_collapse_result">解析結果を折りたたむ</string>
     <string name="audio_action_expand_flash_style">flash 音声スタイルを展開</string>
@@ -79,6 +87,14 @@
     <string name="audio_sample_thematic_3">七つ目の松明は灯ったが、遠門はなお沈黙している</string>
     <string name="audio_sample_thematic_4">灰の荒野の果てで、巡礼船が黒き潮を渡っていく</string>
     <string name="audio_sample_thematic_5">鉄の鐘が響くとき、外門はなお応答しない</string>
+    <string name="audio_sample_thematic_long_1">鐘楼の記録には、東の炉が夜明け前に先に応え、屋根の灯を上げる刻よりも早く唸りを返したとある。三人の守り手が銅の輪を手で回し、灰が上層の通気口から舞い落ちて石段を薄く覆った。封印室の低く安定した響きは長く続き、見回りの書記たちはその拍を蝋板へ刻み取った。最後の余韻が消えても誰ひとり鉄扉を開けず、それでも記録の末尾には、扉の向こうの機械が確かに目覚めたと書き残されている。</string>
+    <string name="audio_sample_thematic_long_2">二の見回りの刻、門楼の灯は整え直され、外側の錠はもう一度試され、鎖の蝶番から煤が削り落とされた。遠い通路から返事はなかったが、大広間の石床は短い間隔で震え続け、地下の重い機関が昔の務めを思い出したかのようだった。見張りたちはその震えを水時計と照らし合わせ、西壁に風が当たるたび同じ拍が戻ることを確かめた。見回りの終わりには内側の掛け金に新たな封蝋が押され、報告は、門の向こうの沈黙はもはや空虚な沈黙ではない、という警句で閉じられている。</string>
+    <string name="audio_sample_thematic_long_3">炉の年代記には、赤い灯が一つずつ掲げられ、身廊全体が熾火を伏せたような色に染まったと記されている。最後の鎖が静まると、当番の記録係たちは信号を蝋板へ写し取り、そのあいだ上部回廊では鉄の鉤が擦れる音が響き続けた。その信号は四度ゆっくりと返り、戻るたびに弱くなったが、どの記録係もそれがどの壁の向こうから来たのかを言い当てられなかった。巻末には、五度目の呼びかけに何が応えるかを誰も聞きたがらなかったため、夜明けまで鐘を巻かなかったとだけ追記されている。</string>
+    <string name="audio_sample_thematic_long_4">灰の岸辺の巡礼記録は、欠けた月の下での夜渡りと、炉灰に曇る空を語る。船体灯は絞られ、星図室は終始沈黙し、甲板下の時を刻んだのは機関礼拝室のゆるやかな脈動だけだった。真夜中近く、黒い波のあいだに淡い影が動いたという報告を受け、舵手は船首を三度だけ外へ振らせたが、欄干まで届く音は何もなかった。朝に陸を見つけたあと、記録の最後には、すべての灯が再びともされたが、封印匣のそばの一灯だけは消えたままだったと書かれている。</string>
+    <string name="audio_sample_pro_long_1">EAST FURNACE ANSWERED BEFORE DAWN. THREE KEEPERS TURNED THE COPPER WHEELS BY HAND WHILE ASH FELL THROUGH THE UPPER VENTS. THE SEALED CHAMBER RETURNED A LOW STEADY HUM, AND THE WATCH SCRIBES MARKED THE RHYTHM INTO WAX TABLETS. FINAL ENTRY STATES THE MACHINE AWAKENED BEYOND THE IRON DOOR.</string>
+    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER LOCKS TESTED AGAIN, HINGES CLEANED OF SOOT. FAR PASSAGE REMAINED SILENT, BUT THE FLOOR SHOOK IN SHORT INTERVALS ABOVE THE ENGINE HALL. PATTERN MATCHED THE WIND AGAINST THE WESTERN WALL. INNER LATCH SEALED AGAIN BEFORE WATCH END.</string>
+    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE NAVE GLOWED LIKE BANKED COALS. OPERATORS COPIED THE SIGNAL INTO WAX TABLETS WHILE IRON HOOKS ECHOED ABOVE THE GALLERIES. FOUR SLOW RETURNS WERE HEARD, EACH WEAKER THAN THE LAST. BELLS LEFT UNWOUND UNTIL DAWN.</string>
+    <string name="audio_sample_pro_long_4">ASH SHORE RECORD. HULL LIGHTS SHADED, CHART ROOM SILENT, ENGINE CHAPEL MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. NO SOUND REACHED THE RAIL. ALL LAMPS RELIT AT LANDING EXCEPT THE ONE BESIDE THE SEALED RELIQUARY.</string>
 
     <string name="status_ready_to_encode">テキストを入力してから「テキストを音声に変換」をタップしてください</string>
     <string name="status_input_empty">入力テキストが空です。</string>
@@ -117,15 +133,34 @@
     <string name="config_language_traditional_chinese">繁體中文</string>
     <string name="config_language_english">English</string>
     <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_expand">言語設定を展開</string>
+    <string name="config_language_collapse">言語設定を折りたたむ</string>
     <string name="config_theme_mode_title">テーマモード</string>
     <string name="config_theme_mode_subtitle">システムに合わせるか、ライトか、ダークかを選びます。</string>
+    <string name="config_theme_mode_brand_fixed">2色テーマは固定スタイルで、ライト/ダーク切り替えには追従しません。</string>
     <string name="config_theme_mode_follow_system">システムに従う</string>
     <string name="config_theme_mode_light">ライト</string>
     <string name="config_theme_mode_dark">ダーク</string>
+    <string name="config_theme_appearance_title">テーマ外観</string>
+    <string name="config_theme_style_title">テーマスタイル</string>
+    <string name="config_theme_style_subtitle">柔軟な Material テーマと固定の2色テーマを切り替えます。</string>
+    <string name="config_theme_style_material">Material</string>
+    <string name="config_theme_style_brand_dual_tone">2色テーマ</string>
+    <string name="config_theme_appearance_expand">テーマ外観設定を展開</string>
+    <string name="config_theme_appearance_collapse">テーマ外観設定を折りたたむ</string>
     <string name="config_palette_title">カラーパレット</string>
     <string name="config_palette_selected">選択中</string>
     <string name="config_palette_expand">パレットを展開</string>
     <string name="config_palette_collapse">パレットを折りたたむ</string>
+    <string name="config_brand_theme_title">2色テーマ</string>
+    <string name="config_brand_theme_description">各2色テーマは固有の明暗雰囲気を持ち、2色プレビューで選択します。</string>
+    <string name="config_dual_tone_group_sacred_machine">聖機教団</string>
+    <string name="config_dual_tone_group_ancient_dynasty">古代王朝</string>
+    <string name="palette_family_brand">2色テーマ</string>
     <string name="palette_family_reds_pinks">赤・ピンク系</string>
     <string name="palette_family_oranges">オレンジ系</string>
     <string name="palette_family_yellows">イエロー系</string>
@@ -184,6 +219,28 @@
     <string name="library_status_import_unsupported">取り込めるのはモノラル PCM16 WAV 音声のみです</string>
 
     <string name="palette_ruby_title">ルビーレッド</string>
+    <string name="palette_mars_relic_title">Mars Relic</string>
+    <string name="brand_theme_mars_relic_title">Mars Relic</string>
+    <string name="brand_theme_mars_relic_description">深い赤と羊皮紙色を組み合わせた、儀式的な記録庫の雰囲気。</string>
+    <string name="brand_theme_mars_relic_accessibility">Mars Relic テーマ、深紅と羊皮紙ベージュの組み合わせ。</string>
+    <string name="brand_theme_black_crimson_rite_title">Black Crimson Rite</string>
+    <string name="brand_theme_black_crimson_rite_description">煤けた黒と儀式的な深紅で、厳かな機械聖堂の印象。</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">Black Crimson Rite テーマ、ほぼ黒に鮮やかな深紅。</string>
+    <string name="brand_theme_scarlet_guard_title">Scarlet Guard</string>
+    <string name="brand_theme_scarlet_guard_description">象牙色と封印の赤で、規律と紋章感を持たせた配色。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Scarlet Guard テーマ、明るいアイボリーと濃いスカーレット。</string>
+    <string name="brand_theme_dynasty_revival_title">Dynasty Revival</string>
+    <string name="brand_theme_dynasty_revival_description">墓所金属の黒と定番のリアクターグリーンで、再起動した王朝核を表現。</string>
+    <string name="brand_theme_dynasty_revival_accessibility">Dynasty Revival テーマ、深い墓所金属黒と鮮やかなリアクターグリーン。</string>
+    <string name="brand_theme_sepulcher_cyan_title">Sepulcher Cyan</string>
+    <string name="brand_theme_sepulcher_cyan_description">冷たい墓所鋼と抑えたシアングリーンで静かな王朝機械の光を表現。</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">Sepulcher Cyan テーマ、冷たい暗鋼色と落ち着いたシアングリーン。</string>
+    <string name="brand_theme_tomb_sigil_title">Tomb Sigil</string>
+    <string name="brand_theme_tomb_sigil_description">やや暖かい墓所鉄と鋭い再生緑で、儀式的な王朝紋章の印象。</string>
+    <string name="brand_theme_tomb_sigil_accessibility">Tomb Sigil テーマ、暗い墓所鉄色と鮮やかな再生グリーン。</string>
+    <string name="brand_theme_ancient_alloy_title">Ancient Alloy</string>
+    <string name="brand_theme_ancient_alloy_description">古びた合金の影と冷たい青緑で墓所炉の輝きを表現。</string>
+    <string name="brand_theme_ancient_alloy_accessibility">Ancient Alloy テーマ、暗い合金色と明るいターコイズ。</string>
     <string name="palette_crimson_title">クリムゾンレッド</string>
     <string name="palette_rose_title">ローズピンク</string>
     <string name="palette_sakura_title">さくらピンク</string>

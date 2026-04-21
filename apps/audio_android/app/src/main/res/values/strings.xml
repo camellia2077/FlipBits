@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">audio</string>
+    <string name="app_name">FlipBits</string>
 
     <string name="common_back">Back</string>
     <string name="common_cancel">Cancel</string>
@@ -37,8 +37,16 @@
     <string name="audio_action_export">Download audio</string>
     <string name="audio_action_open_saved_audio_list">Open saved audio list</string>
     <string name="audio_action_randomize_sample_input">Use another sample input</string>
+    <string name="audio_action_open_input_editor">Open full-screen input editor</string>
+    <string name="audio_sample_length_short">Short</string>
+    <string name="audio_sample_length_long">Long</string>
     <string name="audio_action_expand_input">Expand input text</string>
     <string name="audio_action_collapse_input">Collapse input text</string>
+    <string name="audio_input_editor_inline_hint">Longer passages stay collapsed here. Open the TXT editor to view or edit the full text.</string>
+    <string name="audio_input_editor_title">Edit input text</string>
+    <string name="audio_input_editor_hint">Use the larger editor for longer lines, notes, or ritual passages before converting them to audio.</string>
+    <string name="audio_input_editor_done">Done</string>
+    <string name="audio_input_editor_count">%1$d characters</string>
     <string name="audio_action_expand_result">Expand decoded text</string>
     <string name="audio_action_collapse_result">Collapse decoded text</string>
     <string name="audio_action_expand_flash_style">Expand flash voicing style</string>
@@ -79,10 +87,18 @@
     <string name="audio_sample_thematic_3">The seventh torch has been lit, yet the far gate remains silent</string>
     <string name="audio_sample_thematic_4">At the far edge of the ash wastes, a pilgrim ship crosses the black tide</string>
     <string name="audio_sample_thematic_5">When the iron bells echo, the outer gate still goes unanswered</string>
+    <string name="audio_sample_thematic_long_1">The bell tower log records that the east furnace answered before dawn, well before the roof lamps were due to be raised. Three keepers turned the copper wheels by hand while ash drifted through the upper vents and settled across the stair. The sealed chamber returned a low and steady hum, and the sound held so long that the watch scribes began marking the rhythm into wax tablets. When the final note faded, no one opened the iron door, yet every witness wrote that the machine beyond it had plainly awakened.</string>
+    <string name="audio_sample_thematic_long_2">At second watch the gatehouse lamps were trimmed, the outer locks were tested again, and the chain hinges were rubbed clean of soot. No voice came from the far passage, but the stone floor kept trembling in short intervals, as if a heavy engine beneath the hall had remembered its old work. The sentries counted each tremor against the water clock and found that the pattern repeated whenever the wind pressed against the western wall. Before the watch ended, a fresh seal was set over the inner latch, and the report was closed with the warning that the silence beyond the gate was no longer an empty silence.</string>
+    <string name="audio_sample_thematic_long_3">The furnace chronicle says the red lamps were raised one by one until the whole nave glowed like banked coals beneath a layer of smoke. When the last chain settled, a line of operators copied the signal into wax tablets while the upper galleries echoed with the scrape of iron hooks. The signal itself came in four slow returns, each weaker than the one before, yet none of the recorders agreed on where the voice was coming from. The entry ends by noting that the bells were left unwound until dawn, because no one in the hall wished to hear what might answer a fifth call.</string>
+    <string name="audio_sample_thematic_long_4">A pilgrim record from the ash shore tells of a night crossing under a broken moon and a sky veiled by furnace dust. The hull lights were shaded, the chart room stayed silent, and only the slow pulse of the engine chapel marked the passing hours below the deck. Near midnight the helmsman ordered the prow turned by three degrees after pale shapes were seen moving between the black swells, though no sound ever reached the rail. By morning the vessel found land again, and the final line of the record states that every lamp was relit in thanks, except the one that had gone dark beside the sealed reliquary.</string>
     <string name="audio_sample_pro_2">SEAL THE OUTER GATE</string>
     <string name="audio_sample_pro_3">THE RED KEEPERS WAKE THE ENGINE</string>
     <string name="audio_sample_pro_4">SEVENTH TORCH LIT, GATE STILL SILENT</string>
     <string name="audio_sample_pro_5">HOLD THE LINE BENEATH IRON SPIRES</string>
+    <string name="audio_sample_pro_long_1">EAST FURNACE ANSWERED BEFORE DAWN. THREE KEEPERS TURNED THE COPPER WHEELS BY HAND WHILE ASH FELL THROUGH THE UPPER VENTS. THE SEALED CHAMBER RETURNED A LOW STEADY HUM, AND THE WATCH SCRIBES MARKED THE RHYTHM INTO WAX TABLETS. FINAL ENTRY STATES THE MACHINE AWAKENED BEYOND THE IRON DOOR.</string>
+    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER LOCKS TESTED AGAIN, HINGES CLEANED OF SOOT. FAR PASSAGE REMAINED SILENT, BUT THE FLOOR SHOOK IN SHORT INTERVALS ABOVE THE ENGINE HALL. PATTERN MATCHED THE WIND AGAINST THE WESTERN WALL. INNER LATCH SEALED AGAIN BEFORE WATCH END.</string>
+    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE NAVE GLOWED LIKE BANKED COALS. OPERATORS COPIED THE SIGNAL INTO WAX TABLETS WHILE IRON HOOKS ECHOED ABOVE THE GALLERIES. FOUR SLOW RETURNS WERE HEARD, EACH WEAKER THAN THE LAST. BELLS LEFT UNWOUND UNTIL DAWN.</string>
+    <string name="audio_sample_pro_long_4">ASH SHORE RECORD. HULL LIGHTS SHADED, CHART ROOM SILENT, ENGINE CHAPEL MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. NO SOUND REACHED THE RAIL. ALL LAMPS RELIT AT LANDING EXCEPT THE ONE BESIDE THE SEALED RELIQUARY.</string>
 
     <string name="status_ready_to_encode">Enter text and tap "Encode to audio"</string>
     <string name="status_input_empty">Input text is empty.</string>
@@ -121,15 +137,34 @@
     <string name="config_language_traditional_chinese">Traditional Chinese</string>
     <string name="config_language_english">English</string>
     <string name="config_language_japanese">Japanese</string>
+    <string name="config_language_german">German</string>
+    <string name="config_language_russian">Russian</string>
+    <string name="config_language_spanish">Spanish</string>
+    <string name="config_language_portuguese">Portuguese</string>
+    <string name="config_language_expand">Expand language settings</string>
+    <string name="config_language_collapse">Collapse language settings</string>
     <string name="config_theme_mode_title">Theme mode</string>
     <string name="config_theme_mode_subtitle">Choose whether the app follows the system, stays light, or stays dark.</string>
+    <string name="config_theme_mode_brand_fixed">Dual-tone themes use a fixed look and do not follow light or dark mode.</string>
     <string name="config_theme_mode_follow_system">Follow system</string>
     <string name="config_theme_mode_light">Light</string>
     <string name="config_theme_mode_dark">Dark</string>
+    <string name="config_theme_appearance_title">Theme appearance</string>
+    <string name="config_theme_style_title">Theme style</string>
+    <string name="config_theme_style_subtitle">Choose between the flexible Material theme system and the fixed dual-tone theme.</string>
+    <string name="config_theme_style_material">Material</string>
+    <string name="config_theme_style_brand_dual_tone">Dual-tone</string>
+    <string name="config_theme_appearance_expand">Expand theme appearance settings</string>
+    <string name="config_theme_appearance_collapse">Collapse theme appearance settings</string>
     <string name="config_palette_title">Color palettes</string>
     <string name="config_palette_selected">Selected</string>
     <string name="config_palette_expand">Expand palettes</string>
     <string name="config_palette_collapse">Collapse palettes</string>
+    <string name="config_brand_theme_title">Dual-tone themes</string>
+    <string name="config_brand_theme_description">Each dual-tone theme keeps its own fixed light or dark atmosphere and uses a two-color preview for selection.</string>
+    <string name="config_dual_tone_group_sacred_machine">Sacred machine</string>
+    <string name="config_dual_tone_group_ancient_dynasty">Ancient dynasty</string>
+    <string name="palette_family_brand">Dual-tone</string>
     <string name="palette_family_reds_pinks">Reds &amp; Pinks</string>
     <string name="palette_family_oranges">Oranges</string>
     <string name="palette_family_yellows">Yellows</string>
@@ -188,6 +223,28 @@
     <string name="library_status_import_unsupported">Only mono PCM16 WAV audio can be imported</string>
 
     <string name="palette_ruby_title">Ruby Red</string>
+    <string name="palette_mars_relic_title">Mars Relic</string>
+    <string name="brand_theme_mars_relic_title">Mars Relic</string>
+    <string name="brand_theme_mars_relic_description">Deep red paired with parchment for a ceremonial archive look.</string>
+    <string name="brand_theme_mars_relic_accessibility">Mars Relic theme, deep red with parchment beige.</string>
+    <string name="brand_theme_black_crimson_rite_title">Black Crimson Rite</string>
+    <string name="brand_theme_black_crimson_rite_description">Soot black and ritual crimson for a severe machine shrine mood.</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">Black Crimson Rite theme, near-black with vivid crimson red.</string>
+    <string name="brand_theme_scarlet_guard_title">Scarlet Guard</string>
+    <string name="brand_theme_scarlet_guard_description">Ivory white and sealed crimson for a disciplined heraldic tone.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Scarlet Guard theme, light ivory with dark scarlet red.</string>
+    <string name="brand_theme_dynasty_revival_title">Dynasty Revival</string>
+    <string name="brand_theme_dynasty_revival_description">Tomb-metal black with classic reactor green for a reawakened dynasty core.</string>
+    <string name="brand_theme_dynasty_revival_accessibility">Dynasty Revival theme, deep tomb-metal black with bright reactor green.</string>
+    <string name="brand_theme_sepulcher_cyan_title">Sepulcher Cyan</string>
+    <string name="brand_theme_sepulcher_cyan_description">Cold sepulcher steel with restrained cyan-green for a quieter royal machine glow.</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">Sepulcher Cyan theme, cold dark steel with muted cyan-green.</string>
+    <string name="brand_theme_tomb_sigil_title">Tomb Sigil</string>
+    <string name="brand_theme_tomb_sigil_description">Warm crypt iron and sharp revival green for a ceremonial dynasty mark.</string>
+    <string name="brand_theme_tomb_sigil_accessibility">Tomb Sigil theme, dark crypt iron with vivid revival green.</string>
+    <string name="brand_theme_ancient_alloy_title">Ancient Alloy</string>
+    <string name="brand_theme_ancient_alloy_description">Weathered metal shadows and cold turquoise for a tomb-forge glow.</string>
+    <string name="brand_theme_ancient_alloy_accessibility">Ancient Alloy theme, dark bronze gray with bright turquoise.</string>
     <string name="palette_crimson_title">Crimson Red</string>
     <string name="palette_rose_title">Rose Pink</string>
     <string name="palette_sakura_title">Sakura Pink</string>

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 
 @Composable
@@ -33,7 +34,7 @@ fun AudioTabScreen(
     onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
     inputText: String,
     onInputTextChange: (String) -> Unit,
-    onRandomizeSampleInput: () -> Unit,
+    onRandomizeSampleInput: (SampleInputLengthOption) -> Unit,
     resultText: String,
     onEncode: () -> Unit,
     onCancelEncode: () -> Unit,
@@ -45,10 +46,21 @@ fun AudioTabScreen(
     val scrollState = rememberScrollState()
     val isEncodingBusy = isCodecBusy && encodeProgress != null
     val isDecodingBusy = isCodecBusy && !isEncodingBusy
+    var showInputEditor by rememberSaveable { mutableStateOf(false) }
+    var inputCardExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
     var flashVoicingExpanded by rememberSaveable(transportMode) {
         mutableStateOf(transportMode == TransportModeOption.Flash)
     }
     var resultExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
+    var sampleInputLength by rememberSaveable { mutableStateOf(SampleInputLengthOption.Short) }
+
+    if (showInputEditor) {
+        AudioInputEditorDialog(
+            inputText = inputText,
+            onInputTextChange = onInputTextChange,
+            onDismiss = { showInputEditor = false },
+        )
+    }
 
     Column(
         modifier = modifier.verticalScroll(scrollState),
@@ -73,9 +85,19 @@ fun AudioTabScreen(
             isEncodeCancelling = isEncodeCancelling,
             selectedFlashVoicingStyle = selectedFlashVoicingStyle,
             onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
+            inputCardExpanded = inputCardExpanded,
+            onToggleInputCardExpanded = { inputCardExpanded = !inputCardExpanded },
             inputText = inputText,
             onInputTextChange = onInputTextChange,
-            onRandomizeSampleInput = onRandomizeSampleInput,
+            onOpenInputEditor = { showInputEditor = true },
+            sampleInputLength = sampleInputLength,
+            onSampleInputLengthSelected = { length ->
+                if (sampleInputLength != length) {
+                    sampleInputLength = length
+                    onRandomizeSampleInput(length)
+                }
+            },
+            onRandomizeSampleInput = { onRandomizeSampleInput(sampleInputLength) },
             onEncode = onEncode,
             onCancelEncode = onCancelEncode,
             flashVoicingExpanded = flashVoicingExpanded,

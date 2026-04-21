@@ -4,12 +4,16 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
+import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
+import com.bag.audioandroid.ui.theme.BrandDualToneThemes
+import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import kotlinx.coroutines.CoroutineScope
@@ -93,6 +97,20 @@ internal class AudioAndroidChromeActions(
         }
     }
 
+    fun onThemeStyleSelected(themeStyle: ThemeStyleOption) {
+        uiState.update { it.copy(selectedThemeStyle = themeStyle) }
+        scope.launch {
+            appSettingsRepository.setSelectedThemeStyleId(themeStyle.id)
+        }
+    }
+
+    fun onBrandThemeSelected(brandTheme: BrandThemeOption) {
+        uiState.update { it.copy(selectedBrandTheme = brandTheme) }
+        scope.launch {
+            appSettingsRepository.setSelectedBrandThemeId(brandTheme.id)
+        }
+    }
+
     fun onFlashVoicingStyleSelected(style: FlashVoicingStyleOption) {
         uiState.update { it.copy(selectedFlashVoicingStyle = style) }
         scope.launch {
@@ -122,6 +140,20 @@ internal class AudioAndroidChromeActions(
             } else {
                 state
             }
+        }
+    }
+
+    fun onConfigLanguageExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigLanguageExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigLanguageExpanded(expanded)
+        }
+    }
+
+    fun onConfigThemeAppearanceExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigThemeAppearanceExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigThemeAppearanceExpanded(expanded)
         }
     }
 
@@ -159,6 +191,40 @@ internal class AudioAndroidChromeActions(
         }
     }
 
+    fun observeSelectedThemeStyle() {
+        scope.launch {
+            appSettingsRepository.selectedThemeStyleId
+                .distinctUntilChanged()
+                .collect { themeStyleId ->
+                    val themeStyle = ThemeStyleOption.fromId(themeStyleId)
+                    uiState.update { state ->
+                        if (state.selectedThemeStyle == themeStyle) {
+                            state
+                        } else {
+                            state.copy(selectedThemeStyle = themeStyle)
+                        }
+                    }
+                }
+        }
+    }
+
+    fun observeSelectedBrandTheme() {
+        scope.launch {
+            appSettingsRepository.selectedBrandThemeId
+                .distinctUntilChanged()
+                .collect { brandThemeId ->
+                    val brandTheme = BrandDualToneThemes.firstOrNull { it.id == brandThemeId } ?: DefaultBrandTheme
+                    uiState.update { state ->
+                        if (state.selectedBrandTheme.id == brandTheme.id) {
+                            state
+                        } else {
+                            state.copy(selectedBrandTheme = brandTheme)
+                        }
+                    }
+                }
+        }
+    }
+
     fun observeSelectedFlashVoicingStyle() {
         scope.launch {
             appSettingsRepository.selectedFlashVoicingStyleId
@@ -187,6 +253,34 @@ internal class AudioAndroidChromeActions(
                             state
                         } else {
                             state.copy(playbackSequenceMode = mode)
+                        }
+                    }
+                }
+        }
+    }
+
+    fun observeConfigLanguageExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigLanguageExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigLanguageExpanded == expanded) state else state.copy(isConfigLanguageExpanded = expanded)
+                    }
+                }
+        }
+    }
+
+    fun observeConfigThemeAppearanceExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigThemeAppearanceExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigThemeAppearanceExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigThemeAppearanceExpanded = expanded)
                         }
                     }
                 }

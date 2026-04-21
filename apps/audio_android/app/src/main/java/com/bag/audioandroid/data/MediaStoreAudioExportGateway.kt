@@ -73,7 +73,7 @@ class MediaStoreAudioExportGateway(
         val previewStem = buildPreviewStem(inputText)
         val stem =
             if (previewStem.isEmpty()) {
-                "wavebits_${mode.wireName}_$timestamp"
+                "flipbits_${mode.wireName}_$timestamp"
             } else {
                 "${previewStem}_${mode.wireName}_$timestamp"
             }
@@ -145,8 +145,8 @@ class MediaStoreAudioExportGateway(
         const val MAX_DUPLICATE_SUFFIX = 999
         const val MAX_PREVIEW_VISIBLE_CHARACTERS = 12
         const val MIME_TYPE_WAV = "audio/wav"
-        const val RELATIVE_DIRECTORY = "Music/WaveBits"
-        const val RELATIVE_PATH_PREFIX = "Music/WaveBits%"
+        const val RELATIVE_DIRECTORY = "Music/FlipBits"
+        const val RELATIVE_PATH_PREFIX = "Music/FlipBits%"
         const val ILLEGAL_FILE_NAME_CHARACTERS = "\\/:*?\"<>|"
         val FILE_NAME_TIME_FORMATTER: DateTimeFormatter =
             DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss", Locale.US)

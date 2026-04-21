@@ -1,6 +1,7 @@
 package com.bag.audioandroid.data
 
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 
 data class SampleInput(
@@ -17,6 +18,7 @@ interface SampleInputTextProvider {
     fun randomSample(
         mode: TransportModeOption,
         language: AppLanguageOption,
+        length: SampleInputLengthOption,
         excludingSampleId: String? = null,
     ): SampleInput
 

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.component.ActionButton
+import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 
 @Composable
 internal fun AudioResultCard(
@@ -41,6 +42,7 @@ internal fun AudioResultCard(
     modifier: Modifier = Modifier,
 ) {
     val resultScrollState = rememberScrollState()
+    val accentTokens = appThemeAccentTokens()
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -59,6 +61,7 @@ internal fun AudioResultCard(
                     text = stringResource(R.string.audio_result_title),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
+                    color = accentTokens.disclosureAccentTint,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
@@ -81,6 +84,7 @@ internal fun AudioResultCard(
                                     R.string.audio_action_expand_result
                                 },
                             ),
+                        tint = accentTokens.disclosureAccentTint,
                     )
                 }
             }
@@ -123,12 +127,18 @@ internal fun AudioResultCard(
                         ),
                     onClick = onDecode,
                     enabled = !isCodecBusy,
+                    textColor = accentTokens.disclosureAccentTint,
+                    borderColor = accentTokens.selectionBorderAccentTint,
+                    borderWidth = 2.dp,
                     modifier = Modifier.weight(1f),
                 )
                 ActionButton(
                     text = stringResource(R.string.audio_action_clear),
                     onClick = onClearInput,
                     enabled = !isCodecBusy,
+                    textColor = accentTokens.disclosureAccentTint,
+                    borderColor = accentTokens.selectionBorderAccentTint,
+                    borderWidth = 2.dp,
                     modifier = Modifier.weight(1f),
                 )
             }

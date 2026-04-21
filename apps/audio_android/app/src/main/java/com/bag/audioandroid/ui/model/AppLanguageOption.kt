@@ -13,6 +13,10 @@ enum class AppLanguageOption(
     TraditionalChinese(languageTag = "zh-TW", labelResId = R.string.config_language_traditional_chinese),
     English(languageTag = "en", labelResId = R.string.config_language_english),
     Japanese(languageTag = "ja", labelResId = R.string.config_language_japanese),
+    German(languageTag = "de", labelResId = R.string.config_language_german),
+    Russian(languageTag = "ru", labelResId = R.string.config_language_russian),
+    Spanish(languageTag = "es", labelResId = R.string.config_language_spanish),
+    Portuguese(languageTag = "pt", labelResId = R.string.config_language_portuguese),
     ;
 
     fun toLocaleList(): LocaleListCompat =
@@ -40,6 +44,10 @@ enum class AppLanguageOption(
                 firstTag.startsWith("zh") -> Chinese
                 firstTag.startsWith("en") -> English
                 firstTag.startsWith("ja") -> Japanese
+                firstTag.startsWith("de") -> German
+                firstTag.startsWith("ru") -> Russian
+                firstTag.startsWith("es") -> Spanish
+                firstTag.startsWith("pt") -> Portuguese
                 else -> FollowSystem
             }
         }

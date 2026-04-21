@@ -2,6 +2,7 @@ package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,7 @@ internal class AudioSessionEditingActions(
         sessionStateStore.updateCurrentSession { it.copy(inputText = value, sampleInputId = null) }
     }
 
-    fun onRandomizeSampleInput() {
+    fun onRandomizeSampleInput(length: SampleInputLengthOption) {
         val currentState = uiState.value
         if (currentState.currentSession.isCodecBusy) {
             return
@@ -27,6 +28,7 @@ internal class AudioSessionEditingActions(
             sampleInputTextProvider.randomSample(
                 mode = currentState.transportMode,
                 language = currentState.selectedLanguage,
+                length = length,
                 excludingSampleId = currentState.currentSession.sampleInputId,
             )
         sessionStateStore.updateCurrentSession {

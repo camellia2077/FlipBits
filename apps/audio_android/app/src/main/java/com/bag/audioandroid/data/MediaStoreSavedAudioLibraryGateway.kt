@@ -272,8 +272,8 @@ class MediaStoreSavedAudioLibraryGateway(
         runCatching { Instant.parse(createdAtIsoUtc).epochSecond }.getOrNull()
 
     private companion object {
-        const val RELATIVE_PATH_PREFIX = "Music/WaveBits%"
-        const val RelativePathDirectory = "Music/WaveBits/"
+        const val RELATIVE_PATH_PREFIX = "Music/FlipBits%"
+        const val RelativePathDirectory = "Music/FlipBits/"
         const val MimeTypeWav = "audio/wav"
         const val UNKNOWN_MODE = "unknown"
         const val MetadataHeaderReadLimitBytes = 4096

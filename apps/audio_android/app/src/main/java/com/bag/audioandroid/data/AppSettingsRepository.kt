@@ -2,6 +2,7 @@ package com.bag.audioandroid.data
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -46,6 +47,26 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SelectedThemeModeId] }
 
+    val selectedThemeStyleId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedThemeStyleId] }
+
+    val selectedBrandThemeId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedBrandThemeId] }
+
     val selectedPlaybackSequenceModeId: Flow<String?> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -55,6 +76,26 @@ class AppSettingsRepository(
                     throw exception
                 }
             }.map { preferences -> preferences[Keys.SelectedPlaybackSequenceModeId] }
+
+    val isConfigLanguageExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigLanguageExpanded] ?: true }
+
+    val isConfigThemeAppearanceExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigThemeAppearanceExpanded] ?: true }
 
     suspend fun setSelectedPaletteId(paletteId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
@@ -74,9 +115,33 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setSelectedThemeStyleId(themeStyleId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedThemeStyleId] = themeStyleId
+        }
+    }
+
+    suspend fun setSelectedBrandThemeId(brandThemeId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedBrandThemeId] = brandThemeId
+        }
+    }
+
     suspend fun setSelectedPlaybackSequenceModeId(playbackSequenceModeId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedPlaybackSequenceModeId] = playbackSequenceModeId
+        }
+    }
+
+    suspend fun setConfigLanguageExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigLanguageExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigThemeAppearanceExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigThemeAppearanceExpanded] = expanded
         }
     }
 
@@ -84,6 +149,10 @@ class AppSettingsRepository(
         val SelectedPaletteId: Preferences.Key<String> = stringPreferencesKey("palette_id")
         val SelectedFlashVoicingStyleId: Preferences.Key<String> = stringPreferencesKey("flash_voicing_style")
         val SelectedThemeModeId: Preferences.Key<String> = stringPreferencesKey("theme_mode")
+        val SelectedThemeStyleId: Preferences.Key<String> = stringPreferencesKey("theme_style")
+        val SelectedBrandThemeId: Preferences.Key<String> = stringPreferencesKey("brand_theme_id")
         val SelectedPlaybackSequenceModeId: Preferences.Key<String> = stringPreferencesKey("playback_sequence_mode")
+        val ConfigLanguageExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_language_expanded")
+        val ConfigThemeAppearanceExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_theme_appearance_expanded")
     }
 }
