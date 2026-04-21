@@ -16,14 +16,14 @@ enum class WavPcm16Status {
   kTruncatedData = 4,
 };
 
-enum class WaveBitsAudioMetadataMode : std::uint8_t {
+enum class FlipBitsAudioMetadataMode : std::uint8_t {
   kUnknown = 0,
   kFlash = 1,
   kPro = 2,
   kUltra = 3,
 };
 
-enum class WaveBitsAudioMetadataFlashVoicingStyle : std::uint8_t {
+enum class FlipBitsAudioMetadataFlashVoicingStyle : std::uint8_t {
   kUnknown = 0,
   kCodedBurst = 1,
   kRitualChant = 2,
@@ -35,12 +35,12 @@ struct WavPcm16 {
   std::vector<std::int16_t> mono_pcm;
 };
 
-struct WaveBitsAudioMetadata {
+struct FlipBitsAudioMetadata {
   std::uint8_t version = 0;
-  WaveBitsAudioMetadataMode mode = WaveBitsAudioMetadataMode::kUnknown;
+  FlipBitsAudioMetadataMode mode = FlipBitsAudioMetadataMode::kUnknown;
   bool has_flash_voicing_style = false;
-  WaveBitsAudioMetadataFlashVoicingStyle flash_voicing_style =
-      WaveBitsAudioMetadataFlashVoicingStyle::kUnknown;
+  FlipBitsAudioMetadataFlashVoicingStyle flash_voicing_style =
+      FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
   std::string created_at_iso_utc;
   std::uint32_t duration_ms = 0;
   std::uint32_t frame_samples = 0;
@@ -49,7 +49,7 @@ struct WaveBitsAudioMetadata {
   std::string core_version;
 };
 
-enum class WaveBitsAudioMetadataStatus {
+enum class FlipBitsAudioMetadataStatus {
   kOk = 0,
   kNotFound = 1,
   kInvalidArgument = 2,
@@ -59,9 +59,9 @@ enum class WaveBitsAudioMetadataStatus {
   kTruncatedData = 6,
 };
 
-struct WaveBitsAudioMetadataParseResult {
-  WaveBitsAudioMetadataStatus status = WaveBitsAudioMetadataStatus::kNotFound;
-  WaveBitsAudioMetadata metadata{};
+struct FlipBitsAudioMetadataParseResult {
+  FlipBitsAudioMetadataStatus status = FlipBitsAudioMetadataStatus::kNotFound;
+  FlipBitsAudioMetadata metadata{};
 };
 
 struct WavPcm16ParseResult {
@@ -73,14 +73,14 @@ std::vector<std::uint8_t> SerializeMonoPcm16Wav(
     int sample_rate_hz, const std::vector<std::int16_t>& pcm);
 std::vector<std::uint8_t> SerializeMonoPcm16WavWithMetadata(
     int sample_rate_hz, const std::vector<std::int16_t>& pcm,
-    const WaveBitsAudioMetadata& metadata);
+    const FlipBitsAudioMetadata& metadata);
 WavPcm16ParseResult ParseMonoPcm16Wav(const std::uint8_t* wav_bytes,
                                       std::size_t wav_byte_count);
 WavPcm16ParseResult ParseMonoPcm16Wav(
     const std::vector<std::uint8_t>& wav_bytes);
-WaveBitsAudioMetadataParseResult ParseWaveBitsAudioMetadata(
+FlipBitsAudioMetadataParseResult ParseFlipBitsAudioMetadata(
     const std::uint8_t* wav_bytes, std::size_t wav_byte_count);
-WaveBitsAudioMetadataParseResult ParseWaveBitsAudioMetadata(
+FlipBitsAudioMetadataParseResult ParseFlipBitsAudioMetadata(
     const std::vector<std::uint8_t>& wav_bytes);
 
 void WriteMonoPcm16Wav(const std::filesystem::path& output_path,

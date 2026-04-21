@@ -5,29 +5,43 @@ constexpr std::size_t kRiffHeaderSize = 12;
 constexpr std::size_t kChunkHeaderSize = 8;
 constexpr std::size_t kFmtChunkSize = 16;
 constexpr std::size_t kCanonicalWavHeaderSize = 44;
-constexpr std::size_t kWaveBitsMetadataIsoUtcByteCount = 20;
-constexpr std::size_t kWaveBitsMetadataVersionTextByteCount = 32;
-constexpr std::size_t kWaveBitsMetadataV3ChunkSize =
-    4 + 4 + kWaveBitsMetadataIsoUtcByteCount + 4 + 4 +
-    kWaveBitsMetadataVersionTextByteCount +
-    kWaveBitsMetadataVersionTextByteCount;
+constexpr std::size_t kFlipBitsMetadataIsoUtcByteCount = 20;
+constexpr std::size_t kFlipBitsMetadataVersionTextByteCount = 32;
+constexpr std::size_t kFlipBitsMetadataVersionOffset = 0;
+constexpr std::size_t kFlipBitsMetadataModeOffset = 1;
+constexpr std::size_t kFlipBitsMetadataHasFlashStyleOffset = 2;
+constexpr std::size_t kFlipBitsMetadataFlashStyleOffset = 3;
+constexpr std::size_t kFlipBitsMetadataDurationOffset = 4;
+constexpr std::size_t kFlipBitsMetadataCreatedAtOffset = 8;
+constexpr std::size_t kFlipBitsMetadataFrameSamplesOffset =
+    kFlipBitsMetadataCreatedAtOffset + kFlipBitsMetadataIsoUtcByteCount;
+constexpr std::size_t kFlipBitsMetadataPcmSampleCountOffset =
+    kFlipBitsMetadataFrameSamplesOffset + 4;
+constexpr std::size_t kFlipBitsMetadataAppVersionOffset =
+    kFlipBitsMetadataPcmSampleCountOffset + 4;
+constexpr std::size_t kFlipBitsMetadataCoreVersionOffset =
+    kFlipBitsMetadataAppVersionOffset + kFlipBitsMetadataVersionTextByteCount;
+constexpr std::size_t kFlipBitsMetadataV3ChunkSize =
+    4 + 4 + kFlipBitsMetadataIsoUtcByteCount + 4 + 4 +
+    kFlipBitsMetadataVersionTextByteCount +
+    kFlipBitsMetadataVersionTextByteCount;
 constexpr std::uint16_t kPcmFormatCode = 1;
 constexpr std::uint16_t kMonoChannelCount = 1;
 constexpr std::uint16_t kBitsPerSample = 16;
 constexpr std::size_t kBytesPerSample = 2;
 constexpr std::uint32_t kMaxChunkByteCount = 0xFFFFFFFFu;
-constexpr std::uint8_t kWaveBitsMetadataVersionV3 = 3;
+constexpr std::uint8_t kFlipBitsMetadataVersionV3 = 3;
 
-bool IsSupportedMode(WaveBitsAudioMetadataMode mode) {
-  return mode == WaveBitsAudioMetadataMode::kFlash ||
-         mode == WaveBitsAudioMetadataMode::kPro ||
-         mode == WaveBitsAudioMetadataMode::kUltra;
+bool IsSupportedMode(FlipBitsAudioMetadataMode mode) {
+  return mode == FlipBitsAudioMetadataMode::kFlash ||
+         mode == FlipBitsAudioMetadataMode::kPro ||
+         mode == FlipBitsAudioMetadataMode::kUltra;
 }
 
 bool IsSupportedFlashVoicingStyle(
-    WaveBitsAudioMetadataFlashVoicingStyle style) {
-  return style == WaveBitsAudioMetadataFlashVoicingStyle::kCodedBurst ||
-         style == WaveBitsAudioMetadataFlashVoicingStyle::kRitualChant;
+    FlipBitsAudioMetadataFlashVoicingStyle style) {
+  return style == FlipBitsAudioMetadataFlashVoicingStyle::kCodedBurst ||
+         style == FlipBitsAudioMetadataFlashVoicingStyle::kRitualChant;
 }
 
 bool IsIsoUtcTimestampChar(char value, std::size_t index) {
@@ -48,11 +62,11 @@ bool IsIsoUtcTimestampChar(char value, std::size_t index) {
 }
 
 bool IsSupportedMetadataVersion(std::uint8_t version) {
-  return version == kWaveBitsMetadataVersionV3;
+  return version == kFlipBitsMetadataVersionV3;
 }
 
 bool IsValidCreatedAtIsoUtc(const std::string& created_at_iso_utc) {
-  if (created_at_iso_utc.size() != kWaveBitsMetadataIsoUtcByteCount) {
+  if (created_at_iso_utc.size() != kFlipBitsMetadataIsoUtcByteCount) {
     return false;
   }
   for (std::size_t index = 0; index < created_at_iso_utc.size(); ++index) {
@@ -65,7 +79,7 @@ bool IsValidCreatedAtIsoUtc(const std::string& created_at_iso_utc) {
 
 bool IsValidVersionText(const std::string& version_text) {
   if (version_text.empty() ||
-      version_text.size() > kWaveBitsMetadataVersionTextByteCount) {
+      version_text.size() > kFlipBitsMetadataVersionTextByteCount) {
     return false;
   }
   for (char value : version_text) {
@@ -122,14 +136,14 @@ bool MatchesTag(const std::uint8_t* data, const char* expected) {
          data[3] == static_cast<std::uint8_t>(expected[3]);
 }
 
-std::vector<std::uint8_t> BuildWaveBitsMetadataChunk(
-    const WaveBitsAudioMetadata& metadata) {
+std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
+    const FlipBitsAudioMetadata& metadata) {
   if (!IsSupportedMetadataVersion(metadata.version) ||
       !IsSupportedMode(metadata.mode)) {
     return {};
   }
   if (metadata.has_flash_voicing_style) {
-    if (metadata.mode != WaveBitsAudioMetadataMode::kFlash ||
+    if (metadata.mode != FlipBitsAudioMetadataMode::kFlash ||
         !IsSupportedFlashVoicingStyle(metadata.flash_voicing_style)) {
       return {};
     }
@@ -142,95 +156,110 @@ std::vector<std::uint8_t> BuildWaveBitsMetadataChunk(
     return {};
   }
 
-  const std::size_t payload_size = kWaveBitsMetadataV3ChunkSize;
+  const std::size_t payload_size = kFlipBitsMetadataV3ChunkSize;
   std::vector<std::uint8_t> chunk(kChunkHeaderSize + payload_size, 0);
   chunk[0] = 'W';
   chunk[1] = 'B';
   chunk[2] = 'A';
   chunk[3] = 'G';
   WriteU32Le(chunk.data() + 4, static_cast<std::uint32_t>(payload_size));
-  chunk[8] = metadata.version;
-  chunk[9] = static_cast<std::uint8_t>(metadata.mode);
-  chunk[10] = metadata.has_flash_voicing_style ? 1u : 0u;
-  chunk[11] = metadata.has_flash_voicing_style
+  chunk[kChunkHeaderSize + kFlipBitsMetadataVersionOffset] = metadata.version;
+  chunk[kChunkHeaderSize + kFlipBitsMetadataModeOffset] =
+      static_cast<std::uint8_t>(metadata.mode);
+  chunk[kChunkHeaderSize + kFlipBitsMetadataHasFlashStyleOffset] =
+      metadata.has_flash_voicing_style ? 1u : 0u;
+  chunk[kChunkHeaderSize + kFlipBitsMetadataFlashStyleOffset] =
+      metadata.has_flash_voicing_style
                   ? static_cast<std::uint8_t>(metadata.flash_voicing_style)
                   : static_cast<std::uint8_t>(0u);
-  WriteU32Le(chunk.data() + 12, metadata.duration_ms);
-  for (std::size_t index = 0; index < kWaveBitsMetadataIsoUtcByteCount;
+  WriteU32Le(chunk.data() + kChunkHeaderSize + kFlipBitsMetadataDurationOffset,
+             metadata.duration_ms);
+  for (std::size_t index = 0; index < kFlipBitsMetadataIsoUtcByteCount;
        ++index) {
-    chunk[16 + index] =
+    chunk[kChunkHeaderSize + kFlipBitsMetadataCreatedAtOffset + index] =
         static_cast<std::uint8_t>(metadata.created_at_iso_utc[index]);
   }
-  WriteU32Le(chunk.data() + 36, metadata.frame_samples);
-  WriteU32Le(chunk.data() + 40, metadata.pcm_sample_count);
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataFrameSamplesOffset,
+      metadata.frame_samples);
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataPcmSampleCountOffset,
+      metadata.pcm_sample_count);
   for (std::size_t index = 0; index < metadata.app_version.size(); ++index) {
-    chunk[44 + index] = static_cast<std::uint8_t>(metadata.app_version[index]);
+    chunk[kChunkHeaderSize + kFlipBitsMetadataAppVersionOffset + index] =
+        static_cast<std::uint8_t>(metadata.app_version[index]);
   }
   for (std::size_t index = 0; index < metadata.core_version.size(); ++index) {
-    chunk[44 + kWaveBitsMetadataVersionTextByteCount + index] =
+    chunk[kChunkHeaderSize + kFlipBitsMetadataCoreVersionOffset + index] =
         static_cast<std::uint8_t>(metadata.core_version[index]);
   }
   return chunk;
 }
 
-WaveBitsAudioMetadataParseResult ParseWaveBitsMetadataChunk(
+FlipBitsAudioMetadataParseResult ParseFlipBitsMetadataChunk(
     const std::uint8_t* chunk_data, std::size_t chunk_size) {
   if (chunk_data == nullptr && chunk_size > 0) {
-    return {WaveBitsAudioMetadataStatus::kInvalidArgument, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidArgument, {}};
   }
-  if (chunk_size < kWaveBitsMetadataV3ChunkSize) {
-    return {WaveBitsAudioMetadataStatus::kInvalidMetadata, {}};
+  if (chunk_size < kFlipBitsMetadataV3ChunkSize) {
+    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
 
-  WaveBitsAudioMetadata metadata{};
-  metadata.version = chunk_data[0];
-  metadata.mode = static_cast<WaveBitsAudioMetadataMode>(chunk_data[1]);
-  metadata.has_flash_voicing_style = chunk_data[2] != 0u;
+  FlipBitsAudioMetadata metadata{};
+  metadata.version = chunk_data[kFlipBitsMetadataVersionOffset];
+  metadata.mode =
+      static_cast<FlipBitsAudioMetadataMode>(chunk_data[kFlipBitsMetadataModeOffset]);
+  metadata.has_flash_voicing_style =
+      chunk_data[kFlipBitsMetadataHasFlashStyleOffset] != 0u;
   metadata.flash_voicing_style =
-      static_cast<WaveBitsAudioMetadataFlashVoicingStyle>(chunk_data[3]);
+      static_cast<FlipBitsAudioMetadataFlashVoicingStyle>(
+          chunk_data[kFlipBitsMetadataFlashStyleOffset]);
 
-  if (metadata.version != kWaveBitsMetadataVersionV3) {
-    return {WaveBitsAudioMetadataStatus::kUnsupportedVersion, {}};
+  if (metadata.version != kFlipBitsMetadataVersionV3) {
+    return {FlipBitsAudioMetadataStatus::kUnsupportedVersion, {}};
   }
-  metadata.duration_ms = ReadU32Le(chunk_data + 4);
+  metadata.duration_ms = ReadU32Le(chunk_data + kFlipBitsMetadataDurationOffset);
   metadata.created_at_iso_utc.assign(
-      reinterpret_cast<const char*>(chunk_data + 8),
-      kWaveBitsMetadataIsoUtcByteCount);
+      reinterpret_cast<const char*>(chunk_data + kFlipBitsMetadataCreatedAtOffset),
+      kFlipBitsMetadataIsoUtcByteCount);
   if (!IsValidCreatedAtIsoUtc(metadata.created_at_iso_utc)) {
-    return {WaveBitsAudioMetadataStatus::kInvalidMetadata, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
-  metadata.frame_samples = ReadU32Le(chunk_data + 36);
-  metadata.pcm_sample_count = ReadU32Le(chunk_data + 40);
+  metadata.frame_samples =
+      ReadU32Le(chunk_data + kFlipBitsMetadataFrameSamplesOffset);
+  metadata.pcm_sample_count =
+      ReadU32Le(chunk_data + kFlipBitsMetadataPcmSampleCountOffset);
   metadata.app_version = ReadPaddedAsciiString(
-      chunk_data + 44, kWaveBitsMetadataVersionTextByteCount);
+      chunk_data + kFlipBitsMetadataAppVersionOffset,
+      kFlipBitsMetadataVersionTextByteCount);
   metadata.core_version = ReadPaddedAsciiString(
-      chunk_data + 44 + kWaveBitsMetadataVersionTextByteCount,
-      kWaveBitsMetadataVersionTextByteCount);
+      chunk_data + kFlipBitsMetadataCoreVersionOffset,
+      kFlipBitsMetadataVersionTextByteCount);
   if (!IsValidVersionText(metadata.app_version) ||
       !IsValidVersionText(metadata.core_version)) {
-    return {WaveBitsAudioMetadataStatus::kInvalidMetadata, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
   if (!IsSupportedMode(metadata.mode)) {
-    return {WaveBitsAudioMetadataStatus::kInvalidMetadata, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
   if (metadata.has_flash_voicing_style) {
-    if (metadata.mode != WaveBitsAudioMetadataMode::kFlash ||
+    if (metadata.mode != FlipBitsAudioMetadataMode::kFlash ||
         !IsSupportedFlashVoicingStyle(metadata.flash_voicing_style)) {
-      return {WaveBitsAudioMetadataStatus::kInvalidMetadata, {}};
+      return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
     }
   } else {
     metadata.flash_voicing_style =
-        WaveBitsAudioMetadataFlashVoicingStyle::kUnknown;
+        FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
   }
 
-  return {WaveBitsAudioMetadataStatus::kOk, metadata};
+  return {FlipBitsAudioMetadataStatus::kOk, metadata};
 }
 
 }  // namespace
 
 std::vector<std::uint8_t> SerializeMonoPcm16WavBytesWithMetadata(
     int sample_rate_hz, const std::vector<std::int16_t>& pcm,
-    const WaveBitsAudioMetadata* metadata);
+    const FlipBitsAudioMetadata* metadata);
 
 std::vector<std::uint8_t> SerializeMonoPcm16WavBytes(
     int sample_rate_hz, const std::vector<std::int16_t>& pcm) {
@@ -239,13 +268,13 @@ std::vector<std::uint8_t> SerializeMonoPcm16WavBytes(
 
 std::vector<std::uint8_t> SerializeMonoPcm16WavBytesWithMetadata(
     int sample_rate_hz, const std::vector<std::int16_t>& pcm,
-    const WaveBitsAudioMetadata* metadata) {
+    const FlipBitsAudioMetadata* metadata) {
   if (sample_rate_hz <= 0) {
     return {};
   }
 
   const auto metadata_chunk = metadata != nullptr
-                                  ? BuildWaveBitsMetadataChunk(*metadata)
+                                  ? BuildFlipBitsMetadataChunk(*metadata)
                                   : std::vector<std::uint8_t>{};
   if (metadata != nullptr && metadata_chunk.empty()) {
     return {};
@@ -383,16 +412,16 @@ WavPcm16ParseResult ParseMonoPcm16WavBytes(const std::uint8_t* wav_bytes,
   return {WavPcm16Status::kOk, wav};
 }
 
-WaveBitsAudioMetadataParseResult ParseWaveBitsAudioMetadataBytes(
+FlipBitsAudioMetadataParseResult ParseFlipBitsAudioMetadataBytes(
     const std::uint8_t* wav_bytes, std::size_t wav_byte_count) {
   if (wav_bytes == nullptr && wav_byte_count > 0) {
-    return {WaveBitsAudioMetadataStatus::kInvalidArgument, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidArgument, {}};
   }
   if (wav_byte_count < kRiffHeaderSize) {
-    return {WaveBitsAudioMetadataStatus::kInvalidHeader, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidHeader, {}};
   }
   if (!MatchesTag(wav_bytes, "RIFF") || !MatchesTag(wav_bytes + 8, "WAVE")) {
-    return {WaveBitsAudioMetadataStatus::kInvalidHeader, {}};
+    return {FlipBitsAudioMetadataStatus::kInvalidHeader, {}};
   }
 
   std::size_t chunk_offset = kRiffHeaderSize;
@@ -401,19 +430,19 @@ WaveBitsAudioMetadataParseResult ParseWaveBitsAudioMetadataBytes(
     const std::uint32_t chunk_size = ReadU32Le(chunk_header + 4);
     const std::size_t chunk_data_offset = chunk_offset + kChunkHeaderSize;
     if (MatchesTag(chunk_header, "data")) {
-      return {WaveBitsAudioMetadataStatus::kNotFound, {}};
+      return {FlipBitsAudioMetadataStatus::kNotFound, {}};
     }
     if (!HasRange(wav_byte_count, chunk_data_offset, chunk_size)) {
-      return {WaveBitsAudioMetadataStatus::kTruncatedData, {}};
+      return {FlipBitsAudioMetadataStatus::kTruncatedData, {}};
     }
     if (MatchesTag(chunk_header, "WBAG")) {
-      return ParseWaveBitsMetadataChunk(wav_bytes + chunk_data_offset,
+      return ParseFlipBitsMetadataChunk(wav_bytes + chunk_data_offset,
                                         chunk_size);
     }
     chunk_offset = chunk_data_offset + chunk_size + (chunk_size % 2u);
   }
 
-  return {WaveBitsAudioMetadataStatus::kNotFound, {}};
+  return {FlipBitsAudioMetadataStatus::kNotFound, {}};
 }
 
 }  // namespace audio_io::detail::bytes_impl

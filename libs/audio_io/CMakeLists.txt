@@ -35,7 +35,7 @@ target_compile_features(audio_io PRIVATE cxx_std_23)
 set_property(TARGET audio_io PROPERTY CXX_MODULE_STD ON)
 
 if(BUILD_TESTING)
-    wavebits_add_host_test(test_unit
+    flipbits_add_host_test(test_unit
         NAME unit_tests
         SOURCES tests/unit_tests.cpp
         LIBS bag_core audio_io

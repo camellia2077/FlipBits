@@ -1,33 +1,46 @@
 find_program(CARGO_EXECUTABLE cargo REQUIRED)
 
-set(WAVEBITS_RUST_CLI_DIR "${CMAKE_CURRENT_LIST_DIR}/..")
-set(WAVEBITS_RUST_CLI_MANIFEST "${WAVEBITS_RUST_CLI_DIR}/Cargo.toml")
-set(WAVEBITS_RUST_TARGET_TRIPLE "x86_64-pc-windows-gnu")
+set(FLIPBITS_RUST_CLI_DIR "${CMAKE_CURRENT_LIST_DIR}/..")
+set(FLIPBITS_RUST_CLI_MANIFEST "${FLIPBITS_RUST_CLI_DIR}/Cargo.toml")
+set(FLIPBITS_RUST_TARGET_TRIPLE "x86_64-pc-windows-gnu")
+set(FLIPBITS_RUST_TARGET_DIR "${CMAKE_BINARY_DIR}/rust-cli/target")
+set(FLIPBITS_RUST_CLI_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin")
 
 if(WIN32)
-    set(WAVEBITS_RUST_CLI_BINARY
-        "${WAVEBITS_RUST_CLI_DIR}/target/${WAVEBITS_RUST_TARGET_TRIPLE}/debug/binary_audio_cpp.exe")
+    set(FLIPBITS_RUST_CLI_BINARY
+        "${FLIPBITS_RUST_TARGET_DIR}/${FLIPBITS_RUST_TARGET_TRIPLE}/debug/FlipBits.exe")
+    set(FLIPBITS_RUST_CLI_IMPORTED_BINARY
+        "${FLIPBITS_RUST_CLI_OUTPUT_DIR}/FlipBits.exe")
 else()
-    set(WAVEBITS_RUST_CLI_BINARY
-        "${WAVEBITS_RUST_CLI_DIR}/target/${WAVEBITS_RUST_TARGET_TRIPLE}/debug/binary_audio_cpp")
+    set(FLIPBITS_RUST_CLI_BINARY
+        "${FLIPBITS_RUST_TARGET_DIR}/${FLIPBITS_RUST_TARGET_TRIPLE}/debug/FlipBits")
+    set(FLIPBITS_RUST_CLI_IMPORTED_BINARY
+        "${FLIPBITS_RUST_CLI_OUTPUT_DIR}/FlipBits")
 endif()
 
-add_custom_target(binary_audio_cpp_build
+add_custom_target(FlipBits_build
     DEPENDS
-        wavebits_rust_cli_native_deps
+        FlipBits_rust_cli_native_deps
     COMMAND
         "${CMAKE_COMMAND}" -E env
-        "WAVEBITS_CMAKE_BUILD_DIR=${CMAKE_BINARY_DIR}"
+        "FLIPBITS_CMAKE_BUILD_DIR=${CMAKE_BINARY_DIR}"
+        "CARGO_TARGET_DIR=${FLIPBITS_RUST_TARGET_DIR}"
         "${CARGO_EXECUTABLE}"
         build
-        --manifest-path "${WAVEBITS_RUST_CLI_MANIFEST}"
-        --target "${WAVEBITS_RUST_TARGET_TRIPLE}"
-    WORKING_DIRECTORY "${WAVEBITS_RUST_CLI_DIR}"
+        --manifest-path "${FLIPBITS_RUST_CLI_MANIFEST}"
+        --target "${FLIPBITS_RUST_TARGET_TRIPLE}"
+    COMMAND
+        "${CMAKE_COMMAND}" -E make_directory "${FLIPBITS_RUST_CLI_OUTPUT_DIR}"
+    COMMAND
+        "${CMAKE_COMMAND}" -E copy_if_different
+        "${FLIPBITS_RUST_CLI_BINARY}"
+        "${FLIPBITS_RUST_CLI_IMPORTED_BINARY}"
+    WORKING_DIRECTORY "${FLIPBITS_RUST_CLI_DIR}"
     COMMENT "Building Rust CLI via Cargo"
     VERBATIM
 )
 
-add_executable(binary_audio_cpp IMPORTED GLOBAL)
-set_target_properties(binary_audio_cpp PROPERTIES
-    IMPORTED_LOCATION "${WAVEBITS_RUST_CLI_BINARY}"
+add_executable(FlipBits IMPORTED GLOBAL)
+set_target_properties(FlipBits PROPERTIES
+    IMPORTED_LOCATION "${FLIPBITS_RUST_CLI_IMPORTED_BINARY}"
 )

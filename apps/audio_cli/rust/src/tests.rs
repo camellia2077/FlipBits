@@ -11,21 +11,20 @@ fn clap_configuration_is_valid() {
 
 #[test]
 fn parses_version_command() {
-    let cli = Cli::try_parse_from(["binary_audio_cpp", "version"]).unwrap();
+    let cli = Cli::try_parse_from(["FlipBits", "version"]).unwrap();
     assert!(matches!(cli.command, Command::Version));
+}
+
+#[test]
+fn parses_licenses_command() {
+    let cli = Cli::try_parse_from(["FlipBits", "licenses"]).unwrap();
+    assert!(matches!(cli.command, Command::Licenses));
 }
 
 #[test]
 fn parses_encode_command_with_text() {
     let cli = Cli::try_parse_from([
-        "binary_audio_cpp",
-        "encode",
-        "--text",
-        "hello",
-        "--mode",
-        "ultra",
-        "--out",
-        "out.wav",
+        "FlipBits", "encode", "--text", "hello", "--mode", "ultra", "--out", "out.wav",
     ])
     .unwrap();
 
@@ -39,7 +38,7 @@ fn parses_encode_command_with_text() {
 
 #[test]
 fn parses_decode_command() {
-    let cli = Cli::try_parse_from(["binary_audio_cpp", "decode", "--in", "out.wav"]).unwrap();
+    let cli = Cli::try_parse_from(["FlipBits", "decode", "--in", "out.wav"]).unwrap();
 
     let Command::Decode(args) = cli.command else {
         panic!("expected decode command");
@@ -49,7 +48,7 @@ fn parses_decode_command() {
 
 #[test]
 fn rejects_encode_command_without_input() {
-    let result = Cli::try_parse_from(["binary_audio_cpp", "encode", "--out", "out.wav"]);
+    let result = Cli::try_parse_from(["FlipBits", "encode", "--out", "out.wav"]);
     assert!(result.is_err());
 }
 
@@ -60,10 +59,23 @@ fn version_output_includes_core_version_line() {
 }
 
 #[test]
+fn licenses_output_mentions_notice_scope() {
+    let output = crate::licenses::licenses_output();
+    assert!(output.contains("FlipBits third-party notices"));
+    assert!(output.contains("runtime: 14"));
+    assert!(output.contains("build: 6"));
+    assert!(output.contains("test: 3"));
+    assert!(output.contains("docs/legal/cli_third_party_notices.md"));
+    assert!(output.contains("CLI-only scope"));
+    assert!(output.contains("Android is not included"));
+    assert!(output.contains("libsndfile is not included"));
+}
+
+#[test]
 fn wav_bytes_start_with_riff_header() {
     let config = bag_api::CodecConfig::for_mode(TransportMode::Ultra);
-    let pcm_samples = bag_api::encode_text(&config, "WaveBits WAV").unwrap();
-    let metadata = audio_io_api::WaveBitsMetadata {
+    let pcm_samples = bag_api::encode_text_with_progress(&config, "FlipBits WAV", |_| {}).unwrap();
+    let metadata = audio_io_api::FlipBitsMetadata {
         version: 3,
         mode: TransportMode::Ultra,
         flash_voicing_style: None,
@@ -71,7 +83,7 @@ fn wav_bytes_start_with_riff_header() {
         duration_ms: 0,
         frame_samples: config.frame_samples,
         pcm_sample_count: pcm_samples.len(),
-        app_version: "binary_audio_cpp/test".to_string(),
+        app_version: "FlipBits/test".to_string(),
         core_version: "test-core".to_string(),
     };
     let wav_bytes = audio_io_api::encode_mono_pcm16_wav_with_metadata(
@@ -98,9 +110,11 @@ fn free_empty_metadata_is_safe() {
 #[test]
 fn help_mentions_decode_command() {
     let help = Cli::command().render_long_help().to_string();
-    assert!(help.contains("WaveBits command line interface"));
-    assert!(help.contains("encode   Encode text into a WaveBits WAV file"));
-    assert!(help.contains("Decode a WaveBits WAV file back into text"));
-    assert!(help.contains("binary_audio_cpp decode --in out.wav"));
+    assert!(help.contains("FlipBits command line interface"));
+    assert!(help.contains("licenses"));
+    assert!(help.contains("encode"));
+    assert!(help.contains("Encode text into a FlipBits WAV file"));
+    assert!(help.contains("Decode a FlipBits WAV file back into text"));
+    assert!(help.contains("FlipBits decode --in out.wav"));
     assert!(!help.contains("requires an explicit --mode"));
 }

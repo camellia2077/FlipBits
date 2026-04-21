@@ -1,7 +1,11 @@
 [package]
-name = "binary_audio_cpp"
-version = "0.1.1"
+name = "flipbits"
+version = "0.2.1"
 edition = "2021"
+
+[[bin]]
+name = "FlipBits"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.5.38", features = ["derive"] }

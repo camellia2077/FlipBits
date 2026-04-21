@@ -3,6 +3,8 @@ use crate::{CliError, TransportMode, DEFAULT_FRAME_RATE_DIVISOR, DEFAULT_SAMPLE_
 use std::ffi::CString;
 use std::os::raw::c_int;
 use std::ptr;
+use std::thread;
+use std::time::Duration;
 
 type BagErrorCode = c_int;
 type BagTransportMode = c_int;
@@ -11,12 +13,24 @@ type BagFlashVoicingFlavor = c_int;
 type BagValidationIssue = c_int;
 
 const BAG_OK: BagErrorCode = 0;
+const BAG_NOT_READY: BagErrorCode = 2;
+const BAG_INTERNAL: BagErrorCode = 4;
 const BAG_TRANSPORT_FLASH: BagTransportMode = 0;
 const BAG_TRANSPORT_PRO: BagTransportMode = 1;
 const BAG_TRANSPORT_ULTRA: BagTransportMode = 2;
 const BAG_FLASH_SIGNAL_PROFILE_CODED_BURST: BagFlashSignalProfile = 0;
 const BAG_FLASH_VOICING_FLAVOR_CODED_BURST: BagFlashVoicingFlavor = 0;
 const BAG_VALIDATION_OK: BagValidationIssue = 0;
+const BAG_ENCODE_JOB_QUEUED: c_int = 0;
+const BAG_ENCODE_JOB_RUNNING: c_int = 1;
+const BAG_ENCODE_JOB_SUCCEEDED: c_int = 2;
+const BAG_ENCODE_JOB_FAILED: c_int = 3;
+const BAG_ENCODE_JOB_CANCELLED: c_int = 4;
+const BAG_ENCODE_JOB_PHASE_PREPARING_INPUT: c_int = 0;
+const BAG_ENCODE_JOB_PHASE_RENDERING_PCM: c_int = 1;
+const BAG_ENCODE_JOB_PHASE_POSTPROCESSING: c_int = 2;
+const BAG_ENCODE_JOB_PHASE_FINALIZING: c_int = 3;
+const ENCODE_JOB_POLL_INTERVAL_MS: u64 = 33;
 
 #[repr(C)]
 struct BagEncoderConfig {
@@ -56,21 +70,48 @@ struct BagPcm16Result {
     sample_count: usize,
 }
 
+#[repr(C)]
+struct BagEncodeJobProgress {
+    state: c_int,
+    phase: c_int,
+    progress_0_to_1: f32,
+    terminal_code: BagErrorCode,
+}
+
 #[allow(non_camel_case_types)]
 enum BagDecoder {}
 
+#[allow(non_camel_case_types)]
+enum BagEncodeJob {}
+
 unsafe extern "C" {
-    fn bag_validate_encode_request(config: *const BagEncoderConfig, text: *const i8) -> BagValidationIssue;
+    fn bag_validate_encode_request(
+        config: *const BagEncoderConfig,
+        text: *const i8,
+    ) -> BagValidationIssue;
     fn bag_validate_decoder_config(config: *const BagDecoderConfig) -> BagValidationIssue;
     fn bag_validation_issue_message(issue: BagValidationIssue) -> *const i8;
     fn bag_error_code_message(code: BagErrorCode) -> *const i8;
-    fn bag_encode_text(
+    fn bag_start_encode_text_job(
         config: *const BagEncoderConfig,
         text: *const i8,
+        out_job: *mut *mut BagEncodeJob,
+    ) -> BagErrorCode;
+    fn bag_poll_encode_text_job(
+        job: *const BagEncodeJob,
+        out_progress: *mut BagEncodeJobProgress,
+    ) -> BagErrorCode;
+    fn bag_cancel_encode_text_job(job: *mut BagEncodeJob) -> BagErrorCode;
+    fn bag_take_encode_text_job_result(
+        job: *const BagEncodeJob,
         out_result: *mut BagPcm16Result,
     ) -> BagErrorCode;
+    fn bag_destroy_encode_text_job(job: *mut BagEncodeJob);
     fn bag_free_pcm16_result(result: *mut BagPcm16Result);
-    fn bag_create_decoder(config: *const BagDecoderConfig, out_decoder: *mut *mut BagDecoder) -> BagErrorCode;
+    fn bag_create_decoder(
+        config: *const BagDecoderConfig,
+        out_decoder: *mut *mut BagDecoder,
+    ) -> BagErrorCode;
     fn bag_destroy_decoder(decoder: *mut BagDecoder);
     fn bag_push_pcm(
         decoder: *mut BagDecoder,
@@ -87,6 +128,31 @@ pub struct CodecConfig {
     pub sample_rate_hz: i32,
     pub frame_samples: i32,
     pub mode: TransportMode,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum EncodeJobState {
+    Queued,
+    Running,
+    Succeeded,
+    Failed,
+    Cancelled,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum EncodeJobPhase {
+    PreparingInput,
+    RenderingPcm,
+    Postprocessing,
+    Finalizing,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct EncodeJobProgress {
+    pub state: EncodeJobState,
+    pub phase: EncodeJobPhase,
+    pub progress_0_to_1: f32,
+    pub terminal_code: BagErrorCode,
 }
 
 impl CodecConfig {
@@ -108,7 +174,14 @@ pub fn core_version() -> Option<String> {
     }
 }
 
-pub fn encode_text(config: &CodecConfig, text: &str) -> Result<Vec<i16>, CliError> {
+pub fn encode_text_with_progress<F>(
+    config: &CodecConfig,
+    text: &str,
+    mut on_progress: F,
+) -> Result<Vec<i16>, CliError>
+where
+    F: FnMut(EncodeJobProgress),
+{
     let c_text = CString::new(text)
         .map_err(|_| CliError::Api("encode text contains an interior NUL byte".to_string()))?;
     let raw_config = make_encoder_config(config);
@@ -120,23 +193,51 @@ pub fn encode_text(config: &CodecConfig, text: &str) -> Result<Vec<i16>, CliErro
         })));
     }
 
-    let mut pcm = BagPcm16Result {
-        samples: ptr::null_mut(),
-        sample_count: 0,
-    };
-    let code = unsafe { bag_encode_text(&raw_config, c_text.as_ptr(), &mut pcm) };
-    if code != BAG_OK {
+    let mut raw_job = ptr::null_mut();
+    let start_code =
+        unsafe { bag_start_encode_text_job(&raw_config, c_text.as_ptr(), &mut raw_job) };
+    if start_code != BAG_OK || raw_job.is_null() {
         return Err(CliError::Api(c_str_to_string(unsafe {
-            bag_error_code_message(code)
+            bag_error_code_message(start_code)
         })));
     }
 
-    let samples =
-        unsafe { std::slice::from_raw_parts(pcm.samples as *const i16, pcm.sample_count).to_vec() };
-    unsafe {
-        bag_free_pcm16_result(&mut pcm);
+    struct EncodeJobGuard(*mut BagEncodeJob);
+
+    impl Drop for EncodeJobGuard {
+        fn drop(&mut self) {
+            if !self.0.is_null() {
+                unsafe {
+                    bag_cancel_encode_text_job(self.0);
+                    bag_destroy_encode_text_job(self.0);
+                }
+            }
+        }
     }
-    Ok(samples)
+
+    let job = EncodeJobGuard(raw_job);
+    loop {
+        let progress = poll_encode_job(job.0)?;
+        on_progress(progress);
+        match progress.state {
+            EncodeJobState::Queued | EncodeJobState::Running => {
+                thread::sleep(Duration::from_millis(ENCODE_JOB_POLL_INTERVAL_MS));
+            }
+            EncodeJobState::Succeeded => {
+                return take_encode_job_result(job.0);
+            }
+            EncodeJobState::Failed | EncodeJobState::Cancelled => {
+                let code = if progress.terminal_code == BAG_NOT_READY {
+                    BAG_INTERNAL
+                } else {
+                    progress.terminal_code
+                };
+                return Err(CliError::Api(c_str_to_string(unsafe {
+                    bag_error_code_message(code)
+                })));
+            }
+        }
+    }
 }
 
 pub fn decode_pcm(config: &CodecConfig, pcm_samples: &[i16]) -> Result<String, CliError> {
@@ -223,4 +324,57 @@ fn to_bag_mode(mode: TransportMode) -> BagTransportMode {
         TransportMode::Pro => BAG_TRANSPORT_PRO,
         TransportMode::Ultra => BAG_TRANSPORT_ULTRA,
     }
+}
+
+fn poll_encode_job(job: *mut BagEncodeJob) -> Result<EncodeJobProgress, CliError> {
+    let mut progress = BagEncodeJobProgress {
+        state: BAG_ENCODE_JOB_FAILED,
+        phase: BAG_ENCODE_JOB_PHASE_FINALIZING,
+        progress_0_to_1: 0.0,
+        terminal_code: BAG_NOT_READY,
+    };
+    let code = unsafe { bag_poll_encode_text_job(job, &mut progress) };
+    if code != BAG_OK {
+        return Err(CliError::Api(c_str_to_string(unsafe {
+            bag_error_code_message(code)
+        })));
+    }
+
+    Ok(EncodeJobProgress {
+        state: match progress.state {
+            BAG_ENCODE_JOB_QUEUED => EncodeJobState::Queued,
+            BAG_ENCODE_JOB_RUNNING => EncodeJobState::Running,
+            BAG_ENCODE_JOB_SUCCEEDED => EncodeJobState::Succeeded,
+            BAG_ENCODE_JOB_CANCELLED => EncodeJobState::Cancelled,
+            _ => EncodeJobState::Failed,
+        },
+        phase: match progress.phase {
+            BAG_ENCODE_JOB_PHASE_PREPARING_INPUT => EncodeJobPhase::PreparingInput,
+            BAG_ENCODE_JOB_PHASE_RENDERING_PCM => EncodeJobPhase::RenderingPcm,
+            BAG_ENCODE_JOB_PHASE_POSTPROCESSING => EncodeJobPhase::Postprocessing,
+            _ => EncodeJobPhase::Finalizing,
+        },
+        progress_0_to_1: progress.progress_0_to_1.clamp(0.0, 1.0),
+        terminal_code: progress.terminal_code,
+    })
+}
+
+fn take_encode_job_result(job: *mut BagEncodeJob) -> Result<Vec<i16>, CliError> {
+    let mut pcm = BagPcm16Result {
+        samples: ptr::null_mut(),
+        sample_count: 0,
+    };
+    let code = unsafe { bag_take_encode_text_job_result(job, &mut pcm) };
+    if code != BAG_OK {
+        return Err(CliError::Api(c_str_to_string(unsafe {
+            bag_error_code_message(code)
+        })));
+    }
+
+    let samples =
+        unsafe { std::slice::from_raw_parts(pcm.samples as *const i16, pcm.sample_count).to_vec() };
+    unsafe {
+        bag_free_pcm16_result(&mut pcm);
+    }
+    Ok(samples)
 }

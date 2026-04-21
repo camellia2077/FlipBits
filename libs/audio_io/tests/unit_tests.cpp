@@ -13,13 +13,19 @@ namespace {
 // than track repository release bumps.
 constexpr auto kTestAppVersion = "0.2.2";
 constexpr auto kTestCoreVersion = "0.4.1";
+constexpr std::size_t kWavChunkPayloadOffset = 44;
+constexpr std::size_t kMetadataVersionOffset = kWavChunkPayloadOffset + 0;
+constexpr std::size_t kMetadataModeOffset = kWavChunkPayloadOffset + 1;
+constexpr std::size_t kMetadataFlashStyleOffset = kWavChunkPayloadOffset + 3;
+constexpr std::size_t kMetadataCreatedAtOffset = kWavChunkPayloadOffset + 8;
+constexpr std::size_t kMetadataAppVersionOffset = kWavChunkPayloadOffset + 36;
 
-audio_io::WaveBitsAudioMetadata MakeValidMetadata(std::uint32_t pcm_sample_count) {
-    audio_io::WaveBitsAudioMetadata metadata{};
+audio_io::FlipBitsAudioMetadata MakeValidMetadata(std::uint32_t pcm_sample_count) {
+    audio_io::FlipBitsAudioMetadata metadata{};
     metadata.version = 3;
-    metadata.mode = audio_io::WaveBitsAudioMetadataMode::kFlash;
+    metadata.mode = audio_io::FlipBitsAudioMetadataMode::kFlash;
     metadata.has_flash_voicing_style = true;
-    metadata.flash_voicing_style = audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kRitualChant;
+    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kRitualChant;
     metadata.created_at_iso_utc = "2026-03-17T09:45:00Z";
     metadata.duration_ms = 4321u;
     metadata.frame_samples = 2205u;
@@ -305,16 +311,16 @@ void TestWavIoMetadataRoundTripContract() {
     test::AssertEq(parsed_wav.status, audio_io::WavPcm16Status::kOk, "PCM parsing should still succeed.");
     test::AssertAudioIoRoundTripResult(parsed_wav.wav, test_case, "Metadata WAV PCM round trip");
 
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
-    test::AssertEq(parsed_metadata.status, audio_io::WaveBitsAudioMetadataStatus::kOk, "Metadata parse should succeed.");
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
+    test::AssertEq(parsed_metadata.status, audio_io::FlipBitsAudioMetadataStatus::kOk, "Metadata parse should succeed.");
     test::AssertEq(parsed_metadata.metadata.version, 3u, "Metadata version should round-trip.");
     test::AssertEq(parsed_metadata.metadata.mode,
-                   audio_io::WaveBitsAudioMetadataMode::kFlash,
+                   audio_io::FlipBitsAudioMetadataMode::kFlash,
                    "Metadata mode should round-trip.");
     test::AssertTrue(parsed_metadata.metadata.has_flash_voicing_style,
                      "Metadata should preserve the flash voicing style flag.");
     test::AssertEq(parsed_metadata.metadata.flash_voicing_style,
-                   audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kRitualChant,
+                   audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kRitualChant,
                    "Metadata flash voicing style should round-trip.");
     test::AssertEq(parsed_metadata.metadata.created_at_iso_utc,
                    std::string("2026-03-17T09:45:00Z"),
@@ -339,9 +345,9 @@ void TestWavIoMetadataRoundTripContract() {
 void TestWavIoMetadataMissingOnCanonicalWav() {
     const auto test_case = test::AudioIoRoundTripCases().front();
     const auto wav_bytes = audio_io::SerializeMonoPcm16Wav(test_case.sample_rate_hz, test_case.mono_pcm);
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
-                   audio_io::WaveBitsAudioMetadataStatus::kNotFound,
+                   audio_io::FlipBitsAudioMetadataStatus::kNotFound,
                    "Canonical WAV without WBAG chunk should report metadata not found.");
 }
 
@@ -377,9 +383,9 @@ void TestWavIoMetadataRespectsChunkPadding() {
 
 void TestWavIoMetadataRejectsOlderVersions() {
     const auto test_case = test::AudioIoRoundTripCases().front();
-    audio_io::WaveBitsAudioMetadata metadata_v2{};
+    audio_io::FlipBitsAudioMetadata metadata_v2{};
     metadata_v2.version = 2;
-    metadata_v2.mode = audio_io::WaveBitsAudioMetadataMode::kUltra;
+    metadata_v2.mode = audio_io::FlipBitsAudioMetadataMode::kUltra;
     metadata_v2.created_at_iso_utc = "2026-03-17T09:45:00Z";
     metadata_v2.duration_ms = 4321u;
     const auto wav_bytes_v2 = audio_io::SerializeMonoPcm16WavWithMetadata(
@@ -393,10 +399,10 @@ void TestWavIoMetadataRejectsOlderVersions() {
 
 void TestWavIoMetadataParseRejectsUnsupportedVersion() {
     auto wav_bytes = MakeMetadataWavBytes();
-    wav_bytes[44] = 2u;
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+    wav_bytes[kMetadataVersionOffset] = 2u;
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
-                   audio_io::WaveBitsAudioMetadataStatus::kUnsupportedVersion,
+                   audio_io::FlipBitsAudioMetadataStatus::kUnsupportedVersion,
                    "Metadata parsing should surface unsupported versions from existing WBAG chunks.");
 }
 
@@ -406,9 +412,9 @@ void TestWavIoMetadataRejectsTruncatedChunkData() {
     wav_bytes[41] = 0xFFu;
     wav_bytes[42] = 0xFFu;
     wav_bytes[43] = 0xFFu;
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
-                   audio_io::WaveBitsAudioMetadataStatus::kTruncatedData,
+                   audio_io::FlipBitsAudioMetadataStatus::kTruncatedData,
                    "Metadata parsing should reject truncated WBAG chunks.");
 }
 
@@ -418,46 +424,46 @@ void TestWavIoMetadataRejectsShortChunkPayload() {
     wav_bytes[41] = 0u;
     wav_bytes[42] = 0u;
     wav_bytes[43] = 0u;
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
-                   audio_io::WaveBitsAudioMetadataStatus::kInvalidMetadata,
+                   audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
                    "Metadata parsing should reject short WBAG payloads.");
 }
 
 void TestWavIoMetadataRejectsUnknownModeValues() {
     auto wav_bytes = MakeMetadataWavBytes();
-    wav_bytes[45] = 99u;
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+    wav_bytes[kMetadataModeOffset] = 99u;
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
-                   audio_io::WaveBitsAudioMetadataStatus::kInvalidMetadata,
+                   audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
                    "Metadata parsing should reject unknown transport modes.");
 }
 
 void TestWavIoMetadataRejectsUnknownFlashStyleValues() {
     auto wav_bytes = MakeMetadataWavBytes();
-    wav_bytes[47] = 99u;
-    const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+    wav_bytes[kMetadataFlashStyleOffset] = 99u;
+    const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
-                   audio_io::WaveBitsAudioMetadataStatus::kInvalidMetadata,
+                   audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
                    "Metadata parsing should reject unknown flash voicing styles.");
 }
 
 void TestWavIoMetadataRejectsCorruptedFields() {
     {
         auto wav_bytes = MakeMetadataWavBytes();
-        wav_bytes[52] = static_cast<std::uint8_t>('X');
-        const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+        wav_bytes[kMetadataCreatedAtOffset] = static_cast<std::uint8_t>('X');
+        const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
         test::AssertEq(parsed_metadata.status,
-                       audio_io::WaveBitsAudioMetadataStatus::kInvalidMetadata,
+                       audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
                        "Metadata parsing should reject corrupted ISO-UTC timestamps.");
     }
 
     {
         auto wav_bytes = MakeMetadataWavBytes();
-        wav_bytes[80] = 0u;
-        const auto parsed_metadata = audio_io::ParseWaveBitsAudioMetadata(wav_bytes);
+        wav_bytes[kMetadataAppVersionOffset] = 0u;
+        const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
         test::AssertEq(parsed_metadata.status,
-                       audio_io::WaveBitsAudioMetadataStatus::kInvalidMetadata,
+                       audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
                        "Metadata parsing should reject empty app-version fields inside WBAG chunks.");
     }
 }

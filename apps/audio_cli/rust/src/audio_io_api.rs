@@ -79,7 +79,7 @@ pub enum FlashVoicingStyle {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct WaveBitsMetadata {
+pub struct FlipBitsMetadata {
     pub version: u8,
     pub mode: TransportMode,
     pub flash_voicing_style: Option<FlashVoicingStyle>,
@@ -95,7 +95,7 @@ pub struct WaveBitsMetadata {
 pub struct DecodedWav {
     pub sample_rate_hz: i32,
     pub pcm_samples: Vec<i16>,
-    pub metadata: Result<WaveBitsMetadata, String>,
+    pub metadata: Result<FlipBitsMetadata, String>,
 }
 
 unsafe extern "C" {
@@ -122,7 +122,7 @@ unsafe extern "C" {
 pub fn encode_mono_pcm16_wav_with_metadata(
     sample_rate_hz: i32,
     pcm_samples: &[i16],
-    metadata: &WaveBitsMetadata,
+    metadata: &FlipBitsMetadata,
 ) -> Result<Vec<u8>, CliError> {
     let created_at_bytes = metadata.created_at_iso_utc.as_bytes();
     let app_version_bytes = metadata.app_version.as_bytes();
@@ -266,8 +266,8 @@ pub fn free_empty_metadata_for_contract_test() {
     }
 }
 
-fn convert_metadata(raw: &AudioIoMetadata) -> Result<WaveBitsMetadata, CliError> {
-    Ok(WaveBitsMetadata {
+fn convert_metadata(raw: &AudioIoMetadata) -> Result<FlipBitsMetadata, CliError> {
+    Ok(FlipBitsMetadata {
         version: raw.version,
         mode: from_metadata_mode(raw.mode)?,
         flash_voicing_style: if raw.has_flash_voicing_style != 0 {

@@ -28,76 +28,76 @@ audio_io_wav_status ToApiStatus(audio_io::WavPcm16Status status) {
 }
 
 audio_io_metadata_status ToMetadataApiStatus(
-    audio_io::WaveBitsAudioMetadataStatus status) {
+    audio_io::FlipBitsAudioMetadataStatus status) {
   switch (status) {
-    case audio_io::WaveBitsAudioMetadataStatus::kOk:
+    case audio_io::FlipBitsAudioMetadataStatus::kOk:
       return AUDIO_IO_METADATA_OK;
-    case audio_io::WaveBitsAudioMetadataStatus::kNotFound:
+    case audio_io::FlipBitsAudioMetadataStatus::kNotFound:
       return AUDIO_IO_METADATA_NOT_FOUND;
-    case audio_io::WaveBitsAudioMetadataStatus::kInvalidArgument:
+    case audio_io::FlipBitsAudioMetadataStatus::kInvalidArgument:
       return AUDIO_IO_METADATA_INVALID_ARGUMENT;
-    case audio_io::WaveBitsAudioMetadataStatus::kInvalidHeader:
+    case audio_io::FlipBitsAudioMetadataStatus::kInvalidHeader:
       return AUDIO_IO_METADATA_INVALID_HEADER;
-    case audio_io::WaveBitsAudioMetadataStatus::kUnsupportedVersion:
+    case audio_io::FlipBitsAudioMetadataStatus::kUnsupportedVersion:
       return AUDIO_IO_METADATA_UNSUPPORTED_VERSION;
-    case audio_io::WaveBitsAudioMetadataStatus::kInvalidMetadata:
+    case audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata:
       return AUDIO_IO_METADATA_INVALID_METADATA;
-    case audio_io::WaveBitsAudioMetadataStatus::kTruncatedData:
+    case audio_io::FlipBitsAudioMetadataStatus::kTruncatedData:
       return AUDIO_IO_METADATA_TRUNCATED_DATA;
   }
 
   return AUDIO_IO_METADATA_INTERNAL;
 }
 
-audio_io::WaveBitsAudioMetadataMode ToLibraryMode(audio_io_metadata_mode mode) {
+audio_io::FlipBitsAudioMetadataMode ToLibraryMode(audio_io_metadata_mode mode) {
   switch (mode) {
     case AUDIO_IO_METADATA_MODE_FLASH:
-      return audio_io::WaveBitsAudioMetadataMode::kFlash;
+      return audio_io::FlipBitsAudioMetadataMode::kFlash;
     case AUDIO_IO_METADATA_MODE_PRO:
-      return audio_io::WaveBitsAudioMetadataMode::kPro;
+      return audio_io::FlipBitsAudioMetadataMode::kPro;
     case AUDIO_IO_METADATA_MODE_ULTRA:
-      return audio_io::WaveBitsAudioMetadataMode::kUltra;
+      return audio_io::FlipBitsAudioMetadataMode::kUltra;
     case AUDIO_IO_METADATA_MODE_UNKNOWN:
     default:
-      return audio_io::WaveBitsAudioMetadataMode::kUnknown;
+      return audio_io::FlipBitsAudioMetadataMode::kUnknown;
   }
 }
 
-audio_io_metadata_mode ToApiMode(audio_io::WaveBitsAudioMetadataMode mode) {
+audio_io_metadata_mode ToApiMode(audio_io::FlipBitsAudioMetadataMode mode) {
   switch (mode) {
-    case audio_io::WaveBitsAudioMetadataMode::kFlash:
+    case audio_io::FlipBitsAudioMetadataMode::kFlash:
       return AUDIO_IO_METADATA_MODE_FLASH;
-    case audio_io::WaveBitsAudioMetadataMode::kPro:
+    case audio_io::FlipBitsAudioMetadataMode::kPro:
       return AUDIO_IO_METADATA_MODE_PRO;
-    case audio_io::WaveBitsAudioMetadataMode::kUltra:
+    case audio_io::FlipBitsAudioMetadataMode::kUltra:
       return AUDIO_IO_METADATA_MODE_ULTRA;
-    case audio_io::WaveBitsAudioMetadataMode::kUnknown:
+    case audio_io::FlipBitsAudioMetadataMode::kUnknown:
     default:
       return AUDIO_IO_METADATA_MODE_UNKNOWN;
   }
 }
 
-audio_io::WaveBitsAudioMetadataFlashVoicingStyle ToLibraryFlashStyle(
+audio_io::FlipBitsAudioMetadataFlashVoicingStyle ToLibraryFlashStyle(
     audio_io_metadata_flash_voicing_style style) {
   switch (style) {
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_CODED_BURST:
-      return audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kCodedBurst;
+      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCodedBurst;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT:
-      return audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kRitualChant;
+      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kRitualChant;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN:
     default:
-      return audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kUnknown;
+      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
   }
 }
 
 audio_io_metadata_flash_voicing_style ToApiFlashStyle(
-    audio_io::WaveBitsAudioMetadataFlashVoicingStyle style) {
+    audio_io::FlipBitsAudioMetadataFlashVoicingStyle style) {
   switch (style) {
-    case audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kCodedBurst:
+    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCodedBurst:
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_CODED_BURST;
-    case audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kRitualChant:
+    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kRitualChant:
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT;
-    case audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kUnknown:
+    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown:
     default:
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
   }
@@ -170,7 +170,7 @@ bool DuplicateOwnedString(const std::string& input, audio_io_owned_string* out) 
   return true;
 }
 
-bool FillApiMetadata(const audio_io::WaveBitsAudioMetadata& native_metadata,
+bool FillApiMetadata(const audio_io::FlipBitsAudioMetadata& native_metadata,
                      audio_io_metadata* out_metadata) {
   if (out_metadata == nullptr) {
     return false;
@@ -203,7 +203,7 @@ bool FillApiMetadata(const audio_io::WaveBitsAudioMetadata& native_metadata,
 }
 
 bool ToNativeMetadata(const audio_io_metadata_view* metadata,
-                      audio_io::WaveBitsAudioMetadata* out_metadata) {
+                      audio_io::FlipBitsAudioMetadata* out_metadata) {
   if (metadata == nullptr || out_metadata == nullptr) {
     return false;
   }
@@ -220,7 +220,7 @@ bool ToNativeMetadata(const audio_io_metadata_view* metadata,
   out_metadata->flash_voicing_style =
       out_metadata->has_flash_voicing_style
           ? ToLibraryFlashStyle(metadata->flash_voicing_style)
-          : audio_io::WaveBitsAudioMetadataFlashVoicingStyle::kUnknown;
+          : audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
   out_metadata->created_at_iso_utc = ToStdString(metadata->created_at_iso_utc);
   out_metadata->duration_ms = metadata->duration_ms;
   out_metadata->frame_samples = metadata->frame_samples;
@@ -290,7 +290,7 @@ audio_io_wav_status audio_io_encode_mono_pcm16_wav_with_metadata(
   }
 
   try {
-    audio_io::WaveBitsAudioMetadata native_metadata{};
+    audio_io::FlipBitsAudioMetadata native_metadata{};
     if (!ToNativeMetadata(metadata, &native_metadata)) {
       return AUDIO_IO_WAV_INVALID_ARGUMENT;
     }
@@ -335,9 +335,9 @@ audio_io_wav_status audio_io_decode_mono_pcm16_wav(
 
   try {
     const auto parsed_metadata =
-        audio_io::ParseWaveBitsAudioMetadata(wav_bytes, wav_byte_count);
+        audio_io::ParseFlipBitsAudioMetadata(wav_bytes, wav_byte_count);
     out_result->metadata_status = ToMetadataApiStatus(parsed_metadata.status);
-    if (parsed_metadata.status == audio_io::WaveBitsAudioMetadataStatus::kOk &&
+    if (parsed_metadata.status == audio_io::FlipBitsAudioMetadataStatus::kOk &&
         !FillApiMetadata(parsed_metadata.metadata, &out_result->metadata)) {
       out_result->metadata_status = AUDIO_IO_METADATA_INTERNAL;
     }
@@ -391,24 +391,24 @@ const char* audio_io_wav_status_message(audio_io_wav_status status) {
 const char* audio_io_metadata_status_message(audio_io_metadata_status status) {
   switch (status) {
     case AUDIO_IO_METADATA_OK:
-      return "WaveBits metadata parsed successfully.";
+      return "FlipBits metadata parsed successfully.";
     case AUDIO_IO_METADATA_NOT_FOUND:
-      return "WaveBits metadata was not found in the WAV file.";
+      return "FlipBits metadata was not found in the WAV file.";
     case AUDIO_IO_METADATA_INVALID_ARGUMENT:
-      return "Invalid WaveBits metadata parse argument.";
+      return "Invalid FlipBits metadata parse argument.";
     case AUDIO_IO_METADATA_INVALID_HEADER:
-      return "Invalid WaveBits metadata header.";
+      return "Invalid FlipBits metadata header.";
     case AUDIO_IO_METADATA_UNSUPPORTED_VERSION:
-      return "Unsupported WaveBits metadata version.";
+      return "Unsupported FlipBits metadata version.";
     case AUDIO_IO_METADATA_INVALID_METADATA:
-      return "Invalid WaveBits metadata payload.";
+      return "Invalid FlipBits metadata payload.";
     case AUDIO_IO_METADATA_TRUNCATED_DATA:
-      return "Truncated WaveBits metadata payload.";
+      return "Truncated FlipBits metadata payload.";
     case AUDIO_IO_METADATA_INTERNAL:
-      return "Internal WaveBits metadata failure.";
+      return "Internal FlipBits metadata failure.";
   }
 
-  return "Unknown WaveBits metadata status.";
+  return "Unknown FlipBits metadata status.";
 }
 
 void audio_io_free_byte_buffer(audio_io_byte_buffer* buffer) {

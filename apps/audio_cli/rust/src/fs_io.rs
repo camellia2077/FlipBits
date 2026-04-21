@@ -22,11 +22,7 @@ pub fn read_binary_file(path: &Path) -> Result<Vec<u8>, CliError> {
     })
 }
 
-pub fn write_binary_file(
-    path: &Path,
-    bytes: &[u8],
-    context: &'static str,
-) -> Result<(), CliError> {
+pub fn write_binary_file(path: &Path, bytes: &[u8], context: &'static str) -> Result<(), CliError> {
     ensure_parent_dir(path)?;
     fs::write(path, bytes).map_err(|source| CliError::Io {
         context,

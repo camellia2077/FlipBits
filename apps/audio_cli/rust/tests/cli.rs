@@ -5,15 +5,35 @@ use tempfile::tempdir;
 
 #[test]
 fn version_command_reports_rust_wav_build() {
-    let mut command = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut command = Command::cargo_bin("FlipBits").unwrap();
     command
         .arg("version")
         .assert()
         .success()
-        .stdout(predicate::str::contains("presentation: v0.1.1"))
+        .stdout(predicate::str::contains("presentation: v0.2.1"))
         .stdout(predicate::str::contains("core: v"))
         .stdout(predicate::str::contains("build: rust-wav"))
         .stdout(predicate::str::contains("bag_api + audio_io WAV build"));
+}
+
+#[test]
+fn licenses_command_reports_notice_summary() {
+    let mut command = Command::cargo_bin("FlipBits").unwrap();
+    command
+        .arg("licenses")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("FlipBits third-party notices"))
+        .stdout(predicate::str::contains("runtime: 14"))
+        .stdout(predicate::str::contains("build: 6"))
+        .stdout(predicate::str::contains("test: 3"))
+        .stdout(predicate::str::contains(
+            "docs/legal/cli_third_party_notices.md",
+        ))
+        .stdout(predicate::str::contains("CLI-only scope"))
+        .stdout(predicate::str::contains("Android is not included"))
+        .stdout(predicate::str::contains("libsndfile is not included"))
+        .stdout(predicate::str::contains("full notices"));
 }
 
 #[test]
@@ -21,12 +41,12 @@ fn encode_writes_wav_file() {
     let temp = tempdir().unwrap();
     let output_path = temp.path().join("nested").join("artifact.wav");
 
-    let mut command = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut command = Command::cargo_bin("FlipBits").unwrap();
     command
         .args([
             "encode",
             "--text",
-            "WaveBits stub",
+            "FlipBits stub",
             "--mode",
             "ultra",
             "--out",
@@ -48,7 +68,7 @@ fn decode_reads_wav_and_writes_text_file() {
     let artifact_path = temp.path().join("artifact.wav");
     let output_text_path = temp.path().join("decoded.txt");
 
-    let mut encode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut encode = Command::cargo_bin("FlipBits").unwrap();
     encode
         .args([
             "encode",
@@ -62,7 +82,7 @@ fn decode_reads_wav_and_writes_text_file() {
         .assert()
         .success();
 
-    let mut decode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut decode = Command::cargo_bin("FlipBits").unwrap();
     decode
         .args([
             "decode",
@@ -83,7 +103,7 @@ fn decode_missing_input_fails_with_stable_error() {
     let temp = tempdir().unwrap();
     let missing_path = temp.path().join("missing.wav");
 
-    let mut command = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut command = Command::cargo_bin("FlipBits").unwrap();
     command
         .args(["decode", "--in", missing_path.to_str().unwrap()])
         .assert()
@@ -98,7 +118,7 @@ fn encode_decode_wav_roundtrip_is_happy_path() {
     let artifact_path = temp.path().join("artifact.wav");
     fs::write(&input_text_path, "Roundtrip text 你好").unwrap();
 
-    let mut encode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut encode = Command::cargo_bin("FlipBits").unwrap();
     encode
         .args([
             "encode",
@@ -112,7 +132,7 @@ fn encode_decode_wav_roundtrip_is_happy_path() {
         .assert()
         .success();
 
-    let mut decode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut decode = Command::cargo_bin("FlipBits").unwrap();
     decode
         .args(["decode", "--in", artifact_path.to_str().unwrap()])
         .assert()
@@ -125,7 +145,7 @@ fn decode_without_mode_uses_wav_metadata() {
     let temp = tempdir().unwrap();
     let artifact_path = temp.path().join("artifact.wav");
 
-    let mut encode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut encode = Command::cargo_bin("FlipBits").unwrap();
     encode
         .args([
             "encode",
@@ -139,7 +159,7 @@ fn decode_without_mode_uses_wav_metadata() {
         .assert()
         .success();
 
-    let mut decode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut decode = Command::cargo_bin("FlipBits").unwrap();
     decode
         .args(["decode", "--in", artifact_path.to_str().unwrap()])
         .assert()
@@ -152,7 +172,7 @@ fn decode_truncated_wav_fails_with_parse_error() {
     let temp = tempdir().unwrap();
     let artifact_path = temp.path().join("artifact.wav");
 
-    let mut encode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut encode = Command::cargo_bin("FlipBits").unwrap();
     encode
         .args([
             "encode",
@@ -170,7 +190,7 @@ fn decode_truncated_wav_fails_with_parse_error() {
     bytes.truncate(bytes.len().saturating_sub(1));
     fs::write(&artifact_path, bytes).unwrap();
 
-    let mut decode = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut decode = Command::cargo_bin("FlipBits").unwrap();
     decode
         .args(["decode", "--in", artifact_path.to_str().unwrap()])
         .assert()
@@ -181,14 +201,19 @@ fn decode_truncated_wav_fails_with_parse_error() {
 
 #[test]
 fn help_describes_decode_without_mode() {
-    let mut command = Command::cargo_bin("binary_audio_cpp").unwrap();
+    let mut command = Command::cargo_bin("FlipBits").unwrap();
     command
         .arg("--help")
         .assert()
         .success()
-        .stdout(predicate::str::contains("WaveBits command line interface"))
-        .stdout(predicate::str::contains("Decode a WaveBits WAV file back into text"))
-        .stdout(predicate::str::contains("binary_audio_cpp encode --text"))
+        .stdout(predicate::str::contains("FlipBits command line interface"))
+        .stdout(predicate::str::contains(
+            "Decode a FlipBits WAV file back into text",
+        ))
+        .stdout(predicate::str::contains(
+            "licenses  Show third-party license notice coverage for the CLI",
+        ))
+        .stdout(predicate::str::contains("FlipBits encode --text"))
         .stdout(predicate::str::contains("encode"))
         .stdout(predicate::str::contains("decode"));
 }

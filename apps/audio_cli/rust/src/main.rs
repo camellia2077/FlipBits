@@ -1,5 +1,5 @@
-use binary_audio_cpp::{run, Cli, RunOutput};
 use clap::Parser;
+use flipbits::{run, Cli, RunOutput};
 
 fn main() {
     let cli = Cli::parse();

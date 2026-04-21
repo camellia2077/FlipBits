@@ -4,6 +4,8 @@ mod cli;
 mod commands;
 mod error;
 mod fs_io;
+mod licenses;
+mod progress;
 mod util;
 
 #[cfg(test)]
