@@ -12,7 +12,7 @@ description: Agent 专用 CI / tooling / libs 提交消息写法
 - `libs/**` 中以基础设施、构建、验证、边界收口为主的工程改动
 
 它不是仓库 CI 地图；CI 当前职责与触发范围统一看：
-- `C:\code\WaveBits\docs\tools\ci-workflow.md`
+- `<repo-root>/docs/tools/ci-workflow.md`
 
 ## Intent
 
