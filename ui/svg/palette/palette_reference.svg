@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="184" viewBox="0 0 512 184">
+  <title>FlipBits Icon Palette Reference</title>
+  <style>
+    text {
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      fill: #F5F1E8;
+    }
+    .label {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .value {
+      font-size: 15px;
+      opacity: 0.9;
+    }
+  </style>
+
+  <rect width="512" height="184" rx="20" fill="#171112" />
+
+  <g transform="translate(28 28)">
+    <rect x="0" y="0" width="84" height="84" rx="16" fill="#9E1B1B" stroke="#F5F1E8" stroke-opacity="0.18" />
+    <text class="label" x="104" y="28">Mars Red</text>
+    <text class="value" x="104" y="56">#9E1B1B</text>
+    <text class="value" x="104" y="80">icon split fill, left core / right gear</text>
+  </g>
+
+  <g transform="translate(28 126)">
+    <rect x="0" y="0" width="84" height="30" rx="10" fill="#E8E2D0" stroke="#F5F1E8" stroke-opacity="0.18" />
+    <text class="label" x="104" y="22">Parchment</text>
+    <text class="value" x="236" y="22">#E8E2D0</text>
+  </g>
+
+  <g transform="translate(300 28)">
+    <rect x="0" y="0" width="84" height="84" rx="16" fill="#C5A059" stroke="#F5F1E8" stroke-opacity="0.18" />
+    <text class="label" x="104" y="28">Brass Stroke</text>
+    <text class="value" x="104" y="56">#C5A059</text>
+    <text class="value" x="104" y="80">outer / inner outline, core ring reference</text>
+  </g>
+</svg>

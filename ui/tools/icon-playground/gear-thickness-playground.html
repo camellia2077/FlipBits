@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlipBits Gear Thickness Playground</title>
+  <link rel="stylesheet" href="./gear-thickness-playground.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="panel">
+      <h1>Gear Thickness Playground</h1>
+      <p>
+        This preview keeps the current `icon-foreground.svg` gear geometry fixed and only adjusts
+        the inner split circle radius. That lets you quickly judge how thick the outer gear ring feels.
+      </p>
+
+      <details class="panel-section" open>
+        <summary>Geometry</summary>
+        <div class="section-body">
+          <div class="control">
+            <label for="innerRadius">Inner circle radius</label>
+            <div class="control-row">
+              <input id="innerRadius" type="range" min="0" max="96" step="0.5" value="70" />
+              <input id="innerRadiusNumber" type="number" min="0" max="96" step="0.5" value="70" />
+            </div>
+            <div class="preset-row">
+              <button type="button" class="preset-button" id="binaryHalfRadius">Binary half radius</button>
+              <button type="button" class="preset-button" id="optical065Radius">0.65x radius</button>
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="strokeWidth">Stroke width</label>
+            <div class="control-row">
+              <input id="strokeWidth" type="range" min="0" max="12" step="0.25" value="3" />
+              <input id="strokeWidthNumber" type="number" min="0" max="12" step="0.25" value="3" />
+            </div>
+            <div class="preset-row">
+              <button type="button" class="preset-button" data-stroke-preset="3.0">3.0</button>
+              <button type="button" class="preset-button" data-stroke-preset="3.5">3.5</button>
+              <button type="button" class="preset-button" data-stroke-preset="4.0">4.0</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel-section" open>
+        <summary>Inner Pattern</summary>
+        <div class="section-body">
+          <div class="control">
+            <label>Inner pattern</label>
+
+            <div class="toggle-group-section-label">Simple</div>
+            <div class="toggle-group">
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="circle" checked />
+                Circle
+              </label>
+            </div>
+
+            <div class="toggle-group-section-label">A · Proportional angles</div>
+            <div class="toggle-group toggle-group-compact">
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="a6" />
+                6 teeth
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="a8" />
+                8 teeth
+              </label>
+            </div>
+
+            <div class="toggle-group-section-label">B · Fixed angle, tall teeth</div>
+            <div class="toggle-group toggle-group-compact">
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="b6" />
+                6 teeth
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="b8" />
+                8 teeth
+              </label>
+            </div>
+
+            <div class="toggle-group-section-label">C · Proportional + tall teeth</div>
+            <div class="toggle-group toggle-group-compact">
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="c6" />
+                6 teeth
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="c8" />
+                8 teeth
+              </label>
+            </div>
+
+            <div class="toggle-group-section-label">Scaled outer</div>
+            <div class="toggle-group">
+              <label class="toggle-option">
+                <input type="radio" name="innerPatternMode" value="outer12" />
+                12 teeth
+              </label>
+            </div>
+          </div>
+
+          <div class="control">
+            <label>Inner dashed core</label>
+            <div class="toggle-group toggle-group-compact">
+              <label class="toggle-option">
+                <input type="radio" name="innerDashMode" value="off" checked />
+                Hidden
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="innerDashMode" value="on" />
+                Shown
+              </label>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel-section">
+        <summary>Color</summary>
+        <div class="section-body">
+          <div class="control">
+            <label>Color relationship</label>
+            <div class="toggle-group">
+              <label class="toggle-option">
+                <input type="radio" name="colorMode" value="inverted" checked />
+                Current inverted
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="colorMode" value="aligned" />
+                Inner aligned
+              </label>
+            </div>
+          </div>
+
+          <div class="control">
+            <label>Background presets</label>
+            <div class="preset-row">
+              <button type="button" class="preset-button preset-button-color" data-background-preset="default">
+                <span class="color-swatch" style="--swatch:#1A1412"></span>
+                <span class="color-code">#1A1412</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="charcoal">
+                <span class="color-swatch" style="--swatch:#23262A"></span>
+                <span class="color-code">#23262A</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="graphite">
+                <span class="color-swatch" style="--swatch:#30343A"></span>
+                <span class="color-code">#30343A</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="mars">
+                <span class="color-swatch" style="--swatch:#2A1616"></span>
+                <span class="color-code">#2A1616</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="relic">
+                <span class="color-swatch" style="--swatch:#40201D"></span>
+                <span class="color-code">#40201D</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="oxidized">
+                <span class="color-swatch" style="--swatch:#31443B"></span>
+                <span class="color-code">#31443B</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="catacomb">
+                <span class="color-swatch" style="--swatch:#20302A"></span>
+                <span class="color-code">#20302A</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="bone">
+                <span class="color-swatch" style="--swatch:#D8CFBC"></span>
+                <span class="color-code">#D8CFBC</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="light">
+                <span class="color-swatch" style="--swatch:#E8E2D0"></span>
+                <span class="color-code">#E8E2D0</span>
+              </button>
+              <button type="button" class="preset-button preset-button-color" data-background-preset="white">
+                <span class="color-swatch" style="--swatch:#E0E0E0"></span>
+                <span class="color-code">#E0E0E0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel-section">
+        <summary>Metrics</summary>
+        <div class="section-body">
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Inner circle radius</div>
+              <div class="metric-value" id="innerRadiusValue">70.0</div>
+              <div class="metric-note">Current fill split circle radius inside the gear cutout</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Stroke width</div>
+              <div class="metric-value" id="strokeWidthValue">3.0</div>
+              <div class="metric-note">Shared brass outline width for the gear edge and inner circle</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Inner pattern</div>
+              <div class="metric-value" id="innerPatternModeValue">Circle</div>
+              <div class="metric-note">Circle keeps the old outline; Outer 12 reuses the outer gear protrusion geometry unchanged and only scales it down</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Gear hole radius</div>
+              <div class="metric-value" id="gearHoleRadiusValue">70.0</div>
+              <div class="metric-note">Now follows the same radius as the inner split circle</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Gear base thickness</div>
+              <div class="metric-value" id="ringThicknessValue">0.5</div>
+              <div class="metric-note">`110.0 - inner circle radius` from the gear base arc to the inner hole</div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div class="help">
+        Tip: if the ring gets too thin, the brass border starts to feel detached from the filled core.
+        If it gets too thick, the center loses its breathing room and the dashed core feels cramped.
+      </div>
+    </aside>
+
+    <main class="preview-card">
+      <div class="preview-stack">
+        <div class="preview-wrap">
+          <div class="app-tile" id="previewCard">
+            <svg viewBox="0 0 432 432" aria-label="FlipBits gear thickness preview">
+              <defs>
+                <clipPath id="left-wave-clip">
+                  <rect x="0" y="0" width="128" height="256" />
+                </clipPath>
+                <clipPath id="right-wave-clip">
+                  <rect x="128" y="0" width="128" height="256" />
+                </clipPath>
+                <path
+                  id="gear-shape"
+                  d="M 242.02 112.99 L 242.02 143.01 L 236.33 147.10 A 110 110 0 0 1 231.37 165.62 L 234.25 172.01 L 219.24 198.01 L 212.26 198.71 A 110 110 0 0 1 198.71 212.26 L 198.01 219.24 L 172.01 234.25 L 165.62 231.37 A 110 110 0 0 1 147.10 236.33 L 143.01 242.02 L 112.99 242.02 L 108.90 236.33 A 110 110 0 0 1 90.38 231.37 L 83.99 234.25 L 57.99 219.24 L 57.29 212.26 A 110 110 0 0 1 43.74 198.71 L 36.76 198.01 L 21.75 172.01 L 24.63 165.62 A 110 110 0 0 1 19.67 147.10 L 13.98 143.01 L 13.98 112.99 L 19.67 108.90 A 110 110 0 0 1 24.63 90.38 L 21.75 83.99 L 36.76 57.99 L 43.74 57.29 A 110 110 0 0 1 57.29 43.74 L 57.99 36.76 L 83.99 21.75 L 90.38 24.63 A 110 110 0 0 1 108.90 19.67 L 112.99 13.98 L 143.01 13.98 L 147.10 19.67 A 110 110 0 0 1 165.62 24.63 L 172.01 21.75 L 198.01 36.76 L 198.71 43.74 A 110 110 0 0 1 212.26 57.29 L 219.24 57.99 L 234.25 83.99 L 231.37 90.38 A 110 110 0 0 1 236.33 108.90 Z M 128 36.5 A 91.5 91.5 0 0 0 128 219.5 A 91.5 91.5 0 0 0 128 36.5 Z"
+                  stroke="#C5A059"
+                  stroke-width="3"
+                  stroke-linejoin="round" />
+                <g id="gear-rotated">
+                  <!-- `gear-shape` is rotated as a whole here. The visible inner
+                       fill/stroke layers below are not rotated, so embedded
+                       non-circular inner holes must be rotation-compensated. -->
+                  <use href="#gear-shape" transform="translate(128 128) rotate(15) translate(-128 -128)" />
+                </g>
+                <g id="data-core">
+                  <circle
+                    cx="128"
+                    cy="128"
+                    r="40"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    pathLength="8"
+                    stroke-dasharray="0.5 0.5"
+                    stroke-dashoffset="0.25" />
+                </g>
+              </defs>
+
+              <g transform="scale(1.6875)">
+                <path id="leftBg" fill="#9E1B1B"></path>
+                <path id="rightBg" fill="#E8E2D0"></path>
+
+                <g>
+                  <use
+                    id="gearFillLeft"
+                    href="#gear-rotated"
+                    fill="#E8E2D0"
+                    clip-path="url(#left-wave-clip)"
+                    fill-rule="evenodd" />
+                  <use
+                    id="gearFillRight"
+                    href="#gear-rotated"
+                    fill="#9E1B1B"
+                    clip-path="url(#right-wave-clip)"
+                    fill-rule="evenodd" />
+                </g>
+
+                <use id="dataCoreLeft" href="#data-core" color="#E8E2D0" clip-path="url(#left-wave-clip)" />
+                <use id="dataCoreRight" href="#data-core" color="#9E1B1B" clip-path="url(#right-wave-clip)" />
+
+                <path
+                  id="innerBrassOutline"
+                  fill="none"
+                  stroke="#C5A059"
+                  stroke-width="3"
+                  stroke-linejoin="round"
+                  stroke-linecap="round" />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="parameter-panel">
+          <div class="parameter-panel-title">Current parameters</div>
+          <pre class="parameter-output" id="currentParameters">Loading...</pre>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="./gear-thickness-playground-geometry.js"></script>
+  <script src="./gear-thickness-playground-model.js"></script>
+  <script src="./gear-thickness-playground-render.js"></script>
+  <script src="./gear-thickness-playground.js"></script>
+</body>
+</html>

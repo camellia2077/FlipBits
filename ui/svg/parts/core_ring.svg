@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>FlipBits Core Ring Reference</title>
+  <defs>
+    <clipPath id="left-split">
+      <rect x="0" y="0" width="128" height="256" />
+    </clipPath>
+    <clipPath id="right-split">
+      <rect x="128" y="0" width="128" height="256" />
+    </clipPath>
+    <g id="core-ring">
+      <circle
+        cx="128"
+        cy="128"
+        r="40"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3.5"
+        pathLength="8"
+        stroke-dasharray="0.5 0.5"
+        stroke-dashoffset="0.25" />
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="128" height="256" fill="#9E1B1B" />
+  <rect x="128" y="0" width="128" height="256" fill="#E8E2D0" />
+
+  <use href="#core-ring" color="#E8E2D0" clip-path="url(#left-split)" />
+  <use href="#core-ring" color="#9E1B1B" clip-path="url(#right-split)" />
+</svg>

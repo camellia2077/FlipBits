@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlipBits Android Icon Preview</title>
+  <link rel="stylesheet" href="./android-icon-preview.css" />
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <clipPath id="mask-rounded-square" clipPathUnits="objectBoundingBox">
+        <path d="M 0.18 0 H 0.82 C 0.92 0 1 0.08 1 0.18 V 0.82 C 1 0.92 0.92 1 0.82 1 H 0.18 C 0.08 1 0 0.92 0 0.82 V 0.18 C 0 0.08 0.08 0 0.18 0 Z" />
+      </clipPath>
+      <clipPath id="mask-circle" clipPathUnits="objectBoundingBox">
+        <circle cx="0.5" cy="0.5" r="0.5" />
+      </clipPath>
+      <clipPath id="mask-squircle" clipPathUnits="objectBoundingBox">
+        <path d="M 0.5 0 C 0.77 0 1 0.06 1 0.33 V 0.67 C 1 0.94 0.77 1 0.5 1 C 0.23 1 0 0.94 0 0.67 V 0.33 C 0 0.06 0.23 0 0.5 0 Z" />
+      </clipPath>
+      <clipPath id="mask-teardrop" clipPathUnits="objectBoundingBox">
+        <path d="M 0.18 0 H 0.82 C 0.92 0 1 0.08 1 0.18 V 0.58 C 1 0.80 0.84 0.92 0.68 0.98 C 0.56 1.02 0.44 1.02 0.32 0.98 C 0.16 0.92 0 0.80 0 0.58 V 0.18 C 0 0.08 0.08 0 0.18 0 Z" />
+      </clipPath>
+    </defs>
+  </svg>
+
+  <div class="layout">
+    <aside class="panel">
+      <h1>Android Icon Preview</h1>
+      <p class="lead">
+        This page previews the current Android launcher icon without building the app.
+        It is meant for quick visual checks of circle vs rounded-square styling,
+        background color, and whether the icon feels too empty or too full.
+        It does not try to match real-device scale numerically.
+      </p>
+
+      <section class="group">
+        <h2>Inputs</h2>
+        <div class="control">
+          <label for="foregroundScale">Foreground scale</label>
+          <div class="row">
+            <input id="foregroundScale" type="range" min="0" max="100" step="1" value="100" />
+            <input id="foregroundScaleNumber" type="number" min="0" max="100" step="1" value="100" />
+          </div>
+          <div class="note">Use this as a quick visual tuning control, not as a strict real-device scale value.</div>
+        </div>
+
+        <div class="control">
+          <label for="backgroundHex">Adaptive background</label>
+          <div class="row">
+            <input id="backgroundPicker" type="color" value="#E8E2D0" />
+            <input id="backgroundHex" type="text" value="#E8E2D0" />
+          </div>
+          <div class="note">Starts from the Android launcher background currently used by the app.</div>
+        </div>
+
+      </section>
+
+      <section class="group">
+        <h2>Current Setup</h2>
+        <div class="status" id="statusBlock">Loading preview parameters...</div>
+      </section>
+    </aside>
+
+    <main class="surface">
+      <div class="header">
+        <div>
+          <h2>Launcher Result Preview</h2>
+          <p>
+            The top section prioritizes what you are most likely to see on real phones.
+            Pixel and CN Android share the same base icon area size here.
+            Their difference is not background size, but the launcher shape applied to the same icon base:
+            Pixel resolves that base to a circle, while CN Android keeps it as a rounded square.
+            This remains a fast style preview rather than a strict numerical simulation of launcher rendering.
+          </p>
+        </div>
+      </div>
+
+      <section class="device-grid" id="deviceGrid"></section>
+
+      <section class="subsection">
+        <div class="subsection-header">
+          <div>
+            <h2>Adaptive Mask Reference</h2>
+            <p>
+              This lower section keeps a broader mask comparison for resource-level sanity checks,
+              but it is secondary to the shared-base device previews above.
+            </p>
+          </div>
+        </div>
+        <section class="preview-grid" id="maskGrid"></section>
+      </section>
+
+      <section class="reference-grid">
+        <article class="reference-card">
+          <div>
+            <h3>Foreground Source</h3>
+            <p>The same SVG used as the visual source when maintaining the Android foreground drawable.</p>
+          </div>
+          <div class="reference-preview">
+            <img src="../../icon-foreground.svg" alt="FlipBits icon foreground source" />
+          </div>
+        </article>
+
+        <article class="reference-card">
+          <div>
+            <h3>App Tile Reference</h3>
+            <p>The rounded-square product-style variant, useful as a reference but not the Android adaptive foreground itself.</p>
+          </div>
+          <div class="reference-preview">
+            <img src="../../icon-app.svg" alt="FlipBits app tile icon reference" />
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="./android-icon-preview.js"></script>
+</body>
+</html>
