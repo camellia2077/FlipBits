@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,7 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
@@ -31,12 +34,9 @@ internal fun PlayerDetailSheetContent(
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
-    isCodecBusy: Boolean,
-    decodedText: String?,
+    followData: PayloadFollowViewData,
     savedAudioItem: SavedAudioItem?,
     onTogglePlayback: () -> Unit,
-    onDecodeAudio: () -> Unit,
-    onClearDecodedText: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
@@ -46,28 +46,82 @@ internal fun PlayerDetailSheetContent(
     onScrubStarted: () -> Unit,
     onScrubChanged: (Int) -> Unit,
     onScrubFinished: () -> Unit,
+    onLyricsRequested: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val isFlashMode =
-        when (miniPlayerModel) {
-            is MiniPlayerUiModel.Generated ->
-                miniPlayerModel.mode == com.bag.audioandroid.ui.model.TransportModeOption.Flash
-            is MiniPlayerUiModel.Saved ->
-                miniPlayerModel.modeWireName == "flash"
-        }
-    val flashVoicingStyle: FlashVoicingStyleOption? =
-        when (miniPlayerModel) {
-            is MiniPlayerUiModel.Generated -> miniPlayerModel.flashVoicingStyle
-            is MiniPlayerUiModel.Saved -> miniPlayerModel.flashVoicingStyle
-        }
 
     Column(
         modifier =
             modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 24.dp, vertical = 8.dp),
+                .fillMaxSize()
+                .testTag("player-detail-sheet-content")
+    ) {
+        PlayerDetailScrollContent(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(scrollState),
+            miniPlayerModel = miniPlayerModel,
+            displayedSamples = displayedSamples,
+            waveformPcm = waveformPcm,
+            sampleRateHz = sampleRateHz,
+            isFlashMode = miniPlayerModel.isFlashMode,
+            flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
+            followData = followData,
+            isPlaying = isPlaying,
+            canExportGeneratedAudio = canExportGeneratedAudio,
+            onExportGeneratedAudio = onExportGeneratedAudio,
+            onShareSavedAudio = onShareSavedAudio,
+            savedAudioItem = savedAudioItem,
+            onLyricsRequested = onLyricsRequested,
+        )
+        PlayerDetailBottomDock(
+            modifier = Modifier.fillMaxWidth(),
+            displayedSamples = displayedSamples,
+            totalSamples = totalSamples,
+            isScrubbing = isScrubbing,
+            displayedTime = displayedTime,
+            totalTime = totalTime,
+            isPlaying = isPlaying,
+            playbackSequenceMode = playbackSequenceMode,
+            canSkipPrevious = canSkipPrevious,
+            canSkipNext = canSkipNext,
+            canExportGeneratedAudio = canExportGeneratedAudio,
+            onTogglePlayback = onTogglePlayback,
+            onSkipToPreviousTrack = onSkipToPreviousTrack,
+            onSkipToNextTrack = onSkipToNextTrack,
+            onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
+            onExportGeneratedAudio = onExportGeneratedAudio,
+            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
+            onScrubStarted = onScrubStarted,
+            onScrubChanged = onScrubChanged,
+            onScrubFinished = onScrubFinished,
+        )
+    }
+}
+
+@Composable
+private fun PlayerDetailScrollContent(
+    miniPlayerModel: MiniPlayerUiModel,
+    displayedSamples: Int,
+    waveformPcm: ShortArray,
+    sampleRateHz: Int,
+    isFlashMode: Boolean,
+    flashVoicingStyle: FlashVoicingStyleOption?,
+    followData: PayloadFollowViewData,
+    isPlaying: Boolean,
+    canExportGeneratedAudio: Boolean,
+    onExportGeneratedAudio: () -> Unit,
+    onShareSavedAudio: (() -> Unit)?,
+    savedAudioItem: SavedAudioItem?,
+    onLyricsRequested: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier.padding(horizontal = PlayerDetailHorizontalPadding, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         PlayerDetailSummarySection(
@@ -76,24 +130,57 @@ internal fun PlayerDetailSheetContent(
             onExportGeneratedAudio = onExportGeneratedAudio,
             onShareSavedAudio = onShareSavedAudio,
         )
-        if (miniPlayerModel is MiniPlayerUiModel.Generated ||
-            (miniPlayerModel is MiniPlayerUiModel.Saved && miniPlayerModel.modeWireName == "flash")
-        ) {
-            PlayerDetailDecodedSection(
-                decodedText = decodedText.orEmpty(),
-                isCodecBusy = isCodecBusy,
-                onDecodeAudio = onDecodeAudio,
-                onClearDecodedText = onClearDecodedText,
-            )
-        }
-        AudioPlaybackProgressSection(
+
+        savedAudioItem?.let { PlayerDetailSavedInfoSection(item = it) }
+
+        AudioPlaybackDisplayBlock(
             displayedSamples = displayedSamples,
-            totalSamples = totalSamples,
-            isScrubbing = isScrubbing,
             waveformPcm = waveformPcm,
             sampleRateHz = sampleRateHz,
             isFlashMode = isFlashMode,
             flashVoicingStyle = flashVoicingStyle,
+            followData = followData,
+            isPlaying = isPlaying,
+            onLyricsRequested = onLyricsRequested,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+@Composable
+private fun PlayerDetailBottomDock(
+    displayedSamples: Int,
+    totalSamples: Int,
+    isScrubbing: Boolean,
+    displayedTime: String,
+    totalTime: String,
+    isPlaying: Boolean,
+    playbackSequenceMode: PlaybackSequenceMode,
+    canSkipPrevious: Boolean,
+    canSkipNext: Boolean,
+    canExportGeneratedAudio: Boolean,
+    onTogglePlayback: () -> Unit,
+    onSkipToPreviousTrack: () -> Unit,
+    onSkipToNextTrack: () -> Unit,
+    onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
+    onExportGeneratedAudio: () -> Unit,
+    onOpenSavedAudioSheet: () -> Unit,
+    onScrubStarted: () -> Unit,
+    onScrubChanged: (Int) -> Unit,
+    onScrubFinished: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .padding(horizontal = PlayerDetailHorizontalPadding, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        AudioPlaybackTimelineBlock(
+            displayedSamples = displayedSamples,
+            totalSamples = totalSamples,
+            isScrubbing = isScrubbing,
             displayedTime = displayedTime,
             totalTime = totalTime,
             isPlaying = isPlaying,
@@ -106,15 +193,15 @@ internal fun PlayerDetailSheetContent(
             playbackSequenceMode = playbackSequenceMode,
             canSkipPrevious = canSkipPrevious,
             canSkipNext = canSkipNext,
+            canExportGeneratedAudio = canExportGeneratedAudio,
             onTogglePlayback = onTogglePlayback,
             onSkipToPreviousTrack = onSkipToPreviousTrack,
             onSkipToNextTrack = onSkipToNextTrack,
             onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
+            onExportGeneratedAudio = onExportGeneratedAudio,
             onOpenSavedAudioSheet = onOpenSavedAudioSheet,
         )
-        if (miniPlayerModel is MiniPlayerUiModel.Saved) {
-            savedAudioItem?.let { PlayerDetailSavedInfoSection(item = it) }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
     }
 }
+
+private val PlayerDetailHorizontalPadding = 24.dp

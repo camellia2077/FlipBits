@@ -3,6 +3,7 @@ package com.bag.audioandroid.data
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -56,6 +57,7 @@ class AndroidSampleInputTextProviderTest {
             provider.randomSample(
                 mode = TransportModeOption.Flash,
                 language = AppLanguageOption.English,
+                length = SampleInputLengthOption.Short,
                 excludingSampleId = "old_star_chart",
             )
 

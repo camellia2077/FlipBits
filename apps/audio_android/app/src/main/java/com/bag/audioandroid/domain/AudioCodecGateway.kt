@@ -35,7 +35,7 @@ interface AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): String
+    ): DecodedAudioPayloadResult
 
     fun getCoreVersion(): String
 }

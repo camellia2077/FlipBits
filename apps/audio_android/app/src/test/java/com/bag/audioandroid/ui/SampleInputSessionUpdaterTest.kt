@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
 import org.junit.Assert.assertEquals
@@ -10,7 +11,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SampleInputSessionUpdaterTest {
-    private val provider = FakeSampleInputTextProvider()
+    private val provider = UpdaterFakeSampleInputTextProvider()
     private val updater = SampleInputSessionUpdater(provider)
 
     @Test
@@ -52,7 +53,6 @@ class SampleInputSessionUpdaterTest {
         val updated =
             updater.refreshForLanguageChange(
                 sessions = sessions,
-                previousLanguage = AppLanguageOption.English,
                 newLanguage = AppLanguageOption.Japanese,
             )
 
@@ -65,7 +65,7 @@ class SampleInputSessionUpdaterTest {
     }
 }
 
-private class FakeSampleInputTextProvider : SampleInputTextProvider {
+private class UpdaterFakeSampleInputTextProvider : SampleInputTextProvider {
     private val flashUltraSamples =
         mapOf(
             AppLanguageOption.English to
@@ -93,6 +93,7 @@ private class FakeSampleInputTextProvider : SampleInputTextProvider {
     override fun randomSample(
         mode: TransportModeOption,
         language: AppLanguageOption,
+        length: SampleInputLengthOption,
         excludingSampleId: String?,
     ): SampleInput = entries(mode, language).first { it.id != excludingSampleId }
 

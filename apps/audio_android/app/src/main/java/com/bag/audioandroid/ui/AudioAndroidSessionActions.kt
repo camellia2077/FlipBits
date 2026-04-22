@@ -10,6 +10,7 @@ import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -81,6 +82,10 @@ internal class AudioAndroidSessionActions(
         codecActions.onDecode()
     }
 
+    fun ensureCurrentPlaybackDecodedForLyrics() {
+        codecActions.ensureCurrentPlaybackDecodedForLyrics()
+    }
+
     fun onClear() {
         sessionStateStore.updateCurrentSession {
             it.copy(
@@ -101,7 +106,7 @@ internal class AudioAndroidSessionActions(
             is AudioPlaybackSource.Generated ->
                 sessionStateStore.updateCurrentSession {
                     it.copy(
-                        resultText = "",
+                        decodedPayload = DecodedPayloadViewData.Empty,
                         statusText = UiText.Resource(R.string.status_result_cleared),
                     )
                 }
@@ -113,7 +118,7 @@ internal class AudioAndroidSessionActions(
                             ?.takeIf { it.item.itemId == source.itemId }
                             ?: return@update state
                     state.copy(
-                        selectedSavedAudio = selected.copy(decodedText = ""),
+                        selectedSavedAudio = selected.copy(decodedPayload = DecodedPayloadViewData.Empty),
                         libraryStatusText = UiText.Resource(R.string.status_result_cleared),
                     )
                 }

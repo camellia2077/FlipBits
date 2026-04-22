@@ -1,14 +1,10 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -29,18 +25,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagDecodeContentCodes
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 
 @Composable
 internal fun PlayerDetailDecodedSection(
-    decodedText: String,
+    decodedPayload: DecodedPayloadViewData,
     isCodecBusy: Boolean,
     onDecodeAudio: () -> Unit,
     onClearDecodedText: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
-    val decodedScrollState = rememberScrollState()
     val accentTokens = appThemeAccentTokens()
 
     Surface(
@@ -64,7 +61,10 @@ internal fun PlayerDetailDecodedSection(
                 Row {
                     IconButton(
                         onClick = onClearDecodedText,
-                        enabled = decodedText.isNotBlank(),
+                        enabled =
+                            decodedPayload.hasTextResult ||
+                                decodedPayload.rawPayloadAvailable ||
+                                decodedPayload.textDecodeStatusCode != BagDecodeContentCodes.STATUS_UNAVAILABLE,
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.DeleteOutline,
@@ -103,29 +103,10 @@ internal fun PlayerDetailDecodedSection(
                 }
             }
             if (expanded) {
-                if (decodedText.isBlank()) {
-                    Text(
-                        text = stringResource(R.string.audio_player_detail_decoded_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                } else {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = 220.dp)
-                                .verticalScroll(decodedScrollState),
-                    ) {
-                        Text(
-                            text = decodedText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
+                DecodedPayloadContent(
+                    decodedPayload = decodedPayload,
+                    emptyTextResId = R.string.audio_player_detail_decoded_empty,
+                )
             }
         }
     }

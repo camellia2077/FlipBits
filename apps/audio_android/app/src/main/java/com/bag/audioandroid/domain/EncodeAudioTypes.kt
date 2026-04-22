@@ -3,6 +3,9 @@ package com.bag.audioandroid.domain
 sealed interface EncodeAudioResult {
     data class Success(
         val pcm: ShortArray,
+        val rawBytesHex: String = "",
+        val rawBitsBinary: String = "",
+        val followData: PayloadFollowViewData = PayloadFollowViewData.Empty,
     ) : EncodeAudioResult
 
     data object Cancelled : EncodeAudioResult

@@ -40,17 +40,21 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             titleResId = R.string.brand_theme_black_crimson_rite_title,
             descriptionResId = R.string.brand_theme_black_crimson_rite_description,
             accessibilityLabelResId = R.string.brand_theme_black_crimson_rite_accessibility,
-            primaryColor = Color(0xFF211A1A),
-            secondaryColor = Color(0xFFCE1126),
+
+            primaryColor = Color(0xFF4A2B2F),
+            secondaryColor = Color(0xFFDC143C),
             isDarkTheme = true,
         ),
+        // The dark dual-tone dynasty set is separated by material character instead of
+        // tiny near-black shifts: alloy leans warm metallic, revival leans jade-cold,
+        // sepulcher leans graphite-cyan, and tomb sigil leans earthen tomb black.
         brandTheme(
             id = "ancient_alloy",
             groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
             titleResId = R.string.brand_theme_ancient_alloy_title,
             descriptionResId = R.string.brand_theme_ancient_alloy_description,
             accessibilityLabelResId = R.string.brand_theme_ancient_alloy_accessibility,
-            primaryColor = Color(0xFF1E1B1A),
+            primaryColor = Color(0xFF423B33),
             secondaryColor = Color(0xFF00FFCC),
             isDarkTheme = true,
         ),
@@ -60,8 +64,10 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             titleResId = R.string.brand_theme_dynasty_revival_title,
             descriptionResId = R.string.brand_theme_dynasty_revival_description,
             accessibilityLabelResId = R.string.brand_theme_dynasty_revival_accessibility,
-            primaryColor = Color(0xFF161A1D),
-            secondaryColor = Color(0xFF14FF00),
+            // Separate the two green dynasty themes on purpose: dynasty revival stays in
+            // a colder jade/bronze lane, while tomb sigil keeps the harsher tomb glow.
+            primaryColor = Color(0xFF31443E),
+            secondaryColor = Color(0xFF00D68F),
             isDarkTheme = true,
         ),
         brandTheme(
@@ -70,7 +76,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             titleResId = R.string.brand_theme_sepulcher_cyan_title,
             descriptionResId = R.string.brand_theme_sepulcher_cyan_description,
             accessibilityLabelResId = R.string.brand_theme_sepulcher_cyan_accessibility,
-            primaryColor = Color(0xFF181C1F),
+            primaryColor = Color(0xFF2B404A),
             secondaryColor = Color(0xFF00E5B8),
             isDarkTheme = true,
         ),
@@ -80,8 +86,8 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             titleResId = R.string.brand_theme_tomb_sigil_title,
             descriptionResId = R.string.brand_theme_tomb_sigil_description,
             accessibilityLabelResId = R.string.brand_theme_tomb_sigil_accessibility,
-            primaryColor = Color(0xFF1A1A18),
-            secondaryColor = Color(0xFF14FF00),
+            primaryColor = Color(0xFF4D3C2B),
+            secondaryColor = Color(0xFFA6FF00),
             isDarkTheme = true,
         ),
     )
@@ -100,7 +106,10 @@ private fun brandTheme(
     isDarkTheme: Boolean,
 ): BrandThemeOption {
     val background = if (isDarkTheme) primaryColor else secondaryColor
-    val surface = if (isDarkTheme) primaryColor.copy(alpha = 0.94f) else secondaryColor.copy(alpha = 0.94f)
+    // Keep surface fully opaque. Floating UI such as the mini-player relies on
+    // MaterialTheme.colorScheme.surface for readable text; adding alpha here makes
+    // docked cards look translucent even when the component requests a solid color.
+    val surface = if (isDarkTheme) primaryColor else secondaryColor
     val onBackground = if (isDarkTheme) BrandInkDark else BrandInkLight
     val primary = if (isDarkTheme) secondaryColor else primaryColor
     val onPrimary = if (isDarkTheme) primaryColor else secondaryColor

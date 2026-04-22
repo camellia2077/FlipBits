@@ -4,9 +4,17 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
+import com.bag.audioandroid.domain.DecodedAudioPayloadResult
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
+import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
+import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
+import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
+import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
+import com.bag.audioandroid.domain.TextFollowTimelineEntry
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.PlaybackUiState
@@ -22,6 +30,25 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+
+private val DefaultFollowData =
+    PayloadFollowViewData(
+        textTokens = listOf("A"),
+        textTokenTimeline = listOf(TextFollowTimelineEntry(0, 8, 0)),
+        textFollowAvailable = true,
+        lyricLines = listOf("A"),
+        lyricLineTimeline = listOf(TextFollowLyricLineTimelineEntry(0, 8, 0)),
+        lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 1)),
+        lyricLineFollowAvailable = true,
+        hexTokens = listOf("41"),
+        binaryTokens = listOf("01000001"),
+        byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 8, 0)),
+        binaryGroupTimeline = listOf(PayloadFollowBinaryGroupTimelineEntry(0, 8, 0, 0, 8)),
+        payloadBeginSample = 0,
+        payloadSampleCount = 8,
+        totalPcmSampleCount = 8,
+        followAvailable = true,
+    )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AudioSessionCodecActionsTest {
@@ -121,7 +148,7 @@ class AudioSessionCodecActionsTest {
                 createFixture(
                     gateway =
                         FakeAudioCodecGateway(
-                            encodeResult = EncodeAudioResult.Success(shortArrayOf(5, 6, 7)),
+                            encodeResult = EncodeAudioResult.Success(shortArrayOf(5, 6, 7), followData = DefaultFollowData),
                         ),
                     testScope = this,
                 )
@@ -135,6 +162,9 @@ class AudioSessionCodecActionsTest {
                 successSession.generatedPcm.toList(),
             )
             assertEquals(3, successSession.playback.totalSamples)
+            assertTrue(successSession.followData.followAvailable)
+            assertTrue(successSession.followData.textFollowAvailable)
+            assertEquals(listOf("A"), successSession.followData.textTokens)
         }
 
     private fun createFixture(
@@ -174,7 +204,11 @@ class AudioSessionCodecActionsTest {
 }
 
 private class FakeAudioCodecGateway(
-    private val encodeResult: EncodeAudioResult = EncodeAudioResult.Success(shortArrayOf(1, 2)),
+    private val encodeResult: EncodeAudioResult =
+        EncodeAudioResult.Success(
+            shortArrayOf(1, 2),
+            followData = DefaultFollowData,
+        ),
     private val encodeBlock: (suspend ((EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
 ) : AudioCodecGateway {
     override fun validateEncodeRequest(
@@ -211,7 +245,7 @@ private class FakeAudioCodecGateway(
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): String = ""
+    ): DecodedAudioPayloadResult = DecodedAudioPayloadResult()
 
     override fun getCoreVersion(): String = "test"
 }

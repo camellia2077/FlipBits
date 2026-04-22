@@ -30,8 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
-import com.bag.audioandroid.ui.model.SavedAudioModeFilter
+import com.bag.audioandroid.ui.model.asString
 
 @Composable
 internal fun MiniPlayerBar(
@@ -40,14 +41,18 @@ internal fun MiniPlayerBar(
     onTogglePlayback: () -> Unit,
     onOpenSavedAudioSheet: () -> Unit,
     onOpenDetails: () -> Unit,
-    containerColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     modifier: Modifier = Modifier,
 ) {
+    // Keep the mini-player fully opaque. A translucent card lets the screen content show through
+    // and makes the title/subtitle harder to read while the dock is floating above the page.
     Surface(
         shape = MaterialTheme.shapes.large,
         color = containerColor,
-        tonalElevation = 6.dp,
-        shadowElevation = 4.dp,
+        // We force tonalElevation to 0.dp to ensure the Dock System (Player + Bottom Bar)
+        // stays color-consistent and does not get tinted by Material 3's primary color.
+        tonalElevation = 0.dp,
+        shadowElevation = 8.dp,
         modifier =
             modifier
                 .fillMaxWidth()
@@ -64,14 +69,14 @@ internal fun MiniPlayerBar(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = miniPlayerTitle(model),
+                    text = model.title.asString(),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = miniPlayerSubtitle(model),
+                    text = model.subtitle.asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -119,9 +124,9 @@ private fun MiniPlayerLeadingIcon(model: MiniPlayerUiModel) {
         ) {
             Icon(
                 imageVector =
-                    when (model) {
-                        is MiniPlayerUiModel.Generated -> Icons.Rounded.GraphicEq
-                        is MiniPlayerUiModel.Saved -> Icons.Rounded.LibraryMusic
+                    when (model.leadingIcon) {
+                        MiniPlayerLeadingIcon.Generated -> Icons.Rounded.GraphicEq
+                        MiniPlayerLeadingIcon.Saved -> Icons.Rounded.LibraryMusic
                     },
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -129,49 +134,3 @@ private fun MiniPlayerLeadingIcon(model: MiniPlayerUiModel) {
         }
     }
 }
-
-@Composable
-private fun miniPlayerTitle(model: MiniPlayerUiModel): String =
-    when (model) {
-        is MiniPlayerUiModel.Generated ->
-            stringResource(
-                R.string.audio_mini_player_generated_title,
-                stringResource(model.mode.labelResId),
-            )
-
-        is MiniPlayerUiModel.Saved -> model.displayName
-    }
-
-@Composable
-private fun miniPlayerSubtitle(model: MiniPlayerUiModel): String =
-    when (model) {
-        is MiniPlayerUiModel.Generated -> {
-            val duration = formatDurationMillis(model.durationMs)
-            if (model.mode == com.bag.audioandroid.ui.model.TransportModeOption.Flash &&
-                model.flashVoicingStyle != null
-            ) {
-                stringResource(
-                    R.string.audio_mini_player_generated_flash_subtitle,
-                    stringResource(model.flashVoicingStyle.labelResId),
-                    duration,
-                )
-            } else {
-                stringResource(R.string.audio_mini_player_duration_only, duration)
-            }
-        }
-
-        is MiniPlayerUiModel.Saved ->
-            stringResource(
-                if (model.modeWireName == "flash" && model.flashVoicingStyle != null) {
-                    R.string.audio_mini_player_generated_flash_subtitle
-                } else {
-                    R.string.audio_mini_player_saved_subtitle
-                },
-                if (model.modeWireName == "flash" && model.flashVoicingStyle != null) {
-                    stringResource(model.flashVoicingStyle.labelResId)
-                } else {
-                    stringResource(SavedAudioModeFilter.labelResIdForModeWireName(model.modeWireName))
-                },
-                formatDurationMillis(model.durationMs),
-            )
-    }

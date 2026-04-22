@@ -2,6 +2,7 @@ package com.bag.audioandroid.data
 
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
+import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import com.bag.audioandroid.domain.EncodeAudioResult
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,7 +35,7 @@ class NativeAudioCodecGatewayTest {
 
     @Test
     fun `empty successful pcm result maps to internal failure`() {
-        val result = shortArrayOf().toEncodeSuccessOrFailureResult()
+        val result = EncodedAudioPayloadResult(pcm = shortArrayOf()).toEncodeSuccessOrFailureResult()
 
         assertTrue(result is EncodeAudioResult.Failed)
         assertEquals(BagApiCodes.ERROR_INTERNAL, (result as EncodeAudioResult.Failed).errorCode)
@@ -43,7 +44,7 @@ class NativeAudioCodecGatewayTest {
     @Test
     fun `non-empty successful pcm result maps to success`() {
         val pcm = shortArrayOf(1, 2, 3)
-        val result = pcm.toEncodeSuccessOrFailureResult()
+        val result = EncodedAudioPayloadResult(pcm = pcm).toEncodeSuccessOrFailureResult()
 
         assertTrue(result is EncodeAudioResult.Success)
         assertEquals(pcm.toList(), (result as EncodeAudioResult.Success).pcm.toList())

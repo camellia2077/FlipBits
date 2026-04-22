@@ -1,15 +1,11 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -26,22 +22,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagDecodeContentCodes
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.component.ActionButton
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 
 @Composable
 internal fun AudioResultCard(
-    resultText: String,
+    decodedPayload: DecodedPayloadViewData,
     isCodecBusy: Boolean,
     isDecodeBusy: Boolean,
     expanded: Boolean,
     onToggleExpanded: () -> Unit,
     onDecode: () -> Unit,
-    onClearInput: () -> Unit,
     onClearResult: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val resultScrollState = rememberScrollState()
     val accentTokens = appThemeAccentTokens()
 
     Surface(
@@ -66,7 +62,10 @@ internal fun AudioResultCard(
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = onClearResult,
-                    enabled = resultText.isNotBlank(),
+                    enabled =
+                        decodedPayload.hasTextResult ||
+                            decodedPayload.rawPayloadAvailable ||
+                            decodedPayload.textDecodeStatusCode != BagDecodeContentCodes.STATUS_UNAVAILABLE,
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,
@@ -89,28 +88,10 @@ internal fun AudioResultCard(
                 }
             }
             if (expanded) {
-                if (resultText.isBlank()) {
-                    Text(
-                        text = stringResource(R.string.audio_result_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                } else {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = 220.dp)
-                                .verticalScroll(resultScrollState),
-                    ) {
-                        Text(
-                            text = resultText,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
+                DecodedPayloadContent(
+                    decodedPayload = decodedPayload,
+                    emptyTextResId = R.string.audio_result_empty,
+                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -126,15 +107,6 @@ internal fun AudioResultCard(
                             },
                         ),
                     onClick = onDecode,
-                    enabled = !isCodecBusy,
-                    textColor = accentTokens.disclosureAccentTint,
-                    borderColor = accentTokens.selectionBorderAccentTint,
-                    borderWidth = 2.dp,
-                    modifier = Modifier.weight(1f),
-                )
-                ActionButton(
-                    text = stringResource(R.string.audio_action_clear),
-                    onClick = onClearInput,
                     enabled = !isCodecBusy,
                     textColor = accentTokens.disclosureAccentTint,
                     borderColor = accentTokens.selectionBorderAccentTint,

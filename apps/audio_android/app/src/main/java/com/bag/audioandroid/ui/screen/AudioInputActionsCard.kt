@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Casino
+import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
@@ -53,6 +54,7 @@ internal fun AudioInputActionsCard(
     sampleInputLength: SampleInputLengthOption,
     onSampleInputLengthSelected: (SampleInputLengthOption) -> Unit,
     onRandomizeSampleInput: () -> Unit,
+    onClearInput: () -> Unit,
     onEncode: () -> Unit,
     onCancelEncode: () -> Unit,
     flashVoicingExpanded: Boolean,
@@ -96,6 +98,7 @@ internal fun AudioInputActionsCard(
                     sampleInputLength = sampleInputLength,
                     onSampleInputLengthSelected = onSampleInputLengthSelected,
                     onRandomizeSampleInput = onRandomizeSampleInput,
+                    onClearInput = onClearInput,
                 )
                 OutlinedTextField(
                     value = inputText,
@@ -215,6 +218,7 @@ private fun AudioInputFieldHeader(
     sampleInputLength: SampleInputLengthOption,
     onSampleInputLengthSelected: (SampleInputLengthOption) -> Unit,
     onRandomizeSampleInput: () -> Unit,
+    onClearInput: () -> Unit,
 ) {
     val accentTokens = appThemeAccentTokens()
     Row(
@@ -247,6 +251,16 @@ private fun AudioInputFieldHeader(
                     },
                 )
             }
+        }
+        IconButton(
+            onClick = onClearInput,
+            enabled = enabled,
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.DeleteOutline,
+                contentDescription = stringResource(R.string.audio_action_clear),
+                tint = accentTokens.actionAccentTint,
+            )
         }
         IconButton(
             onClick = onOpenInputEditor,

@@ -1,11 +1,13 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Repeat
@@ -25,6 +27,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.playerChromeColors
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 
 @Composable
@@ -33,74 +36,112 @@ internal fun AudioPlaybackTransportControls(
     playbackSequenceMode: PlaybackSequenceMode,
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
+    canExportGeneratedAudio: Boolean,
     onTogglePlayback: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
+    onExportGeneratedAudio: () -> Unit,
     onOpenSavedAudioSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    val playerColors = playerChromeColors()
+    Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        PlaybackSequenceCycleButton(
-            playbackSequenceMode = playbackSequenceMode,
-            onClick = { onPlaybackSequenceModeSelected(playbackSequenceMode.next()) },
-        )
-        TransportIconButton(
-            onClick = onSkipToPreviousTrack,
-            enabled = canSkipPrevious,
-            contentDescription = stringResource(R.string.audio_action_previous_track),
-            size = 42.dp,
+        // Keep playback transport centered as the primary action cluster.
+        // Content actions like download/list live on a separate row so users
+        // can find "what to do with this audio" in one stable place.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Rounded.SkipPrevious,
-                modifier = Modifier.size(40.dp),
-                contentDescription = null,
+            PlaybackSequenceCycleButton(
+                playbackSequenceMode = playbackSequenceMode,
+                onClick = { onPlaybackSequenceModeSelected(playbackSequenceMode.next()) },
+                activeColor = playerColors.accent,
+                inactiveColor = playerColors.mutedAction,
             )
+            TransportIconButton(
+                onClick = onSkipToPreviousTrack,
+                enabled = canSkipPrevious,
+                contentDescription = stringResource(R.string.audio_action_previous_track),
+                size = 42.dp,
+                contentColor = playerColors.neutralAction,
+                disabledContentColor = playerColors.disabledAction,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.SkipPrevious,
+                    modifier = Modifier.size(40.dp),
+                    contentDescription = null,
+                )
+            }
+            TransportIconButton(
+                onClick = onTogglePlayback,
+                contentDescription =
+                    stringResource(
+                        if (isPlaying) {
+                            R.string.audio_action_pause
+                        } else {
+                            R.string.audio_action_play
+                        },
+                    ),
+                size = 56.dp,
+                contentColor = playerColors.accent,
+                disabledContentColor = playerColors.disabledAction,
+            ) {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                    modifier = Modifier.size(54.dp),
+                    contentDescription = null,
+                )
+            }
+            TransportIconButton(
+                onClick = onSkipToNextTrack,
+                enabled = canSkipNext,
+                contentDescription = stringResource(R.string.audio_action_next_track),
+                size = 42.dp,
+                contentColor = playerColors.neutralAction,
+                disabledContentColor = playerColors.disabledAction,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.SkipNext,
+                    modifier = Modifier.size(40.dp),
+                    contentDescription = null,
+                )
+            }
         }
-        TransportIconButton(
-            onClick = onTogglePlayback,
-            contentDescription =
-                stringResource(
-                    if (isPlaying) {
-                        R.string.audio_action_pause
-                    } else {
-                        R.string.audio_action_play
-                    },
-                ),
-            size = 56.dp,
-            contentColor = MaterialTheme.colorScheme.primary,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                modifier = Modifier.size(54.dp),
-                contentDescription = null,
-            )
-        }
-        TransportIconButton(
-            onClick = onSkipToNextTrack,
-            enabled = canSkipNext,
-            contentDescription = stringResource(R.string.audio_action_next_track),
-            size = 42.dp,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.SkipNext,
-                modifier = Modifier.size(40.dp),
-                contentDescription = null,
-            )
-        }
-        UtilityIconButton(
-            onClick = onOpenSavedAudioSheet,
-            contentDescription = stringResource(R.string.audio_action_open_saved_audio_list),
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
-                contentDescription = null,
-                modifier = Modifier.size(38.dp),
-            )
+            if (canExportGeneratedAudio) {
+                UtilityIconButton(
+                    onClick = onExportGeneratedAudio,
+                    contentDescription = stringResource(R.string.audio_action_export),
+                    contentColor = playerColors.neutralAction,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Download,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                    )
+                }
+            }
+            UtilityIconButton(
+                onClick = onOpenSavedAudioSheet,
+                contentDescription = stringResource(R.string.audio_action_open_saved_audio_list),
+                contentColor = playerColors.neutralAction,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                )
+            }
         }
     }
 }
@@ -109,6 +150,8 @@ internal fun AudioPlaybackTransportControls(
 private fun PlaybackSequenceCycleButton(
     playbackSequenceMode: PlaybackSequenceMode,
     onClick: () -> Unit,
+    activeColor: androidx.compose.ui.graphics.Color,
+    inactiveColor: androidx.compose.ui.graphics.Color,
 ) {
     val icon =
         when (playbackSequenceMode) {
@@ -119,9 +162,9 @@ private fun PlaybackSequenceCycleButton(
         }
     val contentColor =
         if (playbackSequenceMode == PlaybackSequenceMode.Normal) {
-            MaterialTheme.colorScheme.onSurfaceVariant
+            inactiveColor
         } else {
-            MaterialTheme.colorScheme.primary
+            activeColor
         }
     val contentDescription = stringResource(playbackSequenceMode.labelResId)
 
@@ -152,6 +195,7 @@ private fun TransportIconButton(
     enabled: Boolean = true,
     size: androidx.compose.ui.unit.Dp = 42.dp,
     contentColor: androidx.compose.ui.graphics.Color? = null,
+    disabledContentColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.30f),
     icon: @Composable () -> Unit,
 ) {
     val resolvedContentColor = contentColor ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -165,7 +209,7 @@ private fun TransportIconButton(
         colors =
             IconButtonDefaults.iconButtonColors(
                 contentColor = resolvedContentColor,
-                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.30f),
+                disabledContentColor = disabledContentColor,
             ),
     ) {
         icon()
@@ -176,17 +220,19 @@ private fun TransportIconButton(
 private fun UtilityIconButton(
     onClick: () -> Unit,
     contentDescription: String,
+    contentColor: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier,
     icon: @Composable () -> Unit,
 ) {
     IconButton(
         onClick = onClick,
         modifier =
-            Modifier
+            modifier
                 .size(36.dp)
                 .semantics { this.contentDescription = contentDescription },
         colors =
             IconButtonDefaults.iconButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                contentColor = contentColor,
             ),
     ) {
         icon()

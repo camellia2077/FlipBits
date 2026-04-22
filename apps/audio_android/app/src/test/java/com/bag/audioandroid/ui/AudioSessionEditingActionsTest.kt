@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
@@ -30,11 +31,11 @@ class AudioSessionEditingActionsTest {
             )
         val actions = createActions(state, CyclingSampleInputTextProvider())
 
-        actions.onRandomizeSampleInput()
+        actions.onRandomizeSampleInput(SampleInputLengthOption.Short)
         assertEquals("flash-b", state.value.currentSession.inputText)
         assertEquals("b", state.value.currentSession.sampleInputId)
 
-        actions.onRandomizeSampleInput()
+        actions.onRandomizeSampleInput(SampleInputLengthOption.Short)
         assertEquals("flash-a", state.value.currentSession.inputText)
         assertEquals("a", state.value.currentSession.sampleInputId)
     }
@@ -127,6 +128,7 @@ private class CyclingSampleInputTextProvider : SampleInputTextProvider {
     override fun randomSample(
         mode: TransportModeOption,
         language: AppLanguageOption,
+        length: SampleInputLengthOption,
         excludingSampleId: String?,
     ): SampleInput = samples(mode).firstOrNull { it.id != excludingSampleId } ?: samples(mode).first()
 

@@ -1,5 +1,8 @@
 package com.bag.audioandroid
 
+import com.bag.audioandroid.domain.DecodedAudioPayloadResult
+import com.bag.audioandroid.domain.EncodedAudioPayloadResult
+
 object NativeBagBridge {
     init {
         System.loadLibrary("audio_android_jni")
@@ -34,7 +37,7 @@ object NativeBagBridge {
 
     external fun nativePollEncodeTextJob(handle: Long): FloatArray
 
-    external fun nativeTakeEncodeTextJobResult(handle: Long): ShortArray
+    external fun nativeTakeEncodeTextJobResult(handle: Long): EncodedAudioPayloadResult
 
     external fun nativeCancelEncodeTextJob(handle: Long): Int
 
@@ -47,7 +50,7 @@ object NativeBagBridge {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): String
+    ): DecodedAudioPayloadResult
 
     external fun nativeValidateDecodeConfig(
         sampleRateHz: Int,

@@ -57,4 +57,8 @@ internal class AudioSessionCodecActions(
     fun onDecode() {
         decodeActions.onDecode()
     }
+
+    fun ensureCurrentPlaybackDecodedForLyrics() {
+        decodeActions.ensureCurrentPlaybackDecodedForLyrics()
+    }
 }

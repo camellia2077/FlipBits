@@ -57,6 +57,7 @@ internal class AudioSavedAudioSelectionActions(
                         item = savedAudio.item,
                         pcm = savedAudio.pcm,
                         sampleRateHz = savedAudio.sampleRateHz,
+                        metadata = savedAudio.metadata,
                         playback = playbackRuntimeGateway.load(savedAudio.pcm.size, savedAudio.sampleRateHz),
                     ),
                 librarySelection =

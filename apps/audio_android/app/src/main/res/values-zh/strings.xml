@@ -36,6 +36,10 @@
     <string name="audio_action_clear_result">清空解析结果</string>
     <string name="audio_action_export">下载音频</string>
     <string name="audio_action_open_saved_audio_list">打开已保存音频列表</string>
+    <string name="audio_decode_source_generated">结果来源：%1$s 生成音频</string>
+    <string name="audio_decode_source_saved">结果来源：%1$s</string>
+    <string name="audio_decode_busy_reason_generated">正在解析当前生成音频</string>
+    <string name="audio_decode_busy_reason_saved">正在解析当前选中的已保存音频</string>
     <string name="audio_action_randomize_sample_input">换一条样例文本</string>
     <string name="audio_action_open_input_editor">打开全屏输入编辑器</string>
     <string name="audio_sample_length_short">短</string>
@@ -55,6 +59,12 @@
     <string name="audio_sample_count">样本数: %1$d</string>
     <string name="audio_result_title">解析结果</string>
     <string name="audio_result_empty">还没有解析结果。</string>
+    <string name="audio_decode_view_text">文本</string>
+    <string name="audio_decode_view_raw">原始数据</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
+    <string name="audio_decode_raw_hex_label">Hex</string>
+    <string name="audio_decode_text_unavailable">这段 payload 无法按文本解释，但仍可查看原始数据。</string>
+    <string name="audio_decode_raw_unavailable">还没有可查看的原始 payload 数据。</string>
     <string name="audio_flash_style_title">Flash 发声风格: %1$s</string>
     <string name="audio_flash_style_hint">作用于下一次生成；已生成音频保持生成时风格。</string>
     <string name="audio_saved_audio_sheet_title">已保存音频</string>
@@ -67,6 +77,15 @@
     <string name="audio_player_detail_now_playing">正在播放</string>
     <string name="audio_player_detail_decoded_title">解析内容</string>
     <string name="audio_player_detail_decoded_empty">还没有解析文本；需要时可直接点按“解析音频”。</string>
+    <string name="audio_playback_view_visual">波形图</string>
+    <string name="audio_playback_view_lyrics">歌词</string>
+    <string name="audio_follow_title">数据跟播</string>
+    <string name="audio_follow_unavailable">当前这段音频暂时无法提供数据跟播。</string>
+    <string name="audio_follow_text_unavailable">当前这段音频暂时无法提供文本跟播。</string>
+    <string name="audio_follow_display_lyrics">歌词</string>
+    <string name="audio_follow_display_data">数据</string>
+    <string name="audio_follow_view_hex">十六进制</string>
+    <string name="audio_follow_view_binary">二进制</string>
     <string name="audio_player_detail_saved_info_title">音频信息</string>
     <string name="audio_player_detail_saved_mode">模式</string>
     <string name="audio_player_detail_saved_duration">时长</string>
@@ -174,6 +193,8 @@
     <string name="config_flash_style_coded_burst_description">更偏高密度分组脉冲，像机器报码。</string>
     <string name="config_flash_style_ritual_chant_label">仪式吟唱</string>
     <string name="config_flash_style_ritual_chant_description">更偏连续共鸣和仪式化语气。</string>
+    <string name="config_flash_style_deep_ritual_label">深仪圣咏</string>
+    <string name="config_flash_style_deep_ritual_description">更像教堂圣咏与礼拜回响，厚重、肃穆、共鸣更深。</string>
     <string name="config_about_title">关于</string>
     <string name="config_about_subtitle">作者、项目链接与开源许可证入口</string>
 

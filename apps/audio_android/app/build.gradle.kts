@@ -1,6 +1,7 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.kotlin.dsl.configure
+import java.io.File
 import java.util.Properties
 
 val flipbitsAndroidModulesSmokeEnabled =
@@ -12,21 +13,30 @@ val flipbitsAndroidModulesSmokeEnabled =
 
 val releaseSigningProperties =
     Properties().apply {
-        val signingPropertiesFile = project.file("release-signing.properties")
+        val configuredSigningPropertiesPath =
+            providers.gradleProperty("flipbits.android.releaseSigningPropertiesFile").orNull
+                ?: System.getenv("FLIPBITS_ANDROID_RELEASE_SIGNING_PROPERTIES_FILE")
+        val signingPropertiesFile =
+            configuredSigningPropertiesPath
+                ?.takeIf { it.isNotBlank() }
+                ?.let(::File)
+                ?: project.file("release-signing.properties")
         if (signingPropertiesFile.exists()) {
             signingPropertiesFile.inputStream().use(::load)
         }
     }
 
-fun signingProperty(name: String): String =
-    releaseSigningProperties
-        .getProperty(name)
-        ?.takeIf { it.isNotBlank() }
-        ?: error("Missing release signing property: $name")
+fun signingProperty(name: String): String? =
+    providers.gradleProperty("flipbits.android.releaseSigning.$name").orNull?.takeIf { it.isNotBlank() }
+        ?: System.getenv("FLIPBITS_ANDROID_RELEASE_SIGNING_${name.uppercase()}")?.takeIf { it.isNotBlank() }
+        ?: releaseSigningProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+
+fun requiredSigningProperty(name: String): String =
+    signingProperty(name) ?: error("Missing release signing property: $name")
 
 val hasReleaseSigningProperties =
     listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all {
-        releaseSigningProperties.getProperty(it)?.isNotBlank() == true
+        signingProperty(it) != null
     }
 
 fun requiredGradleIntProperty(name: String): Int =
@@ -60,6 +70,7 @@ android {
         applicationId = "com.bag.audioandroid"
         minSdk = 29
         targetSdk = 34
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Android presentation version now has a single truth source in
         // apps/audio_android/gradle.properties so release tooling, docs, and
         // agent workflows do not need to edit this larger build script.
@@ -84,10 +95,10 @@ android {
     signingConfigs {
         if (hasReleaseSigningProperties) {
             create("release") {
-                storeFile = project.file(signingProperty("storeFile"))
-                storePassword = signingProperty("storePassword")
-                keyAlias = signingProperty("keyAlias")
-                keyPassword = signingProperty("keyPassword")
+                storeFile = file(requiredSigningProperty("storeFile"))
+                storePassword = requiredSigningProperty("storePassword")
+                keyAlias = requiredSigningProperty("keyAlias")
+                keyPassword = requiredSigningProperty("keyPassword")
             }
         }
     }
@@ -129,7 +140,16 @@ android {
     }
 
     androidResources {
-        localeFilters += listOf("en", "zh", "zh-rTW", "ja")
+        localeFilters += listOf(
+            "en",
+            "zh",
+            "zh-rTW",
+            "ja",
+            "de",
+            "ru",
+            "es",
+            "pt",
+        )
     }
 
     externalNativeBuild {
@@ -215,5 +235,10 @@ dependencies {
     testImplementation("androidx.test:core:1.6.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.8")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
 }

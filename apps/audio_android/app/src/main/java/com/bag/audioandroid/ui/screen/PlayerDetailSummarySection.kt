@@ -22,8 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
-import com.bag.audioandroid.ui.model.SavedAudioModeFilter
-import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.model.asString
 
 @Composable
 internal fun PlayerDetailSummarySection(
@@ -53,50 +52,12 @@ internal fun PlayerDetailSummarySection(
             )
         }
         Text(
-            text =
-                when (miniPlayerModel) {
-                    is MiniPlayerUiModel.Generated ->
-                        stringResource(
-                            R.string.audio_mini_player_generated_title,
-                            stringResource(miniPlayerModel.mode.labelResId),
-                        )
-                    is MiniPlayerUiModel.Saved -> miniPlayerModel.displayName
-                },
+            text = miniPlayerModel.title.asString(),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
         )
         Text(
-            text =
-                when (miniPlayerModel) {
-                    is MiniPlayerUiModel.Generated -> {
-                        val duration = formatDurationMillis(miniPlayerModel.durationMs)
-                        if (miniPlayerModel.mode == TransportModeOption.Flash &&
-                            miniPlayerModel.flashVoicingStyle != null
-                        ) {
-                            stringResource(
-                                R.string.audio_mini_player_generated_flash_subtitle,
-                                stringResource(miniPlayerModel.flashVoicingStyle.labelResId),
-                                duration,
-                            )
-                        } else {
-                            stringResource(R.string.audio_mini_player_duration_only, duration)
-                        }
-                    }
-                    is MiniPlayerUiModel.Saved ->
-                        stringResource(
-                            if (miniPlayerModel.modeWireName == "flash" && miniPlayerModel.flashVoicingStyle != null) {
-                                R.string.audio_mini_player_generated_flash_subtitle
-                            } else {
-                                R.string.audio_mini_player_saved_subtitle
-                            },
-                            if (miniPlayerModel.modeWireName == "flash" && miniPlayerModel.flashVoicingStyle != null) {
-                                stringResource(miniPlayerModel.flashVoicingStyle.labelResId)
-                            } else {
-                                stringResource(SavedAudioModeFilter.labelResIdForModeWireName(miniPlayerModel.modeWireName))
-                            },
-                            formatDurationMillis(miniPlayerModel.durationMs),
-                        )
-                },
+            text = miniPlayerModel.subtitle.asString(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

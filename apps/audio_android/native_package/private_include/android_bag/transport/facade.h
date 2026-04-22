@@ -10,6 +10,7 @@
 #include "android_bag/common/error_code.h"
 #include "android_bag/common/types.h"
 #include "android_bag/transport/decoder.h"
+#include "android_bag/transport/follow.h"
 
 namespace bag {
 
@@ -33,6 +34,13 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config,
                             const std::string& text,
                             std::vector<std::int16_t>* out_pcm,
                             const EncodeProgressSink* progress_sink);
+ErrorCode EncodeTextToPcm16WithFollowData(const CoreConfig& config,
+                                          const std::string& text,
+                                          EncodedPcmFollowResult* out_result);
+ErrorCode EncodeTextToPcm16WithFollowData(const CoreConfig& config,
+                                          const std::string& text,
+                                          EncodedPcmFollowResult* out_result,
+                                          const EncodeProgressSink* progress_sink);
 std::unique_ptr<ITransportDecoder> CreateTransportDecoder(const CoreConfig& config);
 
 }  // namespace bag

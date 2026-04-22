@@ -1,8 +1,10 @@
 package com.bag.audioandroid.ui
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -19,6 +21,7 @@ import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.screen.AudioTabScreen
 import com.bag.audioandroid.ui.screen.ConfigTabScreen
+import com.bag.audioandroid.ui.screen.MiniPlayerBar
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
 import com.bag.audioandroid.ui.screen.PlayerDetailSheetContent
 import com.bag.audioandroid.ui.screen.SavedAudioPickerSheet
@@ -68,6 +71,17 @@ internal fun AudioAndroidMainScaffold(
         viewModel.onSnackbarMessageShown(message.id)
     }
 
+    LaunchedEffect(
+        uiState.showPlayerDetailSheet,
+        uiState.currentPlaybackSource,
+        uiState.currentPlaybackDecodedPayload?.textDecodeStatusCode,
+        uiState.currentPlaybackFollowData.textFollowAvailable,
+    ) {
+        if (uiState.showPlayerDetailSheet && uiState.currentPlaybackSource is AudioPlaybackSource.Saved) {
+            viewModel.ensureCurrentPlaybackDecodedForLyrics()
+        }
+    }
+
     if (uiState.showSavedAudioSheet) {
         ModalBottomSheet(
             onDismissRequest = viewModel::onCloseSavedAudioSheet,
@@ -107,12 +121,9 @@ internal fun AudioAndroidMainScaffold(
                     canExportGeneratedAudio =
                         uiState.currentPlaybackSource is AudioPlaybackSource.Generated &&
                             uiState.currentPlaybackSampleCount > 0,
-                    isCodecBusy = uiState.currentSession.isCodecBusy,
-                    decodedText = uiState.currentPlaybackDecodedText,
+                    followData = uiState.currentPlaybackFollowData,
                     savedAudioItem = uiState.currentSavedAudioItem,
                     onTogglePlayback = viewModel::onTogglePlayback,
-                    onDecodeAudio = viewModel::onDecode,
-                    onClearDecodedText = viewModel::onClearResult,
                     onSkipToPreviousTrack = viewModel::onSkipToPreviousTrack,
                     onSkipToNextTrack = viewModel::onSkipToNextTrack,
                     onPlaybackSequenceModeSelected = viewModel::onPlaybackSequenceModeSelected,
@@ -122,13 +133,14 @@ internal fun AudioAndroidMainScaffold(
                     onScrubStarted = viewModel::onScrubStarted,
                     onScrubChanged = viewModel::onScrubChanged,
                     onScrubFinished = viewModel::onScrubFinished,
+                    onLyricsRequested = viewModel::ensureCurrentPlaybackDecodedForLyrics,
                     modifier = Modifier.padding(sheetInnerPadding),
                 )
             }
         }
     }
 
-    Scaffold(
+    PlayerScaffold(
         modifier = modifier,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -138,12 +150,26 @@ internal fun AudioAndroidMainScaffold(
                 uiState = uiState,
                 navigationBarColors = navigationBarColors,
                 onTabSelected = viewModel::onTabSelected,
-                onTogglePlayback = viewModel::onTogglePlayback,
-                onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheet,
-                onOpenPlayerDetailSheet = viewModel::onOpenPlayerDetailSheet,
             )
         },
-    ) { innerPadding ->
+        miniPlayer =
+            uiState.miniPlayerModel?.takeIf { !uiState.showPlayerDetailSheet }?.let { model ->
+                {
+                    MiniPlayerBar(
+                        model = model,
+                        isPlaying = uiState.currentPlayback.isPlaying,
+                        onTogglePlayback = viewModel::onTogglePlayback,
+                        onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheet,
+                        onOpenDetails = viewModel::onOpenPlayerDetailSheet,
+                        // Keep the mini-player on the same dock container color as the tab bar.
+                        // The two pieces should read as one bottom playback system that adapts
+                        // automatically when the user switches brand dual-tone themes in config.
+                        containerColor = playerDockContainerColor(uiState),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+    ) { contentPadding ->
         when (uiState.selectedTab) {
             AppTab.Config ->
                 ConfigTabScreen(
@@ -165,17 +191,17 @@ internal fun AudioAndroidMainScaffold(
                     brandThemes = brandThemes,
                     accentTokens = accentTokens,
                     onOpenAboutPage = viewModel::onOpenAboutPage,
+                    contentPadding = contentPadding,
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
                             .padding(horizontal = 16.dp, vertical = 16.dp),
                 )
 
             AppTab.Audio ->
                 AudioTabScreen(
                     transportMode = uiState.transportMode,
-                    isCodecBusy = uiState.currentSession.isCodecBusy,
+                    isCodecBusy = uiState.audioTabCodecBusy,
                     encodeProgress = uiState.currentSession.encodeProgress,
                     encodePhase = uiState.currentSession.encodePhase,
                     isEncodeCancelling = uiState.currentSession.isEncodeCancelling,
@@ -185,16 +211,16 @@ internal fun AudioAndroidMainScaffold(
                     inputText = currentSession.inputText,
                     onInputTextChange = viewModel::onInputTextChange,
                     onRandomizeSampleInput = viewModel::onRandomizeSampleInput,
-                    resultText = currentSession.resultText,
+                    decodedPayload = uiState.audioTabDecodedPayload,
                     onEncode = viewModel::onEncode,
                     onCancelEncode = viewModel::onCancelEncode,
                     onDecode = viewModel::onDecode,
                     onClear = viewModel::onClear,
                     onClearResult = viewModel::onClearResult,
+                    contentPadding = contentPadding,
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
                             .padding(horizontal = 16.dp, vertical = 16.dp),
                 )
 
@@ -213,10 +239,10 @@ internal fun AudioAndroidMainScaffold(
                     onDeleteSavedAudio = viewModel::onDeleteSavedAudio,
                     onRenameSavedAudio = viewModel::onRenameSavedAudio,
                     onShareSavedAudio = viewModel::onShareSavedAudio,
+                    contentPadding = contentPadding,
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
                             .padding(horizontal = 16.dp, vertical = 16.dp),
                 )
         }

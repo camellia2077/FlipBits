@@ -1,18 +1,21 @@
 package com.bag.audioandroid.ui.model
 
-sealed interface MiniPlayerUiModel {
-    val durationMs: Long
+data class MiniPlayerUiModel(
+    val title: UiText,
+    val subtitle: UiText,
+    val leadingIcon: MiniPlayerLeadingIcon,
+    val durationMs: Long,
+    val isFlashMode: Boolean,
+    val flashVoicingStyle: FlashVoicingStyleOption?,
+    val source: MiniPlayerSource,
+)
 
-    data class Generated(
-        val mode: TransportModeOption,
-        val flashVoicingStyle: FlashVoicingStyleOption?,
-        override val durationMs: Long,
-    ) : MiniPlayerUiModel
+enum class MiniPlayerLeadingIcon {
+    Generated,
+    Saved,
+}
 
-    data class Saved(
-        val displayName: String,
-        val modeWireName: String,
-        val flashVoicingStyle: FlashVoicingStyleOption?,
-        override val durationMs: Long,
-    ) : MiniPlayerUiModel
+enum class MiniPlayerSource {
+    Generated,
+    Saved,
 }

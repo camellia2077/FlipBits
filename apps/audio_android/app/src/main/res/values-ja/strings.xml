@@ -36,6 +36,10 @@
     <string name="audio_action_clear_result">解析結果をクリア</string>
     <string name="audio_action_export">音声を保存</string>
     <string name="audio_action_open_saved_audio_list">保存済み音声リストを開く</string>
+    <string name="audio_decode_source_generated">結果ソース: %1$s 生成音声</string>
+    <string name="audio_decode_source_saved">結果ソース: %1$s</string>
+    <string name="audio_decode_busy_reason_generated">現在の生成音声を解析中</string>
+    <string name="audio_decode_busy_reason_saved">選択中の保存済み音声を解析中</string>
     <string name="audio_action_randomize_sample_input">別のサンプル入力に切り替える</string>
     <string name="audio_action_open_input_editor">全画面入力エディターを開く</string>
     <string name="audio_sample_length_short">短</string>
@@ -55,6 +59,12 @@
     <string name="audio_sample_count">サンプル数: %1$d</string>
     <string name="audio_result_title">解析結果</string>
     <string name="audio_result_empty">解析結果はまだありません。</string>
+    <string name="audio_decode_view_text">テキスト</string>
+    <string name="audio_decode_view_raw">原始データ</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
+    <string name="audio_decode_raw_hex_label">Hex</string>
+    <string name="audio_decode_text_unavailable">この payload はテキストとして解釈できませんが、原始データは引き続き確認できます。</string>
+    <string name="audio_decode_raw_unavailable">表示できる raw payload データはまだありません。</string>
     <string name="audio_flash_style_title">Flash 音声スタイル: %1$s</string>
     <string name="audio_flash_style_hint">次回の生成に適用されます。既に生成済みの音声は生成時のスタイルを維持します。</string>
     <string name="audio_saved_audio_sheet_title">保存済み音声</string>
@@ -65,8 +75,17 @@
     <string name="audio_mini_player_saved_subtitle">%1$s • %2$s</string>
     <string name="audio_mini_player_duration_only">%1$s</string>
     <string name="audio_player_detail_now_playing">再生中</string>
-    <string name="audio_player_detail_decoded_title">解析テキスト</string>
+    <string name="audio_player_detail_decoded_title">解析内容</string>
     <string name="audio_player_detail_decoded_empty">解析テキストはまだありません。必要ならここで音声を解析してください。</string>
+    <string name="audio_playback_view_visual">ビジュアル</string>
+    <string name="audio_playback_view_lyrics">歌詞</string>
+    <string name="audio_follow_title">データ追従</string>
+    <string name="audio_follow_unavailable">この音声では現在データ追従を利用できません。</string>
+    <string name="audio_follow_text_unavailable">この音声では現在テキスト追従を利用できません。</string>
+    <string name="audio_follow_display_lyrics">歌詞</string>
+    <string name="audio_follow_display_data">データ</string>
+    <string name="audio_follow_view_hex">Hex</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_player_detail_saved_info_title">音声情報</string>
     <string name="audio_player_detail_saved_mode">モード</string>
     <string name="audio_player_detail_saved_duration">長さ</string>
@@ -170,10 +189,12 @@
     <string name="palette_family_neutrals">ニュートラル系</string>
     <string name="config_flash_style_title">flash 音声スタイル</string>
     <string name="config_flash_style_subtitle">生成する flash 音声の聞こえ方を選択します。</string>
-    <string name="config_flash_style_coded_burst_label">coded burst</string>
+    <string name="config_flash_style_coded_burst_label">コードバースト</string>
     <string name="config_flash_style_coded_burst_description">高密度にまとまった機械的なバースト感を強めます。</string>
-    <string name="config_flash_style_ritual_chant_label">ritual chant</string>
+    <string name="config_flash_style_ritual_chant_label">儀式詠唱</string>
     <string name="config_flash_style_ritual_chant_description">より連続的で共鳴感のある儀式的な響きにします。</string>
+    <string name="config_flash_style_deep_ritual_label">深儀式聖歌</string>
+    <string name="config_flash_style_deep_ritual_description">教会の聖歌のような荘厳さと深い残響を持つ、より厳かな響きです。</string>
     <string name="config_about_title">このアプリについて</string>
     <string name="config_about_subtitle">作者、プロジェクトリンク、オープンソースライセンス</string>
 

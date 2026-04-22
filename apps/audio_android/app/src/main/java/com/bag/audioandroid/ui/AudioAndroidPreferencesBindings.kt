@@ -1,17 +1,11 @@
 package com.bag.audioandroid.ui
 
-import androidx.appcompat.app.AppCompatDelegate
 import com.bag.audioandroid.data.AppSettingsRepository
-import com.bag.audioandroid.ui.model.AppLanguageOption
-import com.bag.audioandroid.ui.model.AppTab
-import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
-import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
-import com.bag.audioandroid.ui.state.LibrarySelectionUiState
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
@@ -23,141 +17,23 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-internal class AudioAndroidChromeActions(
+internal class AudioAndroidPreferencesBindings(
     private val uiState: MutableStateFlow<AudioAppUiState>,
-    private val sampleInputSessionUpdater: SampleInputSessionUpdater,
     private val appSettingsRepository: AppSettingsRepository,
     private val scope: CoroutineScope,
 ) {
-    fun onTabSelected(
-        tab: AppTab,
-        refreshSavedAudioItems: () -> Unit,
-    ) {
-        if (tab == AppTab.Library) {
-            refreshSavedAudioItems()
-        }
-        uiState.update { state ->
-            state.copy(
-                selectedTab = tab,
-                librarySelection =
-                    if (tab == AppTab.Library) {
-                        state.librarySelection
-                    } else {
-                        LibrarySelectionUiState()
-                    },
-            )
-        }
+    fun startObserving() {
+        observeSelectedPalette()
+        observeSelectedThemeMode()
+        observeSelectedThemeStyle()
+        observeSelectedBrandTheme()
+        observeSelectedFlashVoicingStyle()
+        observeSelectedPlaybackSequenceMode()
+        observeConfigLanguageExpanded()
+        observeConfigThemeAppearanceExpanded()
     }
 
-    fun onLanguageSelected(language: AppLanguageOption) {
-        val previousLanguage = uiState.value.selectedLanguage
-        if (previousLanguage == language) {
-            return
-        }
-        uiState.update { state ->
-            state.copy(
-                selectedLanguage = language,
-                sessions =
-                    sampleInputSessionUpdater.refreshForLanguageChange(
-                        state.sessions,
-                        language,
-                    ),
-            )
-        }
-        AppCompatDelegate.setApplicationLocales(language.toLocaleList())
-    }
-
-    fun onOpenAboutPage() {
-        uiState.update { it.copy(showAboutPage = true) }
-    }
-
-    fun onCloseAboutPage() {
-        uiState.update { it.copy(showAboutPage = false) }
-    }
-
-    fun onOpenLicensesPage() {
-        uiState.update { it.copy(showLicensesPage = true, showAboutPage = false) }
-    }
-
-    fun onCloseLicensesPage() {
-        uiState.update { it.copy(showLicensesPage = false, showAboutPage = true) }
-    }
-
-    fun onPaletteSelected(palette: PaletteOption) {
-        uiState.update { it.copy(selectedPalette = palette) }
-        scope.launch {
-            appSettingsRepository.setSelectedPaletteId(palette.id)
-        }
-    }
-
-    fun onThemeModeSelected(themeMode: ThemeModeOption) {
-        uiState.update { it.copy(selectedThemeMode = themeMode) }
-        scope.launch {
-            appSettingsRepository.setSelectedThemeModeId(themeMode.id)
-        }
-    }
-
-    fun onThemeStyleSelected(themeStyle: ThemeStyleOption) {
-        uiState.update { it.copy(selectedThemeStyle = themeStyle) }
-        scope.launch {
-            appSettingsRepository.setSelectedThemeStyleId(themeStyle.id)
-        }
-    }
-
-    fun onBrandThemeSelected(brandTheme: BrandThemeOption) {
-        uiState.update { it.copy(selectedBrandTheme = brandTheme) }
-        scope.launch {
-            appSettingsRepository.setSelectedBrandThemeId(brandTheme.id)
-        }
-    }
-
-    fun onFlashVoicingStyleSelected(style: FlashVoicingStyleOption) {
-        uiState.update { it.copy(selectedFlashVoicingStyle = style) }
-        scope.launch {
-            appSettingsRepository.setSelectedFlashVoicingStyleId(style.id)
-        }
-    }
-
-    fun onPlaybackSequenceModeSelected(mode: PlaybackSequenceMode) {
-        uiState.update { it.copy(playbackSequenceMode = mode) }
-        scope.launch {
-            appSettingsRepository.setSelectedPlaybackSequenceModeId(mode.id)
-        }
-    }
-
-    fun onOpenPlayerDetailSheet() {
-        uiState.update { it.copy(showPlayerDetailSheet = true, showSavedAudioSheet = false) }
-    }
-
-    fun onClosePlayerDetailSheet() {
-        uiState.update { it.copy(showPlayerDetailSheet = false) }
-    }
-
-    fun onSnackbarMessageShown(messageId: Long) {
-        uiState.update { state ->
-            if (state.snackbarMessage?.id == messageId) {
-                state.copy(snackbarMessage = null)
-            } else {
-                state
-            }
-        }
-    }
-
-    fun onConfigLanguageExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigLanguageExpanded = expanded) }
-        scope.launch {
-            appSettingsRepository.setConfigLanguageExpanded(expanded)
-        }
-    }
-
-    fun onConfigThemeAppearanceExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigThemeAppearanceExpanded = expanded) }
-        scope.launch {
-            appSettingsRepository.setConfigThemeAppearanceExpanded(expanded)
-        }
-    }
-
-    fun observeSelectedPalette() {
+    private fun observeSelectedPalette() {
         scope.launch {
             appSettingsRepository.selectedPaletteId
                 .distinctUntilChanged()
@@ -174,7 +50,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeSelectedThemeMode() {
+    private fun observeSelectedThemeMode() {
         scope.launch {
             appSettingsRepository.selectedThemeModeId
                 .distinctUntilChanged()
@@ -191,7 +67,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeSelectedThemeStyle() {
+    private fun observeSelectedThemeStyle() {
         scope.launch {
             appSettingsRepository.selectedThemeStyleId
                 .distinctUntilChanged()
@@ -208,7 +84,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeSelectedBrandTheme() {
+    private fun observeSelectedBrandTheme() {
         scope.launch {
             appSettingsRepository.selectedBrandThemeId
                 .distinctUntilChanged()
@@ -225,7 +101,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeSelectedFlashVoicingStyle() {
+    private fun observeSelectedFlashVoicingStyle() {
         scope.launch {
             appSettingsRepository.selectedFlashVoicingStyleId
                 .distinctUntilChanged()
@@ -242,7 +118,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeSelectedPlaybackSequenceMode() {
+    private fun observeSelectedPlaybackSequenceMode() {
         scope.launch {
             appSettingsRepository.selectedPlaybackSequenceModeId
                 .distinctUntilChanged()
@@ -259,7 +135,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeConfigLanguageExpanded() {
+    private fun observeConfigLanguageExpanded() {
         scope.launch {
             appSettingsRepository.isConfigLanguageExpanded
                 .distinctUntilChanged()
@@ -271,7 +147,7 @@ internal class AudioAndroidChromeActions(
         }
     }
 
-    fun observeConfigThemeAppearanceExpanded() {
+    private fun observeConfigThemeAppearanceExpanded() {
         scope.launch {
             appSettingsRepository.isConfigThemeAppearanceExpanded
                 .distinctUntilChanged()

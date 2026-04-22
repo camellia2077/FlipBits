@@ -3,6 +3,9 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.BagApiCodes
+import com.bag.audioandroid.domain.BagDecodeContentCodes
+import com.bag.audioandroid.domain.DecodedAudioPayloadResult
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -14,18 +17,30 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 internal class AudioSessionDecodeActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
     private val scope: CoroutineScope,
-    private val audioCodecGateway: AudioCodecGateway,
-    private val sessionStateStore: AudioSessionStateStore,
-    private val uiTextMapper: BagUiTextMapper,
+    audioCodecGateway: AudioCodecGateway,
+    sessionStateStore: AudioSessionStateStore,
+    uiTextMapper: BagUiTextMapper,
     private val sampleRateHz: Int,
     private val frameSamples: Int,
-    private val workerDispatcher: CoroutineDispatcher,
+    workerDispatcher: CoroutineDispatcher,
 ) {
+    private val requestFactory = DecodeRequestFactory(sampleRateHz = sampleRateHz, frameSamples = frameSamples)
+    private val stateReducer =
+        DecodeStateReducer(
+            uiState = uiState,
+            sessionStateStore = sessionStateStore,
+            uiTextMapper = uiTextMapper,
+        )
+    private val decodeRunner =
+        DecodeRunner(
+            audioCodecGateway = audioCodecGateway,
+            workerDispatcher = workerDispatcher,
+        )
+
     fun onDecode() {
         val current = uiState.value
         if (current.currentSession.isCodecBusy) {
@@ -37,43 +52,37 @@ internal class AudioSessionDecodeActions(
         }
     }
 
+    fun ensureCurrentPlaybackDecodedForLyrics() {
+        val current = uiState.value
+        if (current.currentSession.isCodecBusy) {
+            return
+        }
+        val source = current.currentPlaybackSource as? AudioPlaybackSource.Saved ?: return
+        val selectedSavedAudio =
+            current.selectedSavedAudio
+                ?.takeIf { it.item.itemId == source.itemId }
+                ?: return
+        val alreadyDecodedForLyrics =
+            selectedSavedAudio.decodedPayload.textDecodeStatusCode !=
+                BagDecodeContentCodes.STATUS_UNAVAILABLE ||
+                selectedSavedAudio.followData.textFollowAvailable
+        if (alreadyDecodedForLyrics) {
+            return
+        }
+        onDecodeSaved(current, source.itemId)
+    }
+
     private fun onDecodeGenerated(
         current: AudioAppUiState,
         mode: TransportModeOption,
     ) {
         val session = current.sessions.getValue(mode)
         if (session.generatedPcm.isEmpty()) {
-            sessionStateStore.updateSession(mode) {
-                it.copy(statusText = UiText.Resource(R.string.status_no_audio_for_mode))
-            }
+            stateReducer.applyNoGeneratedAudio(mode)
             return
         }
-        val request =
-            DecodeRequest(
-                mode = mode,
-                generatedPcm = session.generatedPcm,
-                flashPreset = resolveGeneratedFlashPreset(current, mode),
-            )
-        sessionStateStore.updateSession(request.mode) {
-            it.copy(
-                isCodecBusy = true,
-                encodeProgress = null,
-                encodePhase = null,
-                statusText =
-                    UiText.Resource(
-                        R.string.status_mode_audio_decoding,
-                        listOf(request.mode.wireName),
-                    ),
-            )
-        }
-
-        scope.launch {
-            val result =
-                withContext(workerDispatcher) {
-                    performDecode(request)
-                }
-            applyGeneratedDecodeResult(request.mode, result)
-        }
+        val request = requestFactory.buildGenerated(current, mode, session.generatedPcm)
+        launchGeneratedDecode(request)
     }
 
     private fun onDecodeSaved(
@@ -86,115 +95,128 @@ internal class AudioSessionDecodeActions(
                 ?: return
         val mode = TransportModeOption.fromWireName(selectedSavedAudio.item.modeWireName)
         if (mode == null) {
-            sessionStateStore.updateCurrentSession {
-                it.copy(statusText = UiText.Resource(R.string.status_saved_audio_load_failed))
-            }
+            stateReducer.applySavedLoadFailure()
             return
         }
-        val request =
-            DecodeRequest(
-                mode = mode,
-                generatedPcm = selectedSavedAudio.pcm,
-                flashPreset = resolveSavedFlashPreset(current, selectedSavedAudio),
-            )
+        val request = requestFactory.buildSaved(current, mode, selectedSavedAudio)
+        launchSavedDecode(itemId, request)
+    }
 
-        markSavedDecodeBusy(mode)
+    private fun launchGeneratedDecode(request: DecodeRequest) {
+        stateReducer.markBusy(request.mode)
         scope.launch {
-            val result =
-                withContext(workerDispatcher) {
-                    performDecode(request)
-                }
-            applySavedDecodeResult(itemId, mode, result)
+            stateReducer.reduceGeneratedResult(
+                request.mode,
+                decodeRunner.execute(request),
+            )
         }
     }
 
-    private fun resolveGeneratedFlashPreset(
-        current: AudioAppUiState,
-        mode: TransportModeOption,
-    ): FlashVoicingStyleOption =
-        if (mode == TransportModeOption.Flash) {
-            current.sessions.getValue(mode).generatedFlashVoicingStyle ?: current.selectedFlashVoicingStyle
-        } else {
-            FlashVoicingStyleOption.CodedBurst
-        }
-
-    private fun resolveSavedFlashPreset(
-        current: AudioAppUiState,
-        savedAudio: SavedAudioPlaybackSelection,
-    ): FlashVoicingStyleOption =
-        if (savedAudio.item.modeWireName == TransportModeOption.Flash.wireName) {
-            savedAudio.item.flashVoicingStyle ?: current.selectedFlashVoicingStyle
-        } else {
-            FlashVoicingStyleOption.CodedBurst
-        }
-
-    private fun performDecode(request: DecodeRequest): DecodeResult {
-        val validationIssue =
-            audioCodecGateway.validateDecodeConfig(
-                sampleRateHz,
-                frameSamples,
-                request.mode.nativeValue,
-                request.flashPreset.signalProfileValue,
-                request.flashPreset.voicingFlavorValue,
-            )
-        if (validationIssue != BagApiCodes.VALIDATION_OK) {
-            return DecodeResult.ValidationFailure(validationIssue)
-        }
-
-        val decoded =
-            audioCodecGateway.decodeGeneratedPcm(
-                request.generatedPcm,
-                sampleRateHz,
-                frameSamples,
-                request.mode.nativeValue,
-                request.flashPreset.signalProfileValue,
-                request.flashPreset.voicingFlavorValue,
-            )
-        return DecodeResult.Success(decoded)
-    }
-
-    private fun applyGeneratedDecodeResult(
-        mode: TransportModeOption,
-        result: DecodeResult,
+    private fun launchSavedDecode(
+        itemId: String,
+        request: DecodeRequest,
     ) {
-        when (result) {
-            is DecodeResult.ValidationFailure -> {
-                sessionStateStore.updateSession(mode) {
-                    it.copy(
-                        statusText = uiTextMapper.validationIssue(result.validationIssue),
-                        isCodecBusy = false,
-                        encodeProgress = null,
-                        encodePhase = null,
-                        isEncodeCancelling = false,
-                    )
-                }
+        stateReducer.markBusy(request.mode)
+        scope.launch {
+            stateReducer.reduceSavedResult(
+                itemId = itemId,
+                mode = request.mode,
+                result = decodeRunner.execute(request),
+            )
+        }
+    }
+}
+
+private class DecodeRequestFactory(
+    private val sampleRateHz: Int,
+    private val frameSamples: Int,
+) {
+    fun buildGenerated(
+        current: AudioAppUiState,
+        mode: TransportModeOption,
+        generatedPcm: ShortArray,
+    ): DecodeRequest =
+        DecodeRequest(
+            mode = mode,
+            generatedPcm = generatedPcm,
+            sampleRateHz = sampleRateHz,
+            frameSamples = frameSamples,
+            flashPreset =
+                if (mode == TransportModeOption.Flash) {
+                    current.sessions.getValue(mode).generatedFlashVoicingStyle ?: current.selectedFlashVoicingStyle
+                } else {
+                    FlashVoicingStyleOption.CodedBurst
+                },
+        )
+
+    fun buildSaved(
+        current: AudioAppUiState,
+        mode: TransportModeOption,
+        savedAudio: SavedAudioPlaybackSelection,
+    ): DecodeRequest =
+        DecodeRequest(
+            mode = mode,
+            generatedPcm = savedAudio.pcm,
+            sampleRateHz = savedAudio.sampleRateHz,
+            frameSamples = savedAudio.metadata?.frameSamples ?: frameSamples,
+            flashPreset =
+                if (savedAudio.item.modeWireName == TransportModeOption.Flash.wireName) {
+                    savedAudio.item.flashVoicingStyle ?: current.selectedFlashVoicingStyle
+                } else {
+                    FlashVoicingStyleOption.CodedBurst
+                },
+        )
+}
+
+private class DecodeRunner(
+    private val audioCodecGateway: AudioCodecGateway,
+    private val workerDispatcher: CoroutineDispatcher,
+) {
+    suspend fun execute(request: DecodeRequest): DecodeResult =
+        kotlinx.coroutines.withContext(workerDispatcher) {
+            val validationIssue =
+                audioCodecGateway.validateDecodeConfig(
+                    request.sampleRateHz,
+                    request.frameSamples,
+                    request.mode.nativeValue,
+                    request.flashPreset.signalProfileValue,
+                    request.flashPreset.voicingFlavorValue,
+                )
+            if (validationIssue != BagApiCodes.VALIDATION_OK) {
+                return@withContext DecodeResult.ValidationFailure(validationIssue)
             }
 
-            is DecodeResult.Success -> {
-                val status =
-                    if (result.decoded.isEmpty()) {
-                        uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
-                    } else {
-                        UiText.Resource(
-                            R.string.status_mode_decode_completed,
-                            listOf(mode.wireName),
-                        )
-                    }
-                sessionStateStore.updateSession(mode) {
-                    it.copy(
-                        resultText = result.decoded,
-                        statusText = status,
-                        isCodecBusy = false,
-                        encodeProgress = null,
-                        encodePhase = null,
-                        isEncodeCancelling = false,
-                    )
-                }
-            }
+            DecodeResult.Success(
+                audioCodecGateway.decodeGeneratedPcm(
+                    request.generatedPcm,
+                    request.sampleRateHz,
+                    request.frameSamples,
+                    request.mode.nativeValue,
+                    request.flashPreset.signalProfileValue,
+                    request.flashPreset.voicingFlavorValue,
+                ),
+            )
+        }
+}
+
+private class DecodeStateReducer(
+    private val uiState: MutableStateFlow<AudioAppUiState>,
+    private val sessionStateStore: AudioSessionStateStore,
+    private val uiTextMapper: BagUiTextMapper,
+) {
+    fun applyNoGeneratedAudio(mode: TransportModeOption) {
+        sessionStateStore.updateSession(mode) {
+            it.copy(statusText = UiText.Resource(R.string.status_no_audio_for_mode))
         }
     }
 
-    private fun markSavedDecodeBusy(mode: TransportModeOption) {
+    fun applySavedLoadFailure() {
+        sessionStateStore.updateCurrentSession {
+            it.copy(statusText = UiText.Resource(R.string.status_saved_audio_load_failed))
+        }
+    }
+
+    fun markBusy(mode: TransportModeOption) {
         sessionStateStore.updateCurrentSession {
             it.copy(
                 isCodecBusy = true,
@@ -209,69 +231,116 @@ internal class AudioSessionDecodeActions(
         }
     }
 
-    private fun applySavedDecodeResult(
+    fun reduceGeneratedResult(
+        mode: TransportModeOption,
+        result: DecodeResult,
+    ) {
+        when (result) {
+            is DecodeResult.ValidationFailure -> applyValidationFailure(result.validationIssue)
+            is DecodeResult.Success -> applyGeneratedSuccess(mode, result.decoded)
+        }
+    }
+
+    fun reduceSavedResult(
         itemId: String,
         mode: TransportModeOption,
         result: DecodeResult,
     ) {
         when (result) {
-            is DecodeResult.ValidationFailure -> {
-                sessionStateStore.updateCurrentSession {
-                    it.copy(
-                        statusText = uiTextMapper.validationIssue(result.validationIssue),
-                        isCodecBusy = false,
-                        encodeProgress = null,
-                        encodePhase = null,
-                        isEncodeCancelling = false,
-                    )
-                }
-            }
-
+            is DecodeResult.ValidationFailure -> applyValidationFailure(result.validationIssue)
             is DecodeResult.Success -> {
-                val status =
-                    if (result.decoded.isEmpty()) {
-                        uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
-                    } else {
-                        UiText.Resource(
-                            R.string.status_mode_decode_completed,
-                            listOf(mode.wireName),
-                        )
-                    }
-                uiState.update { state ->
-                    val selected =
-                        state.selectedSavedAudio
-                            ?.takeIf { it.item.itemId == itemId }
-                            ?: return@update state
-                    state.copy(
-                        selectedSavedAudio = selected.copy(decodedText = result.decoded),
-                    )
-                }
-                sessionStateStore.updateCurrentSession {
-                    it.copy(
-                        statusText = status,
-                        isCodecBusy = false,
-                        encodeProgress = null,
-                        encodePhase = null,
-                        isEncodeCancelling = false,
-                    )
-                }
+                val status = decodeStatusText(mode, result.decoded.decodedPayload)
+                applySavedSuccess(itemId, result.decoded, status)
             }
         }
     }
 
-    private data class DecodeRequest(
-        val mode: TransportModeOption,
-        val generatedPcm: ShortArray,
-        val flashPreset: FlashVoicingStyleOption,
-    )
-
-    private sealed interface DecodeResult {
-        data class ValidationFailure(
-            val validationIssue: Int,
-        ) : DecodeResult
-
-        data class Success(
-            val decoded: String,
-        ) : DecodeResult
+    private fun applyGeneratedSuccess(
+        mode: TransportModeOption,
+        decoded: DecodedAudioPayloadResult,
+    ) {
+        val status = decodeStatusText(mode, decoded.decodedPayload)
+        sessionStateStore.updateSession(mode) {
+            it.copy(
+                decodedPayload = decoded.decodedPayload,
+                followData = decoded.followData,
+                statusText = status,
+                isCodecBusy = false,
+                encodeProgress = null,
+                encodePhase = null,
+                isEncodeCancelling = false,
+            )
+        }
     }
+
+    private fun applySavedSuccess(
+        itemId: String,
+        decoded: DecodedAudioPayloadResult,
+        status: UiText,
+    ) {
+        uiState.update { state ->
+            val selected =
+                state.selectedSavedAudio
+                    ?.takeIf { it.item.itemId == itemId }
+                    ?: return@update state
+            state.copy(
+                selectedSavedAudio =
+                    selected.copy(
+                        decodedPayload = decoded.decodedPayload,
+                        followData = decoded.followData,
+                    ),
+            )
+        }
+        applyIdleStatus(status)
+    }
+
+    private fun applyValidationFailure(validationIssue: Int) {
+        applyIdleStatus(uiTextMapper.validationIssue(validationIssue))
+    }
+
+    private fun applyIdleStatus(statusText: UiText) {
+        sessionStateStore.updateCurrentSession {
+            it.copy(
+                statusText = statusText,
+                isCodecBusy = false,
+                encodeProgress = null,
+                encodePhase = null,
+                isEncodeCancelling = false,
+            )
+        }
+    }
+
+    private fun decodeStatusText(
+        mode: TransportModeOption,
+        decodedPayload: DecodedPayloadViewData,
+    ): UiText =
+        if (
+            decodedPayload.textDecodeStatusCode == BagDecodeContentCodes.STATUS_INTERNAL_ERROR ||
+            (!decodedPayload.rawPayloadAvailable && !decodedPayload.hasTextResult)
+        ) {
+            uiTextMapper.errorCode(BagApiCodes.ERROR_INTERNAL)
+        } else {
+            UiText.Resource(
+                R.string.status_mode_decode_completed,
+                listOf(mode.wireName),
+            )
+        }
+}
+
+private data class DecodeRequest(
+    val mode: TransportModeOption,
+    val generatedPcm: ShortArray,
+    val sampleRateHz: Int,
+    val frameSamples: Int,
+    val flashPreset: FlashVoicingStyleOption,
+)
+
+private sealed interface DecodeResult {
+    data class ValidationFailure(
+        val validationIssue: Int,
+    ) : DecodeResult
+
+    data class Success(
+        val decoded: DecodedAudioPayloadResult,
+    ) : DecodeResult
 }

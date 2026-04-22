@@ -36,6 +36,10 @@
     <string name="audio_action_clear_result">Limpar texto detectado</string>
     <string name="audio_action_export">Baixar áudio</string>
     <string name="audio_action_open_saved_audio_list">Abrir biblioteca de áudio</string>
+    <string name="audio_decode_source_generated">Origem do resultado: áudio gerado %1$s</string>
+    <string name="audio_decode_source_saved">Origem do resultado: %1$s</string>
+    <string name="audio_decode_busy_reason_generated">Decodificando o áudio gerado atual</string>
+    <string name="audio_decode_busy_reason_saved">Decodificando o áudio salvo selecionado</string>
     <string name="audio_action_randomize_sample_input">Usar outro texto de exemplo</string>
     <string name="audio_action_open_input_editor">Abrir editor de entrada em tela cheia</string>
     <string name="audio_sample_length_short">Curto</string>
@@ -67,6 +71,15 @@
     <string name="audio_player_detail_now_playing">Tocando agora</string>
     <string name="audio_player_detail_decoded_title">Texto detectado</string>
     <string name="audio_player_detail_decoded_empty">Ainda não há texto detectado. Toque em \"Decodificar áudio\" aqui quando precisar.</string>
+    <string name="audio_playback_view_visual">Visual</string>
+    <string name="audio_playback_view_lyrics">Letra</string>
+    <string name="audio_follow_title">Acompanhamento de dados</string>
+    <string name="audio_follow_unavailable">O acompanhamento de dados não está disponível para este áudio no momento.</string>
+    <string name="audio_follow_text_unavailable">O acompanhamento de texto não está disponível para este áudio no momento.</string>
+    <string name="audio_follow_display_lyrics">Letra</string>
+    <string name="audio_follow_display_data">Dados</string>
+    <string name="audio_follow_view_hex">Hex</string>
+    <string name="audio_follow_view_binary">Binário</string>
     <string name="audio_player_detail_saved_info_title">Detalhes do áudio</string>
     <string name="audio_player_detail_saved_mode">Modo</string>
     <string name="audio_player_detail_saved_duration">Duração</string>
@@ -177,6 +190,8 @@
     <string name="config_flash_style_coded_burst_description">Rajadas densas agrupadas para uma sinalização com aparência de máquina.</string>
     <string name="config_flash_style_ritual_chant_label">canto ritual</string>
     <string name="config_flash_style_ritual_chant_description">Fraseado ressonante mais suave para um tom cerimonial de comando.</string>
+    <string name="config_flash_style_deep_ritual_label">rito profundo</string>
+    <string name="config_flash_style_deep_ritual_description">Uma sonoridade solene, mais próxima de uma catedral, com ressonância profunda e ar coral.</string>
     <string name="config_about_title">Sobre</string>
     <string name="config_about_subtitle">Autor, link do projeto e licenças de código aberto</string>
 

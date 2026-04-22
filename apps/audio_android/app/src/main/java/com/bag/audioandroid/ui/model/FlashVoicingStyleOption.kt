@@ -24,6 +24,13 @@ enum class FlashVoicingStyleOption(
         labelResId = R.string.config_flash_style_ritual_chant_label,
         descriptionResId = R.string.config_flash_style_ritual_chant_description,
     ),
+    DeepRitual(
+        id = "deep_ritual",
+        signalProfileValue = 2,
+        voicingFlavorValue = 2,
+        labelResId = R.string.config_flash_style_deep_ritual_label,
+        descriptionResId = R.string.config_flash_style_deep_ritual_description,
+    ),
     ;
 
     companion object {

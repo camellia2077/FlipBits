@@ -2,7 +2,9 @@ package com.bag.audioandroid.ui.state
 
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioEncodePhase
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.UiText
 
@@ -12,7 +14,8 @@ data class ModeAudioSessionState(
     val generatedPcm: ShortArray = shortArrayOf(),
     val generatedAudioMetadata: GeneratedAudioMetadata? = null,
     val generatedFlashVoicingStyle: FlashVoicingStyleOption? = null,
-    val resultText: String = "",
+    val decodedPayload: DecodedPayloadViewData = DecodedPayloadViewData.Empty,
+    val followData: PayloadFollowViewData = PayloadFollowViewData.Empty,
     val statusText: UiText = UiText.Resource(R.string.status_ready_to_encode),
     val isCodecBusy: Boolean = false,
     val encodeProgress: Float? = null,

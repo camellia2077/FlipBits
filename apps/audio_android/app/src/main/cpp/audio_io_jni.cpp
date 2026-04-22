@@ -101,6 +101,9 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata)
             case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT:
                 flash_style_object = env->GetObjectArrayElement(flash_entries, 1);
                 break;
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_DEEP_RITUAL:
+                flash_style_object = env->GetObjectArrayElement(flash_entries, 2);
+                break;
             default:
                 return nullptr;
         }
@@ -193,6 +196,9 @@ audio_io_metadata_flash_voicing_style MapFlashVoicingStyle(JNIEnv* env, jobject 
     }
     if (style_id_text == "ritual_chant") {
         return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT;
+    }
+    if (style_id_text == "deep_ritual") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_DEEP_RITUAL;
     }
     return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
 }

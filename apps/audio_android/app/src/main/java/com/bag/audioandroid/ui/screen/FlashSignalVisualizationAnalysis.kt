@@ -173,6 +173,7 @@ internal fun flashSignalActiveWindowBucketCount(flashVoicingStyle: FlashVoicingS
     // longer scan-head window. Keep coded_burst tighter because it moves fast
     // and reads more clearly as a short 3-bar burst.
     return when (flashVoicingStyle) {
+        FlashVoicingStyleOption.DeepRitual -> 12
         FlashVoicingStyleOption.RitualChant -> 8
         else -> 3
     }

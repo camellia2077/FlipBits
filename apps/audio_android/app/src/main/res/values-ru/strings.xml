@@ -36,6 +36,10 @@
     <string name="audio_action_clear_result">Очистить распознанный текст</string>
     <string name="audio_action_export">Скачать аудио</string>
     <string name="audio_action_open_saved_audio_list">Открыть аудиотеку</string>
+    <string name="audio_decode_source_generated">Источник результата: сгенерированное аудио %1$s</string>
+    <string name="audio_decode_source_saved">Источник результата: %1$s</string>
+    <string name="audio_decode_busy_reason_generated">Идёт декодирование текущего сгенерированного аудио</string>
+    <string name="audio_decode_busy_reason_saved">Идёт декодирование выбранного сохранённого аудио</string>
     <string name="audio_action_randomize_sample_input">Использовать другой пример текста</string>
     <string name="audio_action_open_input_editor">Открыть полноэкранный редактор ввода</string>
     <string name="audio_sample_length_short">Короткий</string>
@@ -67,6 +71,15 @@
     <string name="audio_player_detail_now_playing">Сейчас играет</string>
     <string name="audio_player_detail_decoded_title">Распознанный текст</string>
     <string name="audio_player_detail_decoded_empty">Распознанного текста пока нет. При необходимости нажмите здесь \"Декодировать аудио\".</string>
+    <string name="audio_playback_view_visual">Визуал</string>
+    <string name="audio_playback_view_lyrics">Текст</string>
+    <string name="audio_follow_title">Сопровождение данных</string>
+    <string name="audio_follow_unavailable">Для этого аудио сейчас недоступно сопровождение данных.</string>
+    <string name="audio_follow_text_unavailable">Для этого аудио сейчас недоступно сопровождение текста.</string>
+    <string name="audio_follow_display_lyrics">Текст</string>
+    <string name="audio_follow_display_data">Данные</string>
+    <string name="audio_follow_view_hex">Hex</string>
+    <string name="audio_follow_view_binary">Бинарный</string>
     <string name="audio_player_detail_saved_info_title">Сведения об аудио</string>
     <string name="audio_player_detail_saved_mode">Режим</string>
     <string name="audio_player_detail_saved_duration">Длительность</string>
@@ -173,10 +186,12 @@
     <string name="palette_family_neutrals">Нейтральные</string>
     <string name="config_flash_style_title">Стиль озвучивания flash</string>
     <string name="config_flash_style_subtitle">Выберите, как должно звучать создаваемое flash-аудио.</string>
-    <string name="config_flash_style_coded_burst_label">кодированный импульс</string>
+    <string name="config_flash_style_coded_burst_label">кодовый импульс</string>
     <string name="config_flash_style_coded_burst_description">Плотные сгруппированные импульсы для машиноподобной сигнализации.</string>
     <string name="config_flash_style_ritual_chant_label">ритуальный распев</string>
     <string name="config_flash_style_ritual_chant_description">Более плавная резонансная подача для церемониального командного тона.</string>
+    <string name="config_flash_style_deep_ritual_label">глубокий обряд</string>
+    <string name="config_flash_style_deep_ritual_description">Более торжественное, соборное звучание с глубокой реверберацией и хоровой окраской.</string>
     <string name="config_about_title">О приложении</string>
     <string name="config_about_subtitle">Автор, ссылка на проект и лицензии с открытым исходным кодом</string>
 

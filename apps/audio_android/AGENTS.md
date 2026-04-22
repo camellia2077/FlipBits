@@ -1,48 +1,47 @@
 # apps/audio_android Agent Rules
 
+## First Read
+
 - `apps/audio_android` 是 Android 官方 `Gradle` root。
-- 先读 `apps/audio_android/README.md` 的“快速定位 / 常见改动入口”，再决定是否需要全局 `rg`。
+- 先读 `apps/audio_android/README.md` 的“快速定位 / 常见改动入口”。
+- 如果改动涉及 UI / 配色 / 播放器结构，再按需读：
+  - `docs/design/android/android-player-ui.md`
+  - `docs/design/android/android-dual-tone-theme.md`
+- 如果改动涉及 UI 职责拆分或入口归属，再按需读：
+  - `docs/architecture/android-ui-structure.md`
+
+## Hard Rules
+
 - 优先按职责找入口，不要默认从最大文件开始搜。
-- 常见入口速查：
-  - App 壳层与路由：`ui/AudioAndroidAppShell.kt`
-  - `ViewModel` 总入口：`ui/AudioAndroidViewModel.kt`
-  - 编码/解码/导出：`ui/AudioSessionEncodeActions.kt`、`ui/AudioSessionDecodeActions.kt`、`ui/AudioSessionExportActions.kt`
-  - 播放抽屉：`ui/screen/PlayerDetailSheet.kt`
-  - 播放控制与进度：`ui/screen/AudioPlaybackTransportControls.kt`、`ui/screen/AudioPlaybackProgressSection.kt`
-  - Flash 可视化：`ui/screen/AudioFlashSignalVisualizer.kt`、`ui/screen/FlashSignalVisualizationAnalysis.kt`、`ui/screen/FlashSignalVisualizationDrawing.kt`
-  - PCM 波形：`ui/screen/AudioPcmWaveform.kt`、`ui/screen/AudioPcmWaveformAnalysis.kt`
-  - 数据层：`data/MediaStoreSavedAudioLibraryGateway.kt`、`data/MediaStoreAudioExportGateway.kt`、`data/NativeAudioCodecGateway.kt`、`data/NativeAudioIoGateway.kt`
-  - JNI：`app/src/main/cpp/jni_bridge.cpp`、`app/src/main/cpp/audio_io_jni.cpp`
-  - WAV 元数据：`libs/audio_io/include/wav_io.h`、`libs/audio_io/src/wav_io_bytes_impl.inc`
-  - Palette：`ui/theme/PaletteCatalog.kt`、`ui/theme/PaletteFactory.kt`
-  - 双色主题用色规则：`docs/design/android-dual-tone-theme.md`
-- 修改 `app/src/main/res/values/strings.xml` 中的可见文案时，必须同步检查并更新：
+- 修改可见 XML 文案时，必须同步检查：
+  - `app/src/main/res/values/strings.xml`
   - `app/src/main/res/values-zh/strings.xml`
   - `app/src/main/res/values-ja/strings.xml`
   - `app/src/main/res/values-zh-rTW/strings.xml`
-- 新增 XML 文案 key 时，不允许只落在单一语言目录；基线 `values`、中文 `values-zh`、日语 `values-ja` 需要一起补齐。
-- 如果改动涉及语言切换、随机样例或默认文案，还要同步检查：
+- 新增 XML 文案 key 时，不允许只落在单一语言目录。
+- 改动语言切换、随机样例或默认文案时，还要检查：
   - `data/AndroidSampleInputTextProvider.kt`
   - `ui/SampleInputSessionUpdater.kt`
-- 如果改动涉及保存音频识别，不要再从文件名设计新解析逻辑；优先看 WAV 内嵌 metadata 链路。
-- 如果要修改 Android presentation 版本号，优先改 `apps/audio_android/gradle.properties` 中的 `flipbits.android.versionName` / `flipbits.android.versionCode`；`app/build.gradle.kts` 只负责读取，不再是版本真源。
+- 如果改动涉及保存音频识别，不要再从文件名设计新解析逻辑；优先看 WAV metadata 链路。
+- 如果要修改 Android presentation 版本号，优先改 `apps/audio_android/gradle.properties`。
+
+## Player UI Rules
+
+- Dock 系统颜色必须统一走 `playerDockContainerColor(uiState)`。
+- 播放器 segmented button 必须统一走 `playerSegmentedButtonColors()`。
+- 播放器 transport / chip 等子控件必须优先复用 `playerChromeColors()`。
+- 不要在单个播放器组件里临时手写新的主题色分支，除非同步更新共享 helper。
+
+## Build And Validation
+
 - 编译与测试优先从仓库根目录通过 `python tools/run.py android ...` 执行。
-- 需要自动格式化 Android Kotlin 源码时，优先运行：
-  - `python tools/run.py android ktlint-format`
-  - 注意：这条命令会直接改写 `apps/audio_android/app` 下的 Kotlin 源码
-- 修改 `apps/audio_android` 下的代码后，最小编译验证优先运行：
+- 修改 Android Kotlin 源码后，最小验证优先运行：
   - `python tools/run.py android assemble-debug`
-- 需要做 Android Kotlin 代码质量检查时，优先运行：
+- 修改 `Gradle` / `CMake` / JNI / 依赖接线后，建议运行：
+  - `python tools/run.py android assemble-debug --clean`
+- 需要自动格式化时，优先运行：
+  - `python tools/run.py android ktlint-format`
+- 需要质量检查时，优先运行：
   - `python tools/run.py android ktlint-check`
   - `python tools/run.py android detekt`
   - `python tools/run.py android quality`
-- 修改 Android `Gradle` / `CMake` / JNI / 依赖接线后，建议运行更完整的调试构建验证：
-  - `python tools/run.py android assemble-debug --clean`
-- 需要做 release 构建验证时，运行：
-  - `python tools/run.py android assemble-release`
-- 需要导出 APK 时，优先运行：
-  - `python tools/run.py artifact export-apk`
-  - `python tools/run.py artifact export-apk release`
-- 需要排查 Android 构建失败时，优先运行：
-  - `python tools/run.py android assemble-debug`
-  - 如需更详细 Gradle 日志，再进入 `apps/audio_android` 手动补 `--stacktrace`

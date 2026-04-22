@@ -78,10 +78,20 @@ class AudioAndroidViewModel(
             stopPlayback = playbackActions::stopPlayback,
             refreshSavedAudioItems = libraryActions::refreshSavedAudioItems,
         )
-    private val chromeActions =
-        AudioAndroidChromeActions(
+    private val navigationActions =
+        AudioAndroidNavigationActions(
+            uiState = uiStateFlow,
+        )
+    private val preferencesActions =
+        AudioAndroidPreferencesActions(
             uiState = uiStateFlow,
             sampleInputSessionUpdater = sampleInputSessionUpdater,
+            appSettingsRepository = appSettingsRepository,
+            scope = viewModelScope,
+        )
+    private val preferencesBindings =
+        AudioAndroidPreferencesBindings(
+            uiState = uiStateFlow,
             appSettingsRepository = appSettingsRepository,
             scope = viewModelScope,
         )
@@ -101,78 +111,71 @@ class AudioAndroidViewModel(
                 currentPlaybackSource = AudioPlaybackSource.Generated(it.transportMode),
             )
         }
-        chromeActions.observeSelectedPalette()
-        chromeActions.observeSelectedBrandTheme()
-        chromeActions.observeSelectedThemeStyle()
-        chromeActions.observeSelectedThemeMode()
-        chromeActions.observeConfigLanguageExpanded()
-        chromeActions.observeConfigThemeAppearanceExpanded()
-        chromeActions.observeSelectedFlashVoicingStyle()
-        chromeActions.observeSelectedPlaybackSequenceMode()
+        preferencesBindings.startObserving()
     }
 
     fun onTabSelected(tab: AppTab) {
-        chromeActions.onTabSelected(tab, libraryActions::refreshSavedAudioItems)
+        navigationActions.onTabSelected(tab, libraryActions::refreshSavedAudioItems)
     }
 
     fun onLanguageSelected(language: AppLanguageOption) {
-        chromeActions.onLanguageSelected(language)
+        preferencesActions.onLanguageSelected(language)
     }
 
     fun onOpenAboutPage() {
-        chromeActions.onOpenAboutPage()
+        navigationActions.onOpenAboutPage()
     }
 
     fun onCloseAboutPage() {
-        chromeActions.onCloseAboutPage()
+        navigationActions.onCloseAboutPage()
     }
 
     fun onOpenLicensesPage() {
-        chromeActions.onOpenLicensesPage()
+        navigationActions.onOpenLicensesPage()
     }
 
     fun onCloseLicensesPage() {
-        chromeActions.onCloseLicensesPage()
+        navigationActions.onCloseLicensesPage()
     }
 
     fun onPaletteSelected(palette: PaletteOption) {
-        chromeActions.onPaletteSelected(palette)
+        preferencesActions.onPaletteSelected(palette)
     }
 
     fun onThemeModeSelected(themeMode: ThemeModeOption) {
-        chromeActions.onThemeModeSelected(themeMode)
+        preferencesActions.onThemeModeSelected(themeMode)
     }
 
     fun onThemeStyleSelected(themeStyle: ThemeStyleOption) {
-        chromeActions.onThemeStyleSelected(themeStyle)
+        preferencesActions.onThemeStyleSelected(themeStyle)
     }
 
     fun onBrandThemeSelected(brandTheme: BrandThemeOption) {
-        chromeActions.onBrandThemeSelected(brandTheme)
+        preferencesActions.onBrandThemeSelected(brandTheme)
     }
 
     fun onConfigLanguageExpandedChanged(expanded: Boolean) {
-        chromeActions.onConfigLanguageExpandedChanged(expanded)
+        preferencesActions.onConfigLanguageExpandedChanged(expanded)
     }
 
     fun onConfigThemeAppearanceExpandedChanged(expanded: Boolean) {
-        chromeActions.onConfigThemeAppearanceExpandedChanged(expanded)
+        preferencesActions.onConfigThemeAppearanceExpandedChanged(expanded)
     }
 
     fun onFlashVoicingStyleSelected(style: com.bag.audioandroid.ui.model.FlashVoicingStyleOption) {
-        chromeActions.onFlashVoicingStyleSelected(style)
+        preferencesActions.onFlashVoicingStyleSelected(style)
     }
 
     fun onOpenPlayerDetailSheet() {
-        chromeActions.onOpenPlayerDetailSheet()
+        navigationActions.onOpenPlayerDetailSheet()
     }
 
     fun onClosePlayerDetailSheet() {
-        chromeActions.onClosePlayerDetailSheet()
+        navigationActions.onClosePlayerDetailSheet()
     }
 
     fun onSnackbarMessageShown(messageId: Long) {
-        chromeActions.onSnackbarMessageShown(messageId)
+        navigationActions.onSnackbarMessageShown(messageId)
     }
 
     fun onInputTextChange(value: String) {
@@ -200,7 +203,7 @@ class AudioAndroidViewModel(
     }
 
     fun onPlaybackSequenceModeSelected(mode: PlaybackSequenceMode) {
-        chromeActions.onPlaybackSequenceModeSelected(mode)
+        preferencesActions.onPlaybackSequenceModeSelected(mode)
     }
 
     fun onSkipToPreviousTrack() {
@@ -239,6 +242,10 @@ class AudioAndroidViewModel(
 
     fun onDecode() {
         sessionActions.onDecode()
+    }
+
+    fun ensureCurrentPlaybackDecodedForLyrics() {
+        sessionActions.ensureCurrentPlaybackDecodedForLyrics()
     }
 
     fun onClear() {

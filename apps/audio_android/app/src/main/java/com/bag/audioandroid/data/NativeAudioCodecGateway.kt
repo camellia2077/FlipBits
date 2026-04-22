@@ -4,6 +4,8 @@ import com.bag.audioandroid.NativeBagBridge
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
+import com.bag.audioandroid.domain.DecodedAudioPayloadResult
+import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
 import kotlinx.coroutines.CancellationException
@@ -104,7 +106,7 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): String =
+    ): DecodedAudioPayloadResult =
         NativeBagBridge.nativeDecodeGeneratedPcm(
             pcm,
             sampleRateHz,
@@ -163,9 +165,14 @@ internal fun Long.toStartFailureResultOrNull(): EncodeAudioResult? =
         null
     }
 
-internal fun ShortArray.toEncodeSuccessOrFailureResult(): EncodeAudioResult =
-    if (isEmpty()) {
+internal fun EncodedAudioPayloadResult.toEncodeSuccessOrFailureResult(): EncodeAudioResult =
+    if (pcm.isEmpty()) {
         EncodeAudioResult.Failed(BagApiCodes.ERROR_INTERNAL)
     } else {
-        EncodeAudioResult.Success(this)
+        EncodeAudioResult.Success(
+            pcm = pcm,
+            rawBytesHex = rawBytesHex,
+            rawBitsBinary = rawBitsBinary,
+            followData = followData,
+        )
     }
