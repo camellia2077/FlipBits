@@ -51,17 +51,23 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
     const std::size_t frame_samples =
         config_case.frame_samples > 0 ? static_cast<std::size_t>(config_case.frame_samples) : static_cast<std::size_t>(0);
     const std::size_t payload_samples_per_bit =
-        flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT
-            ? RoundHalfUpFrameScale(config_case.frame_samples, 3, 1)
-            : frame_samples;
+        flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL
+            ? RoundHalfUpFrameScale(config_case.frame_samples, 5, 1)
+            : flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT
+                  ? RoundHalfUpFrameScale(config_case.frame_samples, 3, 1)
+                  : frame_samples;
     const std::size_t leading_nonpayload_samples =
-        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
-            ? frame_samples * static_cast<std::size_t>(16)
-            : frame_samples * static_cast<std::size_t>(3);
+        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL
+            ? frame_samples * static_cast<std::size_t>(24)
+            : flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
+                  ? frame_samples * static_cast<std::size_t>(16)
+                  : frame_samples * static_cast<std::size_t>(3);
     const std::size_t trailing_nonpayload_samples =
-        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
-            ? frame_samples * static_cast<std::size_t>(8)
-            : frame_samples * static_cast<std::size_t>(3);
+        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL
+            ? frame_samples * static_cast<std::size_t>(14)
+            : flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
+                  ? frame_samples * static_cast<std::size_t>(8)
+                  : frame_samples * static_cast<std::size_t>(3);
     return text.size() * static_cast<std::size_t>(8) * payload_samples_per_bit +
            leading_nonpayload_samples +
            trailing_nonpayload_samples;
@@ -77,16 +83,26 @@ DecodeResult DecodeViaApi(const bag_decoder_config& config, const bag_pcm16_resu
     test::AssertEq(push_code, BAG_OK, "PCM push should succeed.");
 
     std::vector<char> text_buffer(4096, '\0');
-    bag_text_result result{};
-    result.buffer = text_buffer.data();
-    result.buffer_size = text_buffer.size();
+    std::vector<char> raw_bytes_hex_buffer(4096, '\0');
+    std::vector<char> raw_bits_binary_buffer(32768, '\0');
+    bag_decode_result result{};
+    result.text_buffer = text_buffer.data();
+    result.text_buffer_size = text_buffer.size();
+    result.raw_bytes_hex_buffer = raw_bytes_hex_buffer.data();
+    result.raw_bytes_hex_buffer_size = raw_bytes_hex_buffer.size();
+    result.raw_bits_binary_buffer = raw_bits_binary_buffer.data();
+    result.raw_bits_binary_buffer_size = raw_bits_binary_buffer.size();
 
-    const auto poll_code = bag_poll_result(decoder, &result);
+    const auto poll_code = bag_poll_decode_result(decoder, &result);
     bag_destroy_decoder(decoder);
 
     DecodeResult out{};
     out.code = poll_code;
     out.text.assign(text_buffer.data(), result.text_size);
+    out.raw_bytes_hex.assign(raw_bytes_hex_buffer.data(), result.raw_bytes_hex_size);
+    out.raw_bits_binary.assign(raw_bits_binary_buffer.data(), result.raw_bits_binary_size);
+    out.text_status = result.text_decode_status;
+    out.raw_payload_available = result.raw_payload_available != 0;
     out.mode = result.mode;
     return out;
 }
@@ -109,16 +125,26 @@ DecodeResult DecodeViaApiInChunks(const bag_decoder_config& config,
     }
 
     std::vector<char> text_buffer(4096, '\0');
-    bag_text_result result{};
-    result.buffer = text_buffer.data();
-    result.buffer_size = text_buffer.size();
+    std::vector<char> raw_bytes_hex_buffer(4096, '\0');
+    std::vector<char> raw_bits_binary_buffer(32768, '\0');
+    bag_decode_result result{};
+    result.text_buffer = text_buffer.data();
+    result.text_buffer_size = text_buffer.size();
+    result.raw_bytes_hex_buffer = raw_bytes_hex_buffer.data();
+    result.raw_bytes_hex_buffer_size = raw_bytes_hex_buffer.size();
+    result.raw_bits_binary_buffer = raw_bits_binary_buffer.data();
+    result.raw_bits_binary_buffer_size = raw_bits_binary_buffer.size();
 
-    const auto poll_code = bag_poll_result(decoder, &result);
+    const auto poll_code = bag_poll_decode_result(decoder, &result);
     bag_destroy_decoder(decoder);
 
     DecodeResult out{};
     out.code = poll_code;
     out.text.assign(text_buffer.data(), result.text_size);
+    out.raw_bytes_hex.assign(raw_bytes_hex_buffer.data(), result.raw_bytes_hex_size);
+    out.raw_bits_binary.assign(raw_bits_binary_buffer.data(), result.raw_bits_binary_size);
+    out.text_status = result.text_decode_status;
+    out.raw_payload_available = result.raw_payload_available != 0;
     out.mode = result.mode;
     return out;
 }

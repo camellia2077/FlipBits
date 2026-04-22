@@ -28,6 +28,13 @@ class PipelineAdapter final : public IPipeline {
     return decoder_->PollTextResult(out_result);
   }
 
+  ErrorCode PollDecodeResult(DecodeResult* out_result) override {
+    if (decoder_ == nullptr) {
+      return ErrorCode::kInvalidArgument;
+    }
+    return decoder_->PollDecodeResult(out_result);
+  }
+
   void Reset() override {
     if (decoder_ != nullptr) {
       decoder_->Reset();

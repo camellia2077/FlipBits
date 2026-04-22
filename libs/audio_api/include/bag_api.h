@@ -24,12 +24,14 @@ typedef enum bag_transport_mode {
 
 typedef enum bag_flash_signal_profile {
   BAG_FLASH_SIGNAL_PROFILE_CODED_BURST = 0,
-  BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT = 1
+  BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT = 1,
+  BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL = 2
 } bag_flash_signal_profile;
 
 typedef enum bag_flash_voicing_flavor {
   BAG_FLASH_VOICING_FLAVOR_CODED_BURST = 0,
-  BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT = 1
+  BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT = 1,
+  BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL = 2
 } bag_flash_voicing_flavor;
 
 typedef enum bag_validation_issue {
@@ -78,10 +80,165 @@ typedef struct bag_text_result {
   bag_transport_mode mode;
 } bag_text_result;
 
+typedef enum bag_decode_content_status {
+  BAG_DECODE_CONTENT_STATUS_OK = 0,
+  BAG_DECODE_CONTENT_STATUS_UNAVAILABLE = 1,
+  BAG_DECODE_CONTENT_STATUS_INVALID_TEXT_PAYLOAD = 2,
+  BAG_DECODE_CONTENT_STATUS_BUFFER_TOO_SMALL = 3,
+  BAG_DECODE_CONTENT_STATUS_INTERNAL_ERROR = 4
+} bag_decode_content_status;
+
+typedef struct bag_payload_follow_byte_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t byte_index;
+} bag_payload_follow_byte_entry;
+
+typedef struct bag_payload_follow_binary_group_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t group_index;
+  size_t bit_offset;
+  size_t bit_count;
+} bag_payload_follow_binary_group_entry;
+
+typedef struct bag_payload_follow_data {
+  bag_payload_follow_byte_entry* byte_timeline_buffer;
+  size_t byte_timeline_buffer_count;
+  size_t byte_timeline_count;
+  bag_decode_content_status byte_timeline_status;
+  bag_payload_follow_binary_group_entry* binary_group_timeline_buffer;
+  size_t binary_group_timeline_buffer_count;
+  size_t binary_group_timeline_count;
+  bag_decode_content_status binary_group_timeline_status;
+  size_t payload_begin_sample;
+  size_t payload_sample_count;
+  size_t total_pcm_sample_count;
+  int available;
+} bag_payload_follow_data;
+
+typedef struct bag_text_follow_token_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t token_index;
+  size_t text_offset;
+  size_t text_size;
+} bag_text_follow_token_entry;
+
+typedef struct bag_text_follow_raw_segment_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t token_index;
+  size_t byte_offset;
+  size_t byte_count;
+} bag_text_follow_raw_segment_entry;
+
+typedef struct bag_text_follow_raw_display_unit_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t token_index;
+  size_t byte_index_within_token;
+  size_t byte_offset;
+  size_t byte_count;
+} bag_text_follow_raw_display_unit_entry;
+
+typedef struct bag_text_follow_lyric_line_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t line_index;
+} bag_text_follow_lyric_line_entry;
+
+typedef struct bag_text_follow_line_token_range_entry {
+  size_t line_index;
+  size_t token_begin_index;
+  size_t token_count;
+} bag_text_follow_line_token_range_entry;
+
+typedef struct bag_text_follow_line_raw_segment_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t line_index;
+  size_t byte_offset;
+  size_t byte_count;
+} bag_text_follow_line_raw_segment_entry;
+
+typedef struct bag_text_follow_data {
+  char* text_tokens_buffer;
+  size_t text_tokens_buffer_size;
+  size_t text_tokens_size;
+  bag_decode_content_status text_tokens_status;
+  bag_text_follow_token_entry* text_token_timeline_buffer;
+  size_t text_token_timeline_buffer_count;
+  size_t text_token_timeline_count;
+  bag_decode_content_status text_token_timeline_status;
+  bag_text_follow_raw_segment_entry* token_raw_segments_buffer;
+  size_t token_raw_segments_buffer_count;
+  size_t token_raw_segments_count;
+  bag_decode_content_status token_raw_segments_status;
+  bag_text_follow_raw_display_unit_entry* token_raw_display_units_buffer;
+  size_t token_raw_display_units_buffer_count;
+  size_t token_raw_display_units_count;
+  bag_decode_content_status token_raw_display_units_status;
+  char* lyric_lines_buffer;
+  size_t lyric_lines_buffer_size;
+  size_t lyric_lines_size;
+  bag_decode_content_status lyric_lines_status;
+  bag_text_follow_lyric_line_entry* lyric_line_timeline_buffer;
+  size_t lyric_line_timeline_buffer_count;
+  size_t lyric_line_timeline_count;
+  bag_decode_content_status lyric_line_timeline_status;
+  bag_text_follow_line_token_range_entry* line_token_ranges_buffer;
+  size_t line_token_ranges_buffer_count;
+  size_t line_token_ranges_count;
+  bag_decode_content_status line_token_ranges_status;
+  bag_text_follow_line_raw_segment_entry* line_raw_segments_buffer;
+  size_t line_raw_segments_buffer_count;
+  size_t line_raw_segments_count;
+  bag_decode_content_status line_raw_segments_status;
+  int available;
+} bag_text_follow_data;
+
+typedef struct bag_decode_result {
+  char* text_buffer;
+  size_t text_buffer_size;
+  size_t text_size;
+  char* raw_bytes_hex_buffer;
+  size_t raw_bytes_hex_buffer_size;
+  size_t raw_bytes_hex_size;
+  char* raw_bits_binary_buffer;
+  size_t raw_bits_binary_buffer_size;
+  size_t raw_bits_binary_size;
+  int complete;
+  float confidence;
+  bag_transport_mode mode;
+  bag_decode_content_status text_decode_status;
+  bag_decode_content_status raw_bytes_hex_status;
+  bag_decode_content_status raw_bits_binary_status;
+  int raw_payload_available;
+  bag_payload_follow_data follow_data;
+  bag_text_follow_data text_follow_data;
+} bag_decode_result;
+
 typedef struct bag_pcm16_result {
   int16_t* samples;
   size_t sample_count;
 } bag_pcm16_result;
+
+typedef struct bag_encode_result {
+  int16_t* samples;
+  size_t sample_count;
+  char* raw_bytes_hex_buffer;
+  size_t raw_bytes_hex_buffer_size;
+  size_t raw_bytes_hex_size;
+  char* raw_bits_binary_buffer;
+  size_t raw_bits_binary_buffer_size;
+  size_t raw_bits_binary_size;
+  bag_decode_content_status raw_bytes_hex_status;
+  bag_decode_content_status raw_bits_binary_status;
+  int raw_payload_available;
+  bag_payload_follow_data follow_data;
+  bag_text_follow_data text_follow_data;
+} bag_encode_result;
 
 typedef enum bag_encode_job_state {
   BAG_ENCODE_JOB_QUEUED = 0,
@@ -117,6 +274,9 @@ const char* bag_error_code_message(bag_error_code code);
 
 bag_error_code bag_encode_text(const bag_encoder_config* config,
                                const char* text, bag_pcm16_result* out_result);
+bag_error_code bag_encode_text_with_follow(const bag_encoder_config* config,
+                                           const char* text,
+                                           bag_encode_result* out_result);
 bag_error_code bag_start_encode_text_job(const bag_encoder_config* config,
                                          const char* text,
                                          bag_encode_job** out_job);
@@ -125,8 +285,11 @@ bag_error_code bag_poll_encode_text_job(const bag_encode_job* job,
 bag_error_code bag_cancel_encode_text_job(bag_encode_job* job);
 bag_error_code bag_take_encode_text_job_result(const bag_encode_job* job,
                                                bag_pcm16_result* out_result);
+bag_error_code bag_take_encode_text_job_result_with_follow(
+    const bag_encode_job* job, bag_encode_result* out_result);
 void bag_destroy_encode_text_job(bag_encode_job* job);
 void bag_free_pcm16_result(bag_pcm16_result* result);
+void bag_free_encode_result(bag_encode_result* result);
 
 bag_error_code bag_create_decoder(const bag_decoder_config* config,
                                   bag_decoder** out_decoder);
@@ -135,6 +298,8 @@ void bag_destroy_decoder(bag_decoder* decoder);
 bag_error_code bag_push_pcm(bag_decoder* decoder, const int16_t* samples,
                             size_t sample_count, int64_t timestamp_ms);
 
+bag_error_code bag_poll_decode_result(bag_decoder* decoder,
+                                      bag_decode_result* out_result);
 bag_error_code bag_poll_result(bag_decoder* decoder,
                                bag_text_result* out_result);
 void bag_reset(bag_decoder* decoder);

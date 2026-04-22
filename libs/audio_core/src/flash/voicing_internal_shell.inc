@@ -40,6 +40,10 @@ double ComputePreamblePhraseMask(size_t local_index, size_t sample_count,
       static_cast<double>(local_index) / static_cast<double>(sample_count);
   double phrased_mask = 1.0;
   switch (style_traits.preamble_cadence_profile) {
+    case FixedShellCadenceProfile::kDeepRitual:
+      phrased_mask =
+          ComputePhraseMask(progress, 0.02, 0.20, 0.30, 0.57, 0.68, 0.96);
+      break;
     case FixedShellCadenceProfile::kRitualChant:
       phrased_mask =
           ComputePhraseMask(progress, 0.03, 0.24, 0.31, 0.59, 0.66, 0.95);
@@ -67,6 +71,10 @@ double ComputeEpiloguePhraseMask(size_t local_index, size_t sample_count,
       static_cast<double>(local_index) / static_cast<double>(sample_count);
   double phrased_mask = 1.0;
   switch (style_traits.epilogue_cadence_profile) {
+    case FixedShellCadenceProfile::kDeepRitual:
+      phrased_mask = std::max(ComputeBurstWindow(progress, 0.06, 0.40),
+                              ComputeBurstWindow(progress, 0.52, 0.96));
+      break;
     case FixedShellCadenceProfile::kRitualChant:
       phrased_mask = std::max(ComputeBurstWindow(progress, 0.08, 0.46),
                               ComputeBurstWindow(progress, 0.56, 0.94));

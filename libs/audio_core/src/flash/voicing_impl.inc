@@ -15,12 +15,31 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
   FlashVoicingConfig voicing{};
   voicing.sample_rate_hz = config.sample_rate_hz;
   switch (NormalizeVoicingFlavor(flavor)) {
+    case FlashVoicingFlavor::kDeepRitual:
+      voicing.attack_ratio = 0.04;
+      voicing.release_ratio = 0.06;
+      voicing.second_harmonic_gain = 0.028;
+      voicing.third_harmonic_gain = 0.004;
+      voicing.boundary_click_gain = 0.006;
+      voicing.enable_preamble = true;
+      voicing.enable_epilogue = true;
+      voicing.preamble_sample_count =
+          config.frame_samples > 0
+              ? static_cast<std::size_t>(config.frame_samples) *
+                    static_cast<std::size_t>(24)
+              : static_cast<std::size_t>(0);
+      voicing.epilogue_sample_count =
+          config.frame_samples > 0
+              ? static_cast<std::size_t>(config.frame_samples) *
+                    static_cast<std::size_t>(14)
+              : static_cast<std::size_t>(0);
+      break;
     case FlashVoicingFlavor::kRitualChant:
       voicing.attack_ratio = 0.05;
       voicing.release_ratio = 0.05;
-      voicing.second_harmonic_gain = 0.05;
-      voicing.third_harmonic_gain = 0.01;
-      voicing.boundary_click_gain = 0.015;
+      voicing.second_harmonic_gain = 0.032;
+      voicing.third_harmonic_gain = 0.004;
+      voicing.boundary_click_gain = 0.008;
       voicing.enable_preamble = true;
       voicing.enable_epilogue = true;
       voicing.preamble_sample_count =
@@ -38,9 +57,9 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
     default:
       voicing.attack_ratio = 0.08;
       voicing.release_ratio = 0.08;
-      voicing.second_harmonic_gain = 0.10;
-      voicing.third_harmonic_gain = 0.03;
-      voicing.boundary_click_gain = 0.02;
+      voicing.second_harmonic_gain = 0.06;
+      voicing.third_harmonic_gain = 0.012;
+      voicing.boundary_click_gain = 0.012;
       voicing.enable_preamble = true;
       voicing.enable_epilogue = true;
       voicing.preamble_sample_count =

@@ -19,6 +19,7 @@ FlashSignalProfile NormalizeFormalSignalProfile(
   switch (signal_profile) {
     case FlashSignalProfile::kCodedBurst:
     case FlashSignalProfile::kRitualChant:
+    case FlashSignalProfile::kDeepRitual:
       return signal_profile;
     default:
       return FlashSignalProfile::kCodedBurst;
@@ -29,6 +30,7 @@ FlashVoicingFlavor NormalizeFormalVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
     case FlashVoicingFlavor::kCodedBurst:
     case FlashVoicingFlavor::kRitualChant:
+    case FlashVoicingFlavor::kDeepRitual:
       return flavor;
     default:
       return FlashVoicingFlavor::kCodedBurst;
@@ -124,34 +126,96 @@ class FlashDecoder final : public ITransportDecoder {
     return ErrorCode::kOk;
   }
 
-  ErrorCode PollTextResult(TextResult* out_result) override {
+  ErrorCode PollDecodeResult(DecodeResult* out_result) override {
     if (out_result == nullptr) {
       return ErrorCode::kInvalidArgument;
     }
     if (!has_pending_result_ || buffered_pcm_.empty()) {
       out_result->text.clear();
+      out_result->raw_payload_bytes.clear();
+      out_result->raw_payload_available = false;
+      out_result->follow_data = PayloadFollowData{};
+      out_result->follow_available = false;
+      out_result->text_follow_data = TextFollowData{};
+      out_result->text_follow_available = false;
       out_result->complete = false;
       out_result->confidence = 0.0f;
       out_result->mode = TransportMode::kFlash;
+      out_result->text_status = DecodeContentStatus::kUnavailable;
       return ErrorCode::kNotReady;
     }
 
-    std::string decoded_text;
-    const ErrorCode decode_code =
-        DecodePcm16ToText(config_, buffered_pcm_, &decoded_text);
-    if (decode_code != ErrorCode::kOk) {
+    try {
+      const FlashSignalProfile normalized_signal_profile =
+          NormalizeFormalSignalProfile(config_.flash_signal_profile);
+      const FlashVoicingFlavor normalized_flavor =
+          NormalizeFormalVoicingFlavor(config_.flash_voicing_flavor);
+      const std::vector<int16_t> trimmed_payload_pcm =
+          TrimFormalPayloadPcmForFlavor(config_, normalized_flavor,
+                                        buffered_pcm_);
+      const std::vector<uint8_t> bytes = DecodePcm16ToBytes(
+          trimmed_payload_pcm,
+          MakeBfskConfigForSignalProfile(config_, normalized_signal_profile));
+      out_result->raw_payload_bytes = bytes;
+      out_result->raw_payload_available = true;
+      out_result->follow_data = BuildPayloadFollowData(config_, bytes);
+      out_result->follow_available = out_result->follow_data.available;
       out_result->text.clear();
+      const ErrorCode text_code = DecodeBytesToText(bytes, &out_result->text);
+      out_result->text_status =
+          text_code == ErrorCode::kOk
+              ? DecodeContentStatus::kOk
+              : DecodeContentStatus::kInvalidTextPayload;
+      if (text_code != ErrorCode::kOk) {
+        out_result->text.clear();
+      }
+      out_result->text_follow_data =
+          text_code == ErrorCode::kOk
+              ? BuildTextFollowData(out_result->follow_data, out_result->text)
+              : TextFollowData{};
+      out_result->text_follow_available =
+          out_result->text_follow_data.available;
+    } catch (...) {
+      out_result->text.clear();
+      out_result->raw_payload_bytes.clear();
+      out_result->raw_payload_available = false;
+      out_result->follow_data = PayloadFollowData{};
+      out_result->follow_available = false;
+      out_result->text_follow_data = TextFollowData{};
+      out_result->text_follow_available = false;
       out_result->complete = false;
       out_result->confidence = 0.0f;
       out_result->mode = TransportMode::kFlash;
+      out_result->text_status = DecodeContentStatus::kInternalError;
       return ErrorCode::kInternal;
     }
 
-    out_result->text = decoded_text;
     out_result->complete = true;
     out_result->confidence = 1.0f;
     out_result->mode = TransportMode::kFlash;
     has_pending_result_ = false;
+    return ErrorCode::kOk;
+  }
+
+  ErrorCode PollTextResult(TextResult* out_result) override {
+    if (out_result == nullptr) {
+      return ErrorCode::kInvalidArgument;
+    }
+
+    DecodeResult decode_result{};
+    const ErrorCode code = PollDecodeResult(&decode_result);
+    if (code != ErrorCode::kOk) {
+      out_result->text.clear();
+      out_result->complete = false;
+      out_result->confidence = 0.0f;
+      out_result->mode = TransportMode::kFlash;
+      return code;
+    }
+
+    out_result->text = decode_result.text;
+    out_result->complete = decode_result.complete;
+    out_result->confidence = decode_result.confidence;
+    out_result->mode = decode_result.mode;
     return ErrorCode::kOk;
   }
 

@@ -7,6 +7,7 @@ module bag.pro.phy_compat;
 import bag.flash.phy_clean;
 import bag.pro.codec;
 import bag.transport.compat.frame_codec;
+import bag.transport.follow;
 
 namespace bag::pro {
 
@@ -29,15 +30,22 @@ class ProCompatDecoder final : public ITransportDecoder {
     return ErrorCode::kOk;
   }
 
-  ErrorCode PollTextResult(TextResult* out_result) override {
+  ErrorCode PollDecodeResult(DecodeResult* out_result) override {
     if (out_result == nullptr) {
       return ErrorCode::kInvalidArgument;
     }
     if (!has_pending_result_ || buffered_pcm_.empty()) {
       out_result->text.clear();
+      out_result->raw_payload_bytes.clear();
+      out_result->raw_payload_available = false;
+      out_result->follow_data = {};
+      out_result->follow_available = false;
+      out_result->text_follow_data = {};
+      out_result->text_follow_available = false;
       out_result->complete = false;
       out_result->confidence = 0.0f;
       out_result->mode = TransportMode::kPro;
+      out_result->text_status = DecodeContentStatus::kUnavailable;
       return ErrorCode::kNotReady;
     }
 
@@ -46,9 +54,16 @@ class ProCompatDecoder final : public ITransportDecoder {
         DecodePcm16ToFrameBytes(config_, buffered_pcm_, &frame_bytes);
     if (frame_bytes_code != ErrorCode::kOk) {
       out_result->text.clear();
+      out_result->raw_payload_bytes.clear();
+      out_result->raw_payload_available = false;
+      out_result->follow_data = {};
+      out_result->follow_available = false;
+      out_result->text_follow_data = {};
+      out_result->text_follow_available = false;
       out_result->complete = false;
       out_result->confidence = 0.0f;
       out_result->mode = TransportMode::kPro;
+      out_result->text_status = DecodeContentStatus::kInternalError;
       return ErrorCode::kInternal;
     }
 
@@ -57,26 +72,68 @@ class ProCompatDecoder final : public ITransportDecoder {
             ErrorCode::kOk ||
         frame.mode != TransportMode::kPro) {
       out_result->text.clear();
+      out_result->raw_payload_bytes.clear();
+      out_result->raw_payload_available = false;
+      out_result->follow_data = {};
+      out_result->follow_available = false;
+      out_result->text_follow_data = {};
+      out_result->text_follow_available = false;
       out_result->complete = false;
       out_result->confidence = 0.0f;
       out_result->mode = TransportMode::kPro;
+      out_result->text_status = DecodeContentStatus::kInternalError;
       return ErrorCode::kInternal;
     }
 
-    std::string text;
-    if (DecodePayloadToText(frame.payload, &text) != ErrorCode::kOk) {
+    out_result->raw_payload_bytes = frame.payload;
+    out_result->raw_payload_available = true;
+    out_result->follow_data = BuildPayloadFollowData(config_, frame.payload);
+    out_result->follow_available = out_result->follow_data.available;
+    out_result->text.clear();
+    if (DecodePayloadToText(frame.payload, &out_result->text) != ErrorCode::kOk) {
+      out_result->text.clear();
+      out_result->text_status = DecodeContentStatus::kInvalidTextPayload;
+      out_result->text_follow_data = {};
+      out_result->text_follow_available = false;
+    } else {
+      out_result->text_status = DecodeContentStatus::kOk;
+      out_result->text_follow_data =
+          BuildTextFollowData(out_result->follow_data, out_result->text);
+      out_result->text_follow_available =
+          out_result->text_follow_data.available;
+    }
+
+    out_result->complete = true;
+    out_result->confidence = 1.0f;
+    out_result->mode = TransportMode::kPro;
+    has_pending_result_ = false;
+    return ErrorCode::kOk;
+  }
+
+  ErrorCode PollTextResult(TextResult* out_result) override {
+    if (out_result == nullptr) {
+      return ErrorCode::kInvalidArgument;
+    }
+    DecodeResult decode_result{};
+    const ErrorCode code = PollDecodeResult(&decode_result);
+    if (code != ErrorCode::kOk) {
+      out_result->text.clear();
+      out_result->complete = false;
+      out_result->confidence = 0.0f;
+      out_result->mode = TransportMode::kPro;
+      return code;
+    }
+    if (decode_result.text_status != DecodeContentStatus::kOk) {
       out_result->text.clear();
       out_result->complete = false;
       out_result->confidence = 0.0f;
       out_result->mode = TransportMode::kPro;
       return ErrorCode::kInternal;
     }
-
-    out_result->text = text;
-    out_result->complete = true;
-    out_result->confidence = 1.0f;
-    out_result->mode = TransportMode::kPro;
-    has_pending_result_ = false;
+    out_result->text = decode_result.text;
+    out_result->complete = decode_result.complete;
+    out_result->confidence = decode_result.confidence;
+    out_result->mode = decode_result.mode;
     return ErrorCode::kOk;
   }
 

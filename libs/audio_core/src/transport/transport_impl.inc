@@ -86,6 +86,47 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
   }
 }
 
+ErrorCode EncodeTextToPcm16WithFollowData(const CoreConfig& config,
+                                          const std::string& text,
+                                          EncodedPcmFollowResult* out_result) {
+  return EncodeTextToPcm16WithFollowData(config, text, out_result, nullptr);
+}
+
+ErrorCode EncodeTextToPcm16WithFollowData(
+    const CoreConfig& config, const std::string& text,
+    EncodedPcmFollowResult* out_result,
+    const EncodeProgressSink* progress_sink) {
+  if (out_result == nullptr) {
+    return ErrorCode::kInvalidArgument;
+  }
+  if (ValidateEncodeRequest(config, text) != TransportValidationIssue::kOk) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  std::vector<std::uint8_t> raw_payload_bytes;
+  ErrorCode payload_code = ErrorCode::kInvalidArgument;
+  switch (config.mode) {
+    case TransportMode::kFlash:
+      payload_code = bag::flash::EncodeTextToBytes(text, &raw_payload_bytes);
+      break;
+    case TransportMode::kPro:
+      payload_code = bag::pro::EncodeTextToPayload(text, &raw_payload_bytes);
+      break;
+    case TransportMode::kUltra:
+      payload_code = bag::ultra::EncodeTextToPayload(text, &raw_payload_bytes);
+      break;
+    default:
+      return ErrorCode::kInvalidArgument;
+  }
+  if (payload_code != ErrorCode::kOk) {
+    return payload_code;
+  }
+
+  out_result->follow_data = BuildPayloadFollowData(config, raw_payload_bytes);
+  out_result->text_follow_data = BuildTextFollowData(out_result->follow_data, text);
+  return EncodeTextToPcm16(config, text, &out_result->pcm, progress_sink);
+}
+
 std::unique_ptr<ITransportDecoder> CreateTransportDecoder(
     const CoreConfig& config) {
   if (ValidateDecoderConfig(config) != TransportValidationIssue::kOk) {

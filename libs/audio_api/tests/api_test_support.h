@@ -13,6 +13,10 @@ namespace api_tests {
 struct DecodeResult {
     bag_error_code code = BAG_INTERNAL;
     std::string text;
+    std::string raw_bytes_hex;
+    std::string raw_bits_binary;
+    bag_decode_content_status text_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+    bool raw_payload_available = false;
     bag_transport_mode mode = BAG_TRANSPORT_FLASH;
 };
 

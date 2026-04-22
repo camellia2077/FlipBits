@@ -18,6 +18,7 @@ set(bag_core_sources
     src/pro/phy_clean.cpp
     src/pro/phy_compat.cpp
     src/transport/compat/frame_codec.cpp
+    src/transport/follow.cpp
     src/transport/transport.cpp
     src/ultra/codec.cpp
     src/ultra/phy_clean.cpp
@@ -56,6 +57,7 @@ target_sources(
             modules/bag/pro/phy_compat.cppm
             modules/bag/transport/decoder.cppm
             modules/bag/transport/compat/frame_codec.cppm
+            modules/bag/transport/follow.cppm
             modules/bag/transport/facade.cppm
             modules/bag/ultra/codec.cppm
             modules/bag/ultra/phy_clean.cppm

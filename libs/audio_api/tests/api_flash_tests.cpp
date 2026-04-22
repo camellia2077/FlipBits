@@ -34,9 +34,22 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_TRANSPORT_FLASH,
                 BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
                 BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+        const auto deep_encoder =
+            MakeEncoderConfig(
+                config_case,
+                BAG_TRANSPORT_FLASH,
+                BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
+                BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL);
+        const auto deep_decoder =
+            MakeDecoderConfig(
+                config_case,
+                BAG_TRANSPORT_FLASH,
+                BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
+                BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL);
 
         bag_pcm16_result coded_pcm{};
         bag_pcm16_result ritual_pcm{};
+        bag_pcm16_result deep_pcm{};
         test::AssertEq(
             bag_encode_text(&coded_encoder, text.c_str(), &coded_pcm),
             BAG_OK,
@@ -45,6 +58,10 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
             bag_encode_text(&ritual_encoder, text.c_str(), &ritual_pcm),
             BAG_OK,
             "ritual_chant flash encode should succeed through the C API.");
+        test::AssertEq(
+            bag_encode_text(&deep_encoder, text.c_str(), &deep_pcm),
+            BAG_OK,
+            "deep_ritual flash encode should succeed through the C API.");
         test::AssertEq(
             coded_pcm.sample_count,
             ExpectedFlashSampleCount(
@@ -64,16 +81,31 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
         test::AssertTrue(
             ritual_pcm.sample_count > coded_pcm.sample_count,
             "ritual_chant flash output should be longer than coded_burst for the same text.");
+        test::AssertEq(
+            deep_pcm.sample_count,
+            ExpectedFlashSampleCount(
+                text,
+                config_case,
+                BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
+                BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL),
+            "deep_ritual C API flash length should include the slowest timing and the longest shell configuration.");
+        test::AssertTrue(
+            deep_pcm.sample_count > ritual_pcm.sample_count,
+            "deep_ritual flash output should be longer than ritual_chant for the same text.");
 
         const auto coded_decoded = DecodeViaApi(coded_decoder, coded_pcm);
         const auto ritual_decoded = DecodeViaApi(ritual_decoder, ritual_pcm);
+        const auto deep_decoded = DecodeViaApi(deep_decoder, deep_pcm);
         test::AssertEq(coded_decoded.code, BAG_OK, "coded_burst flash decode should succeed.");
         test::AssertEq(ritual_decoded.code, BAG_OK, "ritual_chant flash decode should succeed.");
+        test::AssertEq(deep_decoded.code, BAG_OK, "deep_ritual flash decode should succeed.");
         test::AssertEq(coded_decoded.text, text, "coded_burst flash decode should preserve text.");
         test::AssertEq(ritual_decoded.text, text, "ritual_chant flash decode should preserve text.");
+        test::AssertEq(deep_decoded.text, text, "deep_ritual flash decode should preserve text.");
 
         bag_free_pcm16_result(&coded_pcm);
         bag_free_pcm16_result(&ritual_pcm);
+        bag_free_pcm16_result(&deep_pcm);
     }
 }
 

@@ -62,6 +62,9 @@ std::size_t SamplesPerBitForSignalProfile(FlashSignalProfile signal_profile,
   }
 
   switch (signal_profile) {
+    case FlashSignalProfile::kDeepRitual:
+      return static_cast<std::size_t>(config.frame_samples) *
+             static_cast<std::size_t>(5);
     case FlashSignalProfile::kRitualChant:
       return static_cast<std::size_t>(config.frame_samples) *
              static_cast<std::size_t>(3);

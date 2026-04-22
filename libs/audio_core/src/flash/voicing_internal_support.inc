@@ -81,6 +81,7 @@ struct SanitizedVoicingConfig {
 enum class FixedShellCadenceProfile {
   kProtocolHandshake = 0,
   kRitualChant = 1,
+  kDeepRitual = 2,
 };
 
 enum class FixedShellTimbreProfile {
@@ -133,6 +134,7 @@ FlashVoicingFlavor NormalizeVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
     case FlashVoicingFlavor::kCodedBurst:
     case FlashVoicingFlavor::kRitualChant:
+    case FlashVoicingFlavor::kDeepRitual:
       return flavor;
     default:
       return FlashVoicingFlavor::kCodedBurst;
@@ -365,27 +367,57 @@ double ComputeGroupedBurstPattern(size_t local_index, size_t sample_count) {
 
 VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
   switch (NormalizeVoicingFlavor(flavor)) {
+    case FlashVoicingFlavor::kDeepRitual:
+      return VoicingStyleTraits{
+          .nibble_boundary_accent_factor = 0.06,
+          .byte_boundary_click_scale = 0.42,
+          .preamble_grouped_burst_mix = 0.10,
+          .preamble_invocation_shell_mix = 1.26,
+          .epilogue_grouped_burst_mix = 0.08,
+          .epilogue_closure_shell_mix = 1.24,
+          .preamble_rise_ratio = 0.07,
+          .preamble_fall_ratio = 0.12,
+          .epilogue_rise_ratio = 0.05,
+          .epilogue_fall_ratio = 0.15,
+          .epilogue_decay_exponent = 4.8,
+          .payload_release_scale = 1.22,
+          .payload_envelope_floor = 0.20,
+          .metallic_layer_gain_scale = 0.0,
+          .chant_resonance_gain = 0.014,
+          .tremolo_depth_scale = 0.03,
+          .tremolo_freq_hz = 3.9,
+          .spectral_band_mix_scale = 0.10,
+          .spectral_softclip_mix_scale = 0.06,
+          .preamble_cadence_profile = FixedShellCadenceProfile::kDeepRitual,
+          .epilogue_cadence_profile = FixedShellCadenceProfile::kDeepRitual,
+          .preamble_phrase_mask_mix = 1.0,
+          .epilogue_phrase_mask_mix = 1.0,
+          .preamble_terminal_mute_begin = 0.92,
+          .preamble_terminal_mute_end = 1.0,
+          .epilogue_terminal_mute_begin = 0.88,
+          .epilogue_terminal_mute_end = 1.0,
+      };
     case FlashVoicingFlavor::kRitualChant:
       return VoicingStyleTraits{
-          .nibble_boundary_accent_factor = 0.12,
-          .byte_boundary_click_scale = 0.68,
-          .preamble_grouped_burst_mix = 0.26,
-          .preamble_invocation_shell_mix = 1.12,
-          .epilogue_grouped_burst_mix = 0.22,
-          .epilogue_closure_shell_mix = 1.08,
-          .preamble_rise_ratio = 0.09,
-          .preamble_fall_ratio = 0.15,
-          .epilogue_rise_ratio = 0.06,
-          .epilogue_fall_ratio = 0.18,
-          .epilogue_decay_exponent = 3.4,
-          .payload_release_scale = 1.10,
-          .payload_envelope_floor = 0.12,
-          .metallic_layer_gain_scale = 0.18,
-          .chant_resonance_gain = 0.008,
-          .tremolo_depth_scale = 0.15,
-          .tremolo_freq_hz = 5.4,
-          .spectral_band_mix_scale = 0.24,
-          .spectral_softclip_mix_scale = 0.20,
+          .nibble_boundary_accent_factor = 0.08,
+          .byte_boundary_click_scale = 0.46,
+          .preamble_grouped_burst_mix = 0.14,
+          .preamble_invocation_shell_mix = 1.18,
+          .epilogue_grouped_burst_mix = 0.12,
+          .epilogue_closure_shell_mix = 1.14,
+          .preamble_rise_ratio = 0.10,
+          .preamble_fall_ratio = 0.17,
+          .epilogue_rise_ratio = 0.07,
+          .epilogue_fall_ratio = 0.20,
+          .epilogue_decay_exponent = 3.8,
+          .payload_release_scale = 1.16,
+          .payload_envelope_floor = 0.16,
+          .metallic_layer_gain_scale = 0.02,
+          .chant_resonance_gain = 0.012,
+          .tremolo_depth_scale = 0.07,
+          .tremolo_freq_hz = 4.8,
+          .spectral_band_mix_scale = 0.12,
+          .spectral_softclip_mix_scale = 0.08,
           .preamble_cadence_profile = FixedShellCadenceProfile::kRitualChant,
           .epilogue_cadence_profile = FixedShellCadenceProfile::kRitualChant,
           .preamble_phrase_mask_mix = 1.0,
@@ -398,12 +430,12 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
     case FlashVoicingFlavor::kCodedBurst:
     default:
       return VoicingStyleTraits{
-          .nibble_boundary_accent_factor = kNibbleBoundaryAccentFactor,
-          .byte_boundary_click_scale = 1.0,
-          .preamble_grouped_burst_mix = 0.54,
-          .preamble_invocation_shell_mix = 1.10,
-          .epilogue_grouped_burst_mix = 0.50,
-          .epilogue_closure_shell_mix = 1.08,
+          .nibble_boundary_accent_factor = 0.16,
+          .byte_boundary_click_scale = 0.72,
+          .preamble_grouped_burst_mix = 0.46,
+          .preamble_invocation_shell_mix = 1.02,
+          .epilogue_grouped_burst_mix = 0.44,
+          .epilogue_closure_shell_mix = 1.00,
           .preamble_rise_ratio = 0.05,
           .preamble_fall_ratio = 0.24,
           .epilogue_rise_ratio = 0.05,
@@ -411,12 +443,12 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .epilogue_decay_exponent = 5.4,
           .payload_release_scale = 1.0,
           .payload_envelope_floor = 0.0,
-          .metallic_layer_gain_scale = 1.0,
+          .metallic_layer_gain_scale = 0.22,
           .chant_resonance_gain = 0.0,
-          .tremolo_depth_scale = 1.0,
-          .tremolo_freq_hz = kTremoloFreqHz,
-          .spectral_band_mix_scale = 1.0,
-          .spectral_softclip_mix_scale = 1.0,
+          .tremolo_depth_scale = 0.28,
+          .tremolo_freq_hz = 6.2,
+          .spectral_band_mix_scale = 0.42,
+          .spectral_softclip_mix_scale = 0.30,
           .preamble_cadence_profile =
               FixedShellCadenceProfile::kProtocolHandshake,
           .epilogue_cadence_profile =
