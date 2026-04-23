@@ -17,6 +17,7 @@ def register_android_group(subparsers: argparse._SubParsersAction[argparse.Argum
             "- `install-sdk` installs the Android SDK components declared in tooling/build.toml.\n"
             "- Resolves the action to the matching :app Gradle task.\n"
             "- Optionally prepends `clean` before the selected task.\n"
+            "- `assemble-staging` builds a minified, shrink-enabled, debuggable APK for catching release-only issues earlier.\n"
             "- `ktlint-check` / `ktlint-format` / `detekt` provide Kotlin quality tooling for apps/audio_android.\n"
             "- `quality` is the minimal Android Kotlin quality gate: ktlintCheck + detekt.\n"
             "- `modules-smoke` enables the opt-in Android named-modules smoke target for the Phase 3A direct-owner shift.\n"
@@ -29,6 +30,7 @@ def register_android_group(subparsers: argparse._SubParsersAction[argparse.Argum
         choices=[
             "install-sdk",
             "assemble-debug",
+            "assemble-staging",
             "assemble-release",
             "native-debug",
             "modules-smoke",

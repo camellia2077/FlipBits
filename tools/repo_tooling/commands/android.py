@@ -17,6 +17,10 @@ ANDROID_ACTIONS = {
         "tasks": (":app:assembleDebug",),
         "gradle_args": (),
     },
+    "assemble-staging": {
+        "tasks": (":app:assembleStaging",),
+        "gradle_args": (),
+    },
     "assemble-release": {
         "tasks": (":app:assembleRelease",),
         "gradle_args": (),
@@ -54,6 +58,9 @@ RELEASE_SIGNING_PROPERTIES_PATH = ANDROID_GRADLE_ROOT / "app" / "release-signing
 RELEASE_SIGNING_DIRECTORY_PATH = ANDROID_GRADLE_ROOT / "app"
 RELEASE_APK_OUTPUT_PATH = (
     ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "release" / "app-release.apk"
+)
+STAGING_APK_OUTPUT_PATH = (
+    ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "staging" / "app-staging.apk"
 )
 
 
@@ -139,6 +146,11 @@ def _print_release_apk_path_if_present() -> None:
         print(f"Release APK: {RELEASE_APK_OUTPUT_PATH}")
 
 
+def _print_staging_apk_path_if_present() -> None:
+    if STAGING_APK_OUTPUT_PATH.exists():
+        print(f"Staging APK: {STAGING_APK_OUTPUT_PATH}")
+
+
 def cmd_android(args: argparse.Namespace) -> None:
     if args.action == "install-sdk":
         _install_android_sdk_components(accept_licenses=args.accept_licenses)
@@ -155,5 +167,7 @@ def cmd_android(args: argparse.Namespace) -> None:
     command.extend(action["tasks"])
     run(command, cwd=ANDROID_GRADLE_ROOT)
 
+    if args.action == "assemble-staging":
+        _print_staging_apk_path_if_present()
     if args.action == "assemble-release":
         _print_release_apk_path_if_present()

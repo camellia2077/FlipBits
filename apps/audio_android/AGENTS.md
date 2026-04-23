@@ -37,6 +37,12 @@
 - 编译与测试优先从仓库根目录通过 `python tools/run.py android ...` 执行。
 - 修改 Android Kotlin 源码后，最小验证优先运行：
   - `python tools/run.py android assemble-debug`
+- 涉及 JNI / `proguard-rules.pro` / `@Keep` / 反射 / `FindClass` / `GetMethodID` /
+  `NewObject` / 资源收缩 / release-only 崩溃时，不要只验证 debug；默认还要运行：
+  - `python tools/run.py android assemble-staging`
+- 新增会被 native 通过类名、字段名或构造器签名直接访问的 Kotlin/Java DTO 时：
+  - 优先补 `@Keep`
+  - 同步检查 `app/proguard-rules.pro`
 - 修改 `Gradle` / `CMake` / JNI / 依赖接线后，建议运行：
   - `python tools/run.py android assemble-debug --clean`
 - 需要自动格式化时，优先运行：

@@ -111,6 +111,14 @@ android {
                 abiFilters += listOf("x86_64")
             }
         }
+        create("staging") {
+            initWith(getByName("release"))
+            // Staging should behave like release for shrink/minify issues while
+            // still being directly installable and debuggable on local devices.
+            isDebuggable = true
+            isJniDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

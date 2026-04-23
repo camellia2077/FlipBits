@@ -134,6 +134,20 @@
 - UI 设计细则不要继续堆在 `README.md` 或 `AGENTS.md` 里；优先写进 `docs/design/android/`，再由这里做导航。
 - 代码职责、颜色入口、共享 helper 等结构性说明，优先写进 `docs/architecture/`，再由这里做导航。
 
+## Build Variants
+
+- `python tools/run.py android assemble-debug`
+  - 日常开发与基础功能验证入口。
+- `python tools/run.py android assemble-staging`
+  - 面向 release-only 问题排查的本地验证入口。
+  - `staging` 继承 release 的 `minify + shrink` 行为，但保持 `debuggable = true` 并使用 debug 签名，更适合真机安装、连接 Android Studio 和抓日志。
+  - 优先用于排查：
+    - JNI / R8 / `@Keep`
+    - 资源收缩误删
+    - 只在 release-like 构建里出现的闪退
+- `python tools/run.py android assemble-release`
+  - 正式签名与发布产物入口。
+
 ## Release 签名与可更新安装
 
 - Android 能否“直接覆盖安装更新”，关键不在代码逻辑，而在于：
