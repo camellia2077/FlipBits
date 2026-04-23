@@ -1,5 +1,8 @@
 package com.bag.audioandroid.domain
 
+import androidx.annotation.Keep
+
+@Keep
 data class DecodedPayloadViewData(
     val text: String = "",
     val rawBytesHex: String = "",

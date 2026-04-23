@@ -1,11 +1,15 @@
 package com.bag.audioandroid.domain
 
+import androidx.annotation.Keep
+
+@Keep
 data class PayloadFollowByteTimelineEntry(
     val startSample: Int,
     val sampleCount: Int,
     val byteIndex: Int,
 )
 
+@Keep
 data class PayloadFollowBinaryGroupTimelineEntry(
     val startSample: Int,
     val sampleCount: Int,
@@ -14,12 +18,14 @@ data class PayloadFollowBinaryGroupTimelineEntry(
     val bitCount: Int,
 )
 
+@Keep
 data class TextFollowTimelineEntry(
     val startSample: Int,
     val sampleCount: Int,
     val tokenIndex: Int,
 )
 
+@Keep
 data class TextFollowRawSegmentViewData(
     val tokenIndex: Int,
     val startSample: Int,
@@ -30,6 +36,7 @@ data class TextFollowRawSegmentViewData(
     val binaryText: String,
 )
 
+@Keep
 data class TextFollowRawDisplayUnitViewData(
     val tokenIndex: Int,
     val startSample: Int,
@@ -41,18 +48,21 @@ data class TextFollowRawDisplayUnitViewData(
     val binaryText: String,
 )
 
+@Keep
 data class TextFollowLyricLineTimelineEntry(
     val startSample: Int,
     val sampleCount: Int,
     val lineIndex: Int,
 )
 
+@Keep
 data class TextFollowLineTokenRangeViewData(
     val lineIndex: Int,
     val tokenBeginIndex: Int,
     val tokenCount: Int,
 )
 
+@Keep
 data class TextFollowLineRawSegmentViewData(
     val lineIndex: Int,
     val startSample: Int,
@@ -63,6 +73,7 @@ data class TextFollowLineRawSegmentViewData(
     val binaryText: String,
 )
 
+@Keep
 data class PayloadFollowViewData(
     val textTokens: List<String> = emptyList(),
     val textTokenTimeline: List<TextFollowTimelineEntry> = emptyList(),
