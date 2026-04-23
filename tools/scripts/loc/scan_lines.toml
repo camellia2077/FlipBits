@@ -50,6 +50,12 @@ default_over_threshold = 180
 default_under_threshold = 100
 default_dir_over_files = 8
 over_inclusive = false
+default_responsibility_risk_threshold = 5
+responsibility_line_threshold = 180
+responsibility_state_signal_threshold = 4
+responsibility_top_level_composable_threshold = 3
+responsibility_role_kind_threshold = 2
+responsibility_mode_branch_threshold = 2
 
 [py]
 display_name = "Python"
@@ -71,3 +77,9 @@ default_over_threshold = 200
 default_under_threshold = 120
 default_dir_over_files = 10
 over_inclusive = false
+default_responsibility_risk_threshold = 5
+responsibility_line_threshold = 220
+responsibility_state_signal_threshold = 4
+responsibility_top_level_composable_threshold = 6
+responsibility_role_kind_threshold = 2
+responsibility_mode_branch_threshold = 2

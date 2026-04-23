@@ -3,6 +3,10 @@ import os
 from pathlib import Path
 
 from .config import LanguageConfig
+from .responsibility_analyzers import (
+    ResponsibilityRiskResult,
+    create_responsibility_risk_analyzer,
+)
 
 UNDER_SENTINEL = -1
 
@@ -45,6 +49,7 @@ class LocScanService:
     def __init__(self, config: LanguageConfig):
         self.config = config
         self._ignore_dirs_lower = {name.lower() for name in config.ignore_dirs}
+        self._responsibility_risk_analyzer = create_responsibility_risk_analyzer(config)
 
     def analyze_path(
         self,
@@ -112,6 +117,36 @@ class LocScanService:
 
         result_dirs.sort(key=lambda item: item[1], reverse=True)
         return result_dirs
+
+    def analyze_responsibility_risk(
+        self,
+        target_dir: Path,
+        threshold: int,
+    ) -> list[ResponsibilityRiskResult]:
+        if self._responsibility_risk_analyzer is None:
+            raise ValueError(f"职责混杂风险扫描当前不支持语言: {self.config.lang}")
+
+        results: list[ResponsibilityRiskResult] = []
+        for root, dirs, files in os.walk(target_dir):
+            dirs[:] = [name for name in dirs if not self._should_skip_dir(name)]
+            for file_name in files:
+                ext = Path(file_name).suffix.lower()
+                if ext not in self.config.extensions:
+                    continue
+
+                file_path = Path(root) / file_name
+                try:
+                    text = file_path.read_text(encoding="utf-8", errors="ignore")
+                except Exception as error:
+                    print(f"读取文件时发生意外错误 {file_path}: {error}")
+                    continue
+
+                result = self._responsibility_risk_analyzer.analyze_file(file_path, text)
+                if result.score >= threshold:
+                    results.append(result)
+
+        results.sort(key=lambda item: (item.score, item.lines), reverse=True)
+        return results
 
     def _should_skip_dir(self, dir_name: str) -> bool:
         dir_lower = dir_name.lower()

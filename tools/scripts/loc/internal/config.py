@@ -21,6 +21,12 @@ class LanguageConfig:
     default_under_threshold: int
     default_dir_over_files: int
     over_inclusive: bool
+    default_responsibility_risk_threshold: int
+    responsibility_line_threshold: int
+    responsibility_state_signal_threshold: int
+    responsibility_top_level_composable_threshold: int
+    responsibility_role_kind_threshold: int
+    responsibility_mode_branch_threshold: int
 
 
 def load_language_config(config_path: Path, lang: str) -> LanguageConfig:
@@ -57,6 +63,36 @@ def load_language_config(config_path: Path, lang: str) -> LanguageConfig:
         f"{lang}.default_dir_over_files",
     )
     over_inclusive = bool(section.get("over_inclusive", False))
+    default_responsibility_risk_threshold = _as_positive_int_with_default(
+        section.get("default_responsibility_risk_threshold"),
+        f"{lang}.default_responsibility_risk_threshold",
+        default=5,
+    )
+    responsibility_line_threshold = _as_positive_int_with_default(
+        section.get("responsibility_line_threshold"),
+        f"{lang}.responsibility_line_threshold",
+        default=default_over_threshold,
+    )
+    responsibility_state_signal_threshold = _as_positive_int_with_default(
+        section.get("responsibility_state_signal_threshold"),
+        f"{lang}.responsibility_state_signal_threshold",
+        default=4,
+    )
+    responsibility_top_level_composable_threshold = _as_positive_int_with_default(
+        section.get("responsibility_top_level_composable_threshold"),
+        f"{lang}.responsibility_top_level_composable_threshold",
+        default=3,
+    )
+    responsibility_role_kind_threshold = _as_positive_int_with_default(
+        section.get("responsibility_role_kind_threshold"),
+        f"{lang}.responsibility_role_kind_threshold",
+        default=2,
+    )
+    responsibility_mode_branch_threshold = _as_positive_int_with_default(
+        section.get("responsibility_mode_branch_threshold"),
+        f"{lang}.responsibility_mode_branch_threshold",
+        default=2,
+    )
 
     return LanguageConfig(
         lang=lang,
@@ -69,6 +105,12 @@ def load_language_config(config_path: Path, lang: str) -> LanguageConfig:
         default_under_threshold=default_under_threshold,
         default_dir_over_files=default_dir_over_files,
         over_inclusive=over_inclusive,
+        default_responsibility_risk_threshold=default_responsibility_risk_threshold,
+        responsibility_line_threshold=responsibility_line_threshold,
+        responsibility_state_signal_threshold=responsibility_state_signal_threshold,
+        responsibility_top_level_composable_threshold=responsibility_top_level_composable_threshold,
+        responsibility_role_kind_threshold=responsibility_role_kind_threshold,
+        responsibility_mode_branch_threshold=responsibility_mode_branch_threshold,
     )
 
 
@@ -87,3 +129,9 @@ def _as_positive_int(value, field_name: str) -> int:
     if not isinstance(value, int) or value <= 0:
         raise ValueError(f"配置字段必须是正整数: {field_name}")
     return value
+
+
+def _as_positive_int_with_default(value, field_name: str, *, default: int) -> int:
+    if value is None:
+        return default
+    return _as_positive_int(value, field_name)

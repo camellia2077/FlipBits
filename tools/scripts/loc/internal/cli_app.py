@@ -33,6 +33,16 @@ class LocCliApplication:
                 "--dir-max-depth 只能与 --dir-over-files 一起使用。",
                 payload,
             )
+        if args.responsibility_risk and (
+            args.over is not None
+            or args.under is not None
+            or args.threshold is not None
+            or args.dir_over_files is not None
+        ):
+            return self._error(
+                "--responsibility-risk 不能与 over/under/threshold/dir-over-files 混用。",
+                payload,
+            )
 
         try:
             config = load_language_config(config_path=config_path, lang=args.lang)
@@ -43,6 +53,23 @@ class LocCliApplication:
         scan_service = LocScanService(config)
         reporter = LocConsoleReporter(config)
         paths = resolver.resolve_paths(args.paths, config.default_paths, repo_root=repo_root)
+
+        if args.responsibility_risk is not False:
+            threshold = (
+                config.default_responsibility_risk_threshold
+                if args.responsibility_risk is True
+                else int(args.responsibility_risk)
+            )
+            if threshold <= 0:
+                return self._error("--responsibility-risk 阈值必须是正整数。", payload)
+            return self._run_responsibility_scan(
+                payload=payload,
+                paths=paths,
+                threshold=threshold,
+                config=config,
+                scan_service=scan_service,
+                reporter=reporter,
+            )
 
         if args.dir_over_files is not None:
             return self._run_dir_file_scan(args, payload, paths, config, scan_service, reporter)
@@ -138,6 +165,43 @@ class LocCliApplication:
         payload["summary"] = {"matched_dirs": total_matched_dirs}
         return 0, payload
 
+    def _run_responsibility_scan(
+        self,
+        *,
+        payload: dict,
+        paths: list[Path],
+        threshold: int,
+        config: LanguageConfig,
+        scan_service: LocScanService,
+        reporter: LocConsoleReporter,
+    ) -> tuple[int, dict]:
+        reporter.print_responsibility_scan_header(threshold)
+        path_results: list[dict] = []
+        total_matched_files = 0
+
+        if config.lang not in {"kt", "py"}:
+            return self._error(
+                f"--responsibility-risk 当前仅支持 --lang kt 或 --lang py，收到 {config.lang}。",
+                payload,
+            )
+
+        for path in paths:
+            if not path.exists():
+                reporter.print_missing_path(path)
+                path_results.append({"path": str(path), "matched_files": []})
+                continue
+            matched = scan_service.analyze_responsibility_risk(path, threshold)
+            matched_files = [item.to_dict() for item in matched]
+            reporter.print_responsibility_path_result(path, matched_files)
+            total_matched_files += len(matched_files)
+            path_results.append({"path": str(path), "matched_files": matched_files})
+
+        payload["status"] = "ok"
+        payload["scan"] = {"mode": "responsibility_risk", "threshold": threshold}
+        payload["results"] = path_results
+        payload["summary"] = {"matched_files": total_matched_files}
+        return 0, payload
+
     @staticmethod
     def parse_args() -> argparse.Namespace:
         parser = argparse.ArgumentParser(
@@ -195,6 +259,18 @@ class LocCliApplication:
             type=int,
             default=None,
             help="目录扫描最大深度（相对输入根目录；0 仅根目录）。仅与 --dir-over-files 配合使用。",
+        )
+        parser.add_argument(
+            "--responsibility-risk",
+            type=int,
+            nargs="?",
+            const=True,
+            default=False,
+            metavar="N",
+            help=(
+                "扫描语言文件的职责混杂风险（启发式预警，当前支持 --lang kt / --lang py）。"
+                "不传 N 时使用 TOML 中的 default_responsibility_risk_threshold。"
+            ),
         )
         return parser.parse_args()
 

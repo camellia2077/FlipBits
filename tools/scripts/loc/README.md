@@ -19,6 +19,12 @@
   - 扫描 Kotlin 文件行数，默认使用 `kt.default_over_threshold`
 - `tools/scripts/loc/scan_kt_dir_over_files.bat`
   - 扫描 Kotlin 目录内代码文件数，默认使用 `kt.default_dir_over_files`
+- `tools/scripts/loc/scan_kt_responsibility_risk.bat`
+  - 扫描 Kotlin 文件职责混杂风险，默认使用 `kt.default_responsibility_risk_threshold`
+- `tools/scripts/loc/scan_py_responsibility_risk.bat`
+  - 扫描 Python 文件职责混杂风险，默认使用 `py.default_responsibility_risk_threshold`
+- `tools/scripts/loc/scan_py_complexity.bat`
+  - Python 职责混杂/复杂度预警快捷入口，等价于 `scan_py_responsibility_risk.bat`
 - `tools/scripts/loc/scan_py_over.bat`
   - 扫描 Python 文件行数，默认使用 `py.default_over_threshold`
 - `tools/scripts/loc/scan_py_dir_over_files.bat`
@@ -29,7 +35,7 @@
 在仓库根目录执行：
 
 ```powershell
-python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --under [N] | --dir-over-files [N]] [--dir-max-depth N] [--log-file <path>]
+python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --under [N] | --dir-over-files [N] | --responsibility-risk [N]] [--dir-max-depth N] [--log-file <path>]
 ```
 
 参数说明：
@@ -46,6 +52,10 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
   - 扫描目录内代码文件数超过阈值的目录；不传 `N` 时使用 TOML 中该语言的 `default_dir_over_files`
 - `--dir-max-depth N`
   - 目录扫描最大深度，仅对 `--dir-over-files` 生效
+- `--responsibility-risk [N]`
+  - 当前支持 Kotlin / Python 的“职责混杂风险”扫描；不传 `N` 时使用 TOML 中该语言的 `default_responsibility_risk_threshold`
+  - Kotlin 第一版是保守启发式：综合文件行数、`remember* / mutableStateOf / LaunchedEffect`、顶层 `@Composable` 数量、`Section/Block/Card/Switcher/Timeline` 命名种类数，以及模式分支数量
+  - Python 第一版是保守启发式：综合文件行数、状态/副作用信号、顶层 `def/class` 数量、角色命名种类数，以及 `mode/kind/type` 分支数量
 - `-t, --threshold N`
   - 兼容旧参数，等价于 `--over N`
 - `--log-file`
@@ -81,10 +91,12 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
   - `default_over_threshold = 180`
   - `default_under_threshold = 100`
   - `default_dir_over_files = 8`
+  - `default_responsibility_risk_threshold = 5`
 - `py`
   - `default_over_threshold = 200`
   - `default_under_threshold = 120`
   - `default_dir_over_files = 10`
+  - `default_responsibility_risk_threshold = 5`
 
 ## 示例
 
@@ -92,9 +104,15 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
 python tools/scripts/loc/run.py --lang cpp
 python tools/scripts/loc/run.py --lang py --under
 python tools/scripts/loc/run.py --lang kt --dir-over-files --dir-max-depth 2
+python tools/scripts/loc/run.py --lang kt --responsibility-risk
+python tools/scripts/loc/run.py --lang kt --responsibility-risk 7
+python tools/scripts/loc/run.py --lang py --responsibility-risk
 tools\scripts\loc\scan_cpp_over.bat
 tools\scripts\loc\scan_cpp_dir_over_files.bat
 tools\scripts\loc\scan_kt_over.bat
+tools\scripts\loc\scan_kt_responsibility_risk.bat
+tools\scripts\loc\scan_py_responsibility_risk.bat
+tools\scripts\loc\scan_py_complexity.bat
 tools\scripts\loc\scan_py_dir_over_files.bat
 tools\scripts\loc\scan_py_over.bat tools
 ```
