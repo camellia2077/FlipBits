@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,11 @@ internal fun PlayerDetailSheetContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val displaySectionState =
+        rememberPlaybackDisplaySectionState(
+            isFlashMode = miniPlayerModel.isFlashMode,
+            onLyricsRequested = onLyricsRequested,
+        )
 
     Column(
         modifier =
@@ -71,11 +77,11 @@ internal fun PlayerDetailSheetContent(
             flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
             followData = followData,
             isPlaying = isPlaying,
+            displaySectionState = displaySectionState,
             canExportGeneratedAudio = canExportGeneratedAudio,
             onExportGeneratedAudio = onExportGeneratedAudio,
             onShareSavedAudio = onShareSavedAudio,
             savedAudioItem = savedAudioItem,
-            onLyricsRequested = onLyricsRequested,
         )
         PlayerDetailBottomDock(
             modifier = Modifier.fillMaxWidth(),
@@ -112,11 +118,11 @@ private fun PlayerDetailScrollContent(
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
     isPlaying: Boolean,
+    displaySectionState: PlaybackDisplaySectionState,
     canExportGeneratedAudio: Boolean,
     onExportGeneratedAudio: () -> Unit,
     onShareSavedAudio: (() -> Unit)?,
     savedAudioItem: SavedAudioItem?,
-    onLyricsRequested: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -141,7 +147,7 @@ private fun PlayerDetailScrollContent(
             flashVoicingStyle = flashVoicingStyle,
             followData = followData,
             isPlaying = isPlaying,
-            onLyricsRequested = onLyricsRequested,
+            displaySectionState = displaySectionState,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
