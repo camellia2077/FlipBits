@@ -49,6 +49,7 @@ Mode summary:
 
 ### 2. Style & IP
 - **Independent open-source project**: this is an independent, unofficial open-source project and is not affiliated with any film, game, or commercial brand.
+- **No affiliation statement**: this project is an original independent work and is not affiliated with, endorsed by, sponsored by, licensed by, or otherwise associated with Games Workshop or Warhammer 40,000.
 - **Aesthetic references only**: the project's visual and writing style draws from retro-futurism, industrial aesthetics, and ritualized presentation as broad creative influences, without relying on protected setting-specific terminology as its foundation.
 - **Content correction policy**: if any asset, naming, or wording in the repository feels misleading, inappropriate, or legally risky, please report it through [GitHub Issues](../../issues).
 
