@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.screen.AudioTabScreen
@@ -121,6 +122,7 @@ internal fun AudioAndroidMainScaffold(
                     totalTime = totalTime,
                     isPlaying = currentPlayback.isPlaying,
                     playbackSequenceMode = uiState.playbackSequenceMode,
+                    playbackSpeed = uiState.currentPlaybackSpeed,
                     canSkipPrevious = uiState.canSkipPrevious,
                     canSkipNext = uiState.canSkipNext,
                     canExportGeneratedAudio =
@@ -132,6 +134,7 @@ internal fun AudioAndroidMainScaffold(
                     onSkipToPreviousTrack = viewModel::onSkipToPreviousTrack,
                     onSkipToNextTrack = viewModel::onSkipToNextTrack,
                     onPlaybackSequenceModeSelected = viewModel::onPlaybackSequenceModeSelected,
+                    onPlaybackSpeedSelected = viewModel::onPlaybackSpeedSelected,
                     onExportGeneratedAudio = viewModel::onExportAudio,
                     onShareSavedAudio = uiState.currentSavedAudioItem?.let { viewModel::onShareCurrentSavedAudio },
                     onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheet,
@@ -184,8 +187,12 @@ internal fun AudioAndroidMainScaffold(
                     onLanguageExpandedChanged = viewModel::onConfigLanguageExpandedChanged,
                     selectedThemeStyle = uiState.selectedThemeStyle,
                     onThemeStyleSelected = viewModel::onThemeStyleSelected,
-                    selectedBrandTheme = uiState.selectedBrandTheme,
+                    selectedBrandTheme = uiState.activeBrandTheme,
                     onBrandThemeSelected = viewModel::onBrandThemeSelected,
+                    customBrandThemes = uiState.customBrandThemes,
+                    onCustomBrandThemeSaved = viewModel::onCustomBrandThemeSaved,
+                    onCustomBrandThemeDeleted = viewModel::onCustomBrandThemeDeleted,
+                    customBrandThemePresets = uiState.customBrandThemePresets,
                     selectedThemeMode = uiState.selectedThemeMode,
                     onThemeModeSelected = viewModel::onThemeModeSelected,
                     isThemeAppearanceExpanded = uiState.isConfigThemeAppearanceExpanded,
@@ -205,6 +212,7 @@ internal fun AudioAndroidMainScaffold(
 
             AppTab.Audio ->
                 AudioTabScreen(
+                    selectedThemeStyle = uiState.selectedThemeStyle,
                     transportMode = uiState.transportMode,
                     isCodecBusy = uiState.audioTabCodecBusy,
                     encodeProgress = uiState.currentSession.encodeProgress,

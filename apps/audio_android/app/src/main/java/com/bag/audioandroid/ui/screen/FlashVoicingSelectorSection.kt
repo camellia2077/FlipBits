@@ -83,79 +83,13 @@ internal fun FlashVoicingSelectorSection(
         }
         if (expanded) {
             FlashVoicingStyleOption.entries.forEach { option ->
-                val selected = option == selectedFlashVoicingStyle
-                // Keep flash voicing selection visually aligned with Config rows: stronger
-                // container, outline, and selected badge instead of relying on a plain text change.
-                val selectedContainerColor =
-                    if (selected) {
-                        lerp(
-                            accentTokens.selectionLabelAccentTint,
-                            MaterialTheme.colorScheme.surface,
-                            0.82f,
-                        )
-                    } else {
-                        MaterialTheme.colorScheme.surface
-                    }
-                Surface(
-                    color = selectedContainerColor,
-                    tonalElevation = if (selected) 6.dp else 1.dp,
-                    shadowElevation = if (selected) 2.dp else 0.dp,
-                    shape = MaterialTheme.shapes.medium,
-                    border =
-                        if (selected) {
-                            BorderStroke(
-                                width = 2.dp,
-                                color = accentTokens.selectionBorderAccentTint,
-                            )
-                        } else {
-                            null
-                        },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable(enabled = enabled) { onFlashVoicingStyleSelected(option) },
-                ) {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(option.labelResId),
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.weight(1f),
-                        )
-                        if (selected) {
-                            Surface(
-                                color =
-                                    lerp(
-                                        accentTokens.selectionLabelAccentTint,
-                                        MaterialTheme.colorScheme.surface,
-                                        0.78f,
-                                    ),
-                                shape = MaterialTheme.shapes.small,
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        tint = accentTokens.selectionLabelAccentTint,
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.config_palette_selected),
-                                        color = accentTokens.selectionLabelAccentTint,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                SelectionRow(
+                    accentTokens = accentTokens,
+                    label = stringResource(option.labelResId),
+                    selected = option == selectedFlashVoicingStyle,
+                    onClick = { onFlashVoicingStyleSelected(option) },
+                    enabled = enabled,
+                )
             }
         }
     }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Japanese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Japanese. -->
+    <!-- Saved tab strings: file list, import, rename, move, delete, folder actions. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="saved_audio_filter_empty">一致する項目はありません。</string>
+    <string name="library_title">保存済み</string>
+    <string name="library_empty">まだ保存された項目はありません。</string>
+    <string name="library_action_import">インポート</string>
+    <string name="library_action_share">共有</string>
+    <string name="library_action_rename">名前を変更</string>
+    <string name="library_action_delete">削除</string>
+    <string name="library_action_select_all">すべて選択</string>
+    <string name="library_action_clear_selection">選択を解除</string>
+    <string name="library_action_delete_selected">選択した項目を削除</string>
+    <string name="library_selection_count">%1$d個選択済み</string>
+    <string name="library_share_chooser_title">共有</string>
+    <string name="library_rename_title">名前を変更</string>
+    <string name="library_rename_message">%1$s の名前を変更</string>
+    <string name="library_rename_field_label">名前</string>
+    <string name="library_delete_title">削除</string>
+    <string name="library_delete_message">%1$s を削除しますか？</string>
+    <string name="library_delete_selected_title">削除</string>
+    <string name="library_delete_selected_message">選択した %1$d個のファイルを削除しますか？</string>
+    <string name="library_status_deleted">削除しました</string>
+    <string name="library_status_deleted_multiple">%1$d個のオーディオファイルを削除しました</string>
+    <string name="library_status_delete_failed">削除に失敗しました</string>
+    <string name="library_status_delete_partial">%2$d個中 %1$d個のオーディオファイルを削除しました</string>
+    <string name="library_status_renamed">名前を変更しました: %1$s</string>
+    <string name="library_status_rename_duplicate">同じ名前のオーディオファイルが既に存在します</string>
+    <string name="library_status_rename_failed">名前の変更に失敗しました</string>
+    <string name="library_status_share_failed">共有に失敗しました</string>
+    <string name="library_status_imported">インポートしました: %1$s</string>
+    <string name="library_status_import_failed">インポートに失敗しました</string>
+    <string name="library_status_import_unsupported">モノラル PCM16 WAV ファイルのみサポートされています</string>
+    <string name="library_action_new_folder">新しいフォルダ</string>
+    <string name="library_action_move">移動</string>
+    <string name="library_action_move_selected">選択した項目を移動</string>
+    <string name="library_action_rename_folder">フォルダ名を変更</string>
+    <string name="library_action_delete_folder">フォルダを削除</string>
+    <string name="library_folder_uncategorized">未分類</string>
+    <string name="library_folder_name_label">フォルダ名</string>
+    <string name="library_folder_create_title">フォルダを作成</string>
+    <string name="library_folder_rename_title">フォルダ名を変更</string>
+    <string name="library_folder_delete_title">フォルダを削除</string>
+    <string name="library_folder_delete_message">フォルダ %1$s を削除しますか？オーディオファイルはライブラリに残ります。</string>
+    <string name="library_folder_row_label">フォルダ: %1$s</string>
+    <string name="library_move_title">移動</string>
+    <string name="library_move_single_message">%1$s を移動</string>
+    <string name="library_move_multiple_message">%1$d個のファイルを移動</string>
+    <string name="library_status_folder_created">フォルダを作成しました: %1$s</string>
+    <string name="library_status_folder_renamed">フォルダ名を変更しました: %1$s</string>
+    <string name="library_status_folder_deleted">フォルダを削除しました: %1$s</string>
+    <string name="library_status_folder_duplicate">同じ名前のフォルダが既に存在します</string>
+    <string name="library_status_folder_create_failed">フォルダの作成に失敗しました</string>
+    <string name="library_status_folder_rename_failed">フォルダ名の変更に失敗しました</string>
+    <string name="library_status_folder_delete_failed">フォルダの削除に失敗しました</string>
+    <string name="library_status_move_failed">オーディオの移動に失敗しました</string>
+    <string name="library_status_moved_to_folder">%1$d個のファイルを %2$s に移動しました</string>
+    <string name="library_status_moved_to_uncategorized">%1$d個のファイルを未分類に移動しました</string>
+</resources>

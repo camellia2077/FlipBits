@@ -101,6 +101,7 @@ internal class AudioPlaybackCommandActions(
             sourceKey = sourceKey,
             pcm = target.pcm,
             sampleRateHz = target.sampleRateHz,
+            playbackSpeed = target.playbackSpeed,
             startSampleIndex = startedPlayback.playedSamples,
             onStarted = {
                 playbackUiStateSync.updatePlaybackState(target.source) { startedPlayback }

@@ -34,7 +34,16 @@ Code truth:
 ## Player Control Colors
 
 Player controls should not hand-pick theme colors per component.
-Playback UI uses shared helpers so related controls stay aligned across brand dual-tone and Material themes.
+Playback UI uses shared helpers so related controls stay aligned across `dual-tone` and `Material` themes.
+
+Theme-system rule:
+
+- `Material`
+  - player controls may follow the shared single-color `ColorScheme` mapping.
+- `dual-tone`
+  - player controls must start from `BrandThemeCatalog.kt`'s `backgroundColor` / `accentColor` / `outlineColor`.
+  - shared helpers may still read from `MaterialTheme.colorScheme`, but only after those slots have been intentionally mapped from dual-tone visual roles.
+  - do not treat `primaryContainer` / `surfaceVariant` as the player's final dual-tone semantics by default.
 
 Current shared entries:
 
@@ -48,6 +57,17 @@ These should cover:
 - player segmented buttons
 - transport controls
 - current-line raw annotation chip
+
+For current dual-tone mapping:
+
+- dock container
+  - stays on the `backgroundColor` side, with a restrained `accentColor` mix when separation is needed
+- player segmented selected state
+  - uses the `accentColor` lane
+- player segmented idle container
+  - should stay on the `backgroundColor` side instead of drifting into unrelated Material container semantics
+- support-detail rails or inactive tone guides
+  - may use an `outlineColor`-backed support tone when the component is acting as a visualization aid rather than a selected-state chrome
 
 ## Segmented Buttons
 
@@ -68,7 +88,7 @@ Playback transport controls are part of the player chrome, not generic page acti
 
 They should share one color language for:
 
-- accent action
+- `accentColor` action
 - neutral action
 - disabled action
 
@@ -83,7 +103,7 @@ Lyrics mode is player UI, not a generic result card.
 Rules:
 
 - Current-line annotation chip should use player chrome tokens, not its own local theme recipe.
-- Text token highlighting may still use the active playback accent, but should remain visually compatible with the rest of player chrome.
+- Text token highlighting may still use the active playback `accentColor` lane, but should remain visually compatible with the rest of player chrome.
 - Raw browsing that belongs to decode result cards can keep its own UI identity; player follow UI should stay in the player family.
 
 ## Layout Guidance

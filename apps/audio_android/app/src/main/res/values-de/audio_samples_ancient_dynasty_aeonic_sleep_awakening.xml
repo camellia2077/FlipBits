@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <resources>
-
-    <string name="audio_sample_ancient_dynasty_themed_aeonic_ash_stirs">Äonen von Asche zittern über der versiegelten Thronwelt.</string>
-
-    <string name="audio_sample_ancient_dynasty_themed_obsidian_obelisks_rise">Der interstellare Staub löst sich vom toten Planeten, bevor der Himmel den Grund kennt. Ein grünes optisches Auge öffnet sich im Dunkel, dann tausende, geordnet unter vergessenen Zeitaltern. Obsidianobelisken steigen mit der Geduld eines Urteils aus der Kruste. Die jungen Spezies zwischen unseren Sternen nennen sich Nationen, Imperien, Zukunft. Sie sind Emporkömmlinge, die Namen in gestohlenen Boden kratzen. Die wahren Souveräne sind erwacht.</string>
-
+    <string name="audio_sample_ancient_dynasty_themed_aeonic_ash_stirs">Äonenalte Asche bebt über der versiegelten Herrscherwelt.</string>
+    <string name="audio_sample_ancient_dynasty_themed_obsidian_obelisks_rise">Der interstellare Staub löst sich vom toten Planeten, noch bevor der Himmel begreift, warum. Ein smaragdgrünes Auge öffnet sich im Dunkeln, dann zehntausend weitere, aufgereiht unter der Last vergessener Zeitalter. Obsidian-Obelisken erheben sich aus der Kruste mit der Unausweichlichkeit eines Urteils. Die jungen Spezies, die in unseren Sternen nisten, nennen sich Nationen, Imperien, die Zukunft. Sie sind bloße Besetzer, die ihre Namen in gestohlenen Grund ritzen. Die wahren Souveräne sind erwacht.</string>
 </resources>
-

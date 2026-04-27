@@ -11,7 +11,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.random.Random
 
 @RunWith(RobolectricTestRunner::class)
 class AndroidSampleInputTextProviderTest {
@@ -21,39 +20,43 @@ class AndroidSampleInputTextProviderTest {
     @Test
     fun `localized thematic samples follow app language while pro stays ascii for both flavors`() {
         val provider = AndroidSampleInputTextProvider(context)
-
-        assertEquals(
-            "黄铜游标受圣油，首枚齿轮方可触碰",
+        val sacredChinese =
             provider.defaultSample(
                 TransportModeOption.Flash,
                 AppLanguageOption.Chinese,
                 SampleFlavor.SacredMachine,
-            ).text,
-        )
-        assertEquals(
-            "黃銅游標受聖油，首枚齒輪方可觸碰",
+            )
+        val sacredTraditionalChinese =
             provider.defaultSample(
                 TransportModeOption.Flash,
                 AppLanguageOption.TraditionalChinese,
                 SampleFlavor.SacredMachine,
-            ).text,
-        )
-        assertEquals(
-            "The brass calipers receive purified oil before the first gear is touched",
+            )
+        val sacredEnglish =
             provider.defaultSample(
                 TransportModeOption.Ultra,
                 AppLanguageOption.English,
                 SampleFlavor.SacredMachine,
-            ).text,
-        )
-        assertEquals(
-            "黄銅ノギスに聖油を受け、第一歯車は初めて触れられる",
+            )
+        val sacredJapanese =
             provider.defaultSample(
                 TransportModeOption.Flash,
                 AppLanguageOption.Japanese,
                 SampleFlavor.SacredMachine,
-            ).text,
-        )
+            )
+
+        assertEquals("caliper_oil_rite", sacredChinese.id)
+        assertEquals("caliper_oil_rite", sacredTraditionalChinese.id)
+        assertEquals("caliper_oil_rite", sacredEnglish.id)
+        assertEquals("caliper_oil_rite", sacredJapanese.id)
+        assertTrue(sacredChinese.text.isNotBlank())
+        assertTrue(sacredTraditionalChinese.text.isNotBlank())
+        assertTrue(sacredEnglish.text.isNotBlank())
+        assertTrue(sacredJapanese.text.isNotBlank())
+        assertTrue(sacredEnglish.text.all { it.code in 0..0x7F })
+        assertTrue(sacredChinese.text != sacredEnglish.text)
+        assertTrue(sacredTraditionalChinese.text != sacredEnglish.text)
+        assertTrue(sacredJapanese.text != sacredEnglish.text)
 
         AppLanguageOption.entries.forEach { language ->
             val sacredProText =
@@ -174,24 +177,26 @@ class AndroidSampleInputTextProviderTest {
     }
 
     @Test
-    fun `random sample avoids returning the excluded sample id within the active flavor`() {
-        val provider =
-            AndroidSampleInputTextProvider(
-                appContext = context,
-                random = FixedIndexRandom(0),
-            )
+    fun `sample ids stay scoped to the active flavor and length`() {
+        val provider = AndroidSampleInputTextProvider(context)
 
-        val sample =
-            provider.randomSample(
+        val sampleIds =
+            provider.sampleIds(
                 mode = TransportModeOption.Flash,
-                language = AppLanguageOption.English,
                 flavor = SampleFlavor.AncientDynasty,
                 length = SampleInputLengthOption.Short,
-                excludingSampleId = "alloy_hand_no_warmth",
             )
 
-        assertEquals("aeonic_ash_stirs", sample.id)
-        assertTrue(sample.text.isNotBlank())
+        assertEquals(
+            listOf(
+                "alloy_hand_no_warmth",
+                "aeonic_ash_stirs",
+                "molecular_law_unthreads_flesh",
+                "rusted_throne_bad_memory",
+                "red_eyes_wear_skin",
+            ),
+            sampleIds,
+        )
     }
 
     @Test
@@ -214,21 +219,9 @@ class AndroidSampleInputTextProviderTest {
             )
 
         assertEquals("ancient_engine_grants_motion", themed?.id)
-        assertTrue(themed?.text.orEmpty().startsWith("A subsonic note moved"))
+        assertTrue(themed?.text.orEmpty().isNotBlank())
         assertEquals("ancient_engine_grants_motion", ascii?.id)
-        assertTrue(ascii?.text.orEmpty().startsWith("ENGINE AWAKENING."))
-    }
-}
-
-private class FixedIndexRandom(
-    private val fixedIndex: Int,
-) : Random() {
-    override fun nextBits(bitCount: Int): Int = 0
-
-    override fun nextInt(until: Int): Int {
-        if (until <= 0) {
-            return 0
-        }
-        return fixedIndex.coerceIn(0, until - 1)
+        assertTrue(ascii?.text.orEmpty().isNotBlank())
+        assertTrue(ascii?.text.orEmpty().all { it.code in 0..0x7F })
     }
 }

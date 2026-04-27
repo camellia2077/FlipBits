@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 @Composable
 internal fun ProSymbolNibbleStrip(
@@ -22,6 +23,7 @@ internal fun ProSymbolNibbleStrip(
     currentSymbol: ProSymbolExplanation,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Column(
         modifier = modifier.testTag("pro-symbol-nibble-strip"),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -40,9 +42,9 @@ internal fun ProSymbolNibbleStrip(
                     shape = RoundedCornerShape(18.dp),
                     color =
                         if (isActive) {
-                            MaterialTheme.colorScheme.primaryContainer
+                            visualTokens.supportStrongSurfaceColor
                         } else {
-                            MaterialTheme.colorScheme.surfaceVariant
+                            visualTokens.supportSurfaceColor
                         },
                 ) {
                     Column(
@@ -101,10 +103,11 @@ internal fun ProPlaybackGuideCard(
     tokenByteMapping: ProTokenByteMapping,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         modifier = modifier.testTag("pro-playback-guide-card"),
         shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+        color = visualTokens.supportSurfaceColor,
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -166,10 +169,11 @@ private fun ProGuidePill(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
+        color = visualTokens.selectionUnselectedContainerColor,
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),

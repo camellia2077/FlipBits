@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">Отсутствуют настройки.</string>
+    <string name="validation_null_text">Требуется текст для ввода.</string>
+    <string name="validation_null_decoder_output">Отсутствует буфер результата.</string>
+    <string name="validation_invalid_sample_rate">Частота дискретизации должна быть больше 0.</string>
+    <string name="validation_invalid_frame_samples">Размер кадра должен быть больше 0.</string>
+    <string name="validation_invalid_mode">Неподдерживаемый режим передачи.</string>
+    <string name="validation_invalid_flash_signal_profile">Неподдерживаемый профиль flash-сигнала.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Неподдерживаемый стиль flash.</string>
+    <string name="validation_pro_ascii_only">pro поддерживает только ASCII.</string>
+    <string name="validation_payload_too_large">Текст превышает предел 512 байт одного кадра для этого режима.</string>
+    <string name="error_invalid_argument">Недопустимый аргумент.</string>
+    <string name="error_not_ready">Результат ещё не готов.</string>
+    <string name="error_not_implemented">Пока недоступно.</string>
+    <string name="error_cancelled">Операция отменена.</string>
+    <string name="error_internal">Внутренняя ошибка.</string>
+</resources>

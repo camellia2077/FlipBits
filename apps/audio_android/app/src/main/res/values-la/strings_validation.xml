@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">Ritus logicae desunt.</string>
+    <string name="validation_null_text">Sacra data requiruntur.</string>
+    <string name="validation_null_decoder_output">Receptaculum exitus vacuum est.</string>
+    <string name="validation_invalid_sample_rate">Frequentia resonantiae maior quam 0 esse debet.</string>
+    <string name="validation_invalid_frame_samples">Amplitudo matricis maior quam 0 esse debet.</string>
+    <string name="validation_invalid_mode">Via translationis non agnoscitur.</string>
+    <string name="validation_invalid_flash_signal_profile">Signum incognitum est.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Ritus vocis non agnoscitur.</string>
+    <string name="validation_pro_ascii_only">pro cantus ASCII tantum accipit.</string>
+    <string name="validation_payload_too_large">Textus limen 512-byte unius frame huius modi transgreditur.</string>
+    <string name="error_invalid_argument">Heresis syntaxis.</string>
+    <string name="error_not_ready">Calculus nondum perfectus est.</string>
+    <string name="error_not_implemented">Ritualia desunt.</string>
+    <string name="error_cancelled">Processus interrumptus est.</string>
+    <string name="error_internal">Exceptio fatalis.</string>
+</resources>

@@ -44,7 +44,7 @@ internal fun PlaybackFollowLineStrip(
     LazyRow(
         state = listState,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(horizontal = PlaybackLyricsHorizontalPadding, vertical = 8.dp),
         modifier =
             modifier
                 .fillMaxWidth()

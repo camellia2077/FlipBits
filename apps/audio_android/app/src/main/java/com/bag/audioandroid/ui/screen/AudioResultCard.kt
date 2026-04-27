@@ -34,6 +34,8 @@ internal fun AudioResultCard(
     isDecodeBusy: Boolean,
     expanded: Boolean,
     onToggleExpanded: () -> Unit,
+    resultContentExpanded: Boolean,
+    onToggleResultContentExpanded: () -> Unit,
     onDecode: () -> Unit,
     onClearResult: () -> Unit,
     modifier: Modifier = Modifier,
@@ -91,6 +93,8 @@ internal fun AudioResultCard(
                 DecodedPayloadContent(
                     decodedPayload = decodedPayload,
                     emptyTextResId = R.string.audio_result_empty,
+                    bodyExpanded = resultContentExpanded,
+                    onToggleBodyExpanded = onToggleResultContentExpanded,
                 )
             }
             Row(

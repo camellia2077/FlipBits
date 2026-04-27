@@ -39,6 +39,15 @@ object NativeBagBridge {
 
     external fun nativeTakeEncodeTextJobResult(handle: Long): EncodedAudioPayloadResult
 
+    external fun nativeBuildEncodeFollowData(
+        text: String,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): EncodedAudioPayloadResult
+
     external fun nativeCancelEncodeTextJob(handle: Long): Int
 
     external fun nativeDestroyEncodeTextJob(handle: Long)

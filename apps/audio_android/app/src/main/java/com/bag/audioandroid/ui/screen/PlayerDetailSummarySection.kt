@@ -10,7 +10,6 @@ import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.asString
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @Composable
 internal fun PlayerDetailSummarySection(
@@ -111,10 +111,7 @@ private fun HeaderActionButton(
     IconButton(
         onClick = onClick,
         modifier = Modifier.semantics { this.contentDescription = contentDescription },
-        colors =
-            IconButtonDefaults.iconButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            ),
+        colors = utilityActionIconButtonColors(),
     ) {
         icon()
     }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Simplified Chinese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Simplified Chinese. -->
+    <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
+    <!-- These strings are short shared UI labels used across screens. -->
+    <string name="app_name">FlipBits</string>
+    <string name="common_back">返回</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_all">全部</string>
+    <string name="common_unknown">未知</string>
+    <string name="tab_audio">音频</string>
+    <string name="tab_library">已保存</string>
+    <string name="tab_config">设置</string>
+</resources>

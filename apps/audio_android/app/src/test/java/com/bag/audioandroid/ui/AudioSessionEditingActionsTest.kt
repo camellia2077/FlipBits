@@ -11,11 +11,13 @@ import com.bag.audioandroid.ui.state.ModeAudioSessionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.random.Random
 
 class AudioSessionEditingActionsTest {
     @Test
-    fun `randomize sample input replaces current sample without immediate repeats`() {
+    fun `randomize sample input walks the whole shuffled deck before repeating`() {
         val state =
             MutableStateFlow(
                 AudioAppUiState(
@@ -30,15 +32,21 @@ class AudioSessionEditingActionsTest {
                         ),
                 ),
             )
-        val actions = createActions(state, CyclingSampleInputTextProvider())
+        val actions =
+            createActions(
+                state = state,
+                provider = CyclingSampleInputTextProvider(),
+                random = FixedShuffleRandom(),
+            )
 
         actions.onRandomizeSampleInput(SampleInputLengthOption.Short)
-        assertEquals("flash-b", state.value.currentSession.inputText)
-        assertEquals("b", state.value.currentSession.sampleInputId)
+        val firstSeen = state.value.currentSession.sampleInputId
+        assertTrue(firstSeen in setOf("b", "c"))
 
         actions.onRandomizeSampleInput(SampleInputLengthOption.Short)
-        assertEquals("flash-a", state.value.currentSession.inputText)
-        assertEquals("a", state.value.currentSession.sampleInputId)
+        val secondSeen = state.value.currentSession.sampleInputId
+        assertTrue(secondSeen in setOf("b", "c"))
+        assertTrue(firstSeen != secondSeen)
     }
 
     @Test
@@ -57,12 +65,12 @@ class AudioSessionEditingActionsTest {
                         ),
                 ),
             )
-        val actions = createActions(state, LengthAwareSampleInputTextProvider())
+        val actions = createActions(state, LengthAwareSampleInputTextProvider(), FixedShuffleRandom())
 
         actions.onRandomizeSampleInput(SampleInputLengthOption.Long)
 
-        assertEquals("flash-long-a", state.value.currentSession.inputText)
-        assertEquals("long-a", state.value.currentSession.sampleInputId)
+        assertEquals("long-b", state.value.currentSession.sampleInputId)
+        assertEquals("flash-long-b", state.value.currentSession.inputText)
     }
 
     @Test
@@ -92,11 +100,12 @@ class AudioSessionEditingActionsTest {
                         ),
                 ),
             )
-        val actions = createActions(state, CyclingSampleInputTextProvider())
+        val actions = createActions(state, CyclingSampleInputTextProvider(), FixedShuffleRandom())
 
         actions.onInputTextChange("typed by user")
         assertEquals("typed by user", state.value.currentSession.inputText)
         assertNull(state.value.currentSession.sampleInputId)
+        assertNull(state.value.currentSession.sampleShuffleState)
 
         actions.onTransportModeSelected(TransportModeOption.Ultra)
         assertEquals(TransportModeOption.Ultra, state.value.transportMode)
@@ -112,12 +121,14 @@ class AudioSessionEditingActionsTest {
     private fun createActions(
         state: MutableStateFlow<AudioAppUiState>,
         provider: SampleInputTextProvider,
+        random: Random = Random.Default,
     ) = AudioSessionEditingActions(
         uiState = state,
         sessionStateStore = AudioSessionStateStore(state),
         sampleInputTextProvider = provider,
         stopPlayback = {},
         refreshSavedAudioItems = {},
+        random = random,
     )
 
     private fun sessionsWithCurrentFlash(flashSession: ModeAudioSessionState): Map<TransportModeOption, ModeAudioSessionState> =
@@ -133,6 +144,7 @@ private class CyclingSampleInputTextProvider : SampleInputTextProvider {
         listOf(
             SampleInput("a", "flash-a"),
             SampleInput("b", "flash-b"),
+            SampleInput("c", "flash-c"),
         )
     private val proSamples =
         listOf(
@@ -151,13 +163,11 @@ private class CyclingSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): SampleInput = samples(mode).first()
 
-    override fun randomSample(
+    override fun sampleIds(
         mode: TransportModeOption,
-        language: AppLanguageOption,
         flavor: SampleFlavor,
         length: SampleInputLengthOption,
-        excludingSampleId: String?,
-    ): SampleInput = samples(mode).firstOrNull { it.id != excludingSampleId } ?: samples(mode).first()
+    ): List<String> = samples(mode).map(SampleInput::id)
 
     override fun sampleById(
         mode: TransportModeOption,
@@ -192,19 +202,17 @@ private class LengthAwareSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): SampleInput = shortSamples.first()
 
-    override fun randomSample(
+    override fun sampleIds(
         mode: TransportModeOption,
-        language: AppLanguageOption,
         flavor: SampleFlavor,
         length: SampleInputLengthOption,
-        excludingSampleId: String?,
-    ): SampleInput {
+    ): List<String> {
         val samples =
             when (length) {
                 SampleInputLengthOption.Short -> shortSamples
                 SampleInputLengthOption.Long -> longSamples
             }
-        return samples.firstOrNull { it.id != excludingSampleId } ?: samples.first()
+        return samples.map(SampleInput::id)
     }
 
     override fun sampleById(
@@ -213,4 +221,8 @@ private class LengthAwareSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
         sampleId: String,
     ): SampleInput? = (shortSamples + longSamples).firstOrNull { it.id == sampleId }
+}
+
+private class FixedShuffleRandom : Random() {
+    override fun nextBits(bitCount: Int): Int = 0
 }

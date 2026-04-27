@@ -38,6 +38,7 @@ internal fun PlayerDetailDecodedSection(
     modifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
+    var contentExpanded by rememberSaveable { mutableStateOf(true) }
     val accentTokens = appThemeAccentTokens()
 
     Surface(
@@ -106,6 +107,8 @@ internal fun PlayerDetailDecodedSection(
                 DecodedPayloadContent(
                     decodedPayload = decodedPayload,
                     emptyTextResId = R.string.audio_player_detail_decoded_empty,
+                    bodyExpanded = contentExpanded,
+                    onToggleBodyExpanded = { contentExpanded = !contentExpanded },
                 )
             }
         }

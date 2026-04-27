@@ -22,11 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
+import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
 
 @Composable
 internal fun ConfigThemeAppearanceSection(
@@ -34,6 +37,10 @@ internal fun ConfigThemeAppearanceSection(
     onThemeStyleSelected: (ThemeStyleOption) -> Unit,
     selectedBrandTheme: BrandThemeOption,
     onBrandThemeSelected: (BrandThemeOption) -> Unit,
+    customBrandThemes: List<BrandThemeOption>,
+    customBrandThemePresets: List<CustomBrandThemeSettings>,
+    onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
+    onCustomBrandThemeDeleted: (String) -> Unit,
     selectedThemeMode: ThemeModeOption,
     onThemeModeSelected: (ThemeModeOption) -> Unit,
     isExpanded: Boolean,
@@ -104,12 +111,16 @@ internal fun ConfigThemeAppearanceSection(
     var scarletCarnageExpanded by rememberSaveable { mutableStateOf(false) }
     var exquisiteFallExpanded by rememberSaveable { mutableStateOf(false) }
     var labyrinthOfMutabilityExpanded by rememberSaveable { mutableStateOf(false) }
+    var customExpanded by rememberSaveable { mutableStateOf(false) }
+    var showCustomThemeDialog by rememberSaveable { mutableStateOf(false) }
+    var customThemeDialogPresetId by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isBrandStyle, selectedBrandTheme.id, brandThemes) {
         if (!isBrandStyle) {
             return@LaunchedEffect
         }
         when (selectedBrandTheme.groupTitleResId) {
+            R.string.config_dual_tone_group_custom -> customExpanded = true
             R.string.config_dual_tone_group_sacred_machine -> sacredMachineExpanded = true
             R.string.config_dual_tone_group_ancient_dynasty -> ancientDynastyExpanded = true
             R.string.config_dual_tone_group_immortal_rot -> immortalRotExpanded = true
@@ -117,6 +128,33 @@ internal fun ConfigThemeAppearanceSection(
             R.string.config_dual_tone_group_exquisite_fall -> exquisiteFallExpanded = true
             R.string.config_dual_tone_group_labyrinth_of_mutability -> labyrinthOfMutabilityExpanded = true
         }
+    }
+
+    if (showCustomThemeDialog) {
+        val editingSettings =
+            customThemeDialogPresetId?.let { presetId ->
+                customBrandThemePresets.firstOrNull { it.presetId == presetId }
+            }
+        CustomBrandThemeDialog(
+            initialSettings = editingSettings ?: customBrandThemePresets.firstOrNull() ?: DefaultCustomBrandThemeSettings,
+            isCreatingNew = editingSettings == null,
+            canDelete = editingSettings != null && customBrandThemePresets.size > 1,
+            onDismiss = {
+                showCustomThemeDialog = false
+                customThemeDialogPresetId = null
+            },
+            onSave = { settings ->
+                onCustomBrandThemeSaved(settings, customThemeDialogPresetId)
+                showCustomThemeDialog = false
+                customThemeDialogPresetId = null
+            },
+            onDelete = {
+                val presetId = customThemeDialogPresetId ?: return@CustomBrandThemeDialog
+                onCustomBrandThemeDeleted(presetId)
+                showCustomThemeDialog = false
+                customThemeDialogPresetId = null
+            },
+        )
     }
 
     Surface(
@@ -249,6 +287,27 @@ internal fun ConfigThemeAppearanceSection(
                                     .selectableGroup(),
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
+                            BrandThemeSection(
+                                accentTokens = accentTokens,
+                                title = stringResource(R.string.config_dual_tone_group_custom),
+                                options = customBrandThemes,
+                                selectedBrandTheme = selectedBrandTheme,
+                                expanded = customExpanded,
+                                onExpandedChanged = { customExpanded = it },
+                                onBrandThemeSelected = onBrandThemeSelected,
+                                onEditBrandTheme = { option ->
+                                    customThemeDialogPresetId =
+                                        customBrandThemePresets
+                                            .firstOrNull { preset -> option.id == customBrandThemeOptionId(preset.presetId) }
+                                            ?.presetId
+                                    showCustomThemeDialog = true
+                                },
+                                actionLabel = stringResource(R.string.config_custom_brand_theme_add),
+                                onActionClick = {
+                                    customThemeDialogPresetId = null
+                                    showCustomThemeDialog = true
+                                },
+                            )
                             BrandThemeSection(
                                 accentTokens = accentTokens,
                                 title = stringResource(R.string.config_dual_tone_group_sacred_machine),

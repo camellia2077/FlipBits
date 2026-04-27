@@ -4,12 +4,16 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -65,6 +69,59 @@ internal class AudioAndroidPreferencesActions(
         uiState.update { state -> state.withSelectedBrandTheme(brandTheme, sampleInputSessionUpdater) }
         scope.launch {
             appSettingsRepository.setSelectedBrandThemeId(brandTheme.id)
+        }
+    }
+
+    fun onCustomBrandThemeSaved(
+        settings: CustomBrandThemeSettings,
+        replacePresetId: String?,
+    ) {
+        uiState.update { state ->
+            val normalizedSettings =
+                settings.copy(
+                    presetId = replacePresetId ?: UUID.randomUUID().toString(),
+                    displayName = settings.displayName.trim(),
+                )
+            val updatedPresets =
+                if (replacePresetId == null) {
+                    state.customBrandThemePresets + normalizedSettings
+                } else {
+                    state.customBrandThemePresets.map { preset ->
+                        if (preset.presetId == replacePresetId) {
+                            normalizedSettings
+                        } else {
+                            preset
+                        }
+                    }
+                }
+            val updatedState = state.copy(customBrandThemePresets = updatedPresets)
+            updatedState.withSelectedBrandTheme(customBrandTheme(normalizedSettings), sampleInputSessionUpdater)
+        }
+        scope.launch {
+            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
+            appSettingsRepository.setSelectedBrandThemeId(uiState.value.activeBrandTheme.id)
+        }
+    }
+
+    fun onCustomBrandThemeDeleted(presetId: String) {
+        uiState.update { state ->
+            val remainingPresets = state.customBrandThemePresets.filterNot { it.presetId == presetId }
+            if (remainingPresets.isEmpty()) {
+                return@update state
+            }
+
+            val updatedState = state.copy(customBrandThemePresets = remainingPresets)
+            val deletedActiveCustomTheme = state.selectedBrandTheme.id == customBrandThemeOptionId(presetId)
+
+            if (deletedActiveCustomTheme) {
+                updatedState.withSelectedBrandTheme(customBrandTheme(remainingPresets.first()), sampleInputSessionUpdater)
+            } else {
+                updatedState
+            }
+        }
+        scope.launch {
+            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
+            appSettingsRepository.setSelectedBrandThemeId(uiState.value.activeBrandTheme.id)
         }
     }
 

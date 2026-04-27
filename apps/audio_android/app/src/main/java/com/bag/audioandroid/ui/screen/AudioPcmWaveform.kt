@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
@@ -38,6 +39,7 @@ internal fun AudioPcmWaveform(
         return
     }
 
+    val visualTokens = appThemeVisualTokens()
     val density = LocalDensity.current
     val totalSamples = pcm.size.coerceAtLeast(1)
     val visualTransition = rememberInfiniteTransition(label = "pcmWaveform")
@@ -100,7 +102,7 @@ internal fun AudioPcmWaveform(
 
         val primaryColor = MaterialTheme.colorScheme.primary
         val glowColor = MaterialTheme.colorScheme.onPrimaryContainer
-        val baseBackground = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.24f)
+        val baseBackground = visualTokens.visualizationBaseBackgroundColor
         val centerLineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
         val ambientBrush =
             Brush.horizontalGradient(

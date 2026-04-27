@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Simplified Chinese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Simplified Chinese. -->
+    <!-- Validation and error messages shown to users. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="validation_null_config">设置丢失。</string>
+    <string name="validation_null_text">请输入文本。</string>
+    <string name="validation_null_decoder_output">结果数据缺失。</string>
+    <string name="validation_invalid_sample_rate">采样率必须大于 0。</string>
+    <string name="validation_invalid_frame_samples">帧大小必须大于 0。</string>
+    <string name="validation_invalid_mode">不支持的传输模式。</string>
+    <string name="validation_invalid_flash_signal_profile">不支持的 flash 信号配置文件。</string>
+    <!-- CONTEXT: Validation error for an unsupported flash style preset. -->
+    <string name="validation_invalid_flash_voicing_flavor">不支持的 flash 风格。</string>
+    <string name="validation_pro_ascii_only">Pro 仅支持 ASCII 字符。</string>
+    <string name="validation_payload_too_large">输入文本已超过当前模式的 512 字节单帧上限。</string>
+    <string name="error_invalid_argument">参数无效。</string>
+    <!-- CONTEXT: Short user-facing error. Means required result/data is not ready yet. -->
+    <string name="error_not_ready">结果尚未就绪。</string>
+    <string name="error_not_implemented">暂不可用。</string>
+    <string name="error_cancelled">操作已取消。</string>
+    <string name="error_internal">内部错误。</string>
+</resources>

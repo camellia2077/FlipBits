@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CONTEXT: User-facing validation error shown when the native codec/transport call is missing its settings/config object. -->
+    <string name="validation_null_config">Settings are missing.</string>
+    <!-- CONTEXT: User-facing validation error shown when encode/generate is attempted without any input text. -->
+    <string name="validation_null_text">Input text is required.</string>
+    <!-- CONTEXT: User-facing validation error shown when a decode operation was called without a destination/result buffer. -->
+    <string name="validation_null_decoder_output">Result buffer is missing.</string>
+    <!-- CONTEXT: User-facing validation error shown when sample rate is invalid. This refers to audio sample rate, not text samples. -->
+    <string name="validation_invalid_sample_rate">Sample rate must be greater than 0.</string>
+    <!-- CONTEXT: User-facing validation error shown when frame size/samples-per-frame is invalid for audio generation or playback. -->
+    <string name="validation_invalid_frame_samples">Frame size must be greater than 0.</string>
+    <!-- CONTEXT: User-facing validation error shown when the selected transport mode (for example flash/pro/ultra) is unsupported. -->
+    <string name="validation_invalid_mode">Unsupported transport mode.</string>
+    <!-- CONTEXT: User-facing validation error shown when the selected flash signal profile preset is unsupported. -->
+    <string name="validation_invalid_flash_signal_profile">Unsupported flash signal profile.</string>
+    <!-- CONTEXT: User-facing validation error shown when the selected flash style/voicing preset is unsupported. -->
+    <string name="validation_invalid_flash_voicing_flavor">Unsupported flash style.</string>
+    <!-- CONTEXT: User-facing validation error shown when pro mode input contains non-ASCII characters. Keep ASCII uppercase if natural in the target language. -->
+    <string name="validation_pro_ascii_only">Pro supports ASCII only.</string>
+    <!-- CONTEXT: User-facing validation error shown when the input text exceeds this transport mode's payload size limit. -->
+    <string name="validation_payload_too_large">Input text exceeds the 512-byte single-frame limit for this mode.</string>
+    <!-- CONTEXT: Generic short user-facing error for an invalid argument passed into the native/runtime operation. -->
+    <string name="error_invalid_argument">Invalid argument.</string>
+    <!-- CONTEXT: Generic short user-facing error meaning the requested result/data is not ready yet. -->
+    <string name="error_not_ready">Result is not ready.</string>
+    <!-- CONTEXT: Generic short user-facing error meaning the requested capability is not implemented or not available yet. -->
+    <string name="error_not_implemented">Not available yet.</string>
+    <!-- CONTEXT: Generic short user-facing error shown when an operation was cancelled before completion. -->
+    <string name="error_cancelled">Operation cancelled.</string>
+    <!-- CONTEXT: Generic fallback user-facing error for unexpected internal failures. -->
+    <string name="error_internal">Internal error.</string>
+</resources>

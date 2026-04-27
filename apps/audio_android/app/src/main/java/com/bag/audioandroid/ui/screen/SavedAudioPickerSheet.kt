@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 
@@ -75,6 +76,28 @@ internal fun SavedAudioPickerSheet(
                                         "${stringResource(SavedAudioModeFilter.labelResIdForModeWireName(item.modeWireName))} • " +
                                             formatDurationMillis(item.durationMs),
                                 )
+                                // The picker only has one compact metadata line, so keep the
+                                // summary focused on provenance and technical shape: where the
+                                // text came from, what render rate produced the file, and how
+                                // large the encoded payload was.
+                                val savedAudioMetadataSummary =
+                                    buildList {
+                                        item.inputSourceKind?.let { add(stringResource(it.labelResId)) }
+                                        item.sampleRateHz?.takeIf { it > 0 }?.let {
+                                            add(stringResource(R.string.audio_info_sample_rate_value, it))
+                                        }
+                                        item.payloadByteCount?.let {
+                                            add(
+                                                stringResource(
+                                                    R.string.audio_player_detail_saved_payload_bytes_value,
+                                                    it,
+                                                ),
+                                            )
+                                        }
+                                    }.joinToString(separator = " • ")
+                                if (savedAudioMetadataSummary.isNotBlank()) {
+                                    Text(text = savedAudioMetadataSummary)
+                                }
                                 Text(text = formatSavedAudioTime(item.savedAtEpochSeconds))
                             }
                         },
@@ -89,3 +112,10 @@ internal fun SavedAudioPickerSheet(
         }
     }
 }
+
+private val GeneratedAudioInputSourceKind.labelResId: Int
+    get() =
+        when (this) {
+            GeneratedAudioInputSourceKind.Manual -> R.string.audio_generated_input_source_manual
+            GeneratedAudioInputSourceKind.Sample -> R.string.audio_generated_input_source_sample
+        }

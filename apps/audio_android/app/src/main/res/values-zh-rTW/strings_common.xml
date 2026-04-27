@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlipBits</string>
+    <string name="common_back">返回</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_all">全部</string>
+    <string name="common_unknown">未知</string>
+    <string name="tab_audio">音訊</string>
+    <string name="tab_library">已儲存</string>
+    <string name="tab_config">設定</string>
+</resources>

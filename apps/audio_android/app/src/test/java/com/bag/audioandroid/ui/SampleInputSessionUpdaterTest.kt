@@ -9,6 +9,7 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SampleInputSessionUpdaterTest {
@@ -16,7 +17,7 @@ class SampleInputSessionUpdaterTest {
     private val updater = SampleInputSessionUpdater(provider)
 
     @Test
-    fun `initialize uses stable default sample for every mode`() {
+    fun `initialize seeds a shuffled short-sample round for every mode`() {
         val updated =
             updater.initialize(
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
@@ -25,9 +26,13 @@ class SampleInputSessionUpdaterTest {
             )
 
         TransportModeOption.entries.forEach { mode ->
-            val expected = provider.defaultSample(mode, AppLanguageOption.English, SampleFlavor.SacredMachine)
-            assertEquals(expected.text, updated.getValue(mode).inputText)
-            assertEquals(expected.id, updated.getValue(mode).sampleInputId)
+            val session = updated.getValue(mode)
+            assertTrue(session.sampleInputId in setOf("a", "b"))
+            assertTrue(session.inputText.isNotBlank())
+            assertEquals(SampleFlavor.SacredMachine, session.sampleShuffleState?.flavor)
+            assertEquals(SampleInputLengthOption.Short, session.sampleShuffleState?.length)
+            assertEquals(1, session.sampleShuffleState?.nextSampleIndex)
+            assertEquals(session.sampleInputId, session.sampleShuffleState?.lastPresentedSampleId)
         }
     }
 
@@ -68,7 +73,7 @@ class SampleInputSessionUpdaterTest {
     }
 
     @Test
-    fun `flavor change remaps existing sample id but keeps custom text untouched`() {
+    fun `flavor change starts a fresh shuffled round but keeps custom text untouched`() {
         val sessions =
             mapOf(
                 TransportModeOption.Flash to
@@ -95,16 +100,20 @@ class SampleInputSessionUpdaterTest {
                 newFlavor = SampleFlavor.AncientDynasty,
             )
 
-        assertEquals("dynasty-en-b", updated.getValue(TransportModeOption.Flash).inputText)
-        assertEquals("b", updated.getValue(TransportModeOption.Flash).sampleInputId)
+        assertTrue(updated.getValue(TransportModeOption.Flash).sampleInputId in setOf("a", "b"))
+        assertTrue(updated.getValue(TransportModeOption.Flash).inputText.startsWith("dynasty-en-"))
+        assertEquals(SampleFlavor.AncientDynasty, updated.getValue(TransportModeOption.Flash).sampleShuffleState?.flavor)
+        assertEquals(1, updated.getValue(TransportModeOption.Flash).sampleShuffleState?.nextSampleIndex)
         assertEquals("CUSTOM INPUT", updated.getValue(TransportModeOption.Pro).inputText)
         assertNull(updated.getValue(TransportModeOption.Pro).sampleInputId)
-        assertEquals("dynasty-en-a", updated.getValue(TransportModeOption.Ultra).inputText)
-        assertEquals("a", updated.getValue(TransportModeOption.Ultra).sampleInputId)
+        assertTrue(updated.getValue(TransportModeOption.Ultra).sampleInputId in setOf("a", "b"))
+        assertTrue(updated.getValue(TransportModeOption.Ultra).inputText.startsWith("dynasty-en-"))
+        assertEquals(SampleFlavor.AncientDynasty, updated.getValue(TransportModeOption.Ultra).sampleShuffleState?.flavor)
+        assertEquals(1, updated.getValue(TransportModeOption.Ultra).sampleShuffleState?.nextSampleIndex)
     }
 
     @Test
-    fun `flavor change falls back to default sample when old sample id is missing`() {
+    fun `flavor change falls back to a shuffled initial sample when old sample id is missing`() {
         val sessions =
             mapOf(
                 TransportModeOption.Flash to
@@ -131,10 +140,12 @@ class SampleInputSessionUpdaterTest {
                 newFlavor = SampleFlavor.LabyrinthOfMutability,
             )
 
-        assertEquals("labyrinth-en-a", updated.getValue(TransportModeOption.Flash).inputText)
-        assertEquals("a", updated.getValue(TransportModeOption.Flash).sampleInputId)
-        assertEquals("PRO-LABYRINTH-A", updated.getValue(TransportModeOption.Pro).inputText)
-        assertEquals("a", updated.getValue(TransportModeOption.Pro).sampleInputId)
+        assertTrue(updated.getValue(TransportModeOption.Flash).sampleInputId in setOf("a", "b"))
+        assertTrue(updated.getValue(TransportModeOption.Flash).inputText.startsWith("labyrinth-en-"))
+        assertEquals(SampleFlavor.LabyrinthOfMutability, updated.getValue(TransportModeOption.Flash).sampleShuffleState?.flavor)
+        assertTrue(updated.getValue(TransportModeOption.Pro).sampleInputId in setOf("a", "b"))
+        assertTrue(updated.getValue(TransportModeOption.Pro).inputText.startsWith("PRO-LABYRINTH-"))
+        assertEquals(SampleFlavor.LabyrinthOfMutability, updated.getValue(TransportModeOption.Pro).sampleShuffleState?.flavor)
         assertEquals("CUSTOM INPUT", updated.getValue(TransportModeOption.Ultra).inputText)
         assertNull(updated.getValue(TransportModeOption.Ultra).sampleInputId)
     }
@@ -148,13 +159,11 @@ private class UpdaterFakeSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): SampleInput = entries(mode, language, flavor).first()
 
-    override fun randomSample(
+    override fun sampleIds(
         mode: TransportModeOption,
-        language: AppLanguageOption,
         flavor: SampleFlavor,
         length: SampleInputLengthOption,
-        excludingSampleId: String?,
-    ): SampleInput = entries(mode, language, flavor).first { it.id != excludingSampleId }
+    ): List<String> = entries(mode, AppLanguageOption.English, flavor).map(SampleInput::id)
 
     override fun sampleById(
         mode: TransportModeOption,

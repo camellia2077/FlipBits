@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_immortal_rot_themed_mushrooms_from_empty_eyes">텅 빈 눈에서 화사한 버섯이 고마운 봄날처럼 싹을 틔웁니다</string>
-    <string name="audio_sample_immortal_rot_ascii_mushrooms_from_empty_eyes">BRIGHT MUSHROOMS RISE FROM EMPTY EYES</string>
-    <string name="audio_sample_immortal_rot_themed_harvest_beneath_the_flowers">쓰러진 들판이 얼마나 너그러워졌는지요. 안개 속으로 황록색 포자가 굴러다니고, 통통한 하얀 구더기가 흙을 일구며, 거대한 점균류는 심장을 빌린 듯 꽃 아래에서 부드럽게 고동칩니다. 향기로운 꽃 아래에는 더 이상 낭비되지도, 외롭지도 않은 옛 신체들이 누워 있습니다. 모든 갈비뼈는 요람이 되고, 모든 상처는 씨앗의 침대가 되며, 모든 조용한 병사는 수백만 소생들의 만찬이 되었습니다.</string>
-    <string name="audio_sample_immortal_rot_ascii_harvest_beneath_the_flowers">FALLEN FIELD REPORT. SPORES ROLL THROUGH MIST. GRUBS TURN THE SOIL. EVERY RIB IS A CRADLE. EVERY WOUND IS A SEEDBED. THE FEAST OPENS FOR SMALLER LIVES.</string>
+    <string name="audio_sample_immortal_rot_themed_mushrooms_from_empty_eyes">텅 빈 눈동자에서 반가운 봄처럼 화사한 버섯이 피어납니다.</string>
+    <string name="audio_sample_immortal_rot_themed_harvest_beneath_the_flowers">죽음이 휩쓸고 간 들판은 참으로 관대해졌습니다. 안개 속으로 황록색 포자가 일렁이고, 살찐 하얀 구더기들이 흙을 일구며, 거대한 점균류가 마치 빌려온 심장처럼 꽃들 아래서 부드럽게 고동칩니다. 달콤한 꽃송이들 밑에는 더 이상 버려지지도, 외롭지도 않은 오래된 유해들이 누워 있습니다. 모든 갈비뼈는 요람이 되고, 모든 상처는 모종판이 되며, 말 없는 병사들은 수백만 작은 생명들을 위한 성찬이 됩니다.</string>
 </resources>

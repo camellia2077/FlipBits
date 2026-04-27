@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="config_title">Ritus Logicae</string>
+    <string name="config_language_title">Lingua Sancta</string>
+    <string name="config_language_subtitle">Linguam applicationis sacrae confirma</string>
+    <string name="config_language_follow_system">Sequere systema</string>
+    <string name="config_language_chinese">简体中文</string>
+    <string name="config_language_traditional_chinese">繁體中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_ukrainian">Українська</string>
+    <string name="config_language_korean">한국어</string>
+    <string name="config_language_french">Français</string>
+    <string name="config_language_italian">Italiano</string>
+    <string name="config_language_polish">Polski</string>
+    <string name="config_language_high_gothic">Lingua Sacra</string>
+    <string name="config_language_expand">Expande ritum linguae sanctae</string>
+    <string name="config_language_collapse">Contrahe ritum linguae sanctae</string>
+    <string name="config_theme_mode_title">Ritus thematis</string>
+    <string name="config_theme_mode_subtitle">Modum systematis, lucis aut tenebrarum elige.</string>
+    <string name="config_theme_mode_brand_fixed">Themata Duo-tone sigillum rite fixum tenent.</string>
+    <string name="config_theme_mode_follow_system">Sequere systema</string>
+    <string name="config_theme_mode_light">Lux</string>
+    <string name="config_theme_mode_dark">Umbra</string>
+    <string name="config_theme_appearance_title">Species thematis</string>
+    <string name="config_theme_style_title">Stilus thematis</string>
+    <string name="config_theme_style_subtitle">Material aut Dual-tone elige.</string>
+    <string name="config_theme_style_material">Material</string>
+    <string name="config_theme_style_brand_dual_tone">Duo-tone (Sanctum)</string>
+    <string name="config_theme_appearance_expand">Expande speciem thematis</string>
+    <string name="config_theme_appearance_collapse">Contrahe speciem thematis</string>
+    <string name="config_palette_title">Palettae coloris</string>
+    <string name="config_palette_selected">Electa</string>
+    <string name="config_palette_expand">Expande palettas</string>
+    <string name="config_palette_collapse">Contrahe palettas</string>
+    <string name="config_brand_theme_title">Themata Dual-tone</string>
+    <string name="config_brand_theme_description">Quodque thema Dual-tone vultum fixum servat cum praeviso duorum colorum.</string>
+    <string name="config_dual_tone_group_sacred_machine">Apparatus Sacer</string>
+    <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
+    <string name="config_dual_tone_group_custom">Ritus Proprius</string>
+    <string name="config_dual_tone_group_ancient_dynasty">Aeternitas Sepulcralis</string>
+    <string name="config_dual_tone_group_immortal_rot">Tabes Aeterna</string>
+    <string name="config_dual_tone_group_scarlet_carnage">Cruor Infernus</string>
+    <string name="config_dual_tone_group_exquisite_fall">Luxuria Perditionis</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">Labyrinthus Aenigmatis</string>
+    <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_reds_pinks">Rubra et rosea</string>
+    <string name="palette_family_oranges">Aurantia</string>
+    <string name="palette_family_yellows">Flava</string>
+    <string name="palette_family_greens">Viridia</string>
+    <string name="palette_family_cyans_blues">Cyanea et caerulea</string>
+    <string name="palette_family_purples_magentas">Purpurea et magenta</string>
+    <string name="palette_family_neutrals">Neutra</string>
+    <string name="config_flash_style_title">Ritus Vocis</string>
+    <string name="config_flash_style_subtitle">Confirma quomodo vox resonare debeat.</string>
+    <string name="config_flash_style_coded_burst_label">Impulsus sigillatus</string>
+    <string name="config_flash_style_coded_burst_description">Impulsus densi et coniuncti ad signum machinale.</string>
+    <string name="config_flash_style_ritual_chant_label">Cantus ritualis</string>
+    <string name="config_flash_style_ritual_chant_description">Dictio lenior et resonans ad sonum imperii caerimonialis.</string>
+    <string name="config_flash_style_deep_ritual_label">Ritus profundus</string>
+    <string name="config_flash_style_deep_ritual_description">Dictio cathedralis caerimonialis cum resonantia profundiore et velamine chorali solenni.</string>
+    <string name="config_about_title">Apocrypha</string>
+    <string name="config_about_subtitle">Auctor, nexus consilii et licentiae sacrae</string>
+    <string name="palette_ruby_title">Rubrum Rubini</string>
+    <string name="palette_mars_relic_title">Reliquia Martis</string>
+    <string name="brand_theme_mars_relic_title">Reliquia Martis</string>
+    <string name="brand_theme_mars_relic_description">Rubrum profundum cum pergameno ad speciem archivi caerimonialis.</string>
+    <string name="brand_theme_mars_relic_accessibility">Thema Reliquia Martis, rubrum profundum cum begeo pergameni.</string>
+    <string name="brand_theme_black_crimson_rite_title">Ritus Nigro-Coccineus</string>
+    <string name="brand_theme_black_crimson_rite_description">Nigrum fuliginis et coccineum rituale ad animum severum fanorum machinalium.</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">Thema Ritus Nigro-Coccineus, paene nigrum cum rubro coccineo vivido.</string>
+    <string name="brand_theme_scarlet_guard_title">Custodia Coccinea</string>
+    <string name="brand_theme_scarlet_guard_description">Album eburneum et coccineum sigillatum ad sonum heraldicum disciplinae.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Thema Custodia Coccinea, eburneum lucidum cum rubro coccineo obscuro.</string>
+    <string name="brand_theme_dynasty_revival_title">Reditus Aeternus</string>
+    <string name="brand_theme_dynasty_revival_description">Metallum sepulcrale et lux smaragdina pro nucleo aeternitatis experrectae.</string>
+    <string name="brand_theme_dynasty_revival_accessibility">Thema Renovatio Dynastiae, nigrum sepulcrale profundum cum viridi reactoris claro.</string>
+    <string name="brand_theme_sepulcher_cyan_title">Sepulcrum Cyaneum</string>
+    <string name="brand_theme_sepulcher_cyan_description">Chalybs cryptae et aura cyanea ad majestatem machinae dormientis.</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">Thema Cyanum Sepulcri, chalybs obscurus frigidus cum cyaneo viridi mitigato.</string>
+    <string name="brand_theme_tomb_sigil_title">Sigillum Sepulcri</string>
+    <string name="brand_theme_tomb_sigil_description">Ferrum cryptae et viride reditus pro nota caerimoniali aeternitatis.</string>
+    <string name="brand_theme_tomb_sigil_accessibility">Thema Sigillum Tumuli, ferrum cryptae obscurum cum viridi reditus vivido.</string>
+    <string name="brand_theme_ancient_alloy_title">Metallum Aeternum</string>
+    <string name="brand_theme_ancient_alloy_description">Umbrae metalli inexorabilis et lux turchesia pro fornace sepulcrali.</string>
+    <string name="brand_theme_ancient_alloy_accessibility">Thema Alligatio Antiqua, griseo-aeneum obscurum cum turcese claro.</string>
+    <string name="brand_theme_immortal_rot_title">Tabes Aeterna</string>
+    <string name="brand_theme_immortal_rot_description">Viride filicis et flavum citrinum palettam Dual-tone humidam atque obrutam creant.</string>
+    <string name="brand_theme_immortal_rot_accessibility">Thema Putredo Immortalis, viride filicis cum flavo citrino.</string>
+    <string name="brand_theme_scarlet_carnage_title">Cruor Infernus</string>
+    <string name="brand_theme_scarlet_carnage_description">Rubrum obscurum et aurichalcum palettam Dual-tone crudelem sanguinis atque metalli belli fingunt.</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">Thema Strages Coccinea, rubrum obscurum cum aurichalco aureo obscuro.</string>
+    <string name="brand_theme_exquisite_fall_title">Luxuria Perditionis</string>
+    <string name="brand_theme_exquisite_fall_description">Purpureum valde obscurum et roseum clamans palettam Dual-tone luxuriantem vanitatis et sensus creant.</string>
+    <string name="brand_theme_exquisite_fall_accessibility">Thema Lapsus Exquisitus, purpureum valde obscurum cum roseo clamante et margine aureo.</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">Labyrinthus Aenigmatis</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">Caeruleum cyaneum parvae saturationis et purpureum fluorescens clarum labyrinthum Dual-tone mobilem cum ora aurea formant.</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">Thema Labyrinthus Mutabilitatis, caeruleum cyaneum mitigatum cum purpureo fluorescente claro et margine aureo.</string>
+    <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
+    <string name="brand_theme_custom_title">Duo-tone Personalis</string>
+    <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
+    <string name="brand_theme_custom_description">Sigillum tuum Duo-tone sub ritu Apparatus Sacri.</string>
+    <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
+    <string name="brand_theme_custom_accessibility">Praevisum sigilli Duo-tone proprii.</string>
+    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_brand_theme_add">Initia</string>
+    <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_edit">Recensere Sigillum Proprium</string>
+    <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
+    <string name="config_custom_brand_theme_dialog_title">Sigillum Duo-tone Proprium</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_new">Novum Sigillum Proprium</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_edit">Recensere Sigillum Proprium</string>
+    <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
+    <string name="config_custom_brand_theme_dialog_description">Inscribe colores hex in forma #RRGGBB. Relinque margine vacuum pro colore accentus.</string>
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_randomize">Invocare Chaos</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
+    <string name="config_custom_brand_theme_randomize_hint">Tali fati combinationem novam generant.</string>
+    <!-- CONTEXT: Form field label for the user-defined preset name. -->
+    <string name="config_custom_brand_theme_name_label">Nomen Sigilli</string>
+    <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_background_label">Color Primarius</string>
+    <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_accent_label">Color Accentus</string>
+    <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_outline_label">Color Marginis</string>
+    <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
+    <string name="config_custom_brand_theme_outline_optional">Ad Libitum</string>
+    <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_save">Consignare</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete">Annihilare</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete_title">Annihilare Duo-tone Personalis</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
+    <string name="config_custom_brand_theme_delete_message">Annihilare sigillum %1$s?</string>
+    <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
+    <string name="config_custom_brand_theme_invalid_name">Inscribe nomen pro hoc sigillo.</string>
+    <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
+    <string name="config_custom_brand_theme_invalid_hex">Adhibere #RRGGBB.</string>
+    <string name="palette_crimson_title">Rubrum Coccineum</string>
+    <string name="palette_rose_title">Roseum Rosae</string>
+    <string name="palette_sakura_title">Roseum Sakurae</string>
+    <string name="palette_raspberry_title">Flos Rubi</string>
+    <string name="palette_blush_title">Roseum Pudoris</string>
+    <string name="palette_orange_title">Aurantium Solis</string>
+    <string name="palette_coral_title">Flos Corallii</string>
+    <string name="palette_tangerine_title">Fulgor Tangerinae</string>
+    <string name="palette_apricot_title">Nebula Armeniacae</string>
+    <string name="palette_terracotta_title">Argilla Terracota</string>
+    <string name="palette_persimmon_title">Ignis Persimoni</string>
+    <string name="palette_amber_title">Flavum Solis</string>
+    <string name="palette_gold_title">Hora Aurea</string>
+    <string name="palette_sunflower_title">Aurum Helianthi</string>
+    <string name="palette_lemon_title">Lux Citri</string>
+    <string name="palette_honey_title">Electrum Mellis</string>
+    <string name="palette_marigold_title">Fulgor Calendulae</string>
+    <string name="palette_lime_title">Iactus Limettae</string>
+    <string name="palette_olive_title">Muscus Olivae</string>
+    <string name="palette_emerald_title">Viride Smaragdi</string>
+    <string name="palette_mint_title">Fluctus Menthae</string>
+    <string name="palette_jade_title">Rivus Iadis</string>
+    <string name="palette_forest_title">Pinus Silvestris</string>
+    <string name="palette_teal_title">Cyanum Aquae</string>
+    <string name="palette_cyan_title">Cyanum Neon</string>
+    <string name="palette_sky_title">Caeruleum Caeli</string>
+    <string name="palette_ocean_title">Caeruleum Electricum</string>
+    <string name="palette_cobalt_title">Caeruleum Cobalti</string>
+    <string name="palette_indigo_title">Indicum Profundum</string>
+    <string name="palette_violet_title">Pulsus Violae</string>
+    <string name="palette_plum_title">Nox Pruni</string>
+    <string name="palette_magenta_title">Saltus Magentae</string>
+    <string name="palette_fuchsia_title">Flash Fuchsiae</string>
+    <string name="palette_orchid_title">Nebula Orchideae</string>
+    <string name="palette_lilac_title">Caligo Lilaci</string>
+    <string name="palette_mocha_title">Fuscum Mochae</string>
+    <string name="palette_slate_title">Griseum Ardesiae</string>
+    <string name="palette_sand_title">Lapis Arenosus</string>
+    <string name="palette_stone_title">Taupe Lapideus</string>
+    <string name="palette_graphite_title">Atramentum Graphitae</string>
+    <string name="palette_ivory_title">Linum Eburneum</string>
+</resources>

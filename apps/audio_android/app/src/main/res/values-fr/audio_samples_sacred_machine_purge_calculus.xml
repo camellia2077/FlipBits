@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="audio_sample_sacred_machine_themed_kill_confirmed_equation">Élimination confirmée ; la probabilité de survie s\'arrondit à zéro.</string>
+    <string name="audio_sample_sacred_machine_themed_ballistic_debug_grid">Le calcul de purge s\'est achevé avant que le premier canon ne devienne rouge. Des grilles balistiques ont traversé la salle, les mesures de pertes ont grimpé avec une apathie statistique, et chaque cible est devenue une variable redondante attendant d\'être supprimée. Aucune haine n\'est entrée dans la solution de tir. Les fusils ont parlé en volées synchronisées, des tonalités de confirmation d\'élimination ont marqué les espaces nettoyés, et le rapport s\'est fermé lorsque chaque probabilité hostile a été arrondie à zéro.</string>
+</resources>

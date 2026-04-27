@@ -1,6 +1,8 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.data.AppSettingsRepository
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
@@ -10,10 +12,15 @@ import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.MaterialPalettes
+import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
+import com.bag.audioandroid.ui.theme.normalizeBrandThemeHexOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -27,6 +34,7 @@ internal class AudioAndroidPreferencesBindings(
         observeSelectedPalette()
         observeSelectedThemeMode()
         observeSelectedThemeStyle()
+        observeCustomBrandThemeSettings()
         observeSelectedBrandTheme()
         observeSelectedFlashVoicingStyle()
         observeSelectedPlaybackSequenceMode()
@@ -86,9 +94,59 @@ internal class AudioAndroidPreferencesBindings(
             appSettingsRepository.selectedBrandThemeId
                 .distinctUntilChanged()
                 .collect { brandThemeId ->
-                    val brandTheme = BrandDualToneThemes.firstOrNull { it.id == brandThemeId } ?: DefaultBrandTheme
                     uiState.update { state ->
+                        val brandTheme =
+                            if (brandThemeId != null && isCustomBrandThemeOptionId(brandThemeId)) {
+                                state.customBrandThemes.firstOrNull { it.id == brandThemeId } ?: state.customBrandThemes.first()
+                            } else {
+                                BrandDualToneThemes.firstOrNull { it.id == brandThemeId } ?: DefaultBrandTheme
+                            }
                         state.withSelectedBrandTheme(brandTheme, sampleInputSessionUpdater)
+                    }
+                }
+        }
+    }
+
+    private fun observeCustomBrandThemeSettings() {
+        scope.launch {
+            appSettingsRepository.customBrandThemePresets
+                .map { presets ->
+                    val normalizedPresets =
+                        presets.map { settings ->
+                            CustomBrandThemeSettings(
+                                presetId = settings.presetId,
+                                displayName = settings.displayName.trim().ifBlank { DefaultCustomBrandThemeSettings.displayName },
+                                backgroundHex =
+                                    normalizeBrandThemeHex(settings.backgroundHex)
+                                        ?: DefaultCustomBrandThemeSettings.backgroundHex,
+                                accentHex =
+                                    normalizeBrandThemeHex(settings.accentHex)
+                                        ?: DefaultCustomBrandThemeSettings.accentHex,
+                                outlineHexOrNull =
+                                    settings.outlineHexOrNull?.let { outlineHex ->
+                                        normalizeBrandThemeHexOrNull(outlineHex) ?: DefaultCustomBrandThemeSettings.outlineHexOrNull
+                                    },
+                            )
+                        }
+                    if (normalizedPresets.isEmpty()) {
+                        listOf(DefaultCustomBrandThemeSettings)
+                    } else {
+                        normalizedPresets
+                    }
+                }.distinctUntilChanged()
+                .collect { presets ->
+                    uiState.update { state ->
+                        val presetThemes = presets.map(::customBrandTheme)
+                        val selectedBrandTheme =
+                            if (isCustomBrandThemeOptionId(state.selectedBrandTheme.id)) {
+                                presetThemes.firstOrNull { it.id == state.selectedBrandTheme.id } ?: presetThemes.first()
+                            } else {
+                                state.selectedBrandTheme
+                            }
+                        state.copy(
+                            customBrandThemePresets = presets,
+                            selectedBrandTheme = selectedBrandTheme,
+                        )
                     }
                 }
         }

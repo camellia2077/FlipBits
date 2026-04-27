@@ -32,6 +32,7 @@ class AudioPlaybackCoordinator(
         sourceKey: String,
         pcm: ShortArray,
         sampleRateHz: Int,
+        playbackSpeed: Float,
         startSampleIndex: Int,
         onStarted: () -> Unit,
         onProgressChanged: (Int, Int) -> Unit,
@@ -49,6 +50,7 @@ class AudioPlaybackCoordinator(
                         playback = playbackHandle,
                         pcm = pcmCopy,
                         sampleRateHz = sampleRateHz,
+                        playbackSpeed = playbackSpeed,
                         startSampleIndex = startSampleIndex,
                     ) { playedSamples, totalSamples ->
                         if (isPlaybackActive(requestId, sourceKey)) {
@@ -86,6 +88,16 @@ class AudioPlaybackCoordinator(
         playbackPaused = false
         audioPlayer.resume()
         return true
+    }
+
+    fun setPlaybackSpeed(
+        sourceKey: String,
+        playbackSpeed: Float,
+    ): Boolean {
+        if (activePlaybackKey != sourceKey) {
+            return false
+        }
+        return audioPlayer.setPlaybackSpeed(playbackSpeed)
     }
 
     fun beginScrub(sourceKey: String): Boolean =

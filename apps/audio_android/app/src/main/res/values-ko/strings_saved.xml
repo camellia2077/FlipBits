@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Korean rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Korean. -->
+    <!-- Saved tab strings: file list, import, rename, move, delete, folder actions. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="saved_audio_filter_empty">검색 결과가 없습니다.</string>
+    <string name="library_title">저장됨</string>
+    <string name="library_empty">저장된 항목이 없습니다.</string>
+    <string name="library_action_import">가져오기</string>
+    <string name="library_action_share">공유</string>
+    <string name="library_action_rename">이름 바꾸기</string>
+    <string name="library_action_delete">삭제</string>
+    <string name="library_action_select_all">전체 선택</string>
+    <string name="library_action_clear_selection">선택 종료</string>
+    <string name="library_action_delete_selected">선택 항목 삭제</string>
+    <string name="library_selection_count">%1$d개 선택됨</string>
+    <string name="library_share_chooser_title">공유</string>
+    <string name="library_rename_title">이름 바꾸기</string>
+    <string name="library_rename_message">%1$s 이름 바꾸기</string>
+    <string name="library_rename_field_label">이름</string>
+    <string name="library_delete_title">삭제</string>
+    <string name="library_delete_message">%1$s 항목을 삭제하시겠습니까?</string>
+    <string name="library_delete_selected_title">삭제</string>
+    <string name="library_delete_selected_message">선택한 %1$d개 파일을 삭제하시겠습니까?</string>
+    <string name="library_status_deleted">삭제됨</string>
+    <string name="library_status_deleted_multiple">오디오 파일 %1$d개가 삭제되었습니다.</string>
+    <string name="library_status_delete_failed">삭제 실패</string>
+    <string name="library_status_delete_partial">오디오 파일 %2$d개 중 %1$d개가 삭제되었습니다.</string>
+    <string name="library_status_renamed">이름 변경됨: %1$s</string>
+    <string name="library_status_rename_duplicate">해당 이름의 오디오 파일이 이미 존재합니다.</string>
+    <string name="library_status_rename_failed">이름 변경 실패</string>
+    <string name="library_status_share_failed">공유 실패</string>
+    <string name="library_status_imported">가져옴: %1$s</string>
+    <string name="library_status_import_failed">가져오기 실패</string>
+    <string name="library_status_import_unsupported">모노 PCM16 WAV 파일만 지원됩니다.</string>
+    <string name="library_action_new_folder">새 폴더</string>
+    <string name="library_action_move">이동</string>
+    <string name="library_action_move_selected">선택 항목 이동</string>
+    <string name="library_action_rename_folder">폴더 이름 바꾸기</string>
+    <string name="library_action_delete_folder">폴더 삭제</string>
+    <string name="library_folder_uncategorized">미분류</string>
+    <string name="library_folder_name_label">폴더 이름</string>
+    <string name="library_folder_create_title">폴더 생성</string>
+    <string name="library_folder_rename_title">폴더 이름 바꾸기</string>
+    <string name="library_folder_delete_title">폴더 삭제</string>
+    <string name="library_folder_delete_message">%1$s 폴더를 삭제하시겠습니까? 오디오 파일은 라이브러리에 유지됩니다.</string>
+    <string name="library_folder_row_label">폴더: %1$s</string>
+    <string name="library_move_title">이동</string>
+    <string name="library_move_single_message">%1$s 이동</string>
+    <string name="library_move_multiple_message">%1$d개 파일 이동</string>
+    <string name="library_status_folder_created">폴더 생성됨: %1$s</string>
+    <string name="library_status_folder_renamed">폴더 이름 변경됨: %1$s</string>
+    <string name="library_status_folder_deleted">폴더 삭제됨: %1$s</string>
+    <string name="library_status_folder_duplicate">해당 이름의 폴더가 이미 존재합니다.</string>
+    <string name="library_status_folder_create_failed">폴더 생성 실패</string>
+    <string name="library_status_folder_rename_failed">폴더 이름 변경 실패</string>
+    <string name="library_status_folder_delete_failed">폴더 삭제 실패</string>
+    <string name="library_status_move_failed">오디오 이동 실패</string>
+    <string name="library_status_moved_to_folder">%1$d개 파일을 %2$s 폴더로 이동했습니다.</string>
+    <string name="library_status_moved_to_uncategorized">%1$d개 파일을 미분류 폴더로 이동했습니다.</string>
+</resources>

@@ -1,10 +1,14 @@
 package com.bag.audioandroid.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
@@ -12,6 +16,8 @@ import androidx.compose.ui.graphics.lerp
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.theme.appThemeAccentTokens
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 private const val LightDualToneNavUnselectedMix = 0.4f
 
@@ -36,14 +42,7 @@ internal data class PlayerChromeColors(
  */
 @Composable
 internal fun playerDockContainerColor(uiState: AudioAppUiState): Color =
-    when (uiState.selectedThemeStyle) {
-        ThemeStyleOption.BrandDualTone ->
-            // The mini-player and bottom tabs form one dock system. In dual-tone mode they should
-            // share the same container color so the player reads as part of the same base layer
-            // across every brand theme instead of hard-coding a special-case shade per theme.
-            MaterialTheme.colorScheme.primaryContainer
-        ThemeStyleOption.Material -> MaterialTheme.colorScheme.surface
-    }
+    appThemeVisualTokens().dockContainerColor
 
 @Composable
 internal fun playerSegmentedButtonColors() =
@@ -53,10 +52,44 @@ internal fun playerSegmentedButtonColors() =
         activeContainerColor = MaterialTheme.colorScheme.primary,
         activeContentColor = MaterialTheme.colorScheme.onPrimary,
         activeBorderColor = MaterialTheme.colorScheme.primary,
-        inactiveContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        inactiveContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        inactiveContainerColor = appThemeVisualTokens().segmentedInactiveContainerColor,
+        inactiveContentColor = appThemeVisualTokens().segmentedInactiveContentColor,
         inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
     )
+
+@Composable
+internal fun appSegmentedButtonColors() =
+    SegmentedButtonDefaults.colors(
+        // Non-player segmented controls should still read as stateful accent chrome.
+        // Keep the inactive border on a softened primary lane instead of fading back to
+        // outlineVariant so Audio and Saved switchers stay visually consistent.
+        activeContainerColor = MaterialTheme.colorScheme.primary,
+        activeContentColor = MaterialTheme.colorScheme.onPrimary,
+        activeBorderColor = MaterialTheme.colorScheme.primary,
+        inactiveContainerColor = appThemeVisualTokens().segmentedInactiveContainerColor,
+        inactiveContentColor = appThemeVisualTokens().segmentedInactiveContentColor,
+        inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
+    )
+
+@Composable
+internal fun audioInputTextFieldColors(selectedThemeStyle: ThemeStyleOption): TextFieldColors {
+    val visualTokens = appThemeVisualTokens()
+    return when (selectedThemeStyle) {
+        ThemeStyleOption.BrandDualTone -> {
+            OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = visualTokens.inputContainerColor,
+                unfocusedContainerColor = visualTokens.inputContainerColor,
+                disabledContainerColor = visualTokens.inputContainerColor,
+                errorContainerColor = visualTokens.inputContainerColor,
+                focusedBorderColor = visualTokens.inputFocusedBorderColor,
+                unfocusedBorderColor = visualTokens.inputUnfocusedBorderColor,
+                disabledBorderColor = visualTokens.inputUnfocusedBorderColor,
+            )
+        }
+
+        ThemeStyleOption.Material -> OutlinedTextFieldDefaults.colors()
+    }
+}
 
 @Composable
 internal fun playerChromeColors(): PlayerChromeColors =
@@ -66,9 +99,24 @@ internal fun playerChromeColors(): PlayerChromeColors =
         neutralAction = MaterialTheme.colorScheme.onSurfaceVariant,
         mutedAction = MaterialTheme.colorScheme.onSurfaceVariant,
         disabledAction = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.30f),
-        annotationChipContainer = MaterialTheme.colorScheme.surfaceVariant,
-        annotationChipContent = MaterialTheme.colorScheme.onSurfaceVariant,
+        annotationChipContainer = appThemeVisualTokens().annotationChipContainerColor,
+        annotationChipContent = appThemeVisualTokens().annotationChipContentColor,
     )
+
+@Composable
+internal fun utilityActionIconButtonColors(): IconButtonColors {
+    val actionTint = appThemeAccentTokens().selectionLabelAccentTint
+    return IconButtonDefaults.iconButtonColors(
+        // Utility action icons across Settings / Audio / Saved should all follow the same
+        // accent lane instead of each screen inventing its own hard-coded tint behavior.
+        contentColor = actionTint,
+        disabledContentColor = actionTint.copy(alpha = 0.38f),
+    )
+}
+
+@Composable
+internal fun playbackLyricsAccentTextColor(): Color =
+    appThemeAccentTokens().selectionLabelAccentTint
 
 @Composable
 internal fun navigationBarItemColors(uiState: AudioAppUiState): NavigationBarItemColors =
@@ -77,7 +125,7 @@ internal fun navigationBarItemColors(uiState: AudioAppUiState): NavigationBarIte
             // Light dual-tone themes need a corrected unselected foreground so the brighter
             // paired color does not disappear into the navigation container. Dark dual-tone
             // themes already separate strongly enough, so they keep the raw paired color.
-            val brandTheme = uiState.selectedBrandTheme
+            val brandTheme = uiState.activeBrandTheme
             val unselectedDualToneForeground =
                 if (brandTheme.isDarkTheme) {
                     brandTheme.accentColor

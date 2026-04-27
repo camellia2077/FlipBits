@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CONTEXT: Application display name shown by Android and system UI. Keep product naming consistent rather than translating it literally if the brand should stay fixed. -->
+    <string name="app_name">FlipBits</string>
+    <!-- CONTEXT: Generic navigation action for leaving the current screen and returning to the previous one. -->
+    <string name="common_back">Back</string>
+    <!-- CONTEXT: Generic dismiss action used in dialogs, sheets, and temporary UI where the user abandons the current action. -->
+    <string name="common_cancel">Cancel</string>
+    <!-- CONTEXT: Generic filter/category option meaning every available item is shown. -->
+    <string name="common_all">All</string>
+    <!-- CONTEXT: Fallback label shown when a value such as version or mode is unavailable or blank. -->
+    <string name="common_unknown">Unknown</string>
+    <!-- CONTEXT: Bottom navigation tab label for the main audio encode/decode workspace. Keep it short. -->
+    <string name="tab_audio">Audio</string>
+    <!-- CONTEXT: Bottom navigation tab label for the saved audio library screen. Keep it short. -->
+    <string name="tab_library">Saved</string>
+    <!-- CONTEXT: Bottom navigation tab label for the settings/configuration screen. Keep it short. -->
+    <string name="tab_config">Settings</string>
+</resources>

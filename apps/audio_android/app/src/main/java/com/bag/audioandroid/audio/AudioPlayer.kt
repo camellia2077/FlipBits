@@ -29,6 +29,9 @@ class AudioPlayer {
 
         @Volatile
         var bufferedSamples = 0
+
+        @Volatile
+        var playbackSpeed = 1.0f
     }
 
     fun prepareForNewPlayback(): PlaybackHandle = PlaybackHandle().also { currentPlayback = it }
@@ -37,6 +40,7 @@ class AudioPlayer {
         playback: PlaybackHandle,
         pcm: ShortArray,
         sampleRateHz: Int,
+        playbackSpeed: Float = 1.0f,
         startSampleIndex: Int = 0,
         onProgressChanged: (Int, Int) -> Unit = { _, _ -> },
     ): PlaybackResult {
@@ -67,13 +71,16 @@ class AudioPlayer {
                 sampleRateHz = sampleRateHz,
                 sampleCount = playbackPcm.size,
             )
+        val resolvedPlaybackSpeed = playbackSpeed.coerceIn(MinPlaybackSpeed, MaxPlaybackSpeed)
 
         currentPlayback = playback
         playback.track = track
+        playback.playbackSpeed = resolvedPlaybackSpeed
         playback.totalSamples = totalSamples
         playback.bufferStartSamples = startOffsetSamples
         playback.bufferedSamples = playbackPcm.size
         return try {
+            setPlaybackSpeedSafely(track, resolvedPlaybackSpeed)
             runStaticPlaybackLoop(
                 playback = playback,
                 track = track,
@@ -114,8 +121,19 @@ class AudioPlayer {
     fun resume() {
         currentPlayback?.let { playback ->
             playback.pauseRequested = false
-            playback.track?.let(::safelyPlayTrack)
+            playback.track?.let { track ->
+                setPlaybackSpeedSafely(track, playback.playbackSpeed)
+                safelyPlayTrack(track)
+            }
         }
+    }
+
+    fun setPlaybackSpeed(playbackSpeed: Float): Boolean {
+        val playback = currentPlayback ?: return false
+        val resolvedPlaybackSpeed = playbackSpeed.coerceIn(MinPlaybackSpeed, MaxPlaybackSpeed)
+        playback.playbackSpeed = resolvedPlaybackSpeed
+        val track = playback.track ?: return true
+        return setPlaybackSpeedSafely(track, resolvedPlaybackSpeed)
     }
 
     fun stop() {
@@ -144,5 +162,10 @@ class AudioPlayer {
         playback.bufferStartSamples = 0
         playback.bufferedSamples = 0
         track.release()
+    }
+
+    private companion object {
+        const val MinPlaybackSpeed = 0.1f
+        const val MaxPlaybackSpeed = 4.0f
     }
 }

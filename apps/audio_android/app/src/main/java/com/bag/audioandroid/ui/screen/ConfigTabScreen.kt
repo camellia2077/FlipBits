@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
@@ -41,6 +42,10 @@ fun ConfigTabScreen(
     onThemeStyleSelected: (ThemeStyleOption) -> Unit,
     selectedBrandTheme: BrandThemeOption,
     onBrandThemeSelected: (BrandThemeOption) -> Unit,
+    customBrandThemes: List<BrandThemeOption>,
+    customBrandThemePresets: List<CustomBrandThemeSettings>,
+    onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
+    onCustomBrandThemeDeleted: (String) -> Unit,
     selectedThemeMode: ThemeModeOption,
     onThemeModeSelected: (ThemeModeOption) -> Unit,
     isThemeAppearanceExpanded: Boolean,
@@ -79,6 +84,10 @@ fun ConfigTabScreen(
             onThemeStyleSelected = onThemeStyleSelected,
             selectedBrandTheme = selectedBrandTheme,
             onBrandThemeSelected = onBrandThemeSelected,
+            customBrandThemes = customBrandThemes,
+            customBrandThemePresets = customBrandThemePresets,
+            onCustomBrandThemeSaved = onCustomBrandThemeSaved,
+            onCustomBrandThemeDeleted = onCustomBrandThemeDeleted,
             selectedThemeMode = selectedThemeMode,
             onThemeModeSelected = onThemeModeSelected,
             isExpanded = isThemeAppearanceExpanded,

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">As configurações estão ausentes.</string>
+    <string name="validation_null_text">O texto de entrada é obrigatório.</string>
+    <string name="validation_null_decoder_output">O buffer de resultado está ausente.</string>
+    <string name="validation_invalid_sample_rate">A taxa de amostragem deve ser maior que 0.</string>
+    <string name="validation_invalid_frame_samples">O tamanho do quadro deve ser maior que 0.</string>
+    <string name="validation_invalid_mode">Modo de transporte não suportado.</string>
+    <string name="validation_invalid_flash_signal_profile">Perfil de sinal flash não suportado.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Estilo flash não suportado.</string>
+    <string name="validation_pro_ascii_only">pro suporta apenas ASCII.</string>
+    <string name="validation_payload_too_large">O texto de entrada ultrapassa o limite de 512 bytes por quadro deste modo.</string>
+    <string name="error_invalid_argument">Argumento inválido.</string>
+    <string name="error_not_ready">O resultado não está pronto.</string>
+    <string name="error_not_implemented">Ainda não disponível.</string>
+    <string name="error_cancelled">Operação cancelada.</string>
+    <string name="error_internal">Erro interno.</string>
+</resources>

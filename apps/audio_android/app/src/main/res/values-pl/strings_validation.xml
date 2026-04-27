@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">Brak ustawień.</string>
+    <string name="validation_null_text">Tekst wejściowy jest wymagany.</string>
+    <string name="validation_null_decoder_output">Brak bufora wyniku.</string>
+    <string name="validation_invalid_sample_rate">Częstotliwość próbkowania musi być większa od 0.</string>
+    <string name="validation_invalid_frame_samples">Rozmiar ramki musi być większy od 0.</string>
+    <string name="validation_invalid_mode">Nieobsługiwany tryb transportu.</string>
+    <string name="validation_invalid_flash_signal_profile">Nieobsługiwany profil sygnału flash.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Nieobsługiwany styl flash.</string>
+    <string name="validation_pro_ascii_only">pro obsługuje tylko ASCII.</string>
+    <string name="validation_payload_too_large">Tekst wejściowy przekracza limit 512 bajtów pojedynczej ramki dla tego trybu.</string>
+    <string name="error_invalid_argument">Nieprawidłowy argument.</string>
+    <string name="error_not_ready">Wynik nie jest gotowy.</string>
+    <string name="error_not_implemented">Jeszcze niedostępne.</string>
+    <string name="error_cancelled">Operacja anulowana.</string>
+    <string name="error_internal">Błąd wewnętrzny.</string>
+</resources>

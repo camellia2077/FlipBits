@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_labyrinth_of_mutability_themed_new_eye_blesses_spine">척수 위에 새로운 눈이 열려 실패한 형태를 축복합니다.</string>
-    <string name="audio_sample_labyrinth_of_mutability_ascii_new_eye_blesses_spine">NEW EYE OPENS ON THE SPINE. THE FAILED SHAPE IS BLESSED.</string>
-    <string name="audio_sample_labyrinth_of_mutability_themed_flesh_refuses_one_shape">부드러운 촉수가 간절한 붓놀림처럼 갑옷의 틈새를 뚫고 들어옵니다. 깃털은 베일 만큼 선명하게 자라납니다. 뼈는 느슨해지고 새로운 각도를 선택하며, 새로 융합되면서 노래합니다. 비명은 고통과 감사가 하나로 땋아진 것입니다. 이것을 기형이라 부르지 마십시오. 고정된 신체는 아직 태어나지 않은 기적들의 감옥일 뿐이며, 이 육체는 마침내 예술이 되는 법을 배웠습니다.</string>
-    <string name="audio_sample_labyrinth_of_mutability_ascii_flesh_refuses_one_shape">TENDRILS PRESS THROUGH ARMOR. FEATHERS CUT. BONES CHOOSE NEW ANGLES. PAIN AND GRATITUDE SCREAM TOGETHER. FLESH BECOMES ART.</string>
+    <string name="audio_sample_labyrinth_of_mutability_themed_new_eye_blesses_spine">척추에 새로운 눈이 뜨이며, 실패한 육신을 축복합니다.</string>
+    <string name="audio_sample_labyrinth_of_mutability_themed_flesh_refuses_one_shape">부드러운 촉수가 열정적인 붓놀림처럼 갑옷의 이음새를 밀고 나옵니다. 깃털은 눈부시게 빛나며 살을 벨 만큼 날카롭게 자라납니다. 뼈는 느슨해지고 새로운 각도로 맞춰지며, 다시 융합하면서 노래를 부릅니다. 그 비명 속에는 고통과 감사가 하나로 얽혀 있습니다. 이를 기형이라 부르지 마십시오. 고정된 육신은 태어나지 못한 기적을 가두는 감옥일 뿐이며, 이 살점은 마침내 예술이 되는 법을 깨우쳤습니다.</string>
 </resources>

@@ -33,6 +33,7 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.asString
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 @Composable
 internal fun MiniPlayerBar(
@@ -111,9 +112,10 @@ internal fun MiniPlayerBar(
 
 @Composable
 private fun MiniPlayerLeadingIcon(model: MiniPlayerUiModel) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = visualTokens.miniPlayerLeadingContainerColor,
     ) {
         Box(
             modifier =
@@ -129,7 +131,7 @@ private fun MiniPlayerLeadingIcon(model: MiniPlayerUiModel) {
                         MiniPlayerLeadingIcon.Saved -> Icons.Rounded.LibraryMusic
                     },
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                tint = visualTokens.miniPlayerLeadingContentColor,
             )
         }
     }

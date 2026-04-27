@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -24,6 +28,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
+
+internal val SelectedOutlineWidth = 2.dp
 
 @Composable
 internal fun ExpandableCardHeader(
@@ -71,9 +78,32 @@ internal fun SelectionRow(
     onClick: () -> Unit,
     enabled: Boolean = true,
 ) {
+    val visualTokens = appThemeVisualTokens()
+    val backgroundColor = if (selected) {
+        visualTokens.selectionSelectedContainerColor
+    } else {
+        visualTokens.selectionUnselectedContainerColor
+    }
+
+    val contentColor = if (selected) {
+        accentTokens.selectionLabelAccentTint
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    val borderColor = if (selected) {
+        if (enabled) {
+            accentTokens.selectionBorderAccentTint
+        } else {
+            accentTokens.selectionBorderAccentTint.copy(alpha = 0.42f)
+        }
+    } else {
+        Color.Transparent
+    }
+
     Surface(
-        tonalElevation = if (selected) 6.dp else 1.dp,
-        shadowElevation = if (selected) 2.dp else 0.dp,
+        color = backgroundColor,
+        border = if (selected) BorderStroke(SelectedOutlineWidth, borderColor) else null,
         shape = MaterialTheme.shapes.medium,
         modifier =
             Modifier
@@ -84,19 +114,20 @@ internal fun SelectionRow(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = label,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                color = contentColor,
                 modifier = Modifier.weight(1f),
             )
             if (selected) {
                 SelectedBadge(
-                    text = androidx.compose.ui.res.stringResource(R.string.config_palette_selected),
-                    tint = accentTokens.selectionLabelAccentTint,
+                    text = stringResource(R.string.config_palette_selected)
                 )
             }
         }
@@ -106,24 +137,29 @@ internal fun SelectionRow(
 @Composable
 internal fun SelectedBadge(
     text: String,
-    tint: Color,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Surface(
+        color = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        shape = CircleShape,
     ) {
-        Icon(
-            imageVector = Icons.Filled.Check,
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.padding(top = 1.dp).then(Modifier),
-        )
-        Text(
-            text = text,
-            color = tint,
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                softWrap = false,
+            )
+        }
     }
 }

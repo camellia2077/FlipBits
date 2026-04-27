@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_exquisite_fall_themed_velvet_barbs_kiss">벨벳은 가시를 숨기고 있습니다; 모든 접촉은 자아의 경계를 잊게 만듭니다.</string>
-    <string name="audio_sample_exquisite_fall_ascii_velvet_barbs_kiss">VELVET HIDES BARBS. EVERY TOUCH ERASES THE SELF.</string>
-    <string name="audio_sample_exquisite_fall_themed_self_dissolves_in_touch">실크는 땀과 피를 빨아들여 두 가지가 똑같이 빛날 때까지 머금습니다. 익숙한 속삭임이 귓가에 바짝 다가와, 믿을 수 있을 만큼 부드럽지만 베일 듯이 날카롭게 울립니다. 접촉은 전압처럼 가해집니다. 고통과 쾌락은 서로의 이름을 바꾸고는 결국 그 이름마저 잊어버립니다. 환희의 정점에서 영혼은 붙잡히는 것이 아니라 감각 속으로 산산이 조각나며, 모든 파편은 자신을 감싸 안은 심연에 감사를 표합니다.</string>
-    <string name="audio_sample_exquisite_fall_ascii_self_dissolves_in_touch">SILK DRINKS SWEAT AND BLOOD. WHISPERS CUT. TOUCH STRIKES LIKE VOLTAGE. PAIN AND PLEASURE LOSE THEIR NAMES. THE SELF SHATTERS.</string>
+    <string name="audio_sample_exquisite_fall_themed_velvet_barbs_kiss">벨벳은 가시를 감추고 있으며, 손길이 닿을 때마다 자아는 그 경계를 잊습니다.</string>
+    <string name="audio_sample_exquisite_fall_themed_self_dissolves_in_touch">실크는 땀과 피를 빨아들여 두 액체가 하나가 되어 빛날 때까지 머금습니다. 익숙한 속삭임이 귓가를 스치고, 이는 기댈 수 있을 만큼 부드러우면서도 살을 벨 듯 날카롭습니다. 모든 손길은 번개처럼 내리꽂힙니다. 고통과 쾌락은 서로의 이름을 맞바꾼 뒤 끝내 그 이름마저 잃어버립니다. 환희의 정점에서 영혼은 온전한 형태를 잃고 감각 속으로 부서져 내리며, 그 파편들은 기꺼이 자신을 품어준 심연에 감사를 바칩니다.</string>
 </resources>

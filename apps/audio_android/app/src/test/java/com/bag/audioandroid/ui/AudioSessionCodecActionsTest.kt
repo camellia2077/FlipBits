@@ -30,6 +30,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.text.Charsets.UTF_8
 
 private val DefaultFollowData =
     PayloadFollowViewData(
@@ -167,6 +168,60 @@ class AudioSessionCodecActionsTest {
             assertEquals(listOf("A"), successSession.followData.textTokens)
         }
 
+    @Test
+    fun `payload too large input auto segments and keeps aggregated playback`() =
+        runTest {
+            val longText = "祭".repeat(200)
+            var nextSample = 1
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            validateEncodeRequestBlock = { text, _, _, _, _, _ ->
+                                if (text == longText) {
+                                    BagApiCodes.VALIDATION_PAYLOAD_TOO_LARGE
+                                } else {
+                                    BagApiCodes.VALIDATION_OK
+                                }
+                            },
+                            encodeBlock = { _ ->
+                                EncodeAudioResult.Success(shortArrayOf(nextSample++.toShort()))
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = longText)
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.currentSession
+            val status = session.statusText as UiText.Resource
+            assertEquals(R.string.status_mode_audio_generated_segmented, status.resId)
+            assertTrue(session.generatedAudioMetadata?.isSegmented == true)
+            assertTrue((session.generatedAudioMetadata?.segmentCount ?: 0) > 1)
+            assertEquals(session.generatedAudioMetadata?.segmentCount, session.generatedPcm.size)
+            assertEquals(session.generatedPcm.size, session.playback.totalSamples)
+        }
+
+    @Test
+    fun `utf8 segmentation keeps every segment within 512 bytes`() {
+        val longText = "flash 祭 ".repeat(90)
+
+        val plan = splitInputIntoPayloadSegments(longText, maxPayloadBytes = 512)
+
+        assertTrue(plan.segmentCount > 1)
+        assertEquals(longText, plan.segments.joinToString(separator = ""))
+        assertTrue(plan.segments.all { it.toByteArray(UTF_8).size <= 512 })
+    }
+
     private fun createFixture(
         gateway: AudioCodecGateway,
         testScope: TestScope,
@@ -210,6 +265,15 @@ private class FakeAudioCodecGateway(
             followData = DefaultFollowData,
         ),
     private val encodeBlock: (suspend ((EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
+    private val validateEncodeRequestBlock:
+        ((
+            text: String,
+            sampleRateHz: Int,
+            frameSamples: Int,
+            mode: Int,
+            flashSignalProfile: Int,
+            flashVoicingFlavor: Int,
+        ) -> Int)? = null,
 ) : AudioCodecGateway {
     override fun validateEncodeRequest(
         text: String,
@@ -218,7 +282,15 @@ private class FakeAudioCodecGateway(
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): Int = BagApiCodes.VALIDATION_OK
+    ): Int =
+        validateEncodeRequestBlock?.invoke(
+            text,
+            sampleRateHz,
+            frameSamples,
+            mode,
+            flashSignalProfile,
+            flashVoicingFlavor,
+        ) ?: BagApiCodes.VALIDATION_OK
 
     override suspend fun encodeTextToPcm(
         text: String,
@@ -229,6 +301,15 @@ private class FakeAudioCodecGateway(
         flashVoicingFlavor: Int,
         onProgress: (EncodeProgressUpdate) -> Unit,
     ): EncodeAudioResult = encodeBlock?.invoke(onProgress) ?: encodeResult
+
+    override suspend fun buildEncodeFollowData(
+        text: String,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ) = com.bag.audioandroid.domain.EncodedAudioPayloadResult(followData = DefaultFollowData)
 
     override fun validateDecodeConfig(
         sampleRateHz: Int,

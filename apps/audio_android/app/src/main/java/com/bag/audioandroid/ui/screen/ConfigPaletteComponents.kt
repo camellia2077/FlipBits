@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 internal data class PaletteGroupUi(
     val family: PaletteFamily,
@@ -49,6 +50,7 @@ internal fun PaletteSwatch(
         } else {
             MaterialTheme.colorScheme.outlineVariant
         }
+    val ringWidth = if (selected) SelectedOutlineWidth else 1.dp
     Box(
         modifier =
             Modifier
@@ -68,7 +70,7 @@ internal fun PaletteSwatch(
                 Modifier
                     .fillMaxSize()
                     .background(borderColor, CircleShape)
-                    .padding(if (selected) 3.dp else 1.dp),
+                    .padding(ringWidth),
             contentAlignment = Alignment.Center,
         ) {
             Box(
@@ -97,9 +99,10 @@ internal fun PaletteGroupSection(
     selectedPalette: PaletteOption,
     onPaletteSelected: (PaletteOption) -> Unit,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.24f),
+        color = visualTokens.groupContainerColor,
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),

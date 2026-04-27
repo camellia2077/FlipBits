@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.ui.playbackLyricsAccentTextColor
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.roundToInt
 
 @Composable
@@ -35,6 +37,8 @@ internal fun PlaybackTimelineSection(
     onScrubCancelled: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lyricsAccentTextColor = playbackLyricsAccentTextColor()
+    val visualTokens = appThemeVisualTokens()
     Column(
         modifier =
             modifier
@@ -51,10 +55,12 @@ internal fun PlaybackTimelineSection(
             Text(
                 text = displayedTime,
                 style = MaterialTheme.typography.bodySmall,
+                color = lyricsAccentTextColor,
             )
             Text(
                 text = totalTime,
                 style = MaterialTheme.typography.bodySmall,
+                color = lyricsAccentTextColor,
             )
         }
         Slider(
@@ -102,7 +108,7 @@ internal fun PlaybackTimelineSection(
                         SliderDefaults.colors(
                             thumbColor = MaterialTheme.colorScheme.primary,
                             activeTrackColor = MaterialTheme.colorScheme.primary,
-                            inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                            inactiveTrackColor = visualTokens.timelineInactiveTrackColor,
                         ),
                     enabled = totalSamples > 0,
                     thumbTrackGapSize = 0.dp,
@@ -113,7 +119,7 @@ internal fun PlaybackTimelineSection(
                 SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
                     activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                    inactiveTrackColor = visualTokens.timelineInactiveTrackColor,
                 ),
             modifier = Modifier.fillMaxWidth(),
         )

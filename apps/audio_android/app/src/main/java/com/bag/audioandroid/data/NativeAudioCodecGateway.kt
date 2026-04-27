@@ -84,6 +84,28 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         }
     }
 
+    override suspend fun buildEncodeFollowData(
+        text: String,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): EncodedAudioPayloadResult {
+        val result =
+            NativeBagBridge.nativeBuildEncodeFollowData(
+                text,
+                sampleRateHz,
+                frameSamples,
+                mode,
+                flashSignalProfile,
+                flashVoicingFlavor,
+            )
+        return result.copy(
+            followData = result.followData.normalizeDesignTokens(),
+        )
+    }
+
     override fun validateDecodeConfig(
         sampleRateHz: Int,
         frameSamples: Int,
@@ -106,15 +128,20 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): DecodedAudioPayloadResult =
-        NativeBagBridge.nativeDecodeGeneratedPcm(
-            pcm,
-            sampleRateHz,
-            frameSamples,
-            mode,
-            flashSignalProfile,
-            flashVoicingFlavor,
+    ): DecodedAudioPayloadResult {
+        val result =
+            NativeBagBridge.nativeDecodeGeneratedPcm(
+                pcm,
+                sampleRateHz,
+                frameSamples,
+                mode,
+                flashSignalProfile,
+                flashVoicingFlavor,
+            )
+        return result.copy(
+            followData = result.followData.normalizeDesignTokens(),
         )
+    }
 
     override fun getCoreVersion(): String = NativeBagBridge.nativeGetCoreVersion()
 
@@ -171,8 +198,5 @@ internal fun EncodedAudioPayloadResult.toEncodeSuccessOrFailureResult(): EncodeA
     } else {
         EncodeAudioResult.Success(
             pcm = pcm,
-            rawBytesHex = rawBytesHex,
-            rawBitsBinary = rawBitsBinary,
-            followData = followData,
         )
     }

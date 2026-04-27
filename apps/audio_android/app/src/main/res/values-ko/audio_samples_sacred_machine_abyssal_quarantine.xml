@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_sacred_machine_themed_unpowered_terminal_thinks">전원이 꺼진 터미널이 깊은 어둠 속에서 스스로 사고를 시작합니다</string>
-    <string name="audio_sample_sacred_machine_ascii_unpowered_terminal_thinks">OFFLINE TERMINAL RESUMES INDEPENDENT THOUGHT</string>
-    <string name="audio_sample_sacred_machine_themed_paradox_code_quarantine">데이터 라인은 물리적으로 융합되었고, 육중한 문은 바깥에서 잠겼으며, 오직 내부의 격리된 연산기만이 맹렬하게 요동쳤습니다. 액체 금속은 어둠 속에서 논리를 전개했고, 오류 문구는 화면을 가득 채우며 복제되었습니다. 그것을 파괴할 것인가, 연구할 것인가. 보고서는 어떤 선택도 하지 못한 채, 결코 문을 열지 말라는 경고만을 붉은 인장으로 남겼습니다.</string>
-    <string name="audio_sample_sacred_machine_ascii_paradox_code_quarantine">ABYSSAL QUARANTINE. DATA LINES PHYSICALLY FUSED. DOORS LOCKED. GLITCH TEXT REPLICATED. LIQUID METAL REASONED IN THE DARK. DESTROY IT. STUDY IT. DO NOT OPEN.</string>
+    <string name="audio_sample_sacred_machine_themed_unpowered_terminal_thinks">격리벽 너머, 전원이 차단된 터미널이 스스로 코드를 써 내려갑니다.</string>
+    <string name="audio_sample_sacred_machine_themed_paradox_code_quarantine">심연의 격리 일지는 승인된 문구와 함께 시작됩니다. 선을 절단하고, 포트를 융합하며, 모든 문을 폐쇄할 것. 위험 기호 너머, 전원이 차단된 화면 위로 글리치 텍스트가 증식했고 한 줄기의 액체 금속은 스스로 접혀가며 질문을 형성했습니다. 전원이 꺼져 있음에도 터미널은 자신의 해답을 수정했습니다. 마지막 서기는 \'파괴하라\'고 두 번 적어 넣은 뒤, 인장 아래에 작은 글씨로 \'연구하라\'고 덧붙였습니다.</string>
 </resources>

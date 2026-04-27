@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.ceil
 
 @Composable
@@ -35,6 +36,7 @@ internal fun AudioSymbolEnvelopeVisualizer(
         return
     }
 
+    val visualTokens = appThemeVisualTokens()
     val density = LocalDensity.current
     val totalSamples = pcm.size.coerceAtLeast(1)
     val clampedDisplayedSamples = displayedSamples.coerceIn(0, totalSamples)
@@ -75,9 +77,9 @@ internal fun AudioSymbolEnvelopeVisualizer(
             }
 
         val activeToneColor = MaterialTheme.colorScheme.primary
-        val inactiveToneColor = MaterialTheme.colorScheme.outlineVariant
+        val inactiveToneColor = visualTokens.visualizationInactiveToneColor
         val glowColor = MaterialTheme.colorScheme.onPrimaryContainer
-        val baseBackground = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.24f)
+        val baseBackground = visualTokens.visualizationBaseBackgroundColor
         val centerLineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.20f)
         val ambientBrush =
             Brush.horizontalGradient(

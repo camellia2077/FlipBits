@@ -1,5 +1,6 @@
 #include <jni.h>
 
+#include <array>
 #include <algorithm>
 #include <cstdint>
 #include <string>
@@ -756,7 +757,7 @@ jobject NewEncodedAudioPayloadResult(JNIEnv* env,
         follow_data);
 }
 
-jshortArray NewShortArrayFromPcmResult(JNIEnv* env, const bag_encode_result& result) {
+jshortArray NewShortArrayFromPcmResult(JNIEnv* env, const bag_pcm16_result& result) {
     jshortArray out = env->NewShortArray(static_cast<jsize>(result.sample_count));
     if (out != nullptr && result.sample_count > 0) {
         env->SetShortArrayRegion(
@@ -784,6 +785,105 @@ jobject NewEmptyEncodedAudioPayloadResult(JNIEnv* env) {
     jshortArray empty_pcm = env->NewShortArray(0);
     jobject follow_data = NewEmptyPayloadFollowViewData(env);
     return NewEncodedAudioPayloadResult(env, empty_pcm, "", "", follow_data);
+}
+
+std::string CopyApiString(const char* buffer, std::size_t size) {
+    if (buffer == nullptr || size == 0) {
+        return {};
+    }
+    return std::string(buffer, size);
+}
+
+jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
+                                                     const bag_encode_result& result) {
+    const std::string text_tokens = CopyApiString(
+        result.text_follow_data.text_tokens_buffer,
+        result.text_follow_data.text_tokens_size);
+    const std::string lyric_lines = CopyApiString(
+        result.text_follow_data.lyric_lines_buffer,
+        result.text_follow_data.lyric_lines_size);
+    const std::string raw_bytes_hex =
+        CopyApiString(result.raw_bytes_hex_buffer, result.raw_bytes_hex_size);
+    const std::string raw_bits_binary = CopyApiString(
+        result.raw_bits_binary_buffer, result.raw_bits_binary_size);
+    std::vector<bag_text_follow_token_entry> text_entries(
+        result.text_follow_data.text_token_timeline_count);
+    std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(
+        result.text_follow_data.token_raw_segments_count);
+    std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(
+        result.text_follow_data.token_raw_display_units_count);
+    std::vector<bag_text_follow_lyric_line_entry> line_entries(
+        result.text_follow_data.lyric_line_timeline_count);
+    std::vector<bag_text_follow_line_token_range_entry> line_token_ranges(
+        result.text_follow_data.line_token_ranges_count);
+    std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments(
+        result.text_follow_data.line_raw_segments_count);
+    std::vector<bag_payload_follow_byte_entry> byte_entries(
+        result.follow_data.byte_timeline_count);
+    std::vector<bag_payload_follow_binary_group_entry> binary_entries(
+        result.follow_data.binary_group_timeline_count);
+    if (!text_entries.empty()) {
+        std::copy_n(result.text_follow_data.text_token_timeline_buffer,
+                    text_entries.size(), text_entries.begin());
+    }
+    if (!text_raw_segments.empty()) {
+        std::copy_n(result.text_follow_data.token_raw_segments_buffer,
+                    text_raw_segments.size(), text_raw_segments.begin());
+    }
+    if (!text_raw_display_units.empty()) {
+        std::copy_n(result.text_follow_data.token_raw_display_units_buffer,
+                    text_raw_display_units.size(),
+                    text_raw_display_units.begin());
+    }
+    if (!line_entries.empty()) {
+        std::copy_n(result.text_follow_data.lyric_line_timeline_buffer,
+                    line_entries.size(), line_entries.begin());
+    }
+    if (!line_token_ranges.empty()) {
+        std::copy_n(result.text_follow_data.line_token_ranges_buffer,
+                    line_token_ranges.size(), line_token_ranges.begin());
+    }
+    if (!line_raw_segments.empty()) {
+        std::copy_n(result.text_follow_data.line_raw_segments_buffer,
+                    line_raw_segments.size(), line_raw_segments.begin());
+    }
+    if (!byte_entries.empty()) {
+        std::copy_n(result.follow_data.byte_timeline_buffer, byte_entries.size(),
+                    byte_entries.begin());
+    }
+    if (!binary_entries.empty()) {
+        std::copy_n(result.follow_data.binary_group_timeline_buffer,
+                    binary_entries.size(), binary_entries.begin());
+    }
+    bag_pcm16_result pcm_result{};
+    pcm_result.samples = result.samples;
+    pcm_result.sample_count = result.sample_count;
+    jshortArray pcm = NewShortArrayFromPcmResult(env, pcm_result);
+    jobject follow_data = NewPayloadFollowViewData(
+        env,
+        text_tokens,
+        lyric_lines,
+        raw_bytes_hex,
+        raw_bits_binary,
+        text_entries,
+        text_raw_segments,
+        text_raw_display_units,
+        line_entries,
+        line_token_ranges,
+        line_raw_segments,
+        byte_entries,
+        binary_entries,
+        result.text_follow_data.available != 0 ? JNI_TRUE : JNI_FALSE,
+        (result.text_follow_data.available != 0 &&
+         result.text_follow_data.lyric_line_timeline_count > 0 &&
+         result.text_follow_data.line_token_ranges_count > 0)
+            ? JNI_TRUE
+            : JNI_FALSE,
+        static_cast<jint>(result.follow_data.payload_begin_sample),
+        static_cast<jint>(result.follow_data.payload_sample_count),
+        static_cast<jint>(result.follow_data.total_pcm_sample_count),
+        result.follow_data.available != 0 ? JNI_TRUE : JNI_FALSE);
+    return NewEncodedAudioPayloadResult(env, pcm, raw_bytes_hex, raw_bits_binary, follow_data);
 }
 }  // namespace
 
@@ -908,36 +1008,49 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeTakeEncodeTextJobResult(
         return NewEmptyEncodedAudioPayloadResult(env);
     }
 
-    bag_encode_result probe{};
-    const bag_error_code probe_code = bag_take_encode_text_job_result_with_follow(job, &probe);
-    if (probe_code != BAG_OK) {
-        bag_free_encode_result(&probe);
+    bag_pcm16_result result{};
+    if (bag_take_encode_text_job_result(job, &result) != BAG_OK) {
+        return NewEmptyEncodedAudioPayloadResult(env);
+    }
+    jshortArray pcm = NewShortArrayFromPcmResult(env, result);
+    bag_free_pcm16_result(&result);
+    jobject follow_data = NewEmptyPayloadFollowViewData(env);
+    return NewEncodedAudioPayloadResult(env, pcm, "", "", follow_data);
+}
+
+extern "C" JNIEXPORT jobject JNICALL
+Java_com_bag_audioandroid_NativeBagBridge_nativeBuildEncodeFollowData(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jstring text,
+    jint sample_rate_hz,
+    jint frame_samples,
+    jint mode,
+    jint flash_signal_profile,
+    jint flash_voicing_flavor) {
+    const std::string input = JStringToStdString(env, text);
+    if (input.empty()) {
         return NewEmptyEncodedAudioPayloadResult(env);
     }
 
-    std::vector<char> raw_bytes_hex_buffer(probe.raw_bytes_hex_size + 1, '\0');
-    std::vector<char> raw_bits_binary_buffer(probe.raw_bits_binary_size + 1, '\0');
-    std::vector<char> text_tokens_buffer(probe.text_follow_data.text_tokens_size + 1, '\0');
-    std::vector<char> lyric_lines_buffer(probe.text_follow_data.lyric_lines_size + 1, '\0');
-    std::vector<bag_text_follow_token_entry> text_entries(
-        probe.text_follow_data.text_token_timeline_count);
-    std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(
-        probe.text_follow_data.token_raw_segments_count);
-    std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(
-        probe.text_follow_data.token_raw_display_units_count);
-    std::vector<bag_text_follow_lyric_line_entry> line_entries(
-        probe.text_follow_data.lyric_line_timeline_count);
-    std::vector<bag_text_follow_line_token_range_entry> line_token_ranges(
-        probe.text_follow_data.line_token_ranges_count);
-    std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments(
-        probe.text_follow_data.line_raw_segments_count);
-    std::vector<bag_payload_follow_byte_entry> byte_entries(
-        probe.follow_data.byte_timeline_count);
-    std::vector<bag_payload_follow_binary_group_entry> binary_entries(
-        probe.follow_data.binary_group_timeline_count);
-    bag_free_encode_result(&probe);
+    bag_encoder_config config =
+        MakeEncoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
+    config.mode = static_cast<bag_transport_mode>(mode);
 
     bag_encode_result result{};
+    std::array<char, 4096> raw_bytes_hex_buffer{};
+    std::array<char, 32768> raw_bits_binary_buffer{};
+    std::vector<char> text_tokens_buffer(input.size() * 4 + 1, '\0');
+    std::vector<char> lyric_lines_buffer(input.size() * 4 + 1, '\0');
+    std::vector<bag_text_follow_token_entry> text_entries(input.size());
+    std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(input.size());
+    std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(input.size() * 4);
+    std::vector<bag_text_follow_lyric_line_entry> line_entries(input.size());
+    std::vector<bag_text_follow_line_token_range_entry> line_token_ranges(input.size());
+    std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments(input.size());
+    std::vector<bag_payload_follow_byte_entry> byte_entries(input.size() * 4);
+    std::vector<bag_payload_follow_binary_group_entry> binary_entries(input.size() * 8);
+
     result.raw_bytes_hex_buffer = raw_bytes_hex_buffer.data();
     result.raw_bytes_hex_buffer_size = raw_bytes_hex_buffer.size();
     result.raw_bits_binary_buffer = raw_bits_binary_buffer.data();
@@ -962,52 +1075,11 @@ Java_com_bag_audioandroid_NativeBagBridge_nativeTakeEncodeTextJobResult(
     result.follow_data.byte_timeline_buffer_count = byte_entries.size();
     result.follow_data.binary_group_timeline_buffer = binary_entries.data();
     result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
-    if (bag_take_encode_text_job_result_with_follow(job, &result) != BAG_OK) {
-        bag_free_encode_result(&result);
+    if (bag_build_encode_follow_data(&config, input.c_str(), &result) != BAG_OK) {
         return NewEmptyEncodedAudioPayloadResult(env);
     }
 
-    text_entries.resize(result.text_follow_data.text_token_timeline_count);
-    text_raw_segments.resize(result.text_follow_data.token_raw_segments_count);
-    text_raw_display_units.resize(result.text_follow_data.token_raw_display_units_count);
-    line_entries.resize(result.text_follow_data.lyric_line_timeline_count);
-    line_token_ranges.resize(result.text_follow_data.line_token_ranges_count);
-    line_raw_segments.resize(result.text_follow_data.line_raw_segments_count);
-    byte_entries.resize(result.follow_data.byte_timeline_count);
-    binary_entries.resize(result.follow_data.binary_group_timeline_count);
-    const std::string text_tokens(text_tokens_buffer.data(), result.text_follow_data.text_tokens_size);
-    const std::string lyric_lines(lyric_lines_buffer.data(), result.text_follow_data.lyric_lines_size);
-    const std::string raw_bytes_hex(raw_bytes_hex_buffer.data(), result.raw_bytes_hex_size);
-    const std::string raw_bits_binary(raw_bits_binary_buffer.data(), result.raw_bits_binary_size);
-    jshortArray pcm = NewShortArrayFromPcmResult(env, result);
-    jobject follow_data = NewPayloadFollowViewData(
-        env,
-        text_tokens,
-        lyric_lines,
-        raw_bytes_hex,
-        raw_bits_binary,
-        text_entries,
-        text_raw_segments,
-        text_raw_display_units,
-        line_entries,
-        line_token_ranges,
-        line_raw_segments,
-        byte_entries,
-        binary_entries,
-        result.text_follow_data.available != 0 ? JNI_TRUE : JNI_FALSE,
-        (result.text_follow_data.available != 0 &&
-         result.text_follow_data.lyric_line_timeline_count > 0 &&
-         result.text_follow_data.line_token_ranges_count > 0)
-            ? JNI_TRUE
-            : JNI_FALSE,
-        static_cast<jint>(result.follow_data.payload_begin_sample),
-        static_cast<jint>(result.follow_data.payload_sample_count),
-        static_cast<jint>(result.follow_data.total_pcm_sample_count),
-        result.follow_data.available != 0 ? JNI_TRUE : JNI_FALSE);
-    jobject encoded_result =
-        NewEncodedAudioPayloadResult(env, pcm, raw_bytes_hex, raw_bits_binary, follow_data);
-    bag_free_encode_result(&result);
-    return encoded_result;
+    return NewEncodedAudioPayloadResultFromEncodeResult(env, result);
 }
 
 extern "C" JNIEXPORT jint JNICALL

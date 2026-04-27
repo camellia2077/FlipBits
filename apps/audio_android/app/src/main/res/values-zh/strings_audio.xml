@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Simplified Chinese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Simplified Chinese. -->
+    <!-- Audio screen strings: actions, playback modes, player details, status messages. -->
+    <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
+    <string name="audio_title">音频</string>
+    <string name="audio_input_label">输入文本</string>
+    <string name="audio_action_encode">创建</string>
+    <string name="audio_action_encode_busy">正在创建…</string>
+    <string name="audio_action_encode_busy_progress">正在创建… %1$d%%</string>
+    <string name="audio_encode_phase_preparing_input_label">准备中</string>
+    <string name="audio_encode_phase_rendering_pcm_label">渲染中</string>
+    <string name="audio_encode_phase_postprocessing_label">收尾中</string>
+    <string name="audio_encode_phase_finalizing_label">正在完成</string>
+    <string name="audio_action_cancel_encode">取消</string>
+    <string name="audio_action_cancel_encode_busy">正在取消…</string>
+    <string name="audio_action_play">播放</string>
+    <string name="audio_action_pause">暂停</string>
+    <string name="audio_action_previous_track">上一首</string>
+    <string name="audio_action_next_track">下一首</string>
+    <string name="audio_action_open_audio_info">信息</string>
+    <!-- CONTEXT: Playback mode option. Means normal play order. Paired with Random / Repeat one / Repeat all. Do not translate as ordinary quality or 'average'. -->
+    <string name="audio_action_normal_playback">顺序播放</string>
+    <!-- CONTEXT: Playback mode option. Means random order, not manual shuffling UI. -->
+    <string name="audio_action_shuffle_playback">随机随机</string>
+    <!-- CONTEXT: Playback mode option. Repeat the current single track/item. -->
+    <string name="audio_action_repeat_one">单曲循环</string>
+    <!-- CONTEXT: Playback mode option. Repeat the whole list / repeat all. -->
+    <string name="audio_action_repeat_list">全部循环</string>
+    <!-- CONTEXT: Main action on Audio screen. Reads audio back into text/result. Product term is Read. -->
+    <string name="audio_action_decode">读取</string>
+    <!-- CONTEXT: Busy label for the Read action. -->
+    <string name="audio_action_decode_busy">正在读取…</string>
+    <string name="audio_action_clear">清除</string>
+    <string name="audio_action_clear_result">清除结果</string>
+    <string name="audio_action_clear_result_busy">正在清除…</string>
+    <string name="audio_action_export">保存</string>
+    <string name="audio_action_playback_speed_short">速度</string>
+    <string name="audio_action_open_playback_speed_menu">打开播放速度菜单</string>
+    <string name="audio_action_toggle_playback_speed_slider">切换播放速度微调</string>
+    <string name="audio_action_cycle_playback_speed">播放速度 %1$s</string>
+    <string name="audio_action_open_saved_audio_list">已保存</string>
+    <!-- CONTEXT: Label describing where the current read result came from. %1$s is a mode name such as flash/pro/ultra. -->
+    <string name="audio_decode_source_generated">来源：%1$s</string>
+    <!-- CONTEXT: Label describing where the current read result came from. %1$s is a saved audio name. -->
+    <string name="audio_decode_source_saved">来源：%1$s</string>
+    <string name="audio_decode_busy_reason_generated">正在读取当前音频</string>
+    <string name="audio_decode_busy_reason_saved">正在读取已保存的音频</string>
+    <string name="audio_action_randomize_sample_input">随机示例</string>
+    <string name="audio_action_open_input_editor">打开编辑器</string>
+    <string name="audio_sample_length_short">简短</string>
+    <string name="audio_sample_length_long">较长</string>
+    <string name="audio_action_expand_input">展开输入</string>
+    <string name="audio_action_collapse_input">折叠输入</string>
+    <string name="audio_input_editor_inline_hint">长篇文章在此处将折叠显示。打开文本编辑器以查看或编辑全文。</string>
+    <string name="audio_input_editor_title">编辑输入文本</string>
+    <string name="audio_input_editor_hint">在将长行文本、笔记或仪式篇章转换为音频之前，请使用大编辑器进行操作。</string>
+    <string name="audio_input_editor_done">完成</string>
+    <string name="audio_input_editor_count">%1$d 个字符</string>
+    <string name="audio_input_metrics">%1$d 个字符 • %2$d 字节</string>
+    <string name="audio_input_payload_limit_ok">单段参考线：512 字节。更长输入会自动分段。</string>
+    <string name="audio_input_payload_limit_warning">已接近 512 字节。更长输入会自动分段。</string>
+    <string name="audio_input_payload_limit_exceeded">已超过 512 字节。当前输入会自动分段。</string>
+    <string name="audio_action_expand_result">展开结果</string>
+    <string name="audio_action_collapse_result">折叠结果</string>
+    <string name="audio_action_expand_result_content">展开结果文本</string>
+    <string name="audio_action_collapse_result_content">折叠结果文本</string>
+    <string name="audio_action_expand_result_content_short">显示</string>
+    <string name="audio_action_collapse_result_content_short">收起</string>
+    <string name="audio_action_expand_flash_style">展开风格</string>
+    <string name="audio_action_collapse_flash_style">折叠风格</string>
+    <string name="audio_status">%1$s</string>
+    <string name="audio_sample_count">%1$d 个采样</string>
+    <!-- CONTEXT: Panel title for the text produced by reading audio back. Product term is 'Read result'. -->
+    <string name="audio_result_title">读取结果</string>
+    <string name="audio_result_empty">暂无结果。</string>
+    <string name="audio_decode_view_text">文本</string>
+    <string name="audio_decode_view_raw">原始数据</string>
+    <string name="audio_decode_raw_binary_label">二进制</string>
+    <string name="audio_decode_raw_hex_label">十六进制</string>
+    <string name="audio_decode_text_unavailable">无法将此载荷解析为文本。原始数据仍可用。</string>
+    <string name="audio_decode_raw_unavailable">原始载荷数据暂不可用。</string>
+    <string name="audio_flash_style_title">Flash 音色风格：%1$s</string>
+    <string name="audio_flash_style_hint">应用于下次生成的音频。已生成的音频将保留其创建时的风格。</string>
+    <string name="audio_saved_audio_sheet_title">已保存的音频</string>
+    <string name="audio_saved_audio_empty">暂无已保存的音频。</string>
+    <string name="audio_mini_player_generated_title">%1$s 生成音频</string>
+    <string name="audio_mini_player_generated_flash_subtitle">%1$s • %2$s</string>
+    <string name="audio_mini_player_saved_subtitle">%1$s • %2$s</string>
+    <string name="audio_mini_player_duration_only">%1$s</string>
+    <string name="audio_player_detail_now_playing">正在播放</string>
+    <!-- CONTEXT: Title inside the player detail sheet for the text produced by reading audio back. Same concept as Read result. -->
+    <string name="audio_player_detail_decoded_title">读取结果</string>
+    <string name="audio_player_detail_decoded_empty">暂无结果。需要时请点击“读取”。</string>
+    <string name="audio_playback_view_visual">视觉效果</string>
+    <string name="audio_playback_view_lyrics">歌词</string>
+    <string name="audio_pro_visual_waiting_follow">正在等待跟踪数据</string>
+    <string name="audio_pro_visual_symbol_order">当前字节发出 2 个符号：先是高位半字节，然后是低位半字节</string>
+    <string name="audio_pro_visual_step_1">第一步</string>
+    <string name="audio_pro_visual_step_2">第二步</string>
+    <string name="audio_pro_visual_high_nibble">高位半字节</string>
+    <string name="audio_pro_visual_low_nibble">低位半字节</string>
+    <string name="audio_pro_visual_high_group">高位组</string>
+    <string name="audio_pro_visual_low_group">低位组</string>
+    <string name="audio_pro_visual_nibble_value">半字节 %1$s</string>
+    <string name="audio_pro_visual_playing_now">正在播放</string>
+    <string name="audio_pro_visual_up_next">即将播放</string>
+    <string name="audio_pro_visual_guide_title">此字节的发送方式</string>
+    <string name="audio_pro_visual_now">当前</string>
+    <string name="audio_pro_visual_next">下一步</string>
+    <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
+    <string name="audio_pro_visual_byte_complete">字节完成</string>
+    <!-- CONTEXT: Teaching text in the Pro visualizer. Keep Token / byte / ASCII protocol terms stable and concise. -->
+    <string name="audio_pro_visual_token_mapping">令牌 #%1$d \"%2$s\" -&gt; 字节 %3$d/%4$d</string>
+    <string name="audio_pro_visual_next_frequencies">下个符号频率：%1$d + %2$d Hz</string>
+    <string name="audio_pro_visual_next_byte_advance">这是第二个半字节，结束后播放器将推进到下个字节。</string>
+    <string name="audio_pro_visual_ascii_byte">ASCII 字节 %1$d</string>
+    <string name="audio_pro_visual_token_byte">令牌 #%1$d • 字节 %2$d/%3$d</string>
+    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_position">字节位置</string>
+    <string name="audio_pro_visual_then">然后</string>
+    <string name="audio_info_dialog_title">信息</string>
+    <!-- CONTEXT: Section header in the audio info sheet. Means user-facing detail/info, not account/profile identity. -->
+    <string name="audio_info_user_section">详情</string>
+    <!-- CONTEXT: Section header in the audio info sheet for technical metadata. -->
+    <string name="audio_info_technical_section">技术信息</string>
+    <!-- CONTEXT: Row label in the audio info sheet. Means transport/encoding type used by the current audio. -->
+    <string name="audio_info_encoding_type">类型</string>
+    <string name="audio_info_duration">时长</string>
+    <string name="audio_info_sample_rate">采样率</string>
+    <string name="audio_info_sample_rate_value">%1$d Hz</string>
+    <string name="audio_info_frame_samples">帧大小</string>
+    <string name="audio_info_frame_samples_value">%1$d 个采样</string>
+    <string name="audio_info_flash_voicing_style">Flash 音色风格</string>
+    <string name="audio_ultra_visual_now">当前</string>
+    <string name="audio_ultra_visual_next">下一步</string>
+    <string name="audio_ultra_visual_frequency_value">%1$d Hz</string>
+    <string name="audio_ultra_visual_no_symbol">无符号</string>
+    <string name="audio_ultra_visual_no_next_symbol">无下个符号</string>
+    <string name="audio_ultra_visual_level_high">高</string>
+    <string name="audio_ultra_visual_level_mid">中</string>
+    <string name="audio_ultra_visual_level_low">低</string>
+    <string name="audio_follow_unavailable">当前音频暂不可用载荷跟踪。</string>
+    <string name="audio_follow_text_unavailable">当前音频暂不可用文本跟踪。</string>
+    <string name="audio_follow_display_lyrics">歌词</string>
+    <string name="audio_follow_display_data">数据</string>
+    <string name="audio_follow_view_hex">十六进制</string>
+    <string name="audio_follow_view_binary">二进制</string>
+    <string name="audio_player_detail_saved_info_title">详情</string>
+    <string name="audio_player_detail_saved_mode">模式</string>
+    <string name="audio_player_detail_saved_duration">时长</string>
+    <string name="audio_player_detail_saved_time">保存时间</string>
+    <string name="audio_player_detail_saved_generated_time">生成时间</string>
+    <string name="audio_player_detail_saved_input_source">输入来源</string>
+    <string name="audio_player_detail_saved_sample_rate">采样率</string>
+    <string name="audio_player_detail_saved_payload_bytes">载荷大小</string>
+    <string name="audio_player_detail_saved_payload_bytes_value">%1$d 字节</string>
+    <string name="audio_generated_input_source_manual">手动输入</string>
+    <string name="audio_generated_input_source_sample">示例文本</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">FSK 通道</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">音调能量</string>
+    <!-- CONTEXT: Transport mode name shown in tabs/chips. Do not translate flash/pro/ultra as ordinary adjectives. -->
+    <string name="transport_mode_flash_label">flash</string>
+    <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
+    <string name="transport_mode_pro_label">pro</string>
+    <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
+    <string name="transport_mode_ultra_label">ultra</string>
+    <string name="audio_transport_flash_hint">flash 模式使用 UTF-8 文本。</string>
+    <string name="audio_transport_flash_example">守灯人解开了古老星图的封印</string>
+    <string name="audio_transport_pro_hint">pro 模式仅使用 ASCII 文本。</string>
+    <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
+    <string name="audio_transport_ultra_hint">ultra 模式使用 UTF-8 文本。</string>
+    <string name="audio_transport_ultra_example">守灯人解开了古老星图的封印</string>
+    <string name="audio_sample_thematic_2">钟楼深处，封印的引擎开始轰鸣</string>
+    <string name="audio_sample_thematic_3">第七盏灯已点亮，远方的门户仍一片死寂</string>
+    <string name="audio_sample_thematic_4">越过灰烬港湾，一艘朝圣船穿过黑色水域</string>
+    <string name="audio_sample_thematic_5">当铁钟敲响，外侧锁扣依然纹丝不动</string>
+    <string name="audio_sample_thematic_long_1">钟楼日志记录道，东侧熔炉在黎明前就做出了回应，远早于屋顶灯火升起之时。三名侍从手动转动黄铜转轮，煤烟从上方通风口飘落，覆盖了台阶。封印的舱门后传来低沉而稳定的轰鸣声，持续了如此之久，以至于值班书记员开始在蜡板上记录其节律。当最后一个音符消散，没有人触碰铁质门栓，但每位见证人都签署了同一行文字：下方的机器自行苏醒了。</string>
+    <string name="audio_sample_thematic_long_2">二更时分，门房的灯火已被修剪，外侧螺栓再次经过检查，链条铰链上的煤烟也被刮除。远处的走廊没有传来任何信号，但石地板却在短时间内不断震颤，仿佛大厅下方的重型驱动装置恢复了未完成的工作。守卫们参照水钟计算每次震动，发现每当西墙承受全风力载荷时，这种模式就会重现。在撤岗前，内侧锁扣上压印了新鲜的蜡封，报告以警告结尾：“门户之外的寂静，如今已是已被占据的寂静。”</string>
+    <string name="audio_sample_thematic_long_3">熔炉年代记记录到，红色灯火被逐一点亮，直到整个密室像烟雾后的余烬般闪耀。当最后的链条静止，信号员将每一次脉冲誊写在蜡板上，上方的回廊则传来铁钩刮擦的回响。四次缓慢的回声穿过椽木传来，一次比一次微弱，然而没有任何一位记录者能就声音源自哪面墙壁达成共识。结语写道，钟声被放任直到黎明，因为密室中没有人愿意听到第五次呼唤会引来什么样的回应。</string>
+    <string name="audio_sample_thematic_long_4">一份来自灰烬海岸的航行记录讲述了一次在残月下的航行，天空被熔炉的尘埃遮蔽。船体灯火被遮盖，海图室保持静默，只有引擎圣所缓慢的脉冲标志着甲板下的时间。接近午夜时，在黑色波涛间发现游动的苍白身影后，舵手下令船头偏转三度，尽管没有任何声音传到舷窗边。清晨时分，船只再次发现了港口的灯光，最后一条记录写道，除了封印宝匣旁的那一盏，所有灯火都被怀着感激之情重新点燃。</string>
+    <string name="audio_sample_pro_2">SEAL THE OUTER LOCK</string>
+    <string name="audio_sample_pro_3">COPPER WARDENS STIR THE DRIVE</string>
+    <string name="audio_sample_pro_4">SEVENTH LAMP LIT GATE STILL SILENT</string>
+    <string name="audio_sample_pro_5">HOLD FORMATION BELOW IRON MASTS</string>
+    <string name="audio_sample_pro_long_1">BELL TOWER LEDGER. EAST FURNACE ANSWERED BEFORE DAWN. THREE ATTENDANTS TURNED THE BRASS WHEELS BY HAND WHILE SOOT FELL THROUGH THE UPPER VENTS. A LOW STEADY HUM CAME THROUGH THE SEALED HATCH. FINAL LINE STATES THE MACHINE BELOW WOKE OF ITS OWN ACCORD.</string>
+    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
+    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
+    <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
+    <string name="status_ready_to_encode">输入文本并点击“创建”</string>
+    <string name="status_input_empty">输入内容为空。</string>
+    <string name="status_mode_audio_generating">正在创建 %1$s 音频…</string>
+    <string name="status_mode_audio_generating_progress">正在创建 %1$s 音频… %2$d%%</string>
+    <string name="status_mode_audio_generating_preparing_input">正在准备 %1$s 音频…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">正在渲染 %1$s 音频…</string>
+    <string name="status_mode_audio_generating_postprocessing">正在收尾 %1$s 音频…</string>
+    <string name="status_mode_audio_generating_finalizing">正在完成 %1$s 音频…</string>
+    <string name="status_mode_audio_canceling">正在取消 %1$s 音频…</string>
+    <string name="status_mode_audio_cancelled">%1$s 音频已取消</string>
+    <string name="status_mode_audio_generated">%1$s 就绪，%2$d 个采样</string>
+    <string name="status_mode_audio_generated_segmented">%1$s 就绪，%2$d 个采样，分为 %3$d 段</string>
+    <string name="status_playing_mode_audio">正在播放 %1$s 音频</string>
+    <string name="status_playback_paused">播放已暂停</string>
+    <string name="status_playback_completed">播放已完成</string>
+    <string name="status_playback_stopped">播放已停止</string>
+    <string name="status_playback_failed">播放失败</string>
+    <string name="status_mode_audio_decoding">正在读取 %1$s 音频…</string>
+    <string name="status_mode_decode_completed">%1$s 读取完成</string>
+    <string name="status_current_mode_cleared">已清除当前音频</string>
+    <string name="status_result_cleared">结果已清除</string>
+    <string name="status_audio_saved">已保存：%1$s</string>
+    <string name="status_audio_save_failed">保存失败</string>
+    <string name="snackbar_audio_saved_to_library">已保存</string>
+    <string name="snackbar_audio_save_failed">保存失败</string>
+    <string name="status_saved_audio_loaded">已加载：%1$s</string>
+    <string name="status_saved_audio_load_failed">加载失败</string>
+    <string name="status_playing_saved_audio">正在播放：%1$s</string>
+    <string name="status_no_audio_for_mode">此模式暂无音频</string>
+</resources>

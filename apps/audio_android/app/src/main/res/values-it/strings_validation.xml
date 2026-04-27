@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">Mancano le impostazioni.</string>
+    <string name="validation_null_text">Il testo di input è obbligatorio.</string>
+    <string name="validation_null_decoder_output">Manca il buffer del risultato.</string>
+    <string name="validation_invalid_sample_rate">La frequenza di campionamento deve essere maggiore di 0.</string>
+    <string name="validation_invalid_frame_samples">La dimensione del frame deve essere maggiore di 0.</string>
+    <string name="validation_invalid_mode">Modalità di trasporto non supportata.</string>
+    <string name="validation_invalid_flash_signal_profile">Profilo di segnale flash non supportato.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Stile flash non supportato.</string>
+    <string name="validation_pro_ascii_only">pro supporta solo ASCII.</string>
+    <string name="validation_payload_too_large">Il testo di input supera il limite di 512 byte per singolo frame di questa modalità.</string>
+    <string name="error_invalid_argument">Argomento non valido.</string>
+    <string name="error_not_ready">Il risultato non è ancora pronto.</string>
+    <string name="error_not_implemented">Non ancora disponibile.</string>
+    <string name="error_cancelled">Operazione annullata.</string>
+    <string name="error_internal">Errore interno.</string>
+</resources>

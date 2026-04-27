@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.ceil
 
 @Composable
@@ -45,6 +46,7 @@ internal fun UltraSymbolStepVisualizer(
         return
     }
 
+    val visualTokens = appThemeVisualTokens()
     val density = LocalDensity.current
     val totalSamples = pcm.size.coerceAtLeast(1)
     val clampedDisplayedSamples = displayedSamples.coerceIn(0, totalSamples)
@@ -85,6 +87,7 @@ internal fun UltraSymbolStepVisualizer(
         ) {
             UltraSymbolStepChart(
                 buckets = state.buckets,
+                visualTokens = visualTokens,
                 modifier = Modifier.fillMaxWidth(),
             )
             UltraNowNextRow(
@@ -99,19 +102,20 @@ internal fun UltraSymbolStepVisualizer(
 @Composable
 private fun UltraSymbolStepChart(
     buckets: List<SymbolEnvelopeBucket>,
+    visualTokens: com.bag.audioandroid.ui.theme.AppThemeVisualTokens,
     modifier: Modifier = Modifier,
 ) {
     val activeColor = MaterialTheme.colorScheme.primary
     val nextColor = MaterialTheme.colorScheme.secondary
     val inactiveColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.42f)
     val guideColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
-    val baseBackground = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.24f)
+    val baseBackground = visualTokens.visualizationBaseBackgroundColor
     val ambientBrush =
         Brush.horizontalGradient(
             listOf(
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.30f),
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.26f),
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.30f),
+                visualTokens.supportSurfaceColor.copy(alpha = 0.30f),
+                visualTokens.supportStrongSurfaceColor.copy(alpha = 0.26f),
+                visualTokens.supportSurfaceColor.copy(alpha = 0.30f),
             ),
         )
 
@@ -313,10 +317,11 @@ private fun UltraFrequencyPill(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+        color = visualTokens.supportSurfaceColor,
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),

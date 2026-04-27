@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Korean rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Korean. -->
+    <!-- Settings tab strings: language picker, theme, dual-tone palette, flash style, about entry. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="config_title">설정</string>
+    <string name="config_language_title">언어</string>
+    <string name="config_language_subtitle">앱 언어 선택</string>
+    <!-- CONTEXT: Language option meaning follow the device/system language. -->
+    <string name="config_language_follow_system">시스템 설정 따름</string>
+    <string name="config_language_chinese">简体中文</string>
+    <string name="config_language_traditional_chinese">繁體中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_ukrainian">Українська</string>
+    <string name="config_language_korean">한국어</string>
+    <string name="config_language_french">Français</string>
+    <string name="config_language_italian">Italiano</string>
+    <string name="config_language_polish">Polish</string>
+    <!-- CONTEXT: Style-English locale option name. It is a language/style name, not normal UI prose. Keep the intended display strategy. -->
+    <string name="config_language_high_gothic">Altum Gothicum</string>
+    <string name="config_language_expand">언어 설정 확장</string>
+    <string name="config_language_collapse">언어 설정 축소</string>
+    <string name="config_theme_mode_title">테마 모드</string>
+    <string name="config_theme_mode_subtitle">시스템 설정, 라이트 모드 또는 다크 모드 중 선택하세요.</string>
+    <string name="config_theme_mode_brand_fixed">듀얼 톤 테마는 고정된 디자인을 사용합니다.</string>
+    <string name="config_theme_mode_follow_system">시스템 설정 따름</string>
+    <string name="config_theme_mode_light">라이트</string>
+    <string name="config_theme_mode_dark">다크</string>
+    <string name="config_theme_appearance_title">테마 외관</string>
+    <string name="config_theme_style_title">테마 스타일</string>
+    <string name="config_theme_style_subtitle">Material 또는 듀얼 톤 중 선택하세요.</string>
+    <string name="config_theme_style_material">Material</string>
+    <!-- CONTEXT: Theme style option. Product term for the fixed two-color theme system. -->
+    <string name="config_theme_style_brand_dual_tone">듀얼 톤</string>
+    <string name="config_theme_appearance_expand">테마 외관 설정 확장</string>
+    <string name="config_theme_appearance_collapse">테마 외관 설정 축소</string>
+    <string name="config_palette_title">색상 팔레트</string>
+    <string name="config_palette_selected">선택됨</string>
+    <string name="config_palette_expand">팔레트 확장</string>
+    <string name="config_palette_collapse">팔레트 축소</string>
+    <string name="config_brand_theme_title">듀얼 톤 테마</string>
+    <string name="config_brand_theme_description">각 듀얼 톤 테마는 두 가지 색상의 미리보기와 함께 고정된 디자인을 유지합니다.</string>
+    <string name="config_dual_tone_group_sacred_machine">신성한 기계</string>
+    <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
+    <string name="config_dual_tone_group_custom">사용자 지정</string>
+    <string name="config_dual_tone_group_ancient_dynasty">고대 왕조</string>
+    <string name="config_dual_tone_group_immortal_rot">불멸의 부패</string>
+    <string name="config_dual_tone_group_scarlet_carnage">진홍빛 살육</string>
+    <string name="config_dual_tone_group_exquisite_fall">정교한 몰락</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">변이의 미궁</string>
+    <string name="palette_family_brand">듀얼 톤</string>
+    <string name="palette_family_reds_pinks">레드 &amp; 핑크</string>
+    <string name="palette_family_oranges">오렌지</string>
+    <string name="palette_family_yellows">옐로우</string>
+    <string name="palette_family_greens">그린</string>
+    <string name="palette_family_cyans_blues">시안 &amp; 블루</string>
+    <string name="palette_family_purples_magentas">퍼플 &amp; 마젠타</string>
+    <string name="palette_family_neutrals">뉴트럴</string>
+    <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
+    <string name="config_flash_style_title">Flash 스타일</string>
+    <string name="config_flash_style_subtitle">Flash 오디오의 사운드 방식을 선택하세요.</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_coded_burst_label">코드 버스트</string>
+    <string name="config_flash_style_coded_burst_description">기계적인 신호를 위한 고밀도 그룹화 버스트.</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_ritual_chant_label">의식용 찬트</string>
+    <string name="config_flash_style_ritual_chant_description">의식적인 명령 톤을 위한 부드럽고 울림 있는 구절.</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_deep_ritual_label">심층 의식</string>
+    <string name="config_flash_style_deep_ritual_description">대성당 같은 의식 구절과 깊은 공명, 엄숙한 합창 쉘.</string>
+    <string name="config_about_title">정보</string>
+    <string name="config_about_subtitle">제작자, 프로젝트 링크 및 라이선스</string>
+    <string name="palette_ruby_title">루비 레드</string>
+    <string name="palette_mars_relic_title">화성 유물</string>
+    <string name="brand_theme_mars_relic_title">화성 유물</string>
+    <string name="brand_theme_mars_relic_description">의식용 보관소 같은 느낌을 주는 짙은 빨간색과 양피지색의 조합.</string>
+    <string name="brand_theme_mars_relic_accessibility">화성 유물 테마, 짙은 빨간색과 양피지 베이지색.</string>
+    <string name="brand_theme_black_crimson_rite_title">블랙 크림슨 의식</string>
+    <string name="brand_theme_black_crimson_rite_description">엄격한 기계 제단 분위기를 위한 그을음 같은 검은색과 의식용 진홍색.</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">블랙 크림슨 라이트 테마, 검은색에 가까운 색과 선명한 진홍색.</string>
+    <string name="brand_theme_scarlet_guard_title">스칼렛 가드</string>
+    <string name="brand_theme_scarlet_guard_description">절제된 문장학적 톤을 위한 아이보리 화이트와 봉인된 진홍색.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">스칼렛 가드 테마, 밝은 아이보리와 어두운 스칼렛 레드.</string>
+    <string name="brand_theme_dynasty_revival_title">다이너스티 리바이벌</string>
+    <string name="brand_theme_dynasty_revival_description">다시 깨어난 왕조의 핵심을 표현한 툼 메탈 블랙과 클래식 리액터 그린.</string>
+    <string name="brand_theme_dynasty_revival_accessibility">다이너스티 리바이벌 테마, 깊은 툼 메탈 블랙과 밝은 리액터 그린.</string>
+    <string name="brand_theme_sepulcher_cyan_title">세펄커 시안</string>
+    <string name="brand_theme_sepulcher_cyan_description">정적인 왕실 기계의 광채를 위한 차가운 세펄커 스틸과 절제된 시안 그린.</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">세펄커 시안 테마, 차갑고 어두운 스틸과 차분한 시안 그린.</string>
+    <string name="brand_theme_tomb_sigil_title">툼 시질</string>
+    <string name="brand_theme_tomb_sigil_description">의식적인 왕조의 문장을 위한 따뜻한 지하실 철색과 선명한 리바이벌 그린.</string>
+    <string name="brand_theme_tomb_sigil_accessibility">툼 시질 테마, 어두운 지하실 철색과 선명한 리바이벌 그린.</string>
+    <string name="brand_theme_ancient_alloy_title">고대 합금</string>
+    <string name="brand_theme_ancient_alloy_description">툼 포지의 광채를 위한 풍화된 금속 그림자와 차가운 터콰이즈.</string>
+    <string name="brand_theme_ancient_alloy_accessibility">고대 합금 테마, 어두운 브론즈 그레이와 밝은 터콰이즈.</string>
+    <string name="brand_theme_immortal_rot_title">불멸의 부패</string>
+    <string name="brand_theme_immortal_rot_description">고사리 그린과 시트린 옐로우가 습하고 무성한 듀얼 톤 팔레트를 형성합니다.</string>
+    <string name="brand_theme_immortal_rot_accessibility">불멸의 부패 테마, 고사리 그린과 시트린 옐로우.</string>
+    <string name="brand_theme_scarlet_carnage_title">진홍빛 살육</string>
+    <string name="brand_theme_scarlet_carnage_description">짙은 빨간색과 황동색이 피와 전쟁의 금속이라는 잔혹한 듀얼 톤 팔레트를 벼려냅니다.</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">진홍빛 살육 테마, 짙은 빨간색과 어두운 골든로드 황동색.</string>
+    <string name="brand_theme_exquisite_fall_title">정교한 몰락</string>
+    <string name="brand_theme_exquisite_fall_description">깊고 어두운 보라색과 스크리머 핑크가 허영과 감각의 퇴폐적인 듀얼 톤 팔레트를 생성합니다.</string>
+    <string name="brand_theme_exquisite_fall_accessibility">정교한 몰락 테마, 깊고 어두운 보라색과 스크리머 핑크 및 금색 테두리.</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">변이의 미궁</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">채도가 낮은 시안 블루와 밝은 형광 보라색이 금색 테두리와 함께 변화하는 듀얼 톤 미궁을 형성합니다.</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">변이의 미궁 테마, 채도 낮은 시안 블루와 밝은 형광 보라색 및 금색 테두리.</string>
+    <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
+    <string name="brand_theme_custom_title">사용자 지정 듀얼 톤</string>
+    <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
+    <string name="brand_theme_custom_description">신성한 기계 샘플 텍스트와 함께 사용하는 고유한 듀얼 톤 색상입니다.</string>
+    <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
+    <string name="brand_theme_custom_accessibility">사용자 지정 듀얼 톤 테마 미리보기.</string>
+    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_brand_theme_add">추가</string>
+    <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_edit">사용자 지정 색상 편집</string>
+    <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
+    <string name="config_custom_brand_theme_dialog_title">사용자 지정 듀얼 톤 색상</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_new">새 사용자 지정 듀얼 톤</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_edit">사용자 지정 듀얼 톤 편집</string>
+    <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
+    <string name="config_custom_brand_theme_dialog_description">#RRGGBB 형식으로 헥스 색상을 입력하세요. 강조 색상을 재사용하려면 테두리를 비워 두세요.</string>
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_randomize">색상 무작위화</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
+    <string name="config_custom_brand_theme_randomize_hint">주사위를 사용하여 새로운 기본, 강조 및 테두리 색상 조합을 만드세요.</string>
+    <!-- CONTEXT: Form field label for the user-defined preset name. -->
+    <string name="config_custom_brand_theme_name_label">프리셋 이름</string>
+    <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_background_label">기본 색상</string>
+    <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_accent_label">강조 색상</string>
+    <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_outline_label">테두리 색상</string>
+    <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
+    <string name="config_custom_brand_theme_outline_optional">선택 사항</string>
+    <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_save">저장</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete">삭제</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete_title">사용자 지정 듀얼 톤 삭제</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
+    <string name="config_custom_brand_theme_delete_message">프리셋 %1$s을(를) 삭제하시겠습니까?</string>
+    <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
+    <string name="config_custom_brand_theme_invalid_name">프리셋 이름을 입력하세요.</string>
+    <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
+    <string name="config_custom_brand_theme_invalid_hex">#RRGGBB 형식을 사용하세요.</string>
+    <string name="palette_crimson_title">크림슨 레드</string>
+    <string name="palette_rose_title">로즈 핑크</string>
+    <string name="palette_sakura_title">사쿠라 핑크</string>
+    <string name="palette_raspberry_title">라즈베리 블룸</string>
+    <string name="palette_blush_title">블러쉬 핑크</string>
+    <string name="palette_orange_title">솔라 오렌지</string>
+    <string name="palette_coral_title">코랄 블룸</string>
+    <string name="palette_tangerine_title">탠저린 글로우</string>
+    <string name="palette_apricot_title">애프리콧 미스트</string>
+    <string name="palette_terracotta_title">테라코타 클레이</string>
+    <string name="palette_persimmon_title">퍼시먼 파이어</string>
+    <string name="palette_amber_title">썬 옐로우</string>
+    <string name="palette_gold_title">골든 아워</string>
+    <string name="palette_sunflower_title">선플라워 골드</string>
+    <string name="palette_lemon_title">레몬 라이트</string>
+    <string name="palette_honey_title">허니 엠버</string>
+    <string name="palette_marigold_title">메리골드 글로우</string>
+    <string name="palette_lime_title">라임 버스트</string>
+    <string name="palette_olive_title">올리브 모스</string>
+    <string name="palette_emerald_title">에메랄드 그린</string>
+    <string name="palette_mint_title">민트 웨이브</string>
+    <string name="palette_jade_title">제이드 스트림</string>
+    <string name="palette_forest_title">포레스트 파인</string>
+    <string name="palette_teal_title">아쿠아 시안</string>
+    <string name="palette_cyan_title">네온 시안</string>
+    <string name="palette_sky_title">스카이 블루</string>
+    <string name="palette_ocean_title">일렉트릭 블루</string>
+    <string name="palette_cobalt_title">코발트 블루</string>
+    <string name="palette_indigo_title">딥 인디고</string>
+    <string name="palette_violet_title">바이올렛 펄스</string>
+    <string name="palette_plum_title">플럼 나이트</string>
+    <string name="palette_magenta_title">마젠타 팝</string>
+    <string name="palette_fuchsia_title">푸시아 플래시</string>
+    <string name="palette_orchid_title">오키드 미스트</string>
+    <string name="palette_lilac_title">라일락 헤이즈</string>
+    <string name="palette_mocha_title">모카 브라운</string>
+    <string name="palette_slate_title">슬레이트 그레이</string>
+    <string name="palette_sand_title">샌드 스톤</string>
+    <string name="palette_stone_title">스톤 토프</string>
+    <string name="palette_graphite_title">그라파이트 잉크</string>
+    <string name="palette_ivory_title">아이보리 린넨</string>
+</resources>

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_scarlet_carnage_themed_black_iron_answers_magic">The crystal staff shatters. Bare fists only.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_black_iron_answers_magic">CRYSTAL STAFF BREAKS UNDER BARE FIST.</string>
-    <string name="audio_sample_scarlet_carnage_themed_face_to_face_truth">No spells. No hidden knives. No shots from the hill. Iron and brass stride through the fire. Heads unbowed. The distance closes. The staff shatters. The shield is torn by bare hands. Steel meets steel. The sparks tell the only truth: face to face, eye to eye, bone under iron.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_face_to_face_truth">NO SPELL. NO HIDDEN KNIFE. NO SAFE SHOT. BLACK IRON ADVANCES. DISTANCE CLOSES. STAFF SHATTERS. SHIELD TEARS. FACE TO FACE. BONE UNDER IRON.</string>
-    <string name="audio_sample_scarlet_carnage_themed_metal_crushes_magic">Iron crushes magic. Only the strike is true.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_metal_crushes_magic">METAL CRUSHES MAGIC. ONLY THE SWING IS TRUE.</string>
-    <string name="audio_sample_scarlet_carnage_themed_iron_splits_bone">Wards fold like paper. Cores are crushed to dust. They hide behind tricks and sorcery. The iron plate does not yield. It walks through fire. It ignores cowardice. When the blade falls, the lie ends. No magic saves you when the iron splits the bone. This is the only honest death.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_iron_splits_bone">SHIELDS FOLD LIKE PAPER. CORES CRUSHED TO DUST. HEAVY ARMOR WALKS THROUGH FIRE. NO MAGIC SAVES YOU. IRON SPLITS BONE. THE ONLY HONEST DEATH.</string>
+    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
+    <string name="audio_sample_scarlet_carnage_themed_black_iron_answers_magic">The crystal staff shatters. Only bare fists remain.</string>
+    <string name="audio_sample_scarlet_carnage_themed_face_to_face_truth">No spells. No hidden blades. No strikes from afar. Iron and brass stride through the fire, heads unbowed. The distance closes. The staff shatters. Shields are torn by bare hands. Steel meets steel. The sparks tell the only truth: face to face, eye to eye, bone under iron.</string>
+    <string name="audio_sample_scarlet_carnage_themed_metal_crushes_magic">Iron crushes magic. Only the strike is true. Words of power crumble beneath the weight of relentless steel, leaving nothing but the brutal honesty of the killing blow.</string>
+    <string name="audio_sample_scarlet_carnage_themed_iron_splits_bone">Wards fold like paper. Runes are crushed to dust. They hide behind tricks and sorcery. Iron armor does not yield. It walks through fire. It ignores cowardice. When the blade falls, the lie ends. No magic saves you when iron splits bone. This is the only honest death.</string>
 </resources>

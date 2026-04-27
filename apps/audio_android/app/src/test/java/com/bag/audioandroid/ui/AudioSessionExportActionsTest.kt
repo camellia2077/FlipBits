@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioExportResult
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.SavedAudioContent
 import com.bag.audioandroid.domain.SavedAudioImportResult
 import com.bag.audioandroid.domain.SavedAudioItem
@@ -96,8 +97,11 @@ class AudioSessionExportActionsTest {
                     flashVoicingStyle = FlashVoicingStyleOption.CodedBurst,
                     createdAtIsoUtc = "2026-03-17T00:00:00Z",
                     durationMs = 1L,
+                    sampleRateHz = 44_100,
                     frameSamples = 2205,
                     pcmSampleCount = 3,
+                    payloadByteCount = 4,
+                    inputSourceKind = GeneratedAudioInputSourceKind.Manual,
                     appVersion = "1.0.0",
                     coreVersion = "1.0.0",
                 ),

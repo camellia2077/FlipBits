@@ -9,6 +9,8 @@ import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerSource
@@ -23,6 +25,8 @@ import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.screen.formatDurationMillis
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
+import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
 
 data class AudioAppUiState(
     val selectedTab: AppTab = AppTab.Audio,
@@ -33,6 +37,7 @@ data class AudioAppUiState(
     val coreVersion: String = "",
     val selectedPalette: PaletteOption = DefaultMaterialPalette,
     val selectedBrandTheme: BrandThemeOption = DefaultBrandTheme,
+    val customBrandThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomBrandThemeSettings),
     val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.BrandDualTone,
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
     val isConfigLanguageExpanded: Boolean = true,
@@ -52,6 +57,17 @@ data class AudioAppUiState(
     val libraryStatusText: UiText = UiText.Empty,
     val snackbarMessage: SnackbarMessage? = null,
 ) {
+    val customBrandThemes: List<BrandThemeOption>
+        get() = customBrandThemePresets.map(::customBrandTheme)
+
+    val activeBrandTheme: BrandThemeOption
+        get() =
+            if (isCustomBrandThemeOptionId(selectedBrandTheme.id)) {
+                customBrandThemes.firstOrNull { it.id == selectedBrandTheme.id } ?: customBrandThemes.first()
+            } else {
+                selectedBrandTheme
+            }
+
     val currentSession: ModeAudioSessionState
         get() = sessions.getValue(transportMode)
 
@@ -64,6 +80,17 @@ data class AudioAppUiState(
                         ?.takeIf { it.item.itemId == source.itemId }
                         ?.playback
                         ?: PlaybackUiState()
+            }
+
+    val currentPlaybackSpeed: Float
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).playbackSpeed
+                is AudioPlaybackSource.Saved ->
+                    selectedSavedAudio
+                        ?.takeIf { it.item.itemId == source.itemId }
+                        ?.playbackSpeed
+                        ?: com.bag.audioandroid.ui.model.PlaybackSpeedOption.default.speed
             }
 
     val currentPlaybackSampleCount: Int

@@ -2,6 +2,10 @@
 
 本文件定义 Android 多语言文案新增、修改和翻译时的最小规则。
 
+补充执行说明：
+
+- `docs/design/android/translation/android-split-strings-translation-guide.md`
+
 ## Source Of Truth
 
 - 工程基线以 `apps/audio_android/app/src/main/res/values/strings.xml` 为准。
@@ -37,7 +41,7 @@
 ## Translation Rules
 
 - 优先翻译“用户要理解的动作和结果”，不要拘泥英文表面词形。
-- 同一术语在同一语言里保持稳定，不要一处叫 `Config`、另一处叫 `Settings`、再另一处叫 `Preferences`。
+- 同一术语在同一语言里保持稳定，不要一处叫 `Settings`、另一处叫 `Config`、再另一处叫 `Preferences`。
 - UI 空间很紧时，优先保留清晰、短而稳定的产品化说法，不追求完整直译。
 - 如果英文为了开发方便写得偏技术，落到其他语言时可以改成更自然的用户表达，但不能改变实际行为。
 - 不要把品牌风格词翻成过度文学化的长句，避免按钮、标题、标签失去可读性。
@@ -57,12 +61,12 @@
 
 以下术语应优先保持稳定，不要在不同语言里频繁换说法：
 
-- `Config`
+- `Settings`
 - `Dual-tone`
 - `flash voicing`
 - `saved audio`
 - `decoded text`
-- `library`
+- `Saved`
 - `Input text`
 
 如果要改这些词，应该成组检查相关页面和语言资源，而不是只改一处。

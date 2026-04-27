@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_title">О приложении</string>
+    <string name="about_author">%1$s</string>
+    <string name="about_presentation_version">Приложение v%1$s</string>
+    <string name="about_core_version">Движок v%1$s</string>
+    <string name="about_github">%1$s</string>
+    <string name="about_licenses_title">Лицензии open source</string>
+    <string name="about_licenses_subtitle">Просмотреть библиотеки и лицензии</string>
+    <string name="licenses_title">Лицензии open source</string>
+    <string name="licenses_loading">Загрузка лицензий</string>
+</resources>

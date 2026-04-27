@@ -24,10 +24,12 @@ import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 
 @Composable
 fun AudioTabScreen(
+    selectedThemeStyle: ThemeStyleOption,
     transportMode: TransportModeOption,
     isCodecBusy: Boolean,
     encodeProgress: Float?,
@@ -58,10 +60,13 @@ fun AudioTabScreen(
         mutableStateOf(transportMode == TransportModeOption.Flash)
     }
     var resultExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
+    var resultContentExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
     var sampleInputLength by rememberSaveable { mutableStateOf(SampleInputLengthOption.Short) }
 
     if (showInputEditor) {
         AudioInputEditorDialog(
+            selectedThemeStyle = selectedThemeStyle,
+            transportMode = transportMode,
             inputText = inputText,
             placeholderText = inputPlaceholderText,
             sampleInputLength = sampleInputLength,
@@ -101,6 +106,7 @@ fun AudioTabScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AudioInputActionsCard(
+                selectedThemeStyle = selectedThemeStyle,
                 transportMode = transportMode,
                 isCodecBusy = isCodecBusy,
                 encodeProgress = encodeProgress,
@@ -134,6 +140,8 @@ fun AudioTabScreen(
                 isDecodeBusy = isDecodingBusy,
                 expanded = resultExpanded,
                 onToggleExpanded = { resultExpanded = !resultExpanded },
+                resultContentExpanded = resultContentExpanded,
+                onToggleResultContentExpanded = { resultContentExpanded = !resultContentExpanded },
                 onDecode = onDecode,
                 onClearResult = onClearResult,
             )

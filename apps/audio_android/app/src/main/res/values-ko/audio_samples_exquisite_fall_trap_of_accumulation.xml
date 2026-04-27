@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_exquisite_fall_themed_gold_dust_inhaled">금가루가 폐를 채우지만, 손은 여전히 더 많은 것을 갈구합니다.</string>
-    <string name="audio_sample_exquisite_fall_ascii_gold_dust_inhaled">GOLD DUST FILLS THE LUNGS. HANDS STILL REACH FOR MORE.</string>
-    <string name="audio_sample_exquisite_fall_themed_vault_without_enough">동전들이 열띤 더미를 이루며 쌓여 금고 위로 기이한 빛을 내뿜습니다. 천장에서는 다이아몬드가 비처럼 쏟아집니다. 사랑하기엔 너무 무거운 팔찌 아래에서 창백한 해골 손이 부러지고, 살아있는 수집가는 손가락 끝에서부터 안쪽으로 황금으로 변해갑니다. 그는 반짝이는 먼지 속에서 숨을 몰아쉽니다. 그는 방, 왕관, 이름, 그리고 열쇠를 소유하고 있지만, 남은 유일한 생각은 모든 것을 소유하지 못했다는 상처뿐입니다.</string>
-    <string name="audio_sample_exquisite_fall_ascii_vault_without_enough">COINS RISE. DIAMONDS FALL. BONE BREAKS UNDER JEWELS. GOLD DUST IS BREATHED. THE VAULT IS FULL. IT IS NOT ENOUGH.</string>
+    <string name="audio_sample_exquisite_fall_themed_gold_dust_inhaled">금가루가 폐를 가득 채워 숨이 막히면서도, 손은 여전히 더 많은 것을 움켜쥐려 허우적거립니다.</string>
+    <string name="audio_sample_exquisite_fall_themed_vault_without_enough">동전들이 광기 어린 산을 이루며 쌓여 금고 안에 병적인 빛을 드리웁니다. 천장에서는 다이아몬드가 비처럼 쏟아집니다. 감당하기에 너무 무거운 팔찌 아래에서 하얗게 뼈만 남은 손이 부러지고, 살아있는 수집가는 손가락 끝에서부터 서서히 황금으로 굳어갑니다. 그는 반짝이는 먼지 속에서 헐떡입니다. 수많은 방과 왕관, 이름, 그리고 열쇠들을 소유했음에도, 그에게 남은 유일한 사념은 세상 모든 것을 소유하지는 못했다는 지독한 고통뿐입니다.</string>
 </resources>

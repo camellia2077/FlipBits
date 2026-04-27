@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 @Composable
 fun ActionButton(
@@ -25,15 +26,16 @@ fun ActionButton(
     borderWidth: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     // Most action buttons stay on the default container treatment. The optional border lets a
     // few stronger primary actions opt into a clearer selected / emphasized outline when needed.
     Surface(
         shape = MaterialTheme.shapes.medium,
         color =
             if (enabled) {
-                MaterialTheme.colorScheme.primaryContainer
+                visualTokens.actionContainerColor
             } else {
-                MaterialTheme.colorScheme.surfaceVariant
+                visualTokens.actionDisabledContainerColor
             },
         border =
             if (borderColor != Color.Unspecified && borderWidth > 0.dp) {
@@ -56,9 +58,9 @@ fun ActionButton(
                     if (textColor != Color.Unspecified) {
                         textColor
                     } else if (enabled) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
+                        visualTokens.actionContentColor
                     } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                        visualTokens.actionDisabledContentColor
                     },
             )
         }

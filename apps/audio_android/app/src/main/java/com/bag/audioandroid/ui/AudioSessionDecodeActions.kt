@@ -81,7 +81,13 @@ internal class AudioSessionDecodeActions(
             stateReducer.applyNoGeneratedAudio(mode)
             return
         }
-        val request = requestFactory.buildGenerated(current, mode, session.generatedPcm)
+        val request =
+            requestFactory.buildGenerated(
+                current = current,
+                mode = mode,
+                generatedPcm = session.generatedPcm,
+                metadata = session.generatedAudioMetadata,
+            )
         launchGeneratedDecode(request)
     }
 
@@ -135,6 +141,7 @@ private class DecodeRequestFactory(
         current: AudioAppUiState,
         mode: TransportModeOption,
         generatedPcm: ShortArray,
+        metadata: com.bag.audioandroid.domain.GeneratedAudioMetadata?,
     ): DecodeRequest =
         DecodeRequest(
             mode = mode,
@@ -147,6 +154,7 @@ private class DecodeRequestFactory(
                 } else {
                     FlashVoicingStyleOption.CodedBurst
                 },
+            segmentedPcm = metadata?.segmentSampleCounts?.let { splitPcmIntoSegments(generatedPcm, it) },
         )
 
     fun buildSaved(
@@ -164,6 +172,10 @@ private class DecodeRequestFactory(
                     savedAudio.item.flashVoicingStyle ?: current.selectedFlashVoicingStyle
                 } else {
                     FlashVoicingStyleOption.CodedBurst
+                },
+            segmentedPcm =
+                savedAudio.metadata?.segmentSampleCounts?.let {
+                    splitPcmIntoSegments(savedAudio.pcm, it)
                 },
         )
 }
@@ -186,16 +198,33 @@ private class DecodeRunner(
                 return@withContext DecodeResult.ValidationFailure(validationIssue)
             }
 
-            DecodeResult.Success(
-                audioCodecGateway.decodeGeneratedPcm(
-                    request.generatedPcm,
-                    request.sampleRateHz,
-                    request.frameSamples,
-                    request.mode.nativeValue,
-                    request.flashPreset.signalProfileValue,
-                    request.flashPreset.voicingFlavorValue,
-                ),
-            )
+            val decoded =
+                request.segmentedPcm?.let { segmentedPcm ->
+                    // Decode each stored segment independently, then merge the
+                    // user-facing payload/follow views back into one long-text result.
+                    mergeSegmentedDecodedPayloadResults(
+                        segmentedPcm.map { segmentPcm ->
+                            audioCodecGateway.decodeGeneratedPcm(
+                                segmentPcm,
+                                request.sampleRateHz,
+                                request.frameSamples,
+                                request.mode.nativeValue,
+                                request.flashPreset.signalProfileValue,
+                                request.flashPreset.voicingFlavorValue,
+                            )
+                        },
+                    )
+                }
+                    ?: audioCodecGateway.decodeGeneratedPcm(
+                        request.generatedPcm,
+                        request.sampleRateHz,
+                        request.frameSamples,
+                        request.mode.nativeValue,
+                        request.flashPreset.signalProfileValue,
+                        request.flashPreset.voicingFlavorValue,
+                    )
+
+            DecodeResult.Success(decoded)
         }
 }
 
@@ -215,7 +244,6 @@ private class DecodeStateReducer(
             it.copy(statusText = UiText.Resource(R.string.status_saved_audio_load_failed))
         }
     }
-
     fun markBusy(mode: TransportModeOption) {
         sessionStateStore.updateCurrentSession {
             it.copy(
@@ -333,6 +361,7 @@ private data class DecodeRequest(
     val sampleRateHz: Int,
     val frameSamples: Int,
     val flashPreset: FlashVoicingStyleOption,
+    val segmentedPcm: List<ShortArray>? = null,
 )
 
 private sealed interface DecodeResult {

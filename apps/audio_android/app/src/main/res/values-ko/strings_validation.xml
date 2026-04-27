@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Korean rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Korean. -->
+    <!-- Validation and error messages shown to users. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="validation_null_config">설정이 누락되었습니다.</string>
+    <string name="validation_null_text">입력 텍스트가 필요합니다.</string>
+    <string name="validation_null_decoder_output">결과 버퍼가 누락되었습니다.</string>
+    <string name="validation_invalid_sample_rate">샘플링 속도는 0보다 커야 합니다.</string>
+    <string name="validation_invalid_frame_samples">프레임 크기는 0보다 커야 합니다.</string>
+    <string name="validation_invalid_mode">지원되지 않는 전송 모드입니다.</string>
+    <string name="validation_invalid_flash_signal_profile">지원되지 않는 flash 신호 프로필입니다.</string>
+    <!-- CONTEXT: Validation error for an unsupported flash style preset. -->
+    <string name="validation_invalid_flash_voicing_flavor">지원되지 않는 flash 스타일입니다.</string>
+    <string name="validation_pro_ascii_only">Pro는 ASCII만 지원합니다.</string>
+    <string name="validation_payload_too_large">입력 텍스트가 이 모드의 512바이트 단일 프레임 한도를 초과했습니다.</string>
+    <string name="error_invalid_argument">잘못된 인수입니다.</string>
+    <!-- CONTEXT: Short user-facing error. Means required result/data is not ready yet. -->
+    <string name="error_not_ready">결과가 준비되지 않았습니다.</string>
+    <string name="error_not_implemented">아직 사용할 수 없습니다.</string>
+    <string name="error_cancelled">작업이 취소되었습니다.</string>
+    <string name="error_internal">내부 오류가 발생했습니다.</string>
+</resources>

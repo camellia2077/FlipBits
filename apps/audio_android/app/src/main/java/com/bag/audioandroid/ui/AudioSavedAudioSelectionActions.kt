@@ -5,6 +5,7 @@ import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
@@ -59,6 +60,11 @@ internal class AudioSavedAudioSelectionActions(
                         sampleRateHz = savedAudio.sampleRateHz,
                         metadata = savedAudio.metadata,
                         playback = playbackRuntimeGateway.load(savedAudio.pcm.size, savedAudio.sampleRateHz),
+                        playbackSpeed =
+                            state.selectedSavedAudio
+                                ?.takeIf { it.item.itemId == savedAudio.item.itemId }
+                                ?.playbackSpeed
+                                ?: PlaybackSpeedOption.default.speed,
                     ),
                 librarySelection =
                     if (clearLibrarySelection) {

@@ -10,6 +10,7 @@ import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
@@ -222,6 +223,217 @@ class AudioSessionDecodeActionsTest {
             assertResId(session.statusText, R.string.status_result_cleared)
         }
 
+    @Test
+    fun `decode merges segmented generated audio when metadata carries sample boundaries`() =
+        runTest {
+            val firstSegment =
+                DecodedAudioPayloadResult(
+                    decodedPayload =
+                        DecodedPayloadViewData(
+                            text = "hello ",
+                            rawBytesHex = "68 65 6C 6C 6F 20",
+                            rawBitsBinary = "01101000 01100101",
+                            textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                            rawPayloadAvailable = true,
+                        ),
+                    followData =
+                        PayloadFollowViewData(
+                            textTokens = listOf("hello"),
+                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 4, 0)),
+                            textFollowAvailable = true,
+                            hexTokens = listOf("68", "65", "6C", "6C", "6F", "20"),
+                            binaryTokens = listOf("01101000", "01100101"),
+                            byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 4, 0)),
+                            binaryGroupTimeline = listOf(PayloadFollowBinaryGroupTimelineEntry(0, 4, 0, 0, 8)),
+                            payloadBeginSample = 0,
+                            payloadSampleCount = 4,
+                            totalPcmSampleCount = 2,
+                            followAvailable = true,
+                        ),
+                )
+            val secondSegment =
+                DecodedAudioPayloadResult(
+                    decodedPayload =
+                        DecodedPayloadViewData(
+                            text = "world",
+                            rawBytesHex = "77 6F 72 6C 64",
+                            rawBitsBinary = "01110111 01101111",
+                            textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                            rawPayloadAvailable = true,
+                        ),
+                    followData =
+                        PayloadFollowViewData(
+                            textTokens = listOf("world"),
+                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 6, 0)),
+                            textFollowAvailable = true,
+                            hexTokens = listOf("77", "6F", "72", "6C", "64"),
+                            binaryTokens = listOf("01110111", "01101111"),
+                            byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 6, 0)),
+                            binaryGroupTimeline = listOf(PayloadFollowBinaryGroupTimelineEntry(0, 6, 0, 0, 8)),
+                            payloadBeginSample = 0,
+                            payloadSampleCount = 6,
+                            totalPcmSampleCount = 3,
+                            followAvailable = true,
+                        ),
+                )
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeDecodeAudioCodecGateway(
+                            decodeResultsQueue = ArrayDeque(listOf(firstSegment, secondSegment)),
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions +
+                            (
+                                TransportModeOption.Ultra to
+                                    fixture.uiState.value.sessions.getValue(TransportModeOption.Ultra).copy(
+                                        generatedPcm = shortArrayOf(1, 2, 3, 4, 5),
+                                        generatedAudioMetadata =
+                                            GeneratedAudioMetadata(
+                                                mode = TransportModeOption.Ultra,
+                                                createdAtIsoUtc = "2026-04-27T00:00:00Z",
+                                                durationMs = 10,
+                                                sampleRateHz = 44_100,
+                                                frameSamples = 2205,
+                                                pcmSampleCount = 5,
+                                                payloadByteCount = 5,
+                                                inputSourceKind = GeneratedAudioInputSourceKind.Manual,
+                                                segmentCount = 2,
+                                                appVersion = "test",
+                                                coreVersion = "test",
+                                                segmentSampleCounts = listOf(2, 3),
+                                            ),
+                                    )
+                            ),
+                    currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Ultra),
+                    transportMode = TransportModeOption.Ultra,
+                )
+
+            fixture.actions.onDecode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Ultra)
+            assertEquals("hello world", session.decodedPayload.text)
+            assertEquals("68 65 6C 6C 6F 20 77 6F 72 6C 64", session.decodedPayload.rawBytesHex)
+            assertTrue(session.followData.followAvailable)
+            assertEquals(5, session.followData.totalPcmSampleCount)
+            assertResId(session.statusText, R.string.status_mode_decode_completed)
+        }
+
+    @Test
+    fun `decode merges segmented saved audio when metadata carries sample boundaries`() =
+        runTest {
+            val firstSegment =
+                DecodedAudioPayloadResult(
+                    decodedPayload =
+                        DecodedPayloadViewData(
+                            text = "seg-1 ",
+                            rawBytesHex = "73 65 67 2D 31 20",
+                            rawBitsBinary = "01110011 01100101",
+                            textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                            rawPayloadAvailable = true,
+                        ),
+                    followData =
+                        PayloadFollowViewData(
+                            textTokens = listOf("seg-1"),
+                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 2, 0)),
+                            textFollowAvailable = true,
+                            hexTokens = listOf("73", "65", "67", "2D", "31", "20"),
+                            binaryTokens = listOf("01110011", "01100101"),
+                            byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 2, 0)),
+                            binaryGroupTimeline = listOf(PayloadFollowBinaryGroupTimelineEntry(0, 2, 0, 0, 8)),
+                            payloadBeginSample = 0,
+                            payloadSampleCount = 2,
+                            totalPcmSampleCount = 2,
+                            followAvailable = true,
+                        ),
+                )
+            val secondSegment =
+                DecodedAudioPayloadResult(
+                    decodedPayload =
+                        DecodedPayloadViewData(
+                            text = "seg-2",
+                            rawBytesHex = "73 65 67 2D 32",
+                            rawBitsBinary = "01110011 01100101",
+                            textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                            rawPayloadAvailable = true,
+                        ),
+                    followData =
+                        PayloadFollowViewData(
+                            textTokens = listOf("seg-2"),
+                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 3, 0)),
+                            textFollowAvailable = true,
+                            hexTokens = listOf("73", "65", "67", "2D", "32"),
+                            binaryTokens = listOf("01110011", "01100101"),
+                            byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 3, 0)),
+                            binaryGroupTimeline = listOf(PayloadFollowBinaryGroupTimelineEntry(0, 3, 0, 0, 8)),
+                            payloadBeginSample = 0,
+                            payloadSampleCount = 3,
+                            totalPcmSampleCount = 3,
+                            followAvailable = true,
+                        ),
+                )
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeDecodeAudioCodecGateway(
+                            decodeResultsQueue = ArrayDeque(listOf(firstSegment, secondSegment)),
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    selectedSavedAudio =
+                        com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection(
+                            item =
+                                SavedAudioItem(
+                                    itemId = "saved-2",
+                                    displayName = "Saved Segmented",
+                                    uriString = "content://saved/2",
+                                    modeWireName = TransportModeOption.Ultra.wireName,
+                                    durationMs = 1000,
+                                    savedAtEpochSeconds = 0,
+                                ),
+                            pcm = shortArrayOf(1, 2, 3, 4, 5),
+                            sampleRateHz = 44_100,
+                            metadata =
+                                GeneratedAudioMetadata(
+                                    mode = TransportModeOption.Ultra,
+                                    createdAtIsoUtc = "2026-04-27T00:00:00Z",
+                                    durationMs = 1000,
+                                    sampleRateHz = 44_100,
+                                    frameSamples = 2205,
+                                    pcmSampleCount = 5,
+                                    payloadByteCount = 11,
+                                    inputSourceKind = GeneratedAudioInputSourceKind.Manual,
+                                    segmentCount = 2,
+                                    appVersion = "test",
+                                    coreVersion = "test",
+                                    segmentSampleCounts = listOf(2, 3),
+                                ),
+                            playback = com.bag.audioandroid.ui.state.PlaybackUiState(),
+                        ),
+                    currentPlaybackSource = AudioPlaybackSource.Saved("saved-2"),
+                )
+
+            fixture.actions.onDecode()
+            advanceUntilIdle()
+
+            val selected = fixture.uiState.value.selectedSavedAudio ?: error("selected audio missing")
+            assertEquals("seg-1 seg-2", selected.decodedPayload.text)
+            assertEquals("73 65 67 2D 31 20 73 65 67 2D 32", selected.decodedPayload.rawBytesHex)
+            assertTrue(selected.followData.followAvailable)
+            assertEquals(5, selected.followData.totalPcmSampleCount)
+            val status = fixture.uiState.value.currentSession.statusText as UiText.Resource
+            assertEquals(R.string.status_mode_decode_completed, status.resId)
+        }
+
     private fun createFixture(
         gateway: AudioCodecGateway,
         testScope: TestScope,
@@ -287,6 +499,7 @@ private class FakeDecodeAudioCodecGateway(
                     rawPayloadAvailable = true,
                 ),
         ),
+    private val decodeResultsQueue: ArrayDeque<DecodedAudioPayloadResult> = ArrayDeque(),
 ) : AudioCodecGateway {
     override fun validateEncodeRequest(
         text: String,
@@ -307,6 +520,15 @@ private class FakeDecodeAudioCodecGateway(
         onProgress: (com.bag.audioandroid.domain.EncodeProgressUpdate) -> Unit,
     ) = throw UnsupportedOperationException()
 
+    override suspend fun buildEncodeFollowData(
+        text: String,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ) = throw UnsupportedOperationException()
+
     override fun validateDecodeConfig(
         sampleRateHz: Int,
         frameSamples: Int,
@@ -322,7 +544,7 @@ private class FakeDecodeAudioCodecGateway(
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): DecodedAudioPayloadResult = decodedResult
+    ): DecodedAudioPayloadResult = decodeResultsQueue.removeFirstOrNull() ?: decodedResult
 
     override fun getCoreVersion(): String = "test"
 }
@@ -334,13 +556,11 @@ private class LocalFakeSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): SampleInput = SampleInput(id = "default", text = "sample")
 
-    override fun randomSample(
+    override fun sampleIds(
         mode: TransportModeOption,
-        language: AppLanguageOption,
         flavor: SampleFlavor,
         length: SampleInputLengthOption,
-        excludingSampleId: String?,
-    ): SampleInput = SampleInput(id = "random", text = "sample")
+    ): List<String> = listOf("default", "random")
 
     override fun sampleById(
         mode: TransportModeOption,

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.ceil
 
 @Composable
@@ -39,6 +40,7 @@ internal fun AudioFlashSignalVisualizer(
         return
     }
 
+    val visualTokens = appThemeVisualTokens()
     val density = LocalDensity.current
     val visualTransition = rememberInfiniteTransition(label = "flashSignalVisualizer")
     val glowPulseAnimated by visualTransition.animateFloat(
@@ -105,9 +107,9 @@ internal fun AudioFlashSignalVisualizer(
             }
 
         val activeToneColor = MaterialTheme.colorScheme.primary
-        val inactiveToneColor = MaterialTheme.colorScheme.outlineVariant
+        val inactiveToneColor = visualTokens.visualizationInactiveToneColor
         val glowColor = MaterialTheme.colorScheme.onPrimaryContainer
-        val baseBackground = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.24f)
+        val baseBackground = visualTokens.visualizationBaseBackgroundColor
         val centerLineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.20f)
         val ambientBrush =
             Brush.horizontalGradient(

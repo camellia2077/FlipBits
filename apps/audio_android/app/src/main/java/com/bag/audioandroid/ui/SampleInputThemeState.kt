@@ -7,7 +7,7 @@ import com.bag.audioandroid.ui.model.effectiveSampleFlavor
 import com.bag.audioandroid.ui.state.AudioAppUiState
 
 internal val AudioAppUiState.currentSampleFlavor: SampleFlavor
-    get() = effectiveSampleFlavor(selectedThemeStyle, selectedBrandTheme)
+    get() = effectiveSampleFlavor(selectedThemeStyle, activeBrandTheme)
 
 internal fun AudioAppUiState.withSelectedBrandTheme(
     brandTheme: BrandThemeOption,
@@ -40,7 +40,7 @@ internal fun AudioAppUiState.withSelectedThemeStyle(
     if (selectedThemeStyle == themeStyle) {
         return this
     }
-    val newFlavor = effectiveSampleFlavor(themeStyle, selectedBrandTheme)
+    val newFlavor = effectiveSampleFlavor(themeStyle, activeBrandTheme)
     val updatedSessions =
         if (currentSampleFlavor != newFlavor) {
             sampleInputSessionUpdater.refreshForFlavorChange(

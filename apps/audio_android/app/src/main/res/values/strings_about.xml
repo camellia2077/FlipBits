@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CONTEXT: About page title. Prefer a product/about page label such as 'App info' if the target language needs something more specific than a generic noun. -->
+    <string name="about_title">About</string>
+    <!-- CONTEXT: About page row value only. If the surrounding UI already labels the row as Author, keep this as the raw %1$s value rather than repeating the label. -->
+    <string name="about_author">%1$s</string>
+    <!-- CONTEXT: About page row showing the app/UI release version. %1$s is the version number only. -->
+    <string name="about_presentation_version">App v%1$s</string>
+    <!-- CONTEXT: About page row showing the engine/core/library version. %1$s is the version number only. -->
+    <string name="about_core_version">Engine v%1$s</string>
+    <!-- CONTEXT: About page row for the project GitHub link/value. If the surrounding UI already labels the row as GitHub, this can stay as just the %1$s value. -->
+    <string name="about_github">%1$s</string>
+    <!-- CONTEXT: Row title that opens the open-source licenses screen. -->
+    <string name="about_licenses_title">Open Source Licenses</string>
+    <!-- CONTEXT: Short subtitle under the licenses row. Means 'view libraries and licenses', not a separate page title. -->
+    <string name="about_licenses_subtitle">View libraries and licenses</string>
+    <!-- CONTEXT: Title shown at the top of the dedicated licenses screen. -->
+    <string name="licenses_title">Open Source Licenses</string>
+    <!-- CONTEXT: Short loading state shown while the licenses screen is still loading. -->
+    <string name="licenses_loading">Loading licenses</string>
+</resources>

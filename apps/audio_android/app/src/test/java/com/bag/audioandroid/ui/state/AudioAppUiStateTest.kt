@@ -1,6 +1,7 @@
 package com.bag.audioandroid.ui.state
 
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -34,8 +35,11 @@ class AudioAppUiStateTest {
                 mode = TransportModeOption.Pro,
                 createdAtIsoUtc = "2026-01-01T00:00:00Z",
                 durationMs = 1_000L,
+                sampleRateHz = 44_100,
                 frameSamples = 4096,
                 pcmSampleCount = 8_192,
+                payloadByteCount = 12,
+                inputSourceKind = GeneratedAudioInputSourceKind.Manual,
                 appVersion = "1.0.0",
                 coreVersion = "1.0.0",
             )

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Japanese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Japanese. -->
+    <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
+    <!-- These strings are short shared UI labels used across screens. -->
+    <string name="app_name">FlipBits</string>
+    <string name="common_back">戻る</string>
+    <string name="common_cancel">キャンセル</string>
+    <string name="common_all">すべて</string>
+    <string name="common_unknown">不明</string>
+    <string name="tab_audio">オーディオ</string>
+    <string name="tab_library">保存済み</string>
+    <string name="tab_config">設定</string>
+</resources>

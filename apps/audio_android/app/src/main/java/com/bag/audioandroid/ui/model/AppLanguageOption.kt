@@ -20,6 +20,9 @@ enum class AppLanguageOption(
     Ukrainian(languageTag = "uk", labelResId = R.string.config_language_ukrainian),
     Korean(languageTag = "ko", labelResId = R.string.config_language_korean),
     French(languageTag = "fr", labelResId = R.string.config_language_french),
+    Italian(languageTag = "it", labelResId = R.string.config_language_italian),
+    HighGothic(languageTag = "la", labelResId = R.string.config_language_high_gothic),
+    Polish(languageTag = "pl", labelResId = R.string.config_language_polish),
     ;
 
     fun toLocaleList(): LocaleListCompat =
@@ -54,6 +57,9 @@ enum class AppLanguageOption(
                 firstTag.startsWith("uk") -> Ukrainian
                 firstTag.startsWith("ko") -> Korean
                 firstTag.startsWith("fr") -> French
+                firstTag.startsWith("it") -> Italian
+                firstTag.startsWith("pl") -> Polish
+                firstTag.startsWith("la") -> HighGothic
                 else -> FollowSystem
             }
         }

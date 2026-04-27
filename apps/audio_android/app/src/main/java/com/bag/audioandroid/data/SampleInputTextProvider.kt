@@ -17,13 +17,11 @@ interface SampleInputTextProvider {
         flavor: SampleFlavor,
     ): SampleInput
 
-    fun randomSample(
+    fun sampleIds(
         mode: TransportModeOption,
-        language: AppLanguageOption,
         flavor: SampleFlavor,
         length: SampleInputLengthOption,
-        excludingSampleId: String? = null,
-    ): SampleInput
+    ): List<String>
 
     fun sampleById(
         mode: TransportModeOption,

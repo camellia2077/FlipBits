@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -66,6 +67,18 @@ class AppSettingsRepository(
                     throw exception
                 }
             }.map { preferences -> preferences[Keys.SelectedBrandThemeId] }
+
+    val customBrandThemePresets: Flow<List<CustomBrandThemeSettings>> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences ->
+                CustomBrandThemeSettingsStore.decode(preferences[Keys.CustomBrandThemePresetsJson])
+            }
 
     val selectedPlaybackSequenceModeId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -127,6 +140,12 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setCustomBrandThemePresets(settings: List<CustomBrandThemeSettings>) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.CustomBrandThemePresetsJson] = CustomBrandThemeSettingsStore.encode(settings)
+        }
+    }
+
     suspend fun setSelectedPlaybackSequenceModeId(playbackSequenceModeId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedPlaybackSequenceModeId] = playbackSequenceModeId
@@ -151,6 +170,7 @@ class AppSettingsRepository(
         val SelectedThemeModeId: Preferences.Key<String> = stringPreferencesKey("theme_mode")
         val SelectedThemeStyleId: Preferences.Key<String> = stringPreferencesKey("theme_style")
         val SelectedBrandThemeId: Preferences.Key<String> = stringPreferencesKey("brand_theme_id")
+        val CustomBrandThemePresetsJson: Preferences.Key<String> = stringPreferencesKey("custom_brand_presets_json")
         val SelectedPlaybackSequenceModeId: Preferences.Key<String> = stringPreferencesKey("playback_sequence_mode")
         val ConfigLanguageExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_language_expanded")
         val ConfigThemeAppearanceExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_theme_appearance_expanded")

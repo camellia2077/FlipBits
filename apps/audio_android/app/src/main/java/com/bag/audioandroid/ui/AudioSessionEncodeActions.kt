@@ -7,6 +7,7 @@ import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
@@ -23,6 +24,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -58,6 +60,7 @@ internal class AudioSessionEncodeActions(
         )
 
     private var encodeJob: Job? = null
+    private val followDataJobs = mutableMapOf<TransportModeOption, Job>()
 
     fun onEncode() {
         val current = uiState.value
@@ -67,6 +70,7 @@ internal class AudioSessionEncodeActions(
 
         val request = requestFactory.build(current)
         stopPlayback()
+        cancelFollowDataJob(request.mode)
         stateReducer.markBusy(request)
         launchEncode(request)
     }
@@ -87,7 +91,11 @@ internal class AudioSessionEncodeActions(
             scope.launch {
                 val runningJob = currentCoroutineContext()[Job]
                 try {
-                    stateReducer.reduceResult(request, encodeRunner.execute(request))
+                    val followHydration =
+                        stateReducer.reduceResult(request, encodeRunner.execute(request))
+                    if (followHydration != null) {
+                        launchFollowDataHydration(followHydration)
+                    }
                 } catch (cancelled: CancellationException) {
                     handleEncodeCancellation(request.mode, cancelled)
                 } finally {
@@ -113,6 +121,27 @@ internal class AudioSessionEncodeActions(
             encodeJob = null
         }
     }
+
+    private fun launchFollowDataHydration(request: FollowDataHydrationRequest) {
+        cancelFollowDataJob(request.mode)
+        followDataJobs[request.mode] =
+            scope.launch {
+                // Keep encode completion on the fast PCM path; hydrate the
+                // heavier follow-data view models after playback is ready.
+                val followData = encodeRunner.buildFollowData(request.encodeRequest)
+                if (followData != null) {
+                    stateReducer.applyHydratedFollowData(
+                        mode = request.mode,
+                        revision = request.generatedContentRevision,
+                        followData = followData,
+                    )
+                }
+            }
+    }
+
+    private fun cancelFollowDataJob(mode: TransportModeOption) {
+        followDataJobs.remove(mode)?.cancel()
+    }
 }
 
 private class EncodeRequestFactory {
@@ -120,6 +149,7 @@ private class EncodeRequestFactory {
         EncodeRequest(
             mode = current.transportMode,
             inputText = current.currentSession.inputText,
+            sampleInputId = current.currentSession.sampleInputId,
             selectedFlashVoicingStyle = current.selectedFlashVoicingStyle,
             flashPreset =
                 if (current.transportMode == TransportModeOption.Flash) {
@@ -150,8 +180,14 @@ private class EncodeRunner(
                     request.flashPreset.signalProfileValue,
                     request.flashPreset.voicingFlavorValue,
                 )
-            if (validationIssue != BagApiCodes.VALIDATION_OK) {
+            if (
+                validationIssue != BagApiCodes.VALIDATION_OK &&
+                validationIssue != BagApiCodes.VALIDATION_PAYLOAD_TOO_LARGE
+            ) {
                 return@withContext EncodeResult.ValidationFailure(validationIssue)
+            }
+            if (validationIssue == BagApiCodes.VALIDATION_PAYLOAD_TOO_LARGE) {
+                return@withContext encodeSegmented(request)
             }
 
             when (
@@ -169,12 +205,116 @@ private class EncodeRunner(
                 is EncodeAudioResult.Success ->
                     EncodeResult.Success(
                         pcm = gatewayResult.pcm,
-                        followData = gatewayResult.followData,
+                        segmentCount = 1,
                     )
                 EncodeAudioResult.Cancelled -> EncodeResult.Cancelled
                 is EncodeAudioResult.Failed -> EncodeResult.Failure(gatewayResult.errorCode)
             }
         }
+
+    suspend fun buildFollowData(request: EncodeRequest): PayloadFollowViewData? =
+        kotlinx.coroutines.withContext(workerDispatcher) {
+            val segmentation = request.segmentation
+            if (segmentation != null) {
+                val followSegments =
+                    segmentation.segments.map { segmentText ->
+                        val result =
+                            audioCodecGateway.buildEncodeFollowData(
+                                segmentText,
+                                sampleRateHz,
+                                frameSamples,
+                                request.mode.nativeValue,
+                                request.flashPreset.signalProfileValue,
+                                request.flashPreset.voicingFlavorValue,
+                            )
+                        result.followData.takeIf { it.followAvailable } ?: return@withContext null
+                    }
+                return@withContext mergeSegmentedFollowData(followSegments)
+            }
+            val result =
+                audioCodecGateway.buildEncodeFollowData(
+                    request.inputText,
+                    sampleRateHz,
+                    frameSamples,
+                    request.mode.nativeValue,
+                    request.flashPreset.signalProfileValue,
+                    request.flashPreset.voicingFlavorValue,
+            )
+            result.followData.takeIf { it.followAvailable }
+        }
+
+    private suspend fun encodeSegmented(request: EncodeRequest): EncodeResult {
+        val segmentation = splitInputIntoPayloadSegments(request.inputText, MAX_SINGLE_FRAME_PAYLOAD_BYTES)
+        val pcmSegments = ArrayList<ShortArray>(segmentation.segmentCount)
+        val totalSegments = segmentation.segmentCount.toFloat()
+
+        segmentation.segments.forEachIndexed { index, segmentText ->
+            val validationIssue =
+                audioCodecGateway.validateEncodeRequest(
+                    segmentText,
+                    sampleRateHz,
+                    frameSamples,
+                    request.mode.nativeValue,
+                    request.flashPreset.signalProfileValue,
+                    request.flashPreset.voicingFlavorValue,
+                )
+            if (validationIssue != BagApiCodes.VALIDATION_OK) {
+                return EncodeResult.ValidationFailure(validationIssue)
+            }
+            when (
+                val gatewayResult =
+                    audioCodecGateway.encodeTextToPcm(
+                        segmentText,
+                        sampleRateHz,
+                        frameSamples,
+                        request.mode.nativeValue,
+                        request.flashPreset.signalProfileValue,
+                        request.flashPreset.voicingFlavorValue,
+                        onProgress = { update ->
+                            // Keep the native phase labels, but scale progress across
+                            // all segments so the UI reflects the whole long-text job.
+                            onProgress(
+                                request.mode,
+                                update.copy(
+                                    progress0To1 =
+                                        ((index.toFloat() + update.progress0To1.coerceIn(0f, 1f)) / totalSegments)
+                                            .coerceIn(0f, 1f),
+                                ),
+                            )
+                        },
+                    )
+            ) {
+                is EncodeAudioResult.Success -> pcmSegments += gatewayResult.pcm
+                EncodeAudioResult.Cancelled -> return EncodeResult.Cancelled
+                is EncodeAudioResult.Failed -> return EncodeResult.Failure(gatewayResult.errorCode)
+            }
+        }
+
+        return EncodeResult.Success(
+            pcm = concatenatePcmSegments(pcmSegments),
+            segmentCount = segmentation.segmentCount,
+            segmentation = segmentation,
+            segmentSampleCounts = pcmSegments.map(ShortArray::size),
+        )
+    }
+
+    private fun concatenatePcmSegments(segments: List<ShortArray>): ShortArray {
+        val totalSamples = segments.sumOf(ShortArray::size)
+        val merged = ShortArray(totalSamples)
+        var offset = 0
+        segments.forEach { segment ->
+            segment.copyInto(
+                destination = merged,
+                destinationOffset = offset,
+            )
+            offset += segment.size
+        }
+        return merged
+    }
+
+    private companion object {
+        const val MAX_SINGLE_FRAME_PAYLOAD_BYTES = 512
+    }
 }
 
 private class EncodeStateReducer(
@@ -239,14 +379,22 @@ private class EncodeStateReducer(
     fun reduceResult(
         request: EncodeRequest,
         result: EncodeResult,
-    ) {
+    ): FollowDataHydrationRequest? =
         when (result) {
-            is EncodeResult.ValidationFailure -> applyValidationFailure(request.mode, result.validationIssue)
-            EncodeResult.Cancelled -> applyCancelled(request.mode)
-            is EncodeResult.Failure -> applyFailure(request.mode, result.errorCode)
+            is EncodeResult.ValidationFailure -> {
+                applyValidationFailure(request.mode, result.validationIssue)
+                null
+            }
+            EncodeResult.Cancelled -> {
+                applyCancelled(request.mode)
+                null
+            }
+            is EncodeResult.Failure -> {
+                applyFailure(request.mode, result.errorCode)
+                null
+            }
             is EncodeResult.Success -> applySuccess(request, result)
         }
-    }
 
     fun applyCancelled(mode: TransportModeOption) {
         sessionStateStore.updateSession(mode) {
@@ -306,7 +454,7 @@ private class EncodeStateReducer(
     private fun applySuccess(
         request: EncodeRequest,
         result: EncodeResult.Success,
-    ) {
+    ): FollowDataHydrationRequest {
         val pcm = result.pcm
         val generatedFlashStyle =
             if (request.mode == TransportModeOption.Flash && pcm.isNotEmpty()) {
@@ -314,6 +462,9 @@ private class EncodeStateReducer(
             } else {
                 null
             }
+        val payloadByteCount = request.inputText.toByteArray(UTF_8).size
+        val nextRevision =
+            uiState.value.sessions.getValue(request.mode).generatedContentRevision + 1L
         sessionStateStore.updateSession(request.mode) {
             it.copy(
                 generatedPcm = pcm,
@@ -323,18 +474,37 @@ private class EncodeStateReducer(
                         flashVoicingStyle = generatedFlashStyle,
                         createdAtIsoUtc = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString(),
                         durationMs = (pcm.size.toLong() * 1000L) / sampleRateHz.toLong(),
+                        sampleRateHz = sampleRateHz,
                         frameSamples = frameSamples,
                         pcmSampleCount = pcm.size,
+                        payloadByteCount = payloadByteCount,
+                        inputSourceKind =
+                            if (request.sampleInputId != null) {
+                                GeneratedAudioInputSourceKind.Sample
+                            } else {
+                                GeneratedAudioInputSourceKind.Manual
+                            },
+                        segmentCount = result.segmentCount,
                         appVersion = request.appVersion,
                         coreVersion = request.coreVersion,
+                        segmentSampleCounts = result.segmentSampleCounts,
                     ),
                 generatedFlashVoicingStyle = generatedFlashStyle,
+                generatedContentRevision = nextRevision,
                 decodedPayload = DecodedPayloadViewData.Empty,
-                followData = result.followData,
+                followData = PayloadFollowViewData.Empty,
                 statusText =
                     UiText.Resource(
-                        R.string.status_mode_audio_generated,
-                        listOf(request.mode.wireName, pcm.size),
+                        if (result.segmentCount > 1) {
+                            R.string.status_mode_audio_generated_segmented
+                        } else {
+                            R.string.status_mode_audio_generated
+                        },
+                        if (result.segmentCount > 1) {
+                            listOf(request.mode.wireName, pcm.size, result.segmentCount)
+                        } else {
+                            listOf(request.mode.wireName, pcm.size)
+                        },
                     ),
                 isCodecBusy = false,
                 encodeProgress = null,
@@ -348,16 +518,37 @@ private class EncodeStateReducer(
                 it.copy(currentPlaybackSource = AudioPlaybackSource.Generated(request.mode))
             }
         }
+        return FollowDataHydrationRequest(
+            mode = request.mode,
+            encodeRequest = request.copy(segmentation = result.segmentation),
+            generatedContentRevision = nextRevision,
+        )
+    }
+
+    fun applyHydratedFollowData(
+        mode: TransportModeOption,
+        revision: Long,
+        followData: PayloadFollowViewData,
+    ) {
+        sessionStateStore.updateSession(mode) { session ->
+            if (session.generatedContentRevision != revision) {
+                session
+            } else {
+                session.copy(followData = followData)
+            }
+        }
     }
 }
 
 private data class EncodeRequest(
     val mode: TransportModeOption,
     val inputText: String,
+    val sampleInputId: String?,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption,
     val flashPreset: FlashVoicingStyleOption,
     val appVersion: String,
     val coreVersion: String,
+    val segmentation: SegmentedInputPlan? = null,
 )
 
 private sealed interface EncodeResult {
@@ -373,6 +564,14 @@ private sealed interface EncodeResult {
 
     data class Success(
         val pcm: ShortArray,
-        val followData: PayloadFollowViewData,
+        val segmentCount: Int,
+        val segmentation: SegmentedInputPlan? = null,
+        val segmentSampleCounts: List<Int> = emptyList(),
     ) : EncodeResult
 }
+
+private data class FollowDataHydrationRequest(
+    val mode: TransportModeOption,
+    val encodeRequest: EncodeRequest,
+    val generatedContentRevision: Long,
+)

@@ -9,6 +9,8 @@ import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
+import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -136,6 +138,132 @@ class SampleInputThemeStateTest {
         assertEquals("sacred-en-b", updated.sessions.getValue(TransportModeOption.Ultra).inputText)
         assertEquals("b", updated.sessions.getValue(TransportModeOption.Ultra).sampleInputId)
     }
+
+    @Test
+    fun `switching from sacred machine preset to custom theme keeps sacred machine samples`() {
+        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
+        val customTheme = customBrandTheme(DefaultCustomBrandThemeSettings)
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
+                selectedBrandTheme = marsRelic,
+                sessions =
+                    mapOf(
+                        TransportModeOption.Flash to
+                            ModeAudioSessionState(
+                                inputText = "sacred-en-a",
+                                sampleInputId = "a",
+                            ),
+                        TransportModeOption.Pro to
+                            ModeAudioSessionState(
+                                inputText = "CUSTOM INPUT",
+                                sampleInputId = null,
+                            ),
+                        TransportModeOption.Ultra to
+                            ModeAudioSessionState(
+                                inputText = "sacred-en-b",
+                                sampleInputId = "b",
+                            ),
+                    ),
+            )
+
+        val updated = state.withSelectedBrandTheme(customTheme, updater)
+
+        assertEquals(customTheme.id, updated.selectedBrandTheme.id)
+        assertEquals("sacred-en-a", updated.sessions.getValue(TransportModeOption.Flash).inputText)
+        assertEquals("a", updated.sessions.getValue(TransportModeOption.Flash).sampleInputId)
+        assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
+        assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)
+        assertEquals("sacred-en-b", updated.sessions.getValue(TransportModeOption.Ultra).inputText)
+        assertEquals("b", updated.sessions.getValue(TransportModeOption.Ultra).sampleInputId)
+    }
+
+    @Test
+    fun `switching from ancient dynasty to custom theme falls back to sacred machine samples`() {
+        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+        val customTheme = customBrandTheme(DefaultCustomBrandThemeSettings)
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
+                selectedBrandTheme = ancientAlloy,
+                sessions =
+                    mapOf(
+                        TransportModeOption.Flash to
+                            ModeAudioSessionState(
+                                inputText = "dynasty-en-a",
+                                sampleInputId = "a",
+                            ),
+                        TransportModeOption.Pro to
+                            ModeAudioSessionState(
+                                inputText = "CUSTOM INPUT",
+                                sampleInputId = null,
+                            ),
+                        TransportModeOption.Ultra to
+                            ModeAudioSessionState(
+                                inputText = "dynasty-en-b",
+                                sampleInputId = "b",
+                            ),
+                    ),
+            )
+
+        val updated = state.withSelectedBrandTheme(customTheme, updater)
+
+        assertEquals(customTheme.id, updated.selectedBrandTheme.id)
+        assertEquals("sacred-en-a", updated.sessions.getValue(TransportModeOption.Flash).inputText)
+        assertEquals("a", updated.sessions.getValue(TransportModeOption.Flash).sampleInputId)
+        assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
+        assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)
+        assertEquals("sacred-en-b", updated.sessions.getValue(TransportModeOption.Ultra).inputText)
+        assertEquals("b", updated.sessions.getValue(TransportModeOption.Ultra).sampleInputId)
+    }
+
+    @Test
+    fun `switching to named custom preset still uses sacred machine samples`() {
+        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+        val customTheme =
+            customBrandTheme(
+                DefaultCustomBrandThemeSettings.copy(
+                    presetId = "named-custom",
+                    displayName = "Named Custom",
+                ),
+            )
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
+                selectedBrandTheme = ancientAlloy,
+                sessions =
+                    mapOf(
+                        TransportModeOption.Flash to
+                            ModeAudioSessionState(
+                                inputText = "dynasty-en-a",
+                                sampleInputId = "a",
+                            ),
+                        TransportModeOption.Pro to
+                            ModeAudioSessionState(
+                                inputText = "CUSTOM INPUT",
+                                sampleInputId = null,
+                            ),
+                        TransportModeOption.Ultra to
+                            ModeAudioSessionState(
+                                inputText = "dynasty-en-b",
+                                sampleInputId = "b",
+                            ),
+                    ),
+            )
+
+        val updated = state.withSelectedBrandTheme(customTheme, updater)
+
+        assertEquals(customTheme.id, updated.selectedBrandTheme.id)
+        assertEquals("sacred-en-a", updated.sessions.getValue(TransportModeOption.Flash).inputText)
+        assertEquals("a", updated.sessions.getValue(TransportModeOption.Flash).sampleInputId)
+        assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
+        assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)
+        assertEquals("sacred-en-b", updated.sessions.getValue(TransportModeOption.Ultra).inputText)
+        assertEquals("b", updated.sessions.getValue(TransportModeOption.Ultra).sampleInputId)
+    }
 }
 
 private class ThemeStateFakeSampleInputTextProvider : SampleInputTextProvider {
@@ -145,13 +273,11 @@ private class ThemeStateFakeSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): SampleInput = entries(mode, language, flavor).first()
 
-    override fun randomSample(
+    override fun sampleIds(
         mode: TransportModeOption,
-        language: AppLanguageOption,
         flavor: SampleFlavor,
         length: SampleInputLengthOption,
-        excludingSampleId: String?,
-    ): SampleInput = entries(mode, language, flavor).first { it.id != excludingSampleId }
+    ): List<String> = entries(mode, AppLanguageOption.English, flavor).map(SampleInput::id)
 
     override fun sampleById(
         mode: TransportModeOption,

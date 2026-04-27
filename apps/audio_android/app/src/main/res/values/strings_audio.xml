@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CONTEXT: Title/tab label for the main audio workspace screen. Keep it short. -->
+    <string name="audio_title">Audio</string>
+    <!-- CONTEXT: Section header and text-field label for the input text that will be converted into audio. -->
+    <string name="audio_input_label">Input text</string>
+    <!-- CONTEXT: Primary action button on the Audio screen that starts generating audio from the current input. -->
+    <string name="audio_action_encode">Create</string>
+    <!-- CONTEXT: Busy label for the primary create button while audio generation is running. -->
+    <string name="audio_action_encode_busy">Creating…</string>
+    <!-- CONTEXT: Busy label for the primary create button while audio generation is running. %1$d is the integer progress percent. -->
+    <string name="audio_action_encode_busy_progress">Creating… %1$d%%</string>
+    <!-- CONTEXT: Short progress-stage label shown while the encoder is preparing input before audio rendering starts. -->
+    <string name="audio_encode_phase_preparing_input_label">Preparing</string>
+    <!-- CONTEXT: Short progress-stage label shown while PCM audio is being rendered. -->
+    <string name="audio_encode_phase_rendering_pcm_label">Rendering</string>
+    <!-- CONTEXT: Short progress-stage label shown while postprocessing/render cleanup is happening near the end. -->
+    <string name="audio_encode_phase_postprocessing_label">Finishing</string>
+    <!-- CONTEXT: Short progress-stage label shown during the final wrap-up step of audio generation. -->
+    <string name="audio_encode_phase_finalizing_label">Finalizing</string>
+    <!-- CONTEXT: Secondary action button that cancels an in-progress audio generation job. -->
+    <string name="audio_action_cancel_encode">Cancel</string>
+    <!-- CONTEXT: Busy label shown after the user has requested cancellation and the encode job is stopping. -->
+    <string name="audio_action_cancel_encode_busy">Cancelling…</string>
+    <!-- CONTEXT: Playback control for starting audio playback. -->
+    <string name="audio_action_play">Play</string>
+    <!-- CONTEXT: Playback control for pausing currently playing audio. -->
+    <string name="audio_action_pause">Pause</string>
+    <!-- CONTEXT: Playback control for jumping to the previous item in the current playback queue/list. -->
+    <string name="audio_action_previous_track">Previous track</string>
+    <!-- CONTEXT: Playback control for jumping to the next item in the current playback queue/list. -->
+    <string name="audio_action_next_track">Next track</string>
+    <!-- CONTEXT: Button/icon label that opens the audio information/details dialog or sheet. -->
+    <string name="audio_action_open_audio_info">Info</string>
+    <!-- CONTEXT: Playback mode label for normal sequential playback without shuffle/repeat emphasis. -->
+    <string name="audio_action_normal_playback">Normal</string>
+    <!-- CONTEXT: Playback mode label for shuffled/random order playback. -->
+    <string name="audio_action_shuffle_playback">Random</string>
+    <!-- CONTEXT: Playback mode label for repeating only the current track/item. -->
+    <string name="audio_action_repeat_one">Repeat one</string>
+    <!-- CONTEXT: Playback mode label for repeating the whole list/queue. -->
+    <string name="audio_action_repeat_list">Repeat all</string>
+    <!-- CONTEXT: Action button that decodes/reads text back from the current audio payload. -->
+    <string name="audio_action_decode">Read</string>
+    <!-- CONTEXT: Busy label for the decode/read action while text is being extracted from audio. -->
+    <string name="audio_action_decode_busy">Reading…</string>
+    <!-- CONTEXT: Action/icon label for clearing the current input text field. -->
+    <string name="audio_action_clear">Clear</string>
+    <!-- CONTEXT: Action/icon label for clearing the currently decoded/read result. -->
+    <string name="audio_action_clear_result">Clear result</string>
+    <!-- CONTEXT: Busy label shown while the decoded/read result is being cleared. -->
+    <string name="audio_action_clear_result_busy">Clearing…</string>
+    <!-- CONTEXT: Action button/icon that saves the current generated audio into the Saved library. -->
+    <string name="audio_action_export">Save</string>
+    <string name="audio_action_playback_speed_short">Speed</string>
+    <string name="audio_action_open_playback_speed_menu">Open playback speed menu</string>
+    <string name="audio_action_toggle_playback_speed_slider">Toggle playback speed adjustment</string>
+    <!-- CONTEXT: Accessibility label for the playback-speed button in the player controls. %1$s is the current speed, such as 1.0x or 0.75x. -->
+    <string name="audio_action_cycle_playback_speed">Playback speed %1$s</string>
+    <!-- CONTEXT: Action/icon label that opens the saved-audio list or picker from the audio screen/mini player. -->
+    <string name="audio_action_open_saved_audio_list">Saved</string>
+    <!-- CONTEXT: Small status line showing the source display name for a decoded result that came from freshly generated audio. %1$s is the source label/name. -->
+    <string name="audio_decode_source_generated">Source: %1$s</string>
+    <!-- CONTEXT: Small status line showing the source display name for a decoded result that came from a saved audio file. %1$s is the source label/name. -->
+    <string name="audio_decode_source_saved">Source: %1$s</string>
+    <!-- CONTEXT: Busy reason text shown while reading text back from the currently generated audio. -->
+    <string name="audio_decode_busy_reason_generated">Reading current audio</string>
+    <!-- CONTEXT: Busy reason text shown while reading text back from a saved audio file. -->
+    <string name="audio_decode_busy_reason_saved">Reading saved audio</string>
+    <!-- CONTEXT: Icon/button label that replaces the input with a built-in random sample sentence. -->
+    <string name="audio_action_randomize_sample_input">Random sample</string>
+    <!-- CONTEXT: Icon/button label that opens the full-screen input editor dialog. -->
+    <string name="audio_action_open_input_editor">Open editor</string>
+    <!-- CONTEXT: Segmented-control option for using the shorter random sample set. -->
+    <string name="audio_sample_length_short">Short</string>
+    <!-- CONTEXT: Segmented-control option for using the longer random sample set. -->
+    <string name="audio_sample_length_long">Long</string>
+    <!-- CONTEXT: Accessibility/action label for expanding the collapsed input card. -->
+    <string name="audio_action_expand_input">Expand input</string>
+    <!-- CONTEXT: Accessibility/action label for collapsing the expanded input card. -->
+    <string name="audio_action_collapse_input">Collapse input</string>
+    <!-- CONTEXT: Small helper text under the compact input field explaining that long text is truncated there and can be edited in the full-screen editor. -->
+    <string name="audio_input_editor_inline_hint">Longer passages stay collapsed here. Open the TXT editor to view or edit the full text.</string>
+    <!-- CONTEXT: Title of the full-screen dialog used to edit the input text before generating audio. -->
+    <string name="audio_input_editor_title">Edit input text</string>
+    <!-- CONTEXT: Explanatory hint inside the full-screen input editor. Mentions longer lines, notes, or ritual passages before converting to audio. -->
+    <string name="audio_input_editor_hint">Use the larger editor for longer lines, notes, or ritual passages before converting them to audio.</string>
+    <!-- CONTEXT: Confirm/close button in the input editor dialog. -->
+    <string name="audio_input_editor_done">Done</string>
+    <!-- CONTEXT: Character counter shown under the input editor text field. %1$d is the current character count. -->
+    <string name="audio_input_editor_count">%1$d characters</string>
+    <!-- CONTEXT: Input counter shown for all transports. %1$d is the visible character count and %2$d is the UTF-8 byte count. -->
+    <string name="audio_input_metrics">%1$d chars • %2$d bytes</string>
+    <!-- CONTEXT: Baseline helper under the input field explaining that 512 bytes is the single-segment reference point and longer input will auto-segment. -->
+    <string name="audio_input_payload_limit_ok">Single-segment target: 512 bytes. Longer input will auto-segment.</string>
+    <!-- CONTEXT: Warning helper under the input field shown when the current text is getting close to the 512-byte single-segment reference point. -->
+    <string name="audio_input_payload_limit_warning">Near 512 bytes. Longer input will auto-segment.</string>
+    <!-- CONTEXT: Helper under the input field shown when the current text is already beyond the 512-byte single-segment reference point. -->
+    <string name="audio_input_payload_limit_exceeded">Over 512 bytes. This input will auto-segment.</string>
+    <!-- CONTEXT: Accessibility/action label for expanding the decoded result panel. -->
+    <string name="audio_action_expand_result">Expand result</string>
+    <!-- CONTEXT: Accessibility/action label for collapsing the decoded result panel. -->
+    <string name="audio_action_collapse_result">Collapse result</string>
+    <!-- CONTEXT: Accessibility/action label for expanding only the decoded text/raw content area inside the result card. -->
+    <string name="audio_action_expand_result_content">Expand result text</string>
+    <!-- CONTEXT: Accessibility/action label for collapsing only the decoded text/raw content area inside the result card. -->
+    <string name="audio_action_collapse_result_content">Collapse result text</string>
+    <!-- CONTEXT: Short visible label for the small helper control that expands the result content area. -->
+    <string name="audio_action_expand_result_content_short">Show</string>
+    <!-- CONTEXT: Short visible label for the small helper control that collapses the result content area. -->
+    <string name="audio_action_collapse_result_content_short">Hide</string>
+    <!-- CONTEXT: Accessibility/action label for expanding the flash style selector section. -->
+    <string name="audio_action_expand_flash_style">Expand style</string>
+    <!-- CONTEXT: Accessibility/action label for collapsing the flash style selector section. -->
+    <string name="audio_action_collapse_flash_style">Collapse style</string>
+    <!-- CONTEXT: Generic audio status wrapper where %1$s is a more specific status message. -->
+    <string name="audio_status">%1$s</string>
+    <!-- CONTEXT: Technical summary showing the sample count of generated/loaded audio. %1$d is the number of audio samples, not text examples. -->
+    <string name="audio_sample_count">%1$d samples</string>
+    <!-- CONTEXT: Header for the decoded/read-back result section on the main Audio screen. -->
+    <string name="audio_result_title">Read result</string>
+    <!-- CONTEXT: Empty-state text shown in the decoded/read-back result section before anything has been decoded yet. -->
+    <string name="audio_result_empty">No result yet.</string>
+    <!-- CONTEXT: Tab/segment label for showing the decoded result as interpreted text. -->
+    <string name="audio_decode_view_text">Text</string>
+    <!-- CONTEXT: Tab/segment label for showing the decoded result as raw payload data. -->
+    <string name="audio_decode_view_raw">Raw</string>
+    <!-- CONTEXT: Label for the binary representation inside the raw decoded payload view. -->
+    <string name="audio_decode_raw_binary_label">Binary</string>
+    <!-- CONTEXT: Label for the hexadecimal representation inside the raw decoded payload view. -->
+    <string name="audio_decode_raw_hex_label">Hex</string>
+    <!-- CONTEXT: Message shown when a decoded payload exists but cannot be interpreted as text. Raw payload tabs are still available. -->
+    <string name="audio_decode_text_unavailable">This payload could not be interpreted as text. Raw data is still available.</string>
+    <!-- CONTEXT: Message shown when there is no raw payload data available yet for the current result. -->
+    <string name="audio_decode_raw_unavailable">No raw payload data is available yet.</string>
+    <!-- CONTEXT: Section title for the selected flash voicing style. %1$s is the current style name. -->
+    <string name="audio_flash_style_title">Flash voicing style: %1$s</string>
+    <!-- CONTEXT: Helper text under the flash voicing style selector. It applies only to future generated audio, not already-generated audio. -->
+    <string name="audio_flash_style_hint">Applies to the next generated audio. Existing generated audio keeps the style it was created with.</string>
+    <!-- CONTEXT: Title for the bottom sheet/dialog that lets the user pick from saved audio items. -->
+    <string name="audio_saved_audio_sheet_title">Saved audio</string>
+    <!-- CONTEXT: Empty-state text inside the saved-audio picker sheet when the library has no saved audio. -->
+    <string name="audio_saved_audio_empty">No saved audio yet.</string>
+    <!-- CONTEXT: Mini-player title for currently selected/generated audio. %1$s is the transport mode label such as flash/pro/ultra. -->
+    <string name="audio_mini_player_generated_title">%1$s generated audio</string>
+    <!-- CONTEXT: Mini-player subtitle for generated flash audio. %1$s is usually a duration/status and %2$s is the flash style label. -->
+    <string name="audio_mini_player_generated_flash_subtitle">%1$s • %2$s</string>
+    <!-- CONTEXT: Mini-player subtitle for saved audio. %1$s and %2$s are compact metadata such as duration and saved time/source. -->
+    <string name="audio_mini_player_saved_subtitle">%1$s • %2$s</string>
+    <!-- CONTEXT: Mini-player subtitle fallback when only a duration is available. -->
+    <string name="audio_mini_player_duration_only">%1$s</string>
+    <!-- CONTEXT: Section title in the player detail sheet indicating the currently playing audio summary. -->
+    <string name="audio_player_detail_now_playing">Now playing</string>
+    <!-- CONTEXT: Section title in the player detail sheet for the decoded/read-back result area. -->
+    <string name="audio_player_detail_decoded_title">Read result</string>
+    <!-- CONTEXT: Empty-state text in the player detail sheet before the user has decoded/read the payload. -->
+    <string name="audio_player_detail_decoded_empty">No result yet. Tap Read when needed.</string>
+    <!-- CONTEXT: Tab label for the playback screen's visual mode. Shows waveform/visualizer rather than lyric/data text. -->
+    <string name="audio_playback_view_visual">Visual</string>
+    <!-- CONTEXT: Tab label for the playback screen's lyric/text-follow mode. -->
+    <string name="audio_playback_view_lyrics">Lyrics</string>
+    <!-- CONTEXT: Placeholder text in the pro visualizer before follow/token data is available for explaining the current byte. -->
+    <string name="audio_pro_visual_waiting_follow">Waiting for follow data</string>
+    <!-- CONTEXT: Intro line in the pro visualizer explaining that each byte emits two symbols: high nibble first, then low nibble. -->
+    <string name="audio_pro_visual_symbol_order">Current byte emits 2 symbols: high nibble first, then low nibble</string>
+    <!-- CONTEXT: Step label in the pro nibble visualizer for the first emitted symbol within a byte. -->
+    <string name="audio_pro_visual_step_1">Step 1</string>
+    <!-- CONTEXT: Step label in the pro nibble visualizer for the second emitted symbol within a byte. -->
+    <string name="audio_pro_visual_step_2">Step 2</string>
+    <!-- CONTEXT: Label for the first 4-bit half of a byte in the pro visualization. -->
+    <string name="audio_pro_visual_high_nibble">High nibble</string>
+    <!-- CONTEXT: Label for the second 4-bit half of a byte in the pro visualization. -->
+    <string name="audio_pro_visual_low_nibble">Low nibble</string>
+    <!-- CONTEXT: Label for the frequency hit map section representing the high-nibble symbol group. -->
+    <string name="audio_pro_visual_high_group">High group</string>
+    <!-- CONTEXT: Label for the frequency hit map section representing the low-nibble symbol group. -->
+    <string name="audio_pro_visual_low_group">Low group</string>
+    <!-- CONTEXT: Text showing the nibble value in hexadecimal. %1$s is a nibble string such as A or 7. -->
+    <string name="audio_pro_visual_nibble_value">Nibble %1$s</string>
+    <!-- CONTEXT: Status tag in the pro visualizer for the currently playing symbol step. -->
+    <string name="audio_pro_visual_playing_now">Playing now</string>
+    <!-- CONTEXT: Status tag in the pro visualizer for the next upcoming symbol step. -->
+    <string name="audio_pro_visual_up_next">Up next</string>
+    <!-- CONTEXT: Card title explaining how the current byte is being transmitted in pro mode. -->
+    <string name="audio_pro_visual_guide_title">How this byte is being sent</string>
+    <!-- CONTEXT: Short label for the current symbol/step in the pro guide card. -->
+    <string name="audio_pro_visual_now">Now</string>
+    <!-- CONTEXT: Short label for the next symbol/step in the pro guide card. -->
+    <string name="audio_pro_visual_next">Next</string>
+    <!-- CONTEXT: Compact summary in the pro guide card. %1$s is the slot label (high/low nibble) and %2$s is the nibble hex value. -->
+    <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
+    <!-- CONTEXT: Fallback text in the pro guide card when both nibble steps for the current byte are complete. -->
+    <string name="audio_pro_visual_byte_complete">Byte complete</string>
+    <!-- CONTEXT: Mapping line in the pro guide card. %1$d is token index, %2$s token text, %3$d byte position within token, %4$d total byte count. -->
+    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
+    <!-- CONTEXT: Line in the pro guide card showing the next symbol's low and high frequencies. -->
+    <string name="audio_pro_visual_next_frequencies">Next symbol frequencies: %1$d + %2$d Hz</string>
+    <!-- CONTEXT: Explanatory line shown when the next emitted symbol will advance to the next byte because the current one is the low nibble. -->
+    <string name="audio_pro_visual_next_byte_advance">This is the second nibble, so the player will advance to the next byte after it.</string>
+    <!-- CONTEXT: Label in the pro byte explanation view for an ASCII byte. %1$d is the byte index number. -->
+    <string name="audio_pro_visual_ascii_byte">ASCII byte %1$d</string>
+    <!-- CONTEXT: Label in the pro byte explanation view mapping a token index to a byte position. -->
+    <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d/%3$d</string>
+    <!-- CONTEXT: Byte explanation line showing one byte in hex and binary. %1$s is the hex byte and %2$s is the binary string. -->
+    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <!-- CONTEXT: Small section heading in the pro byte explanation view for the current byte's position info. -->
+    <string name="audio_pro_visual_byte_position">Byte position</string>
+    <!-- CONTEXT: Small section heading in the pro byte explanation view introducing what happens next after the current byte. -->
+    <string name="audio_pro_visual_then">Then</string>
+    <!-- CONTEXT: Dialog title for the audio information/details sheet. -->
+    <string name="audio_info_dialog_title">Info</string>
+    <!-- CONTEXT: Section heading for user-facing details in the audio information sheet. -->
+    <string name="audio_info_user_section">Details</string>
+    <!-- CONTEXT: Section heading for technical metadata in the audio information sheet. -->
+    <string name="audio_info_technical_section">Tech info</string>
+    <!-- CONTEXT: Label in the audio information sheet for transport/encoding type. -->
+    <string name="audio_info_encoding_type">Type</string>
+    <!-- CONTEXT: Label in the audio information sheet for playback duration. -->
+    <string name="audio_info_duration">Duration</string>
+    <!-- CONTEXT: Label in the audio information sheet for audio sample rate. -->
+    <string name="audio_info_sample_rate">Sample rate</string>
+    <!-- CONTEXT: Value formatter for audio sample rate. %1$d is the numeric sample rate in hertz. -->
+    <string name="audio_info_sample_rate_value">%1$d Hz</string>
+    <!-- CONTEXT: Label in the audio information sheet for frame size / samples per frame. -->
+    <string name="audio_info_frame_samples">Frame size</string>
+    <!-- CONTEXT: Value formatter for frame size. %1$d is the number of audio samples in one frame. -->
+    <string name="audio_info_frame_samples_value">%1$d samples</string>
+    <!-- CONTEXT: Label in the audio information sheet for the selected flash voicing style metadata. -->
+    <string name="audio_info_flash_voicing_style">Flash voicing style</string>
+    <!-- CONTEXT: Label in the ultra visualizer for the currently playing symbol/frequency. -->
+    <string name="audio_ultra_visual_now">Now</string>
+    <!-- CONTEXT: Label in the ultra visualizer for the next upcoming symbol/frequency. -->
+    <string name="audio_ultra_visual_next">Next</string>
+    <!-- CONTEXT: Value formatter in the ultra visualizer. %1$d is a frequency in hertz. -->
+    <string name="audio_ultra_visual_frequency_value">%1$d Hz</string>
+    <!-- CONTEXT: Placeholder in the ultra visualizer when there is currently no active symbol. -->
+    <string name="audio_ultra_visual_no_symbol">No symbol</string>
+    <!-- CONTEXT: Placeholder in the ultra visualizer when there is no upcoming next symbol. -->
+    <string name="audio_ultra_visual_no_next_symbol">No next symbol</string>
+    <!-- CONTEXT: Reference tick label in the ultra symbol visualizer for the high level band. -->
+    <string name="audio_ultra_visual_level_high">High</string>
+    <!-- CONTEXT: Reference tick label in the ultra symbol visualizer for the middle level band. -->
+    <string name="audio_ultra_visual_level_mid">Mid</string>
+    <!-- CONTEXT: Reference tick label in the ultra symbol visualizer for the low level band. -->
+    <string name="audio_ultra_visual_level_low">Low</string>
+    <!-- CONTEXT: Message in playback follow/data sections when payload follow data is currently unavailable. -->
+    <string name="audio_follow_unavailable">Payload follow is unavailable for this audio right now.</string>
+    <!-- CONTEXT: Message in playback follow/lyrics sections when text follow data is currently unavailable. -->
+    <string name="audio_follow_text_unavailable">Text follow is unavailable for this audio right now.</string>
+    <!-- CONTEXT: Tab label in the playback follow section for lyric/text-style following. -->
+    <string name="audio_follow_display_lyrics">Lyrics</string>
+    <!-- CONTEXT: Tab label in the playback follow section for data-oriented following. -->
+    <string name="audio_follow_display_data">Data</string>
+    <!-- CONTEXT: View-mode label in the playback follow data section for hexadecimal output. -->
+    <string name="audio_follow_view_hex">Hex</string>
+    <!-- CONTEXT: View-mode label in the playback follow data section for binary output. -->
+    <string name="audio_follow_view_binary">Binary</string>
+    <!-- CONTEXT: Section title in the saved-audio player detail sheet for saved-file metadata. -->
+    <string name="audio_player_detail_saved_info_title">Details</string>
+    <!-- CONTEXT: Label in the saved-audio player detail sheet for transport mode. -->
+    <string name="audio_player_detail_saved_mode">Mode</string>
+    <!-- CONTEXT: Label in the saved-audio player detail sheet for saved audio duration. -->
+    <string name="audio_player_detail_saved_duration">Duration</string>
+    <!-- CONTEXT: Label in the saved-audio player detail sheet for the saved timestamp/date. -->
+    <string name="audio_player_detail_saved_time">Saved at</string>
+    <!-- CONTEXT: Label in the saved-audio player detail sheet for the original generation timestamp recorded inside generated-audio metadata. -->
+    <string name="audio_player_detail_saved_generated_time">Generated at</string>
+    <!-- CONTEXT: Label in saved-audio surfaces describing whether the audio came from manual text entry or a built-in sample input. -->
+    <string name="audio_player_detail_saved_input_source">Input source</string>
+    <!-- CONTEXT: Label in saved-audio surfaces for the render sample rate recorded with the generated file metadata. -->
+    <string name="audio_player_detail_saved_sample_rate">Sample rate</string>
+    <!-- CONTEXT: Label in saved-audio surfaces for the UTF-8 payload size that was encoded into the generated audio. -->
+    <string name="audio_player_detail_saved_payload_bytes">Payload size</string>
+    <!-- CONTEXT: Value formatter in saved-audio surfaces for the UTF-8 payload size. %1$d is the byte count. -->
+    <string name="audio_player_detail_saved_payload_bytes_value">%1$d bytes</string>
+    <!-- CONTEXT: Value label for generated audio that came from text typed or pasted by the user. -->
+    <string name="audio_generated_input_source_manual">Manual</string>
+    <!-- CONTEXT: Value label for generated audio that came from the built-in sample library. -->
+    <string name="audio_generated_input_source_sample">Sample</string>
+    <!-- CONTEXT: Mode label in the flash visualizer for the view that emphasizes separate FSK tone lanes. -->
+    <string name="audio_flash_visualizer_mode_tone_tracks">FSK lanes</string>
+    <!-- CONTEXT: Mode label in the flash visualizer for the view that emphasizes tone energy. -->
+    <string name="audio_flash_visualizer_mode_tone_energy">Tone energy</string>
+    <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
+    <string name="transport_mode_flash_label">flash</string>
+    <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
+    <string name="transport_mode_pro_label">pro</string>
+    <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
+    <string name="transport_mode_ultra_label">ultra</string>
+    <!-- CONTEXT: Short helper text shown under the input field when flash mode is selected. -->
+    <string name="audio_transport_flash_hint">flash uses UTF-8 text.</string>
+    <!-- CONTEXT: Example placeholder text shown for flash mode when the input is empty. -->
+    <string name="audio_transport_flash_example">The lamp keepers unseal the old star chart</string>
+    <!-- CONTEXT: Short helper text shown under the input field when pro mode is selected. -->
+    <string name="audio_transport_pro_hint">pro uses ASCII text only.</string>
+    <!-- CONTEXT: Example placeholder text shown for pro mode when the input is empty. It must remain plain ASCII. -->
+    <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
+    <!-- CONTEXT: Short helper text shown under the input field when ultra mode is selected. -->
+    <string name="audio_transport_ultra_hint">ultra uses UTF-8 text.</string>
+    <!-- CONTEXT: Example placeholder text shown for ultra mode when the input is empty. -->
+    <string name="audio_transport_ultra_example">The lamp keepers unseal the old star chart</string>
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
+    <string name="audio_sample_thematic_2">Deep in the bell tower, the sealed engine begins to hum</string>
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
+    <string name="audio_sample_thematic_3">The seventh lamp is lit, yet the far gate stays silent</string>
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
+    <string name="audio_sample_thematic_4">Beyond the ash harbor, a pilgrim vessel crosses the black water</string>
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
+    <string name="audio_sample_thematic_5">When the iron bells answer, the outer lock still holds</string>
+    <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
+    <string name="audio_sample_thematic_long_1">The bell tower ledger states that the east furnace answered before dawn, well before the roof lamps were due to rise. Three attendants turned the brass wheels by hand while soot drifted from the upper vents and settled across the steps. From behind the sealed hatch came a low, steady hum, held so long that the night clerks began tapping its measure into wax tablets. When the last note thinned away, no one touched the iron latch, yet every witness signed the same line: the machine below had woken of its own accord.</string>
+    <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
+    <string name="audio_sample_thematic_long_2">At second watch the gatehouse lamps were trimmed, the outer bolts were tested again, and soot was scraped from the chain hinges. No signal came from the far corridor, but the stone floor kept trembling in short intervals, as though a heavy drive beneath the hall had resumed an unfinished labor. The wardens counted each tremor against the water clock and found the pattern returned whenever the western wall took the full weight of the wind. Before the watch was dismissed, fresh wax was pressed over the inner lock, and the report closed with a warning that the silence beyond the gate was now an occupied silence.</string>
+    <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
+    <string name="audio_sample_thematic_long_3">The furnace chronicle records that the red lamps were raised one by one until the whole chamber glowed like banked coals behind smoke. When the final chain fell still, the signal clerks copied each pulse into wax tablets while the upper galleries answered with the scrape of iron hooks. Four slow returns came back through the rafters, each weaker than the last, yet none of the recorders agreed on which wall had carried the voice. The closing line notes that the bells were left unwound until dawn, because no one in the chamber wished to hear what might answer a fifth call.</string>
+    <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
+    <string name="audio_sample_thematic_long_4">A voyage record from the ash coast tells of a night crossing under a broken moon and a sky dimmed by furnace dust. The hull lamps were hooded, the chart room kept silent, and only the slow pulse of the engine sanctum marked the hours below deck. Near midnight the helmsman ordered the prow turned three degrees after pale shapes were seen moving between the black swells, though no sound ever reached the rail. By morning the vessel found the harbor lights again, and the final entry says every lamp was rekindled in thanks except the one beside the sealed coffer.</string>
+    <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_2">SEAL THE OUTER LOCK</string>
+    <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_3">COPPER WARDENS STIR THE DRIVE</string>
+    <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_4">SEVENTH LAMP LIT GATE STILL SILENT</string>
+    <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_5">HOLD FORMATION BELOW IRON MASTS</string>
+    <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_long_1">BELL TOWER LEDGER. EAST FURNACE ANSWERED BEFORE DAWN. THREE ATTENDANTS TURNED THE BRASS WHEELS BY HAND WHILE SOOT FELL THROUGH THE UPPER VENTS. A LOW STEADY HUM CAME THROUGH THE SEALED HATCH. FINAL LINE STATES THE MACHINE BELOW WOKE OF ITS OWN ACCORD.</string>
+    <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
+    <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
+    <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
+    <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
+    <!-- CONTEXT: Status text shown on the Audio screen before any input is entered. User should type input and then press Create. -->
+    <string name="status_ready_to_encode">Enter text and tap \"Create\"</string>
+    <!-- CONTEXT: Status text shown on the Audio screen when the input field is empty. -->
+    <string name="status_input_empty">Input is empty.</string>
+    <!-- CONTEXT: Generic busy status for audio generation. %1$s is the transport mode label such as flash/pro/ultra. -->
+    <string name="status_mode_audio_generating">Creating %1$s audio…</string>
+    <!-- CONTEXT: Busy status for audio generation with progress. %1$s is the transport mode label and %2$d is the progress percent. -->
+    <string name="status_mode_audio_generating_progress">Creating %1$s audio… %2$d%%</string>
+    <!-- CONTEXT: Busy status for the input-preparation phase of audio generation. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_generating_preparing_input">Preparing %1$s audio…</string>
+    <!-- CONTEXT: Busy status for the PCM rendering phase of audio generation. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_generating_rendering_pcm">Rendering %1$s audio…</string>
+    <!-- CONTEXT: Busy status for the postprocessing phase of audio generation. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_generating_postprocessing">Finishing %1$s audio…</string>
+    <!-- CONTEXT: Busy status for the finalization phase of audio generation. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_generating_finalizing">Finalizing %1$s audio…</string>
+    <!-- CONTEXT: Busy status shown while a generation job is being cancelled. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_canceling">Cancelling %1$s audio…</string>
+    <!-- CONTEXT: Completion status shown after the user successfully cancelled a generation job. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_cancelled">%1$s audio cancelled</string>
+    <!-- CONTEXT: Completion status shown after audio generation succeeds. %1$s is the transport mode label and %2$d is the sample count. -->
+    <string name="status_mode_audio_generated">%1$s ready, %2$d samples</string>
+    <string name="status_mode_audio_generated_segmented">%1$s ready, %2$d samples across %3$d segments</string>
+    <!-- CONTEXT: Status shown when currently generated audio starts playback. %1$s is the transport mode label. -->
+    <string name="status_playing_mode_audio">Playing %1$s audio</string>
+    <!-- CONTEXT: Playback status shown when playback is paused. -->
+    <string name="status_playback_paused">Playback paused</string>
+    <!-- CONTEXT: Playback status shown when playback reaches the end successfully. -->
+    <string name="status_playback_completed">Playback completed</string>
+    <!-- CONTEXT: Playback status shown when playback is stopped manually. -->
+    <string name="status_playback_stopped">Playback stopped</string>
+    <!-- CONTEXT: Playback status shown when playback failed unexpectedly. -->
+    <string name="status_playback_failed">Playback failed</string>
+    <!-- CONTEXT: Busy status shown while reading/decoding payload text from audio. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_decoding">Reading %1$s audio…</string>
+    <!-- CONTEXT: Completion status shown after payload reading/decoding finishes. %1$s is the transport mode label. -->
+    <string name="status_mode_decode_completed">%1$s read complete</string>
+    <!-- CONTEXT: Status shown after clearing the currently generated audio for the active mode. -->
+    <string name="status_current_mode_cleared">Cleared current audio</string>
+    <!-- CONTEXT: Status shown after clearing the decoded/read-back result text. -->
+    <string name="status_result_cleared">Result cleared</string>
+    <!-- CONTEXT: Status/snackbar shown after saving generated audio into the library. %1$s is the saved display name. -->
+    <string name="status_audio_saved">Saved: %1$s</string>
+    <!-- CONTEXT: Status/snackbar shown when saving generated audio into the library fails. -->
+    <string name="status_audio_save_failed">Save failed</string>
+    <!-- CONTEXT: Short snackbar text shown after saving audio succeeds. -->
+    <string name="snackbar_audio_saved_to_library">Saved</string>
+    <!-- CONTEXT: Short snackbar text shown after saving audio fails. -->
+    <string name="snackbar_audio_save_failed">Save failed</string>
+    <!-- CONTEXT: Status shown after a saved audio item is loaded back into the player. %1$s is the saved display name. -->
+    <string name="status_saved_audio_loaded">Loaded: %1$s</string>
+    <!-- CONTEXT: Status shown when loading a saved audio item fails. -->
+    <string name="status_saved_audio_load_failed">Load failed</string>
+    <!-- CONTEXT: Status shown when playback starts for a saved audio item. %1$s is the saved display name. -->
+    <string name="status_playing_saved_audio">Playing: %1$s</string>
+    <!-- CONTEXT: Status shown when the user tries to play or inspect a mode that has no generated audio yet. -->
+    <string name="status_no_audio_for_mode">No audio yet for this mode</string>
+</resources>

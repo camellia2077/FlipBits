@@ -25,6 +25,7 @@ import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @Composable
 internal fun LibraryTabScreenContent(
@@ -55,14 +56,20 @@ internal fun LibraryTabScreenContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            IconButton(onClick = onImportAudio) {
+            IconButton(
+                onClick = onImportAudio,
+                colors = utilityActionIconButtonColors(),
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.FileOpen,
                     contentDescription = stringResource(R.string.library_action_import),
                 )
             }
             Row {
-                IconButton(onClick = screenState.onCreateFolderStarted) {
+                IconButton(
+                    onClick = screenState.onCreateFolderStarted,
+                    colors = utilityActionIconButtonColors(),
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.CreateNewFolder,
                         contentDescription = stringResource(R.string.library_action_new_folder),
@@ -71,6 +78,7 @@ internal fun LibraryTabScreenContent(
                 IconButton(
                     onClick = screenState.onRenameFolderStarted,
                     enabled = screenState.selectedCustomFolder != null,
+                    colors = utilityActionIconButtonColors(),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DriveFileRenameOutline,
@@ -80,6 +88,7 @@ internal fun LibraryTabScreenContent(
                 IconButton(
                     onClick = screenState.onDeleteFolderStarted,
                     enabled = screenState.selectedCustomFolder != null,
+                    colors = utilityActionIconButtonColors(),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,

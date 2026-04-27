@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_exquisite_fall_themed_gold_dust_inhaled">Gold dust fills the lungs; the hands still reach for more.</string>
-    <string name="audio_sample_exquisite_fall_ascii_gold_dust_inhaled">GOLD DUST FILLS THE LUNGS. HANDS STILL REACH FOR MORE.</string>
-    <string name="audio_sample_exquisite_fall_themed_vault_without_enough">Coins climb in feverish heaps and throw a wrong light over the vault. Diamonds rain from the ceiling. A white bone hand breaks under bracelets too heavy to love, while a living collector turns to gold from the fingertips inward. He gasps through glittering dust. He owns rooms, crowns, names, and keys, yet the only thought left is the wound of not owning all.</string>
-    <string name="audio_sample_exquisite_fall_ascii_vault_without_enough">COINS RISE. DIAMONDS FALL. BONE BREAKS UNDER JEWELS. GOLD DUST IS BREATHED. THE VAULT IS FULL. IT IS NOT ENOUGH.</string>
+    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
+    <string name="audio_sample_exquisite_fall_themed_gold_dust_inhaled">Gold dust fills the lungs, yet the hands still reach for more.</string>
+    <string name="audio_sample_exquisite_fall_themed_vault_without_enough">Coins pile in feverish heaps, casting a sickly light over the vault. Diamonds rain from the ceiling. A white bone hand snaps under bracelets too heavy to bear, while a living collector turns to gold from the fingertips inward. He gasps through glittering dust. He owns rooms, crowns, names, and keys, yet his only remaining thought is the agony of not owning everything.</string>
 </resources>

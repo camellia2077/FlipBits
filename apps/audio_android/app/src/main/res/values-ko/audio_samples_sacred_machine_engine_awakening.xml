@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_sacred_machine_themed_plasma_matrix_wakes">플라즈마 매트릭스가 인광을 띠며 맥동하며 저음의 웅웅거림과 함께 깨어납니다</string>
-    <string name="audio_sample_sacred_machine_ascii_plasma_matrix_wakes">PLASMA MATRIX INITIALIZED. ENGINE HUMS.</string>
-    <string name="audio_sample_sacred_machine_themed_ancient_engine_grants_motion">오래된 엔진이 깊은 침묵에서 깨어날 때, 그 떨림은 바닥판을 타고 전해지며 기계적인 잠에서 깨어났음을 알립니다. 시종들은 압력계가 살아나는 것을 지켜보았고, 증기 파이프는 통제된 한숨과 함께 열을 내뿜었습니다. 한때 정지했던 피스톤이 이제는 신성한 목적을 가지고 움직이며, 성소에 활력을 불어넣고 전설적인 기계의 부활을 확인시켜 줍니다.</string>
-    <string name="audio_sample_sacred_machine_ascii_ancient_engine_grants_motion">ANCIENT ENGINE AWAKENS. PRESSURE STABILIZED. PISTONS ENGAGED. THE MACHINE LIVES AGAIN.</string>
+    <string name="audio_sample_sacred_machine_themed_plasma_matrix_wakes">방폭문이 차례로 잠기며 플라즈마 매트릭스가 점화됩니다.</string>
+    <string name="audio_sample_sacred_machine_themed_ancient_engine_grants_motion">어떤 시종이 감히 마지막 활성화 암호에 손을 대기도 전에, 초저음의 파동이 갑판을 타고 울렸습니다. 붉은 경고등은 파묻힌 심장처럼 맥동했고, 오존이 레일을 따라 모여들었으며, 사람을 삼킬 만큼 거대한 파이프 속으로 냉각수가 요란하게 흘렀습니다. 고대의 모방 지성은 곧바로 기동하지 않고 그 청원을 숙고했습니다. 파라미터가 만족스러워지자 엔진은 마침내 움직임을 허락했고, 방 안에 있던 이들의 떨리는 손은 이 자비가 언제든 거두어질 수 있음을 알고 있었습니다.</string>
 </resources>

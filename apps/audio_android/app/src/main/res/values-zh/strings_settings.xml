@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Simplified Chinese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Simplified Chinese. -->
+    <!-- Settings tab strings: language picker, theme, dual-tone palette, flash style, about entry. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="config_title">设置</string>
+    <string name="config_language_title">语言</string>
+    <string name="config_language_subtitle">选择应用语言</string>
+    <!-- CONTEXT: Language option meaning follow the device/system language. -->
+    <string name="config_language_follow_system">跟随系统</string>
+    <string name="config_language_chinese">简体中文</string>
+    <string name="config_language_traditional_chinese">繁體中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_ukrainian">Українська</string>
+    <string name="config_language_korean">한국어</string>
+    <string name="config_language_french">Français</string>
+    <string name="config_language_italian">Italiano</string>
+    <string name="config_language_polish">Polski</string>
+    <!-- CONTEXT: Style-English locale option name. It is a language/style name, not normal UI prose. Keep the intended display strategy. -->
+    <string name="config_language_high_gothic">Altum Gothicum</string>
+    <string name="config_language_expand">展开语言设置</string>
+    <string name="config_language_collapse">折叠语言设置</string>
+    <string name="config_theme_mode_title">主题模式</string>
+    <string name="config_theme_mode_subtitle">选择系统、浅色或深色模式。</string>
+    <string name="config_theme_mode_brand_fixed">双色调主题使用固定外观。</string>
+    <string name="config_theme_mode_follow_system">跟随系统</string>
+    <string name="config_theme_mode_light">浅色</string>
+    <string name="config_theme_mode_dark">深色</string>
+    <string name="config_theme_appearance_title">外观</string>
+    <string name="config_theme_style_title">主题样式</string>
+    <string name="config_theme_style_subtitle">选择 Material 或双色调。</string>
+    <string name="config_theme_style_material">Material</string>
+    <!-- CONTEXT: Theme style option. Product term for the fixed two-color theme system. -->
+    <string name="config_theme_style_brand_dual_tone">双色调</string>
+    <string name="config_theme_appearance_expand">展开外观设置</string>
+    <string name="config_theme_appearance_collapse">折叠外观设置</string>
+    <string name="config_palette_title">调色盘</string>
+    <string name="config_palette_selected">已选择</string>
+    <string name="config_palette_expand">展开调色盘</string>
+    <string name="config_palette_collapse">折叠调色盘</string>
+    <string name="config_brand_theme_title">双色调主题</string>
+    <string name="config_brand_theme_description">每个双色调主题均具有固定的双色外观。</string>
+    <string name="config_dual_tone_group_sacred_machine">神圣机器</string>
+    <string name="config_dual_tone_group_custom">自定义</string>
+    <string name="config_dual_tone_group_ancient_dynasty">远古王朝</string>
+    <string name="config_dual_tone_group_immortal_rot">永恒腐朽</string>
+    <string name="config_dual_tone_group_scarlet_carnage">猩红杀戮</string>
+    <string name="config_dual_tone_group_exquisite_fall">精美陨落</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">易变迷宫</string>
+    <string name="palette_family_brand">双色调</string>
+    <string name="palette_family_reds_pinks">红色与粉色</string>
+    <string name="palette_family_oranges">橙色</string>
+    <string name="palette_family_yellows">黄色</string>
+    <string name="palette_family_greens">绿色</string>
+    <string name="palette_family_cyans_blues">青色与蓝色</string>
+    <string name="palette_family_purples_magentas">紫色与洋红色</string>
+    <string name="palette_family_neutrals">中性色</string>
+    <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
+    <string name="config_flash_style_title">Flash 风格</string>
+    <string name="config_flash_style_subtitle">选择 Flash 音频的发声效果。</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_coded_burst_label">编码脉冲</string>
+    <string name="config_flash_style_coded_burst_description">密集的成组脉冲，呈现机器般的信号感。</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_ritual_chant_label">仪式颂唱</string>
+    <string name="config_flash_style_ritual_chant_description">平滑的共鸣短语，带有肃穆的仪式指令感。</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_deep_ritual_label">深度仪式</string>
+    <string name="config_flash_style_deep_ritual_description">大教堂般的仪式短语，具有更深沉的共鸣和肃穆的合唱外壳。</string>
+    <string name="config_about_title">关于</string>
+    <string name="config_about_subtitle">作者、项目链接及许可协议</string>
+    <string name="palette_ruby_title">红宝石红</string>
+    <string name="palette_mars_relic_title">火星遗物</string>
+    <string name="brand_theme_mars_relic_title">火星遗物</string>
+    <string name="brand_theme_mars_relic_description">深红配羊皮纸色，呈现仪式档案的质感。</string>
+    <string name="brand_theme_mars_relic_accessibility">火星遗物主题，深红色配羊皮纸米色。</string>
+    <string name="brand_theme_black_crimson_rite_title">黑红仪式</string>
+    <string name="brand_theme_black_crimson_rite_description">灰黑与祭祀深红，营造冷峻的机器神龛氛围。</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">黑红仪式主题，近黑色配亮深红色。</string>
+    <string name="brand_theme_scarlet_guard_title">猩红卫队</string>
+    <string name="brand_theme_scarlet_guard_description">象牙白与封印深红，呈现严谨的纹章基调。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">猩红卫队主题，浅象牙色配暗猩红色。</string>
+    <string name="brand_theme_dynasty_revival_title">王朝复兴</string>
+    <string name="brand_theme_dynasty_revival_description">墓金黑与经典的反应堆绿，仿佛苏醒的王朝核心。</string>
+    <string name="brand_theme_dynasty_revival_accessibility">王朝复兴主题，深墓金黑色配亮反应堆绿色。</string>
+    <string name="brand_theme_sepulcher_cyan_title">墓穴青</string>
+    <string name="brand_theme_sepulcher_cyan_description">冷冽的墓穴钢色与克制的青绿色，呈现寂静的皇家机器光芒。</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">墓穴青主题，冷深钢色配暗淡青绿色。</string>
+    <string name="brand_theme_tomb_sigil_title">古墓印记</string>
+    <string name="brand_theme_tomb_sigil_description">温暖的墓窖铁色与锐利的复兴绿，呈现仪式性的王朝标志。</string>
+    <string name="brand_theme_tomb_sigil_accessibility">古墓印记主题，深墓窖铁色配鲜艳复兴绿色。</string>
+    <string name="brand_theme_ancient_alloy_title">远古合金</string>
+    <string name="brand_theme_ancient_alloy_description">风化的金属阴影与冷青色，呈现墓穴锻炉的火光。</string>
+    <string name="brand_theme_ancient_alloy_accessibility">远古合金主题，深青铜灰色配亮青色。</string>
+    <string name="brand_theme_immortal_rot_title">永恒腐朽</string>
+    <string name="brand_theme_immortal_rot_description">蕨绿色与雪松黄，打造潮湿、繁茂的双色调调色盘。</string>
+    <string name="brand_theme_immortal_rot_accessibility">永恒腐朽主题，蕨绿色配雪松黄色。</string>
+    <string name="brand_theme_scarlet_carnage_title">猩红杀戮</string>
+    <string name="brand_theme_scarlet_carnage_description">深红与黄铜，打造充满血腥与战争金属感的粗犷双色调调色盘。</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">猩红杀戮主题，深红色配深金黄铜色。</string>
+    <string name="brand_theme_exquisite_fall_title">精美陨落</string>
+    <string name="brand_theme_exquisite_fall_description">深暗紫色与尖叫粉，打造极尽奢华的双色调调色盘。</string>
+    <string name="brand_theme_exquisite_fall_accessibility">精美陨落主题，深暗紫色配尖叫粉及金色轮廓。</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">易变迷宫</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">低饱和度的青蓝色与鲜艳的荧光紫，形成一个变幻莫测的双色调迷宫。</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">易变迷宫主题，低饱和度青蓝色配亮荧光紫及金色轮廓。</string>
+    <string name="brand_theme_custom_title">自定义双色调</string>
+    <string name="brand_theme_custom_description">使用你自己的双色调颜色，并沿用神圣机器的示例文本。</string>
+    <string name="brand_theme_custom_accessibility">自定义双色调主题预览。</string>
+    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_brand_theme_add">添加</string>
+    <string name="config_custom_brand_theme_edit">编辑自定义颜色</string>
+    <string name="config_custom_brand_theme_dialog_title">自定义双色调颜色</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_new">新建自定义双色调</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_edit">编辑自定义双色调</string>
+    <string name="config_custom_brand_theme_dialog_description">请输入 `#RRGGBB` 格式的十六进制颜色。描边留空时会复用辅色。</string>
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_randomize">随机颜色</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
+    <string name="config_custom_brand_theme_randomize_hint">点击骰子随机生成主色、辅色及描边色组合。</string>
+    <!-- CONTEXT: Form field label for the user-defined preset name. -->
+    <string name="config_custom_brand_theme_name_label">预设名称</string>
+    <string name="config_custom_brand_theme_background_label">主色</string>
+    <string name="config_custom_brand_theme_accent_label">辅色</string>
+    <string name="config_custom_brand_theme_outline_label">描边色</string>
+    <string name="config_custom_brand_theme_outline_optional">可选</string>
+    <string name="config_custom_brand_theme_save">保存</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete">删除</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete_title">删除自定义双色调</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
+    <string name="config_custom_brand_theme_delete_message">删除预设 %1$s？</string>
+    <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
+    <string name="config_custom_brand_theme_invalid_name">请输入预设名称。</string>
+    <string name="config_custom_brand_theme_invalid_hex">请输入 `#RRGGBB`。</string>
+    <string name="palette_crimson_title">猩红</string>
+    <string name="palette_rose_title">玫瑰粉</string>
+    <string name="palette_sakura_title">樱花粉</string>
+    <string name="palette_raspberry_title">树莓红</string>
+    <string name="palette_blush_title">腮红粉</string>
+    <string name="palette_orange_title">日光橙</string>
+    <string name="palette_coral_title">珊瑚红</string>
+    <string name="palette_tangerine_title">橘黄光</string>
+    <string name="palette_apricot_title">杏黄雾</string>
+    <string name="palette_terracotta_title">陶瓦红</string>
+    <string name="palette_persimmon_title">柿红火</string>
+    <string name="palette_amber_title">向日黄</string>
+    <string name="palette_gold_title">黄金时刻</string>
+    <string name="palette_sunflower_title">葵花金</string>
+    <string name="palette_lemon_title">柠檬光</string>
+    <string name="palette_honey_title">蜂蜜琥珀</string>
+    <string name="palette_marigold_title">万寿菊光</string>
+    <string name="palette_lime_title">青柠脉冲</string>
+    <string name="palette_olive_title">橄榄苔藓</string>
+    <string name="palette_emerald_title">祖母绿</string>
+    <string name="palette_mint_title">薄荷浪潮</string>
+    <string name="palette_jade_title">翠玉溪流</string>
+    <string name="palette_forest_title">森之松</string>
+    <string name="palette_teal_title">水青色</string>
+    <string name="palette_cyan_title">霓虹青</string>
+    <string name="palette_sky_title">天空蓝</string>
+    <string name="palette_ocean_title">极客蓝</string>
+    <string name="palette_cobalt_title">钴蓝</string>
+    <string name="palette_indigo_title">深靛蓝</string>
+    <string name="palette_violet_title">紫罗兰脉冲</string>
+    <string name="palette_plum_title">李子之夜</string>
+    <string name="palette_magenta_title">洋红波普</string>
+    <string name="palette_fuchsia_title">桃红闪烁</string>
+    <string name="palette_orchid_title">兰花雾</string>
+    <string name="palette_lilac_title">丁香迷蒙</string>
+    <string name="palette_mocha_title">摩卡棕</string>
+    <string name="palette_slate_title">板岩灰</string>
+    <string name="palette_sand_title">砂石色</string>
+    <string name="palette_stone_title">石青灰</string>
+    <string name="palette_graphite_title">石墨墨迹</string>
+    <string name="palette_ivory_title">象牙白</string>
+</resources>

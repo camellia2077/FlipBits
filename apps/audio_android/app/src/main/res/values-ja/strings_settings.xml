@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Japanese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Japanese. -->
+    <!-- Settings tab strings: language picker, theme, dual-tone palette, flash style, about entry. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="config_title">設定</string>
+    <string name="config_language_title">言語</string>
+    <string name="config_language_subtitle">アプリの言語を選択</string>
+    <!-- CONTEXT: Language option meaning follow the device/system language. -->
+    <string name="config_language_follow_system">システムの設定に従う</string>
+    <string name="config_language_chinese">简体中文</string>
+    <string name="config_language_traditional_chinese">繁體中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_ukrainian">Українська</string>
+    <string name="config_language_korean">한국어</string>
+    <string name="config_language_french">Français</string>
+    <string name="config_language_italian">Italiano</string>
+    <string name="config_language_polish">Polish</string>
+    <!-- CONTEXT: Style-English locale option name. It is a language/style name, not normal UI prose. Keep the intended display strategy. -->
+    <string name="config_language_high_gothic">Altum Gothicum</string>
+    <string name="config_language_expand">言語設定を展開</string>
+    <string name="config_language_collapse">言語設定を折りたたむ</string>
+    <string name="config_theme_mode_title">テーマモード</string>
+    <string name="config_theme_mode_subtitle">システム設定、ライト、またはダークモードを選択します。</string>
+    <string name="config_theme_mode_brand_fixed">デュアルトーンテーマは固定のデザインを使用します。</string>
+    <string name="config_theme_mode_follow_system">システムの設定に従う</string>
+    <string name="config_theme_mode_light">ライト</string>
+    <string name="config_theme_mode_dark">ダーク</string>
+    <string name="config_theme_appearance_title">テーマのデザイン</string>
+    <string name="config_theme_style_title">テーマスタイル</string>
+    <string name="config_theme_style_subtitle">Material またはデュアルトーンを選択します。</string>
+    <string name="config_theme_style_material">Material</string>
+    <!-- CONTEXT: Theme style option. Product term for the fixed two-color theme system. -->
+    <string name="config_theme_style_brand_dual_tone">デュアルトーン</string>
+    <string name="config_theme_appearance_expand">テーマデザイン設定を展開</string>
+    <string name="config_theme_appearance_collapse">テーマデザイン設定を折りたたむ</string>
+    <string name="config_palette_title">カラーパレット</string>
+    <string name="config_palette_selected">選択済み</string>
+    <string name="config_palette_expand">パレットを展開</string>
+    <string name="config_palette_collapse">パレットを折りたたむ</string>
+    <string name="config_brand_theme_title">デュアルトーンテーマ</string>
+    <string name="config_brand_theme_description">各デュアルトーンテーマは、2色のプレビューと共に固定のデザインを維持します。</string>
+    <string name="config_dual_tone_group_sacred_machine">神聖なる機械</string>
+    <string name="config_dual_tone_group_custom">カスタム</string>
+    <string name="config_dual_tone_group_ancient_dynasty">古代の王朝</string>
+    <string name="config_dual_tone_group_immortal_rot">不滅の腐敗</string>
+    <string name="config_dual_tone_group_scarlet_carnage">真紅の虐殺</string>
+    <string name="config_dual_tone_group_exquisite_fall">精緻なる没落</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">変転の迷宮</string>
+    <string name="palette_family_brand">デュアルトーン</string>
+    <string name="palette_family_reds_pinks">レッド＆ピンク</string>
+    <string name="palette_family_oranges">オレンジ</string>
+    <string name="palette_family_yellows">イエロー</string>
+    <string name="palette_family_greens">グリーン</string>
+    <string name="palette_family_cyans_blues">シアン＆ブルー</string>
+    <string name="palette_family_purples_magentas">パープル＆マゼンタ</string>
+    <string name="palette_family_neutrals">ニュートラル</string>
+    <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
+    <string name="config_flash_style_title">Flashスタイル</string>
+    <string name="config_flash_style_subtitle">Flashオーディオのサウンド方式を選択します。</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_coded_burst_label">コードバースト</string>
+    <string name="config_flash_style_coded_burst_description">機械的な信号のための高密度なグループ化バースト。</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_ritual_chant_label">儀式用チャント</string>
+    <string name="config_flash_style_ritual_chant_description">儀式的な命令トーンのための、より滑らかで響きのあるフレーズ。</string>
+    <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
+    <string name="config_flash_style_deep_ritual_label">深層の儀式</string>
+    <string name="config_flash_style_deep_ritual_description">大聖堂のような儀式的なフレーズと、より深い共鳴、厳かな合唱のシェル。</string>
+    <string name="config_about_title">このアプリについて</string>
+    <string name="config_about_subtitle">著者、プロジェクトリンク、ライセンス</string>
+    <string name="palette_ruby_title">ルビーレッド</string>
+    <string name="palette_mars_relic_title">マーズレリック</string>
+    <string name="brand_theme_mars_relic_title">マーズレリック</string>
+    <string name="brand_theme_mars_relic_description">儀式用保管所のような外見のための、羊皮紙と深い赤の組み合わせ。</string>
+    <string name="brand_theme_mars_relic_accessibility">マーズレリック・テーマ。深い赤と羊皮紙のようなベージュ。</string>
+    <string name="brand_theme_black_crimson_rite_title">ブラッククリムゾンの儀</string>
+    <string name="brand_theme_black_crimson_rite_description">すすのような黒と儀式的な真紅。厳格な機械の祭壇の雰囲気に。</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">ブラッククリムゾンの儀テーマ。黒に近い色と鮮やかな真紅。</string>
+    <string name="brand_theme_scarlet_guard_title">スカーレットガード</string>
+    <string name="brand_theme_scarlet_guard_description">規律ある紋章学的なトーンのための、アイボリーホワイトと封印された真紅。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">スカーレットガード・テーマ。明るいアイボリーと濃いスカーレットレッド。</string>
+    <string name="brand_theme_dynasty_revival_title">ダイナスティ・リバイバル</string>
+    <string name="brand_theme_dynasty_revival_description">再覚醒した王朝の核をイメージした、トゥームメタル・ブラックと伝統的なリアクター・グリーン。</string>
+    <string name="brand_theme_dynasty_revival_accessibility">ダイナスティ・リバイバル・テーマ。深いトゥームメタル・ブラックと鮮やかなリアクター・グリーン。</string>
+    <string name="brand_theme_sepulcher_cyan_title">セパルカー・シアン</string>
+    <string name="brand_theme_sepulcher_cyan_description">静かな王室の機械の輝き。冷たいセパルカースチールと控えめなシアン・グリーン。</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">セパルカー・シアン・テーマ。冷たく暗いスチールと落ち着いたシアン・グリーン。</string>
+    <string name="brand_theme_tomb_sigil_title">トゥーム・シジル</string>
+    <string name="brand_theme_tomb_sigil_description">儀式的な王朝の印のための、温かみのある地下室の鉄と鋭いリバイバル・グリーン。</string>
+    <string name="brand_theme_tomb_sigil_accessibility">トゥーム・シジル・テーマ。暗い地下室の鉄と鮮やかなリバイバル・グリーン。</string>
+    <string name="brand_theme_ancient_alloy_title">エンシェント・アロイ</string>
+    <string name="brand_theme_ancient_alloy_description">トゥームフォージの輝き。風化した金属の影と冷たいターコイズ。</string>
+    <string name="brand_theme_ancient_alloy_accessibility">エンシェント・アロイ・テーマ。ダークブロンズグレーと明るいターコイズ。</string>
+    <string name="brand_theme_immortal_rot_title">不滅の腐敗</string>
+    <string name="brand_theme_immortal_rot_description">シダの緑とシトリンイエロー。湿った、生い茂ったデュアルトーンパレット。</string>
+    <string name="brand_theme_immortal_rot_accessibility">不滅の腐敗・テーマ。シダの緑とシトリンイエロー。</string>
+    <string name="brand_theme_scarlet_carnage_title">真紅の虐殺</string>
+    <string name="brand_theme_scarlet_carnage_description">血と戦争の金属。濃い赤と真鍮色が織りなす冷酷なデュアルトーンパレット。</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">真紅の虐殺・テーマ。濃い赤とダークゴールデンロッドの真鍮色。</string>
+    <string name="brand_theme_exquisite_fall_title">精緻なる没落</string>
+    <string name="brand_theme_exquisite_fall_description">虚栄と感覚。深く暗い紫とスクリーマー・ピンクが織りなす退廃的なデュアルトーンパレット。</string>
+    <string name="brand_theme_exquisite_fall_accessibility">精緻なる没落・テーマ。深く暗い紫、スクリーマー・ピンク、そして金の縁取り。</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">変転の迷宮</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">低彩度のシアン・ブルーと明るい蛍光紫。金の縁取りを持つ、移ろいゆくデュアルトーンの迷宮。</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">変転の迷宮・テーマ。低彩度のシアン・ブルー、明るい蛍光紫、そして金の縁取り。</string>
+    <string name="brand_theme_custom_title">カスタム・デュアルトーン</string>
+    <string name="brand_theme_custom_description">自分のデュアルトーン色を使い、サンプルテキストは神聖なる機械をそのまま使います。</string>
+    <string name="brand_theme_custom_accessibility">カスタム・デュアルトーンテーマのプレビュー。</string>
+    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_brand_theme_add">追加</string>
+    <string name="config_custom_brand_theme_edit">カスタム色を編集</string>
+    <string name="config_custom_brand_theme_dialog_title">カスタム・デュアルトーン色</string>
+    <string name="config_custom_brand_theme_dialog_description">`#RRGGBB` 形式の 16 進カラーを入力します。輪郭を空欄にすると accent 色を再利用します。</string>
+    <string name="config_custom_brand_theme_background_label">主色</string>
+    <string name="config_custom_brand_theme_accent_label">accent 色</string>
+    <string name="config_custom_brand_theme_outline_label">輪郭色</string>
+    <string name="config_custom_brand_theme_outline_optional">任意</string>
+    <string name="config_custom_brand_theme_save">保存</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete">削除</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete_title">カスタムデュアルトーンを削除</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
+    <string name="config_custom_brand_theme_delete_message">プリセット %1$s を削除しますか？</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_new">新規カスタムデュアルトーン</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_edit">カスタムデュアルトーンを編集</string>
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_randomize">色をランダム化</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
+    <string name="config_custom_brand_theme_randomize_hint">サイコロを使用して、プライマリ、アクセント、アウトラインの新しい組み合わせを作成します。</string>
+    <!-- CONTEXT: Form field label for the user-defined preset name. -->
+    <string name="config_custom_brand_theme_name_label">プリセット名</string>
+    <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
+    <string name="config_custom_brand_theme_invalid_name">プリセット名を入力してください。</string>
+    <string name="config_custom_brand_theme_invalid_hex">`#RRGGBB` を入力してください。</string>
+    <string name="palette_crimson_title">クリムゾンレッド</string>
+    <string name="palette_rose_title">ローズピンク</string>
+    <string name="palette_sakura_title">桜ピンク</string>
+    <string name="palette_raspberry_title">ラズベリー・ブルーム</string>
+    <string name="palette_blush_title">ブラッシュピンク</string>
+    <string name="palette_orange_title">ソーラーオレンジ</string>
+    <string name="palette_coral_title">コーラル・ブルーム</string>
+    <string name="palette_tangerine_title">タンジェリン・グロウ</string>
+    <string name="palette_apricot_title">アプリコット・ミスト</string>
+    <string name="palette_terracotta_title">テラコッタ・クレイ</string>
+    <string name="palette_persimmon_title">パーシモン・ファイア</string>
+    <string name="palette_amber_title">サンイエロー</string>
+    <string name="palette_gold_title">ゴールデンアワー</string>
+    <string name="palette_sunflower_title">ひまわりゴールド</string>
+    <string name="palette_lemon_title">レモンライト</string>
+    <string name="palette_honey_title">ハニーアンバー</string>
+    <string name="palette_marigold_title">マリーゴールド・グロウ</string>
+    <string name="palette_lime_title">ライム・バースト</string>
+    <string name="palette_olive_title">オリーブモス</string>
+    <string name="palette_emerald_title">エメラルドグリーン</string>
+    <string name="palette_mint_title">ミントウェーブ</string>
+    <string name="palette_jade_title">ジェイドストリーム</string>
+    <string name="palette_forest_title">フォレストパイン</string>
+    <string name="palette_teal_title">アクアシアン</string>
+    <string name="palette_cyan_title">ネオンシアン</string>
+    <string name="palette_sky_title">スカイブルー</string>
+    <string name="palette_ocean_title">エレクトリックブルー</string>
+    <string name="palette_cobalt_title">コバルトブルー</string>
+    <string name="palette_indigo_title">ディープインディゴ</string>
+    <string name="palette_violet_title">バイオレット・パルス</string>
+    <string name="palette_plum_title">プラムナイト</string>
+    <string name="palette_magenta_title">マゼンタ・ポップ</string>
+    <string name="palette_fuchsia_title">フューシャ・フラッシュ</string>
+    <string name="palette_orchid_title">オーキッド・ミスト</string>
+    <string name="palette_lilac_title">ライラック・ヘイズ</string>
+    <string name="palette_mocha_title">モカブラウン</string>
+    <string name="palette_slate_title">スレートグレー</string>
+    <string name="palette_sand_title">サンドストーン</string>
+    <string name="palette_stone_title">ストーン・トープ</string>
+    <string name="palette_graphite_title">グラファイト・インク</string>
+    <string name="palette_ivory_title">アイボリーリネン</string>
+</resources>

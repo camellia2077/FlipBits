@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @Composable
 internal fun LibrarySelectionActionsRow(
@@ -40,6 +41,7 @@ internal fun LibrarySelectionActionsRow(
         IconButton(
             onClick = onSelectAll,
             enabled = canSelectAll,
+            colors = utilityActionIconButtonColors(),
         ) {
             Icon(
                 imageVector = Icons.Rounded.DoneAll,
@@ -49,6 +51,7 @@ internal fun LibrarySelectionActionsRow(
         IconButton(
             onClick = onMoveSelected,
             enabled = selectedCount > 0,
+            colors = utilityActionIconButtonColors(),
         ) {
             Icon(
                 imageVector = Icons.Rounded.FolderOpen,
@@ -58,13 +61,17 @@ internal fun LibrarySelectionActionsRow(
         IconButton(
             onClick = onDeleteSelected,
             enabled = selectedCount > 0,
+            colors = utilityActionIconButtonColors(),
         ) {
             Icon(
                 imageVector = Icons.Rounded.Delete,
                 contentDescription = stringResource(R.string.library_action_delete_selected),
             )
         }
-        IconButton(onClick = onClearSelection) {
+        IconButton(
+            onClick = onClearSelection,
+            colors = utilityActionIconButtonColors(),
+        ) {
             Icon(
                 imageVector = Icons.Rounded.Close,
                 contentDescription = stringResource(R.string.library_action_clear_selection),

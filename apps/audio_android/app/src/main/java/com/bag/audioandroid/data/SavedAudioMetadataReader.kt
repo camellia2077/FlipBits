@@ -37,10 +37,12 @@ internal class SavedAudioMetadataReader(
             uriString = row.uri.toString(),
             modeWireName = metadata?.mode?.wireName ?: unknownModeWireName,
             durationMs = metadata?.durationMs?.takeIf { it > 0L } ?: row.durationMs.coerceAtLeast(0L),
-            savedAtEpochSeconds =
-                metadata?.createdAtIsoUtc?.let(::parseCreatedAtEpochSeconds)
-                    ?: row.dateAddedEpochSeconds.coerceAtLeast(0L),
+            savedAtEpochSeconds = row.dateAddedEpochSeconds.coerceAtLeast(0L),
+            generatedAtEpochSeconds = metadata?.createdAtIsoUtc?.let(::parseCreatedAtEpochSeconds),
             flashVoicingStyle = metadata?.flashVoicingStyle,
+            sampleRateHz = metadata?.sampleRateHz?.takeIf { it > 0 },
+            inputSourceKind = metadata?.inputSourceKind,
+            payloadByteCount = metadata?.payloadByteCount?.takeIf { it >= 0 },
         )
 
     fun importedFallbackItem(
@@ -61,9 +63,12 @@ internal class SavedAudioMetadataReader(
                 metadata?.durationMs?.takeIf { it > 0L }
                     ?: pcmSize.toLong() * 1000L / sampleRateHz.toLong(),
             savedAtEpochSeconds =
-                metadata?.createdAtIsoUtc?.let(::parseCreatedAtEpochSeconds)
-                    ?: Instant.now().epochSecond,
+                Instant.now().epochSecond,
+            generatedAtEpochSeconds = metadata?.createdAtIsoUtc?.let(::parseCreatedAtEpochSeconds),
             flashVoicingStyle = metadata?.flashVoicingStyle,
+            sampleRateHz = metadata?.sampleRateHz?.takeIf { it > 0 } ?: sampleRateHz,
+            inputSourceKind = metadata?.inputSourceKind,
+            payloadByteCount = metadata?.payloadByteCount?.takeIf { it >= 0 },
         )
 
     private fun parseCreatedAtEpochSeconds(createdAtIsoUtc: String): Long? =

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlipBits</string>
+    <string name="common_back">Назад</string>
+    <string name="common_cancel">Скасувати</string>
+    <string name="common_all">Усе</string>
+    <string name="common_unknown">Невідомо</string>
+    <string name="tab_audio">Аудіо</string>
+    <string name="tab_library">Збережене</string>
+    <string name="tab_config">Налаштування</string>
+</resources>

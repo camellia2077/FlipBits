@@ -23,4 +23,24 @@ class AppLanguageOptionTest {
             AppLanguageOption.fromLanguageTags("zh-Hans"),
         )
     }
+
+    @Test
+    fun `fromLanguageTags maps newly added locales`() {
+        assertEquals(
+            AppLanguageOption.Korean,
+            AppLanguageOption.fromLanguageTags("ko-KR"),
+        )
+        assertEquals(
+            AppLanguageOption.French,
+            AppLanguageOption.fromLanguageTags("fr-FR"),
+        )
+        assertEquals(
+            AppLanguageOption.Italian,
+            AppLanguageOption.fromLanguageTags("it-IT"),
+        )
+        assertEquals(
+            AppLanguageOption.Polish,
+            AppLanguageOption.fromLanguageTags("pl-PL"),
+        )
+    }
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -89,25 +90,37 @@ internal fun LibrarySavedAudioRow(
                 }
             }
             if (!isSelectionMode) {
-                IconButton(onClick = onShare) {
+                IconButton(
+                    onClick = onShare,
+                    colors = utilityActionIconButtonColors(),
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Share,
                         contentDescription = stringResource(R.string.library_action_share),
                     )
                 }
-                IconButton(onClick = onMove) {
+                IconButton(
+                    onClick = onMove,
+                    colors = utilityActionIconButtonColors(),
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.FolderOpen,
                         contentDescription = stringResource(R.string.library_action_move),
                     )
                 }
-                IconButton(onClick = onRename) {
+                IconButton(
+                    onClick = onRename,
+                    colors = utilityActionIconButtonColors(),
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Edit,
                         contentDescription = stringResource(R.string.library_action_rename),
                     )
                 }
-                IconButton(onClick = onDelete) {
+                IconButton(
+                    onClick = onDelete,
+                    colors = utilityActionIconButtonColors(),
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,
                         contentDescription = stringResource(R.string.library_action_delete),

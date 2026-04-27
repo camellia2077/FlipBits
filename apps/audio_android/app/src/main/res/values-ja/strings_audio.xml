@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Japanese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Japanese. -->
+    <!-- Audio screen strings: actions, playback modes, player details, status messages. -->
+    <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
+    <string name="audio_title">オーディオ</string>
+    <string name="audio_input_label">入力テキスト</string>
+    <string name="audio_action_encode">作成</string>
+    <string name="audio_action_encode_busy">作成中…</string>
+    <string name="audio_action_encode_busy_progress">作成中… %1$d%%</string>
+    <string name="audio_encode_phase_preparing_input_label">準備中</string>
+    <string name="audio_encode_phase_rendering_pcm_label">レンダリング中</string>
+    <string name="audio_encode_phase_postprocessing_label">仕上げ中</string>
+    <string name="audio_encode_phase_finalizing_label">完了処理中</string>
+    <string name="audio_action_cancel_encode">キャンセル</string>
+    <string name="audio_action_cancel_encode_busy">キャンセル中…</string>
+    <string name="audio_action_play">再生</string>
+    <string name="audio_action_pause">一時停止</string>
+    <string name="audio_action_previous_track">前のトラック</string>
+    <string name="audio_action_next_track">次のトラック</string>
+    <string name="audio_action_open_audio_info">情報</string>
+    <!-- CONTEXT: Playback mode option. Means normal play order. Paired with Random / Repeat one / Repeat all. Do not translate as ordinary quality or 'average'. -->
+    <string name="audio_action_normal_playback">通常</string>
+    <!-- CONTEXT: Playback mode option. Means random order, not manual shuffling UI. -->
+    <string name="audio_action_shuffle_playback">ランダム</string>
+    <!-- CONTEXT: Playback mode option. Repeat the current single track/item. -->
+    <string name="audio_action_repeat_one">1曲リピート</string>
+    <!-- CONTEXT: Playback mode option. Repeat the whole list / repeat all. -->
+    <string name="audio_action_repeat_list">全曲リピート</string>
+    <!-- CONTEXT: Main action on Audio screen. Reads audio back into text/result. Product term is Read. -->
+    <string name="audio_action_decode">読み取り</string>
+    <!-- CONTEXT: Busy label for the Read action. -->
+    <string name="audio_action_decode_busy">読み取り中…</string>
+    <string name="audio_action_clear">クリア</string>
+    <string name="audio_action_clear_result">結果をクリア</string>
+    <string name="audio_action_clear_result_busy">クリア中…</string>
+    <string name="audio_action_export">保存</string>
+    <string name="audio_action_playback_speed_short">速度</string>
+    <string name="audio_action_open_playback_speed_menu">再生速度メニューを開く</string>
+    <string name="audio_action_toggle_playback_speed_slider">再生速度の微調整を切り替える</string>
+    <string name="audio_action_cycle_playback_speed">再生速度 %1$s</string>
+    <string name="audio_action_open_saved_audio_list">保存済み</string>
+    <!-- CONTEXT: Label describing where the current read result came from. %1$s is a mode name such as flash/pro/ultra. -->
+    <string name="audio_decode_source_generated">取得元: %1$s</string>
+    <!-- CONTEXT: Label describing where the current read result came from. %1$s is a saved audio name. -->
+    <string name="audio_decode_source_saved">取得元: %1$s</string>
+    <string name="audio_decode_busy_reason_generated">現在のオーディオを読み取り中</string>
+    <string name="audio_decode_busy_reason_saved">保存されたオーディオを読み取り中</string>
+    <string name="audio_action_randomize_sample_input">ランダムサンプル</string>
+    <string name="audio_action_open_input_editor">エディタを開く</string>
+    <string name="audio_sample_length_short">短い</string>
+    <string name="audio_sample_length_long">長い</string>
+    <string name="audio_action_expand_input">入力を展開</string>
+    <string name="audio_action_collapse_input">入力を折りたたむ</string>
+    <string name="audio_input_editor_inline_hint">長い文章はここで折りたたまれます。全文を表示または編集するにはテキストエディタを開いてください。</string>
+    <string name="audio_input_editor_title">入力テキストを編集</string>
+    <string name="audio_input_editor_hint">長い行、メモ、または儀式用の文章をオーディオに変換する前に、この大きなエディタを使用してください。</string>
+    <string name="audio_input_editor_done">完了</string>
+    <string name="audio_input_editor_count">%1$d 文字</string>
+    <string name="audio_input_metrics">%1$d 文字 • %2$d バイト</string>
+    <string name="audio_input_payload_limit_ok">1 セグメントの目安は 512 バイトです。より長い入力は自動分割されます。</string>
+    <string name="audio_input_payload_limit_warning">512 バイトに近づいています。より長い入力は自動分割されます。</string>
+    <string name="audio_input_payload_limit_exceeded">512 バイトを超えています。この入力は自動分割されます。</string>
+    <string name="audio_action_expand_result">結果を展開</string>
+    <string name="audio_action_collapse_result">結果を折りたたむ</string>
+    <string name="audio_action_expand_result_content">結果テキストを展開</string>
+    <string name="audio_action_collapse_result_content">結果テキストを折りたたむ</string>
+    <string name="audio_action_expand_result_content_short">表示</string>
+    <string name="audio_action_collapse_result_content_short">非表示</string>
+    <string name="audio_action_expand_flash_style">スタイルを展開</string>
+    <string name="audio_action_collapse_flash_style">スタイルを折りたたむ</string>
+    <string name="audio_status">%1$s</string>
+    <string name="audio_sample_count">%1$d サンプル</string>
+    <!-- CONTEXT: Panel title for the text produced by reading audio back. Product term is 'Read result'. -->
+    <string name="audio_result_title">読み取り結果</string>
+    <string name="audio_result_empty">結果はまだありません。</string>
+    <string name="audio_decode_view_text">テキスト</string>
+    <string name="audio_decode_view_raw">RAW</string>
+    <string name="audio_decode_raw_binary_label">バイナリ</string>
+    <string name="audio_decode_raw_hex_label">16進数</string>
+    <string name="audio_decode_text_unavailable">このペイロードはテキストとして解釈できませんでした。RAWデータは引き続き利用可能です。</string>
+    <string name="audio_decode_raw_unavailable">RAWペイロードデータはまだ利用できません。</string>
+    <string name="audio_flash_style_title">Flash音声スタイル: %1$s</string>
+    <string name="audio_flash_style_hint">次に生成されるオーディオに適用されます。既存の生成済みオーディオは、作成時のスタイルを維持します。</string>
+    <string name="audio_saved_audio_sheet_title">保存されたオーディオ</string>
+    <string name="audio_saved_audio_empty">保存されたオーディオはまだありません。</string>
+    <string name="audio_mini_player_generated_title">%1$s 生成オーディオ</string>
+    <string name="audio_mini_player_generated_flash_subtitle">%1$s • %2$s</string>
+    <string name="audio_mini_player_saved_subtitle">%1$s • %2$s</string>
+    <string name="audio_mini_player_duration_only">%1$s</string>
+    <string name="audio_player_detail_now_playing">再生中</string>
+    <!-- CONTEXT: Title inside the player detail sheet for the text produced by reading audio back. Same concept as Read result. -->
+    <string name="audio_player_detail_decoded_title">読み取り結果</string>
+    <string name="audio_player_detail_decoded_empty">結果はまだありません。必要な時に「読み取り」をタップしてください。</string>
+    <string name="audio_playback_view_visual">ビジュアル</string>
+    <string name="audio_playback_view_lyrics">歌詞</string>
+    <string name="audio_pro_visual_waiting_follow">フォローデータを待機中</string>
+    <string name="audio_pro_visual_symbol_order">現在のバイトは2つのシンボルを発信します：上位ニブル、次に下位ニブル</string>
+    <string name="audio_pro_visual_step_1">ステップ 1</string>
+    <string name="audio_pro_visual_step_2">ステップ 2</string>
+    <string name="audio_pro_visual_high_nibble">上位ニブル</string>
+    <string name="audio_pro_visual_low_nibble">下位ニブル</string>
+    <string name="audio_pro_visual_high_group">上位グループ</string>
+    <string name="audio_pro_visual_low_group">下位グループ</string>
+    <string name="audio_pro_visual_nibble_value">ニブル %1$s</string>
+    <string name="audio_pro_visual_playing_now">現在再生中</string>
+    <string name="audio_pro_visual_up_next">次の予定</string>
+    <string name="audio_pro_visual_guide_title">このバイトの送信方法</string>
+    <string name="audio_pro_visual_now">現在</string>
+    <string name="audio_pro_visual_next">次</string>
+    <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
+    <string name="audio_pro_visual_byte_complete">バイト完了</string>
+    <!-- CONTEXT: Teaching text in the Pro visualizer. Keep Token / byte / ASCII protocol terms stable and concise. -->
+    <string name="audio_pro_visual_token_mapping">トークン #%1$d \"%2$s\" -&gt; バイト %3$d/%4$d</string>
+    <string name="audio_pro_visual_next_frequencies">次のシンボル周波数: %1$d + %2$d Hz</string>
+    <string name="audio_pro_visual_next_byte_advance">これは2番目のニブルです。終了後、プレイヤーは次のバイトに進みます。</string>
+    <string name="audio_pro_visual_ascii_byte">ASCIIバイト %1$d</string>
+    <string name="audio_pro_visual_token_byte">トークン #%1$d • バイト %2$d/%3$d</string>
+    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_position">バイト位置</string>
+    <string name="audio_pro_visual_then">その後</string>
+    <string name="audio_info_dialog_title">情報</string>
+    <!-- CONTEXT: Section header in the audio info sheet. Means user-facing detail/info, not account/profile identity. -->
+    <string name="audio_info_user_section">詳細</string>
+    <!-- CONTEXT: Section header in the audio info sheet for technical metadata. -->
+    <string name="audio_info_technical_section">技術情報</string>
+    <!-- CONTEXT: Row label in the audio info sheet. Means transport/encoding type used by the current audio. -->
+    <string name="audio_info_encoding_type">種類</string>
+    <string name="audio_info_duration">再生時間</string>
+    <string name="audio_info_sample_rate">サンプルレート</string>
+    <string name="audio_info_sample_rate_value">%1$d Hz</string>
+    <string name="audio_info_frame_samples">フレームサイズ</string>
+    <string name="audio_info_frame_samples_value">%1$d サンプル</string>
+    <string name="audio_info_flash_voicing_style">Flash音声スタイル</string>
+    <string name="audio_ultra_visual_now">現在</string>
+    <string name="audio_ultra_visual_next">次</string>
+    <string name="audio_ultra_visual_frequency_value">%1$d Hz</string>
+    <string name="audio_ultra_visual_no_symbol">シンボルなし</string>
+    <string name="audio_ultra_visual_no_next_symbol">次のシンボルなし</string>
+    <string name="audio_ultra_visual_level_high">高</string>
+    <string name="audio_ultra_visual_level_mid">中</string>
+    <string name="audio_ultra_visual_level_low">低</string>
+    <string name="audio_follow_unavailable">このオーディオでは現在ペイロードフォローを利用できません。</string>
+    <string name="audio_follow_text_unavailable">このオーディオでは現在テキストフォローを利用できません。</string>
+    <string name="audio_follow_display_lyrics">歌詞</string>
+    <string name="audio_follow_display_data">データ</string>
+    <string name="audio_follow_view_hex">16進数</string>
+    <string name="audio_follow_view_binary">バイナリ</string>
+    <string name="audio_player_detail_saved_info_title">詳細</string>
+    <string name="audio_player_detail_saved_mode">モード</string>
+    <string name="audio_player_detail_saved_duration">再生時間</string>
+    <string name="audio_player_detail_saved_time">保存日時</string>
+    <string name="audio_player_detail_saved_generated_time">生成日時</string>
+    <string name="audio_player_detail_saved_input_source">入力元</string>
+    <string name="audio_player_detail_saved_sample_rate">サンプルレート</string>
+    <string name="audio_player_detail_saved_payload_bytes">ペイロードサイズ</string>
+    <string name="audio_player_detail_saved_payload_bytes_value">%1$d バイト</string>
+    <string name="audio_generated_input_source_manual">手動</string>
+    <string name="audio_generated_input_source_sample">サンプル</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">FSKレーン</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">トーンエネルギー</string>
+    <!-- CONTEXT: Transport mode name shown in tabs/chips. Do not translate flash/pro/ultra as ordinary adjectives. -->
+    <string name="transport_mode_flash_label">flash</string>
+    <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
+    <string name="transport_mode_pro_label">pro</string>
+    <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
+    <string name="transport_mode_ultra_label">ultra</string>
+    <string name="audio_transport_flash_hint">flashはUTF-8テキストを使用します。</string>
+    <string name="audio_transport_flash_example">灯守たちは古の星図の封を解く</string>
+    <string name="audio_transport_pro_hint">proはASCIIテキストのみを使用します。</string>
+    <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
+    <string name="audio_transport_ultra_hint">ultraはUTF-8テキストを使用します。</string>
+    <string name="audio_transport_ultra_example">灯守たちは古の星図の封を解く</string>
+    <string name="audio_sample_thematic_2">鐘楼の奥深くで、封印されたエンジンが唸りを上げ始める</string>
+    <string name="audio_sample_thematic_3">七番目の灯火が点されるも、遠方の門は沈黙したままである</string>
+    <string name="audio_sample_thematic_4">灰の港の彼方、巡礼船が黒い海を渡る</string>
+    <string name="audio_sample_thematic_5">鉄の鐘が応える時、外側の錠は未だ開かれず</string>
+    <string name="audio_sample_thematic_long_1">鐘楼の台帳によれば、東の炉は夜明け前に応じ、それは屋根の灯火が昇る時刻よりずっと早かった。三人の従者が手作業で真鍮の車輪を回す間、煤が上部の通気口から漂い、階段に降り積もった。封印されたハッチの向こうからは低く安定した唸り声が響き、それは夜の書記たちが蝋板にその拍子を刻み始めるほど長く続いた。最後の音が消え去った時、鉄のラッチに触れる者は誰もいなかったが、目撃者全員が同じ行に署名した。下の機械は自らの意志で目覚めたのである。</string>
+    <string name="audio_sample_thematic_long_2">第二の見張りの際、門衛所の灯火は切り詰められ、外側のボルトが再び点検され、鎖のヒンジから煤が削り落とされた。遠方の廊下からは何の信号も届かなかったが、石の床は短い間隔で震え続け、あたかも広間の下の重厚な駆動部が未完の作業を再開したかのようであった。衛兵たちは水時計で各震動を計測し、西の壁が風の全重量を受けた時にそのパターンが回帰することを発見した。見張りが解かれる前に、内側の錠には新しい蝋が押し当てられ、報告書は「門の向こうの沈黙は、今や占拠された沈黙である」という警告で締めくくられた。</string>
+    <string name="audio_sample_thematic_long_3">炉の年代記には、赤い灯火が一つずつ掲げられ、部屋全体が煙の背後にある堆積した石炭のように輝いたと記録されている。最後の鎖が静止した時、信号係たちは各パルスを蝋板に書き写し、上部の回廊からは鉄のフックが擦れる音が応えた。四つの緩やかな回帰が垂木を抜けて戻ってきたが、それぞれが前よりも弱く、どの壁が声を運んできたのか記録者たちの意見が一致することはなかった。結びの行には、五度目の呼びかけに何が応えるかを部屋の誰も聞きたがらなかったため、鐘は夜明けまで巻かれぬまま放置されたと記されている。</string>
+    <string name="audio_sample_thematic_long_4">灰の海岸からのある航海記録には、欠けた月の下、炉の塵で霞んだ空を行く夜の横断について記されている。船体の灯火は覆われ、海図室は沈黙を保ち、甲板の下ではエンジンの聖域が刻む緩やかな鼓動だけが時間を告げていた。真夜中近く、黒いうねりの間に動く青白い影が見えたため、操舵手は舳先を三度転向させるよう命じたが、音はついぞ舷側まで届かなかった。朝までに船は再び港の明かりを見出し、最後の一行には、封印された供物箱の横にあるものを除き、感謝のうちに全ての灯火が再び点されたと書かれている。</string>
+    <string name="audio_sample_pro_2">SEAL THE OUTER LOCK</string>
+    <string name="audio_sample_pro_3">COPPER WARDENS STIR THE DRIVE</string>
+    <string name="audio_sample_pro_4">SEVENTH LAMP LIT GATE STILL SILENT</string>
+    <string name="audio_sample_pro_5">HOLD FORMATION BELOW IRON MASTS</string>
+    <string name="audio_sample_pro_long_1">BELL TOWER LEDGER. EAST FURNACE ANSWERED BEFORE DAWN. THREE ATTENDANTS TURNED THE BRASS WHEELS BY HAND WHILE SOOT FELL THROUGH THE UPPER VENTS. A LOW STEADY HUM CAME THROUGH THE SEALED HATCH. FINAL LINE STATES THE MACHINE BELOW WOKE OF ITS OWN ACCORD.</string>
+    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
+    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
+    <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
+    <string name="status_ready_to_encode">テキストを入力して「作成」をタップしてください</string>
+    <string name="status_input_empty">入力が空です。</string>
+    <string name="status_mode_audio_generating">%1$s オーディオを作成中…</string>
+    <string name="status_mode_audio_generating_progress">%1$s オーディオを作成中… %2$d%%</string>
+    <string name="status_mode_audio_generating_preparing_input">%1$s オーディオを準備中…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">%1$s オーディオをレンダリング中…</string>
+    <string name="status_mode_audio_generating_postprocessing">%1$s オーディオを仕上げ中…</string>
+    <string name="status_mode_audio_generating_finalizing">%1$s オーディオを完了処理中…</string>
+    <string name="status_mode_audio_canceling">%1$s オーディオをキャンセル中…</string>
+    <string name="status_mode_audio_cancelled">%1$s オーディオがキャンセルされました</string>
+    <string name="status_mode_audio_generated">%1$s 準備完了、%2$d サンプル</string>
+    <string name="status_mode_audio_generated_segmented">%1$s 準備完了、%2$d サンプル、%3$d セグメント</string>
+    <string name="status_playing_mode_audio">%1$s オーディオを再生中</string>
+    <string name="status_playback_paused">再生一時停止</string>
+    <string name="status_playback_completed">再生完了</string>
+    <string name="status_playback_stopped">再生停止</string>
+    <string name="status_playback_failed">再生失敗</string>
+    <string name="status_mode_audio_decoding">%1$s オーディオを読み取り中…</string>
+    <string name="status_mode_decode_completed">%1$s 読み取り完了</string>
+    <string name="status_current_mode_cleared">現在のオーディオをクリアしました</string>
+    <string name="status_result_cleared">結果をクリアしました</string>
+    <string name="status_audio_saved">保存済み: %1$s</string>
+    <string name="status_audio_save_failed">保存失敗</string>
+    <string name="snackbar_audio_saved_to_library">保存しました</string>
+    <string name="snackbar_audio_save_failed">保存失敗</string>
+    <string name="status_saved_audio_loaded">読み込み完了: %1$s</string>
+    <string name="status_saved_audio_load_failed">ロード失敗</string>
+    <string name="status_playing_saved_audio">再生中: %1$s</string>
+    <string name="status_no_audio_for_mode">このモードのオーディオはまだありません</string>
+</resources>

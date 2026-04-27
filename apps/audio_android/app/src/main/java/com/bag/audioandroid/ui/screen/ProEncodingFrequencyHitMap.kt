@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 private val ProFrequencySectionHeight = 76.dp
 private val ProFrequencyLabelColumnWidth = 78.dp
@@ -39,14 +40,15 @@ internal fun ProFrequencyHitMap(
     symbols: List<ProSymbolExplanation>,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     val mapBackgroundBrush =
         Brush.horizontalGradient(
             listOf(
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f),
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f),
+                visualTokens.supportStrongSurfaceColor.copy(alpha = 0.34f),
+                visualTokens.supportSurfaceColor.copy(alpha = 0.48f),
             ),
         )
-    val neutralColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.34f)
+    val neutralColor = visualTokens.subtleOutlineColor.copy(alpha = 0.34f)
     val activeColor = MaterialTheme.colorScheme.primary
     val historyColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.68f)
 
@@ -91,6 +93,7 @@ private fun ProFrequencySection(
     historyColor: androidx.compose.ui.graphics.Color,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -105,7 +108,7 @@ private fun ProFrequencySection(
                         .width(ProFrequencyAxisStrokeWidth)
                         .height(ProFrequencySectionHeight + ProFrequencySectionLabelSpacing + 18.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.32f),
+                            color = visualTokens.subtleOutlineColor.copy(alpha = 0.32f),
                             shape = RoundedCornerShape(99.dp),
                         ),
             )

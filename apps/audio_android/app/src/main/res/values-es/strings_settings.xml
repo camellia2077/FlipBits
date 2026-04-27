@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="config_title">Ajustes</string>
+    <string name="config_language_title">Idioma</string>
+    <string name="config_language_subtitle">Elegir idioma de la app</string>
+    <string name="config_language_follow_system">Usar idioma del sistema</string>
+    <string name="config_language_chinese">简体中文</string>
+    <string name="config_language_traditional_chinese">繁體中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_ukrainian">Українська</string>
+    <string name="config_language_korean">한국어</string>
+    <string name="config_language_french">Français</string>
+    <string name="config_language_italian">Italiano</string>
+    <string name="config_language_polish">Polski</string>
+    <string name="config_language_high_gothic">Altum Gothicum</string>
+    <string name="config_language_expand">Expandir ajustes de idioma</string>
+    <string name="config_language_collapse">Ocultar ajustes de idioma</string>
+    <string name="config_theme_mode_title">Modo de tema</string>
+    <string name="config_theme_mode_subtitle">Elegir modo del sistema, claro u oscuro.</string>
+    <string name="config_theme_mode_brand_fixed">Los temas Dual-tone usan una apariencia fija.</string>
+    <string name="config_theme_mode_follow_system">Usar ajuste del sistema</string>
+    <string name="config_theme_mode_light">Claro</string>
+    <string name="config_theme_mode_dark">Oscuro</string>
+    <string name="config_theme_appearance_title">Apariencia del tema</string>
+    <string name="config_theme_style_title">Estilo del tema</string>
+    <string name="config_theme_style_subtitle">Elegir Material o Dual-tone.</string>
+    <string name="config_theme_style_material">Material</string>
+    <string name="config_theme_style_brand_dual_tone">Dual-tone</string>
+    <string name="config_theme_appearance_expand">Expandir apariencia del tema</string>
+    <string name="config_theme_appearance_collapse">Ocultar apariencia del tema</string>
+    <string name="config_palette_title">Paletas de color</string>
+    <string name="config_palette_selected">Seleccionado</string>
+    <string name="config_palette_expand">Expandir paletas</string>
+    <string name="config_palette_collapse">Ocultar paletas</string>
+    <string name="config_brand_theme_title">Temas Dual-tone</string>
+    <string name="config_brand_theme_description">Cada tema Dual-tone mantiene una apariencia fija con vista previa de dos colores.</string>
+    <string name="config_dual_tone_group_sacred_machine">La Máquina Sagrada</string>
+    <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
+    <string name="config_dual_tone_group_custom">Personalizado</string>
+    <string name="config_dual_tone_group_ancient_dynasty">La Dinastía Antigua</string>
+    <string name="config_dual_tone_group_immortal_rot">La Putrefacción Inmortal</string>
+    <string name="config_dual_tone_group_scarlet_carnage">La Carnicería Escarlata</string>
+    <string name="config_dual_tone_group_exquisite_fall">La Caída Exquisita</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">El Laberinto de la Mutabilidad</string>
+    <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_reds_pinks">Rojos y rosas</string>
+    <string name="palette_family_oranges">Naranjas</string>
+    <string name="palette_family_yellows">Amarillos</string>
+    <string name="palette_family_greens">Verdes</string>
+    <string name="palette_family_cyans_blues">Cianes y azules</string>
+    <string name="palette_family_purples_magentas">Púrpuras y magentas</string>
+    <string name="palette_family_neutrals">Neutros</string>
+    <string name="config_flash_style_title">Estilo flash</string>
+    <string name="config_flash_style_subtitle">Elige cómo debe sonar el audio flash.</string>
+    <string name="config_flash_style_coded_burst_label">Ráfaga codificada</string>
+    <string name="config_flash_style_coded_burst_description">Ráfagas densas y agrupadas para una señalización mecánica.</string>
+    <string name="config_flash_style_ritual_chant_label">Canto ritual</string>
+    <string name="config_flash_style_ritual_chant_description">Fraseo más suave y resonante para un tono ceremonial de mando.</string>
+    <string name="config_flash_style_deep_ritual_label">Ritual profundo</string>
+    <string name="config_flash_style_deep_ritual_description">Fraseo ceremonial de catedral con resonancia más profunda y una solemne capa coral.</string>
+    <string name="config_about_title">Información</string>
+    <string name="config_about_subtitle">Autor, enlace del proyecto y licencias</string>
+    <string name="palette_ruby_title">Rojo rubí</string>
+    <string name="palette_mars_relic_title">Reliquia de Marte</string>
+    <string name="brand_theme_mars_relic_title">Reliquia de Marte</string>
+    <string name="brand_theme_mars_relic_description">Rojo profundo con pergamino para una estética de archivo ceremonial.</string>
+    <string name="brand_theme_mars_relic_accessibility">Tema Reliquia de Marte, rojo profundo con beige pergamino.</string>
+    <string name="brand_theme_black_crimson_rite_title">Rito carmesí negro</string>
+    <string name="brand_theme_black_crimson_rite_description">Negro hollín y carmesí ritual para una atmósfera severa de santuario mecánico.</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">Tema Rito carmesí negro, casi negro con rojo carmesí intenso.</string>
+    <string name="brand_theme_scarlet_guard_title">Guardia escarlata</string>
+    <string name="brand_theme_scarlet_guard_description">Blanco marfil y carmesí sellado para un tono heráldico disciplinado.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Tema Guardia escarlata, marfil claro con rojo escarlata oscuro.</string>
+    <string name="brand_theme_dynasty_revival_title">Renacer de la Dinastía</string>
+    <string name="brand_theme_dynasty_revival_description">Negro de metal funerario con verde reactor clásico para un núcleo dinástico reanimado.</string>
+    <string name="brand_theme_dynasty_revival_accessibility">Tema Renacer de la Dinastía, negro metal funerario profundo con verde reactor brillante.</string>
+    <string name="brand_theme_sepulcher_cyan_title">Cian sepulcral</string>
+    <string name="brand_theme_sepulcher_cyan_description">Acero sepulcral frío con cian verdoso contenido para un resplandor regio y mecánico más sereno.</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">Tema Cian sepulcral, acero frío y oscuro con cian verdoso apagado.</string>
+    <string name="brand_theme_tomb_sigil_title">Sigilo funerario</string>
+    <string name="brand_theme_tomb_sigil_description">Hierro cálido de cripta y verde de resurgimiento intenso para un emblema ceremonial dinástico.</string>
+    <string name="brand_theme_tomb_sigil_accessibility">Tema Sigilo funerario, hierro oscuro de cripta con verde de resurgimiento intenso.</string>
+    <string name="brand_theme_ancient_alloy_title">Aleación antigua</string>
+    <string name="brand_theme_ancient_alloy_description">Sombras de metal envejecido y turquesa fría para el brillo de una forja sepulcral.</string>
+    <string name="brand_theme_ancient_alloy_accessibility">Tema Aleación antigua, gris bronce oscuro con turquesa brillante.</string>
+    <string name="brand_theme_immortal_rot_title">La Putrefacción Inmortal</string>
+    <string name="brand_theme_immortal_rot_description">Verde helecho y amarillo citrino crean una paleta Dual-tone húmeda y cubierta de maleza.</string>
+    <string name="brand_theme_immortal_rot_accessibility">Tema La Putrefacción Inmortal, verde helecho con amarillo citrino.</string>
+    <string name="brand_theme_scarlet_carnage_title">La Carnicería Escarlata</string>
+    <string name="brand_theme_scarlet_carnage_description">Rojo oscuro y latón forjan una brutal paleta Dual-tone de sangre y metal de guerra.</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">Tema La Carnicería Escarlata, rojo oscuro con latón dorado oscuro.</string>
+    <string name="brand_theme_exquisite_fall_title">La Caída Exquisita</string>
+    <string name="brand_theme_exquisite_fall_description">Púrpura muy oscuro y rosa estridente crean una paleta Dual-tone decadente de vanidad y sensación.</string>
+    <string name="brand_theme_exquisite_fall_accessibility">Tema Caída Exquisita, púrpura muy oscuro con rosa estridente y contorno dorado.</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">El Laberinto de la Mutabilidad</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">Azul cian de baja saturación y púrpura fluorescente brillante forman un laberinto Dual-tone cambiante con borde dorado.</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">Tema El Laberinto de la Mutabilidad, azul cian de baja saturación con púrpura fluorescente brillante y contorno dorado.</string>
+    <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
+    <string name="brand_theme_custom_title">Bitono personalizado</string>
+    <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
+    <string name="brand_theme_custom_description">Tus propios colores bitono con el texto de ejemplo de La Máquina Sagrada.</string>
+    <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
+    <string name="brand_theme_custom_accessibility">Vista previa del tema bitono personalizado.</string>
+    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_brand_theme_add">Añadir</string>
+    <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_edit">Editar colores personalizados</string>
+    <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
+    <string name="config_custom_brand_theme_dialog_title">Colores bitono personalizados</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_new">Nuevo bitono personalizado</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_edit">Editar bitono personalizado</string>
+    <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
+    <string name="config_custom_brand_theme_dialog_description">Introduce colores hex en formato #RRGGBB. Deja el contorno vacío para reutilizar el color de acento.</string>
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_randomize">Aleatorizar colores</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
+    <string name="config_custom_brand_theme_randomize_hint">Usa los dados para generar una nueva combinación de colores.</string>
+    <!-- CONTEXT: Form field label for the user-defined preset name. -->
+    <string name="config_custom_brand_theme_name_label">Nombre del ajuste</string>
+    <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_background_label">Color principal</string>
+    <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_accent_label">Color de acento</string>
+    <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_outline_label">Color de contorno</string>
+    <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
+    <string name="config_custom_brand_theme_outline_optional">Opcional</string>
+    <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_save">Guardar</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete">Eliminar</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete_title">Eliminar bitono personalizado</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
+    <string name="config_custom_brand_theme_delete_message">¿Eliminar el ajuste %1$s?</string>
+    <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
+    <string name="config_custom_brand_theme_invalid_name">Introduce un nombre.</string>
+    <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
+    <string name="config_custom_brand_theme_invalid_hex">Usa #RRGGBB.</string>
+    <string name="palette_crimson_title">Rojo carmesí</string>
+    <string name="palette_rose_title">Rosa rosa</string>
+    <string name="palette_sakura_title">Rosa sakura</string>
+    <string name="palette_raspberry_title">Flor frambuesa</string>
+    <string name="palette_blush_title">Rosa rubor</string>
+    <string name="palette_orange_title">Naranja solar</string>
+    <string name="palette_coral_title">Flor coral</string>
+    <string name="palette_tangerine_title">Brillo mandarina</string>
+    <string name="palette_apricot_title">Niebla albaricoque</string>
+    <string name="palette_terracotta_title">Arcilla terracota</string>
+    <string name="palette_persimmon_title">Fuego caqui</string>
+    <string name="palette_amber_title">Amarillo sol</string>
+    <string name="palette_gold_title">Hora dorada</string>
+    <string name="palette_sunflower_title">Dorado girasol</string>
+    <string name="palette_lemon_title">Luz limón</string>
+    <string name="palette_honey_title">Ámbar miel</string>
+    <string name="palette_marigold_title">Brillo caléndula</string>
+    <string name="palette_lime_title">Estallido lima</string>
+    <string name="palette_olive_title">Musgo oliva</string>
+    <string name="palette_emerald_title">Verde esmeralda</string>
+    <string name="palette_mint_title">Ola menta</string>
+    <string name="palette_jade_title">Corriente jade</string>
+    <string name="palette_forest_title">Pino del bosque</string>
+    <string name="palette_teal_title">Cian aqua</string>
+    <string name="palette_cyan_title">Cian neón</string>
+    <string name="palette_sky_title">Azul cielo</string>
+    <string name="palette_ocean_title">Azul eléctrico</string>
+    <string name="palette_cobalt_title">Azul cobalto</string>
+    <string name="palette_indigo_title">Índigo profundo</string>
+    <string name="palette_violet_title">Pulso violeta</string>
+    <string name="palette_plum_title">Noche ciruela</string>
+    <string name="palette_magenta_title">Magenta pop</string>
+    <string name="palette_fuchsia_title">Flash fucsia</string>
+    <string name="palette_orchid_title">Niebla orquídea</string>
+    <string name="palette_lilac_title">Bruma lila</string>
+    <string name="palette_mocha_title">Marrón moca</string>
+    <string name="palette_slate_title">Gris pizarra</string>
+    <string name="palette_sand_title">Piedra de arena</string>
+    <string name="palette_stone_title">Topo piedra</string>
+    <string name="palette_graphite_title">Tinta grafito</string>
+    <string name="palette_ivory_title">Lino marfil</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_title">關於</string>
+    <string name="about_author">%1$s</string>
+    <string name="about_presentation_version">App v%1$s</string>
+    <string name="about_core_version">引擎 v%1$s</string>
+    <string name="about_github">%1$s</string>
+    <string name="about_licenses_title">開源授權</string>
+    <string name="about_licenses_subtitle">查看函式庫與授權</string>
+    <string name="licenses_title">開源授權</string>
+    <string name="licenses_loading">載入授權中</string>
+</resources>

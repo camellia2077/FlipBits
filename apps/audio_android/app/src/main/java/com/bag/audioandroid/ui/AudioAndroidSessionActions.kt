@@ -91,6 +91,7 @@ internal class AudioAndroidSessionActions(
             it.copy(
                 inputText = "",
                 sampleInputId = null,
+                sampleShuffleState = null,
                 statusText =
                     if (it.generatedPcm.isEmpty()) {
                         UiText.Resource(R.string.status_ready_to_encode)

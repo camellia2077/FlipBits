@@ -1,21 +1,28 @@
 package com.bag.audioandroid.ui.theme
 
+import android.graphics.Color as AndroidColor
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemePresetId
 import com.bag.audioandroid.ui.model.SampleFlavor
 
 private val BrandInkLight = Color(0xFF241B18)
 private val BrandInkDark = Color(0xFFF1E8E1)
 
+const val CustomBrandThemeId = "custom_dual_tone"
+private const val CustomBrandThemeIdSeparator = "::"
+
 val BrandDualToneThemes: List<BrandThemeOption> =
     listOf(
         // Each group is ordered from the most stable / approachable theme to the strongest one.
         // Neighboring entries are also staggered to avoid stacking near-identical hues together.
-        brandTheme(
+        buildBrandThemeOption(
             id = "mars_relic",
             groupTitleResId = R.string.config_dual_tone_group_sacred_machine,
             titleResId = R.string.brand_theme_mars_relic_title,
@@ -27,7 +34,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             outlineColor = Color(0xFFC5A059),
             isDarkTheme = false,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "scarlet_guard",
             groupTitleResId = R.string.config_dual_tone_group_sacred_machine,
             titleResId = R.string.brand_theme_scarlet_guard_title,
@@ -36,10 +43,10 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.SacredMachine,
             backgroundColor = Color(0xFFE0E0E0),
             accentColor = Color(0xFF8B0000),
-            outlineColor = Color(0xFFC5A059),
+            outlineColor = Color(0xFFB8860B),
             isDarkTheme = false,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "black_crimson_rite",
             groupTitleResId = R.string.config_dual_tone_group_sacred_machine,
             titleResId = R.string.brand_theme_black_crimson_rite_title,
@@ -48,9 +55,10 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.SacredMachine,
             backgroundColor = Color(0xFF4A2B2F),
             accentColor = Color(0xFFDC143C),
+            outlineColor = Color(0xFFB2C9AB),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "scarlet_carnage",
             groupTitleResId = R.string.config_dual_tone_group_scarlet_carnage,
             titleResId = R.string.brand_theme_scarlet_carnage_title,
@@ -62,7 +70,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             outlineColor = Color(0xFF000000),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "labyrinth_of_mutability",
             groupTitleResId = R.string.config_dual_tone_group_labyrinth_of_mutability,
             titleResId = R.string.brand_theme_labyrinth_of_mutability_title,
@@ -74,7 +82,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             outlineColor = Color(0xFFFFD700),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "exquisite_fall",
             groupTitleResId = R.string.config_dual_tone_group_exquisite_fall,
             titleResId = R.string.brand_theme_exquisite_fall_title,
@@ -86,7 +94,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             outlineColor = Color(0xFFFFD700),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "immortal_rot",
             groupTitleResId = R.string.config_dual_tone_group_immortal_rot,
             titleResId = R.string.brand_theme_immortal_rot_title,
@@ -101,7 +109,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
         // The dark dual-tone dynasty set is separated by material character instead of
         // tiny near-black shifts: alloy leans warm metallic, revival leans jade-cold,
         // sepulcher leans graphite-cyan, and tomb sigil leans earthen tomb black.
-        brandTheme(
+        buildBrandThemeOption(
             id = "ancient_alloy",
             groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
             titleResId = R.string.brand_theme_ancient_alloy_title,
@@ -110,9 +118,10 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.AncientDynasty,
             backgroundColor = Color(0xFF423B33),
             accentColor = Color(0xFF00FFCC),
+            outlineColor = Color(0xFF1A1815),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "dynasty_revival",
             groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
             titleResId = R.string.brand_theme_dynasty_revival_title,
@@ -123,9 +132,10 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             // a colder jade/bronze lane, while tomb sigil keeps the harsher tomb glow.
             backgroundColor = Color(0xFF31443E),
             accentColor = Color(0xFF00D68F),
+            outlineColor = Color(0xFF5E736C),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "sepulcher_cyan",
             groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
             titleResId = R.string.brand_theme_sepulcher_cyan_title,
@@ -134,9 +144,10 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.AncientDynasty,
             backgroundColor = Color(0xFF2B404A),
             accentColor = Color(0xFF00E5B8),
+            outlineColor = Color(0xFF81A1B1),
             isDarkTheme = true,
         ),
-        brandTheme(
+        buildBrandThemeOption(
             id = "tomb_sigil",
             groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
             titleResId = R.string.brand_theme_tomb_sigil_title,
@@ -145,6 +156,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.AncientDynasty,
             backgroundColor = Color(0xFF4D3C2B),
             accentColor = Color(0xFFA6FF00),
+            outlineColor = Color(0xFF7D5F41),
             isDarkTheme = true,
         ),
     )
@@ -152,12 +164,67 @@ val BrandDualToneThemes: List<BrandThemeOption> =
 val DefaultBrandTheme: BrandThemeOption
     get() = BrandDualToneThemes.first()
 
-private fun brandTheme(
+fun customBrandTheme(settings: CustomBrandThemeSettings): BrandThemeOption {
+    val normalizedBackground = normalizeBrandThemeHex(settings.backgroundHex) ?: DefaultCustomBackgroundHex
+    val normalizedAccent = normalizeBrandThemeHex(settings.accentHex) ?: DefaultCustomAccentHex
+    val normalizedOutline = normalizeBrandThemeHexOrNull(settings.outlineHexOrNull)
+    val backgroundColor = parseBrandThemeColor(normalizedBackground)
+    val accentColor = parseBrandThemeColor(normalizedAccent)
+    return buildBrandThemeOption(
+        id = customBrandThemeOptionId(settings.presetId),
+        groupTitleResId = R.string.config_dual_tone_group_custom,
+        titleResId = R.string.brand_theme_custom_title,
+        descriptionResId = R.string.brand_theme_custom_description,
+        accessibilityLabelResId = R.string.brand_theme_custom_accessibility,
+        titleOverride = settings.displayName,
+        sampleFlavor = SampleFlavor.SacredMachine,
+        backgroundColor = backgroundColor,
+        accentColor = accentColor,
+        outlineColor = normalizedOutline?.let(::parseBrandThemeColor) ?: accentColor,
+        isDarkTheme = backgroundColor.luminance() < CustomThemeDarkThreshold,
+    )
+}
+
+fun normalizeBrandThemeHex(value: String?): String? {
+    val trimmed = value?.trim()?.uppercase().orEmpty()
+    if (!BrandThemeHexRegex.matches(trimmed)) {
+        return null
+    }
+    return trimmed
+}
+
+fun normalizeBrandThemeHexOrNull(value: String?): String? {
+    val trimmed = value?.trim().orEmpty()
+    if (trimmed.isBlank()) {
+        return null
+    }
+    return normalizeBrandThemeHex(trimmed)
+}
+
+fun brandThemeColorOrNull(value: String?): Color? =
+    normalizeBrandThemeHexOrNull(value)?.let(::parseBrandThemeColor)
+
+fun customBrandThemeOptionId(presetId: String): String =
+    if (presetId == DefaultCustomBrandThemePresetId) {
+        CustomBrandThemeId
+    } else {
+        "$CustomBrandThemeId$CustomBrandThemeIdSeparator$presetId"
+    }
+
+fun isCustomBrandThemeOptionId(optionId: String): Boolean =
+    optionId == CustomBrandThemeId || optionId.startsWith("$CustomBrandThemeId$CustomBrandThemeIdSeparator")
+
+private fun parseBrandThemeColor(hex: String): Color = Color(AndroidColor.parseColor(hex))
+
+fun buildBrandThemeOption(
     id: String,
     groupTitleResId: Int,
     titleResId: Int,
     descriptionResId: Int,
     accessibilityLabelResId: Int,
+    titleOverride: String? = null,
+    descriptionOverride: String? = null,
+    accessibilityLabelOverride: String? = null,
     sampleFlavor: SampleFlavor,
     backgroundColor: Color,
     accentColor: Color,
@@ -236,6 +303,9 @@ private fun brandTheme(
         titleResId = titleResId,
         descriptionResId = descriptionResId,
         accessibilityLabelResId = accessibilityLabelResId,
+        titleOverride = titleOverride,
+        descriptionOverride = descriptionOverride,
+        accessibilityLabelOverride = accessibilityLabelOverride,
         sampleFlavor = sampleFlavor,
         isDarkTheme = isDarkTheme,
         backgroundColor = backgroundColor,
@@ -250,3 +320,9 @@ private fun blend(
     to: Color,
     ratio: Float,
 ): Color = lerp(from, to, ratio.coerceIn(0f, 1f))
+
+private val BrandThemeHexRegex = Regex("^#[0-9A-F]{6}$")
+
+private const val DefaultCustomBackgroundHex = "#E8E2D0"
+private const val DefaultCustomAccentHex = "#9E1B1B"
+private const val CustomThemeDarkThreshold = 0.5f

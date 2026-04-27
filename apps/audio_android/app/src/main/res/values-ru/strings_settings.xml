@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="config_title">Настройки</string>
+    <string name="config_language_title">Язык</string>
+    <string name="config_language_subtitle">Выберите язык приложения</string>
+    <string name="config_language_follow_system">Как в системе</string>
+    <string name="config_language_chinese">简体中文</string>
+    <string name="config_language_traditional_chinese">繁體中文</string>
+    <string name="config_language_english">English</string>
+    <string name="config_language_japanese">日本語</string>
+    <string name="config_language_german">Deutsch</string>
+    <string name="config_language_russian">Русский</string>
+    <string name="config_language_spanish">Español</string>
+    <string name="config_language_portuguese">Português</string>
+    <string name="config_language_ukrainian">Українська</string>
+    <string name="config_language_korean">한국어</string>
+    <string name="config_language_french">Français</string>
+    <string name="config_language_italian">Italiano</string>
+    <string name="config_language_polish">Polski</string>
+    <string name="config_language_high_gothic">Altum Gothicum</string>
+    <string name="config_language_expand">Развернуть настройки языка</string>
+    <string name="config_language_collapse">Свернуть настройки языка</string>
+    <string name="config_theme_mode_title">Режим темы</string>
+    <string name="config_theme_mode_subtitle">Выберите системный, светлый или тёмный режим.</string>
+    <string name="config_theme_mode_brand_fixed">Темы Dual-tone используют фиксированный стиль.</string>
+    <string name="config_theme_mode_follow_system">Как в системе</string>
+    <string name="config_theme_mode_light">Светлая</string>
+    <string name="config_theme_mode_dark">Тёмная</string>
+    <string name="config_theme_appearance_title">Внешний вид темы</string>
+    <string name="config_theme_style_title">Стиль темы</string>
+    <string name="config_theme_style_subtitle">Выберите Material или Dual-tone.</string>
+    <string name="config_theme_style_material">Material</string>
+    <string name="config_theme_style_brand_dual_tone">Dual-tone</string>
+    <string name="config_theme_appearance_expand">Развернуть внешний вид темы</string>
+    <string name="config_theme_appearance_collapse">Свернуть внешний вид темы</string>
+    <string name="config_palette_title">Цветовые палитры</string>
+    <string name="config_palette_selected">Выбрано</string>
+    <string name="config_palette_expand">Развернуть палитры</string>
+    <string name="config_palette_collapse">Свернуть палитры</string>
+    <string name="config_brand_theme_title">Темы Dual-tone</string>
+    <string name="config_brand_theme_description">Каждая тема Dual-tone сохраняет фиксированный вид с двухцветным предпросмотром.</string>
+    <string name="config_dual_tone_group_sacred_machine">Священная машина</string>
+    <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
+    <string name="config_dual_tone_group_custom">Свои темы</string>
+    <string name="config_dual_tone_group_ancient_dynasty">Древняя династия</string>
+    <string name="config_dual_tone_group_immortal_rot">Бессмертная Гниль</string>
+    <string name="config_dual_tone_group_scarlet_carnage">Багряная Резня</string>
+    <string name="config_dual_tone_group_exquisite_fall">Изысканное Падение</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">Лабиринт Изменчивости</string>
+    <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_reds_pinks">Красные и розовые</string>
+    <string name="palette_family_oranges">Оранжевые</string>
+    <string name="palette_family_yellows">Жёлтые</string>
+    <string name="palette_family_greens">Зелёные</string>
+    <string name="palette_family_cyans_blues">Бирюзовые и синие</string>
+    <string name="palette_family_purples_magentas">Фиолетовые и маджента</string>
+    <string name="palette_family_neutrals">Нейтральные</string>
+    <string name="config_flash_style_title">Стиль flash</string>
+    <string name="config_flash_style_subtitle">Выберите, как должен звучать flash-аудио.</string>
+    <string name="config_flash_style_coded_burst_label">Кодированный импульс</string>
+    <string name="config_flash_style_coded_burst_description">Плотные сгруппированные импульсы для машинного сигнального звучания.</string>
+    <string name="config_flash_style_ritual_chant_label">Ритуальный распев</string>
+    <string name="config_flash_style_ritual_chant_description">Более плавная резонансная подача для церемониального командного тона.</string>
+    <string name="config_flash_style_deep_ritual_label">Глубокий ритуал</string>
+    <string name="config_flash_style_deep_ritual_description">Соборная церемониальная подача с более глубоким резонансом и торжественным хоровым оттенком.</string>
+    <string name="config_about_title">О приложении</string>
+    <string name="config_about_subtitle">Автор, ссылка на проект и лицензии</string>
+    <string name="palette_ruby_title">Рубиново-красный</string>
+    <string name="palette_mars_relic_title">Марсианская реликвия</string>
+    <string name="brand_theme_mars_relic_title">Марсианская реликвия</string>
+    <string name="brand_theme_mars_relic_description">Глубокий красный с пергаментным оттенком создают образ церемониального архива.</string>
+    <string name="brand_theme_mars_relic_accessibility">Тема Марсианская реликвия, глубокий красный с пергаментно-бежевым.</string>
+    <string name="brand_theme_black_crimson_rite_title">Чёрный Багряный Обряд</string>
+    <string name="brand_theme_black_crimson_rite_description">Сажисто-чёрный и ритуальный багряный создают суровую атмосферу машинного святилища.</string>
+    <string name="brand_theme_black_crimson_rite_accessibility">Тема Чёрный Багряный Обряд, почти чёрный с ярким багряно-красным.</string>
+    <string name="brand_theme_scarlet_guard_title">Багряная Стража</string>
+    <string name="brand_theme_scarlet_guard_description">Слоновая кость и запечатанный багряный придают строгий геральдический тон.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Тема Багряная Стража, светлая слоновая кость с тёмно-багряным красным.</string>
+    <string name="brand_theme_dynasty_revival_title">Возрождение Династии</string>
+    <string name="brand_theme_dynasty_revival_description">Чёрный гробовой металл и классический реакторный зелёный для пробудившегося династического ядра.</string>
+    <string name="brand_theme_dynasty_revival_accessibility">Тема Возрождение Династии, глубокий чёрный гробовой металл с ярким реакторным зелёным.</string>
+    <string name="brand_theme_sepulcher_cyan_title">Склеповый Циан</string>
+    <string name="brand_theme_sepulcher_cyan_description">Холодная склеповая сталь и сдержанный циан-зелёный создают более тихое королевское машинное сияние.</string>
+    <string name="brand_theme_sepulcher_cyan_accessibility">Тема Склеповый Циан, холодная тёмная сталь с приглушённым циан-зелёным.</string>
+    <string name="brand_theme_tomb_sigil_title">Могильная Печать</string>
+    <string name="brand_theme_tomb_sigil_description">Тёплое криптовое железо и яркий зелёный пробуждения создают церемониальный знак династии.</string>
+    <string name="brand_theme_tomb_sigil_accessibility">Тема Могильная Печать, тёмное криптовое железо с ярким зелёным пробуждения.</string>
+    <string name="brand_theme_ancient_alloy_title">Древний Сплав</string>
+    <string name="brand_theme_ancient_alloy_description">Тени потёртого металла и холодная бирюза создают свечение погребальной кузницы.</string>
+    <string name="brand_theme_ancient_alloy_accessibility">Тема Древний Сплав, тёмный бронзово-серый с яркой бирюзой.</string>
+    <string name="brand_theme_immortal_rot_title">Бессмертная Гниль</string>
+    <string name="brand_theme_immortal_rot_description">Папоротниковый зелёный и цитриновый жёлтый создают влажную заросшую палитру Dual-tone.</string>
+    <string name="brand_theme_immortal_rot_accessibility">Тема Бессмертная Гниль, папоротниковый зелёный с цитриновым жёлтым.</string>
+    <string name="brand_theme_scarlet_carnage_title">Багряная Резня</string>
+    <string name="brand_theme_scarlet_carnage_description">Тёмно-красный и латунь формируют жестокую палитру Dual-tone из крови и военного металла.</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">Тема Багряная Резня, тёмно-красный с тёмной латунной позолотой.</string>
+    <string name="brand_theme_exquisite_fall_title">Изысканное Падение</string>
+    <string name="brand_theme_exquisite_fall_description">Очень тёмный фиолетовый и кричащий розовый создают декадентскую палитру Dual-tone тщеславия и чувственности.</string>
+    <string name="brand_theme_exquisite_fall_accessibility">Тема Изысканное Падение, очень тёмный фиолетовый с кричащим розовым и золотой обводкой.</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">Лабиринт Изменчивости</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">Слабо насыщенный цианово-синий и яркий флуоресцентный фиолетовый образуют изменчивый Dual-tone лабиринт с золотой кромкой.</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">Тема Лабиринт Изменчивости, слабо насыщенный цианово-синий с ярким флуоресцентным фиолетовым и золотой обводкой.</string>
+    <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
+    <string name="brand_theme_custom_title">Пользовательская тема</string>
+    <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
+    <string name="brand_theme_custom_description">Ваши собственные двухцветные темы с примером текста Sacred Machine.</string>
+    <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
+    <string name="brand_theme_custom_accessibility">Предпросмотр пользовательской двухцветной темы.</string>
+    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_brand_theme_add">Добавить</string>
+    <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_edit">Изменить цвета</string>
+    <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
+    <string name="config_custom_brand_theme_dialog_title">Пользовательские цвета темы</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_new">Новая пользовательская тема</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_dialog_title_edit">Редактировать пользовательскую тему</string>
+    <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
+    <string name="config_custom_brand_theme_dialog_description">Введите цвета в формате #RRGGBB. Оставьте поле контура пустым, чтобы использовать акцентный цвет.</string>
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_randomize">Случайные цвета</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
+    <string name="config_custom_brand_theme_randomize_hint">Используйте кости, чтобы создать новое сочетание основного цвета, акцента и контура.</string>
+    <!-- CONTEXT: Form field label for the user-defined preset name. -->
+    <string name="config_custom_brand_theme_name_label">Название пресета</string>
+    <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_background_label">Основной цвет</string>
+    <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_accent_label">Акцентный цвет</string>
+    <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
+    <string name="config_custom_brand_theme_outline_label">Цвет контура</string>
+    <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
+    <string name="config_custom_brand_theme_outline_optional">Необязательно</string>
+    <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_save">Сохранить</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete">Удалить</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_delete_title">Удалить пользовательскую тему</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
+    <string name="config_custom_brand_theme_delete_message">Удалить пресет %1$s?</string>
+    <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
+    <string name="config_custom_brand_theme_invalid_name">Введите название пресета.</string>
+    <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
+    <string name="config_custom_brand_theme_invalid_hex">Используйте #RRGGBB.</string>
+    <string name="palette_crimson_title">Багряно-красный</string>
+    <string name="palette_rose_title">Розово-розовый</string>
+    <string name="palette_sakura_title">Сакура-розовый</string>
+    <string name="palette_raspberry_title">Малиновый Цвет</string>
+    <string name="palette_blush_title">Пудрово-розовый</string>
+    <string name="palette_orange_title">Солнечно-оранжевый</string>
+    <string name="palette_coral_title">Коралловый Цвет</string>
+    <string name="palette_tangerine_title">Мандариновое Сияние</string>
+    <string name="palette_apricot_title">Абрикосовая Дымка</string>
+    <string name="palette_terracotta_title">Терракотовая Глина</string>
+    <string name="palette_persimmon_title">Хурмовый Огонь</string>
+    <string name="palette_amber_title">Солнечно-жёлтый</string>
+    <string name="palette_gold_title">Золотой Час</string>
+    <string name="palette_sunflower_title">Подсолнечное Золото</string>
+    <string name="palette_lemon_title">Лимонный Свет</string>
+    <string name="palette_honey_title">Медовый Янтарь</string>
+    <string name="palette_marigold_title">Сияние Календулы</string>
+    <string name="palette_lime_title">Лаймовый Всплеск</string>
+    <string name="palette_olive_title">Оливковый Мох</string>
+    <string name="palette_emerald_title">Изумрудно-зелёный</string>
+    <string name="palette_mint_title">Мятная Волна</string>
+    <string name="palette_jade_title">Нефритовый Поток</string>
+    <string name="palette_forest_title">Лесная Сосна</string>
+    <string name="palette_teal_title">Аква-циан</string>
+    <string name="palette_cyan_title">Неоновый Циан</string>
+    <string name="palette_sky_title">Небесно-голубой</string>
+    <string name="palette_ocean_title">Электрический Синий</string>
+    <string name="palette_cobalt_title">Кобальтово-синий</string>
+    <string name="palette_indigo_title">Глубокий Индиго</string>
+    <string name="palette_violet_title">Фиолетовый Импульс</string>
+    <string name="palette_plum_title">Сливовая Ночь</string>
+    <string name="palette_magenta_title">Маджента Поп</string>
+    <string name="palette_fuchsia_title">Фуксия Flash</string>
+    <string name="palette_orchid_title">Орхидейная Дымка</string>
+    <string name="palette_lilac_title">Сиреневая Мгла</string>
+    <string name="palette_mocha_title">Мокко-коричневый</string>
+    <string name="palette_slate_title">Сланцево-серый</string>
+    <string name="palette_sand_title">Песчаник</string>
+    <string name="palette_stone_title">Каменный Тауп</string>
+    <string name="palette_graphite_title">Графитовые Чернила</string>
+    <string name="palette_ivory_title">Слоновая Кость и Лён</string>
+</resources>

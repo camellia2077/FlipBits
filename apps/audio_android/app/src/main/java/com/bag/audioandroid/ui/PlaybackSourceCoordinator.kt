@@ -20,6 +20,7 @@ class PlaybackSourceCoordinator(
                         pcm = session.generatedPcm,
                         sampleRateHz = generatedSampleRateHz,
                         playback = session.playback,
+                        playbackSpeed = session.playbackSpeed,
                     )
                 }
             }
@@ -34,6 +35,7 @@ class PlaybackSourceCoordinator(
                     pcm = selectedSavedAudio.pcm,
                     sampleRateHz = selectedSavedAudio.sampleRateHz,
                     playback = selectedSavedAudio.playback,
+                    playbackSpeed = selectedSavedAudio.playbackSpeed,
                 )
             }
         }
@@ -73,5 +75,6 @@ class PlaybackSourceCoordinator(
         val pcm: ShortArray,
         val sampleRateHz: Int,
         val playback: PlaybackUiState,
+        val playbackSpeed: Float,
     )
 }

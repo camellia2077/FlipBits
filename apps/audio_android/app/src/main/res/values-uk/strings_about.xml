@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_title">Про застосунок</string>
+    <string name="about_author">%1$s</string>
+    <string name="about_presentation_version">Версія застосунку v%1$s</string>
+    <string name="about_core_version">Версія рушія v%1$s</string>
+    <string name="about_github">%1$s</string>
+    <string name="about_licenses_title">Ліцензії відкритого коду</string>
+    <string name="about_licenses_subtitle">Переглянути бібліотеки та ліцензії</string>
+    <string name="licenses_title">Ліцензії відкритого коду</string>
+    <string name="licenses_loading">Завантаження ліцензій</string>
+</resources>

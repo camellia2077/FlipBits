@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerChromeColors
 
@@ -21,6 +22,7 @@ import com.bag.audioandroid.ui.playerChromeColors
 internal fun AudioPlaybackTransportControls(
     isPlaying: Boolean,
     playbackSequenceMode: PlaybackSequenceMode,
+    playbackSpeed: Float,
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
@@ -33,12 +35,14 @@ internal fun AudioPlaybackTransportControls(
     onSkipToPreviousTrack: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
+    onPlaybackSpeedSelected: (Float) -> Unit,
     onExportGeneratedAudio: () -> Unit,
     onOpenSavedAudioSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val playerColors = playerChromeColors()
     var showAudioInfo by remember { mutableStateOf(false) }
+    var showSpeedAdjustment by remember { mutableStateOf(false) }
     val audioInfoDialogModel =
         AudioInfoDialogModel(
             title = stringResource(R.string.audio_info_dialog_title),
@@ -78,13 +82,19 @@ internal fun AudioPlaybackTransportControls(
             onOpenSavedAudioSheet = onOpenSavedAudioSheet,
             colors = playerColors,
         )
-        if (canExportGeneratedAudio) {
-            AudioPlaybackSecondaryActionsRow(
-                onOpenAudioInfo = { showAudioInfo = true },
-                onExportGeneratedAudio = onExportGeneratedAudio,
-                contentColor = playerColors.neutralAction,
-            )
-        }
+        AudioPlaybackSecondaryActionsRow(
+            playbackSpeed = playbackSpeed,
+            showSpeedAdjustment = showSpeedAdjustment,
+            onOpenAudioInfo = { showAudioInfo = true },
+            onCyclePlaybackSpeed = {
+                onPlaybackSpeedSelected(PlaybackSpeedOption.nextSpeed(playbackSpeed))
+            },
+            onToggleSpeedAdjustment = { showSpeedAdjustment = !showSpeedAdjustment },
+            onPlaybackSpeedSelected = onPlaybackSpeedSelected,
+            onExportGeneratedAudio = onExportGeneratedAudio,
+            canExportGeneratedAudio = canExportGeneratedAudio,
+            contentColor = playerColors.neutralAction,
+        )
     }
     if (showAudioInfo) {
         AudioPlaybackInfoDialog(

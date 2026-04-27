@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Simplified Chinese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Simplified Chinese. -->
+    <!-- Saved tab strings: file list, import, rename, move, delete, folder actions. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="saved_audio_filter_empty">没有匹配项</string>
+    <string name="library_title">已保存</string>
+    <string name="library_empty">暂无保存内容</string>
+    <string name="library_action_import">导入</string>
+    <string name="library_action_share">分享</string>
+    <string name="library_action_rename">重命名</string>
+    <string name="library_action_delete">删除</string>
+    <string name="library_action_select_all">全选</string>
+    <string name="library_action_clear_selection">退出选择</string>
+    <string name="library_action_delete_selected">删除所选</string>
+    <string name="library_selection_count">已选择 %1$d 项</string>
+    <string name="library_share_chooser_title">分享</string>
+    <string name="library_rename_title">重命名</string>
+    <string name="library_rename_message">重命名 %1$s</string>
+    <string name="library_rename_field_label">名称</string>
+    <string name="library_delete_title">删除</string>
+    <string name="library_delete_message">删除 %1$s？</string>
+    <string name="library_delete_selected_title">删除</string>
+    <string name="library_delete_selected_message">确定删除所选的 %1$d 个文件吗？</string>
+    <string name="library_status_deleted">已删除</string>
+    <string name="library_status_deleted_multiple">已删除 %1$d 个音频文件</string>
+    <string name="library_status_delete_failed">删除失败</string>
+    <string name="library_status_delete_partial">已删除 %1$d 个音频文件，共 %2$d 个</string>
+    <string name="library_status_renamed">已重命名为：%1$s</string>
+    <string name="library_status_rename_duplicate">同名音频文件已存在</string>
+    <string name="library_status_rename_failed">重命名失败</string>
+    <string name="library_status_share_failed">分享失败</string>
+    <string name="library_status_imported">已导入：%1$s</string>
+    <string name="library_status_import_failed">导入失败</string>
+    <string name="library_status_import_unsupported">仅支持单声道 PCM16 WAV 文件</string>
+    <string name="library_action_new_folder">新建文件夹</string>
+    <string name="library_action_move">移动</string>
+    <string name="library_action_move_selected">移动所选</string>
+    <string name="library_action_rename_folder">重命名文件夹</string>
+    <string name="library_action_delete_folder">删除文件夹</string>
+    <string name="library_folder_uncategorized">未分类</string>
+    <string name="library_folder_name_label">文件夹名称</string>
+    <string name="library_folder_create_title">新建文件夹</string>
+    <string name="library_folder_rename_title">重命名文件夹</string>
+    <string name="library_folder_delete_title">删除文件夹</string>
+    <string name="library_folder_delete_message">确定删除文件夹 %1$s 吗？其中的音频文件将保留在媒体库中。</string>
+    <string name="library_folder_row_label">文件夹：%1$s</string>
+    <string name="library_move_title">移动</string>
+    <string name="library_move_single_message">移动 %1$s</string>
+    <string name="library_move_multiple_message">移动 %1$d 个文件</string>
+    <string name="library_status_folder_created">已创建文件夹：%1$s</string>
+    <string name="library_status_folder_renamed">已重命名文件夹：%1$s</string>
+    <string name="library_status_folder_deleted">已删除文件夹：%1$s</string>
+    <string name="library_status_folder_duplicate">同名文件夹已存在</string>
+    <string name="library_status_folder_create_failed">文件夹创建失败</string>
+    <string name="library_status_folder_rename_failed">文件夹重命名失败</string>
+    <string name="library_status_folder_delete_failed">文件夹删除失败</string>
+    <string name="library_status_move_failed">音频移动失败</string>
+    <string name="library_status_moved_to_folder">已将 %1$d 个文件移动到 %2$s</string>
+    <string name="library_status_moved_to_uncategorized">已将 %1$d 个文件移动到“未分类”</string>
+</resources>

@@ -3,6 +3,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.kotlin.dsl.configure
 import java.io.File
 import java.util.Properties
+import org.gradle.api.tasks.Exec
 
 val flipbitsAndroidModulesSmokeEnabled =
     providers
@@ -52,6 +53,15 @@ fun requiredGradleStringProperty(name: String): String =
         .orNull
         ?.takeIf { it.isNotBlank() }
         ?: error("Missing or blank Gradle string property: $name")
+
+val repoRootDir = rootProject.projectDir.parentFile.parentFile
+val translateRunScript = repoRootDir.resolve("tools/scripts/android/translate/run.py")
+val pythonCommand =
+    if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
+        listOf("py", "-3")
+    } else {
+        listOf("python3")
+    }
 
 plugins {
     id("com.android.application")
@@ -158,6 +168,11 @@ android {
             "es",
             "pt-rBR",
             "uk",
+            "ko",
+            "fr",
+            "it",
+            "pl",
+            "la",
         )
     }
 
@@ -223,6 +238,23 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 
 tasks.named("preBuild").configure {
     dependsOn("exportLibraryDefinitions")
+    dependsOn(checkTranslationKeyAlignment)
+}
+
+val checkTranslationKeyAlignment by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Fails when localized Android text keys drift from the English values/ baseline."
+    workingDir = repoRootDir
+    // Design intent:
+    // - English `res/values` is the sole structural baseline for translation keys.
+    // - High Gothic (`values-la`) is a localized style language, not an alternate baseline.
+    // - Pro `_ascii_` sample strings are protocol inputs and are intentionally excluded
+    //   from missing-translation checks because Pro mode only accepts ASCII payloads.
+    commandLine(*(pythonCommand + listOf(translateRunScript.absolutePath, "key-alignment", "--quiet")).toTypedArray())
+}
+
+tasks.named("check").configure {
+    dependsOn(checkTranslationKeyAlignment)
 }
 
 dependencies {

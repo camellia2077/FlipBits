@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">Les réglages sont manquants.</string>
+    <string name="validation_null_text">Le texte d’entrée est requis.</string>
+    <string name="validation_null_decoder_output">Le tampon de résultat est manquant.</string>
+    <string name="validation_invalid_sample_rate">La fréquence d’échantillonnage doit être supérieure à 0.</string>
+    <string name="validation_invalid_frame_samples">La taille de trame doit être supérieure à 0.</string>
+    <string name="validation_invalid_mode">Mode de transport non pris en charge.</string>
+    <string name="validation_invalid_flash_signal_profile">Profil de signal flash non pris en charge.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Style flash non pris en charge.</string>
+    <string name="validation_pro_ascii_only">pro ne prend en charge que l’ASCII.</string>
+    <string name="validation_payload_too_large">Le texte d’entrée dépasse la limite de 512 octets par trame pour ce mode.</string>
+    <string name="error_invalid_argument">Argument non valide.</string>
+    <string name="error_not_ready">Le résultat n’est pas encore prêt.</string>
+    <string name="error_not_implemented">Pas encore disponible.</string>
+    <string name="error_cancelled">Opération annulée.</string>
+    <string name="error_internal">Erreur interne.</string>
+</resources>

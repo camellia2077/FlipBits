@@ -90,6 +90,49 @@ class PlaybackTokenContextTapeTest {
     }
 
     @Test
+    fun `lyric line text preserves punctuation spacing when tokens are detached`() {
+        val line =
+            resolveContinuousViewportLine(
+                followData =
+                    PayloadFollowViewData(
+                        textTokens = listOf("Hello", ",", "world", "!"),
+                        lyricLines = listOf("Hello, world!"),
+                        lineTokenRanges =
+                            listOf(
+                                TextFollowLineTokenRangeViewData(lineIndex = 0, tokenBeginIndex = 0, tokenCount = 4),
+                            ),
+                        lyricLineFollowAvailable = true,
+                        textFollowAvailable = true,
+                    ),
+                activeTokenIndex = 2,
+            )
+
+        assertEquals("Hello, world!", line?.text)
+        assertEquals(0, line?.tokenSegments?.get(0)?.start)
+        assertEquals(5, line?.tokenSegments?.get(0)?.endExclusive)
+        assertEquals(5, line?.tokenSegments?.get(1)?.start)
+        assertEquals(6, line?.tokenSegments?.get(1)?.endExclusive)
+        assertEquals(7, line?.tokenSegments?.get(2)?.start)
+        assertEquals(12, line?.tokenSegments?.get(2)?.endExclusive)
+        assertEquals(12, line?.tokenSegments?.get(3)?.start)
+    }
+
+    @Test
+    fun `fallback separator logic keeps detached punctuation readable`() {
+        val line =
+            resolveContinuousViewportLineForRange(
+                followData =
+                    PayloadFollowViewData(
+                        textTokens = listOf("don", "'", "t", "panic", "!"),
+                        textFollowAvailable = true,
+                    ),
+                tokenRange = 0..4,
+            )
+
+        assertEquals("don't panic!", line.text)
+    }
+
+    @Test
     fun `short active segment stays anchored in viewport`() {
         val translation =
             targetContinuousViewportTranslationPx(

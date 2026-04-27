@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Japanese rewrite scaffold. -->
+    <!-- Replace the English placeholder values below with Japanese. -->
+    <!-- Validation and error messages shown to users. -->
+    <!-- Keep placeholders unchanged. -->
+    <string name="validation_null_config">設定が見つかりません。</string>
+    <string name="validation_null_text">入力テキストが必要です。</string>
+    <string name="validation_null_decoder_output">結果バッファが見つかりません。</string>
+    <string name="validation_invalid_sample_rate">サンプルレートは0より大きい必要があります。</string>
+    <string name="validation_invalid_frame_samples">フレームサイズは0より大きい必要があります。</string>
+    <string name="validation_invalid_mode">サポートされていない転送モードです。</string>
+    <string name="validation_invalid_flash_signal_profile">サポートされていないflash信号プロファイルです。</string>
+    <!-- CONTEXT: Validation error for an unsupported flash style preset. -->
+    <string name="validation_invalid_flash_voicing_flavor">サポートされていないflashスタイルです。</string>
+    <string name="validation_pro_ascii_only">proはASCIIのみをサポートしています。</string>
+    <string name="validation_payload_too_large">入力テキストがこのモードの 512 バイト単一フレーム上限を超えています。</string>
+    <string name="error_invalid_argument">無効な引数です。</string>
+    <!-- CONTEXT: Short user-facing error. Means required result/data is not ready yet. -->
+    <string name="error_not_ready">結果の準備ができていません。</string>
+    <string name="error_not_implemented">まだ利用できません。</string>
+    <string name="error_cancelled">操作がキャンセルされました。</string>
+    <string name="error_internal">内部エラーが発生しました。</string>
+</resources>

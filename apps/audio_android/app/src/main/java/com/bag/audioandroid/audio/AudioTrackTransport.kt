@@ -1,6 +1,8 @@
 package com.bag.audioandroid.audio
 
+import android.media.PlaybackParams
 import android.media.AudioTrack
+import kotlin.math.roundToInt
 
 internal fun safelyStopTrack(track: AudioTrack) {
     try {
@@ -43,5 +45,34 @@ internal fun setPlaybackHeadPositionSafely(
         track.setPlaybackHeadPosition(sampleIndex)
         true
     } catch (_: IllegalStateException) {
+        false
+    }
+
+internal fun setPlaybackSpeedSafely(
+    track: AudioTrack,
+    playbackSpeed: Float,
+): Boolean {
+    val resolvedPlaybackSpeed = playbackSpeed.coerceAtLeast(0.1f)
+    return try {
+        track.playbackParams =
+            (track.playbackParams ?: PlaybackParams())
+                .allowDefaults()
+                .setPitch(1.0f)
+                .setSpeed(resolvedPlaybackSpeed)
+        true
+    } catch (_: Exception) {
+        setPlaybackRateFallback(track, resolvedPlaybackSpeed)
+    }
+}
+
+@Suppress("DEPRECATION")
+private fun setPlaybackRateFallback(
+    track: AudioTrack,
+    playbackSpeed: Float,
+): Boolean =
+    try {
+        track.playbackRate = (track.sampleRate * playbackSpeed).roundToInt().coerceAtLeast(1)
+        true
+    } catch (_: Exception) {
         false
     }

@@ -15,6 +15,7 @@ import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
@@ -160,6 +161,17 @@ class AudioAndroidViewModel(
         preferencesActions.onBrandThemeSelected(brandTheme)
     }
 
+    fun onCustomBrandThemeSaved(
+        settings: CustomBrandThemeSettings,
+        replacePresetId: String?,
+    ) {
+        preferencesActions.onCustomBrandThemeSaved(settings, replacePresetId)
+    }
+
+    fun onCustomBrandThemeDeleted(presetId: String) {
+        preferencesActions.onCustomBrandThemeDeleted(presetId)
+    }
+
     fun onConfigLanguageExpandedChanged(expanded: Boolean) {
         preferencesActions.onConfigLanguageExpandedChanged(expanded)
     }
@@ -220,6 +232,10 @@ class AudioAndroidViewModel(
 
     fun onPlaybackSequenceModeSelected(mode: PlaybackSequenceMode) {
         preferencesActions.onPlaybackSequenceModeSelected(mode)
+    }
+
+    fun onPlaybackSpeedSelected(playbackSpeed: Float) {
+        playbackActions.onPlaybackSpeedSelected(playbackSpeed)
     }
 
     fun onSkipToPreviousTrack() {

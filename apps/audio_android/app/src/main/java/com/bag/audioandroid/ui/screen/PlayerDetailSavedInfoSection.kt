@@ -14,14 +14,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 
 @Composable
 internal fun PlayerDetailSavedInfoSection(
     item: SavedAudioItem,
+    currentSampleRateHz: Int,
     modifier: Modifier = Modifier,
 ) {
+    // This section surfaces the metadata that explains how a saved file was produced,
+    // not just when it was saved. That keeps playback detail useful even when the
+    // original input text is no longer visible.
     Surface(
         shape = MaterialTheme.shapes.large,
         tonalElevation = 2.dp,
@@ -48,9 +53,41 @@ internal fun PlayerDetailSavedInfoSection(
                 label = stringResource(R.string.audio_player_detail_saved_time),
                 value = formatSavedAudioTime(item.savedAtEpochSeconds),
             )
+            item.generatedAtEpochSeconds?.let { generatedAtEpochSeconds ->
+                PlayerDetailInfoRow(
+                    label = stringResource(R.string.audio_player_detail_saved_generated_time),
+                    value = formatSavedAudioTime(generatedAtEpochSeconds),
+                )
+            }
+            item.inputSourceKind?.let { inputSourceKind ->
+                PlayerDetailInfoRow(
+                    label = stringResource(R.string.audio_player_detail_saved_input_source),
+                    value = stringResource(inputSourceKind.labelResId),
+                )
+            }
+            val savedSampleRateHz = item.sampleRateHz?.takeIf { it > 0 } ?: currentSampleRateHz.takeIf { it > 0 }
+            if (savedSampleRateHz != null) {
+                PlayerDetailInfoRow(
+                    label = stringResource(R.string.audio_player_detail_saved_sample_rate),
+                    value = stringResource(R.string.audio_info_sample_rate_value, savedSampleRateHz),
+                )
+            }
+            item.payloadByteCount?.let { payloadByteCount ->
+                PlayerDetailInfoRow(
+                    label = stringResource(R.string.audio_player_detail_saved_payload_bytes),
+                    value = stringResource(R.string.audio_player_detail_saved_payload_bytes_value, payloadByteCount),
+                )
+            }
         }
     }
 }
+
+private val GeneratedAudioInputSourceKind.labelResId: Int
+    get() =
+        when (this) {
+            GeneratedAudioInputSourceKind.Manual -> R.string.audio_generated_input_source_manual
+            GeneratedAudioInputSourceKind.Sample -> R.string.audio_generated_input_source_sample
+        }
 
 @Composable
 private fun PlayerDetailInfoRow(

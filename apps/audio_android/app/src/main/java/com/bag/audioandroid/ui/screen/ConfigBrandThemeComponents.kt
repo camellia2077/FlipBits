@@ -11,17 +11,20 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.stringResource
@@ -30,6 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 
@@ -42,6 +46,9 @@ internal fun BrandThemeSection(
     expanded: Boolean,
     onExpandedChanged: (Boolean) -> Unit,
     onBrandThemeSelected: (BrandThemeOption) -> Unit,
+    onEditBrandTheme: ((BrandThemeOption) -> Unit)? = null,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null,
 ) {
     if (options.isEmpty()) {
         return
@@ -76,18 +83,30 @@ internal fun BrandThemeSection(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Icon(
-                imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                contentDescription = null,
-                tint = accentTokens.disclosureAccentTint,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (actionLabel != null && onActionClick != null) {
+                    TextButton(onClick = onActionClick) {
+                        Text(text = actionLabel)
+                    }
+                }
+                Icon(
+                    imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    contentDescription = null,
+                    tint = accentTokens.disclosureAccentTint,
+                )
+            }
         }
+
         visibleOptions.forEach { option ->
             BrandThemeRow(
                 accentTokens = accentTokens,
                 option = option,
                 selected = option.id == selectedBrandTheme.id,
                 onClick = { onBrandThemeSelected(option) },
+                onEdit = onEditBrandTheme?.let { callback -> { callback(option) } },
             )
         }
     }
@@ -99,8 +118,13 @@ internal fun BrandThemeRow(
     option: BrandThemeOption,
     selected: Boolean,
     onClick: () -> Unit,
+    onEdit: (() -> Unit)? = null,
 ) {
     val usesStrongSelectedState = selected && option.id in StrongSelectedBrandThemeIds
+    val editContentDescription = stringResource(R.string.config_custom_brand_theme_edit)
+    val optionTitle = option.titleOverride ?: stringResource(option.titleResId)
+    val optionDescription = option.descriptionOverride ?: stringResource(option.descriptionResId)
+    val optionAccessibility = option.accessibilityLabelOverride ?: stringResource(option.accessibilityLabelResId)
     val selectedContainerColor =
         when (option.id) {
             "mars_relic" -> lerp(option.backgroundColor, option.accentColor, 0.10f)
@@ -108,6 +132,7 @@ internal fun BrandThemeRow(
             "black_crimson_rite" -> lerp(option.backgroundColor, option.accentColor, 0.22f)
             else -> MaterialTheme.colorScheme.surface
         }
+
     Surface(
         color = if (usesStrongSelectedState) selectedContainerColor else MaterialTheme.colorScheme.surface,
         tonalElevation = if (selected) 6.dp else 1.dp,
@@ -116,7 +141,7 @@ internal fun BrandThemeRow(
         border =
             if (selected) {
                 BorderStroke(
-                    width = if (usesStrongSelectedState) 2.dp else 1.dp,
+                    width = SelectedOutlineWidth,
                     color = accentTokens.selectionBorderAccentTint,
                 )
             } else {
@@ -139,7 +164,7 @@ internal fun BrandThemeRow(
                 backgroundColor = option.backgroundColor,
                 accentColor = option.accentColor,
                 outlineColor = option.outlineColor,
-                contentDescription = stringResource(option.accessibilityLabelResId),
+                contentDescription = optionAccessibility,
             )
             Column(
                 modifier =
@@ -149,38 +174,37 @@ internal fun BrandThemeRow(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = stringResource(option.titleResId),
+                    text = optionTitle,
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = stringResource(option.descriptionResId),
+                    text = optionDescription,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            if (selected) {
-                if (usesStrongSelectedState) {
-                    Surface(
-                        color =
-                            lerp(
-                                accentTokens.selectionLabelAccentTint,
-                                MaterialTheme.colorScheme.surface,
-                                0.78f,
-                            ),
-                        shape = MaterialTheme.shapes.small,
-                    ) {
-                        Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                            SelectedBadge(
-                                text = stringResource(R.string.config_palette_selected),
-                                tint = accentTokens.selectionLabelAccentTint,
-                            )
-                        }
-                    }
-                } else {
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                if (selected) {
                     SelectedBadge(
-                        text = stringResource(R.string.config_palette_selected),
-                        tint = accentTokens.selectionLabelAccentTint,
+                        text = stringResource(R.string.config_palette_selected)
                     )
+                }
+                if (onEdit != null) {
+                    IconButton(
+                        onClick = onEdit,
+                        colors = utilityActionIconButtonColors(),
+                        modifier = Modifier.semantics {
+                            contentDescription = editContentDescription
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Edit,
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         }

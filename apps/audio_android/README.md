@@ -16,6 +16,7 @@
   - `docs/design/android/android-player-ui.md`
 - Android 本地化规则：
   - `docs/design/android/android-localization-guidelines.md`
+  - `docs/design/android/translation/android-split-strings-translation-guide.md`
 - Android 子项目规则：
   - `apps/audio_android/AGENTS.md`
 
@@ -27,6 +28,23 @@
   - Android 子项目专属薄索引与硬约束
 - `README.md`
   - 人类入口与快速定位
+
+## 文案资源布局
+
+- 英文基线资源现在按职责拆在 `app/src/main/res/values/` 下：
+  - `strings_common.xml`
+  - `strings_audio.xml`
+  - `strings_saved.xml`
+  - `strings_settings.xml`
+  - `strings_about.xml`
+  - `strings_validation.xml`
+- 其他语言当前仍主要保留在各自目录下的单文件 `strings.xml`，例如：
+  - `app/src/main/res/values-zh/strings.xml`
+  - `app/src/main/res/values-zh-rTW/strings.xml`
+  - `app/src/main/res/values-ja/strings.xml`
+  - `app/src/main/res/values-fr/strings.xml`
+- 修改用户可见文案时，先按职责定位英文基线文件，再同步检查对应语言目录下的 `strings.xml`。
+- `audio_samples_*` 一类示例文本资源仍保持独立 XML，不在上述 `strings_*.xml` 中。
 
 ## 使用方式
 
@@ -90,6 +108,8 @@
   - `app/src/main/java/com/bag/audioandroid/ui/theme/PaletteCatalog.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/PaletteFactory.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeAccentTokens.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeVisualTokens.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
 
@@ -116,8 +136,12 @@
 - 新增/修改 dual-tone 主题阵容：
   - 先看 `docs/design/android/android-dual-tone-theme.md`
   - 主题颜色入口：`app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`
+  - dual-tone UI token 入口：
+    - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeAccentTokens.kt`
+    - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeVisualTokens.kt`
+    - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
   - 齿轮 / encode glyph 颜色入口：`app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
-  - Config 分组展示入口：`app/src/main/java/com/bag/audioandroid/ui/screen/ConfigThemeAppearanceSection.kt`
+  - Settings 分组展示入口（代码仍在 `Config*` 文件中）：`app/src/main/java/com/bag/audioandroid/ui/screen/ConfigThemeAppearanceSection.kt`
   - 示例文本入口：`AndroidSampleInputTextProvider.kt` 与对应 `audio_samples_*` 资源
 - 改 Audio 页输入卡与随机样例：
   - `AudioInputActionsCard.kt`
@@ -135,12 +159,20 @@
 
 - Android 官方 `Gradle` 入口固定在 `apps/audio_android/`。
 - Android Studio / IntelliJ 应直接打开 `apps/audio_android/`。
+- 当前应用有两套主题实现：
+  - `Material`
+    - 继续走单色 `ColorScheme` 语义。
+  - `dual-tone`
+    - 从 `BrandThemeCatalog.kt` 的 `backgroundColor` / `accentColor` / `outlineColor` 出发。
+    - 通过 `AppThemeAccentTokens.kt`、`AppThemeVisualTokens.kt` 和 `AudioAndroidThemeMappings.kt` 显式映射到 UI。
+    - `Material` 组件继续提供结构、状态与可读性基础，但不再负责决定 dual-tone 的最终视觉语义。
 - Android XML 多语言当前以 `app/src/main/res/values/strings.xml` 为英文基线，中文与日语分别位于：
   - `app/src/main/res/values-zh/strings.xml`
   - `app/src/main/res/values-ja/strings.xml`
 - 新增或修改可见 XML 文案时，需要同步更新以上三个目录，避免语言版本漂移。
 - UI 设计细则不要继续堆在 `README.md` 或 `AGENTS.md` 里；优先写进 `docs/design/android/`，再由这里做导航。
 - 代码职责、颜色入口、共享 helper 等结构性说明，优先写进 `docs/architecture/`，再由这里做导航。
+- 当前底部 tab 用户文案以 `Audio / Saved / Settings` 为准；代码入口文件仍沿用历史命名，如 `LibraryTabScreen.kt`、`ConfigTabScreen.kt`。
 
 ## Build Variants
 

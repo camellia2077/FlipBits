@@ -21,16 +21,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 @Composable
 internal fun ProByteExplanationCard(
     explanation: ProByteExplanation,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         modifier = modifier.testTag("pro-byte-explanation-card"),
         shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f),
+        color = visualTokens.supportSurfaceColor,
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -68,7 +70,7 @@ internal fun ProByteExplanationCard(
                     modifier =
                         Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
+                                color = visualTokens.supportStrongSurfaceColor,
                                 shape = RoundedCornerShape(14.dp),
                             )
                             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -124,6 +126,7 @@ private fun ProByteSlotIndicator(
     active: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
@@ -131,7 +134,7 @@ private fun ProByteSlotIndicator(
             if (active) {
                 MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
             } else {
-                MaterialTheme.colorScheme.surface
+                visualTokens.supportSurfaceColor
             },
     ) {
         Row(
@@ -149,7 +152,7 @@ private fun ProByteSlotIndicator(
                                 if (active) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
-                                    MaterialTheme.colorScheme.outlineVariant
+                                    visualTokens.subtleOutlineColor
                                 },
                             shape = RoundedCornerShape(99.dp),
                         ),
@@ -176,13 +179,14 @@ private fun ProNibbleBadge(
     value: String,
     active: Boolean,
 ) {
+    val visualTokens = appThemeVisualTokens()
     Surface(
         shape = RoundedCornerShape(16.dp),
         color =
             if (active) {
                 MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
             } else {
-                MaterialTheme.colorScheme.surface
+                visualTokens.supportSurfaceColor
             },
     ) {
         Column(

@@ -16,7 +16,6 @@ import androidx.compose.material.icons.rounded.Casino
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -33,12 +32,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.audioInputTextFieldColors
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AudioInputEditorDialog(
+    selectedThemeStyle: ThemeStyleOption,
+    transportMode: TransportModeOption,
     inputText: String,
     placeholderText: String,
     sampleInputLength: SampleInputLengthOption,
@@ -48,17 +53,19 @@ internal fun AudioInputEditorDialog(
     onDismiss: () -> Unit,
 ) {
     val accentTokens = appThemeAccentTokens()
+    val inputMetrics = measureAudioInputText(inputText)
+    val payloadLimitColor =
+        when (inputMetrics.payloadLimitMessageResId) {
+            R.string.audio_input_payload_limit_exceeded -> MaterialTheme.colorScheme.error
+            R.string.audio_input_payload_limit_warning -> accentTokens.disclosureAccentTint
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
     val topAppBarColors =
         TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
             titleContentColor = accentTokens.disclosureAccentTint,
-            navigationIconContentColor = accentTokens.actionAccentTint,
-            actionIconContentColor = accentTokens.actionAccentTint,
-        )
-    val topBarActionButtonColors =
-        IconButtonDefaults.iconButtonColors(
-            contentColor = accentTokens.actionAccentTint,
-            disabledContentColor = accentTokens.actionAccentTint.copy(alpha = 0.38f),
+            navigationIconContentColor = accentTokens.selectionLabelAccentTint,
+            actionIconContentColor = accentTokens.selectionLabelAccentTint,
         )
 
     Dialog(
@@ -81,7 +88,7 @@ internal fun AudioInputEditorDialog(
                         navigationIcon = {
                             IconButton(
                                 onClick = onDismiss,
-                                colors = topBarActionButtonColors,
+                                colors = utilityActionIconButtonColors(),
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -93,7 +100,7 @@ internal fun AudioInputEditorDialog(
                             IconButton(
                                 onClick = { onRandomizeSampleInput(sampleInputLength) },
                                 enabled = randomizeEnabled,
-                                colors = topBarActionButtonColors,
+                                colors = utilityActionIconButtonColors(),
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Casino,
@@ -137,14 +144,29 @@ internal fun AudioInputEditorDialog(
                         label = { Text(stringResource(R.string.audio_input_label)) },
                         placeholder = { Text(placeholderText) },
                         supportingText = {
-                            Text(
-                                text = stringResource(R.string.audio_input_editor_count, inputText.length),
-                            )
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                AudioInputMetricsSummaryRow(
+                                    charsetHint = stringResource(transportMode.charsetHintResId),
+                                    metricsText =
+                                        stringResource(
+                                            R.string.audio_input_metrics,
+                                            inputMetrics.characterCount,
+                                            inputMetrics.byteCount,
+                                        ),
+                                )
+                                inputMetrics.payloadLimitMessageResId?.let { messageResId ->
+                                    Text(
+                                        text = stringResource(messageResId),
+                                        color = payloadLimitColor,
+                                    )
+                                }
+                            }
                         },
                         keyboardOptions =
                             KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Sentences,
                             ),
+                        colors = audioInputTextFieldColors(selectedThemeStyle),
                     )
                 }
             }

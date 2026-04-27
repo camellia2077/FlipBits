@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CONTEXT: Empty-state text shown when the current filter/search leaves the saved-audio list with no matches. -->
+    <string name="saved_audio_filter_empty">No matches.</string>
+    <!-- CONTEXT: Title/tab label for the saved audio library screen. Keep it short to match the bottom tab label. -->
+    <string name="library_title">Saved</string>
+    <!-- CONTEXT: Empty-state text shown when the user has not saved or imported any audio yet. -->
+    <string name="library_empty">Nothing saved yet.</string>
+    <!-- CONTEXT: Toolbar/icon action that imports an existing audio file into the saved library. -->
+    <string name="library_action_import">Import</string>
+    <!-- CONTEXT: Row action that shares one saved audio file through Android's share sheet. -->
+    <string name="library_action_share">Share</string>
+    <!-- CONTEXT: Row or dialog confirm action for renaming a saved audio file. -->
+    <string name="library_action_rename">Rename</string>
+    <!-- CONTEXT: Row or dialog confirm action for deleting one saved audio file. -->
+    <string name="library_action_delete">Delete</string>
+    <!-- CONTEXT: Selection-mode toolbar action that selects every currently visible saved audio item. -->
+    <string name="library_action_select_all">Select all</string>
+    <!-- CONTEXT: Selection-mode toolbar action that exits multi-selection mode. -->
+    <string name="library_action_clear_selection">Exit selection</string>
+    <!-- CONTEXT: Selection-mode toolbar action that deletes the currently selected saved audio items. -->
+    <string name="library_action_delete_selected">Delete selected</string>
+    <!-- CONTEXT: Selection-mode status label. %1$d is the number of currently selected items. -->
+    <string name="library_selection_count">%1$d selected</string>
+    <!-- CONTEXT: Android share sheet title when sharing a saved audio file. -->
+    <string name="library_share_chooser_title">Share</string>
+    <!-- CONTEXT: Dialog title for renaming a saved audio file. -->
+    <string name="library_rename_title">Rename</string>
+    <!-- CONTEXT: Dialog/body prompt for renaming one saved audio file. %1$s is the current display name. -->
+    <string name="library_rename_message">Rename %1$s</string>
+    <!-- CONTEXT: Text field label for entering a new saved-audio name. -->
+    <string name="library_rename_field_label">Name</string>
+    <!-- CONTEXT: Dialog title for deleting a single saved audio file. -->
+    <string name="library_delete_title">Delete</string>
+    <!-- CONTEXT: Confirmation question for deleting one saved audio file. %1$s is the file display name. -->
+    <string name="library_delete_message">Delete %1$s?</string>
+    <!-- CONTEXT: Dialog title for deleting multiple selected saved audio files. -->
+    <string name="library_delete_selected_title">Delete</string>
+    <!-- CONTEXT: Confirmation question for deleting multiple selected saved audio files. %1$d is the selected count. -->
+    <string name="library_delete_selected_message">Delete %1$d selected files?</string>
+    <!-- CONTEXT: Short status/snackbar message shown after a single saved audio file is deleted successfully. -->
+    <string name="library_status_deleted">Deleted</string>
+    <!-- CONTEXT: Status/snackbar message shown after multiple saved audio files are deleted successfully. %1$d is the deleted count. -->
+    <string name="library_status_deleted_multiple">Deleted %1$d audio files</string>
+    <!-- CONTEXT: Status/snackbar message shown when deleting saved audio fails. -->
+    <string name="library_status_delete_failed">Delete failed</string>
+    <!-- CONTEXT: Status/snackbar message shown when only part of a multi-delete succeeded. %1$d deleted out of %2$d requested. -->
+    <string name="library_status_delete_partial">Deleted %1$d of %2$d audio files</string>
+    <!-- CONTEXT: Status/snackbar message shown after renaming a saved audio file. %1$s is the new display name. -->
+    <string name="library_status_renamed">Renamed: %1$s</string>
+    <!-- CONTEXT: Validation/status message shown when renaming would duplicate an existing saved audio file name. -->
+    <string name="library_status_rename_duplicate">An audio file with that name already exists</string>
+    <!-- CONTEXT: Status/snackbar message shown when renaming a saved audio file fails. -->
+    <string name="library_status_rename_failed">Rename failed</string>
+    <!-- CONTEXT: Status/snackbar message shown when Android sharing could not be started. -->
+    <string name="library_status_share_failed">Share failed</string>
+    <!-- CONTEXT: Status/snackbar message shown after importing an external audio file into the library. %1$s is the imported display name. -->
+    <string name="library_status_imported">Imported: %1$s</string>
+    <!-- CONTEXT: Status/snackbar message shown when importing an external audio file fails. -->
+    <string name="library_status_import_failed">Import failed</string>
+    <!-- CONTEXT: Validation/status message shown when the imported file is not a supported WAV format. -->
+    <string name="library_status_import_unsupported">Only mono PCM16 WAV files are supported</string>
+    <!-- CONTEXT: Toolbar/icon action that starts creating a custom folder in the saved audio library. -->
+    <string name="library_action_new_folder">New folder</string>
+    <!-- CONTEXT: Row or dialog confirm action for moving one or more saved audio files into another folder. -->
+    <string name="library_action_move">Move</string>
+    <!-- CONTEXT: Selection-mode toolbar action for moving the current selection into another folder. -->
+    <string name="library_action_move_selected">Move selected</string>
+    <!-- CONTEXT: Toolbar/icon or dialog confirm action for renaming the currently selected folder. -->
+    <string name="library_action_rename_folder">Rename folder</string>
+    <!-- CONTEXT: Toolbar/icon or dialog confirm action for deleting the currently selected folder. -->
+    <string name="library_action_delete_folder">Delete folder</string>
+    <!-- CONTEXT: Special built-in folder/filter label meaning items with no assigned custom folder. -->
+    <string name="library_folder_uncategorized">Uncategorized</string>
+    <!-- CONTEXT: Text field label for creating or renaming a saved-audio folder. -->
+    <string name="library_folder_name_label">Folder name</string>
+    <!-- CONTEXT: Dialog title for creating a new saved-audio folder. -->
+    <string name="library_folder_create_title">Create folder</string>
+    <!-- CONTEXT: Dialog title for renaming a saved-audio folder. -->
+    <string name="library_folder_rename_title">Rename folder</string>
+    <!-- CONTEXT: Dialog title for deleting a saved-audio folder. -->
+    <string name="library_folder_delete_title">Delete folder</string>
+    <!-- CONTEXT: Confirmation message for deleting a folder only. %1$s is the folder name. Audio files remain in the library and are not deleted. -->
+    <string name="library_folder_delete_message">Delete the folder %1$s? Audio files will stay in the library.</string>
+    <!-- CONTEXT: Secondary row label shown on a saved-audio item to indicate which folder it belongs to. %1$s is the folder name. -->
+    <string name="library_folder_row_label">Folder: %1$s</string>
+    <!-- CONTEXT: Dialog title for choosing a destination folder when moving saved audio. -->
+    <string name="library_move_title">Move</string>
+    <!-- CONTEXT: Dialog prompt for moving a single saved audio file. %1$s is the display name. -->
+    <string name="library_move_single_message">Move %1$s</string>
+    <!-- CONTEXT: Dialog prompt for moving multiple saved audio files. %1$d is the selected file count. -->
+    <string name="library_move_multiple_message">Move %1$d files</string>
+    <!-- CONTEXT: Status/snackbar message shown after creating a folder. %1$s is the folder name. -->
+    <string name="library_status_folder_created">Folder created: %1$s</string>
+    <!-- CONTEXT: Status/snackbar message shown after renaming a folder. %1$s is the new folder name. -->
+    <string name="library_status_folder_renamed">Folder renamed: %1$s</string>
+    <!-- CONTEXT: Status/snackbar message shown after deleting a folder. %1$s is the deleted folder name. -->
+    <string name="library_status_folder_deleted">Folder deleted: %1$s</string>
+    <!-- CONTEXT: Validation/status message shown when creating or renaming a folder would duplicate an existing folder name. -->
+    <string name="library_status_folder_duplicate">A folder with that name already exists</string>
+    <!-- CONTEXT: Status/snackbar message shown when creating a folder fails. -->
+    <string name="library_status_folder_create_failed">Failed to create folder</string>
+    <!-- CONTEXT: Status/snackbar message shown when renaming a folder fails. -->
+    <string name="library_status_folder_rename_failed">Failed to rename folder</string>
+    <!-- CONTEXT: Status/snackbar message shown when deleting a folder fails. -->
+    <string name="library_status_folder_delete_failed">Failed to delete folder</string>
+    <!-- CONTEXT: Status/snackbar message shown when moving saved audio to another folder fails. -->
+    <string name="library_status_move_failed">Failed to move audio</string>
+    <!-- CONTEXT: Status/snackbar message shown after moving files into a named folder. %1$d is the file count and %2$s is the destination folder name. -->
+    <string name="library_status_moved_to_folder">Moved %1$d files to %2$s</string>
+    <!-- CONTEXT: Status/snackbar message shown after moving files into the special Uncategorized bucket. %1$d is the file count. -->
+    <string name="library_status_moved_to_uncategorized">Moved %1$d files to Uncategorized</string>
+</resources>

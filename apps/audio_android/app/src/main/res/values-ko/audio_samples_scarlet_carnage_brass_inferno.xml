@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="audio_sample_scarlet_carnage_themed_brass_gears_drink_blood">황동 기어들이 붉은 조공으로 윤활유를 칠한 채 맞물려 돌아갑니다</string>
-    <string name="audio_sample_scarlet_carnage_ascii_brass_gears_drink_blood">BRASS GEARS TURN. BLOOD KEEPS THEM WET.</string>
     <string name="audio_sample_scarlet_carnage_themed_war_engine_eats_the_sky">평화란 해머 타격 사이의 부패한 숨결일 뿐입니다. 잿더미 지각 위에서, 황동의 굶주림은 선혈의 강물 위에서 꿈틀거립니다. 철의 군단이 세상을 평평하게 짓밟으며 행진합니다. 거대한 엔진들이 강철을 골수에, 육체를 금속에 이식합니다. 진홍빛 하늘이 별을 잊을 때까지 매연 기둥이 솟아오릅니다. 어떤 옥좌도 그것을 명령할 만큼 높지 않으며, 어떤 영혼도 용서받을 만큼 작지 않습니다. 전쟁 엔진은 둘 다 수확할 뿐입니다.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_war_engine_eats_the_sky">PEACE IS BREATH BETWEEN HAMMERS. BRASS GEARS TURN WITH BLOOD OIL. INFANTRY GRINDS THE GROUND. SMOKE HIDES THE STARS. WAR ENGINE FEEDS ON ALL.</string>
+    <string name="audio_sample_scarlet_carnage_themed_furnace_never_sleeps">학살의 용광로는 결코 식지 않습니다. 쓰러진 자들의 부서진 잔해가 끝없이 불길을 먹이고, 그 불은 또 다른 살육의 무기를 벼려 내기 위해 영원히 타오릅니다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_eternal_conflict_fuel">세상은 검댕과 재로 뒤덮인 무덤이 되었고, 검은 연기가 숨통을 틀어막습니다. 쇠징을 두른 군세는 끝없는 조수처럼 밀려와 대지를 먼지로 갈아엎습니다. 거대한 기계는 쓰러진 자들의 피를 기름 삼아 쉼 없이 돌아갑니다. 여기엔 정복도 승리도 없습니다. 오직 전쟁만 있을 뿐입니다. 우주의 톱니는 끝없는 투쟁을 공물로 요구하고, 우리는 그 불길에 던져질 석탄에 지나지 않습니다.</string>
 </resources>

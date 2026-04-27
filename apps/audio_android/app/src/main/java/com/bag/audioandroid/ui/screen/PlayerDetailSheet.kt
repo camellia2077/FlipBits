@@ -34,6 +34,7 @@ internal fun PlayerDetailSheetContent(
     totalTime: String,
     isPlaying: Boolean,
     playbackSequenceMode: PlaybackSequenceMode,
+    playbackSpeed: Float,
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
@@ -43,6 +44,7 @@ internal fun PlayerDetailSheetContent(
     onSkipToPreviousTrack: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
+    onPlaybackSpeedSelected: (Float) -> Unit,
     onExportGeneratedAudio: () -> Unit,
     onShareSavedAudio: (() -> Unit)?,
     onOpenSavedAudioSheet: () -> Unit,
@@ -63,7 +65,7 @@ internal fun PlayerDetailSheetContent(
         modifier =
             modifier
                 .fillMaxSize()
-                .testTag("player-detail-sheet-content")
+                .testTag("player-detail-sheet-content"),
     ) {
         PlayerDetailScrollContent(
             modifier =
@@ -92,6 +94,7 @@ internal fun PlayerDetailSheetContent(
             totalTime = totalTime,
             isPlaying = isPlaying,
             playbackSequenceMode = playbackSequenceMode,
+            playbackSpeed = playbackSpeed,
             canSkipPrevious = canSkipPrevious,
             canSkipNext = canSkipNext,
             canExportGeneratedAudio = canExportGeneratedAudio,
@@ -104,6 +107,7 @@ internal fun PlayerDetailSheetContent(
             onSkipToPreviousTrack = onSkipToPreviousTrack,
             onSkipToNextTrack = onSkipToNextTrack,
             onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
+            onPlaybackSpeedSelected = onPlaybackSpeedSelected,
             onExportGeneratedAudio = onExportGeneratedAudio,
             onOpenSavedAudioSheet = onOpenSavedAudioSheet,
             onScrubStarted = onScrubStarted,
@@ -133,7 +137,7 @@ private fun PlayerDetailScrollContent(
             modifier.padding(horizontal = PlayerDetailHorizontalPadding, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        savedAudioItem?.let { PlayerDetailSavedInfoSection(item = it) }
+        savedAudioItem?.let { PlayerDetailSavedInfoSection(item = it, currentSampleRateHz = sampleRateHz) }
 
         AudioPlaybackDisplayBlock(
             displayedSamples = displayedSamples,
@@ -161,6 +165,7 @@ private fun PlayerDetailBottomDock(
     totalTime: String,
     isPlaying: Boolean,
     playbackSequenceMode: PlaybackSequenceMode,
+    playbackSpeed: Float,
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
@@ -173,6 +178,7 @@ private fun PlayerDetailBottomDock(
     onSkipToPreviousTrack: () -> Unit,
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
+    onPlaybackSpeedSelected: (Float) -> Unit,
     onExportGeneratedAudio: () -> Unit,
     onOpenSavedAudioSheet: () -> Unit,
     onScrubStarted: () -> Unit,
@@ -200,6 +206,7 @@ private fun PlayerDetailBottomDock(
         AudioPlaybackTransportControls(
             isPlaying = isPlaying,
             playbackSequenceMode = playbackSequenceMode,
+            playbackSpeed = playbackSpeed,
             canSkipPrevious = canSkipPrevious,
             canSkipNext = canSkipNext,
             canExportGeneratedAudio = canExportGeneratedAudio,
@@ -212,6 +219,7 @@ private fun PlayerDetailBottomDock(
             onSkipToPreviousTrack = onSkipToPreviousTrack,
             onSkipToNextTrack = onSkipToNextTrack,
             onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
+            onPlaybackSpeedSelected = onPlaybackSpeedSelected,
             onExportGeneratedAudio = onExportGeneratedAudio,
             onOpenSavedAudioSheet = onOpenSavedAudioSheet,
         )

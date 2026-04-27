@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_null_config">Налаштування відсутні.</string>
+    <string name="validation_null_text">Потрібен текст для введення.</string>
+    <string name="validation_null_decoder_output">Буфер результату відсутній.</string>
+    <string name="validation_invalid_sample_rate">Частота дискретизації має бути більшою за 0.</string>
+    <string name="validation_invalid_frame_samples">Розмір кадру має бути більшим за 0.</string>
+    <string name="validation_invalid_mode">Непідтримуваний режим передавання.</string>
+    <string name="validation_invalid_flash_signal_profile">Непідтримуваний профіль flash-сигналу.</string>
+    <string name="validation_invalid_flash_voicing_flavor">Непідтримуваний стиль flash.</string>
+    <string name="validation_pro_ascii_only">pro підтримує лише ASCII.</string>
+    <string name="validation_payload_too_large">Текст перевищує ліміт 512 байтів одного кадру для цього режиму.</string>
+    <string name="error_invalid_argument">Неприпустимий аргумент.</string>
+    <string name="error_not_ready">Результат ще не готовий.</string>
+    <string name="error_not_implemented">Ще недоступно.</string>
+    <string name="error_cancelled">Операцію скасовано.</string>
+    <string name="error_internal">Внутрішня помилка.</string>
+</resources>

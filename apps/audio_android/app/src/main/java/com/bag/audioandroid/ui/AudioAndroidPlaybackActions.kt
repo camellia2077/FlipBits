@@ -3,17 +3,19 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 internal class AudioAndroidPlaybackActions(
-    uiState: MutableStateFlow<AudioAppUiState>,
+    private val uiState: MutableStateFlow<AudioAppUiState>,
     scope: CoroutineScope,
-    sessionStateStore: AudioSessionStateStore,
-    playbackCoordinator: AudioPlaybackCoordinator,
+    private val sessionStateStore: AudioSessionStateStore,
+    private val playbackCoordinator: AudioPlaybackCoordinator,
     playbackRuntimeGateway: PlaybackRuntimeGateway,
-    playbackSourceCoordinator: PlaybackSourceCoordinator,
+    private val playbackSourceCoordinator: PlaybackSourceCoordinator,
     playbackSessionReducer: PlaybackSessionReducer,
     sampleRateHz: Int,
     onPlaybackCompleted: (AudioPlaybackSource) -> Boolean,
@@ -76,4 +78,29 @@ internal class AudioAndroidPlaybackActions(
     }
 
     fun playCurrentFromStart(): Boolean = commandActions.playCurrentFromStart()
+
+    fun onPlaybackSpeedSelected(playbackSpeed: Float) {
+        val current = uiState.value
+        when (val source = current.currentPlaybackSource) {
+            is AudioPlaybackSource.Generated ->
+                sessionStateStore.updateSession(source.mode) {
+                    it.copy(playbackSpeed = playbackSpeed)
+                }
+
+            is AudioPlaybackSource.Saved ->
+                uiState.update { state ->
+                    val selectedSavedAudio =
+                        state.selectedSavedAudio
+                            ?.takeIf { it.item.itemId == source.itemId }
+                            ?: return@update state
+                    state.copy(
+                        selectedSavedAudio = selectedSavedAudio.copy(playbackSpeed = playbackSpeed),
+                    )
+                }
+        }
+        playbackCoordinator.setPlaybackSpeed(
+            sourceKey = playbackSourceCoordinator.sourceKey(current.currentPlaybackSource),
+            playbackSpeed = playbackSpeed,
+        )
+    }
 }

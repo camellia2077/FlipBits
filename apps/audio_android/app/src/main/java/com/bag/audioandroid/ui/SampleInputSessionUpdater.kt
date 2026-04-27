@@ -3,11 +3,15 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.SampleFlavor
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
+import com.bag.audioandroid.ui.state.SampleInputShuffleState
+import kotlin.random.Random
 
 class SampleInputSessionUpdater(
     private val sampleInputTextProvider: SampleInputTextProvider,
+    private val random: Random = Random.Default,
 ) {
     fun initialize(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
@@ -15,12 +19,12 @@ class SampleInputSessionUpdater(
         flavor: SampleFlavor,
     ): Map<TransportModeOption, ModeAudioSessionState> =
         sessions.mapValues { (mode, session) ->
-            sampleInputTextProvider.defaultSample(mode, language, flavor).let { sample ->
-                session.copy(
-                    inputText = sample.text,
-                    sampleInputId = sample.id,
-                )
-            }
+            randomizedInitialSession(
+                session = session,
+                mode = mode,
+                language = language,
+                flavor = flavor,
+            )
         }
 
     fun refreshForLanguageChange(
@@ -31,7 +35,12 @@ class SampleInputSessionUpdater(
         sessions.mapValues { (mode, session) ->
             session.sampleInputId
                 ?.let { sampleInputTextProvider.sampleById(mode, newLanguage, flavor, it) }
-                ?.let { sample -> session.copy(inputText = sample.text, sampleInputId = sample.id) }
+                ?.let { sample ->
+                    session.copy(
+                        inputText = sample.text,
+                        sampleInputId = sample.id,
+                    )
+                }
                 ?: session
         }
 
@@ -45,12 +54,50 @@ class SampleInputSessionUpdater(
             if (sampleId == null) {
                 session
             } else {
-                // Theme lineups do not share sample ids, so fall back to the new flavor's default
-                // sample instead of leaving the previous dual-tone theme text on screen.
-                val sample =
-                    sampleInputTextProvider.sampleById(mode, language, newFlavor, sampleId)
-                        ?: sampleInputTextProvider.defaultSample(mode, language, newFlavor)
-                session.copy(inputText = sample.text, sampleInputId = sample.id)
+                // Flavor changes switch the sample catalog itself. We intentionally
+                // start a fresh shuffled round for the new catalog instead of trying
+                // to preserve a fixed first sample or carry over the old deck.
+                randomizedInitialSession(
+                    session = session,
+                    mode = mode,
+                    language = language,
+                    flavor = newFlavor,
+                )
             }
         }
+
+    private fun randomizedInitialSession(
+        session: ModeAudioSessionState,
+        mode: TransportModeOption,
+        language: AppLanguageOption,
+        flavor: SampleFlavor,
+    ): ModeAudioSessionState {
+        val length = SampleInputLengthOption.Short
+        // The first sample does not need to be fixed. We can shuffle first, show
+        // the first card immediately, and persist the same deck state so the
+        // randomize action simply continues dealing the next sample.
+        val shuffledSampleIds = sampleInputTextProvider.sampleIds(mode, flavor, length).shuffled(random)
+        val firstSampleId = shuffledSampleIds.firstOrNull()
+        val sample =
+            firstSampleId
+                ?.let { sampleInputTextProvider.sampleById(mode, language, flavor, it) }
+                ?: sampleInputTextProvider.defaultSample(mode, language, flavor)
+        val shuffleState =
+            if (shuffledSampleIds.isEmpty()) {
+                null
+            } else {
+                SampleInputShuffleState(
+                    flavor = flavor,
+                    length = length,
+                    shuffledSampleIds = shuffledSampleIds,
+                    nextSampleIndex = 1.coerceAtMost(shuffledSampleIds.size),
+                    lastPresentedSampleId = sample.id,
+                )
+            }
+        return session.copy(
+            inputText = sample.text,
+            sampleInputId = sample.id,
+            sampleShuffleState = shuffleState,
+        )
+    }
 }

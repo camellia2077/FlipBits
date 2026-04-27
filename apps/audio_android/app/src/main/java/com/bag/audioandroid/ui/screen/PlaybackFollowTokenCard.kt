@@ -23,7 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
-import com.bag.audioandroid.ui.playerChromeColors
+import com.bag.audioandroid.ui.playbackLyricsAccentTextColor
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
+import java.nio.charset.StandardCharsets
 
 @Composable
 internal fun PlaybackFollowTokenCard(
@@ -34,59 +36,85 @@ internal fun PlaybackFollowTokenCard(
     activeByteIndexWithinToken: Int,
     modifier: Modifier = Modifier,
 ) {
-    val playerColors = playerChromeColors()
-    val containerColor =
-        if (isActive) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.28f)
-        }
+    val visualTokens = appThemeVisualTokens()
+    val activeAnnotationContainer = Color.Transparent
+    val lyricsAccentTextColor = playbackLyricsAccentTextColor()
+    val focusColor = MaterialTheme.colorScheme.primary
+    val onFocusColor = MaterialTheme.colorScheme.onPrimary
+    val activeAnnotationTint = lyricsAccentTextColor
+    val containerColor = visualTokens.followTokenContainerColor
     val tokenColor =
         if (isActive) {
-            MaterialTheme.colorScheme.primary
+            lyricsAccentTextColor
         } else {
             MaterialTheme.colorScheme.onSurface
         }
     val inactiveRawColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val inactiveCharacterColor = MaterialTheme.colorScheme.onSurfaceVariant
     val annotationByteGroups = annotationByteGroupsForMode(annotationMode, rawDisplayUnits)
+    val characterDisplayUnits = remember(token) { characterDisplayUnits(token) }
+    val shouldShowCharacterTrack = remember(token, characterDisplayUnits) { shouldShowCharacterTrack(token, characterDisplayUnits) }
     val rawText =
         remember(
             annotationByteGroups,
             activeByteIndexWithinToken,
             isActive,
             inactiveRawColor,
-            playerColors.annotationChipContainer,
-            playerColors.annotationChipContent,
+            activeAnnotationContainer,
+            activeAnnotationTint,
         ) {
             buildAnnotatedString {
                 annotationByteGroups.forEachIndexed { index, group ->
-                    if (index > 0) {
+                    val isActiveByte = isActive && index == activeByteIndexWithinToken
+                    if (index > 0 && !isActiveByte) {
                         append(" ")
                     }
-                    val isActiveByte = isActive && index == activeByteIndexWithinToken
                     withStyle(
                         SpanStyle(
-                            color =
-                                if (isActiveByte) {
-                                    playerColors.annotationChipContent
-                                } else {
-                                    inactiveRawColor
-                                },
-                            background =
-                                if (isActiveByte) {
-                                    playerColors.annotationChipContainer
-                                } else {
-                                    Color.Transparent
-                                },
-                            fontWeight =
-                                if (isActiveByte) {
-                                    FontWeight.Bold
-                                } else {
-                                    FontWeight.Medium
-                                },
+                            color = if (isActiveByte) onFocusColor else inactiveRawColor,
+                            background = if (isActiveByte) focusColor else Color.Transparent,
+                            fontWeight = if (isActiveByte) FontWeight.Bold else FontWeight.Medium,
                         ),
                     ) {
-                        append(group)
+                        if (isActiveByte) {
+                            append(if (index > 0) " $group " else "$group ")
+                        } else {
+                            append(group)
+                        }
+                    }
+                }
+            }
+        }
+    val characterTrackText =
+        remember(
+            characterDisplayUnits,
+            activeByteIndexWithinToken,
+            isActive,
+            inactiveCharacterColor,
+            lyricsAccentTextColor,
+        ) {
+            buildAnnotatedString {
+                characterDisplayUnits.forEachIndexed { index, unit ->
+                    val isActiveCharacter =
+                        isActive &&
+                            activeByteIndexWithinToken >= unit.byteStartIndexWithinToken &&
+                            activeByteIndexWithinToken <
+                            unit.byteStartIndexWithinToken + unit.byteCount
+                    if (index > 0 && !isActiveCharacter) {
+                        append(" ")
+                    }
+                    withStyle(
+                        SpanStyle(
+                            color = if (isActiveCharacter) onFocusColor else inactiveCharacterColor,
+                            background = if (isActiveCharacter) focusColor else Color.Transparent,
+                            fontWeight = if (isActiveCharacter) FontWeight.Bold else FontWeight.Medium,
+                        ),
+                    ) {
+                        if (isActiveCharacter) {
+                            append(if (index > 0) " ${unit.text} " else "${unit.text} ")
+                        } else {
+                            append(unit.text)
+                        }
                     }
                 }
             }
@@ -129,13 +157,13 @@ internal fun PlaybackFollowTokenCard(
             Surface(
                 color =
                     if (isActive) {
-                        playerColors.annotationChipContainer.copy(alpha = 0.28f)
+                        activeAnnotationContainer
                     } else {
                         Color.Transparent
                     },
                 contentColor =
                     if (isActive) {
-                        playerColors.annotationChipContent
+                        activeAnnotationTint
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
@@ -154,6 +182,68 @@ internal fun PlaybackFollowTokenCard(
                             .padding(horizontal = 10.dp, vertical = 10.dp),
                 )
             }
+            if (shouldShowCharacterTrack) {
+                Text(
+                    text = characterTrackText,
+                    color = inactiveCharacterColor,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.Center,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 6.dp),
+                )
+            }
         }
     }
+}
+
+private data class CharacterDisplayUnit(
+    val text: String,
+    val byteStartIndexWithinToken: Int,
+    val byteCount: Int,
+)
+
+private fun characterDisplayUnits(token: String): List<CharacterDisplayUnit> {
+    if (token.isEmpty()) {
+        return emptyList()
+    }
+    val units = ArrayList<CharacterDisplayUnit>()
+    var index = 0
+    var byteStart = 0
+    while (index < token.length) {
+        val codePoint = token.codePointAt(index)
+        val characterText = String(Character.toChars(codePoint))
+        val byteCount = characterText.toByteArray(StandardCharsets.UTF_8).size.coerceAtLeast(1)
+        units +=
+            CharacterDisplayUnit(
+                text = characterText,
+                byteStartIndexWithinToken = byteStart,
+                byteCount = byteCount,
+            )
+        byteStart += byteCount
+        index += Character.charCount(codePoint)
+    }
+    return units
+}
+
+private fun shouldShowCharacterTrack(
+    token: String,
+    characterDisplayUnits: List<CharacterDisplayUnit>,
+): Boolean {
+    if (characterDisplayUnits.size < 2) {
+        return false
+    }
+    val trimmed = token.trim()
+    if (trimmed.isEmpty()) {
+        return false
+    }
+    if (trimmed.all { Character.isDigit(it) }) {
+        return false
+    }
+    if (trimmed.all { !Character.isLetterOrDigit(it) }) {
+        return false
+    }
+    return true
 }

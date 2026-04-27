@@ -11,6 +11,7 @@ data class SavedAudioPlaybackSelection(
     val sampleRateHz: Int,
     val metadata: GeneratedAudioMetadata? = null,
     val playback: PlaybackUiState,
+    val playbackSpeed: Float = com.bag.audioandroid.ui.model.PlaybackSpeedOption.default.speed,
     val decodedPayload: DecodedPayloadViewData = DecodedPayloadViewData.Empty,
     val followData: PayloadFollowViewData = PayloadFollowViewData.Empty,
 )

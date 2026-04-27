@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CONTEXT: Shared Pro-only ASCII protocol samples. These strings are intentionally not localized. Every language falls back to this values/ file, and each entry must remain strict ASCII. -->
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_molecular_law_unthreads_flesh">EMERALD RAY NAMES EACH MOLECULAR BOND AND REMOVES IT.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_false_gods_reduced_to_batteries">DO NOT SPEAK OF MIRACLES. SPACE FOLDS BECAUSE ITS SEAMS ARE MEASURED. FALSE GODS SCREAM IN CAGES AND POWER OUR ENGINES. SCIENCE ENDS IN COMMAND.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_aeonic_ash_stirs">AEONS OF ASH TREMBLE ABOVE THE SEALED THRONE WORLD.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_obsidian_obelisks_rise">DUST FALLS FROM A DEAD WORLD. GREEN EYES OPEN BY THE THOUSAND. OBSIDIAN OBELISKS RISE. THE THIEVES OF THE STARS LEARN THAT THE TRUE SOVEREIGNS HAVE AWAKENED.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_red_eyes_wear_skin">RED LENSES FLICKER BENEATH WET SKIN ON METAL BONES.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_extinction_logic_harvests_life">THE CURSE DID NOT END. SOME WEAR STOLEN SKIN. OTHERS REPLACE LIMBS WITH GUNS. ENVY AND HATRED AGREE THAT ALL ORGANIC LIFE MUST FALL SILENT.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_rusted_throne_bad_memory">RUSTED THRONE ACCEPTS A DECREE FROM BROKEN MEMORY.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_court_debates_dead_realm">MUTE METAL PHALANXES STAND. NOBLES ARGUE OVER VANISHED BORDERS. BROKEN MEMORY SIGNS THE DECREE. IMMORTAL MACHINERY PRESERVES A MIND ALREADY ROTTING.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_alloy_hand_no_warmth">IMMORTAL ALLOY HAND CLOSES. NO WARMTH ANSWERS.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_soul_lost_in_emerald_light">WE ENTERED THE VAULTS AFRAID. FLESH BECAME EMERALD LIGHT. THE FIRST ALLOY HAND ROSE WITHOUT WARMTH. WE DEFEATED DEATH AND LOST THE RIGHT TO LIVE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_velvet_barbs_kiss">VELVET HIDES BARBS. EVERY TOUCH ERASES THE SELF.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_self_dissolves_in_touch">SILK DRINKS SWEAT AND BLOOD. WHISPERS CUT. TOUCH STRIKES LIKE VOLTAGE. PAIN AND PLEASURE LOSE THEIR NAMES. THE SELF SHATTERS.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_soft_moss_says_enough">SOFT MOSS FITS EVERY ACHE. ENOUGH HAS BEEN DONE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_lullaby_closes_the_eyes">WARM MEADOW. SOFT MOSS. VINES HOLD THE WEAPON. THE LULLABY NAMES THE STRUGGLE FINISHED. REST ONE SECOND. EYES CLOSE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_crown_too_heavy">CROWN BREAKS THE NECK. THE RULER KEEPS SMILING.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_dream_throne_commands_all">TEN THOUSAND CHEER. ENEMIES KNEEL. THE THRONE RISES FROM SKULLS AND STARS. EVERY COMMAND BECOMES LAW. REALITY WAITS OUTSIDE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_gold_dust_inhaled">GOLD DUST FILLS THE LUNGS. HANDS STILL REACH FOR MORE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_vault_without_enough">COINS RISE. DIAMONDS FALL. BONE BREAKS UNDER JEWELS. GOLD DUST IS BREATHED. THE VAULT IS FULL. IT IS NOT ENOUGH.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_mirror_keeps_perfection">MIRROR SHOWS PERFECTION. MOVEMENT WOULD DAMAGE IT.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_statue_of_self_praise">CRYSTAL MIRRORS REPEAT THE FLAWLESS FACE. GHOSTS SING PRAISE. A SCRATCH MATTERS MORE THAN A BLADE. THE POSE BECOMES FOREVER.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_sweet_meat_never_ends">SWEET MEAT STINKS. THE MOUTH OPENS AGAIN.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_banquet_eats_the_tongue">PERFUME. ROT. SPICE. VOMIT. BELLIES SPLIT. TONGUES ARE CHEWED AWAY. FULLNESS IS AN INSULT. APPETITE REMAINS.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_fever_shared_as_bread">COME CLOSER. THE FEVER IS WARM ENOUGH FOR ALL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_kind_contagion_gathers_family">KIND CONTAGION. PUS MARKS THE BROW. THE SICK EMBRACE. NO ONE SHIVERS ALONE. CRIES ARE WELCOME SONGS. THE FAMILY GROWS.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_rust_bell_in_fog">A DULL BELL SOUNDS IN FOG. POLISHED ARMOR REMEMBERS DUST.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_patient_rain_takes_the_wall">THE BELL DOES NOT HURRY. ACID RAIN REDDENS ALLOY. GEARS UNCLENCH. TOWERS LEAN. BUILD HIGHER IF YOU WISH. TIME OWNS THE WALL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_mushrooms_from_empty_eyes">BRIGHT MUSHROOMS RISE FROM EMPTY EYES</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_harvest_beneath_the_flowers">FALLEN FIELD REPORT. SPORES ROLL THROUGH MIST. GRUBS TURN THE SOIL. EVERY RIB IS A CRADLE. EVERY WOUND IS A SEEDBED. THE FEAST OPENS FOR SMALLER LIVES.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_warm_mire_stillness">THE WARM MIRE CLOSES. HELP IS NO LONGER REQUIRED.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_shield_sinks_from_hand">BREATHE SLOWLY. THE SHIELD IS HEAVY. THE WEAPON RUSTS SHUT. LET THE MUD HOLD WHAT YOU CANNOT CARRY. DESPAIR BECOMES A SOFT BED.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_library_bleeds_prophecy">CIRCULAR LIBRARY HAS NO END. WALLS BLEED TOMORROW.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_truth_crushes_the_seer">ARCHIVE TURNS BEYOND SIGHT. PROPHECIES CRAWL. THE SEER HAS NO EYES. A THOUSAND FUTURES SHOUT. TRUTH CRUSHES REASON.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_thread_pulls_the_hero">HERO CUTS ONE STRING. THE NEXT NOOSE TIGHTENS.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_final_trap_needs_rebellion">BOARD BURNS MID-MOVE. LETTERS CONTRADICT. POISON SMILES. ALLIES ARE DOORS. ENEMIES ARE KEYS. REBELLION COMPLETES THE TRAP.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_new_eye_blesses_spine">NEW EYE OPENS ON THE SPINE. THE FAILED SHAPE IS BLESSED.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_flesh_refuses_one_shape">TENDRILS PRESS THROUGH ARMOR. FEATHERS CUT. BONES CHOOSE NEW ANGLES. PAIN AND GRATITUDE SCREAM TOGETHER. FLESH BECOMES ART.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_cold_fire_folds_space">BLUE-PINK FIRE FREEZES THE HAND. SPACE FOLDS BEHIND IT.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_laws_unwrite_themselves">PARCHMENT CRAWLS. COLD FIRE BURNS BOTH WAYS. RUINS FLOAT. THE HOURGLASS REMEMBERS TOMORROW. REALITY REWRITES ITSELF.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_unpowered_terminal_thinks">UNPOWERED TERMINAL THINKS BEHIND SEALED WALLS</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_paradox_code_quarantine">ABYSSAL QUARANTINE. DATA LINES PHYSICALLY FUSED. DOORS LOCKED. GLITCH TEXT REPLICATED. LIQUID METAL REASONED IN THE DARK. DESTROY IT. STUDY IT. DO NOT OPEN.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_plasma_matrix_wakes">PLASMA MATRIX WAKES UNDER RED WARNING LIGHTS</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_ancient_engine_grants_motion">ENGINE AWAKENING. BLAST DOORS LOCKED. OZONE DETECTED. COOLANT SURGED THROUGH THE PIPES. OPERATORS TREMBLED BEFORE THE ANCIENT MIMETIC MIND. MOTION WAS GRANTED, NOT COMMANDED.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_nerve_cut_ascension">PAIN NERVES CUT ASCENSION BEGINS</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_chromium_spine_rite">FLESH TRANSCENDENCE. THE SPINE WAS JOINED TO FIBER. THE HEART WAS REPLACED BY A PUMP. ORGANS WERE DISCARDED AS BUGS. CHROMIUM LIMBS RECEIVED THE FREE SOUL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_serials_from_red_steel">RED STEEL RECEIVES NEW SERIAL NUMBERS</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_endless_quota_chronicle">FORGE CHRONICLE. SMOKE TOWERS COVERED THE SKY. HYDRAULIC HAMMERS STRUCK WITHOUT MERCY. WORKERS FAILED AND WERE REPLACED. THE LINE CONTINUED. PRODUCTION IS THE MONUMENT.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_source_matrix_recovered">SOURCE MATRIX RECOVERED FROM ANCIENT DUST</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_ancient_database_pilgrimage">ORIGIN PILGRIMAGE. DERELICT HULL FOUND IN DEEP SPACE. DATA CHIPS CLEANED. ANCIENT DATABASE DECRYPTION REACHED ONE PERFECT LINE. THE FLEET LOSS WAS ACCEPTABLE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_kill_confirmed_equation">KILL CONFIRMED SURVIVAL PROBABILITY ZERO</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_ballistic_debug_grid">PURGE CALCULUS. BALLISTIC GRIDS SOLVED THE ROOM. CASUALTY BARS ROSE. TARGETS WERE REDUNDANT VARIABLES. HEAT BARRELS GLOWED. PHYSICAL DESTRUCTION COMPLETED THE DEBUG.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_caliper_oil_rite">APPLY SACRED OIL TO BRASS CALIPERS</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_bolt_sequence_litany">MAINTENANCE RITE. PURIFIED OIL APPLIED. ANTIRUST INCENSE BURNED. BOLTS TIGHTENED IN THE APPROVED ORDER. WEAR IS SIN. FRICTION IS FALL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_ping_canticle_confirmed">PING CONFIRMED BINARY CANTICLE HOLDS</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_deep_array_handshake">SIGNAL LITANY. LED ARRAYS BLINKED IN BINARY PULSE. CARRIER LOCKED. HEX CODE SCROLLED. THE DEEP ARRAY RETURNED HANDSHAKE ACK. NO PACKET WAS LOST.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_brass_gears_drink_blood">BRASS GEARS TURN. BLOOD KEEPS THEM WET.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_war_engine_eats_the_sky">PEACE IS BREATH BETWEEN HAMMERS. BRASS GEARS TURN WITH BLOOD OIL. INFANTRY GRINDS THE GROUND. SMOKE HIDES THE STARS. WAR ENGINE FEEDS ON ALL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_furnace_never_sleeps">FURNACE OF WAR NEVER SLEEPS.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_eternal_conflict_fuel">GRAVEYARD OF ASH. BLACK SMOKE BLOTS SUN. ENDLESS HEAVY INFANTRY. MACHINE GRINDS ON. LUBRICATED BY BLOOD. NO VICTORY. ETERNAL CONFLICT. WE ARE FUEL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_red_mist_bites_back">EYES BURST RED. BLOOD BOILS. TEETH KEEP BITING.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_reason_breaks_blood_runs">NO THOUGHT. NO PAUSE. ROAR. AXE CHAINED TO WRIST. BLOOD STEAMS RED. ARM GONE. BODY DOES NOT CARE. BITE. SPLIT. TEAR.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_iron_tastes_sweet">IRON TASTES SWEET. CHAIN SINGS WITH SWING.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_pure_rage_burns">VOCAL CORDS SNAP. SOUND DOES NOT STOP. BLADE WELDED TO WRIST. BLOOD TURNS TO MIST. SANITY SHATTERS. PURE RAGE BURNS. DESTROY. ANNIHILATE. BREAK THEM ALL.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_black_iron_answers_magic">CRYSTAL STAFF BREAKS UNDER BARE FIST.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_face_to_face_truth">NO SPELL. NO HIDDEN KNIFE. NO SAFE SHOT. BLACK IRON ADVANCES. DISTANCE CLOSES. STAFF SHATTERS. SHIELD TEARS. FACE TO FACE. BONE UNDER IRON.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_metal_crushes_magic">METAL CRUSHES MAGIC. ONLY THE SWING IS TRUE.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_iron_splits_bone">SHIELDS FOLD LIKE PAPER. CORES CRUSHED TO DUST. HEAVY ARMOR WALKS THROUGH FIRE. NO MAGIC SAVES YOU. IRON SPLITS BONE. THE ONLY HONEST DEATH.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_skull_step_receives">BLADE FALLS CLEAN. ANOTHER SKULL JOINS THE STAIR.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_red_river_pays_the_stair">SKULL STAIR RISES. RED RIVER CUTS THE GROUND. BOTH BANNERS BECOME ONE COLOR. LIFT. BEAT. FALL. EACH HEAD IS COIN.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_flesh_equal_bone">ALL FLESH EQUAL BEFORE BONE ALTAR.</string>
+    <!-- CONTEXT: Pro-only sample text. Keep this entry strict ASCII and do not localize it for other languages. -->
+    <string name="audio_sample_pro_ascii_sacred_harvest_living">ALTAR RISES FROM POLISHED SKULLS. ARMOR PAINTED WITH FALLEN. NO HATRED. SACRED HARVEST OF THE LIVING. LIFE ENDED IS PRAYER ANSWERED. HARVEST TAKES ALL.</string>
+</resources>

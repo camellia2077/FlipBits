@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_title">O aplikacji</string>
+    <string name="about_author">%1$s</string>
+    <string name="about_presentation_version">App v%1$s</string>
+    <string name="about_core_version">Engine v%1$s</string>
+    <string name="about_github">%1$s</string>
+    <string name="about_licenses_title">Licencje open source</string>
+    <string name="about_licenses_subtitle">Zobacz biblioteki i licencje</string>
+    <string name="licenses_title">Licencje open source</string>
+    <string name="licenses_loading">Wczytywanie licencji</string>
+</resources>

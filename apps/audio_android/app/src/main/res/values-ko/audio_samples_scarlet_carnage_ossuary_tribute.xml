@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="audio_sample_scarlet_carnage_themed_skull_step_receives">칼날이 떨어집니다; 납골당을 위한 또 하나의 전리품입니다.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_skull_step_receives">BLADE FALLS CLEAN. ANOTHER SKULL JOINS THE STAIR.</string>
     <string name="audio_sample_scarlet_carnage_themed_red_river_pays_the_stair">첨탑은 계산원의 손길에 매끄럽게 닳은 연마된 뼈 위로 솟아오릅니다. 끈적한 조수가 침전물에 협곡을 깎아내며, 모든 깃발을 정맥의 빛깔로 물들입니다. 칼날은 맥박에 맞춰 움직입니다: 들어 올리고, 가르고, 반복합니다. 증오는 무의미합니다. 이름은 먼지일 뿐입니다. 날끝은 그 어떤 신보다도 공정합니다. 각 머리는 보잘것없는 조각이며, 각 영혼은 고지를 향한 지불금입니다.</string>
-    <string name="audio_sample_scarlet_carnage_ascii_red_river_pays_the_stair">SKULL STAIR RISES. RED RIVER CUTS THE GROUND. BOTH BANNERS BECOME ONE COLOR. LIFT. BEAT. FALL. EACH HEAD IS COIN.</string>
+    <string name="audio_sample_scarlet_carnage_themed_flesh_equal_bone">칼날 앞에서는 모든 살덩이가 평등합니다. 왕이든 거지든 같은 진홍빛 피를 쏟고, 속살이 벗겨진 해골은 피로 물든 하늘에 닿을 기념비를 세우는 재료가 됩니다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_sacred_harvest_living">기념비는 번쩍이는 해골 층을 차곡차곡 쌓아 올리며 더욱 거대해집니다. 검은 갑주는 죽은 자들의 피칠갑을 입고 더욱 무겁게 가라앉습니다. 여기에는 악의도, 칼날의 잔혹함도 없습니다. 이것은 산 자들을 거두어들이는 성스러운 수확입니다. 마지막 숨만이 유일하게 진실한 기도입니다. 수확은 충성을 요구하지 않습니다. 오직 베어 낼 곡물만을 원할 뿐입니다.</string>
 </resources>

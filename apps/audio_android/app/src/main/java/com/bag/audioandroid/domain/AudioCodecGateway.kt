@@ -20,6 +20,15 @@ interface AudioCodecGateway {
         onProgress: (EncodeProgressUpdate) -> Unit = {},
     ): EncodeAudioResult
 
+    suspend fun buildEncodeFollowData(
+        text: String,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): EncodedAudioPayloadResult
+
     fun validateDecodeConfig(
         sampleRateHz: Int,
         frameSamples: Int,

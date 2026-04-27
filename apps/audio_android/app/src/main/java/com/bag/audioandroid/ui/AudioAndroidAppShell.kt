@@ -10,11 +10,14 @@ import com.bag.audioandroid.ui.screen.OpenSourceLicensesScreen
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import com.bag.audioandroid.ui.theme.LocalAppThemeAccentTokens
+import com.bag.audioandroid.ui.theme.LocalAppThemeVisualTokens
 import com.bag.audioandroid.ui.theme.LocalAudioEncodeGlyphColors
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.audioEncodeGlyphColorsForBrandTheme
+import com.bag.audioandroid.ui.theme.brandThemeVisualTokens
 import com.bag.audioandroid.ui.theme.brandAccentTokens
 import com.bag.audioandroid.ui.theme.defaultAudioEncodeGlyphColors
+import com.bag.audioandroid.ui.theme.materialThemeVisualTokens
 import com.bag.audioandroid.ui.theme.materialAccentTokens
 
 @Composable
@@ -30,7 +33,7 @@ internal fun AudioAndroidAppShell(
         when (uiState.selectedThemeStyle) {
             // Dual-tone brand themes are curated, fixed looks. They can be either light or dark
             // on their own, so they do not follow the app's Material light/dark mode toggle.
-            ThemeStyleOption.BrandDualTone -> uiState.selectedBrandTheme.colorScheme
+            ThemeStyleOption.BrandDualTone -> uiState.activeBrandTheme.colorScheme
             ThemeStyleOption.Material ->
                 if (shouldUseDarkTheme(uiState.selectedThemeMode)) {
                     uiState.selectedPalette.darkScheme
@@ -40,19 +43,25 @@ internal fun AudioAndroidAppShell(
         }
     val accentTokens =
         when (uiState.selectedThemeStyle) {
-            ThemeStyleOption.BrandDualTone -> brandAccentTokens(uiState.selectedBrandTheme)
+            ThemeStyleOption.BrandDualTone -> brandAccentTokens(uiState.activeBrandTheme)
             ThemeStyleOption.Material -> materialAccentTokens(colorScheme.primary)
         }
     val audioEncodeGlyphColors =
         when (uiState.selectedThemeStyle) {
             ThemeStyleOption.BrandDualTone ->
-                audioEncodeGlyphColorsForBrandTheme(uiState.selectedBrandTheme)
+                audioEncodeGlyphColorsForBrandTheme(uiState.activeBrandTheme)
             ThemeStyleOption.Material -> defaultAudioEncodeGlyphColors()
+        }
+    val visualTokens =
+        when (uiState.selectedThemeStyle) {
+            ThemeStyleOption.BrandDualTone -> brandThemeVisualTokens(uiState.activeBrandTheme, accentTokens)
+            ThemeStyleOption.Material -> materialThemeVisualTokens(colorScheme)
         }
 
     MaterialTheme(colorScheme = colorScheme) {
         androidx.compose.runtime.CompositionLocalProvider(
             LocalAppThemeAccentTokens provides accentTokens,
+            LocalAppThemeVisualTokens provides visualTokens,
             LocalAudioEncodeGlyphColors provides audioEncodeGlyphColors,
         ) {
             when {

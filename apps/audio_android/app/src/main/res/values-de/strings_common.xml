@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlipBits</string>
+    <string name="common_back">Zurück</string>
+    <string name="common_cancel">Abbrechen</string>
+    <string name="common_all">Alle</string>
+    <string name="common_unknown">Unbekannt</string>
+    <string name="tab_audio">Audio</string>
+    <string name="tab_library">Gespeichert</string>
+    <string name="tab_config">Einstellungen</string>
+</resources>

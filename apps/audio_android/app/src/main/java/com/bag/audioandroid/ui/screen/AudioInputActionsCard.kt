@@ -30,15 +30,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioEncodePhase
+import com.bag.audioandroid.ui.audioInputTextFieldColors
 import com.bag.audioandroid.ui.component.ActionButton
+import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 import kotlin.math.roundToInt
 
 @Composable
 internal fun AudioInputActionsCard(
+    selectedThemeStyle: ThemeStyleOption,
     transportMode: TransportModeOption,
     isCodecBusy: Boolean,
     encodeProgress: Float?,
@@ -64,6 +69,14 @@ internal fun AudioInputActionsCard(
 ) {
     val isEncodingBusy = isCodecBusy && encodeProgress != null
     val encodePercent = ((encodeProgress ?: 0f).coerceIn(0f, 1f) * 100f).roundToInt()
+    val inputMetrics = measureAudioInputText(inputText)
+    val accentTokens = appThemeAccentTokens()
+    val payloadLimitColor =
+        when (inputMetrics.payloadLimitMessageResId) {
+            R.string.audio_input_payload_limit_exceeded -> MaterialTheme.colorScheme.error
+            R.string.audio_input_payload_limit_warning -> accentTokens.disclosureAccentTint
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -107,13 +120,32 @@ internal fun AudioInputActionsCard(
                     enabled = !isCodecBusy,
                     label = { Text(stringResource(R.string.audio_input_label)) },
                     placeholder = { Text(inputPlaceholderText) },
-                    supportingText = { Text(stringResource(transportMode.charsetHintResId)) },
+                    supportingText = {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            AudioInputMetricsSummaryRow(
+                                charsetHint = stringResource(transportMode.charsetHintResId),
+                                metricsText =
+                                    stringResource(
+                                        R.string.audio_input_metrics,
+                                        inputMetrics.characterCount,
+                                        inputMetrics.byteCount,
+                                    ),
+                            )
+                            inputMetrics.payloadLimitMessageResId?.let { messageResId ->
+                                Text(
+                                    text = stringResource(messageResId),
+                                    color = payloadLimitColor,
+                                )
+                            }
+                        }
+                    },
                     minLines = 2,
                     maxLines = 2,
+                    colors = audioInputTextFieldColors(selectedThemeStyle),
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 124.dp),
+                            .heightIn(min = 156.dp),
                 )
                 Text(
                     text = stringResource(R.string.audio_input_editor_inline_hint),
@@ -138,7 +170,7 @@ internal fun AudioInputActionsCard(
                                 ),
                             onClick = {},
                             enabled = false,
-                            borderColor = appThemeAccentTokens().selectionBorderAccentTint,
+                            borderColor = accentTokens.selectionBorderAccentTint,
                             borderWidth = 2.dp,
                             modifier = Modifier.weight(1f),
                         )
@@ -153,7 +185,7 @@ internal fun AudioInputActionsCard(
                                 ),
                             onClick = onCancelEncode,
                             enabled = !isEncodeCancelling,
-                            borderColor = appThemeAccentTokens().selectionBorderAccentTint,
+                            borderColor = accentTokens.selectionBorderAccentTint,
                             borderWidth = 2.dp,
                             modifier = Modifier.weight(1f),
                         )
@@ -163,13 +195,31 @@ internal fun AudioInputActionsCard(
                         text = stringResource(R.string.audio_action_encode),
                         onClick = onEncode,
                         enabled = !isCodecBusy,
-                        textColor = appThemeAccentTokens().disclosureAccentTint,
-                        borderColor = appThemeAccentTokens().selectionBorderAccentTint,
+                        textColor = accentTokens.disclosureAccentTint,
+                        borderColor = accentTokens.selectionBorderAccentTint,
                         borderWidth = 2.dp,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+internal fun AudioInputMetricsSummaryRow(
+    charsetHint: String,
+    metricsText: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = charsetHint,
+            modifier = Modifier.weight(1f),
+        )
+        Text(text = metricsText)
     }
 }
 
@@ -238,15 +288,7 @@ private fun AudioInputFieldHeader(
                             index = index,
                             count = SampleInputLengthOption.entries.size,
                         ),
-                    colors =
-                        SegmentedButtonDefaults.colors(
-                            activeContainerColor = MaterialTheme.colorScheme.primary,
-                            activeContentColor = MaterialTheme.colorScheme.onPrimary,
-                            activeBorderColor = MaterialTheme.colorScheme.primary,
-                            inactiveContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            inactiveBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                        ),
+                    colors = appSegmentedButtonColors(),
                     label = {
                         Text(text = stringResource(option.labelResId))
                     },
@@ -256,31 +298,31 @@ private fun AudioInputFieldHeader(
         IconButton(
             onClick = onClearInput,
             enabled = enabled,
+            colors = utilityActionIconButtonColors(),
         ) {
             Icon(
                 imageVector = Icons.Rounded.DeleteOutline,
                 contentDescription = stringResource(R.string.audio_action_clear),
-                tint = accentTokens.actionAccentTint,
             )
         }
         IconButton(
             onClick = onOpenInputEditor,
             enabled = enabled,
+            colors = utilityActionIconButtonColors(),
         ) {
             Icon(
                 imageVector = Icons.Rounded.Description,
                 contentDescription = stringResource(R.string.audio_action_open_input_editor),
-                tint = accentTokens.actionAccentTint,
             )
         }
         IconButton(
             onClick = onRandomizeSampleInput,
             enabled = enabled,
+            colors = utilityActionIconButtonColors(),
         ) {
             Icon(
                 imageVector = Icons.Rounded.Casino,
                 contentDescription = stringResource(R.string.audio_action_randomize_sample_input),
-                tint = accentTokens.actionAccentTint,
             )
         }
     }

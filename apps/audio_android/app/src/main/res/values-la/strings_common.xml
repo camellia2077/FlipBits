@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlipBits</string>
+    <string name="common_back">Revertere</string>
+    <string name="common_cancel">Interrumpe Processum</string>
+    <string name="common_all">Omnes Sectores</string>
+    <string name="common_unknown">Relatio Nulla</string>
+    <string name="tab_audio">Vox-Matrix</string>
+    <string name="tab_library">Reliquiarium</string>
+    <string name="tab_config">Ritus Logicae</string>
+</resources>
