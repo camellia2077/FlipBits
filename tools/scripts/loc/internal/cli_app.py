@@ -179,9 +179,9 @@ class LocCliApplication:
         path_results: list[dict] = []
         total_matched_files = 0
 
-        if config.lang not in {"kt", "py"}:
+        if config.lang not in {"kt", "py", "cpp"}:
             return self._error(
-                f"--responsibility-risk 当前仅支持 --lang kt 或 --lang py，收到 {config.lang}。",
+                f"--responsibility-risk 当前仅支持 --lang kt / --lang py / --lang cpp，收到 {config.lang}。",
                 payload,
             )
 
@@ -269,6 +269,7 @@ class LocCliApplication:
             metavar="N",
             help=(
                 "扫描语言文件的职责混杂风险（启发式预警，当前支持 --lang kt / --lang py）。"
+                "当前也支持 --lang cpp。"
                 "不传 N 时使用 TOML 中的 default_responsibility_risk_threshold。"
             ),
         )

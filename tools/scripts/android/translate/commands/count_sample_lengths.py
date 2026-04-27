@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 
-from translation_common import (
+from core.translation_common import (
     DEFAULT_RES_DIRECTORY,
     FACTIONS,
     AndroidStringResourceRepository,

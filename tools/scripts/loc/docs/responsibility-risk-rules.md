@@ -144,6 +144,118 @@ Python 第一版也保持保守，只做“脚本/模块级职责混杂预警”
 
 - `responsibility_mode_branch_threshold = 2`
 
+## C++ 第一版规则
+
+C++ 第一版同样保持保守，目标是先把“超大实现文件 + 桥接/规则/lifecycle 混在一起”的候选打出来。
+
+### 1. 行数
+
+- 超过 `responsibility_line_threshold` 加 2 分
+- 超过 `responsibility_line_threshold + 140` 再加 1 分
+
+建议默认阈值：
+
+- `responsibility_line_threshold = 360`
+
+### 2. 共享状态 / 线程原语
+
+统计这些模式的命中次数：
+
+- `std::mutex`
+- `std::atomic`
+- `std::condition_variable`
+- `thread_local`
+- `std::thread`
+- `std::future`
+- `std::promise`
+
+设计意图：
+
+- 大文件里如果同时持有共享状态和线程原语，更容易把协调、资源管理和业务逻辑揉在一起
+
+### 3. 顶层符号数量
+
+启发式统计顶层：
+
+- `class / struct / enum`
+- 顶层函数定义
+
+设计意图：
+
+- 如果一个 `.cpp/.inc` 文件同时堆了很多 helper、桥接函数和实现函数，通常已经在承担多类职责
+
+### 4. 命名角色种类
+
+统计顶层符号名里是否出现这些角色词：
+
+- `Bridge`
+- `Codec`
+- `Api`
+- `Parser`
+- `Builder`
+- `Factory`
+- `Adapter`
+- `Facade`
+- `Runtime`
+- `Registry`
+- `Manager`
+- `Support`
+- `Test`
+
+设计意图：
+
+- 一个文件里如果同时命中很多不同角色名，往往意味着桥接、规则、runtime、测试 support 被混搭在一起
+
+### 5. 模式分支
+
+统计和这些词相关的 `if/switch/case`：
+
+- `mode`
+- `style`
+- `profile`
+- `state`
+- `phase`
+- `kind`
+- `flavor`
+
+设计意图：
+
+- 多个执行路径揉在同一实现文件里时，`mode/style/state` 分支通常会显著增多
+
+### 6. 桥接 / FFI 表面
+
+统计一个文件同时命中的桥接类别数：
+
+- JNI 表面
+- C ABI 表面
+- 封送 / marshalling helper
+
+对应字段：
+
+- `interop_surface_hits`
+
+设计意图：
+
+- `jni_bridge.cpp`、`audio_io_jni.cpp`、大 C API facade 这类文件，问题往往不是“单个 helper 太长”，而是桥接表面和规则实现同时增长
+
+### 7. 资源生命周期信号
+
+统计这些 ownership / 生命周期模式的命中密度：
+
+- `new/delete`
+- `unique_ptr/shared_ptr`
+- `lock_guard/unique_lock`
+- `Release/Destroy/Cancel/Close/Free`
+- `GetStringUTFChars/ReleaseStringUTFChars`
+
+对应字段：
+
+- `resource_lifecycle_hits`
+
+设计意图：
+
+- 一旦资源获取、释放、取消、封送都混在一个超大文件里，可读性和修改风险都会显著上升
+
 ## 当前边界
 
 当前职责混杂扫描的边界是：

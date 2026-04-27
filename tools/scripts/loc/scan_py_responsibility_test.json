@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-04-27T08:16:19+08:00",
+  "status": "ok",
+  "lang": "py",
+  "scan": {
+    "mode": "responsibility_risk",
+    "threshold": 5
+  },
+  "results": [
+    {
+      "path": "C:\\code\\WaveBits\\tools\\scripts\\android\\translate",
+      "matched_files": [
+        {
+          "path": "C:\\code\\WaveBits\\tools\\scripts\\android\\translate\\commands\\apply_translation_replacements.py",
+          "score": 6,
+          "priority": "P2",
+          "summary": "中度风险：commands 层混入底层规则 helper、规则常量、校验和解析 helper 过密",
+          "dominant_risks": [
+            "command_layer_leak",
+            "rule_helper_density"
+          ],
+          "suggestion": "优先把底层规则、校验和解析 helper 下沉到 core，命令层只保留编排和结果输出。",
+          "lines": 401,
+          "state_signal_hits": 0,
+          "top_level_composables": 9,
+          "role_kinds": [],
+          "mode_branch_hits": 0,
+          "io_kind_count": 2,
+          "rule_helper_count": 6,
+          "responsibility_verb_kind_count": 3,
+          "command_layer_leak_hits": 7
+        },
+        {
+          "path": "C:\\code\\WaveBits\\tools\\scripts\\android\\translate\\commands\\compare_translation_quality.py",
+          "score": 5,
+          "priority": "P2",
+          "summary": "中度风险：状态/副作用信号偏多",
+          "dominant_risks": [
+            "stateful_side_effects"
+          ],
+          "suggestion": "建议先检查是否能把纯规则函数与命令协调逻辑分开。",
+          "lines": 284,
+          "state_signal_hits": 26,
+          "top_level_composables": 3,
+          "role_kinds": [],
+          "mode_branch_hits": 0,
+          "io_kind_count": 1,
+          "rule_helper_count": 2,
+          "responsibility_verb_kind_count": 0,
+          "command_layer_leak_hits": 2
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "matched_files": 2
+  }
+}

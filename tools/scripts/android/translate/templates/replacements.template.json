@@ -1,0 +1,15 @@
+{
+  "dir": "values-it",
+  "items": [
+    {
+      "name": "audio_sample_example_key",
+      "find": "CURRENT SUBSTRING HERE",
+      "replace": "IMPROVED SUBSTRING HERE"
+    },
+    {
+      "name": "settings_example_key",
+      "find": "CURRENT SUBSTRING HERE",
+      "replace": "IMPROVED SUBSTRING HERE"
+    }
+  ]
+}

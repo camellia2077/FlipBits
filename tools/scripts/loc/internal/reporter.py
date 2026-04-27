@@ -90,23 +90,51 @@ class LocConsoleReporter:
                 for item in items:
                     role_display = ",".join(item["role_kinds"]) if item["role_kinds"] else "-"
                     top_level_label = self._top_level_label()
+                    extra_metrics = self._responsibility_extra_metrics(item)
                     print(
                         f'    score {item["score"]:<2} | {item["lines"]:<5} lines | '
                         f'{top_level_label} {item["top_level_composables"]:<2} | '
                         f'state {item["state_signal_hits"]:<2} | '
+                        f'{extra_metrics}'
                         f'roles {role_display:<24} | '
                         f'mode branches {item["mode_branch_hits"]:<2} | '
                         f'File "{item["path"]}"'
                     )
                     print(f'         -> {item["summary"]}')
+                    dominant_risks = item.get("dominant_risks") or []
+                    if dominant_risks:
+                        print(f'            risks: {", ".join(dominant_risks)}')
+                    suggestion = item.get("suggestion")
+                    if suggestion:
+                        print(f"            suggestion: {suggestion}")
         else:
             print("  [OK] 扫描完毕，未发现超过风险阈值的文件。")
         print(f"\n{'-' * 100}\n")
 
     def _top_level_label(self) -> str:
-        if self.config.lang == "py":
+        if self.config.lang in {"py", "cpp"}:
             return "symbols"
         return "composables"
+
+    def _responsibility_extra_metrics(self, item: dict) -> str:
+        if self.config.lang == "kt":
+            return ""
+        if self.config.lang == "py":
+            return (
+                f'io {item.get("io_kind_count", 0):<2} | '
+                f'rules {item.get("rule_helper_count", 0):<2} | '
+                f'verbs {item.get("responsibility_verb_kind_count", 0):<2} | '
+                f'cmd leak {item.get("command_layer_leak_hits", 0):<2} | '
+            )
+        if self.config.lang == "cpp":
+            return (
+                f'io {item.get("io_kind_count", 0):<2} | '
+                f'rules {item.get("rule_helper_count", 0):<2} | '
+                f'verbs {item.get("responsibility_verb_kind_count", 0):<2} | '
+                f'interop {item.get("interop_surface_hits", 0):<2} | '
+                f'lifecycle {item.get("resource_lifecycle_hits", 0):<2} | '
+            )
+        return ""
 
     @staticmethod
     def _group_responsibility_items_by_priority(matched: list[dict]) -> dict[str, list[dict]]:

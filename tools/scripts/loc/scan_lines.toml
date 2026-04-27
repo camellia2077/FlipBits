@@ -29,6 +29,12 @@ default_over_threshold = 350
 default_under_threshold = 120
 default_dir_over_files = 16
 over_inclusive = false
+default_responsibility_risk_threshold = 5
+responsibility_line_threshold = 360
+responsibility_state_signal_threshold = 3
+responsibility_top_level_composable_threshold = 10
+responsibility_role_kind_threshold = 3
+responsibility_mode_branch_threshold = 3
 
 [kt]
 display_name = "Kotlin"
