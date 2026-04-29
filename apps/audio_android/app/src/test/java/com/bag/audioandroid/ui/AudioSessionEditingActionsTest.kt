@@ -97,6 +97,11 @@ class AudioSessionEditingActionsTest {
                                     inputText = "ultra-custom",
                                     sampleInputId = null,
                                 ),
+                            TransportModeOption.Mini to
+                                ModeAudioSessionState(
+                                    inputText = "MINI-A",
+                                    sampleInputId = "a",
+                                ),
                         ),
                 ),
             )
@@ -136,6 +141,7 @@ class AudioSessionEditingActionsTest {
             TransportModeOption.Flash to flashSession,
             TransportModeOption.Pro to ModeAudioSessionState(inputText = "PRO-A", sampleInputId = "a"),
             TransportModeOption.Ultra to ModeAudioSessionState(inputText = "ultra-a", sampleInputId = "a"),
+            TransportModeOption.Mini to ModeAudioSessionState(inputText = "MINI-A", sampleInputId = "a"),
         )
 }
 
@@ -155,6 +161,11 @@ private class CyclingSampleInputTextProvider : SampleInputTextProvider {
         listOf(
             SampleInput("a", "ultra-a"),
             SampleInput("b", "ultra-b"),
+        )
+    private val miniSamples =
+        listOf(
+            SampleInput("a", "MINI-A"),
+            SampleInput("b", "MAX-B"),
         )
 
     override fun defaultSample(
@@ -181,6 +192,7 @@ private class CyclingSampleInputTextProvider : SampleInputTextProvider {
             TransportModeOption.Flash -> flashSamples
             TransportModeOption.Pro -> proSamples
             TransportModeOption.Ultra -> ultraSamples
+            TransportModeOption.Mini -> miniSamples
         }
 }
 

@@ -9,6 +9,7 @@
     <string name="validation_invalid_flash_signal_profile">Signum incognitum est.</string>
     <string name="validation_invalid_flash_voicing_flavor">Ritus vocis non agnoscitur.</string>
     <string name="validation_pro_ascii_only">pro cantus ASCII tantum accipit.</string>
+    <string name="validation_mini_morse_only">Mini Morse supports A-Z, 0-9, spaces, and common Morse punctuation.</string>
     <string name="validation_payload_too_large">Textus limen 512-byte unius frame huius modi transgreditur.</string>
     <string name="error_invalid_argument">Heresis syntaxis.</string>
     <string name="error_not_ready">Calculus nondum perfectus est.</string>

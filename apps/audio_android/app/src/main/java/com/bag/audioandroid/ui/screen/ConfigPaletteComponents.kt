@@ -43,7 +43,9 @@ internal fun PaletteSwatch(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val paletteLabel = androidx.compose.ui.res.stringResource(option.titleResId)
+    val paletteLabel =
+        androidx.compose.ui.res
+            .stringResource(option.titleResId)
     val borderColor =
         if (selected) {
             accentTokens.selectionBorderAccentTint
@@ -60,8 +62,7 @@ internal fun PaletteSwatch(
                     selected = selected,
                     onClick = onClick,
                     role = Role.RadioButton,
-                )
-                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                ).background(MaterialTheme.colorScheme.surface, CircleShape)
                 .padding(3.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -109,7 +110,9 @@ internal fun PaletteGroupSection(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                text = androidx.compose.ui.res.stringResource(group.family.titleResId),
+                text =
+                    androidx.compose.ui.res
+                        .stringResource(group.family.titleResId),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

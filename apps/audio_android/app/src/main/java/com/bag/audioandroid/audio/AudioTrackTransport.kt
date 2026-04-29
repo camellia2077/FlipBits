@@ -1,7 +1,7 @@
 package com.bag.audioandroid.audio
 
-import android.media.PlaybackParams
 import android.media.AudioTrack
+import android.media.PlaybackParams
 import kotlin.math.roundToInt
 
 internal fun safelyStopTrack(track: AudioTrack) {

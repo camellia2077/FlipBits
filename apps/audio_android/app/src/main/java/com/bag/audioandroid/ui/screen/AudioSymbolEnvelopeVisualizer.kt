@@ -192,10 +192,12 @@ private fun DrawScope.drawProSymbolEnvelope(
         val upperHeight = laneHeight * (0.08f + 0.82f * bucket.upperEnergy.coerceIn(0f, 1f))
         val lowerHeight = laneHeight * (0.08f + 0.82f * bucket.lowerEnergy.coerceIn(0f, 1f))
         val upperColor =
-            inactiveToneColor.copy(alpha = (0.16f + 0.36f * bucket.peakAmplitude + 0.24f * glowPulse).coerceIn(0f, 0.72f))
+            inactiveToneColor
+                .copy(alpha = (0.16f + 0.36f * bucket.peakAmplitude + 0.24f * glowPulse).coerceIn(0f, 0.72f))
                 .compositeOver(activeToneColor.copy(alpha = (0.22f + 0.44f * bucket.upperEnergy).coerceIn(0f, 0.88f)))
         val lowerColor =
-            inactiveToneColor.copy(alpha = (0.16f + 0.36f * bucket.peakAmplitude + 0.24f * glowPulse).coerceIn(0f, 0.72f))
+            inactiveToneColor
+                .copy(alpha = (0.16f + 0.36f * bucket.peakAmplitude + 0.24f * glowPulse).coerceIn(0f, 0.72f))
                 .compositeOver(activeToneColor.copy(alpha = (0.22f + 0.44f * bucket.lowerEnergy).coerceIn(0f, 0.88f)))
 
         drawRoundRect(
@@ -240,7 +242,8 @@ private fun DrawScope.drawUltraSymbolEnvelope(
         val energy = bucket.upperEnergy.coerceIn(0f, 1f)
         val halfHeight = maxEnvelopeHeight * (0.10f + 0.84f * energy)
         val color =
-            inactiveToneColor.copy(alpha = (0.18f + 0.24f * bucket.peakAmplitude).coerceIn(0f, 0.40f))
+            inactiveToneColor
+                .copy(alpha = (0.18f + 0.24f * bucket.peakAmplitude).coerceIn(0f, 0.40f))
                 .compositeOver(activeToneColor.copy(alpha = (0.28f + 0.42f * energy + 0.10f * glowPulse).coerceIn(0f, 0.92f)))
 
         drawRoundRect(

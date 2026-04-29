@@ -3,15 +3,15 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
-import com.bag.audioandroid.ui.theme.customBrandTheme
-import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
+import com.bag.audioandroid.ui.theme.customBrandTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -292,7 +292,7 @@ private class ThemeStateFakeSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): List<SampleInput> =
         when (mode) {
-            TransportModeOption.Pro ->
+            TransportModeOption.Pro, TransportModeOption.Mini ->
                 listOf(
                     SampleInput("a", "PRO-CUSTOM-A"),
                     SampleInput("b", "PRO-CUSTOM-B"),

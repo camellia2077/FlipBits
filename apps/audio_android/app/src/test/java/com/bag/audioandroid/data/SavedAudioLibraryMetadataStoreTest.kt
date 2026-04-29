@@ -17,7 +17,8 @@ class SavedAudioLibraryMetadataStoreTest {
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        context.getSharedPreferences("saved_audio_library_metadata", android.content.Context.MODE_PRIVATE)
+        context
+            .getSharedPreferences("saved_audio_library_metadata", android.content.Context.MODE_PRIVATE)
             .edit()
             .clear()
             .commit()

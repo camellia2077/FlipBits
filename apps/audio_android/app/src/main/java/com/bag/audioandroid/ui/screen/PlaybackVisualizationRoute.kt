@@ -5,14 +5,20 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 
 internal sealed interface PlaybackVisualizationRoute {
     data object PcmWaveform : PlaybackVisualizationRoute
+
     data class SymbolEnvelope(
         val transportMode: TransportModeOption,
     ) : PlaybackVisualizationRoute
+
     data class FlashSignal(
         val input: FlashSignalVisualizationInput,
     ) : PlaybackVisualizationRoute
+
     data object ProExplanation : PlaybackVisualizationRoute
+
     data object UltraStep : PlaybackVisualizationRoute
+
+    data object MorseTimeline : PlaybackVisualizationRoute
 }
 
 internal fun resolvePlaybackVisualizationRoute(
@@ -58,6 +64,13 @@ internal fun resolvePlaybackVisualizationRoute(
                 PlaybackVisualizationRoute.ProExplanation
             } else {
                 PlaybackVisualizationRoute.UltraStep
+            }
+
+        TransportModeOption.Mini ->
+            if (followData.followAvailable && followData.binaryGroupTimeline.isNotEmpty()) {
+                PlaybackVisualizationRoute.MorseTimeline
+            } else {
+                PlaybackVisualizationRoute.PcmWaveform
             }
 
         null ->

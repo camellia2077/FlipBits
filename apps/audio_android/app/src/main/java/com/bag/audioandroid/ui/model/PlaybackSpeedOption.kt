@@ -26,7 +26,8 @@ internal enum class PlaybackSpeedOption(
         fun labelFor(speed: Float): String = fromSpeed(speed).label
 
         fun format(speed: Float): String =
-            String.format(Locale.US, "%.2fx", speed)
+            String
+                .format(Locale.US, "%.2fx", speed)
                 .replace(".00x", ".0x")
                 .replace(Regex("(\\.\\d)0x$"), "$1x")
     }

@@ -34,7 +34,7 @@ internal fun FlashVoicingSelectorSection(
         if (isFlashVoicingEnabled) {
             selectedFlashVoicingStyle
         } else {
-            FlashVoicingStyleOption.CodedBurst
+            FlashVoicingStyleOption.Steady
         }
     val accentTokens = appThemeAccentTokens()
 

@@ -34,7 +34,7 @@ fun UiText.asString(): String =
                         } else {
                             arg
                         }
-                    }
+                }
                 stringResource(resId, *resolvedArgs.toTypedArray())
             }
     }

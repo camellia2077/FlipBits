@@ -17,6 +17,7 @@ import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
@@ -198,6 +199,10 @@ class AudioAndroidViewModel(
 
     fun onFlashVoicingStyleSelected(style: com.bag.audioandroid.ui.model.FlashVoicingStyleOption) {
         preferencesActions.onFlashVoicingStyleSelected(style)
+    }
+
+    fun onMorseSpeedSelected(speed: MorseSpeedOption) {
+        uiStateFlow.update { it.copy(selectedMorseSpeed = speed) }
     }
 
     fun onOpenPlayerDetailSheet() {

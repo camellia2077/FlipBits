@@ -23,8 +23,8 @@ FlipBits is an experimental audio project built around retro-futurist communicat
 
 The project provides multiple transport modes that map text into waveform structures through different frequency organizations, then recover text from those waveforms. It does not provide cryptographic encryption.
 
-- **Core modes**: the project currently includes `flash`, `pro`, and `ultra`.
-- **Mode positioning**: `flash` favors ritualistic atmosphere and stylized presentation, `pro` favors a cleaner and more structured signaling path, and `ultra` favors denser mapping for UTF-8 text.
+- **Core modes**: the project currently includes `flash`, `pro`, `ultra`, and `mini`.
+- **Mode positioning**: `flash` favors ritualistic atmosphere and stylized presentation, `pro` favors a cleaner and more structured signaling path, `ultra` favors denser mapping for UTF-8 text, and `mini` favors clear Morse code dot/dash rhythm.
 - **Design intent**: the goal is not just to transmit content, but to make the generated audio feel deliberate, dramatic, and technologically evocative.
 - **Entertainment-first focus**: some modes intentionally sacrifice efficiency in exchange for stronger atmosphere and a more distinctive listening experience.
 
@@ -32,8 +32,26 @@ Mode summary:
 - `flash`: transmits bit-by-bit through high / low frequency switching, emphasizing atmosphere, audibility, and stylized presentation.
 - `pro`: uses dual-tone combinations for each nibble, with a more regular structure suited to a more formal signaling path.
 - `ultra`: uses `16-FSK` frequency mapping for nibbles, targeting UTF-8 text with higher information density.
+- `mini`: uses International Morse code dot / dash / silence timing, emphasizing clear rhythm, visual readability, and follow-along playback.
 
 `flash` is intentionally the least efficient mode. The same input text may produce audio close to a minute long in `flash`, while `ultra` may finish in only a few seconds. That gap is intentional: the project values the feeling of "being played like a ritual signal" more than raw throughput.
+
+`flash` currently provides four styles. Each style defines both the base low/high carrier pair and the emotional voicing layer:
+
+| Style | Low / High | Listening target |
+| --- | --- | --- |
+| Litany | `220 / 440 Hz` | low, solemn, chant-like |
+| Collapse | `280 / 560 Hz` | hushed, panicked, stuttering |
+| Steady | `300 / 600 Hz` | everyday, precise, stable |
+| Hostile | `450 / 900 Hz` | sharp, hostile, aggressive |
+
+`mini` is the Morse code mode. Input is normalized through Morse-compatible text rules, and the current speed presets are:
+
+| Speed | Role |
+| --- | --- |
+| Slow | slower and easier to inspect in dot/dash visuals and lyrics follow |
+| Standard | default Morse rhythm |
+| Fast | shorter, more compact Morse output |
 
 ---
 

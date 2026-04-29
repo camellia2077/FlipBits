@@ -71,6 +71,9 @@ internal fun PlaybackFollowLineStrip(
                     } else {
                         -1
                     },
+                isActiveBitTone =
+                    absoluteTokenIndex == presentationState.activeTextIndex &&
+                        presentationState.isActiveBitTone,
                 isPast = absoluteTokenIndex < presentationState.activeTextIndex,
             )
         }

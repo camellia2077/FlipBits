@@ -22,6 +22,7 @@ class BagUiTextMapper {
             BagApiCodes.VALIDATION_INVALID_FLASH_VOICING_FLAVOR ->
                 UiText.Resource(R.string.validation_invalid_flash_voicing_flavor)
             BagApiCodes.VALIDATION_PRO_ASCII_ONLY -> UiText.Resource(R.string.validation_pro_ascii_only)
+            BagApiCodes.VALIDATION_MINI_MORSE_ONLY -> UiText.Resource(R.string.validation_mini_morse_only)
             BagApiCodes.VALIDATION_PAYLOAD_TOO_LARGE ->
                 UiText.Resource(R.string.validation_payload_too_large)
             else -> errorCode(BagApiCodes.ERROR_INTERNAL)

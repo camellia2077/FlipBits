@@ -1,8 +1,8 @@
 package com.bag.audioandroid.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -37,13 +36,12 @@ internal data class PlayerChromeColors(
  * Returns the container color for the "Dock System" (Mini Player + Bottom Navigation).
  *
  * DESIGN DECISION:
- * The mini-player and bottom tabs form a single visual dock. They MUST share the same 
+ * The mini-player and bottom tabs form a single visual dock. They MUST share the same
  * container color so they read as part of the same base layer across every theme.
  * Modification here will affect both components simultaneously.
  */
 @Composable
-internal fun playerDockContainerColor(uiState: AudioAppUiState): Color =
-    appThemeVisualTokens().dockContainerColor
+internal fun playerDockContainerColor(uiState: AudioAppUiState): Color = appThemeVisualTokens().dockContainerColor
 
 @Composable
 internal fun playerSegmentedButtonColors() =
@@ -122,22 +120,22 @@ internal fun utilityActionIconButtonColors(): IconButtonColors {
 }
 
 @Composable
-internal fun playbackLyricsAccentTextColor(): Color =
-    appThemeAccentTokens().selectionLabelAccentTint
+internal fun playbackLyricsAccentTextColor(): Color = appThemeAccentTokens().selectionLabelAccentTint
 
 @Composable
 internal fun navigationBarItemColors(uiState: AudioAppUiState): NavigationBarItemColors =
     when (uiState.selectedThemeStyle) {
         ThemeStyleOption.BrandDualTone -> {
             val brandTheme = uiState.activeBrandTheme
-            // All dual-tone themes now blend the unselected foreground with the background 
-            // color. This ensures unselected tabs visually "sink" into the background, 
+            // All dual-tone themes now blend the unselected foreground with the background
+            // color. This ensures unselected tabs visually "sink" into the background,
             // making the flipped selection (with its accent indicator) much more prominent.
-            val unselectedDualToneForeground = lerp(
-                brandTheme.accentColor,
-                brandTheme.backgroundColor,
-                0.42f,
-            )
+            val unselectedDualToneForeground =
+                lerp(
+                    brandTheme.accentColor,
+                    brandTheme.backgroundColor,
+                    0.42f,
+                )
             NavigationBarItemDefaults.colors(
                 // Dual-tone navigation keeps selected/unselected states on the original
                 // paired colors instead of relying on Material's derived alpha variants.

@@ -18,6 +18,7 @@
     <string name="validation_invalid_flash_voicing_flavor">Unsupported flash style.</string>
     <!-- CONTEXT: User-facing validation error shown when pro mode input contains non-ASCII characters. Keep ASCII uppercase if natural in the target language. -->
     <string name="validation_pro_ascii_only">Pro supports ASCII only.</string>
+    <string name="validation_mini_morse_only">Mini Morse supports A-Z, 0-9, spaces, and common Morse punctuation.</string>
     <!-- CONTEXT: User-facing validation error shown when the input text exceeds this transport mode's payload size limit. -->
     <string name="validation_payload_too_large">Input text exceeds the 512-byte single-frame limit for this mode.</string>
     <!-- CONTEXT: Generic short user-facing error for an invalid argument passed into the native/runtime operation. -->

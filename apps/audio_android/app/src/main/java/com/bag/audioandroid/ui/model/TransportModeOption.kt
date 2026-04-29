@@ -10,22 +10,29 @@ enum class TransportModeOption(
     @param:StringRes val charsetHintResId: Int,
     @param:StringRes val exampleTextResId: Int,
 ) {
-    Flash(
+    Mini(
         nativeValue = 0,
+        wireName = "mini",
+        labelResId = R.string.transport_mode_mini_label,
+        charsetHintResId = R.string.audio_transport_mini_hint,
+        exampleTextResId = R.string.audio_transport_pro_example,
+    ),
+    Flash(
+        nativeValue = 1,
         wireName = "flash",
         labelResId = R.string.transport_mode_flash_label,
         charsetHintResId = R.string.audio_transport_flash_hint,
         exampleTextResId = R.string.audio_transport_flash_example,
     ),
     Pro(
-        nativeValue = 1,
+        nativeValue = 2,
         wireName = "pro",
         labelResId = R.string.transport_mode_pro_label,
         charsetHintResId = R.string.audio_transport_pro_hint,
         exampleTextResId = R.string.audio_transport_pro_example,
     ),
     Ultra(
-        nativeValue = 2,
+        nativeValue = 3,
         wireName = "ultra",
         labelResId = R.string.transport_mode_ultra_label,
         charsetHintResId = R.string.audio_transport_ultra_hint,

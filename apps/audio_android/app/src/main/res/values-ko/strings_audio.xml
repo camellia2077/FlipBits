@@ -145,6 +145,7 @@
     <string name="audio_follow_display_data">데이터</string>
     <string name="audio_follow_view_hex">16진수</string>
     <string name="audio_follow_view_binary">이진수</string>
+    <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">상세 정보</string>
     <string name="audio_player_detail_saved_mode">모드</string>
     <string name="audio_player_detail_saved_duration">길이</string>
@@ -165,12 +166,20 @@
     <string name="transport_mode_pro_label">pro</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
     <string name="transport_mode_ultra_label">ultra</string>
+    <string name="transport_mode_mini_label">mini</string>
     <string name="audio_transport_flash_hint">flash는 UTF-8 텍스트를 사용합니다.</string>
     <string name="audio_transport_flash_example">등지기들이 오래된 성문을 엽니다</string>
     <string name="audio_transport_pro_hint">pro는 ASCII 텍스트만 사용합니다.</string>
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra는 UTF-8 텍스트를 사용합니다.</string>
+    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_morse_speed_slow">느림</string>
+    <string name="audio_morse_speed_standard">표준</string>
+    <string name="audio_morse_speed_fast">빠름</string>
+    <string name="audio_morse_normalized_preview">정규화된 Morse: %1$s</string>
+    <string name="audio_morse_unsupported_characters">지원되지 않는 Morse 문자: %1$s</string>
     <string name="audio_transport_ultra_example">등지기들이 오래된 성문을 엽니다</string>
+    <string name="audio_transport_mini_example">PRAISE THE OMNISSIAH</string>
     <string name="audio_sample_thematic_2">종탑 깊은 곳에서 봉인된 엔진이 웅웅거리기 시작합니다</string>
     <string name="audio_sample_thematic_3">일곱 번째 램프가 켜졌지만, 먼 쪽 성문은 여전히 침묵을 지킵니다</string>
     <string name="audio_sample_thematic_4">잿빛 항구 너머로 순례선 한 척이 검은 바다를 건넙니다</string>

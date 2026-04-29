@@ -70,6 +70,66 @@ jobject NewIntegerList(JNIEnv* env, const std::uint32_t* values, std::size_t cou
     return list;
 }
 
+jobject FindFlashStyleById(JNIEnv* env, jobjectArray flash_entries, const char* target_id) {
+    if (flash_entries == nullptr || target_id == nullptr) {
+        return nullptr;
+    }
+    jclass flash_style_class = env->FindClass("com/bag/audioandroid/ui/model/FlashVoicingStyleOption");
+    if (flash_style_class == nullptr) {
+        return nullptr;
+    }
+    jmethodID get_id = env->GetMethodID(
+        flash_style_class,
+        "getId",
+        "()Ljava/lang/String;");
+    if (get_id == nullptr) {
+        return nullptr;
+    }
+    const jsize count = env->GetArrayLength(flash_entries);
+    for (jsize index = 0; index < count; ++index) {
+        jobject entry = env->GetObjectArrayElement(flash_entries, index);
+        if (entry == nullptr) {
+            continue;
+        }
+        jstring id = static_cast<jstring>(env->CallObjectMethod(entry, get_id));
+        const std::string id_text = JStringToStdString(env, id);
+        if (id_text == target_id) {
+            return entry;
+        }
+    }
+    return nullptr;
+}
+
+jobject FindTransportModeByWireName(JNIEnv* env, jobjectArray transport_entries, const char* target_wire_name) {
+    if (transport_entries == nullptr || target_wire_name == nullptr) {
+        return nullptr;
+    }
+    jclass transport_mode_class = env->FindClass("com/bag/audioandroid/ui/model/TransportModeOption");
+    if (transport_mode_class == nullptr) {
+        return nullptr;
+    }
+    jmethodID get_wire_name = env->GetMethodID(
+        transport_mode_class,
+        "getWireName",
+        "()Ljava/lang/String;");
+    if (get_wire_name == nullptr) {
+        return nullptr;
+    }
+    const jsize count = env->GetArrayLength(transport_entries);
+    for (jsize index = 0; index < count; ++index) {
+        jobject entry = env->GetObjectArrayElement(transport_entries, index);
+        if (entry == nullptr) {
+            continue;
+        }
+        jstring wire_name = static_cast<jstring>(env->CallObjectMethod(entry, get_wire_name));
+        const std::string wire_name_text = JStringToStdString(env, wire_name);
+        if (wire_name_text == target_wire_name) {
+            return entry;
+        }
+    }
+    return nullptr;
+}
+
 bool ReadIntegerList(
     JNIEnv* env,
     jobject list_object,
@@ -156,33 +216,45 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
 
     jobject mode_object = nullptr;
     switch (metadata.mode) {
+        case AUDIO_IO_METADATA_MODE_MINI:
+            mode_object = FindTransportModeByWireName(env, transport_entries, "mini");
+            break;
         case AUDIO_IO_METADATA_MODE_FLASH:
-            mode_object = env->GetObjectArrayElement(transport_entries, 0);
+            mode_object = FindTransportModeByWireName(env, transport_entries, "flash");
             break;
         case AUDIO_IO_METADATA_MODE_PRO:
-            mode_object = env->GetObjectArrayElement(transport_entries, 1);
+            mode_object = FindTransportModeByWireName(env, transport_entries, "pro");
             break;
         case AUDIO_IO_METADATA_MODE_ULTRA:
-            mode_object = env->GetObjectArrayElement(transport_entries, 2);
+            mode_object = FindTransportModeByWireName(env, transport_entries, "ultra");
             break;
         default:
             return nullptr;
+    }
+    if (mode_object == nullptr) {
+        return nullptr;
     }
 
     jobject flash_style_object = nullptr;
     if (metadata.has_flash_voicing_style != 0u) {
         switch (metadata.flash_voicing_style) {
-            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_CODED_BURST:
-                flash_style_object = env->GetObjectArrayElement(flash_entries, 0);
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY:
+                flash_style_object = FindFlashStyleById(env, flash_entries, "steady");
                 break;
-            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT:
-                flash_style_object = env->GetObjectArrayElement(flash_entries, 1);
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY:
+                flash_style_object = FindFlashStyleById(env, flash_entries, "litany");
                 break;
-            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_DEEP_RITUAL:
-                flash_style_object = env->GetObjectArrayElement(flash_entries, 2);
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE:
+                flash_style_object = FindFlashStyleById(env, flash_entries, "hostile");
+                break;
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE:
+                flash_style_object = FindFlashStyleById(env, flash_entries, "collapse");
                 break;
             default:
                 return nullptr;
+        }
+        if (flash_style_object == nullptr) {
+            return nullptr;
         }
     }
 
@@ -269,6 +341,9 @@ audio_io_metadata_mode MapTransportMode(JNIEnv* env, jobject mode_object) {
     if (wire_name_text == "ultra") {
         return AUDIO_IO_METADATA_MODE_ULTRA;
     }
+    if (wire_name_text == "mini") {
+        return AUDIO_IO_METADATA_MODE_MINI;
+    }
     return AUDIO_IO_METADATA_MODE_UNKNOWN;
 }
 
@@ -288,14 +363,17 @@ audio_io_metadata_flash_voicing_style MapFlashVoicingStyle(JNIEnv* env, jobject 
 
     jstring style_id = static_cast<jstring>(env->CallObjectMethod(flash_style_object, get_id));
     const std::string style_id_text = JStringToStdString(env, style_id);
-    if (style_id_text == "coded_burst") {
-        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_CODED_BURST;
+    if (style_id_text == "steady") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY;
     }
-    if (style_id_text == "ritual_chant") {
-        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_RITUAL_CHANT;
+    if (style_id_text == "litany") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY;
     }
-    if (style_id_text == "deep_ritual") {
-        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_DEEP_RITUAL;
+    if (style_id_text == "hostile") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE;
+    }
+    if (style_id_text == "collapse") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE;
     }
     return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
 }

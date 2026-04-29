@@ -1,13 +1,13 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
 import com.bag.audioandroid.domain.SavedAudioFolder
 import com.bag.audioandroid.domain.SavedAudioFolderMutationResult
 import com.bag.audioandroid.domain.SavedAudioImportResult
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
-import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -80,7 +80,10 @@ internal class AudioSavedAudioMutationActions(
     }
 
     fun onDeleteSavedAudioFolder(folderId: String) {
-        val folderName = uiState.value.savedAudioFolders.firstOrNull { it.folderId == folderId }?.name
+        val folderName =
+            uiState.value.savedAudioFolders
+                .firstOrNull { it.folderId == folderId }
+                ?.name
         if (!savedAudioRepository.deleteSavedAudioFolder(folderId)) {
             uiState.update {
                 it.copy(libraryStatusText = UiText.Resource(R.string.library_status_folder_delete_failed))

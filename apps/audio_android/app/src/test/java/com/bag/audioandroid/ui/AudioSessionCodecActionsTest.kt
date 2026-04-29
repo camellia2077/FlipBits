@@ -5,7 +5,6 @@ import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
-import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
@@ -17,11 +16,11 @@ import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.PlaybackUiState
-import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -332,7 +331,7 @@ class AudioSessionCodecActionsTest {
                 fixture.uiState.value.copy(
                     transportMode = TransportModeOption.Flash,
                     isFlashVoicingEnabled = false,
-                    selectedFlashVoicingStyle = FlashVoicingStyleOption.DeepRitual,
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Hostile,
                     sessions =
                         fixture.uiState.value.sessions.mapValues { (_, session) ->
                             session.copy(inputText = "flash baseline")
@@ -344,6 +343,40 @@ class AudioSessionCodecActionsTest {
 
             assertTrue(seenPresets.isNotEmpty())
             assertEquals(listOf(0 to 0), seenPresets.distinct())
+        }
+
+    @Test
+    fun `flash encode sends selected emotion preset axes`() =
+        runTest {
+            val seenPresets = mutableListOf<Pair<Int, Int>>()
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            validateEncodeRequestBlock = { _, _, _, _, flashSignalProfile, flashVoicingFlavor ->
+                                seenPresets += flashSignalProfile to flashVoicingFlavor
+                                BagApiCodes.VALIDATION_OK
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    transportMode = TransportModeOption.Flash,
+                    isFlashVoicingEnabled = true,
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Hostile,
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = "hostile flash")
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            assertTrue(seenPresets.isNotEmpty())
+            assertEquals(listOf(0 to 3), seenPresets.distinct())
         }
 
     private fun createFixture(
@@ -391,15 +424,16 @@ private class FakeAudioCodecGateway(
         ),
     private val encodeBlock: (suspend ((EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
     private val encodeTextBlock: (suspend (String, (EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
-    private val validateEncodeRequestBlock:
-        ((
+    private val validateEncodeRequestBlock: (
+        (
             text: String,
             sampleRateHz: Int,
             frameSamples: Int,
             mode: Int,
             flashSignalProfile: Int,
             flashVoicingFlavor: Int,
-        ) -> Int)? = null,
+        ) -> Int
+    )? = null,
     private val buildFollowDataBlock: ((String) -> PayloadFollowViewData)? = null,
 ) : AudioCodecGateway {
     override fun validateEncodeRequest(

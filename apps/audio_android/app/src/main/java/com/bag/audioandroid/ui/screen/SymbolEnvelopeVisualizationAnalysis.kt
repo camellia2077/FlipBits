@@ -60,25 +60,27 @@ internal fun buildSymbolEnvelopeBuckets(
             when (transportMode) {
                 TransportModeOption.Pro -> {
                     val lowPower =
-                        ProLowFreqsHz.sumOf { freq ->
-                            goertzelPower(
-                                pcm = pcm,
-                                startIndex = startIndex,
-                                endIndexExclusive = endIndexExclusive,
-                                sampleRateHz = sampleRateHz,
-                                targetFrequencyHz = freq,
-                            ).toDouble()
-                        }.toFloat()
+                        ProLowFreqsHz
+                            .sumOf { freq ->
+                                goertzelPower(
+                                    pcm = pcm,
+                                    startIndex = startIndex,
+                                    endIndexExclusive = endIndexExclusive,
+                                    sampleRateHz = sampleRateHz,
+                                    targetFrequencyHz = freq,
+                                ).toDouble()
+                            }.toFloat()
                     val highPower =
-                        ProHighFreqsHz.sumOf { freq ->
-                            goertzelPower(
-                                pcm = pcm,
-                                startIndex = startIndex,
-                                endIndexExclusive = endIndexExclusive,
-                                sampleRateHz = sampleRateHz,
-                                targetFrequencyHz = freq,
-                            ).toDouble()
-                        }.toFloat()
+                        ProHighFreqsHz
+                            .sumOf { freq ->
+                                goertzelPower(
+                                    pcm = pcm,
+                                    startIndex = startIndex,
+                                    endIndexExclusive = endIndexExclusive,
+                                    sampleRateHz = sampleRateHz,
+                                    targetFrequencyHz = freq,
+                                ).toDouble()
+                            }.toFloat()
                     rawBuckets +=
                         RawSymbolEnvelopeBucket(
                             upperPower = highPower,
@@ -289,10 +291,22 @@ private val ProLowFreqsHz = listOf(697.0, 770.0, 852.0, 941.0)
 private val ProHighFreqsHz = listOf(1209.0, 1336.0, 1477.0, 1633.0)
 internal val UltraFreqsHz =
     listOf(
-        1000.0, 1140.0, 1280.0, 1420.0,
-        1560.0, 1700.0, 1840.0, 1980.0,
-        2120.0, 2260.0, 2400.0, 2540.0,
-        2680.0, 2820.0, 2960.0, 3100.0,
+        1000.0,
+        1140.0,
+        1280.0,
+        1420.0,
+        1560.0,
+        1700.0,
+        1840.0,
+        1980.0,
+        2120.0,
+        2260.0,
+        2400.0,
+        2540.0,
+        2680.0,
+        2820.0,
+        2960.0,
+        3100.0,
     )
 
 internal const val SymbolEnvelopePlayheadAnchorRatio = 0.40f

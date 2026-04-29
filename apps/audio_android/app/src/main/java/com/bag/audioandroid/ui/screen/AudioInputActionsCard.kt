@@ -21,15 +21,14 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
@@ -37,13 +36,15 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioEncodePhase
+import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.audioInputTextFieldColors
 import com.bag.audioandroid.ui.component.ActionButton
-import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.model.analyzeMorseText
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 import com.bag.audioandroid.ui.utilityActionIconButtonColors
 import kotlin.math.roundToInt
@@ -59,6 +60,8 @@ internal fun AudioInputActionsCard(
     isFlashVoicingEnabled: Boolean,
     selectedFlashVoicingStyle: FlashVoicingStyleOption,
     onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
+    selectedMorseSpeed: MorseSpeedOption,
+    onMorseSpeedSelected: (MorseSpeedOption) -> Unit,
     inputCardExpanded: Boolean,
     onToggleInputCardExpanded: () -> Unit,
     inputText: String,
@@ -104,6 +107,14 @@ internal fun AudioInputActionsCard(
                         onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
                     )
                 }
+                if (transportMode == TransportModeOption.Mini) {
+                    MorseInputAssistSection(
+                        enabled = !isCodecBusy,
+                        inputText = inputText,
+                        selectedMorseSpeed = selectedMorseSpeed,
+                        onMorseSpeedSelected = onMorseSpeedSelected,
+                    )
+                }
                 AudioInputFieldHeader(
                     enabled = !isCodecBusy,
                     onOpenInputEditor = onOpenInputEditor,
@@ -112,17 +123,17 @@ internal fun AudioInputActionsCard(
                     onRandomizeSampleInput = onRandomizeSampleInput,
                     onClearInput = onClearInput,
                 )
-                
+
                 var isInputFocused by remember { mutableStateOf(false) }
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = onInputTextChange,
                     enabled = !isCodecBusy,
-                    label = { 
+                    label = {
                         Text(
                             text = stringResource(R.string.audio_input_label),
-                            fontWeight = if (isInputFocused) FontWeight.SemiBold else FontWeight.Medium
-                        ) 
+                            fontWeight = if (isInputFocused) FontWeight.SemiBold else FontWeight.Medium,
+                        )
                     },
                     placeholder = { Text(inputPlaceholderText) },
                     supportingText = {
@@ -130,38 +141,40 @@ internal fun AudioInputActionsCard(
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             AudioInputMetricsSummaryRow(
                                 charsetHint = stringResource(transportMode.charsetHintResId),
-                                metricsText = stringResource(
-                                    R.string.audio_input_metrics,
-                                    inputMetrics.characterCount,
-                                    inputMetrics.byteCount,
-                                ),
+                                metricsText =
+                                    stringResource(
+                                        R.string.audio_input_metrics,
+                                        inputMetrics.characterCount,
+                                        inputMetrics.byteCount,
+                                    ),
                             )
                         }
                     },
                     minLines = 2,
                     maxLines = 8,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(
-                        lineBreak = LineBreak.Paragraph,
-                        hyphens = Hyphens.Auto,
-                        fontWeight = if (isInputFocused) FontWeight.SemiBold else FontWeight.Medium
-                    ),
+                    textStyle =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            lineBreak = LineBreak.Paragraph,
+                            hyphens = Hyphens.Auto,
+                            fontWeight = if (isInputFocused) FontWeight.SemiBold else FontWeight.Medium,
+                        ),
                     colors = audioInputTextFieldColors(selectedThemeStyle),
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.fillMaxWidth().onFocusChanged { isInputFocused = it.isFocused },
                 )
-                
+
                 Text(
                     text = stringResource(R.string.audio_input_editor_inline_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                
+
                 AudioEncodeStatusSection(
                     encodeProgress = encodeProgress,
                     encodePhase = encodePhase,
                     isEncodingBusy = isEncodingBusy,
                 )
-                
+
                 if (isEncodingBusy) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -177,10 +190,14 @@ internal fun AudioInputActionsCard(
                             modifier = Modifier.weight(1f),
                         )
                         ActionButton(
-                            text = stringResource(
-                                if (isEncodeCancelling) R.string.audio_action_cancel_encode_busy
-                                else R.string.audio_action_cancel_encode
-                            ),
+                            text =
+                                stringResource(
+                                    if (isEncodeCancelling) {
+                                        R.string.audio_action_cancel_encode_busy
+                                    } else {
+                                        R.string.audio_action_cancel_encode
+                                    },
+                                ),
                             onClick = onCancelEncode,
                             enabled = !isEncodeCancelling,
                             borderColor = accentTokens.selectionBorderAccentTint,
@@ -198,6 +215,68 @@ internal fun AudioInputActionsCard(
                         borderWidth = 2.dp,
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorseInputAssistSection(
+    enabled: Boolean,
+    inputText: String,
+    selectedMorseSpeed: MorseSpeedOption,
+    onMorseSpeedSelected: (MorseSpeedOption) -> Unit,
+) {
+    val analysis = remember(inputText) { analyzeMorseText(inputText) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SingleChoiceSegmentedButtonRow {
+            MorseSpeedOption.entries.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = selectedMorseSpeed == option,
+                    onClick = { onMorseSpeedSelected(option) },
+                    enabled = enabled,
+                    shape =
+                        SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = MorseSpeedOption.entries.size,
+                        ),
+                    colors = appSegmentedButtonColors(),
+                    label = { Text(text = stringResource(option.labelResId)) },
+                )
+            }
+        }
+        if (inputText.isNotBlank()) {
+            val previewText =
+                if (analysis.isValid) {
+                    stringResource(
+                        R.string.audio_morse_normalized_preview,
+                        analysis.normalizedText.ifBlank { " " },
+                    )
+                } else {
+                    stringResource(
+                        R.string.audio_morse_unsupported_characters,
+                        analysis.unsupportedCharacters.joinToString(" "),
+                    )
+                }
+            Text(
+                text = previewText,
+                style = MaterialTheme.typography.bodySmall,
+                color =
+                    if (analysis.isValid) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
+            )
+            if (analysis.isValid && analysis.morseNotation.isNotBlank()) {
+                Text(
+                    text = analysis.morseNotation,
+                    style =
+                        MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
@@ -246,10 +325,14 @@ private fun AudioInputCardHeader(
         ) {
             Icon(
                 imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                contentDescription = stringResource(
-                    if (expanded) R.string.audio_action_collapse_input
-                    else R.string.audio_action_expand_input
-                ),
+                contentDescription =
+                    stringResource(
+                        if (expanded) {
+                            R.string.audio_action_collapse_input
+                        } else {
+                            R.string.audio_action_expand_input
+                        },
+                    ),
                 tint = accentTokens.disclosureAccentTint,
             )
         }
@@ -276,10 +359,11 @@ private fun AudioInputFieldHeader(
                     selected = sampleInputLength == option,
                     onClick = { onSampleInputLengthSelected(option) },
                     enabled = enabled,
-                    shape = SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = SampleInputLengthOption.entries.size,
-                    ),
+                    shape =
+                        SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = SampleInputLengthOption.entries.size,
+                        ),
                     colors = appSegmentedButtonColors(),
                     label = {
                         Text(text = stringResource(option.labelResId))

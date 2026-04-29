@@ -126,12 +126,14 @@
   - `MediaStoreAudioExportGateway.kt` -> `MediaStoreSavedAudioLibraryGateway.kt` -> `NativeAudioIoGateway.kt` / `audio_io_jni.cpp` -> `libs/audio_io/`
 - 播放区 UI：
   - `PlayerDetailSheet.kt` -> `AudioPlaybackProgressSection.kt` -> `AudioPlaybackTransportControls.kt`
-- flash / pro / ultra 可视化：
+- mini / flash / pro / ultra 可视化：
   - `AudioFlashSignalVisualizer.kt` -> `FlashSignalVisualizationAnalysis.kt` -> `FlashSignalVisualizationDrawing.kt`
+  - `MorseTimelineVisualizer.kt` 负责 `mini` 的 dot/dash block timeline；silence gap 保持空白，不画成 tone。
 - 主题、palette、glyph：
   - `BrandThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
 - Audio 页输入卡、随机样例、示例文本：
   - `AudioInputActionsCard.kt` -> `AudioSessionEditingActions.kt` -> `SampleInputSessionUpdater.kt` -> `AndroidSampleInputTextProvider.kt`
+  - `mini` 输入辅助由 `ui/model/MorseCode.kt` 提供 normalization、unsupported character 提示、dot/dash 预览与 `Slow / Standard / Fast` speed preset。
 - XML 文案与本地化资源：
   - `app/src/main/res/values/strings_*.xml` -> `app/src/main/res/values-*/strings*.xml` -> `app/src/main/res/values*/audio_samples_*.xml`
 - 媒体库导入、重命名、删除、分享：

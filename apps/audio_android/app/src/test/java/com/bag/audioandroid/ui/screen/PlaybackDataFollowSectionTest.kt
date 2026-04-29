@@ -16,7 +16,9 @@ import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.ui.model.TransportModeOption
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -36,6 +38,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = PayloadFollowViewData.Empty,
                 displayedSamples = 0,
+                transportMode = TransportModeOption.Flash,
             )
         }
 
@@ -48,6 +51,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                transportMode = TransportModeOption.Flash,
             )
         }
 
@@ -63,6 +67,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                transportMode = TransportModeOption.Flash,
                 initialAnnotationMode = PlaybackFollowViewMode.Binary,
             )
         }
@@ -72,12 +77,49 @@ class PlaybackDataFollowSectionTest {
     }
 
     @Test
+    fun `flash mode keeps hex and binary annotation choices`() {
+        composeRule.setContent {
+            PlaybackDataFollowSection(
+                followData = sampleFollowData(),
+                displayedSamples = 7,
+                transportMode = TransportModeOption.Flash,
+            )
+        }
+
+        composeRule.onNodeWithText(string(R.string.audio_follow_view_hex)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.audio_follow_view_binary)).assertIsDisplayed()
+        composeRule.onAllNodesWithText(string(R.string.audio_follow_view_morse)).assertCountEquals(0)
+    }
+
+    @Test
+    fun `mini mode only shows morse annotation choice`() {
+        composeRule.setContent {
+            PlaybackDataFollowSection(
+                followData = sampleFollowData(),
+                displayedSamples = 7,
+                transportMode = TransportModeOption.Mini,
+                initialAnnotationMode = PlaybackFollowViewMode.Binary,
+            )
+        }
+
+        composeRule.onNodeWithText(string(R.string.audio_follow_view_morse)).assertIsDisplayed()
+        composeRule.onAllNodesWithText(string(R.string.audio_follow_view_hex)).assertCountEquals(0)
+        composeRule.onAllNodesWithText(string(R.string.audio_follow_view_binary)).assertCountEquals(0)
+        composeRule.onNodeWithText("-...").assertIsDisplayed()
+    }
+
+    @Test
     fun `first active token starts centered inside lyrics strip`() {
         composeRule.setContent {
-            Box(modifier = androidx.compose.ui.Modifier.width(360.dp)) {
+            Box(
+                modifier =
+                    androidx.compose.ui.Modifier
+                        .width(360.dp),
+            ) {
                 PlaybackDataFollowSection(
                     followData = sampleFollowData(),
                     displayedSamples = 0,
+                    transportMode = TransportModeOption.Flash,
                 )
             }
         }
@@ -106,6 +148,7 @@ class PlaybackDataFollowSectionTest {
                         textFollowAvailable = true,
                     ),
                 displayedSamples = 0,
+                transportMode = TransportModeOption.Flash,
             )
         }
 
@@ -122,6 +165,7 @@ class PlaybackDataFollowSectionTest {
                         textFollowAvailable = false,
                     ),
                 displayedSamples = 0,
+                transportMode = TransportModeOption.Flash,
             )
         }
 
@@ -172,6 +216,48 @@ class PlaybackDataFollowSectionTest {
     }
 
     @Test
+    fun `morse mode chooses dot dash annotation`() {
+        val annotation =
+            annotationByteGroupsForMode(
+                PlaybackFollowViewMode.Morse,
+                listOf(
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 0,
+                        sampleCount = 4,
+                        byteIndexWithinToken = 0,
+                        byteOffset = 0,
+                        byteCount = 1,
+                        hexText = "50",
+                        binaryText = "01010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 4,
+                        sampleCount = 4,
+                        byteIndexWithinToken = 1,
+                        byteOffset = 1,
+                        byteCount = 1,
+                        hexText = "52",
+                        binaryText = "01010010",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 8,
+                        sampleCount = 4,
+                        byteIndexWithinToken = 2,
+                        byteOffset = 2,
+                        byteCount = 1,
+                        hexText = "41",
+                        binaryText = "01000001",
+                    ),
+                ),
+            )
+
+        assertEquals(listOf(".--.", ".-.", ".-"), annotation)
+    }
+
+    @Test
     fun `active bit index uses follow timeline bit offset from libs`() {
         val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
         val activeBitIndex =
@@ -196,6 +282,76 @@ class PlaybackDataFollowSectionTest {
             )
 
         assertEquals(3, activeBitIndex)
+    }
+
+    @Test
+    fun `active bit position keeps completed bit during silence gap`() {
+        val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
+        val position =
+            activeBitPositionWithinByte(
+                activeTextIndex = 0,
+                activeByteIndexWithinToken = 0,
+                displayedSamples = 25,
+                followData =
+                    PayloadFollowViewData(
+                        binaryGroupTimeline =
+                            listOf(
+                                PayloadFollowBinaryGroupTimelineEntry(
+                                    startSample = 10,
+                                    sampleCount = 10,
+                                    groupIndex = 0,
+                                    bitOffset = 3,
+                                    bitCount = 1,
+                                ),
+                                PayloadFollowBinaryGroupTimelineEntry(
+                                    startSample = 40,
+                                    sampleCount = 10,
+                                    groupIndex = 1,
+                                    bitOffset = 4,
+                                    bitCount = 1,
+                                ),
+                            ),
+                    ),
+                rawDisplayUnitsByToken = mapOf(0 to listOf(rawDisplayUnit)),
+            )
+
+        assertEquals(3, position.bitIndexWithinByte)
+        assertFalse(position.isToneActive)
+    }
+
+    @Test
+    fun `active bit position reports tone active during current bit`() {
+        val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
+        val position =
+            activeBitPositionWithinByte(
+                activeTextIndex = 0,
+                activeByteIndexWithinToken = 0,
+                displayedSamples = 45,
+                followData =
+                    PayloadFollowViewData(
+                        binaryGroupTimeline =
+                            listOf(
+                                PayloadFollowBinaryGroupTimelineEntry(
+                                    startSample = 10,
+                                    sampleCount = 10,
+                                    groupIndex = 0,
+                                    bitOffset = 3,
+                                    bitCount = 1,
+                                ),
+                                PayloadFollowBinaryGroupTimelineEntry(
+                                    startSample = 40,
+                                    sampleCount = 10,
+                                    groupIndex = 1,
+                                    bitOffset = 4,
+                                    bitCount = 1,
+                                ),
+                            ),
+                    ),
+                rawDisplayUnitsByToken = mapOf(0 to listOf(rawDisplayUnit)),
+            )
+
+        assertEquals(4, position.bitIndexWithinByte)
+        assertTrue(position.isToneActive)
     }
 
     private fun sampleFollowData(): PayloadFollowViewData =

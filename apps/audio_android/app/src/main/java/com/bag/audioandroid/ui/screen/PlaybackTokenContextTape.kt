@@ -5,14 +5,14 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,7 +74,7 @@ internal data class TokenPixelBounds(
  * - The view behaves like a standard music player's lyrics scroller.
  * - The active line is kept vertically centered using large vertical content padding.
  * - Previous and future lines are faded out, while the currently playing line is fully opaque.
- * - Within the active line, the horizontal "tape" translation continues to track the 
+ * - Within the active line, the horizontal "tape" translation continues to track the
  *   currently playing token, smoothly panning left as long sentences are sung.
  */
 @Composable
@@ -94,10 +94,11 @@ internal fun PlaybackTokenContextTape(
         }
     val activeTimelineEntry = followData.textTokenTimeline.getOrNull(activeTimelineIndex)
     val activeTokenIndex = activeTimelineEntry?.tokenIndex ?: -1
-    
-    val lineRanges = followData.lineTokenRanges.ifEmpty {
-        listOf(TextFollowLineTokenRangeViewData(0, 0, followData.textTokens.size))
-    }
+
+    val lineRanges =
+        followData.lineTokenRanges.ifEmpty {
+            listOf(TextFollowLineTokenRangeViewData(0, 0, followData.textTokens.size))
+        }
     val prefersWrappedLines =
         remember(followData.textTokens, followData.lyricLines, lineRanges) {
             lineRanges.any { lineRange ->
@@ -110,22 +111,27 @@ internal fun PlaybackTokenContextTape(
             }
         }
 
-    val activeTokenLineRange = remember(lineRanges, followData.lyricLineFollowAvailable, activeTokenIndex, followData.textTokens.size) {
-        resolveActiveTokenLineRange(
-            lineTokenRanges = lineRanges,
-            lyricLineFollowAvailable = followData.lyricLineFollowAvailable,
-            activeTokenIndex = activeTokenIndex,
-            tokenCount = followData.textTokens.size,
-        )
-    }
-    val activeLineIndex = remember(lineRanges, activeTokenLineRange) {
-        lineRanges.indexOfFirst { lineRange ->
-            activeTokenLineRange?.first == lineRange.tokenBeginIndex &&
-                activeTokenLineRange.last == lineRange.tokenBeginIndex + lineRange.tokenCount - 1
-        }.takeIf { it >= 0 } ?: -1
-    }
+    val activeTokenLineRange =
+        remember(lineRanges, followData.lyricLineFollowAvailable, activeTokenIndex, followData.textTokens.size) {
+            resolveActiveTokenLineRange(
+                lineTokenRanges = lineRanges,
+                lyricLineFollowAvailable = followData.lyricLineFollowAvailable,
+                activeTokenIndex = activeTokenIndex,
+                tokenCount = followData.textTokens.size,
+            )
+        }
+    val activeLineIndex =
+        remember(lineRanges, activeTokenLineRange) {
+            lineRanges
+                .indexOfFirst { lineRange ->
+                    activeTokenLineRange?.first == lineRange.tokenBeginIndex &&
+                        activeTokenLineRange.last == lineRange.tokenBeginIndex + lineRange.tokenCount - 1
+                }.takeIf { it >= 0 } ?: -1
+        }
 
-    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val listState =
+        androidx.compose.foundation.lazy
+            .rememberLazyListState()
 
     // Smoothly scroll the list so the active line moves to the center spot
     androidx.compose.runtime.LaunchedEffect(activeLineIndex) {
@@ -146,8 +152,8 @@ internal fun PlaybackTokenContextTape(
             (totalHeightDp - singleLineHeightDp) / 2f
         }
 
-    // A fixed-height LazyColumn with userScrollEnabled = false prevents nested scrolling 
-    // conflicts with the outer parent's verticalScroll. 
+    // A fixed-height LazyColumn with userScrollEnabled = false prevents nested scrolling
+    // conflicts with the outer parent's verticalScroll.
     // The vertical padding positions the active item: centered for wide lyric
     // stacks, or on the lower row in the compact two-line Lyrics view so the
     // just-played line can remain fully visible above it instead of being clipped.
@@ -155,35 +161,40 @@ internal fun PlaybackTokenContextTape(
         state = listState,
         userScrollEnabled = false,
         verticalArrangement = Arrangement.spacedBy(spacingDp.dp),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = verticalPaddingDp.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .height(totalHeightDp.dp)
-            .testTag("playback-token-context-tape-list"),
+        contentPadding =
+            androidx.compose.foundation.layout
+                .PaddingValues(vertical = verticalPaddingDp.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(totalHeightDp.dp)
+                .testTag("playback-token-context-tape-list"),
     ) {
         items(lineRanges.size) { lineIndex ->
             val lineRange = lineRanges[lineIndex]
             val isActiveLine = lineIndex == activeLineIndex
             val lineTokenRange = lineRange.tokenBeginIndex until (lineRange.tokenBeginIndex + lineRange.tokenCount)
-            val lineModel = remember(followData.textTokens, followData.lyricLines, lineRange) {
-                resolveContinuousViewportLineForRange(
-                    followData = followData,
-                    tokenRange = lineTokenRange,
-                    lyricLineText = followData.lyricLines.getOrNull(lineRange.lineIndex),
-                )
-            }
+            val lineModel =
+                remember(followData.textTokens, followData.lyricLines, lineRange) {
+                    resolveContinuousViewportLineForRange(
+                        followData = followData,
+                        tokenRange = lineTokenRange,
+                        lyricLineText = followData.lyricLines.getOrNull(lineRange.lineIndex),
+                    )
+                }
 
             // Fade out previous/future lines to create a Karaoke focus effect
             // We use a stepped alpha based on distance from the active line
             val distance = kotlin.math.abs(lineIndex - activeLineIndex)
-            val targetAlpha = when (distance) {
-                0 -> 1.0f
-                1 -> 0.5f
-                else -> 0.2f
-            }
+            val targetAlpha =
+                when (distance) {
+                    0 -> 1.0f
+                    1 -> 0.5f
+                    else -> 0.2f
+                }
             val alpha by animateFloatAsState(
                 targetValue = targetAlpha,
-                label = "context_tape_line_alpha"
+                label = "context_tape_line_alpha",
             )
 
             PlaybackTokenContextTapeLine(
@@ -191,7 +202,7 @@ internal fun PlaybackTokenContextTape(
                 activeTokenIndex = activeTokenIndex,
                 activeTimelineEntry = if (isActiveLine) activeTimelineEntry else null,
                 displayedSamples = displayedSamples,
-                modifier = Modifier.alpha(alpha)
+                modifier = Modifier.alpha(alpha),
             )
         }
     }
@@ -321,8 +332,7 @@ internal fun PlaybackTokenContextTapeLine(
                             Brush.horizontalGradient(
                                 colors = listOf(surfaceColor, surfaceColor.copy(alpha = 0f)),
                             ),
-                        )
-                        .testTag("playback-token-context-fade-left"),
+                        ).testTag("playback-token-context-fade-left"),
             )
             Box(
                 modifier =
@@ -334,13 +344,11 @@ internal fun PlaybackTokenContextTapeLine(
                             Brush.horizontalGradient(
                                 colors = listOf(surfaceColor.copy(alpha = 0f), surfaceColor),
                             ),
-                        )
-                        .testTag("playback-token-context-fade-right"),
+                        ).testTag("playback-token-context-fade-right"),
             )
         }
     }
 }
-
 
 internal fun buildContinuousViewportAnnotatedString(
     lineModel: ContinuousViewportLine,

@@ -10,9 +10,9 @@ import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.GeneratedAudioPcmCacheWriter
-import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
@@ -102,7 +102,9 @@ class AudioSessionDecodeActionsTest {
             fixture.actions.onDecode()
             advanceUntilIdle()
 
-            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Flash)
+            val session =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Flash)
             assertEquals(expected, session.decodedPayload)
             assertEquals(expectedFollow, session.followData)
             assertFalse(session.isCodecBusy)
@@ -165,7 +167,9 @@ class AudioSessionDecodeActionsTest {
             fixture.actions.onDecode()
             advanceUntilIdle()
 
-            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Pro)
+            val session =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Pro)
             assertTrue(session.decodedPayload.rawPayloadAvailable)
             assertEquals(BagDecodeContentCodes.STATUS_INVALID_TEXT_PAYLOAD, session.decodedPayload.textDecodeStatusCode)
             assertEquals("FF 80 41", session.decodedPayload.rawBytesHex)
@@ -220,7 +224,9 @@ class AudioSessionDecodeActionsTest {
 
             fixture.sessionActions.onClearResult()
 
-            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Flash)
+            val session =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Flash)
             assertEquals(DecodedPayloadViewData.Empty, session.decodedPayload)
             assertEquals(followData, session.followData)
             assertResId(session.statusText, R.string.status_result_cleared)
@@ -242,7 +248,11 @@ class AudioSessionDecodeActionsTest {
                     followData =
                         PayloadFollowViewData(
                             textTokens = listOf("hello"),
-                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 4, 0)),
+                            textTokenTimeline =
+                                listOf(
+                                    com.bag.audioandroid.domain
+                                        .TextFollowTimelineEntry(0, 4, 0),
+                                ),
                             textFollowAvailable = true,
                             hexTokens = listOf("68", "65", "6C", "6C", "6F", "20"),
                             binaryTokens = listOf("01101000", "01100101"),
@@ -267,7 +277,11 @@ class AudioSessionDecodeActionsTest {
                     followData =
                         PayloadFollowViewData(
                             textTokens = listOf("world"),
-                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 6, 0)),
+                            textTokenTimeline =
+                                listOf(
+                                    com.bag.audioandroid.domain
+                                        .TextFollowTimelineEntry(0, 6, 0),
+                                ),
                             textFollowAvailable = true,
                             hexTokens = listOf("77", "6F", "72", "6C", "64"),
                             binaryTokens = listOf("01110111", "01101111"),
@@ -320,7 +334,9 @@ class AudioSessionDecodeActionsTest {
             fixture.actions.onDecode()
             advanceUntilIdle()
 
-            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Ultra)
+            val session =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Ultra)
             assertEquals("hello world", session.decodedPayload.text)
             assertEquals("68 65 6C 6C 6F 20 77 6F 72 6C 64", session.decodedPayload.rawBytesHex)
             assertTrue(session.followData.followAvailable)
@@ -344,7 +360,11 @@ class AudioSessionDecodeActionsTest {
                     followData =
                         PayloadFollowViewData(
                             textTokens = listOf("seg-1"),
-                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 2, 0)),
+                            textTokenTimeline =
+                                listOf(
+                                    com.bag.audioandroid.domain
+                                        .TextFollowTimelineEntry(0, 2, 0),
+                                ),
                             textFollowAvailable = true,
                             hexTokens = listOf("73", "65", "67", "2D", "31", "20"),
                             binaryTokens = listOf("01110011", "01100101"),
@@ -369,7 +389,11 @@ class AudioSessionDecodeActionsTest {
                     followData =
                         PayloadFollowViewData(
                             textTokens = listOf("seg-2"),
-                            textTokenTimeline = listOf(com.bag.audioandroid.domain.TextFollowTimelineEntry(0, 3, 0)),
+                            textTokenTimeline =
+                                listOf(
+                                    com.bag.audioandroid.domain
+                                        .TextFollowTimelineEntry(0, 3, 0),
+                                ),
                             textFollowAvailable = true,
                             hexTokens = listOf("73", "65", "67", "2D", "32"),
                             binaryTokens = listOf("01110011", "01100101"),
@@ -420,7 +444,9 @@ class AudioSessionDecodeActionsTest {
                                     coreVersion = "test",
                                     segmentSampleCounts = listOf(2, 3),
                                 ),
-                            playback = com.bag.audioandroid.ui.state.PlaybackUiState(),
+                            playback =
+                                com.bag.audioandroid.ui.state
+                                    .PlaybackUiState(),
                         ),
                     currentPlaybackSource = AudioPlaybackSource.Saved("saved-2"),
                 )
@@ -468,18 +494,6 @@ class AudioSessionDecodeActionsTest {
                 )
             val fallbackResults =
                 mapOf(
-                    2 to
-                        DecodedAudioPayloadResult(
-                            decodedPayload =
-                                DecodedPayloadViewData(
-                                    text = "",
-                                    rawBytesHex = "",
-                                    rawBitsBinary = "",
-                                    textDecodeStatusCode = BagDecodeContentCodes.STATUS_INTERNAL_ERROR,
-                                    rawPayloadAvailable = false,
-                                ),
-                            followData = PayloadFollowViewData.Empty,
-                        ),
                     1 to
                         DecodedAudioPayloadResult(
                             decodedPayload =
@@ -505,7 +519,7 @@ class AudioSessionDecodeActionsTest {
 
             fixture.uiState.value =
                 fixture.uiState.value.copy(
-                    selectedFlashVoicingStyle = com.bag.audioandroid.ui.model.FlashVoicingStyleOption.DeepRitual,
+                    selectedFlashVoicingStyle = com.bag.audioandroid.ui.model.FlashVoicingStyleOption.Litany,
                     sessions =
                         fixture.uiState.value.sessions +
                             (
@@ -534,9 +548,11 @@ class AudioSessionDecodeActionsTest {
             fixture.actions.onDecode()
             advanceUntilIdle()
 
-            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Flash)
+            val session =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Flash)
             assertEquals("decoded by fallback", session.decodedPayload.text)
-            assertEquals(listOf(2, 0), (fixture.actionsGateway as FakeDecodeAudioCodecGateway).decodeSignalProfiles)
+            assertEquals(listOf(1, 0), (fixture.actionsGateway as FakeDecodeAudioCodecGateway).decodeSignalProfiles)
         }
 
     private fun createFixture(
@@ -749,12 +765,15 @@ private class LocalFakeGeneratedAudioCacheGateway : GeneratedAudioCacheGateway {
 }
 
 private class LocalFakePlaybackRuntimeGateway : PlaybackRuntimeGateway {
-    override fun cleared() = com.bag.audioandroid.ui.state.PlaybackUiState()
+    override fun cleared() =
+        com.bag.audioandroid.ui.state
+            .PlaybackUiState()
 
     override fun load(
         totalSamples: Int,
         sampleRateHz: Int,
-    ) = com.bag.audioandroid.ui.state.PlaybackUiState(totalSamples = totalSamples, sampleRateHz = sampleRateHz)
+    ) = com.bag.audioandroid.ui.state
+        .PlaybackUiState(totalSamples = totalSamples, sampleRateHz = sampleRateHz)
 
     override fun playStarted(state: com.bag.audioandroid.ui.state.PlaybackUiState) = state
 

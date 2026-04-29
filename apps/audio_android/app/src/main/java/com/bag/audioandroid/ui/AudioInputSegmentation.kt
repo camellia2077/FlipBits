@@ -208,9 +208,7 @@ internal fun splitPcmIntoSegments(
     return segments
 }
 
-internal fun mergeSegmentedDecodedPayloadResults(
-    segments: List<DecodedAudioPayloadResult>,
-): DecodedAudioPayloadResult {
+internal fun mergeSegmentedDecodedPayloadResults(segments: List<DecodedAudioPayloadResult>): DecodedAudioPayloadResult {
     if (segments.isEmpty()) {
         return DecodedAudioPayloadResult()
     }

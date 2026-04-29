@@ -1,13 +1,10 @@
 package com.bag.audioandroid.ui
 
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -21,13 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.screen.AudioTabScreen
 import com.bag.audioandroid.ui.screen.ConfigTabScreen
-import com.bag.audioandroid.ui.screen.MiniPlayerBar
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
+import com.bag.audioandroid.ui.screen.MiniPlayerBar
 import com.bag.audioandroid.ui.screen.PlayerDetailSheetContent
 import com.bag.audioandroid.ui.screen.SavedAudioPickerSheet
 import com.bag.audioandroid.ui.screen.formatDurationMillis
@@ -246,6 +242,8 @@ internal fun AudioAndroidMainScaffold(
                     isFlashVoicingEnabled = uiState.isFlashVoicingEnabled,
                     selectedFlashVoicingStyle = uiState.selectedFlashVoicingStyle,
                     onFlashVoicingStyleSelected = viewModel::onFlashVoicingStyleSelected,
+                    selectedMorseSpeed = uiState.selectedMorseSpeed,
+                    onMorseSpeedSelected = viewModel::onMorseSpeedSelected,
                     inputText = currentSession.inputText,
                     inputPlaceholderText = viewModel.currentPlaceholderText(uiState.transportMode),
                     onInputTextChange = viewModel::onInputTextChange,

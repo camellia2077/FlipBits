@@ -2,8 +2,8 @@ package com.bag.audioandroid.data
 
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
-import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import com.bag.audioandroid.domain.EncodeAudioResult
+import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

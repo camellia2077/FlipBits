@@ -145,6 +145,7 @@
     <string name="audio_follow_display_data">データ</string>
     <string name="audio_follow_view_hex">16進数</string>
     <string name="audio_follow_view_binary">バイナリ</string>
+    <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">詳細</string>
     <string name="audio_player_detail_saved_mode">モード</string>
     <string name="audio_player_detail_saved_duration">再生時間</string>
@@ -165,12 +166,20 @@
     <string name="transport_mode_pro_label">pro</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
     <string name="transport_mode_ultra_label">ultra</string>
+    <string name="transport_mode_mini_label">mini</string>
     <string name="audio_transport_flash_hint">flashはUTF-8テキストを使用します。</string>
     <string name="audio_transport_flash_example">灯守たちは古の星図の封を解く</string>
     <string name="audio_transport_pro_hint">proはASCIIテキストのみを使用します。</string>
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultraはUTF-8テキストを使用します。</string>
+    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_morse_speed_slow">低速</string>
+    <string name="audio_morse_speed_standard">標準</string>
+    <string name="audio_morse_speed_fast">高速</string>
+    <string name="audio_morse_normalized_preview">正規化Morse: %1$s</string>
+    <string name="audio_morse_unsupported_characters">未対応のMorse文字: %1$s</string>
     <string name="audio_transport_ultra_example">灯守たちは古の星図の封を解く</string>
+    <string name="audio_transport_mini_example">PRAISE THE OMNISSIAH</string>
     <string name="audio_sample_thematic_2">鐘楼の奥深くで、封印されたエンジンが唸りを上げ始める</string>
     <string name="audio_sample_thematic_3">七番目の灯火が点されるも、遠方の門は沈黙したままである</string>
     <string name="audio_sample_thematic_4">灰の港の彼方、巡礼船が黒い海を渡る</string>

@@ -14,12 +14,12 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
-import java.util.LinkedHashSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.LinkedHashSet
 
 internal class AudioSessionDecodeActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
@@ -86,7 +86,11 @@ internal class AudioSessionDecodeActions(
         }
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "decodeGenerated:request mode=${mode.wireName} inMemorySamples=${session.generatedPcm.size} waveformSamples=${session.generatedWaveformPcm.size} fileBacked=${!session.generatedPcmFilePath.isNullOrBlank()} metadataSamples=${session.generatedAudioMetadata?.pcmSampleCount ?: 0}",
+            "decodeGenerated:request mode=${mode.wireName} " +
+                "inMemorySamples=${session.generatedPcm.size} " +
+                "waveformSamples=${session.generatedWaveformPcm.size} " +
+                "fileBacked=${!session.generatedPcmFilePath.isNullOrBlank()} " +
+                "metadataSamples=${session.generatedAudioMetadata?.pcmSampleCount ?: 0}",
         )
         val request =
             requestFactory.buildGenerated(
@@ -182,14 +186,15 @@ private class DecodeRequestFactory(
             }
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "decodeRequest:generated mode=${mode.wireName} inMemorySamples=${generatedPcm.size} fileBacked=${!generatedPcmFilePath.isNullOrBlank()} metadataSamples=${metadata?.pcmSampleCount ?: 0} segmentedCount=${segmentedPcm?.size ?: 0}",
+            "decodeRequest:generated mode=${mode.wireName} inMemorySamples=${generatedPcm.size} fileBacked=${!generatedPcmFilePath
+                .isNullOrBlank()} metadataSamples=${metadata?.pcmSampleCount ?: 0} segmentedCount=${segmentedPcm?.size ?: 0}",
         )
         return DecodeRequest(
             mode = mode,
             generatedPcm = generatedPcm,
             generatedPcmFilePath = generatedPcmFilePath,
             sampleRateHz = sampleRateHz,
-            frameSamples = frameSamples,
+            frameSamples = metadata?.frameSamples ?: frameSamples,
             segmentedPcm = segmentedPcm,
             flashPresets =
                 flashPresetCandidates(
@@ -224,7 +229,12 @@ private class DecodeRequestFactory(
             }
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "decodeRequest:saved mode=${mode.wireName} itemId=${savedAudio.item.itemId} inMemorySamples=${savedAudio.pcm.size} fileBacked=${!savedAudio.pcmFilePath.isNullOrBlank()} metadataSamples=${savedAudio.metadata?.pcmSampleCount ?: 0} segmentedCount=${segmentedPcm?.size ?: 0}",
+            "decodeRequest:saved mode=${mode.wireName} " +
+                "itemId=${savedAudio.item.itemId} " +
+                "inMemorySamples=${savedAudio.pcm.size} " +
+                "fileBacked=${!savedAudio.pcmFilePath.isNullOrBlank()} " +
+                "metadataSamples=${savedAudio.metadata?.pcmSampleCount ?: 0} " +
+                "segmentedCount=${segmentedPcm?.size ?: 0}",
         )
         return DecodeRequest(
             mode = mode,
@@ -249,7 +259,7 @@ private class DecodeRequestFactory(
         fallback: FlashVoicingStyleOption,
     ): List<FlashVoicingStyleOption> {
         if (mode != TransportModeOption.Flash) {
-            return listOf(FlashVoicingStyleOption.CodedBurst)
+            return listOf(FlashVoicingStyleOption.Steady)
         }
         val ordered = LinkedHashSet<FlashVoicingStyleOption>()
         preferred?.let(ordered::add)
@@ -267,7 +277,12 @@ private class DecodeRunner(
         kotlinx.coroutines.withContext(workerDispatcher) {
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
-                "decodeRunner:start mode=${request.mode.wireName} inMemorySamples=${request.generatedPcm.size} fileBacked=${!request.generatedPcmFilePath.isNullOrBlank()} segmentedCount=${request.segmentedPcm?.size ?: 0} sampleRate=${request.sampleRateHz} frameSamples=${request.frameSamples}",
+                "decodeRunner:start mode=${request.mode.wireName} " +
+                    "inMemorySamples=${request.generatedPcm.size} " +
+                    "fileBacked=${!request.generatedPcmFilePath.isNullOrBlank()} " +
+                    "segmentedCount=${request.segmentedPcm?.size ?: 0} " +
+                    "sampleRate=${request.sampleRateHz} " +
+                    "frameSamples=${request.frameSamples}",
             )
             val validationIssue =
                 audioCodecGateway.validateDecodeConfig(
@@ -310,9 +325,10 @@ private class DecodeRunner(
                 return attempt.result
             }
         }
-        return attempts.maxWithOrNull(compareBy<DecodeAttempt> { scoreDecodeAttempt(it, request.expectedPayloadByteCount) })
+        return attempts
+            .maxWithOrNull(compareBy<DecodeAttempt> { scoreDecodeAttempt(it, request.expectedPayloadByteCount) })
             ?.result
-            ?: decodeWithPreset(request, FlashVoicingStyleOption.CodedBurst)
+            ?: decodeWithPreset(request, FlashVoicingStyleOption.Steady)
     }
 
     private fun decodeWithPreset(
@@ -350,7 +366,11 @@ private class DecodeRunner(
         attempt: DecodeAttempt,
         expectedPayloadByteCount: Int?,
     ): Int {
-        val payloadByteCount = attempt.result.decodedPayload.rawBytesHex.split(' ').filter { it.isNotBlank() }.size
+        val payloadByteCount =
+            attempt.result.decodedPayload.rawBytesHex
+                .split(' ')
+                .filter { it.isNotBlank() }
+                .size
         val payloadMatchBonus =
             if (expectedPayloadByteCount != null && payloadByteCount == expectedPayloadByteCount) {
                 100
@@ -382,7 +402,10 @@ private class DecodeRunner(
         if (expectedPayloadByteCount == null) {
             return true
         }
-        val payloadByteCount = attempt.result.decodedPayload.rawBytesHex.split(' ').count { it.isNotBlank() }
+        val payloadByteCount =
+            attempt.result.decodedPayload.rawBytesHex
+                .split(' ')
+                .count { it.isNotBlank() }
         return payloadByteCount == expectedPayloadByteCount
     }
 }
@@ -403,6 +426,7 @@ private class DecodeStateReducer(
             it.copy(statusText = UiText.Resource(R.string.status_saved_audio_load_failed))
         }
     }
+
     fun markBusy(mode: TransportModeOption) {
         sessionStateStore.updateCurrentSession {
             it.copy(

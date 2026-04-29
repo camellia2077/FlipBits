@@ -1,6 +1,6 @@
 # FlipBits 文档索引
 
-更新时间：2026-03-14
+更新时间：2026-04-30
 
 ## 先看这里
 - 修改 `libs/` 下的共享库代码前，优先阅读：
@@ -12,6 +12,7 @@
   - `flash` 不校验字符集，按输入字节透明传输；公共入口仍是字符串接口
   - `pro` 仅允许 ASCII
   - `ultra` 面向 UTF-8
+  - `mini` 是 Morse code 模式，仅支持 `A-Z / 0-9 / space / 常见 Morse 标点`，小写会规范化为大写
 
 ## 文档分层
 - `docs/architecture/`
@@ -44,12 +45,18 @@
   - `docs/notes/android-ndk-cmake-upgrade-decision.md`
 - `legacy` 相关 release gate：
   - `docs/notes/legacy-release-gates.md`
-- `legacy` 退休前置条件追踪：
-  - `docs/notes/legacy-retirement-preconditions.md`
-
 ## 常见任务应该看哪里
-- 改 `flash / pro / ultra` 模式实现
+- 只改 Android UI 文案 / 本地化 key
+  - 先看 `apps/audio_android/AGENTS.md`
+  - 再看 `docs/design/android/android-translation-workflow.md`
+  - 只需要定位英文基线 `apps/audio_android/app/src/main/res/values/strings_*.xml` 和对应 `values-*` 文件；通常不用展开 core/native 文档。
+- 只改 core follow / lyrics / visual timeline 对齐
   - 先看 `docs/design/transports.md`
+  - 再看 `docs/architecture/repo-map.md` 的 `mini / flash / pro / ultra`、`播放会话 runtime / seek 语义`、测试地图相关入口
+  - 重点入口通常是 `libs/audio_core/src/transport/follow.cpp`、`libs/audio_api/tests/api_sync_tests.cpp` 和 Android follow/visual 组件。
+- 改 `mini / flash / pro / ultra` 模式实现
+  - 先看 `docs/design/transports.md`
+  - flash 情绪音色与 `Steady / Hostile / Litany / Collapse` 设计看 `docs/design/flash-voicing-emotions.md`
   - 再看 `docs/architecture/repo-map.md`
 - 改 `bag_api`
   - 先看 `docs/architecture/repo-map.md`

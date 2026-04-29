@@ -72,8 +72,7 @@ internal fun ProByteExplanationCard(
                             .background(
                                 color = visualTokens.supportStrongSurfaceColor,
                                 shape = RoundedCornerShape(14.dp),
-                            )
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            ).padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
                     Text(
                         text = explanation.asciiDisplay,

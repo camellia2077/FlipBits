@@ -58,43 +58,43 @@ internal fun PlayerScaffold(
                 PaddingValues(bottom = contentBottomPadding),
             )
 
-        Column(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.navigationBars),
-        ) {
-            miniPlayer?.let { miniPlayerContent ->
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = PlayerScaffoldDefaults.dockHorizontalPadding),
-                ) {
-                    miniPlayerContent()
-                }
-                Spacer(modifier = Modifier.height(PlayerScaffoldDefaults.dockSectionSpacing))
-            }
-
-            bottomBar()
-        }
-
-        snackbarHost?.let { host ->
-            Box(
+            Column(
                 modifier =
                     Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(
-                            start = 16.dp,
-                            top = 16.dp,
-                            end = 16.dp,
-                            bottom = snackbarBottomPadding,
-                        ),
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.navigationBars),
             ) {
-                host()
+                miniPlayer?.let { miniPlayerContent ->
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = PlayerScaffoldDefaults.dockHorizontalPadding),
+                    ) {
+                        miniPlayerContent()
+                    }
+                    Spacer(modifier = Modifier.height(PlayerScaffoldDefaults.dockSectionSpacing))
+                }
+
+                bottomBar()
+            }
+
+            snackbarHost?.let { host ->
+                Box(
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(
+                                start = 16.dp,
+                                top = 16.dp,
+                                end = 16.dp,
+                                bottom = snackbarBottomPadding,
+                            ),
+                ) {
+                    host()
+                }
             }
         }
     }
-}
 }

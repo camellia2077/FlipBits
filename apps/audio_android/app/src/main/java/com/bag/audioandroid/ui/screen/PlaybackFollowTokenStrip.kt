@@ -74,6 +74,9 @@ internal fun PlaybackFollowTokenStrip(
                         } else {
                             -1
                         },
+                    isActiveBitTone =
+                        index == presentationState.activeTextIndex &&
+                            presentationState.isActiveBitTone,
                     isPast = index < presentationState.activeTextIndex,
                     modifier = Modifier.animateItem().width(centeredItemWidth),
                 )

@@ -80,7 +80,8 @@ class SavedAudioLibraryMetadataStore(
         }
         val updatedFolders = folders.filterNot { it.folderId == folderId }
         val updatedAssignments = readAssignments().filterValues { assignedFolderId -> assignedFolderId != folderId }
-        return sharedPreferences.edit()
+        return sharedPreferences
+            .edit()
             .putString(KEY_FOLDERS, foldersToJson(updatedFolders).toString())
             .putString(KEY_ASSIGNMENTS, assignmentsToJson(updatedAssignments).toString())
             .commit()
@@ -164,12 +165,14 @@ class SavedAudioLibraryMetadataStore(
     }
 
     private fun writeFolders(folders: List<SavedAudioFolder>): Boolean =
-        sharedPreferences.edit()
+        sharedPreferences
+            .edit()
             .putString(KEY_FOLDERS, foldersToJson(folders).toString())
             .commit()
 
     private fun writeAssignments(assignments: Map<String, String>): Boolean =
-        sharedPreferences.edit()
+        sharedPreferences
+            .edit()
             .putString(KEY_ASSIGNMENTS, assignmentsToJson(assignments).toString())
             .commit()
 

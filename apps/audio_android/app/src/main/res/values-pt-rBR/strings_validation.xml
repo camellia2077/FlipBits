@@ -9,6 +9,7 @@
     <string name="validation_invalid_flash_signal_profile">Perfil de sinal flash não suportado.</string>
     <string name="validation_invalid_flash_voicing_flavor">Estilo flash não suportado.</string>
     <string name="validation_pro_ascii_only">pro suporta apenas ASCII.</string>
+    <string name="validation_mini_morse_only">Mini Morse supports A-Z, 0-9, spaces, and common Morse punctuation.</string>
     <string name="validation_payload_too_large">O texto de entrada ultrapassa o limite de 512 bytes por quadro deste modo.</string>
     <string name="error_invalid_argument">Argumento inválido.</string>
     <string name="error_not_ready">O resultado não está pronto.</string>

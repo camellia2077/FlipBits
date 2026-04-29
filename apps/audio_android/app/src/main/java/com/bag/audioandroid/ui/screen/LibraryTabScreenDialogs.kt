@@ -98,7 +98,8 @@ internal fun LibraryTabScreenDialogs(
             selectedFolderId = moveTargetFolderId,
             titleText =
                 request.displayName?.let {
-                    androidx.compose.ui.res.stringResource(R.string.library_move_single_message, it)
+                    androidx.compose.ui.res
+                        .stringResource(R.string.library_move_single_message, it)
                 } ?: androidx.compose.ui.res.stringResource(
                     R.string.library_move_multiple_message,
                     request.itemIds.size,

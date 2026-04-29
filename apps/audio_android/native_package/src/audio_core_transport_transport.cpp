@@ -1,5 +1,7 @@
 #include "android_bag/flash/codec.h"
 #include "android_bag/flash/phy_clean.h"
+#include "android_bag/mini/codec.h"
+#include "android_bag/mini/phy_clean.h"
 #include "android_bag/pro/codec.h"
 #include "android_bag/pro/phy_clean.h"
 #include "android_bag/transport/facade.h"

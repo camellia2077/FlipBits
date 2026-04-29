@@ -12,16 +12,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Casino
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -48,13 +48,10 @@ import com.bag.audioandroid.ui.theme.DefaultAppThemeVisualTokens
 import com.bag.audioandroid.ui.theme.LocalAppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.LocalAppThemeVisualTokens
 import com.bag.audioandroid.ui.theme.LocalAudioEncodeGlyphColors
-import com.bag.audioandroid.ui.theme.appThemeAccentTokens
-import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import com.bag.audioandroid.ui.theme.brandThemeColorOrNull
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHexOrNull
 import com.bag.audioandroid.ui.theme.randomCustomBrandThemeColors
-import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @Composable
 internal fun CustomBrandThemeDialog(
@@ -73,7 +70,7 @@ internal fun CustomBrandThemeDialog(
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
 
     val trimmedDisplayName = displayName.trim()
-    
+
     val normalizedBackground = remember(backgroundHex) { normalizeBrandThemeHex(backgroundHex) }
     val normalizedAccent = remember(accentHex) { normalizeBrandThemeHex(accentHex) }
     val normalizedOutline = remember(outlineHexValue) { normalizeBrandThemeHexOrNull(outlineHexValue) }
@@ -86,46 +83,51 @@ internal fun CustomBrandThemeDialog(
 
     val previewBackground = remember(normalizedBackground) { brandThemeColorOrNull(normalizedBackground ?: "") }
     val previewAccent = remember(normalizedAccent) { brandThemeColorOrNull(normalizedAccent ?: "") }
-    val previewOutline = remember(normalizedOutline, previewAccent, outlineHexValue) {
-        if (outlineHexValue.isBlank()) {
-            previewAccent
-        } else {
-            brandThemeColorOrNull(normalizedOutline ?: "")
-        }
-    }
-
-    val dialogContentColor = remember(previewBackground) {
-        if (previewBackground != null) {
-            if (previewBackground.luminance() < 0.5f) Color.White else Color(0xFF1A1C1E) // BrandInkLight
-        } else {
-            Color.Unspecified
-        }
-    }
-
-    val previewVisualTokens = remember(previewBackground, previewAccent, dialogContentColor) {
-        DefaultAppThemeVisualTokens.copy(
-            themeStyle = ThemeStyleOption.BrandDualTone,
-            inputContainerColor = if (previewBackground != null && previewAccent != null) {
-                lerp(previewBackground, previewAccent, 0.08f)
+    val previewOutline =
+        remember(normalizedOutline, previewAccent, outlineHexValue) {
+            if (outlineHexValue.isBlank()) {
+                previewAccent
             } else {
-                previewBackground ?: Color.Transparent
-            },
-            inputContentColor = if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White,
-            inputFocusedBorderColor = previewAccent ?: Color.Unspecified,
-            inputUnfocusedBorderColor = (previewAccent ?: Color.Unspecified).copy(alpha = 0.42f),
-            modalContainerColor = previewBackground ?: Color.Transparent,
-            modalContentColor = if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White,
-        )
-    }
+                brandThemeColorOrNull(normalizedOutline ?: "")
+            }
+        }
 
-    val previewAccentTokens = remember(previewAccent) {
-        DefaultAppThemeAccentTokens.copy(
-            disclosureAccentTint = previewAccent ?: Color.Unspecified,
-            actionAccentTint = previewAccent ?: Color.Unspecified,
-            selectionLabelAccentTint = previewAccent ?: Color.Unspecified,
-            selectionBorderAccentTint = previewAccent ?: Color.Unspecified,
-        )
-    }
+    val dialogContentColor =
+        remember(previewBackground) {
+            if (previewBackground != null) {
+                if (previewBackground.luminance() < 0.5f) Color.White else Color(0xFF1A1C1E) // BrandInkLight
+            } else {
+                Color.Unspecified
+            }
+        }
+
+    val previewVisualTokens =
+        remember(previewBackground, previewAccent, dialogContentColor) {
+            DefaultAppThemeVisualTokens.copy(
+                themeStyle = ThemeStyleOption.BrandDualTone,
+                inputContainerColor =
+                    if (previewBackground != null && previewAccent != null) {
+                        lerp(previewBackground, previewAccent, 0.08f)
+                    } else {
+                        previewBackground ?: Color.Transparent
+                    },
+                inputContentColor = if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White,
+                inputFocusedBorderColor = previewAccent ?: Color.Unspecified,
+                inputUnfocusedBorderColor = (previewAccent ?: Color.Unspecified).copy(alpha = 0.42f),
+                modalContainerColor = previewBackground ?: Color.Transparent,
+                modalContentColor = if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White,
+            )
+        }
+
+    val previewAccentTokens =
+        remember(previewAccent) {
+            DefaultAppThemeAccentTokens.copy(
+                disclosureAccentTint = previewAccent ?: Color.Unspecified,
+                actionAccentTint = previewAccent ?: Color.Unspecified,
+                selectionLabelAccentTint = previewAccent ?: Color.Unspecified,
+                selectionBorderAccentTint = previewAccent ?: Color.Unspecified,
+            )
+        }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -134,10 +136,14 @@ internal fun CustomBrandThemeDialog(
         textContentColor = previewVisualTokens.modalContentColor,
         title = {
             Text(
-                text = stringResource(
-                    if (isCreatingNew) R.string.config_custom_brand_theme_dialog_title_new
-                    else R.string.config_custom_brand_theme_dialog_title_edit
-                )
+                text =
+                    stringResource(
+                        if (isCreatingNew) {
+                            R.string.config_custom_brand_theme_dialog_title_new
+                        } else {
+                            R.string.config_custom_brand_theme_dialog_title_edit
+                        },
+                    ),
             )
         },
         text = {
@@ -148,15 +154,15 @@ internal fun CustomBrandThemeDialog(
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             IconButton(
                                 onClick = {
@@ -165,24 +171,26 @@ internal fun CustomBrandThemeDialog(
                                     accentHex = random.accentHex
                                     outlineHexValue = random.outlineHex ?: ""
                                 },
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = previewAccent?.copy(alpha = 0.15f) ?: Color.Unspecified,
-                                    contentColor = previewAccent ?: Color.Unspecified
-                                ),
-                                modifier = Modifier.size(48.dp)
+                                colors =
+                                    IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = previewAccent?.copy(alpha = 0.15f) ?: Color.Unspecified,
+                                        contentColor = previewAccent ?: Color.Unspecified,
+                                    ),
+                                modifier = Modifier.size(48.dp),
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Casino,
                                     contentDescription = stringResource(R.string.config_custom_brand_theme_randomize),
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp),
                                 )
                             }
-                            
-                            val previewGlyphColors = AudioEncodeGlyphColors(
-                                primarySplit = previewAccent ?: Color.Unspecified,
-                                secondarySplit = previewBackground ?: Color.Unspecified,
-                                outline = previewOutline ?: previewAccent ?: Color.Unspecified,
-                            )
+
+                            val previewGlyphColors =
+                                AudioEncodeGlyphColors(
+                                    primarySplit = previewAccent ?: Color.Unspecified,
+                                    secondarySplit = previewBackground ?: Color.Unspecified,
+                                    outline = previewOutline ?: previewAccent ?: Color.Unspecified,
+                                )
                             CompositionLocalProvider(LocalAudioEncodeGlyphColors provides previewGlyphColors) {
                                 AudioEncodeGlyph(
                                     encodeProgress = 0.65f,
@@ -200,17 +208,19 @@ internal fun CustomBrandThemeDialog(
                         label = {
                             Text(
                                 text = stringResource(R.string.config_custom_brand_theme_name_label),
-                                fontWeight = if (isNameFocused) FontWeight.SemiBold else FontWeight.Medium
+                                fontWeight = if (isNameFocused) FontWeight.SemiBold else FontWeight.Medium,
                             )
                         },
                         isError = trimmedDisplayName.isEmpty(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged { isNameFocused = it.isFocused },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged { isNameFocused = it.isFocused },
                         shape = MaterialTheme.shapes.medium,
-                        textStyle = LocalTextStyle.current.copy(
-                            fontWeight = if (isNameFocused) FontWeight.SemiBold else FontWeight.Medium
-                        ),
+                        textStyle =
+                            LocalTextStyle.current.copy(
+                                fontWeight = if (isNameFocused) FontWeight.SemiBold else FontWeight.Medium,
+                            ),
                         colors = audioInputTextFieldColors(ThemeStyleOption.BrandDualTone),
                         supportingText = {
                             if (trimmedDisplayName.isEmpty()) {
@@ -258,13 +268,14 @@ internal fun CustomBrandThemeDialog(
                             backgroundHex = normalizedBackground!!,
                             accentHex = normalizedAccent!!,
                             outlineHexOrNull = normalizedOutline,
-                        )
+                        ),
                     )
                 },
                 enabled = canSave,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = previewAccent ?: MaterialTheme.colorScheme.primary
-                )
+                colors =
+                    ButtonDefaults.textButtonColors(
+                        contentColor = previewAccent ?: MaterialTheme.colorScheme.primary,
+                    ),
             ) {
                 Text(text = stringResource(R.string.config_custom_brand_theme_save))
             }
@@ -274,32 +285,34 @@ internal fun CustomBrandThemeDialog(
                 if (canDelete) {
                     TextButton(
                         onClick = { showDeleteConfirm = true },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
+                        colors =
+                            ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error,
+                            ),
                     ) {
                         Text(text = stringResource(R.string.config_custom_brand_theme_delete))
                     }
                 }
                 TextButton(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = previewAccent ?: MaterialTheme.colorScheme.primary
-                    )
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = previewAccent ?: MaterialTheme.colorScheme.primary,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.common_cancel))
                 }
             }
-        }
+        },
     )
 
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = { Text(text = stringResource(R.string.config_custom_brand_theme_delete_title)) },
-            text = { 
+            text = {
                 val message = stringResource(R.string.config_custom_brand_theme_delete_message, displayName)
-                Text(text = message) 
+                Text(text = message)
             },
             confirmButton = {
                 TextButton(
@@ -307,9 +320,10 @@ internal fun CustomBrandThemeDialog(
                         showDeleteConfirm = false
                         onDelete()
                     },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.config_custom_brand_theme_delete))
                 }
@@ -317,9 +331,10 @@ internal fun CustomBrandThemeDialog(
             dismissButton = {
                 TextButton(
                     onClick = { showDeleteConfirm = false },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = previewAccent ?: MaterialTheme.colorScheme.primary
-                    )
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = previewAccent ?: MaterialTheme.colorScheme.primary,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.common_cancel))
                 }
@@ -348,20 +363,22 @@ private fun HexColorField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
-            label = { 
+            label = {
                 Text(
                     text = label,
-                    fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Medium
-                ) 
+                    fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Medium,
+                )
             },
             isError = isError,
-            modifier = Modifier
-                .weight(1f)
-                .onFocusChanged { isFocused = it.isFocused },
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .onFocusChanged { isFocused = it.isFocused },
             shape = MaterialTheme.shapes.medium,
-            textStyle = LocalTextStyle.current.copy(
-                fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Medium
-            ),
+            textStyle =
+                LocalTextStyle.current.copy(
+                    fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Medium,
+                ),
             colors = audioInputTextFieldColors(ThemeStyleOption.BrandDualTone),
             supportingText = {
                 when {

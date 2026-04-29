@@ -1,6 +1,5 @@
 package com.bag.audioandroid.ui.theme
 
-import android.graphics.Color as AndroidColor
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
@@ -11,6 +10,7 @@ import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.DefaultCustomBrandThemePresetId
 import com.bag.audioandroid.ui.model.SampleFlavor
+import android.graphics.Color as AndroidColor
 
 private val BrandInkLight = Color(0xFF241B18)
 private val BrandInkDark = Color(0xFFF1E8E1)
@@ -189,8 +189,7 @@ fun normalizeBrandThemeHexOrNull(value: String?): String? {
     return normalizeBrandThemeHex(trimmed)
 }
 
-fun brandThemeColorOrNull(value: String?): Color? =
-    normalizeBrandThemeHexOrNull(value)?.let(::parseBrandThemeColor)
+fun brandThemeColorOrNull(value: String?): Color? = normalizeBrandThemeHexOrNull(value)?.let(::parseBrandThemeColor)
 
 fun customBrandThemeOptionId(presetId: String): String =
     if (presetId == DefaultCustomBrandThemePresetId) {

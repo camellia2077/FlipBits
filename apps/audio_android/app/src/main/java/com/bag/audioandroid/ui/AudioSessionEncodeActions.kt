@@ -17,6 +17,7 @@ import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.model.analyzeMorseText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,7 +44,7 @@ internal class AudioSessionEncodeActions(
     workerDispatcher: CoroutineDispatcher,
     generatedAudioCacheGateway: GeneratedAudioCacheGateway,
 ) {
-    private val requestFactory = EncodeRequestFactory()
+    private val requestFactory = EncodeRequestFactory(frameSamples)
     private val stateReducer =
         EncodeStateReducer(
             uiState = uiState,
@@ -51,14 +52,12 @@ internal class AudioSessionEncodeActions(
             uiTextMapper = uiTextMapper,
             playbackRuntimeGateway = playbackRuntimeGateway,
             sampleRateHz = sampleRateHz,
-            frameSamples = frameSamples,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
         )
     private val encodeRunner =
         EncodeRunner(
             audioCodecGateway = audioCodecGateway,
             sampleRateHz = sampleRateHz,
-            frameSamples = frameSamples,
             workerDispatcher = workerDispatcher,
             onProgress = stateReducer::applyProgress,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
@@ -80,7 +79,7 @@ internal class AudioSessionEncodeActions(
         val request = requestFactory.build(current)
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "onEncode:start mode=${request.mode.wireName} chars=${request.inputText.length} payloadBytes=${request.inputText.toByteArray(UTF_8).size} source=${current.currentPlaybackSource}",
+            "onEncode:start mode=${request.mode.wireName} chars=${request.inputText.length} payloadBytes=${request.payloadByteCount} frameSamples=${request.frameSamples} source=${current.currentPlaybackSource}",
         )
         stopPlayback()
         cancelFollowDataJob(request.mode)
@@ -195,7 +194,9 @@ private fun safeLogE(
     }
 }
 
-private class EncodeRequestFactory {
+private class EncodeRequestFactory(
+    private val defaultFrameSamples: Int,
+) {
     fun build(current: AudioAppUiState): EncodeRequest =
         EncodeRequest(
             mode = current.transportMode,
@@ -206,7 +207,13 @@ private class EncodeRequestFactory {
                 if (current.transportMode == TransportModeOption.Flash && current.isFlashVoicingEnabled) {
                     current.selectedFlashVoicingStyle
                 } else {
-                    FlashVoicingStyleOption.CodedBurst
+                    FlashVoicingStyleOption.Steady
+                },
+            frameSamples =
+                if (current.transportMode == TransportModeOption.Mini) {
+                    current.selectedMorseSpeed.frameSamples(defaultFrameSamples)
+                } else {
+                    defaultFrameSamples
                 },
             appVersion = current.presentationVersion.ifBlank { "unknown" },
             coreVersion = current.coreVersion.ifBlank { "unknown" },
@@ -216,26 +223,28 @@ private class EncodeRequestFactory {
 private class EncodeRunner(
     private val audioCodecGateway: AudioCodecGateway,
     private val sampleRateHz: Int,
-    private val frameSamples: Int,
     private val workerDispatcher: CoroutineDispatcher,
     private val onProgress: (TransportModeOption, EncodeProgressUpdate) -> Unit,
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
 ) {
     suspend fun execute(request: EncodeRequest): EncodeResult =
         kotlinx.coroutines.withContext(workerDispatcher) {
-            val payloadByteCount = request.inputText.toByteArray(UTF_8).size
+            val payloadByteCount = request.payloadByteCount
             val validationIssue =
                 audioCodecGateway.validateEncodeRequest(
                     request.inputText,
                     sampleRateHz,
-                    frameSamples,
+                    request.frameSamples,
                     request.mode.nativeValue,
                     request.flashPreset.signalProfileValue,
                     request.flashPreset.voicingFlavorValue,
                 )
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
-                "execute:validated mode=${request.mode.wireName} payloadBytes=$payloadByteCount issue=$validationIssue maxSegmentPayloadBytes=${segmentedPayloadByteLimit(request)}",
+                "execute:validated mode=${request.mode.wireName} " +
+                    "payloadBytes=$payloadByteCount " +
+                    "issue=$validationIssue " +
+                    "maxSegmentPayloadBytes=${segmentedPayloadByteLimit(request)}",
             )
             if (
                 validationIssue != BagApiCodes.VALIDATION_OK &&
@@ -256,7 +265,7 @@ private class EncodeRunner(
                     audioCodecGateway.encodeTextToPcm(
                         request.inputText,
                         sampleRateHz,
-                        frameSamples,
+                        request.frameSamples,
                         request.mode.nativeValue,
                         request.flashPreset.signalProfileValue,
                         request.flashPreset.voicingFlavorValue,
@@ -302,7 +311,7 @@ private class EncodeRunner(
                             audioCodecGateway.buildEncodeFollowData(
                                 segmentText,
                                 sampleRateHz,
-                                frameSamples,
+                                request.frameSamples,
                                 request.mode.nativeValue,
                                 request.flashPreset.signalProfileValue,
                                 request.flashPreset.voicingFlavorValue,
@@ -315,11 +324,11 @@ private class EncodeRunner(
                 audioCodecGateway.buildEncodeFollowData(
                     request.inputText,
                     sampleRateHz,
-                    frameSamples,
+                    request.frameSamples,
                     request.mode.nativeValue,
                     request.flashPreset.signalProfileValue,
                     request.flashPreset.voicingFlavorValue,
-            )
+                )
             result.followData.takeIf { it.followAvailable }
         }
 
@@ -328,7 +337,7 @@ private class EncodeRunner(
         val segmentation = splitInputIntoPayloadSegments(request.inputText, maxPayloadBytes)
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "encodeSegmented:start mode=${request.mode.wireName} payloadBytes=${request.inputText.toByteArray(UTF_8).size} segments=${segmentation.segmentCount} maxPayloadBytes=$maxPayloadBytes style=${request.selectedFlashVoicingStyle.id}",
+            "encodeSegmented:start mode=${request.mode.wireName} payloadBytes=${request.payloadByteCount} segments=${segmentation.segmentCount} maxPayloadBytes=$maxPayloadBytes style=${request.selectedFlashVoicingStyle.id}",
         )
         val totalSegments = segmentation.segmentCount.toFloat()
         val audioAssembler =
@@ -344,11 +353,11 @@ private class EncodeRunner(
                     audioCodecGateway.validateEncodeRequest(
                         segmentText,
                         sampleRateHz,
-                        frameSamples,
+                        request.frameSamples,
                         request.mode.nativeValue,
                         request.flashPreset.signalProfileValue,
                         request.flashPreset.voicingFlavorValue,
-                )
+                    )
                 if (validationIssue != BagApiCodes.VALIDATION_OK) {
                     audioAssembler.abort()
                     return EncodeResult.ValidationFailure(validationIssue)
@@ -358,7 +367,7 @@ private class EncodeRunner(
                         audioCodecGateway.encodeTextToPcm(
                             segmentText,
                             sampleRateHz,
-                            frameSamples,
+                            request.frameSamples,
                             request.mode.nativeValue,
                             request.flashPreset.signalProfileValue,
                             request.flashPreset.voicingFlavorValue,
@@ -437,7 +446,6 @@ private class EncodeRunner(
     private companion object {
         const val MAX_SINGLE_FRAME_PAYLOAD_BYTES = 512
         const val MAX_SEGMENT_PAYLOAD_BYTES_RITUAL = 256
-        const val MAX_SEGMENT_PAYLOAD_BYTES_DEEP_RITUAL = 128
     }
 
     private fun shouldEncodeSegmented(
@@ -451,8 +459,7 @@ private class EncodeRunner(
     private fun segmentedPayloadByteLimit(request: EncodeRequest): Int =
         when {
             request.mode != TransportModeOption.Flash -> MAX_SINGLE_FRAME_PAYLOAD_BYTES
-            request.flashPreset == FlashVoicingStyleOption.DeepRitual -> MAX_SEGMENT_PAYLOAD_BYTES_DEEP_RITUAL
-            request.flashPreset == FlashVoicingStyleOption.RitualChant -> MAX_SEGMENT_PAYLOAD_BYTES_RITUAL
+            request.flashPreset.usesLongCadencePayload -> MAX_SEGMENT_PAYLOAD_BYTES_RITUAL
             else -> MAX_SINGLE_FRAME_PAYLOAD_BYTES
         }
 }
@@ -463,7 +470,6 @@ private class EncodeStateReducer(
     private val uiTextMapper: BagUiTextMapper,
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
     private val sampleRateHz: Int,
-    private val frameSamples: Int,
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
 ) {
     fun markBusy(request: EncodeRequest) {
@@ -561,7 +567,10 @@ private class EncodeStateReducer(
             LONG_AUDIO_LOG_TAG,
             "applyValidationFailure mode=${mode.wireName} issue=$validationIssue",
         )
-        val previousFilePath = uiState.value.sessions.getValue(mode).generatedPcmFilePath
+        val previousFilePath =
+            uiState.value.sessions
+                .getValue(mode)
+                .generatedPcmFilePath
         sessionStateStore.updateSession(mode) {
             it.copy(
                 generatedPcm = shortArrayOf(),
@@ -611,16 +620,21 @@ private class EncodeStateReducer(
         result: EncodeResult.Success,
     ): FollowDataHydrationRequest? {
         val pcm = result.pcm
-        val previousFilePath = uiState.value.sessions.getValue(request.mode).generatedPcmFilePath
+        val previousFilePath =
+            uiState.value.sessions
+                .getValue(request.mode)
+                .generatedPcmFilePath
         val generatedFlashStyle =
             if (request.mode == TransportModeOption.Flash && result.pcmSampleCount > 0) {
                 request.flashPreset
             } else {
                 null
             }
-        val payloadByteCount = request.inputText.toByteArray(UTF_8).size
+        val payloadByteCount = request.payloadByteCount
         val nextRevision =
-            uiState.value.sessions.getValue(request.mode).generatedContentRevision + 1L
+            uiState.value.sessions
+                .getValue(request.mode)
+                .generatedContentRevision + 1L
         safeLogE(
             LONG_AUDIO_LOG_TAG,
             "applySuccess:begin mode=${request.mode.wireName} pcmSamples=${result.pcmSampleCount} inMemorySamples=${pcm.size} waveformSamples=${result.waveformPcm.size} fileBacked=${result.generatedPcmFilePath != null} segments=${result.segmentCount} payloadBytes=$payloadByteCount nextRevision=$nextRevision",
@@ -637,7 +651,7 @@ private class EncodeStateReducer(
                         createdAtIsoUtc = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString(),
                         durationMs = (result.pcmSampleCount.toLong() * 1000L) / sampleRateHz.toLong(),
                         sampleRateHz = sampleRateHz,
-                        frameSamples = frameSamples,
+                        frameSamples = request.frameSamples,
                         pcmSampleCount = result.pcmSampleCount,
                         payloadByteCount = payloadByteCount,
                         inputSourceKind =
@@ -713,7 +727,7 @@ private class EncodeStateReducer(
         request: EncodeRequest,
         result: EncodeResult.Success,
     ): Boolean {
-        val payloadByteCount = request.inputText.toByteArray(UTF_8).size
+        val payloadByteCount = request.payloadByteCount
         return payloadByteCount <= MAX_FOLLOW_DATA_PAYLOAD_BYTES &&
             result.segmentCount <= MAX_FOLLOW_DATA_SEGMENTS
     }
@@ -747,10 +761,19 @@ private data class EncodeRequest(
     val sampleInputId: String?,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption,
     val flashPreset: FlashVoicingStyleOption,
+    val frameSamples: Int,
     val appVersion: String,
     val coreVersion: String,
     val segmentation: SegmentedInputPlan? = null,
-)
+) {
+    val payloadByteCount: Int
+        get() =
+            if (mode == TransportModeOption.Mini) {
+                analyzeMorseText(inputText).normalizedText.toByteArray(UTF_8).size
+            } else {
+                inputText.toByteArray(UTF_8).size
+            }
+}
 
 private sealed interface EncodeResult {
     data class ValidationFailure(

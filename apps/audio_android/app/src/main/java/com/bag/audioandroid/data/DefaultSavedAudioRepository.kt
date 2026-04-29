@@ -6,10 +6,10 @@ import com.bag.audioandroid.domain.AudioShareGateway
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioContent
 import com.bag.audioandroid.domain.SavedAudioFolderMutationResult
-import com.bag.audioandroid.domain.SavedAudioLibraryMetadata
 import com.bag.audioandroid.domain.SavedAudioImportResult
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.SavedAudioLibraryGateway
+import com.bag.audioandroid.domain.SavedAudioLibraryMetadata
 import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -32,8 +32,7 @@ class DefaultSavedAudioRepository(
         pcmFilePath: String?,
         sampleRateHz: Int,
         metadata: GeneratedAudioMetadata,
-    ): AudioExportResult =
-        audioExportGateway.exportGeneratedAudio(mode, inputText, pcm, pcmFilePath, sampleRateHz, metadata)
+    ): AudioExportResult = audioExportGateway.exportGeneratedAudio(mode, inputText, pcm, pcmFilePath, sampleRateHz, metadata)
 
     override fun exportGeneratedAudioToDocument(
         mode: TransportModeOption,
@@ -79,8 +78,7 @@ class DefaultSavedAudioRepository(
 
     override fun readLibraryMetadata(): SavedAudioLibraryMetadata = libraryMetadataStore.readMetadata()
 
-    override fun createSavedAudioFolder(name: String): SavedAudioFolderMutationResult =
-        libraryMetadataStore.createFolder(name)
+    override fun createSavedAudioFolder(name: String): SavedAudioFolderMutationResult = libraryMetadataStore.createFolder(name)
 
     override fun renameSavedAudioFolder(
         folderId: String,

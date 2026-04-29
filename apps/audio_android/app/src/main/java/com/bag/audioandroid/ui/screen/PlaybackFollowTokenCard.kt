@@ -1,13 +1,13 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,6 +39,7 @@ internal fun PlaybackFollowTokenCard(
     isActive: Boolean,
     activeByteIndexWithinToken: Int,
     activeBitIndexWithinByte: Int = -1,
+    isActiveBitTone: Boolean = false,
     isPast: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -48,18 +49,20 @@ internal fun PlaybackFollowTokenCard(
     val focusColor = MaterialTheme.colorScheme.primary
     val onFocusColor = MaterialTheme.colorScheme.onPrimary
     val activeAnnotationTint = lyricsAccentTextColor
-    
-    val containerColor = when {
-        isActive -> visualTokens.followTokenContainerColor
-        else -> Color.Transparent
-    }
-    
-    val tokenColor = when {
-        isActive -> lyricsAccentTextColor
-        isPast -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        else -> MaterialTheme.colorScheme.onSurface
-    }
-    
+
+    val containerColor =
+        when {
+            isActive -> visualTokens.followTokenContainerColor
+            else -> Color.Transparent
+        }
+
+    val tokenColor =
+        when {
+            isActive -> lyricsAccentTextColor
+            isPast -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            else -> MaterialTheme.colorScheme.onSurface
+        }
+
     val inactiveRawColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isPast) 0.5f else 1.0f)
     val inactiveCharacterColor = tokenColor
     val annotationByteGroups = annotationByteGroupsForMode(annotationMode, rawDisplayUnits)
@@ -177,7 +180,15 @@ internal fun PlaybackFollowTokenCard(
                                             mode = annotationMode,
                                             isActive = isActive && byteIndex == activeByteIndexWithinToken,
                                             isPast = isActive && byteIndex < activeByteIndexWithinToken,
-                                            activeBitIndex = if (isActive && byteIndex == activeByteIndexWithinToken) activeBitIndexWithinByte else -1,
+                                            activeBitIndex =
+                                                if (isActive &&
+                                                    byteIndex == activeByteIndexWithinToken
+                                                ) {
+                                                    activeBitIndexWithinByte
+                                                } else {
+                                                    -1
+                                                },
+                                            isActiveBitTone = isActiveBitTone,
                                             focusColor = focusColor,
                                             onFocusColor = onFocusColor,
                                             inactiveColor = inactiveRawColor,
@@ -205,12 +216,47 @@ internal fun PlaybackFollowTokenCard(
                                     rowGroups.forEachIndexed { groupIndexInRow, group ->
                                         val byteIndex = rowIndex * HexByteGroupsPerRow + groupIndexInRow
                                         val isActiveByte = isActive && byteIndex == activeByteIndexWithinToken
+                                        PlaybackHexByteBlock(
+                                            group = group,
+                                            isActive = isActiveByte,
+                                            isPast = isActive && byteIndex < activeByteIndexWithinToken,
+                                            activeBitIndex = if (isActiveByte) activeBitIndexWithinByte else -1,
+                                            isActiveBitTone = isActiveBitTone,
+                                            focusColor = focusColor,
+                                            onFocusColor = onFocusColor,
+                                            inactiveColor = inactiveRawColor,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    PlaybackFollowViewMode.Morse -> {
+                        Column(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState())
+                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            annotationByteGroups.chunked(MorseGroupsPerRow).forEachIndexed { rowIndex, rowGroups ->
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    rowGroups.forEachIndexed { groupIndexInRow, group ->
+                                        val byteIndex = rowIndex * MorseGroupsPerRow + groupIndexInRow
+                                        val isActiveByte = isActive && byteIndex == activeByteIndexWithinToken
                                         PlaybackByteBlock(
                                             group = group,
                                             mode = annotationMode,
                                             isActive = isActiveByte,
                                             isPast = isActive && byteIndex < activeByteIndexWithinToken,
                                             activeBitIndex = if (isActiveByte) activeBitIndexWithinByte else -1,
+                                            isActiveBitTone = isActiveBitTone,
                                             focusColor = focusColor,
                                             onFocusColor = onFocusColor,
                                             inactiveColor = inactiveRawColor,
@@ -229,7 +275,8 @@ internal fun PlaybackFollowTokenCard(
 private val PlaybackFollowTokenCardMinimumWidth = 92.dp
 private val PlaybackFollowTokenCardMaximumWidth = 360.dp
 private const val BinaryByteGroupsPerRow = 3
-private const val HexByteGroupsPerRow = 8
+private const val HexByteGroupsPerRow = 4
+private const val MorseGroupsPerRow = 4
 
 private data class CharacterDisplayUnit(
     val text: String,
@@ -261,64 +308,237 @@ private fun characterDisplayUnits(token: String): List<CharacterDisplayUnit> {
 }
 
 @Composable
+private fun PlaybackHexByteBlock(
+    group: String,
+    isActive: Boolean,
+    isPast: Boolean,
+    activeBitIndex: Int,
+    isActiveBitTone: Boolean,
+    focusColor: Color,
+    onFocusColor: Color,
+    inactiveColor: Color,
+) {
+    val nibbles = remember(group) { hexNibbleGroups(group) }
+    val currentNibbleIndex =
+        if (isActive && activeBitIndex >= 4 && nibbles.size > 1) {
+            1
+        } else {
+            0
+        }.coerceAtMost(nibbles.lastIndex.coerceAtLeast(0))
+    val currentNibble = nibbles.getOrNull(currentNibbleIndex) ?: HexNibbleGroup(hex = group, binary = "0000")
+    val activeBitIndexWithinNibble =
+        if (isActive && activeBitIndex >= 0) {
+            activeBitIndex % 4
+        } else {
+            -1
+        }
+    PlaybackHexNibbleBlock(
+        hexText = if (isActive) currentNibble.hex else group.uppercase(),
+        binaryText = currentNibble.binary,
+        isActive = isActive,
+        isPast = isPast,
+        activeBitIndex = activeBitIndexWithinNibble,
+        isActiveBitTone = isActiveBitTone,
+        focusColor = focusColor,
+        onFocusColor = onFocusColor,
+        inactiveColor = inactiveColor,
+    )
+}
+
+@Composable
+private fun PlaybackHexNibbleBlock(
+    hexText: String,
+    binaryText: String,
+    isActive: Boolean,
+    isPast: Boolean,
+    activeBitIndex: Int,
+    isActiveBitTone: Boolean,
+    focusColor: Color,
+    onFocusColor: Color,
+    inactiveColor: Color,
+) {
+    val hexColor =
+        when {
+            isActive -> onFocusColor
+            isPast -> focusColor
+            else -> inactiveColor
+        }
+    val hexBackground = if (isActive) focusColor else Color.Transparent
+    val hexWeight = if (isActive) FontWeight.Bold else FontWeight.Medium
+    val annotatedBinaryText =
+        buildAnnotatedString {
+            binaryText.forEachIndexed { bitIndex, bitChar ->
+                val isCurrentBit = isActive && isActiveBitTone && bitIndex == activeBitIndex
+                val isHistoryBit =
+                    isPast ||
+                        (
+                            isActive &&
+                                activeBitIndex >= 0 &&
+                                (
+                                    if (isActiveBitTone) {
+                                        bitIndex < activeBitIndex
+                                    } else {
+                                        bitIndex <= activeBitIndex
+                                    }
+                                )
+                        )
+                val (textColor, backgroundColor, weight) =
+                    when {
+                        isCurrentBit -> Triple(onFocusColor, focusColor, FontWeight.Bold)
+                        isHistoryBit -> Triple(focusColor, Color.Transparent, FontWeight.Medium)
+                        else -> Triple(inactiveColor, Color.Transparent, FontWeight.Medium)
+                    }
+                withStyle(SpanStyle(color = textColor, background = backgroundColor, fontWeight = weight)) {
+                    append(bitChar)
+                }
+            }
+        }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text =
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = hexColor, background = hexBackground, fontWeight = hexWeight)) {
+                        append(hexText)
+                    }
+                },
+            style =
+                MaterialTheme.typography.labelLarge.copy(
+                    fontFamily = FontFamily.Monospace,
+                ),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            softWrap = false,
+        )
+        Text(
+            text = annotatedBinaryText,
+            style =
+                MaterialTheme.typography.labelSmall.copy(
+                    fontFamily = FontFamily.Monospace,
+                ),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            softWrap = false,
+        )
+    }
+}
+
+private data class HexNibbleGroup(
+    val hex: String,
+    val binary: String,
+)
+
+private fun hexNibbleGroups(group: String): List<HexNibbleGroup> =
+    group
+        .mapNotNull { hexChar ->
+            hexChar.digitToIntOrNull(radix = 16)?.let { value ->
+                HexNibbleGroup(
+                    hex = hexChar.uppercaseChar().toString(),
+                    binary = value.toString(radix = 2).padStart(4, '0'),
+                )
+            }
+        }.ifEmpty {
+            listOf(HexNibbleGroup(hex = group, binary = "0000"))
+        }
+
+@Composable
 private fun PlaybackByteBlock(
     group: String,
     mode: PlaybackFollowViewMode,
     isActive: Boolean,
     isPast: Boolean,
     activeBitIndex: Int,
+    isActiveBitTone: Boolean,
     focusColor: Color,
     onFocusColor: Color,
     inactiveColor: Color,
 ) {
-    val text = buildAnnotatedString {
-        if (isActive) {
-            when (mode) {
-                PlaybackFollowViewMode.Binary -> {
-                    group.forEachIndexed { bitIndex, bitChar ->
-                        val isHistoryBit = bitIndex < activeBitIndex
-                        val isCurrentBit = bitIndex == activeBitIndex
-                        
-                        val (textColor, bgColor, weight) = when {
-                            isCurrentBit -> Triple(onFocusColor, focusColor, FontWeight.Bold)
-                            isHistoryBit -> Triple(focusColor, Color.Transparent, FontWeight.Medium)
-                            else -> Triple(inactiveColor, Color.Transparent, FontWeight.Medium)
-                        }
+    val text =
+        buildAnnotatedString {
+            if (isActive) {
+                when (mode) {
+                    PlaybackFollowViewMode.Binary -> {
+                        group.forEachIndexed { bitIndex, bitChar ->
+                            val isCurrentBit = isActiveBitTone && bitIndex == activeBitIndex
+                            val isHistoryBit =
+                                if (isActiveBitTone) {
+                                    bitIndex < activeBitIndex
+                                } else {
+                                    bitIndex <= activeBitIndex
+                                }
 
-                        withStyle(SpanStyle(color = textColor, background = bgColor, fontWeight = weight)) {
-                            append(bitChar)
+                            val (textColor, bgColor, weight) =
+                                when {
+                                    isCurrentBit -> Triple(onFocusColor, focusColor, FontWeight.Bold)
+                                    isHistoryBit -> Triple(focusColor, Color.Transparent, FontWeight.Medium)
+                                    else -> Triple(inactiveColor, Color.Transparent, FontWeight.Medium)
+                                }
+
+                            withStyle(SpanStyle(color = textColor, background = bgColor, fontWeight = weight)) {
+                                append(bitChar)
+                            }
+                        }
+                    }
+                    PlaybackFollowViewMode.Hex -> {
+                        val currentNibbleIndex = if (activeBitIndex >= 0) activeBitIndex / 4 else -1
+                        group.forEachIndexed { nibbleIndex, hexChar ->
+                            val isCurrentNibble = isActiveBitTone && nibbleIndex == currentNibbleIndex
+                            val isHistoryNibble =
+                                if (isActiveBitTone) {
+                                    nibbleIndex < currentNibbleIndex
+                                } else {
+                                    nibbleIndex <= currentNibbleIndex
+                                }
+
+                            val (textColor, bgColor, weight) =
+                                when {
+                                    isCurrentNibble -> Triple(onFocusColor, focusColor, FontWeight.Bold)
+                                    isHistoryNibble -> Triple(focusColor, Color.Transparent, FontWeight.Medium)
+                                    else -> Triple(inactiveColor, Color.Transparent, FontWeight.Medium)
+                                }
+
+                            withStyle(SpanStyle(color = textColor, background = bgColor, fontWeight = weight)) {
+                                append(hexChar)
+                            }
+                        }
+                    }
+                    PlaybackFollowViewMode.Morse -> {
+                        group.forEachIndexed { elementIndex, elementChar ->
+                            val isCurrentElement = isActiveBitTone && elementIndex == activeBitIndex
+                            val isHistoryElement =
+                                if (isActiveBitTone) {
+                                    elementIndex < activeBitIndex
+                                } else {
+                                    elementIndex <= activeBitIndex
+                                }
+
+                            val (textColor, bgColor, weight) =
+                                when {
+                                    isCurrentElement -> Triple(onFocusColor, focusColor, FontWeight.Bold)
+                                    isHistoryElement -> Triple(focusColor, Color.Transparent, FontWeight.Medium)
+                                    else -> Triple(inactiveColor, Color.Transparent, FontWeight.Medium)
+                                }
+
+                            withStyle(SpanStyle(color = textColor, background = bgColor, fontWeight = weight)) {
+                                append(elementChar)
+                            }
                         }
                     }
                 }
-                PlaybackFollowViewMode.Hex -> {
-                    val currentNibbleIndex = if (activeBitIndex >= 0) activeBitIndex / 4 else -1
-                    group.forEachIndexed { nibbleIndex, hexChar ->
-                        val isHistoryNibble = nibbleIndex < currentNibbleIndex
-                        val isCurrentNibble = nibbleIndex == currentNibbleIndex
-
-                        val (textColor, bgColor, weight) = when {
-                            isCurrentNibble -> Triple(onFocusColor, focusColor, FontWeight.Bold)
-                            isHistoryNibble -> Triple(focusColor, Color.Transparent, FontWeight.Medium)
-                            else -> Triple(inactiveColor, Color.Transparent, FontWeight.Medium)
-                        }
-
-                        withStyle(SpanStyle(color = textColor, background = bgColor, fontWeight = weight)) {
-                            append(hexChar)
-                        }
-                    }
+            } else {
+                withStyle(
+                    SpanStyle(
+                        color = if (isPast) focusColor else inactiveColor,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                ) {
+                    append(group)
                 }
-            }
-        } else {
-            withStyle(
-                SpanStyle(
-                    color = if (isPast) focusColor else inactiveColor,
-                    fontWeight = FontWeight.Medium,
-                ),
-            ) {
-                append(group)
             }
         }
-    }
 
     Text(
         text = text,

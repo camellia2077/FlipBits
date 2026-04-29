@@ -141,6 +141,15 @@ internal fun PlaybackDisplaySection(
                             frameSamples = frameSamples,
                             modifier = Modifier.fillMaxWidth(),
                         )
+
+                    PlaybackVisualizationRoute.MorseTimeline ->
+                        MorseTimelineVisualizer(
+                            followData = followData,
+                            displayedSamples = displayedSamples,
+                            frameSamples = frameSamples,
+                            isPlaying = isPlaying,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                 }
             }
         } else {
@@ -149,6 +158,7 @@ internal fun PlaybackDisplaySection(
             PlaybackDataFollowSection(
                 followData = followData,
                 displayedSamples = displayedSamples,
+                transportMode = transportMode,
             )
         }
         PlaybackTokenContextTape(

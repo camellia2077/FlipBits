@@ -251,6 +251,7 @@
     <string name="audio_follow_view_hex">Hex</string>
     <!-- CONTEXT: View-mode label in the playback follow data section for binary output. -->
     <string name="audio_follow_view_binary">Binary</string>
+    <string name="audio_follow_view_morse">Morse</string>
     <!-- CONTEXT: Section title in the saved-audio player detail sheet for saved-file metadata. -->
     <string name="audio_player_detail_saved_info_title">Details</string>
     <!-- CONTEXT: Label in the saved-audio player detail sheet for transport mode. -->
@@ -285,6 +286,7 @@
     <string name="transport_mode_pro_label">pro</string>
     <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
     <string name="transport_mode_ultra_label">ultra</string>
+    <string name="transport_mode_mini_label">mini</string>
     <!-- CONTEXT: Short helper text shown under the input field when flash mode is selected. -->
     <string name="audio_transport_flash_hint">flash uses UTF-8 text.</string>
     <!-- CONTEXT: Example placeholder text shown for flash mode when the input is empty. -->
@@ -295,8 +297,20 @@
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <!-- CONTEXT: Short helper text shown under the input field when ultra mode is selected. -->
     <string name="audio_transport_ultra_hint">ultra uses UTF-8 text.</string>
+    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <!-- CONTEXT: Morse speed preset label. Keep short for a segmented control. -->
+    <string name="audio_morse_speed_slow">Slow</string>
+    <!-- CONTEXT: Morse speed preset label. Keep short for a segmented control. -->
+    <string name="audio_morse_speed_standard">Standard</string>
+    <!-- CONTEXT: Morse speed preset label. Keep short for a segmented control. -->
+    <string name="audio_morse_speed_fast">Fast</string>
+    <!-- CONTEXT: Mini/Morse input helper. %1$s is the normalized Morse-compatible text preview. -->
+    <string name="audio_morse_normalized_preview">Normalized Morse: %1$s</string>
+    <!-- CONTEXT: Mini/Morse input helper. %1$s is the list of unsupported characters typed by the user. -->
+    <string name="audio_morse_unsupported_characters">Unsupported Morse characters: %1$s</string>
     <!-- CONTEXT: Example placeholder text shown for ultra mode when the input is empty. -->
     <string name="audio_transport_ultra_example">The lamp keepers unseal the old star chart</string>
+    <string name="audio_transport_mini_example">PRAISE THE OMNISSIAH</string>
     <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
     <string name="audio_sample_thematic_2">Deep in the bell tower, the sealed engine begins to hum</string>
     <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->

@@ -24,16 +24,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
-import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.DecodedPayloadViewData
+import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 
 private enum class DecodedPayloadTab {
@@ -202,7 +202,7 @@ internal fun DecodedPayloadContent(
                                 )
                             }
                         }
-                    }    
+                    }
                 }
             }
         }

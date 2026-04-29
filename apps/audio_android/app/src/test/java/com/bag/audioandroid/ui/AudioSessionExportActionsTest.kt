@@ -2,8 +2,8 @@ package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioExportResult
-import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
+import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioContent
 import com.bag.audioandroid.domain.SavedAudioImportResult
 import com.bag.audioandroid.domain.SavedAudioItem
@@ -46,7 +46,7 @@ class AudioSessionExportActionsTest {
                                 displayName = "test.wav",
                                 uriString = "content://saved/test",
                             ),
-                ),
+                    ),
                 sampleRateHz = 44100,
                 refreshSavedAudioItems = {},
                 workerDispatcher = Dispatchers.Unconfined,
@@ -100,7 +100,7 @@ class AudioSessionExportActionsTest {
             generatedAudioMetadata =
                 GeneratedAudioMetadata(
                     mode = TransportModeOption.Flash,
-                    flashVoicingStyle = FlashVoicingStyleOption.CodedBurst,
+                    flashVoicingStyle = FlashVoicingStyleOption.Steady,
                     createdAtIsoUtc = "2026-03-17T00:00:00Z",
                     durationMs = 1L,
                     sampleRateHz = 44_100,
@@ -111,7 +111,7 @@ class AudioSessionExportActionsTest {
                     appVersion = "1.0.0",
                     coreVersion = "1.0.0",
                 ),
-            generatedFlashVoicingStyle = FlashVoicingStyleOption.CodedBurst,
+            generatedFlashVoicingStyle = FlashVoicingStyleOption.Steady,
         )
 
     private fun assertResId(

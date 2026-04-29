@@ -66,9 +66,8 @@ fun ConfigTabScreen(
                 .padding(
                     top = contentPadding.calculateTopPadding(),
                     start = contentPadding.calculateStartPadding(layoutDirection),
-                    end = contentPadding.calculateEndPadding(layoutDirection)
-                )
-                .verticalScroll(rememberScrollState()),
+                    end = contentPadding.calculateEndPadding(layoutDirection),
+                ).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         ConfigLanguageSection(
@@ -123,9 +122,9 @@ fun ConfigTabScreen(
                 Text(">", color = accentTokens.disclosureAccentTint, fontWeight = FontWeight.Bold)
             }
         }
-        
+
         androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.height(contentPadding.calculateBottomPadding())
+            modifier = Modifier.height(contentPadding.calculateBottomPadding()),
         )
     }
 }

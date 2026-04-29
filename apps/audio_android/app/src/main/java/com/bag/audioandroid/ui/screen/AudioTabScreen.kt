@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -39,6 +40,8 @@ fun AudioTabScreen(
     isFlashVoicingEnabled: Boolean,
     selectedFlashVoicingStyle: FlashVoicingStyleOption,
     onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
+    selectedMorseSpeed: MorseSpeedOption,
+    onMorseSpeedSelected: (MorseSpeedOption) -> Unit,
     inputText: String,
     inputPlaceholderText: String,
     onInputTextChange: (String) -> Unit,
@@ -86,7 +89,7 @@ fun AudioTabScreen(
                 .padding(
                     top = contentPadding.calculateTopPadding(),
                     start = contentPadding.calculateStartPadding(layoutDirection),
-                    end = contentPadding.calculateEndPadding(layoutDirection)
+                    end = contentPadding.calculateEndPadding(layoutDirection),
                 ),
     ) {
         // Treat transport mode as the Audio page's primary navigation, not as just another
@@ -116,6 +119,8 @@ fun AudioTabScreen(
                 isFlashVoicingEnabled = isFlashVoicingEnabled,
                 selectedFlashVoicingStyle = selectedFlashVoicingStyle,
                 onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
+                selectedMorseSpeed = selectedMorseSpeed,
+                onMorseSpeedSelected = onMorseSpeedSelected,
                 inputCardExpanded = inputCardExpanded,
                 onToggleInputCardExpanded = { inputCardExpanded = !inputCardExpanded },
                 inputText = inputText,
@@ -137,8 +142,8 @@ fun AudioTabScreen(
                 onToggleFlashVoicingExpanded = {
                     val nextExpanded = !flashVoicingExpanded
                     flashVoicingExpanded = nextExpanded
-                    if (!nextExpanded && selectedFlashVoicingStyle != FlashVoicingStyleOption.CodedBurst) {
-                        onFlashVoicingStyleSelected(FlashVoicingStyleOption.CodedBurst)
+                    if (!nextExpanded && selectedFlashVoicingStyle != FlashVoicingStyleOption.Steady) {
+                        onFlashVoicingStyleSelected(FlashVoicingStyleOption.Steady)
                     }
                 },
             )
@@ -155,7 +160,7 @@ fun AudioTabScreen(
             )
 
             androidx.compose.foundation.layout.Spacer(
-                modifier = Modifier.height(contentPadding.calculateBottomPadding())
+                modifier = Modifier.height(contentPadding.calculateBottomPadding()),
             )
         }
         AudioModeSwitcherBar(

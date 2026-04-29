@@ -1,10 +1,10 @@
 package com.bag.audioandroid.ui.state
 
+import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioFolder
 import com.bag.audioandroid.domain.SavedAudioItem
-import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
@@ -15,6 +15,7 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerSource
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
@@ -43,7 +44,8 @@ data class AudioAppUiState(
     val isConfigLanguageExpanded: Boolean = true,
     val isConfigThemeAppearanceExpanded: Boolean = true,
     val isFlashVoicingEnabled: Boolean = true,
-    val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.CodedBurst,
+    val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.Steady,
+    val selectedMorseSpeed: MorseSpeedOption = MorseSpeedOption.default,
     val transportMode: TransportModeOption = TransportModeOption.Flash,
     val sessions: Map<TransportModeOption, ModeAudioSessionState> = defaultModeSessions(),
     val currentPlaybackSource: AudioPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),

@@ -11,21 +11,29 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerSegmentedButtonColors
 
 @Composable
 internal fun PlaybackFollowAnnotationModeSwitcher(
     selectedMode: PlaybackFollowViewMode,
     onModeSelected: (PlaybackFollowViewMode) -> Unit,
+    transportMode: TransportModeOption?,
     modifier: Modifier = Modifier,
 ) {
+    val options =
+        if (transportMode == TransportModeOption.Mini) {
+            listOf(PlaybackFollowViewMode.Morse)
+        } else {
+            PlaybackFollowViewMode.entries.filterNot { it == PlaybackFollowViewMode.Morse }
+        }
     SingleChoiceSegmentedButtonRow(
         modifier =
             modifier
                 .fillMaxWidth()
                 .testTag("follow-annotation-switcher"),
     ) {
-        PlaybackFollowViewMode.entries.forEachIndexed { index, option ->
+        options.forEachIndexed { index, option ->
             val optionLabel = stringResource(option.titleResId)
             SegmentedButton(
                 selected = selectedMode == option,
@@ -37,7 +45,7 @@ internal fun PlaybackFollowAnnotationModeSwitcher(
                 shape =
                     SegmentedButtonDefaults.itemShape(
                         index = index,
-                        count = PlaybackFollowViewMode.entries.size,
+                        count = options.size,
                     ),
                 colors = playerSegmentedButtonColors(),
                 label = { Text(text = optionLabel) },

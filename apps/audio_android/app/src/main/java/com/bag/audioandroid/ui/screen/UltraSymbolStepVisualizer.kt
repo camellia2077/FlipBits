@@ -180,12 +180,13 @@ private fun UltraSymbolStepChart(
                 }
 
             if (stepPoints.size >= 2) {
-                val path = Path().apply {
-                    moveTo(stepPoints.first().point.x, stepPoints.first().point.y)
-                    stepPoints.drop(1).forEach { indexedPoint ->
-                        lineTo(indexedPoint.point.x, indexedPoint.point.y)
+                val path =
+                    Path().apply {
+                        moveTo(stepPoints.first().point.x, stepPoints.first().point.y)
+                        stepPoints.drop(1).forEach { indexedPoint ->
+                            lineTo(indexedPoint.point.x, indexedPoint.point.y)
+                        }
                     }
-                }
                 drawPath(
                     path = path,
                     color = inactiveColor.copy(alpha = 0.20f),
@@ -244,9 +245,7 @@ private fun UltraSymbolStepChart(
 }
 
 @Composable
-private fun UltraReferenceTicks(
-    modifier: Modifier = Modifier,
-) {
+private fun UltraReferenceTicks(modifier: Modifier = Modifier) {
     Column(
         modifier =
             modifier.padding(start = 8.dp, top = 10.dp, bottom = 10.dp),
@@ -260,9 +259,7 @@ private fun UltraReferenceTicks(
 }
 
 @Composable
-private fun UltraReferenceTick(
-    label: String,
-) {
+private fun UltraReferenceTick(label: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),

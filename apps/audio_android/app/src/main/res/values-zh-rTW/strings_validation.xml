@@ -9,6 +9,7 @@
     <string name="validation_invalid_flash_signal_profile">不支援的 flash 訊號設定檔。</string>
     <string name="validation_invalid_flash_voicing_flavor">不支援的 flash 風格。</string>
     <string name="validation_pro_ascii_only">Pro 僅支援 ASCII。</string>
+    <string name="validation_mini_morse_only">Mini Morse supports A-Z, 0-9, spaces, and common Morse punctuation.</string>
     <string name="validation_payload_too_large">輸入文字已超過此模式的 512 位元組單一 frame 上限。</string>
     <string name="error_invalid_argument">無效參數。</string>
     <string name="error_not_ready">結果尚未就緒。</string>

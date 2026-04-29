@@ -1,3 +1,4 @@
+#include "bag_api.h"
 #include "jni_bridge_internal.h"
 
 extern "C" JNIEXPORT jshortArray JNICALL

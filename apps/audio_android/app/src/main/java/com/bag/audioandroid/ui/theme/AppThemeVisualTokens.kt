@@ -166,7 +166,7 @@ fun brandThemeVisualTokens(
         subtleOutlineColor = depthShadow.copy(alpha = 0.52f),
         timelineInactiveTrackColor = blend(base, accent, 0.10f),
         visualizationBaseBackgroundColor = blend(base, accent, 0.10f),
-        // Inactive waveform/tone rails now always use the recessed shadow 
+        // Inactive waveform/tone rails now always use the recessed shadow
         // to match the Ancient Alloy philosophy of depth.
         visualizationInactiveToneColor = depthShadow,
     )

@@ -65,15 +65,17 @@
     <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
     <string name="config_flash_style_title">Flash 스타일</string>
     <string name="config_flash_style_subtitle">Flash 오디오의 사운드 방식을 선택하세요.</string>
+    <string name="config_flash_style_steady_label">평온</string>
+    <string name="config_flash_style_steady_description">명확하고 안정적인 기계 신호.</string>
+    <string name="config_flash_style_hostile_label">분노</string>
+    <string name="config_flash_style_hostile_description">분노한 명령 프리셋입니다. 현재는 평온 신호 셸을 사용합니다.</string>
+    <string name="config_flash_style_litany_label">경배</string>
+    <string name="config_flash_style_litany_description">기도 프리셋이며 더 느린 의식 신호 박자를 사용합니다.</string>
+    <string name="config_flash_style_collapse_label">공포</string>
+    <string name="config_flash_style_collapse_description">공포와 붕괴 프리셋입니다. 현재는 평온 신호 셸을 사용합니다.</string>
     <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
-    <string name="config_flash_style_coded_burst_label">코드 버스트</string>
-    <string name="config_flash_style_coded_burst_description">기계적인 신호를 위한 고밀도 그룹화 버스트.</string>
     <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
-    <string name="config_flash_style_ritual_chant_label">의식용 찬트</string>
-    <string name="config_flash_style_ritual_chant_description">의식적인 명령 톤을 위한 부드럽고 울림 있는 구절.</string>
     <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
-    <string name="config_flash_style_deep_ritual_label">심층 의식</string>
-    <string name="config_flash_style_deep_ritual_description">대성당 같은 의식 구절과 깊은 공명, 엄숙한 합창 쉘.</string>
     <string name="config_about_title">정보</string>
     <string name="config_about_subtitle">제작자, 프로젝트 링크 및 라이선스</string>
     <string name="palette_ruby_title">루비 레드</string>

@@ -186,7 +186,7 @@ internal object AndroidSampleCatalog {
         fun resIdFor(mode: TransportModeOption): Int =
             when (mode) {
                 TransportModeOption.Flash, TransportModeOption.Ultra -> themedResId
-                TransportModeOption.Pro -> asciiResId
+                TransportModeOption.Pro, TransportModeOption.Mini -> asciiResId
             }
     }
 
@@ -200,7 +200,7 @@ internal object AndroidSampleCatalog {
         fun resIdFor(mode: TransportModeOption): Int =
             when (mode) {
                 TransportModeOption.Flash, TransportModeOption.Ultra -> themedResId
-                TransportModeOption.Pro -> asciiResId
+                TransportModeOption.Pro, TransportModeOption.Mini -> asciiResId
             }
     }
 
@@ -214,7 +214,7 @@ internal object AndroidSampleCatalog {
         fun resIdFor(mode: TransportModeOption): Int =
             when (mode) {
                 TransportModeOption.Flash, TransportModeOption.Ultra -> themedResId
-                TransportModeOption.Pro -> asciiResId
+                TransportModeOption.Pro, TransportModeOption.Mini -> asciiResId
             }
     }
 
@@ -228,7 +228,7 @@ internal object AndroidSampleCatalog {
         fun resIdFor(mode: TransportModeOption): Int =
             when (mode) {
                 TransportModeOption.Flash, TransportModeOption.Ultra -> themedResId
-                TransportModeOption.Pro -> asciiResId
+                TransportModeOption.Pro, TransportModeOption.Mini -> asciiResId
             }
     }
 
@@ -242,7 +242,7 @@ internal object AndroidSampleCatalog {
         fun resIdFor(mode: TransportModeOption): Int =
             when (mode) {
                 TransportModeOption.Flash, TransportModeOption.Ultra -> themedResId
-                TransportModeOption.Pro -> asciiResId
+                TransportModeOption.Pro, TransportModeOption.Mini -> asciiResId
             }
     }
 
@@ -256,7 +256,7 @@ internal object AndroidSampleCatalog {
         fun resIdFor(mode: TransportModeOption): Int =
             when (mode) {
                 TransportModeOption.Flash, TransportModeOption.Ultra -> themedResId
-                TransportModeOption.Pro -> asciiResId
+                TransportModeOption.Pro, TransportModeOption.Mini -> asciiResId
             }
     }
 
@@ -451,7 +451,6 @@ internal object AndroidSampleCatalog {
                 ),
             )
 
-
         val immortalRotSampleCatalog =
             listOf(
                 ImmortalRotSampleDefinition(
@@ -572,7 +571,6 @@ internal object AndroidSampleCatalog {
                 ),
             )
 
-
         val exquisiteFallSampleCatalog =
             listOf(
                 ExquisiteFallSampleDefinition(
@@ -661,7 +659,6 @@ internal object AndroidSampleCatalog {
                 ),
             )
 
-
         val labyrinthOfMutabilitySampleCatalog =
             listOf(
                 LabyrinthOfMutabilitySampleDefinition(
@@ -721,7 +718,5 @@ internal object AndroidSampleCatalog {
                     asciiResId = R.string.audio_sample_pro_ascii_truth_crushes_the_seer,
                 ),
             )
-
-
     }
 }

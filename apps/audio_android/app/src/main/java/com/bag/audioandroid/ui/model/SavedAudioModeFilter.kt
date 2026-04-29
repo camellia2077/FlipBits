@@ -12,6 +12,10 @@ enum class SavedAudioModeFilter(
         labelResId = R.string.common_all,
         mode = null,
     ),
+    Mini(
+        labelResId = R.string.transport_mode_mini_label,
+        mode = TransportModeOption.Mini,
+    ),
     Flash(
         labelResId = R.string.transport_mode_flash_label,
         mode = TransportModeOption.Flash,

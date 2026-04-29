@@ -50,8 +50,7 @@ internal class MediaStoreSavedAudioQueries(
             listRows().firstOrNull { it.uri == targetUri }
         }
 
-    fun uriForItemId(itemId: String): Uri? =
-        itemId.toLongOrNull()?.let { ContentUris.withAppendedId(collection, it) }
+    fun uriForItemId(itemId: String): Uri? = itemId.toLongOrNull()?.let { ContentUris.withAppendedId(collection, it) }
 
     fun delete(itemId: String): Boolean {
         val uri = uriForItemId(itemId) ?: return false

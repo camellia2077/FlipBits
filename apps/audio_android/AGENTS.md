@@ -16,6 +16,8 @@
   - `docs/design/android/android-dual-tone-theme.md`
 - 如果改动涉及 JNI / native 编解码 / WAV metadata / release-only native 问题，再按需读：
   - `docs/architecture/android-native-strategy.md`
+- 如果改动涉及 flash voicing 选择器、preset、emotion 文案或 `{signalProfileValue, voicingFlavorValue}` 接线，再按需读：
+  - `docs/design/flash-voicing-emotions.md`
 - 如果改动涉及 XML 文案 / 本地化 / 样例文本 / 翻译检查失败，再按需读：
   - `docs/design/android/android-translation-workflow.md`
   - `docs/design/android/android-translation-tooling-agent-index.md`
@@ -30,6 +32,7 @@
   - 本地化目录的对应 `strings*.xml`
 - 修改 XML 文案、本地化结构或样例文本时，优先按 `docs/design/android/android-translation-workflow.md` 的流程处理，不要跳过 translation key alignment。
 - 新增 XML 文案 key 时，不允许只落在单一语言目录。
+- 新增 XML 文案 key 时，优先使用脚手架：`python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`。
 - 改动语言切换、随机样例或默认文案时，还要检查：
   - `data/AndroidSampleInputTextProvider.kt`
   - `ui/SampleInputSessionUpdater.kt`
@@ -75,4 +78,7 @@
 - 需要质量检查时，优先运行：
   - `python tools/run.py android ktlint-check`
   - `python tools/run.py android detekt`
+  - `python tools/run.py android kotlin-policy`
   - `python tools/run.py android quality`
+- 修复 review findings 或小批量跨层改动后，可先跑：
+  - `python tools/run.py verify review-fixes --build-dir build/dev`

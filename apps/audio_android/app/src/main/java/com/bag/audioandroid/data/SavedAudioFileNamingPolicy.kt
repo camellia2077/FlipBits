@@ -1,8 +1,7 @@
 package com.bag.audioandroid.data
 
 internal class SavedAudioFileNamingPolicy {
-    fun normalizeRenameBaseName(newBaseName: String): String? =
-        newBaseName.trim().takeIf { it.isNotEmpty() }?.let(::ensureWavExtension)
+    fun normalizeRenameBaseName(newBaseName: String): String? = newBaseName.trim().takeIf { it.isNotEmpty() }?.let(::ensureWavExtension)
 
     fun resolveImportDisplayName(queriedDisplayName: String?): String {
         val rawName =

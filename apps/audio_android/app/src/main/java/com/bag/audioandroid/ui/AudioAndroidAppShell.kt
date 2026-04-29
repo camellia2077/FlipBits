@@ -14,11 +14,11 @@ import com.bag.audioandroid.ui.theme.LocalAppThemeVisualTokens
 import com.bag.audioandroid.ui.theme.LocalAudioEncodeGlyphColors
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.audioEncodeGlyphColorsForBrandTheme
-import com.bag.audioandroid.ui.theme.brandThemeVisualTokens
 import com.bag.audioandroid.ui.theme.brandAccentTokens
+import com.bag.audioandroid.ui.theme.brandThemeVisualTokens
 import com.bag.audioandroid.ui.theme.defaultAudioEncodeGlyphColors
-import com.bag.audioandroid.ui.theme.materialThemeVisualTokens
 import com.bag.audioandroid.ui.theme.materialAccentTokens
+import com.bag.audioandroid.ui.theme.materialThemeVisualTokens
 
 @Composable
 internal fun AudioAndroidAppShell(

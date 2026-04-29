@@ -171,12 +171,13 @@ internal fun buildFskEnergyBucketsFromFollowData(
                 // Add a shallow per-symbol envelope so repeated 0s or 1s still
                 // read as separate payload bits instead of one continuous band.
                 val displayOverlap =
-                    overlap * timelineSymbolDisplayEnvelope(
-                        symbolStart = entry.startSample.toFloat(),
-                        symbolSampleCount = entry.sampleCount,
-                        overlapStart = maxOf(bucketStart, entry.startSample.toFloat()),
-                        overlapEnd = minOf(bucketEnd, (entry.startSample + entry.sampleCount).toFloat()),
-                    )
+                    overlap *
+                        timelineSymbolDisplayEnvelope(
+                            symbolStart = entry.startSample.toFloat(),
+                            symbolSampleCount = entry.sampleCount,
+                            overlapStart = maxOf(bucketStart, entry.startSample.toFloat()),
+                            overlapEnd = minOf(bucketEnd, (entry.startSample + entry.sampleCount).toFloat()),
+                        )
                 lowWeight += displayOverlap * bitWeights.lowWeight
                 highWeight += displayOverlap * bitWeights.highWeight
             }
@@ -317,13 +318,5 @@ internal const val FlashSignalMinimumAnalysisSamples = 96
 private const val FlashSignalTimelineSymbolCoreRatio = 0.62f
 private const val FlashSignalTimelineSymbolEdgeFloor = 0.12f
 
-internal fun flashSignalActiveWindowBucketCount(flashVoicingStyle: FlashVoicingStyleOption?): Int {
-    // Keep ritual_chant wider because it moves more slowly and benefits from a
-    // longer scan-head window. Keep coded_burst tighter because it moves fast
-    // and reads more clearly as a short 3-bar burst.
-    return when (flashVoicingStyle) {
-        FlashVoicingStyleOption.DeepRitual -> 12
-        FlashVoicingStyleOption.RitualChant -> 8
-        else -> 3
-    }
-}
+internal fun flashSignalActiveWindowBucketCount(flashVoicingStyle: FlashVoicingStyleOption?): Int =
+    flashVoicingStyle?.flashVisualActiveWindowBucketCount ?: 3

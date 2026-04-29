@@ -145,6 +145,7 @@
     <string name="audio_follow_display_data">数据</string>
     <string name="audio_follow_view_hex">十六进制</string>
     <string name="audio_follow_view_binary">二进制</string>
+    <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">详情</string>
     <string name="audio_player_detail_saved_mode">模式</string>
     <string name="audio_player_detail_saved_duration">时长</string>
@@ -165,12 +166,20 @@
     <string name="transport_mode_pro_label">pro</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
     <string name="transport_mode_ultra_label">ultra</string>
+    <string name="transport_mode_mini_label">mini</string>
     <string name="audio_transport_flash_hint">flash 模式使用 UTF-8 文本。</string>
     <string name="audio_transport_flash_example">守灯人解开了古老星图的封印</string>
     <string name="audio_transport_pro_hint">pro 模式仅使用 ASCII 文本。</string>
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra 模式使用 UTF-8 文本。</string>
+    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_morse_speed_slow">慢速</string>
+    <string name="audio_morse_speed_standard">标准</string>
+    <string name="audio_morse_speed_fast">快速</string>
+    <string name="audio_morse_normalized_preview">规范化 Morse：%1$s</string>
+    <string name="audio_morse_unsupported_characters">不支持的 Morse 字符：%1$s</string>
     <string name="audio_transport_ultra_example">守灯人解开了古老星图的封印</string>
+    <string name="audio_transport_mini_example">PRAISE THE OMNISSIAH</string>
     <string name="audio_sample_thematic_2">钟楼深处，封印的引擎开始轰鸣</string>
     <string name="audio_sample_thematic_3">第七盏灯已点亮，远方的门户仍一片死寂</string>
     <string name="audio_sample_thematic_4">越过灰烬港湾，一艘朝圣船穿过黑色水域</string>

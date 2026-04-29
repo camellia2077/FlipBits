@@ -149,7 +149,6 @@ class SampleInputSessionUpdaterTest {
         assertEquals("CUSTOM INPUT", updated.getValue(TransportModeOption.Ultra).inputText)
         assertNull(updated.getValue(TransportModeOption.Ultra).sampleInputId)
     }
-
 }
 
 private class UpdaterFakeSampleInputTextProvider : SampleInputTextProvider {
@@ -178,7 +177,7 @@ private class UpdaterFakeSampleInputTextProvider : SampleInputTextProvider {
         flavor: SampleFlavor,
     ): List<SampleInput> =
         when (mode) {
-            TransportModeOption.Pro ->
+            TransportModeOption.Pro, TransportModeOption.Mini ->
                 when (flavor) {
                     SampleFlavor.SacredMachine ->
                         listOf(

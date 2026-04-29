@@ -64,15 +64,17 @@
     <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
     <string name="config_flash_style_title">Flash 风格</string>
     <string name="config_flash_style_subtitle">选择 Flash 音频的发声效果。</string>
+    <string name="config_flash_style_steady_label">平稳</string>
+    <string name="config_flash_style_steady_description">清晰稳定的机械信号。</string>
+    <string name="config_flash_style_hostile_label">愤怒</string>
+    <string name="config_flash_style_hostile_description">愤怒的命令预设；当前先使用平稳信号外壳。</string>
+    <string name="config_flash_style_litany_label">崇敬</string>
+    <string name="config_flash_style_litany_description">崇敬祷告预设，使用更慢的仪式信号节奏。</string>
+    <string name="config_flash_style_collapse_label">恐惧</string>
+    <string name="config_flash_style_collapse_description">恐惧与崩溃预设；当前先使用平稳信号外壳。</string>
     <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
-    <string name="config_flash_style_coded_burst_label">编码脉冲</string>
-    <string name="config_flash_style_coded_burst_description">密集的成组脉冲，呈现机器般的信号感。</string>
     <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
-    <string name="config_flash_style_ritual_chant_label">仪式颂唱</string>
-    <string name="config_flash_style_ritual_chant_description">平滑的共鸣短语，带有肃穆的仪式指令感。</string>
     <!-- CONTEXT: Preset label. Short chip-like option. Keep it compact. -->
-    <string name="config_flash_style_deep_ritual_label">深度仪式</string>
-    <string name="config_flash_style_deep_ritual_description">大教堂般的仪式短语，具有更深沉的共鸣和肃穆的合唱外壳。</string>
     <string name="config_about_title">关于</string>
     <string name="config_about_subtitle">作者、项目链接及许可协议</string>
     <string name="palette_ruby_title">红宝石红</string>

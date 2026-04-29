@@ -7,7 +7,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -15,12 +14,11 @@ import androidx.compose.ui.test.performClick
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
-import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
+import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
 import com.bag.audioandroid.ui.model.TransportModeOption
-import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -122,7 +120,11 @@ class AudioPlaybackProgressSectionTest {
     @Test
     fun `lyrics mode stays stable inside outer vertical scroll container`() {
         composeRule.setContent {
-            Column(modifier = androidx.compose.ui.Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier =
+                    androidx.compose.ui.Modifier
+                        .verticalScroll(rememberScrollState()),
+            ) {
                 AudioPlaybackProgressSection(
                     displayedSamples = 0,
                     totalSamples = 8,

@@ -42,13 +42,13 @@ class PlayerDetailSheetContentTest {
                         subtitle =
                             UiText.Resource(
                                 R.string.audio_mini_player_generated_flash_subtitle,
-                                listOf(UiText.Resource(FlashVoicingStyleOption.RitualChant.labelResId), "0:44"),
+                                listOf(UiText.Resource(FlashVoicingStyleOption.Litany.labelResId), "0:44"),
                             ),
                         leadingIcon = MiniPlayerLeadingIcon.Generated,
                         durationMs = 44_000L,
                         transportMode = TransportModeOption.Flash,
                         isFlashMode = true,
-                        flashVoicingStyle = FlashVoicingStyleOption.RitualChant,
+                        flashVoicingStyle = FlashVoicingStyleOption.Litany,
                         source = MiniPlayerSource.Generated,
                     ),
                 displayedSamples = 7,
@@ -154,7 +154,7 @@ class PlayerDetailSheetContentTest {
                         durationMs = 44_000L,
                         transportMode = TransportModeOption.Flash,
                         isFlashMode = true,
-                        flashVoicingStyle = FlashVoicingStyleOption.RitualChant,
+                        flashVoicingStyle = FlashVoicingStyleOption.Litany,
                         source = MiniPlayerSource.Generated,
                     ),
                 displayedSamples = 7,
@@ -203,9 +203,7 @@ class PlayerDetailSheetContentTest {
         composeRule.onAllNodesWithTag("follow-token-active", useUnmergedTree = true).assertCountEquals(1)
     }
 
-    private fun setPreviewPlayerDetailContent(
-        initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
-    ) {
+    private fun setPreviewPlayerDetailContent(initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual) {
         composeRule.setContent {
             PlayerDetailSheetContent(
                 miniPlayerModel =
@@ -216,7 +214,7 @@ class PlayerDetailSheetContentTest {
                         durationMs = 100_000L,
                         transportMode = TransportModeOption.Flash,
                         isFlashMode = true,
-                        flashVoicingStyle = FlashVoicingStyleOption.RitualChant,
+                        flashVoicingStyle = FlashVoicingStyleOption.Litany,
                         source = MiniPlayerSource.Generated,
                     ),
                 displayedSamples = 10_000,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -13,7 +14,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
@@ -121,7 +121,12 @@ internal fun ProPlaybackGuideCard(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ProGuidePill(
                     title = stringResource(R.string.audio_pro_visual_now),
-                    value = stringResource(R.string.audio_pro_visual_symbol_summary, proSymbolSlotLabel(currentSymbol.slotIndexWithinByte), currentSymbol.nibbleHex),
+                    value =
+                        stringResource(
+                            R.string.audio_pro_visual_symbol_summary,
+                            proSymbolSlotLabel(currentSymbol.slotIndexWithinByte),
+                            currentSymbol.nibbleHex,
+                        ),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 ProGuidePill(
@@ -138,13 +143,14 @@ internal fun ProPlaybackGuideCard(
                 )
             }
             Text(
-                text = stringResource(
-                    R.string.audio_pro_visual_token_mapping,
-                    tokenByteMapping.tokenIndex,
-                    tokenByteMapping.tokenText.ifBlank { "?" },
-                    tokenByteMapping.byteIndexWithinToken + 1,
-                    tokenByteMapping.byteCountWithinUnit.coerceAtLeast(1),
-                ),
+                text =
+                    stringResource(
+                        R.string.audio_pro_visual_token_mapping,
+                        tokenByteMapping.tokenIndex,
+                        tokenByteMapping.tokenText.ifBlank { "?" },
+                        tokenByteMapping.byteIndexWithinToken + 1,
+                        tokenByteMapping.byteCountWithinUnit.coerceAtLeast(1),
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(

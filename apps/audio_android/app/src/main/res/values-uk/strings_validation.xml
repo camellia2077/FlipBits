@@ -9,6 +9,7 @@
     <string name="validation_invalid_flash_signal_profile">Непідтримуваний профіль flash-сигналу.</string>
     <string name="validation_invalid_flash_voicing_flavor">Непідтримуваний стиль flash.</string>
     <string name="validation_pro_ascii_only">pro підтримує лише ASCII.</string>
+    <string name="validation_mini_morse_only">Mini Morse supports A-Z, 0-9, spaces, and common Morse punctuation.</string>
     <string name="validation_payload_too_large">Текст перевищує ліміт 512 байтів одного кадру для цього режиму.</string>
     <string name="error_invalid_argument">Неприпустимий аргумент.</string>
     <string name="error_not_ready">Результат ще не готовий.</string>

@@ -3,10 +3,10 @@ package com.bag.audioandroid.data
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
-import kotlin.text.Charsets.UTF_8
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.text.Charsets.UTF_8
 
 class PayloadFollowDesignNormalizerTest {
     @Test

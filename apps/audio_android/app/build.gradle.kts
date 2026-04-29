@@ -1,9 +1,9 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.configure
 import java.io.File
 import java.util.Properties
-import org.gradle.api.tasks.Exec
 
 val flipbitsAndroidModulesSmokeEnabled =
     providers
@@ -32,8 +32,7 @@ fun signingProperty(name: String): String? =
         ?: System.getenv("FLIPBITS_ANDROID_RELEASE_SIGNING_${name.uppercase()}")?.takeIf { it.isNotBlank() }
         ?: releaseSigningProperties.getProperty(name)?.takeIf { it.isNotBlank() }
 
-fun requiredSigningProperty(name: String): String =
-    signingProperty(name) ?: error("Missing release signing property: $name")
+fun requiredSigningProperty(name: String): String = signingProperty(name) ?: error("Missing release signing property: $name")
 
 val hasReleaseSigningProperties =
     listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all {
@@ -158,22 +157,23 @@ android {
     }
 
     androidResources {
-        localeFilters += listOf(
-            "en",
-            "zh",
-            "zh-rTW",
-            "ja",
-            "de",
-            "ru",
-            "es",
-            "pt-rBR",
-            "uk",
-            "ko",
-            "fr",
-            "it",
-            "pl",
-            "la",
-        )
+        localeFilters +=
+            listOf(
+                "en",
+                "zh",
+                "zh-rTW",
+                "ja",
+                "de",
+                "ru",
+                "es",
+                "pt-rBR",
+                "uk",
+                "ko",
+                "fr",
+                "it",
+                "pl",
+                "la",
+            )
     }
 
     externalNativeBuild {
@@ -203,7 +203,11 @@ extensions.configure<AboutLibrariesExtension>("aboutLibraries") {
     android {
         registerAndroidTasks.set(false)
     }
+    collect {
+        filterVariants.add("release")
+    }
     export {
+        variant.set("release")
         outputFile.set(layout.buildDirectory.file("generated/aboutlibraries/res/raw/aboutlibraries.json"))
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -27,17 +28,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
-import com.bag.audioandroid.ui.utilityActionIconButtonColors
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @Composable
 internal fun BrandThemeSection(
@@ -184,16 +183,17 @@ internal fun BrandThemeRow(
             ) {
                 if (selected) {
                     SelectedBadge(
-                        text = stringResource(R.string.config_palette_selected)
+                        text = stringResource(R.string.config_palette_selected),
                     )
                 }
                 if (onEdit != null) {
                     IconButton(
                         onClick = onEdit,
                         colors = utilityActionIconButtonColors(),
-                        modifier = Modifier.semantics {
-                            contentDescription = editContentDescription
-                        },
+                        modifier =
+                            Modifier.semantics {
+                                contentDescription = editContentDescription
+                            },
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.Edit,
@@ -250,4 +250,3 @@ internal fun BrandThemePreview(
         }
     }
 }
-

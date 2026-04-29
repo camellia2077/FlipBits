@@ -26,13 +26,13 @@ int NormalizeFrameSamples(int sample_rate_hz, int frame_samples);
 
 bag_encoder_config MakeEncoderConfig(int sample_rate_hz,
                                      int frame_samples,
-                                     int flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                                     int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+                                     int flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                                     int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY);
 
 bag_decoder_config MakeDecoderConfig(int sample_rate_hz,
                                      int frame_samples,
-                                     int flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                                     int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+                                     int flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                                     int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY);
 
 bag_encode_job* HandleToEncodeJob(jlong handle);
 

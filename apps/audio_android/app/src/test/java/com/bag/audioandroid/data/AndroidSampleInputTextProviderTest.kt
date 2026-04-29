@@ -60,56 +60,62 @@ class AndroidSampleInputTextProviderTest {
 
         AppLanguageOption.entries.forEach { language ->
             val sacredProText =
-                provider.defaultSample(
-                    TransportModeOption.Pro,
-                    language,
-                    SampleFlavor.SacredMachine,
-                ).text
+                provider
+                    .defaultSample(
+                        TransportModeOption.Pro,
+                        language,
+                        SampleFlavor.SacredMachine,
+                    ).text
             assertEquals("APPLY SACRED OIL TO BRASS CALIPERS", sacredProText)
             assertTrue(sacredProText.all { it.code in 0..0x7F })
 
             val dynastyProText =
-                provider.defaultSample(
-                    TransportModeOption.Pro,
-                    language,
-                    SampleFlavor.AncientDynasty,
-                ).text
+                provider
+                    .defaultSample(
+                        TransportModeOption.Pro,
+                        language,
+                        SampleFlavor.AncientDynasty,
+                    ).text
             assertEquals("IMMORTAL ALLOY HAND CLOSES. NO WARMTH ANSWERS.", dynastyProText)
             assertTrue(dynastyProText.all { it.code in 0..0x7F })
 
             val rotProText =
-                provider.defaultSample(
-                    TransportModeOption.Pro,
-                    language,
-                    SampleFlavor.ImmortalRot,
-                ).text
+                provider
+                    .defaultSample(
+                        TransportModeOption.Pro,
+                        language,
+                        SampleFlavor.ImmortalRot,
+                    ).text
             assertEquals("BRIGHT MUSHROOMS RISE FROM EMPTY EYES", rotProText)
             assertTrue(rotProText.all { it.code in 0..0x7F })
 
             val scarletProText =
-                provider.defaultSample(
-                    TransportModeOption.Pro,
-                    language,
-                    SampleFlavor.ScarletCarnage,
-                ).text
+                provider
+                    .defaultSample(
+                        TransportModeOption.Pro,
+                        language,
+                        SampleFlavor.ScarletCarnage,
+                    ).text
             assertEquals("EYES BURST RED. BLOOD BOILS. TEETH KEEP BITING.", scarletProText)
             assertTrue(scarletProText.all { it.code in 0..0x7F })
 
             val exquisiteProText =
-                provider.defaultSample(
-                    TransportModeOption.Pro,
-                    language,
-                    SampleFlavor.ExquisiteFall,
-                ).text
+                provider
+                    .defaultSample(
+                        TransportModeOption.Pro,
+                        language,
+                        SampleFlavor.ExquisiteFall,
+                    ).text
             assertEquals("GOLD DUST FILLS THE LUNGS. HANDS STILL REACH FOR MORE.", exquisiteProText)
             assertTrue(exquisiteProText.all { it.code in 0..0x7F })
 
             val labyrinthProText =
-                provider.defaultSample(
-                    TransportModeOption.Pro,
-                    language,
-                    SampleFlavor.LabyrinthOfMutability,
-                ).text
+                provider
+                    .defaultSample(
+                        TransportModeOption.Pro,
+                        language,
+                        SampleFlavor.LabyrinthOfMutability,
+                    ).text
             assertEquals("HERO CUTS ONE STRING. THE NEXT NOOSE TIGHTENS.", labyrinthProText)
             assertTrue(labyrinthProText.all { it.code in 0..0x7F })
         }

@@ -3,7 +3,6 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
-import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

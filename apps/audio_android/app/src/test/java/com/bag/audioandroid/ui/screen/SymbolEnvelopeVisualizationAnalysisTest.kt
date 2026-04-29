@@ -144,7 +144,7 @@ class SymbolEnvelopeVisualizationAnalysisTest {
                 symbolSamples = 2_205,
                 targetBucketCount = 24,
                 transportMode = TransportModeOption.Pro,
-        )
+            )
 
         assertFalse(earlierBuckets == laterBuckets)
         assertTrue(earlierBuckets.zip(laterBuckets).any { (earlier, later) -> earlier != later })

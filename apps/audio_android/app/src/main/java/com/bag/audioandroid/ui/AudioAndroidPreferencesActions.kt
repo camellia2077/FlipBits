@@ -13,11 +13,11 @@ import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.theme.customBrandTheme
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
-import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 internal class AudioAndroidPreferencesActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
@@ -126,7 +126,7 @@ internal class AudioAndroidPreferencesActions(
     }
 
     fun onFlashVoicingStyleSelected(style: FlashVoicingStyleOption) {
-        val isEnhancedStyle = style != FlashVoicingStyleOption.CodedBurst
+        val isEnhancedStyle = style != FlashVoicingStyleOption.Steady
         uiState.update {
             it.copy(
                 selectedFlashVoicingStyle = style,

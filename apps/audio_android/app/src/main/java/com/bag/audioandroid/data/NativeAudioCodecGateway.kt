@@ -5,9 +5,9 @@ import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
-import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
+import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay

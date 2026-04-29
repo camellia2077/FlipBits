@@ -12,18 +12,19 @@ internal object CustomBrandThemeSettingsStore {
     private const val KeyOutlineHex = "outline_hex"
 
     fun encode(settings: List<CustomBrandThemeSettings>): String =
-        JSONArray().apply {
-            settings.forEach { item ->
-                put(
-                    JSONObject()
-                        .put(KeyPresetId, item.presetId)
-                        .put(KeyDisplayName, item.displayName)
-                        .put(KeyBackgroundHex, item.backgroundHex)
-                        .put(KeyAccentHex, item.accentHex)
-                        .put(KeyOutlineHex, item.outlineHexOrNull),
-                )
-            }
-        }.toString()
+        JSONArray()
+            .apply {
+                settings.forEach { item ->
+                    put(
+                        JSONObject()
+                            .put(KeyPresetId, item.presetId)
+                            .put(KeyDisplayName, item.displayName)
+                            .put(KeyBackgroundHex, item.backgroundHex)
+                            .put(KeyAccentHex, item.accentHex)
+                            .put(KeyOutlineHex, item.outlineHexOrNull),
+                    )
+                }
+            }.toString()
 
     fun decode(rawValue: String?): List<CustomBrandThemeSettings> {
         if (rawValue.isNullOrBlank()) {
