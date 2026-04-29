@@ -6,6 +6,7 @@ from commands.apply_translation_replacements import (
     DEFAULT_JSON_PATH,
     apply_translation_replacements,
 )
+from commands.add_translation_key import add_translation_key
 from commands.fix_android_resource_escapes import run_fix_android_resource_escapes
 from commands.check_mixed_language import run_mixed_language_check
 from commands.check_translation_key_alignment import run_translation_key_alignment_check
@@ -239,6 +240,45 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Emit machine-readable JSON instead of human-readable text.",
     )
+    add_key_parser = subparsers.add_parser(
+        "add-key",
+        help="Add a string key to the English baseline file and matching localized files.",
+    )
+    add_key_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    add_key_parser.add_argument(
+        "--file",
+        required=True,
+        help="Resource XML filename, such as strings_audio.xml.",
+    )
+    add_key_parser.add_argument(
+        "--key",
+        required=True,
+        help="String resource key to add.",
+    )
+    add_key_parser.add_argument(
+        "--en",
+        required=True,
+        help="English baseline value.",
+    )
+    add_key_parser.add_argument(
+        "--localized",
+        default=None,
+        help="Optional localized fallback value for all values-* files. Defaults to --en.",
+    )
+    add_key_parser.add_argument(
+        "--context",
+        default=None,
+        help="Optional CONTEXT comment inserted above the English baseline key.",
+    )
+    add_key_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
 
     return parser.parse_args()
 
@@ -387,6 +427,43 @@ def run() -> int:
         )
         if json_output:
             emit_json_payload(fix_resource_escapes_payload(result))
+        return result.exit_code
+    if command == "add-key":
+        result = add_translation_key(
+            filename=args.file,
+            key=args.key,
+            english_value=args.en,
+            localized_value=args.localized,
+            context=args.context,
+            res_dir=args.res_dir,
+        )
+        payload = {
+            "ok": result.exit_code == 0,
+            "command": "add-key",
+            "exit_code": result.exit_code,
+            "summary": {
+                "touched_files": len(result.touched_files),
+                "skipped_files": len(result.skipped_files),
+            },
+            "artifacts": {
+                "touched_files": [normalize_path_string(path) for path in result.touched_files],
+                "skipped_files": [normalize_path_string(path) for path in result.skipped_files],
+            },
+            "errors": result.errors,
+        }
+        if json_output:
+            emit_json_payload(payload)
+        else:
+            print(
+                f"Added key `{args.key}` to {len(result.touched_files)} files "
+                f"(skipped existing: {len(result.skipped_files)})."
+            )
+            if result.touched_files:
+                print("Touched:")
+                for path in result.touched_files:
+                    print(f"- {normalize_path_string(path)}")
+            for error in result.errors:
+                print(error)
         return result.exit_code
 
     raise ValueError(f"Unsupported command: {command}")

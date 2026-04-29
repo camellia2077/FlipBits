@@ -76,6 +76,8 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
       - 主导风险类型，方便 agent 或人工快速判断是“命令层泄漏”“IO 过宽”还是“规则 helper 过密”
     - `suggestion`
       - 一句方向性建议，例如“把底层规则下沉到 core，命令层只保留编排和结果输出”
+    - `next_action`
+      - 更具体的第一步动作，例如“先把校验/规范化下沉到 core module，再让 command 调用它”
   - C++ 第一版也是保守启发式：综合文件行数、共享状态/线程原语、顶层符号数量、角色命名种类数、`mode/style/state` 分支数量，以及更贴近桥接/大实现文件的信号：
     - `interop_surface_hits`
       - 一个文件同时命中的桥接/FFI 面数量，例如 JNI 表面、C ABI 表面、封送 helper
@@ -90,6 +92,8 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
       - 主导风险类型，例如 `interop_surface_breadth`、`resource_lifecycle_density`
     - `suggestion`
       - 一句方向性建议，例如“把桥接/封送代码与编码规则 helper 分开，保留一层薄协调面”
+    - `next_action`
+      - 更具体的第一步动作，例如“先判断该文件是否只是边界 glue；如果是，就保留薄桥接，把转换规则移出”
 - `-t, --threshold N`
   - 兼容旧参数，等价于 `--over N`
 - `--log-file`
@@ -189,6 +193,7 @@ Python 额外字段：
 - `command_layer_leak_hits`
 - `dominant_risks`
 - `suggestion`
+- `next_action`
 
 C++ 额外字段：
 
@@ -198,6 +203,7 @@ C++ 额外字段：
 - `responsibility_verb_kind_count`
 - `dominant_risks`
 - `suggestion`
+- `next_action`
 
 这样终端输出和 `tools/scripts/loc/logs/scan_py.json` 里的结构会保持一致，方便 agent 直接读取日志做后续分析。
 
@@ -209,4 +215,5 @@ C++ 额外字段：
 4. `summary`
 5. `dominant_risks`
 6. `suggestion`
-7. 其余计数型证据信号
+7. `next_action`
+8. 其余计数型证据信号

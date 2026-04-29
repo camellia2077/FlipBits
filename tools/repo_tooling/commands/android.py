@@ -9,7 +9,8 @@ from ..build_config import load_build_config
 from ..constants import ANDROID_GRADLE_ROOT
 from ..errors import ToolError
 from ..paths import gradle_wrapper
-from ..process import print_command, run
+from ..process import print_command, run, run_capture_merged_streaming
+from .android_kotlin_policy import cmd_android_kotlin_policy
 
 
 ANDROID_ACTIONS = {
@@ -151,9 +152,48 @@ def _print_staging_apk_path_if_present() -> None:
         print(f"Staging APK: {STAGING_APK_OUTPUT_PATH}")
 
 
+def _add_android_string_key(args: argparse.Namespace) -> None:
+    missing_args = [
+        option
+        for option in ("file", "key", "en")
+        if not getattr(args, option, None)
+    ]
+    if missing_args:
+        formatted_args = ", ".join(f"--{option}" for option in missing_args)
+        raise ToolError(
+            "android strings-add requires resource filename, key, and English text.\n"
+            f"Missing: {formatted_args}\n"
+            "Example:\n"
+            "  python tools/run.py android strings-add --file strings_audio.xml "
+            "--key sample_key --en \"Sample text\""
+        )
+    command = [
+        "python",
+        "tools/scripts/android/translate/run.py",
+        "add-key",
+        "--file",
+        args.file,
+        "--key",
+        args.key,
+        "--en",
+        args.en,
+    ]
+    if args.localized is not None:
+        command.extend(["--localized", args.localized])
+    if args.context is not None:
+        command.extend(["--context", args.context])
+    run(command)
+
+
 def cmd_android(args: argparse.Namespace) -> None:
+    if getattr(args, "action", None) == "strings-add":
+        _add_android_string_key(args)
+        return
     if args.action == "install-sdk":
         _install_android_sdk_components(accept_licenses=args.accept_licenses)
+        return
+    if args.action == "kotlin-policy":
+        cmd_android_kotlin_policy()
         return
 
     if args.action == "assemble-release":
@@ -165,7 +205,19 @@ def cmd_android(args: argparse.Namespace) -> None:
     action = ANDROID_ACTIONS[args.action]
     command.extend(action["gradle_args"])
     command.extend(action["tasks"])
-    run(command, cwd=ANDROID_GRADLE_ROOT)
+    if args.action == "ktlint-check":
+        completed = run_capture_merged_streaming(command, cwd=ANDROID_GRADLE_ROOT)
+        if completed.returncode != 0:
+            print(
+                "\n[android] ktlint-check failed. If the reported issues are auto-correctable, run:\n"
+                "  python tools/run.py android ktlint-format\n"
+                "Then rerun:\n"
+                "  python tools/run.py android ktlint-check",
+                flush=True,
+            )
+            raise SystemExit(completed.returncode)
+    else:
+        run(command, cwd=ANDROID_GRADLE_ROOT)
 
     if args.action == "assemble-staging":
         _print_staging_apk_path_if_present()

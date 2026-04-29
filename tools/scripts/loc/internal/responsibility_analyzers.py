@@ -28,6 +28,7 @@ class ResponsibilityRiskResult:
     resource_lifecycle_hits: int = 0
     dominant_risks: list[str] | None = None
     suggestion: str | None = None
+    next_action: str | None = None
 
     def to_dict(self) -> dict:
         raw = asdict(self)
@@ -38,6 +39,7 @@ class ResponsibilityRiskResult:
             "summary",
             "dominant_risks",
             "suggestion",
+            "next_action",
             "lines",
             "state_signal_hits",
             "top_level_composables",

@@ -10,7 +10,9 @@
 - 常用命令组优先记这几个：`build`、`test`、`test-lib`、`verify`、`cli`、`windows`、`android`、`artifact`、`history`、`message`
 - 修改代码后，如需开始编译，优先使用 `python tools/run.py build --build-dir build/dev`。
 - 修改代码后，如需完整验证，优先使用 `python tools/run.py verify --build-dir build/dev`。
+- 修复 review findings 或小批量跨层改动后，可先跑较短验证：`python tools/run.py verify review-fixes --build-dir build/dev`。
 - 如需只跑库级单测，优先使用 `python tools/run.py test-lib <audio_runtime|audio_api|audio_io> --build-dir build/dev`。
+- 新增 Android XML 文案 key 时，优先用 `python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`，避免漏掉本地化目录。
 - 不再依赖根层 `ctest -R runtime_tests|api_tests|unit_tests` 作为正式工作流。
 - Python CLI 的 `--help` 保持分层：根命令只展示主要子命令与简短摘要，详细参数放到 `python tools/run.py <command> --help`，不要把所有选项堆到顶层帮助里。
 - 如需生成或导出可见产物，优先先看 `python tools/run.py artifact --help`。

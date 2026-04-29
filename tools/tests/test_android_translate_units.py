@@ -11,6 +11,7 @@ if str(TRANSLATE_DIR) not in sys.path:
     sys.path.insert(0, str(TRANSLATE_DIR))
 
 from commands.apply_translation_replacements import apply_replacement_in_string
+from commands.add_translation_key import add_translation_key
 from core.android_string_text import (
     decode_android_string_resource_text,
     encode_android_string_resource_text,
@@ -86,6 +87,72 @@ class ReplacementJsonPreflightTests(unittest.TestCase):
             self.assertTrue(result.ok)
             self.assertTrue(result.changed)
             self.assertIn('\\"quote\\"', json_path.read_text(encoding="utf-8"))
+
+
+class AddTranslationKeyTests(unittest.TestCase):
+    def test_add_translation_key_updates_base_and_localized_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            res_dir = Path(tmp_dir) / "res"
+            values_dir = res_dir / "values"
+            values_fr_dir = res_dir / "values-fr"
+            values_dir.mkdir(parents=True, exist_ok=True)
+            values_fr_dir.mkdir(parents=True, exist_ok=True)
+            base_xml = values_dir / "strings_audio.xml"
+            fr_xml = values_fr_dir / "strings_audio.xml"
+            xml_text = (
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                "<resources>\n"
+                "</resources>\n"
+            )
+            base_xml.write_text(xml_text, encoding="utf-8")
+            fr_xml.write_text(xml_text, encoding="utf-8")
+
+            result = add_translation_key(
+                filename="strings_audio.xml",
+                key="sample_new_key",
+                english_value='Audio "sample" & status',
+                localized_value="Audio localise",
+                context="Shown in the audio toolbar.",
+                res_dir=res_dir,
+            )
+
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(len(result.touched_files), 2)
+            self.assertEqual(len(result.skipped_files), 0)
+            base_text = base_xml.read_text(encoding="utf-8")
+            fr_text = fr_xml.read_text(encoding="utf-8")
+            self.assertIn("CONTEXT: Shown in the audio toolbar.", base_text)
+            self.assertIn(
+                '<string name="sample_new_key">Audio \\"sample\\" &amp; status</string>',
+                base_text,
+            )
+            self.assertIn(
+                '<string name="sample_new_key">Audio localise</string>',
+                fr_text,
+            )
+
+            second_result = add_translation_key(
+                filename="strings_audio.xml",
+                key="sample_new_key",
+                english_value="Ignored",
+                res_dir=res_dir,
+            )
+
+            self.assertEqual(second_result.exit_code, 0)
+            self.assertEqual(len(second_result.touched_files), 0)
+            self.assertEqual(len(second_result.skipped_files), 2)
+
+    def test_add_translation_key_reports_missing_base_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            result = add_translation_key(
+                filename="strings_missing.xml",
+                key="sample_new_key",
+                english_value="Sample",
+                res_dir=Path(tmp_dir) / "res",
+            )
+
+            self.assertEqual(result.exit_code, 2)
+            self.assertTrue(any("Base resource file not found" in error for error in result.errors))
 
 
 class ReplacementEntrySchemaTests(unittest.TestCase):

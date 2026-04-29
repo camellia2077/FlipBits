@@ -48,13 +48,14 @@
 
 推荐顺序：
 
-1. 改英文基线 XML
-2. 同步补本地化 XML
-3. 如果改动涉及样例文本，再检查：
+1. 新增 key 时优先用 `python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`
+2. 修改已有 key 时改英文基线 XML
+3. 同步补本地化 XML
+4. 如果改动涉及样例文本，再检查：
    - `apps/audio_android/app/src/main/java/com/bag/audioandroid/data/AndroidSampleInputTextProvider.kt`
    - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/SampleInputSessionUpdater.kt`
-4. 运行 Android 验证
-5. 如果翻译检查失败，去看自动生成的报告再补齐
+5. 运行 Android 验证
+6. 如果翻译检查失败，去看自动生成的报告再补齐
 
 ## Tool Entry
 
@@ -66,6 +67,12 @@
 
 ```powershell
 pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignment"
+```
+
+新增 key 脚手架：
+
+```powershell
+pwsh -NoLogo -Command "python tools/run.py android strings-add --file strings_audio.xml --key sample_key --en 'Sample text'"
 ```
 
 静默模式：

@@ -69,7 +69,25 @@ class KotlinResponsibilityScorer(BaseResponsibilityScorer):
             summary=summary,
             dominant_risks=dominant_risks or None,
             suggestion=suggestion,
+            next_action=self._build_kotlin_next_action(dominant_risks),
         )
+
+    @staticmethod
+    def _build_kotlin_next_action(
+        dominant_risks: list[ResponsibilityRiskKind],
+    ) -> str | None:
+        if not dominant_risks:
+            return None
+        if (
+            ResponsibilityRiskKind.STATEFUL_SIDE_EFFECTS in dominant_risks
+            and ResponsibilityRiskKind.MODE_BRANCHING in dominant_risks
+        ):
+            return "First extract the state/mode decision into a small model helper, then keep the Composable mostly rendering."
+        if ResponsibilityRiskKind.MODE_BRANCHING in dominant_risks:
+            return "First replace repeated mode branches with semantic helpers or a small option model."
+        if ResponsibilityRiskKind.STATEFUL_SIDE_EFFECTS in dominant_risks:
+            return "First move remember/side-effect orchestration behind a focused state holder."
+        return "First identify the largest UI subsection and split it behind a named Composable boundary."
 
 
 class PythonResponsibilityScorer(BaseResponsibilityScorer):
@@ -108,6 +126,7 @@ class PythonResponsibilityScorer(BaseResponsibilityScorer):
             summary=summary,
             dominant_risks=dominant_risks or None,
             suggestion=suggestion,
+            next_action=self._build_python_next_action(dominant_risks),
         )
 
     @staticmethod
@@ -131,6 +150,20 @@ class PythonResponsibilityScorer(BaseResponsibilityScorer):
         if ResponsibilityRiskKind.IO_SURFACE_BREADTH in dominant_risks:
             return "Keep IO at the edge and return structured results from the core logic."
         return "Trim the module into smaller units around side effects, mode branching, and reusable rules."
+
+    @staticmethod
+    def _build_python_next_action(
+        dominant_risks: list[ResponsibilityRiskKind],
+    ) -> str | None:
+        if not dominant_risks:
+            return None
+        if ResponsibilityRiskKind.COMMAND_LAYER_LEAK in dominant_risks:
+            return "First create or reuse a core module for validation/normalization, then make the command call it."
+        if ResponsibilityRiskKind.IO_SURFACE_BREADTH in dominant_risks:
+            return "First introduce a pure result object so file/console/subprocess work stays at the command edge."
+        if ResponsibilityRiskKind.RULE_HELPER_DENSITY in dominant_risks:
+            return "First group related rule helpers into a focused module with unit tests."
+        return "First split by one verb family such as read, validate, mutate, or report."
 
 
 class CppResponsibilityScorer(BaseResponsibilityScorer):
@@ -173,6 +206,7 @@ class CppResponsibilityScorer(BaseResponsibilityScorer):
             summary=summary,
             dominant_risks=dominant_risks or None,
             suggestion=suggestion,
+            next_action=self._build_cpp_next_action(dominant_risks),
         )
 
     @staticmethod
@@ -195,3 +229,19 @@ class CppResponsibilityScorer(BaseResponsibilityScorer):
         if ResponsibilityRiskKind.MODE_BRANCHING in dominant_risks:
             return "Narrow mode/style branching behind smaller strategy helpers or per-mode functions."
         return "Break the file around interop, lifecycle, and helper-heavy responsibilities before it grows further."
+
+    @staticmethod
+    def _build_cpp_next_action(
+        dominant_risks: list[ResponsibilityRiskKind],
+    ) -> str | None:
+        if not dominant_risks:
+            return None
+        if ResponsibilityRiskKind.INTEROP_SURFACE_BREADTH in dominant_risks:
+            return "First decide whether this file is boundary glue; if yes, keep a thin bridge and move conversion rules out."
+        if ResponsibilityRiskKind.RESOURCE_LIFECYCLE_DENSITY in dominant_risks:
+            return "First isolate ownership/release/cancel paths before changing codec behavior."
+        if ResponsibilityRiskKind.MODE_BRANCHING in dominant_risks:
+            return "First wrap the mode/style branch in a named helper, then split per-mode logic only if it keeps growing."
+        if ResponsibilityRiskKind.RULE_HELPER_DENSITY in dominant_risks:
+            return "First move reusable validation/build/map helpers next to the domain they serve."
+        return "First choose one responsibility boundary and add a narrow test before extracting code."

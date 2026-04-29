@@ -28,6 +28,7 @@ class ResponsibilityAssessment:
     summary: str
     dominant_risks: list[ResponsibilityRiskKind] | None = None
     suggestion: str | None = None
+    next_action: str | None = None
 
 
 def build_responsibility_result(
@@ -56,4 +57,5 @@ def build_responsibility_result(
         if assessment.dominant_risks
         else None,
         "suggestion": assessment.suggestion,
+        "next_action": assessment.next_action,
     }

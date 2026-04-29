@@ -107,6 +107,9 @@ class LocConsoleReporter:
                     suggestion = item.get("suggestion")
                     if suggestion:
                         print(f"            suggestion: {suggestion}")
+                    next_action = item.get("next_action")
+                    if next_action:
+                        print(f"            next action: {next_action}")
         else:
             print("  [OK] 扫描完毕，未发现超过风险阈值的文件。")
         print(f"\n{'-' * 100}\n")

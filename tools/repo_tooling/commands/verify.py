@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Callable
 
 from .android import cmd_android
+from .android_kotlin_policy import run_android_kotlin_policy_checks
 from .audio_io_boundary_policy import run_audio_io_boundary_policy_checks
 from .boundary_policy import run_boundary_policy_checks
 from .build import cmd_build
@@ -14,6 +15,8 @@ from .format import cmd_format
 from .module_structure_policy import run_module_structure_policy_checks
 from .retirement_policy import run_retirement_policy_checks
 from .test import cmd_test
+from .test_lib import cmd_test_lib
+from ..constants import ROOT_DIR
 from ..paths import resolve_build_dir
 from ..process import run
 
@@ -41,6 +44,11 @@ VERIFY_CHECK_GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
         "Guard boundary-adjacent host wiring, retired wrappers, Android private header self-containment, and post-legacy deleted surfaces.",
         ("boundary_hosts", "retired_wrappers", "android_private_headers", "post_legacy_surfaces"),
     ),
+    (
+        "android_kotlin_policy",
+        "Guard Android Kotlin project rules that are too specific for generic lint.",
+        ("flash_wire_branching",),
+    ),
 )
 
 VERIFY_STATIC_CHECK_RUNNERS: tuple[tuple[str, Callable[[], None]], ...] = (
@@ -48,6 +56,7 @@ VERIFY_STATIC_CHECK_RUNNERS: tuple[tuple[str, Callable[[], None]], ...] = (
     ("boundary", run_boundary_policy_checks),
     ("audio_io_boundary", run_audio_io_boundary_policy_checks),
     ("retirement", run_retirement_policy_checks),
+    ("android_kotlin_policy", run_android_kotlin_policy_checks),
 )
 
 def _print_verify_banner(message: str) -> None:
@@ -145,6 +154,11 @@ def run_verify_steps(
 
 
 def cmd_verify(args: argparse.Namespace) -> None:
+    if getattr(args, "verify_action", None) is None:
+        args.verify_action = "full"
+    if args.verify_action == "review-fixes":
+        cmd_verify_review_fixes(args)
+        return
     if getattr(args, "list_checks", False):
         print(format_verify_check_groups())
         return
@@ -157,3 +171,38 @@ def cmd_verify(args: argparse.Namespace) -> None:
         format_check=args.format_check,
         format_scope=args.format_scope,
     )
+
+
+def cmd_verify_review_fixes(args: argparse.Namespace) -> None:
+    build_dir = resolve_build_dir(args.build_dir)
+    _print_verify_banner("review-fixes 1/5: running static policy checks")
+    run_verify_static_checks()
+
+    _print_verify_banner("review-fixes 2/5: checking Android translation key alignment")
+    run(
+        [
+            "python",
+            "tools/scripts/android/translate/run.py",
+            "key-alignment",
+            "--quiet",
+        ],
+        cwd=ROOT_DIR,
+    )
+
+    _print_verify_banner("review-fixes 3/5: running audio_api tests")
+    cmd_test_lib(
+        argparse.Namespace(
+            library="audio_api",
+            build_dir=str(build_dir),
+            output_on_failure=True,
+            tests_regex=None,
+            report_dir=None,
+            write_report=True,
+        )
+    )
+
+    _print_verify_banner("review-fixes 4/5: running Android ktlint-check")
+    cmd_android(argparse.Namespace(action="ktlint-check", clean=False))
+
+    _print_verify_banner("review-fixes 5/5: assembling Android debug APK")
+    cmd_android(argparse.Namespace(action="assemble-debug", clean=False))
