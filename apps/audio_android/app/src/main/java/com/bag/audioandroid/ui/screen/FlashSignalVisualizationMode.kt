@@ -7,4 +7,5 @@ internal enum class FlashSignalVisualizationMode(
 ) {
     ToneTracks(R.string.audio_flash_visualizer_mode_tone_tracks),
     ToneEnergy(R.string.audio_flash_visualizer_mode_tone_energy),
+    PitchLadder(R.string.audio_flash_visualizer_mode_pitch_ladder),
 }

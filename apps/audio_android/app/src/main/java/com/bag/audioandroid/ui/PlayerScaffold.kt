@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,15 +49,14 @@ internal fun PlayerScaffold(
     val snackbarBottomPadding =
         bottomNavigationHeight + miniPlayerHeight + dockSpacing + PlayerScaffoldDefaults.snackbarBottomSpacing
 
-    Box(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
     ) {
-        content(
-            PaddingValues(bottom = contentBottomPadding),
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            content(
+                PaddingValues(bottom = contentBottomPadding),
+            )
 
         Column(
             modifier =
@@ -96,4 +96,5 @@ internal fun PlayerScaffold(
             }
         }
     }
+}
 }

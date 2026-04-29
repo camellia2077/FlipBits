@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-PROMPT_VERSION = "v3"
+from prompts.language_prompt_profiles import get_locale_prompt_profile
+
+PROMPT_VERSION = "v4"
 
 
 RESOURCE_TEXT_CONTENT_RULE = (
@@ -91,12 +93,14 @@ def build_english_source_review_prompt_for_text_type(text_type: str) -> str:
     )
 
 
-def build_translation_review_prompt_for_text_type(language_tag: str, text_type: str) -> str:
+def build_translation_review_prompt_for_text_type(locale_code: str, language_tag: str, text_type: str) -> str:
+    profile = get_locale_prompt_profile(locale_code)
     common_prefix = (
         f"Evaluate whether the [{language_tag}] lines are natural and suitable for [{language_tag}]. "
         "Do not require strict word-for-word translation from English. "
         f"Prefer wording that fits [{language_tag}] sentence structure, grammar, rhythm, pronunciation, and idiom. "
         "Meaning only needs to be broadly consistent with English. "
+        + profile.identity_rule
     )
     if text_type == "sample_text":
         return (
@@ -107,6 +111,7 @@ def build_translation_review_prompt_for_text_type(language_tag: str, text_type: 
             + RESOURCE_TEXT_CONTENT_RULE
             + CHANGE_THRESHOLD_RULE
             + _build_agent_sample_text_rule()
+            + profile.sample_text_rule
             + "For stylized titles or proper nouns, preserve the original meaning first; do not replace a title word with a different concept because it looks or sounds similar. "
             + "For user-facing audio, style, or settings terminology, prefer natural product language over clinical, implementation-oriented, or state-flag wording. "
             + JSON_OUTPUT_RULE
@@ -116,6 +121,7 @@ def build_translation_review_prompt_for_text_type(language_tag: str, text_type: 
         + RESOURCE_TEXT_CONTENT_RULE
         + CHANGE_THRESHOLD_RULE
         + _build_agent_app_text_rule()
+        + profile.app_text_rule
         + JSON_OUTPUT_RULE
     )
 
@@ -143,12 +149,14 @@ def build_manual_english_source_review_prompt_for_text_type(text_type: str) -> s
     )
 
 
-def build_manual_translation_review_prompt_for_text_type(language_tag: str, text_type: str) -> str:
+def build_manual_translation_review_prompt_for_text_type(locale_code: str, language_tag: str, text_type: str) -> str:
+    profile = get_locale_prompt_profile(locale_code)
     common_prefix = (
         f"Evaluate whether the [{language_tag}] lines are natural and suitable for [{language_tag}]. "
         "Do not require strict word-for-word translation from English. "
         f"Prefer wording that fits [{language_tag}] sentence structure, grammar, rhythm, pronunciation, and idiom. "
         "Meaning only needs to be broadly consistent with English. "
+        + profile.identity_rule
     )
     if text_type == "sample_text":
         return (
@@ -159,6 +167,7 @@ def build_manual_translation_review_prompt_for_text_type(language_tag: str, text
             + CHANGE_THRESHOLD_RULE
             + "Return review notes in plain natural-language text. "
             + _build_manual_sample_text_rule()
+            + profile.sample_text_rule
             + "For stylized titles or proper nouns, preserve the original meaning first; do not replace a title word with a different concept because it looks or sounds similar. "
         )
     return (
@@ -166,6 +175,7 @@ def build_manual_translation_review_prompt_for_text_type(language_tag: str, text
         + CHANGE_THRESHOLD_RULE
         + "Return review notes in plain natural-language text. "
         + _build_manual_app_text_rule()
+        + profile.app_text_rule
     )
 
 
@@ -173,23 +183,24 @@ def build_english_source_review_prompt() -> str:
     return build_english_source_review_prompt_for_text_type("sample_text")
 
 
-def build_translation_review_prompt(language_tag: str) -> str:
-    return build_translation_review_prompt_for_text_type(language_tag, "sample_text")
+def build_translation_review_prompt(locale_code: str, language_tag: str) -> str:
+    return build_translation_review_prompt_for_text_type(locale_code, language_tag, "sample_text")
 
 
 def build_manual_english_source_review_prompt() -> str:
     return build_manual_english_source_review_prompt_for_text_type("sample_text")
 
 
-def build_manual_translation_review_prompt(language_tag: str) -> str:
-    return build_manual_translation_review_prompt_for_text_type(language_tag, "sample_text")
+def build_manual_translation_review_prompt(locale_code: str, language_tag: str) -> str:
+    return build_manual_translation_review_prompt_for_text_type(locale_code, language_tag, "sample_text")
 
 
 def get_supported_prompt_modes() -> tuple[str, ...]:
     return ("agent_json", "manual_notes")
 
 
-def build_key_alignment_repair_prompt(language_tag: str) -> str:
+def build_key_alignment_repair_prompt(locale_code: str, language_tag: str) -> str:
+    profile = get_locale_prompt_profile(locale_code)
     return (
         f"Use this report to repair missing or misaligned [{language_tag}] Android string resources. "
         "Treat EN as the only source of meaning, and use CONTEXT when provided to understand UI role, tone, and constraints. "
@@ -198,5 +209,7 @@ def build_key_alignment_repair_prompt(language_tag: str) -> str:
         "For 'localized key exists but English base key is missing' and 'localized file has no English base counterpart', treat them as structural drift findings to inspect; do not delete or rewrite anything unless explicitly asked. "
         "Do not add, translate, or rewrite Pro sample keys that contain '_ascii_'; those fixed ASCII protocol samples are intentionally outside this report. "
         "Preserve placeholders such as %1$s, preserve product terms when needed, and keep terminology consistent across related settings labels. "
+        + profile.key_alignment_rule
+        + " "
         "Do not modify English resources. Do not infer a different target file or key than the DIR/FILE/KEY shown in the report."
     )

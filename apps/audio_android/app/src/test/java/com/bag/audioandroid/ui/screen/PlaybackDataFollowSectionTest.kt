@@ -1,17 +1,23 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +53,8 @@ class PlaybackDataFollowSectionTest {
 
         composeRule.onNodeWithTag("follow-token-strip").assertIsDisplayed()
         composeRule.onNodeWithText("BELL").assertIsDisplayed()
-        composeRule.onNodeWithText("42 45 4C 4C").assertIsDisplayed()
+        composeRule.onNodeWithText("42").assertIsDisplayed()
+        composeRule.onAllNodesWithText("4C").assertCountEquals(2)
     }
 
     @Test
@@ -60,7 +67,33 @@ class PlaybackDataFollowSectionTest {
             )
         }
 
-        composeRule.onNodeWithText("01000010 01000101 01001100 01001100").assertIsDisplayed()
+        composeRule.onNodeWithText("01000010").assertIsDisplayed()
+        composeRule.onAllNodesWithText("01001100").assertCountEquals(2)
+    }
+
+    @Test
+    fun `first active token starts centered inside lyrics strip`() {
+        composeRule.setContent {
+            Box(modifier = androidx.compose.ui.Modifier.width(360.dp)) {
+                PlaybackDataFollowSection(
+                    followData = sampleFollowData(),
+                    displayedSamples = 0,
+                )
+            }
+        }
+        composeRule.waitForIdle()
+
+        val stripBounds = composeRule.onNodeWithTag("follow-token-strip").getUnclippedBoundsInRoot()
+        val activeBounds =
+            composeRule
+                .onNodeWithTag("follow-token-active", useUnmergedTree = true)
+                .getUnclippedBoundsInRoot()
+        val stripCenterX = (stripBounds.left.value + stripBounds.right.value) / 2f
+        val activeCenterX = (activeBounds.left.value + activeBounds.right.value) / 2f
+
+        assertEquals(stripCenterX, activeCenterX, 2f)
+        assertTrue(activeBounds.left >= stripBounds.left)
+        assertTrue(activeBounds.right <= stripBounds.right)
     }
 
     @Test
@@ -136,6 +169,33 @@ class PlaybackDataFollowSectionTest {
             )
 
         assertEquals(listOf("11100110", "10011100", "10111010"), annotation)
+    }
+
+    @Test
+    fun `active bit index uses follow timeline bit offset from libs`() {
+        val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
+        val activeBitIndex =
+            activeBitIndexWithinByte(
+                activeTextIndex = 0,
+                activeByteIndexWithinToken = 0,
+                displayedSamples = 15,
+                followData =
+                    PayloadFollowViewData(
+                        binaryGroupTimeline =
+                            listOf(
+                                PayloadFollowBinaryGroupTimelineEntry(
+                                    startSample = 10,
+                                    sampleCount = 10,
+                                    groupIndex = 99,
+                                    bitOffset = 3,
+                                    bitCount = 1,
+                                ),
+                            ),
+                    ),
+                rawDisplayUnitsByToken = mapOf(0 to listOf(rawDisplayUnit)),
+            )
+
+        assertEquals(3, activeBitIndex)
     }
 
     private fun sampleFollowData(): PayloadFollowViewData =

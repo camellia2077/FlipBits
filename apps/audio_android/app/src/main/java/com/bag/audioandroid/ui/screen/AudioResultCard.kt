@@ -44,7 +44,7 @@ internal fun AudioResultCard(
 
     Surface(
         shape = MaterialTheme.shapes.medium,
-        tonalElevation = 2.dp,
+        tonalElevation = 0.dp,
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
@@ -91,6 +91,7 @@ internal fun AudioResultCard(
             }
             if (expanded) {
                 DecodedPayloadContent(
+                    accentTokens = accentTokens,
                     decodedPayload = decodedPayload,
                     emptyTextResId = R.string.audio_result_empty,
                     bodyExpanded = resultContentExpanded,

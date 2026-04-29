@@ -2,6 +2,7 @@ package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -120,22 +122,14 @@ internal fun BrandThemeRow(
     onClick: () -> Unit,
     onEdit: (() -> Unit)? = null,
 ) {
-    val usesStrongSelectedState = selected && option.id in StrongSelectedBrandThemeIds
     val editContentDescription = stringResource(R.string.config_custom_brand_theme_edit)
     val optionTitle = option.titleOverride ?: stringResource(option.titleResId)
     val optionDescription = option.descriptionOverride ?: stringResource(option.descriptionResId)
     val optionAccessibility = option.accessibilityLabelOverride ?: stringResource(option.accessibilityLabelResId)
-    val selectedContainerColor =
-        when (option.id) {
-            "mars_relic" -> lerp(option.backgroundColor, option.accentColor, 0.10f)
-            "scarlet_guard" -> lerp(option.backgroundColor, option.accentColor, 0.14f)
-            "black_crimson_rite" -> lerp(option.backgroundColor, option.accentColor, 0.22f)
-            else -> MaterialTheme.colorScheme.surface
-        }
 
     Surface(
-        color = if (usesStrongSelectedState) selectedContainerColor else MaterialTheme.colorScheme.surface,
-        tonalElevation = if (selected) 6.dp else 1.dp,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
         shadowElevation = if (selected) 2.dp else 0.dp,
         shape = MaterialTheme.shapes.medium,
         border =
@@ -164,6 +158,7 @@ internal fun BrandThemeRow(
                 backgroundColor = option.backgroundColor,
                 accentColor = option.accentColor,
                 outlineColor = option.outlineColor,
+                textColor = option.accentColor,
                 contentDescription = optionAccessibility,
             )
             Column(
@@ -216,42 +211,43 @@ internal fun BrandThemePreview(
     backgroundColor: Color,
     accentColor: Color,
     outlineColor: Color,
+    textColor: Color,
     contentDescription: String,
 ) {
-    Row(
+    val previewShape = RoundedCornerShape(6.dp)
+
+    Box(
         modifier =
             Modifier
-                .size(width = 56.dp, height = 36.dp)
-                .clip(MaterialTheme.shapes.extraSmall)
+                .size(width = 70.dp, height = 45.dp)
+                .clip(previewShape)
+                .border(2.25.dp, outlineColor, previewShape)
                 .semantics { this.contentDescription = contentDescription },
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .weight(0.5f)
-                    .fillMaxHeight()
-                    .background(backgroundColor),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .weight(0.35f)
-                    .fillMaxHeight()
-                    .background(accentColor),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .weight(0.15f)
-                    .fillMaxHeight()
-                    .background(outlineColor),
-        )
+        Row(modifier = Modifier.matchParentSize()) {
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(backgroundColor),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "A",
+                    color = textColor,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(accentColor),
+            )
+        }
     }
 }
 
-private val StrongSelectedBrandThemeIds =
-    setOf(
-        "mars_relic",
-        "scarlet_guard",
-        "black_crimson_rite",
-    )

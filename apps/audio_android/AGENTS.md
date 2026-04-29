@@ -9,9 +9,16 @@
 
 - `apps/audio_android` 是 Android 官方 `Gradle` root。
 - 先读 `apps/audio_android/README.md` 的“快速定位 / 常见改动入口”。
+- 想快速判断还要不要展开别的 Android 文档，先看：
+  - `docs/design/android/android-agent-read-order.md`
 - 如果改动涉及 UI / 配色 / 播放器结构，再按需读：
   - `docs/design/android/android-player-ui.md`
   - `docs/design/android/android-dual-tone-theme.md`
+- 如果改动涉及 JNI / native 编解码 / WAV metadata / release-only native 问题，再按需读：
+  - `docs/architecture/android-native-strategy.md`
+- 如果改动涉及 XML 文案 / 本地化 / 样例文本 / 翻译检查失败，再按需读：
+  - `docs/design/android/android-translation-workflow.md`
+  - `docs/design/android/android-translation-tooling-agent-index.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
   - `docs/architecture/android-ui-structure.md`
 
@@ -20,11 +27,8 @@
 - 优先按职责找入口，不要默认从最大文件开始搜。
 - 修改可见 XML 文案时，必须同步检查：
   - 英文基线按职责拆在 `app/src/main/res/values/strings_*.xml`
-  - `app/src/main/res/values-zh/strings.xml`
-  - `app/src/main/res/values-ja/strings.xml`
-  - `app/src/main/res/values-zh-rTW/strings.xml`
-  - `app/src/main/res/values-fr/strings.xml`
-- 当前英文已拆分、其他语言大多仍是单文件 `strings.xml`；找入口时先看英文对应职责文件，再同步到各语言目录。
+  - 本地化目录的对应 `strings*.xml`
+- 修改 XML 文案、本地化结构或样例文本时，优先按 `docs/design/android/android-translation-workflow.md` 的流程处理，不要跳过 translation key alignment。
 - 新增 XML 文案 key 时，不允许只落在单一语言目录。
 - 改动语言切换、随机样例或默认文案时，还要检查：
   - `data/AndroidSampleInputTextProvider.kt`

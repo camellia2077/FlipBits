@@ -16,6 +16,7 @@ from core.translation_reporting import (
     ReportKeyBlock,
 )
 from core.translation_resources import AndroidStringResourceRepository, ResourceFile
+from prompts.language_prompt_profiles import get_locale_prompt_profile
 from prompts.translation_review_prompts import build_key_alignment_repair_prompt
 
 DEFAULT_OUTPUT_DIRECTORY = Path(__file__).resolve().parents[5] / "temp" / "translation_key_alignment_reports"
@@ -57,16 +58,20 @@ class TranslationKeyAlignmentChecker:
             file_blocks = self._build_language_issue_blocks(lang_code, folder_path, base_files)
             if not file_blocks:
                 continue
+            profile = get_locale_prompt_profile(lang_code)
 
             output_file = self.output_manager.output_dir / lang_code / f"{lang_code}_translation_tasks.md"
             self.writer.write(
                 output_file,
                 title=f"{display_language_tag(lang_code)} Translation Tasks",
                 section=f"{display_language_tag(lang_code)} vs EN",
-                prompt=build_key_alignment_repair_prompt(display_language_tag(lang_code)),
+                prompt=build_key_alignment_repair_prompt(lang_code, display_language_tag(lang_code)),
                 metadata_lines=(
                     f"TOTAL_ISSUES: {sum(len(block.key_blocks) for block in file_blocks)}",
                     f"DIR: values-{lang_code}",
+                    f"LOCALE_PROFILE: {profile.profile_id}",
+                    f"LOCALE_MODE: {profile.mode}",
+                    f"LOCALE_NOTE: {profile.locale_note}",
                     "NOTE: Pro sample keys that contain '_ascii_' are intentionally excluded. They are fixed ASCII protocol samples and are not translation tasks.",
                 ),
                 file_blocks=tuple(file_blocks),

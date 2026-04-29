@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui.model
 import androidx.annotation.StringRes
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 data class BrandThemeOption(
     val id: String,
@@ -14,12 +15,14 @@ data class BrandThemeOption(
     val descriptionOverride: String? = null,
     val accessibilityLabelOverride: String? = null,
     val sampleFlavor: SampleFlavor,
-    val isDarkTheme: Boolean,
     val backgroundColor: Color,
     val accentColor: Color,
     val outlineColor: Color,
     val colorScheme: ColorScheme,
 ) {
+    val isDarkTheme: Boolean
+        get() = backgroundColor.luminance() < 0.5f
+
     val primaryColor: Color
         get() = backgroundColor
 

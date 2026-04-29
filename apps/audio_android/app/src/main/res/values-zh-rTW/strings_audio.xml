@@ -138,8 +138,9 @@
     <string name="audio_player_detail_saved_payload_bytes_value">%1$d 位元組</string>
     <string name="audio_generated_input_source_manual">手動輸入</string>
     <string name="audio_generated_input_source_sample">示例文字</string>
-    <string name="audio_flash_visualizer_mode_tone_tracks">FSK 軌道</string>
-    <string name="audio_flash_visualizer_mode_tone_energy">音調能量</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">軌道</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">能量</string>
+    <string name="audio_flash_visualizer_mode_pitch_ladder">階梯</string>
     <string name="transport_mode_flash_label">flash</string>
     <string name="transport_mode_pro_label">pro</string>
     <string name="transport_mode_ultra_label">ultra</string>

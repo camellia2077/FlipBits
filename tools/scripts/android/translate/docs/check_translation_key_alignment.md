@@ -21,6 +21,14 @@ For each localized `values-*` directory, the checker looks only at translation t
 
 It then compares them against the English `values/` baseline.
 
+Generated per-locale task reports may include locale-specific prompt metadata such as:
+
+- `LOCALE_PROFILE`
+- `LOCALE_MODE`
+- `LOCALE_NOTE`
+
+This allows agents to repair missing keys using the right writing brief for that locale instead of assuming every language follows the same translation style.
+
 Pro `_ascii_` sample keys are a special case: they now live in the shared English file `values/audio_samples_pro_ascii_shared.xml`, remain ASCII for every locale, and are intentionally excluded from missing-key translation tasks.
 
 Issues:

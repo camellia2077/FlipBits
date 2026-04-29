@@ -242,6 +242,52 @@ Generated review markdown now includes header metadata lines such as:
 
 These are part of the human-readable artifact, not the CLI JSON envelope, but agents may rely on them when deciding whether a review file is stale or suitable for direct JSON generation.
 
+Generated `*.task.json` files may also include locale-specific persona metadata under `locale_profile`, including a stable profile id, mode, note, and rule fragments. This is part of the machine-readable agent contract for locale-specific writing modes such as `values-la`.
+
+Current `*.task.json` shape:
+
+```json
+{
+  "task_version": 2,
+  "prompt_mode": "agent_json",
+  "prompt_version": "v4",
+  "generated_at": "2026-04-29T01:31:49Z",
+  "language": "la",
+  "language_tag": "LA",
+  "locale_profile": {
+    "id": "high_gothic_dog_latin",
+    "mode": "stylized_dog_latin",
+    "note": "High Gothic (`values-la`) is a stylized Dog Latin / pseudo-Latin locale.",
+    "identity_rule": "This locale is High Gothic, not classical Latin and not a standard translation locale.",
+    "app_text_rule": "For app UI text, keep labels usable and recognizable...",
+    "sample_text_rule": "For sample prose, atmosphere outranks literal fidelity...",
+    "key_alignment_rule": "When filling missing entries, write in the repository's High Gothic house style..."
+  },
+  "text_type": "sample_text",
+  "prompt_text_type": "sample_text",
+  "group": "ancient_dynasty",
+  "prompt_ref": "la/_prompts/agent_json_sample_text.md",
+  "entry_count": 10,
+  "entries": [
+    {
+      "dir": "values-la",
+      "xml": "values-la/audio_samples_ancient_dynasty_absolute_materialism.xml",
+      "name": "audio_sample_ancient_dynasty_themed_molecular_law_unthreads_flesh",
+      "sample_length": "SHORT",
+      "context": "This file contains localized themed sample text for flash/ultra.",
+      "en": "Molecular bonds severed; organic matter eradicated.",
+      "localized": "Vincula molecularia soluta; carnis penitus eradicata."
+    }
+  ]
+}
+```
+
+Stability notes:
+
+- `task_version` is the top-level schema version for agent task files.
+- `locale_profile` is the stable place for locale-specific writing persona data.
+- Agents that skip Markdown should read `locale_profile` directly instead of inferring persona only from `prompt_ref`.
+
 `run.py replace` accepts `--summary-out <path>`, which writes the same structured JSON result payload to disk for agent-job audit trails.
 `run.py compare` and `run.py replace` also accept `--job-dir <path>`, which updates `<job-dir>/job_manifest.json` so a single job folder can point to:
 

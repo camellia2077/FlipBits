@@ -21,7 +21,13 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -50,6 +56,7 @@ internal fun AudioInputActionsCard(
     encodeProgress: Float?,
     encodePhase: AudioEncodePhase?,
     isEncodeCancelling: Boolean,
+    isFlashVoicingEnabled: Boolean,
     selectedFlashVoicingStyle: FlashVoicingStyleOption,
     onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
     inputCardExpanded: Boolean,
@@ -69,20 +76,15 @@ internal fun AudioInputActionsCard(
     modifier: Modifier = Modifier,
 ) {
     val isEncodingBusy = isCodecBusy && encodeProgress != null
-    val encodePercent = ((encodeProgress ?: 0f).coerceIn(0f, 1f) * 100f).roundToInt()
-    val inputMetrics = measureAudioInputText(inputText)
     val accentTokens = appThemeAccentTokens()
 
     Surface(
         shape = MaterialTheme.shapes.medium,
-        tonalElevation = 2.dp,
+        tonalElevation = 0.dp,
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AudioInputCardHeader(
@@ -97,6 +99,7 @@ internal fun AudioInputActionsCard(
                         enabled = !isCodecBusy,
                         expanded = flashVoicingExpanded,
                         onToggleExpanded = onToggleFlashVoicingExpanded,
+                        isFlashVoicingEnabled = isFlashVoicingEnabled,
                         selectedFlashVoicingStyle = selectedFlashVoicingStyle,
                         onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
                     )
@@ -109,56 +112,64 @@ internal fun AudioInputActionsCard(
                     onRandomizeSampleInput = onRandomizeSampleInput,
                     onClearInput = onClearInput,
                 )
+                
+                var isInputFocused by remember { mutableStateOf(false) }
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = onInputTextChange,
                     enabled = !isCodecBusy,
-                    label = { Text(stringResource(R.string.audio_input_label)) },
+                    label = { 
+                        Text(
+                            text = stringResource(R.string.audio_input_label),
+                            fontWeight = if (isInputFocused) FontWeight.SemiBold else FontWeight.Medium
+                        ) 
+                    },
                     placeholder = { Text(inputPlaceholderText) },
                     supportingText = {
+                        val inputMetrics = measureAudioInputText(inputText)
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             AudioInputMetricsSummaryRow(
                                 charsetHint = stringResource(transportMode.charsetHintResId),
-                                metricsText =
-                                    stringResource(
-                                        R.string.audio_input_metrics,
-                                        inputMetrics.characterCount,
-                                        inputMetrics.byteCount,
-                                    ),
+                                metricsText = stringResource(
+                                    R.string.audio_input_metrics,
+                                    inputMetrics.characterCount,
+                                    inputMetrics.byteCount,
+                                ),
                             )
                         }
                     },
                     minLines = 2,
                     maxLines = 8,
-                    textStyle =
-                        MaterialTheme.typography.bodyLarge.copy(
-                            lineBreak = LineBreak.Paragraph,
-                            hyphens = Hyphens.Auto,
-                        ),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        lineBreak = LineBreak.Paragraph,
+                        hyphens = Hyphens.Auto,
+                        fontWeight = if (isInputFocused) FontWeight.SemiBold else FontWeight.Medium
+                    ),
                     colors = audioInputTextFieldColors(selectedThemeStyle),
-                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth().onFocusChanged { isInputFocused = it.isFocused },
                 )
+                
                 Text(
                     text = stringResource(R.string.audio_input_editor_inline_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                
                 AudioEncodeStatusSection(
                     encodeProgress = encodeProgress,
                     encodePhase = encodePhase,
                     isEncodingBusy = isEncodingBusy,
                 )
+                
                 if (isEncodingBusy) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
+                        val encodePercent = ((encodeProgress ?: 0f).coerceIn(0f, 1f) * 100f).roundToInt()
                         ActionButton(
-                            text =
-                                stringResource(
-                                    R.string.audio_action_encode_busy_progress,
-                                    encodePercent,
-                                ),
+                            text = stringResource(R.string.audio_action_encode_busy_progress, encodePercent),
                             onClick = {},
                             enabled = false,
                             borderColor = accentTokens.selectionBorderAccentTint,
@@ -166,14 +177,10 @@ internal fun AudioInputActionsCard(
                             modifier = Modifier.weight(1f),
                         )
                         ActionButton(
-                            text =
-                                stringResource(
-                                    if (isEncodeCancelling) {
-                                        R.string.audio_action_cancel_encode_busy
-                                    } else {
-                                        R.string.audio_action_cancel_encode
-                                    },
-                                ),
+                            text = stringResource(
+                                if (isEncodeCancelling) R.string.audio_action_cancel_encode_busy
+                                else R.string.audio_action_cancel_encode
+                            ),
                             onClick = onCancelEncode,
                             enabled = !isEncodeCancelling,
                             borderColor = accentTokens.selectionBorderAccentTint,
@@ -239,14 +246,10 @@ private fun AudioInputCardHeader(
         ) {
             Icon(
                 imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                contentDescription =
-                    stringResource(
-                        if (expanded) {
-                            R.string.audio_action_collapse_input
-                        } else {
-                            R.string.audio_action_expand_input
-                        },
-                    ),
+                contentDescription = stringResource(
+                    if (expanded) R.string.audio_action_collapse_input
+                    else R.string.audio_action_expand_input
+                ),
                 tint = accentTokens.disclosureAccentTint,
             )
         }
@@ -262,7 +265,6 @@ private fun AudioInputFieldHeader(
     onRandomizeSampleInput: () -> Unit,
     onClearInput: () -> Unit,
 ) {
-    val accentTokens = appThemeAccentTokens()
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -274,11 +276,10 @@ private fun AudioInputFieldHeader(
                     selected = sampleInputLength == option,
                     onClick = { onSampleInputLengthSelected(option) },
                     enabled = enabled,
-                    shape =
-                        SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = SampleInputLengthOption.entries.size,
-                        ),
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = SampleInputLengthOption.entries.size,
+                    ),
                     colors = appSegmentedButtonColors(),
                     label = {
                         Text(text = stringResource(option.labelResId))

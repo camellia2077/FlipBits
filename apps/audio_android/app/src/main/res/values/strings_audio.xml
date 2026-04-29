@@ -50,9 +50,9 @@
     <string name="audio_action_clear_result">Clear result</string>
     <!-- CONTEXT: Busy label shown while the decoded/read result is being cleared. -->
     <string name="audio_action_clear_result_busy">Clearing…</string>
-    <!-- CONTEXT: Action button/icon that saves the current generated audio into the Saved library. -->
-    <string name="audio_action_export">Save</string>
-    <!-- CONTEXT: Action/icon that exports the current audio through Android's file picker so the user can choose an exact destination file. -->
+    <!-- CONTEXT: Action button/icon that saves the current generated audio into the app's own Saved library, not the device file system. -->
+    <string name="audio_action_export">Save to library</string>
+    <!-- CONTEXT: Action/icon that exports the current audio through Android's file picker so the user can choose an exact destination file on the device. -->
     <string name="audio_action_export_to_file">Export to file</string>
     <string name="audio_action_playback_speed_short">Speed</string>
     <string name="audio_action_open_playback_speed_menu">Open playback speed menu</string>
@@ -273,10 +273,12 @@
     <string name="audio_generated_input_source_manual">Manual</string>
     <!-- CONTEXT: Value label for generated audio that came from the built-in sample library. -->
     <string name="audio_generated_input_source_sample">Sample</string>
-    <!-- CONTEXT: Mode label in the flash visualizer for the view that emphasizes separate FSK tone lanes. -->
-    <string name="audio_flash_visualizer_mode_tone_tracks">FSK lanes</string>
-    <!-- CONTEXT: Mode label in the flash visualizer for the view that emphasizes tone energy. -->
-    <string name="audio_flash_visualizer_mode_tone_energy">Tone energy</string>
+    <!-- CONTEXT: Short mode label in the flash visualizer for separate low/high tone lanes. -->
+    <string name="audio_flash_visualizer_mode_tone_tracks">Lanes</string>
+    <!-- CONTEXT: Short mode label in the flash visualizer for low/high tone energy. -->
+    <string name="audio_flash_visualizer_mode_tone_energy">Energy</string>
+    <!-- CONTEXT: Short mode label in the flash visualizer for a low/high pitch step line. -->
+    <string name="audio_flash_visualizer_mode_pitch_ladder">Pitch</string>
     <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
     <string name="transport_mode_flash_label">flash</string>
     <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->

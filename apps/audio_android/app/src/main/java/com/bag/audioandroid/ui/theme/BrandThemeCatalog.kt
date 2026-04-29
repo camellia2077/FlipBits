@@ -32,7 +32,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFFE8E2D0),
             accentColor = Color(0xFF9E1B1B),
             outlineColor = Color(0xFFC5A059),
-            isDarkTheme = false,
         ),
         buildBrandThemeOption(
             id = "scarlet_guard",
@@ -44,7 +43,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFFE0E0E0),
             accentColor = Color(0xFF8B0000),
             outlineColor = Color(0xFFB8860B),
-            isDarkTheme = false,
         ),
         buildBrandThemeOption(
             id = "black_crimson_rite",
@@ -56,7 +54,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF4A2B2F),
             accentColor = Color(0xFFDC143C),
             outlineColor = Color(0xFFB2C9AB),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "scarlet_carnage",
@@ -68,7 +65,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF8B0000),
             accentColor = Color(0xFFB8860B),
             outlineColor = Color(0xFF000000),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "labyrinth_of_mutability",
@@ -80,7 +76,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF005D7C),
             accentColor = Color(0xFFB066FF),
             outlineColor = Color(0xFFFFD700),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "exquisite_fall",
@@ -92,7 +87,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF5C0273),
             accentColor = Color(0xFFAB0040),
             outlineColor = Color(0xFFFFD700),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "immortal_rot",
@@ -104,7 +98,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF4F7942),
             accentColor = Color(0xFFE4D00A),
             outlineColor = Color(0xFF2D3B2D),
-            isDarkTheme = true,
         ),
         // The dark dual-tone dynasty set is separated by material character instead of
         // tiny near-black shifts: alloy leans warm metallic, revival leans jade-cold,
@@ -119,7 +112,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF423B33),
             accentColor = Color(0xFF00FFCC),
             outlineColor = Color(0xFF1A1815),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "dynasty_revival",
@@ -133,7 +125,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF31443E),
             accentColor = Color(0xFF00D68F),
             outlineColor = Color(0xFF5E736C),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "sepulcher_cyan",
@@ -145,7 +136,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF2B404A),
             accentColor = Color(0xFF00E5B8),
             outlineColor = Color(0xFF81A1B1),
-            isDarkTheme = true,
         ),
         buildBrandThemeOption(
             id = "tomb_sigil",
@@ -157,7 +147,6 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             backgroundColor = Color(0xFF4D3C2B),
             accentColor = Color(0xFFA6FF00),
             outlineColor = Color(0xFF7D5F41),
-            isDarkTheme = true,
         ),
     )
 
@@ -181,7 +170,6 @@ fun customBrandTheme(settings: CustomBrandThemeSettings): BrandThemeOption {
         backgroundColor = backgroundColor,
         accentColor = accentColor,
         outlineColor = normalizedOutline?.let(::parseBrandThemeColor) ?: accentColor,
-        isDarkTheme = backgroundColor.luminance() < CustomThemeDarkThreshold,
     )
 }
 
@@ -229,8 +217,8 @@ fun buildBrandThemeOption(
     backgroundColor: Color,
     accentColor: Color,
     outlineColor: Color = accentColor,
-    isDarkTheme: Boolean,
 ): BrandThemeOption {
+    val isDarkTheme = backgroundColor.luminance() < DarkThemeLuminanceThreshold
     // Call sites pass colors by visual responsibility, not by Material slot name:
     // backgroundColor is the dominant page/surface color, and accentColor is the
     // strong action/selection color. Do not swap them based on light/dark mode.
@@ -307,7 +295,6 @@ fun buildBrandThemeOption(
         descriptionOverride = descriptionOverride,
         accessibilityLabelOverride = accessibilityLabelOverride,
         sampleFlavor = sampleFlavor,
-        isDarkTheme = isDarkTheme,
         backgroundColor = backgroundColor,
         accentColor = accentColor,
         outlineColor = outlineColor,
@@ -325,4 +312,4 @@ private val BrandThemeHexRegex = Regex("^#[0-9A-F]{6}$")
 
 private const val DefaultCustomBackgroundHex = "#E8E2D0"
 private const val DefaultCustomAccentHex = "#9E1B1B"
-private const val CustomThemeDarkThreshold = 0.5f
+private const val DarkThemeLuminanceThreshold = 0.5f

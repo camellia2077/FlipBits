@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.SavedAudioFolder
 import com.bag.audioandroid.ui.model.LibraryFolderFilter
@@ -62,7 +63,8 @@ private fun LibraryFolderChip(
         label = {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                color = MaterialTheme.colorScheme.onSurface,
             )
         },
     )

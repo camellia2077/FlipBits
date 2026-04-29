@@ -128,6 +128,10 @@ internal fun buildFskEnergyBucketsFromFollowData(
         return emptyList()
     }
 
+    // This path is a timeline-driven display layer, not a decoder. For flash
+    // playback the libs follow data already maps each bit to its sample span,
+    // so the visual can stay aligned with the payload even when the PCM is too
+    // long or preview-only for cheap frequency analysis.
     val safeBucketCount = targetBucketCount.coerceAtLeast(1)
     val safeWindowSampleCount = windowSampleCount.coerceAtLeast(1)
     val pastWindowSamples = safeWindowSampleCount * FlashSignalPlayheadAnchorRatio
@@ -164,8 +168,17 @@ internal fun buildFskEnergyBucketsFromFollowData(
                 )
             if (overlap > 0f) {
                 val bitWeights = binaryTokenWeights(followData.binaryTokens.getOrNull(entry.groupIndex))
-                lowWeight += overlap * bitWeights.lowWeight
-                highWeight += overlap * bitWeights.highWeight
+                // Add a shallow per-symbol envelope so repeated 0s or 1s still
+                // read as separate payload bits instead of one continuous band.
+                val displayOverlap =
+                    overlap * timelineSymbolDisplayEnvelope(
+                        symbolStart = entry.startSample.toFloat(),
+                        symbolSampleCount = entry.sampleCount,
+                        overlapStart = maxOf(bucketStart, entry.startSample.toFloat()),
+                        overlapEnd = minOf(bucketEnd, (entry.startSample + entry.sampleCount).toFloat()),
+                    )
+                lowWeight += displayOverlap * bitWeights.lowWeight
+                highWeight += displayOverlap * bitWeights.highWeight
             }
             scanIndex += 1
         }
@@ -224,6 +237,33 @@ private fun overlapLength(
     secondEnd: Float,
 ): Float = (minOf(firstEnd, secondEnd) - maxOf(firstStart, secondStart)).coerceAtLeast(0f)
 
+private fun timelineSymbolDisplayEnvelope(
+    symbolStart: Float,
+    symbolSampleCount: Int,
+    overlapStart: Float,
+    overlapEnd: Float,
+): Float {
+    if (symbolSampleCount <= 0 || overlapEnd <= overlapStart) {
+        return 0f
+    }
+
+    val symbolProgress =
+        (((overlapStart + overlapEnd) / 2f - symbolStart) / symbolSampleCount.toFloat())
+            .coerceIn(0f, 1f)
+    val edgeRatio = (1f - FlashSignalTimelineSymbolCoreRatio) / 2f
+    if (edgeRatio <= 0f) {
+        return 1f
+    }
+
+    val distanceToEdge = minOf(symbolProgress, 1f - symbolProgress)
+    if (distanceToEdge >= edgeRatio) {
+        return 1f
+    }
+    val ramp = (distanceToEdge / edgeRatio).coerceIn(0f, 1f)
+    return FlashSignalTimelineSymbolEdgeFloor +
+        (1f - FlashSignalTimelineSymbolEdgeFloor) * ramp
+}
+
 private data class RawFskEnergyBucket(
     val lowPower: Float,
     val highPower: Float,
@@ -274,6 +314,8 @@ internal const val FlashSignalPlayheadAnchorRatio = 0.40f
 internal const val FlashSignalSilenceThreshold = 0.02f
 internal const val FlashSignalConfidenceThreshold = 0.12f
 internal const val FlashSignalMinimumAnalysisSamples = 96
+private const val FlashSignalTimelineSymbolCoreRatio = 0.62f
+private const val FlashSignalTimelineSymbolEdgeFloor = 0.12f
 
 internal fun flashSignalActiveWindowBucketCount(flashVoicingStyle: FlashVoicingStyleOption?): Int {
     // Keep ritual_chant wider because it moves more slowly and benefits from a

@@ -409,6 +409,9 @@ PayloadFollowData BuildFlashPayloadFollowData(
   }
 
   const std::size_t bit_count = raw_payload_bytes.size() * static_cast<std::size_t>(8);
+  // Flash follow data is intentionally bit-granular. The UI uses bit_offset as
+  // the source of truth for lyrics highlighting and for timeline-driven low/high
+  // visuals; group_index is only the ordinal of this published follow group.
   for (std::size_t bit_index = 0; bit_index < bit_count; ++bit_index) {
     follow_data.binary_group_timeline.push_back(PayloadFollowBinaryGroupEntry{
         .start_sample =
@@ -452,6 +455,9 @@ PayloadFollowData BuildNibblePayloadFollowData(
     });
   }
 
+  // Coded transports publish one follow group per nibble-sized symbol. Keeping
+  // bit_offset/bit_count explicit lets UI code consume the same timeline shape
+  // without assuming every group is a single bit.
   for (std::size_t group_index = 0; group_index < symbol_count; ++group_index) {
     follow_data.binary_group_timeline.push_back(PayloadFollowBinaryGroupEntry{
         .start_sample = group_index * symbol_sample_count,

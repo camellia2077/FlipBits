@@ -25,13 +25,17 @@ internal fun resolvePlaybackVisualizationRoute(
     displayedSamples: Int,
     followData: PayloadFollowViewData,
 ): PlaybackVisualizationRoute {
+    val useFlashFollowTimelineBuckets = followData.canDriveFlashSignalBuckets()
+    val useTimelineLimitedVisualization =
+        isWaveformPreview || waveformPcm.size >= LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
     val useLightweightVisualization =
-        (isWaveformPreview || waveformPcm.size >= LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD) &&
-            !followData.followAvailable
+        useTimelineLimitedVisualization && !followData.followAvailable
+    val useFlashLightweightVisualization =
+        useTimelineLimitedVisualization && !useFlashFollowTimelineBuckets
 
     return when (transportMode) {
         TransportModeOption.Flash ->
-            if (useLightweightVisualization) {
+            if (useFlashLightweightVisualization) {
                 PlaybackVisualizationRoute.PcmWaveform
             } else {
                 PlaybackVisualizationRoute.FlashSignal(
@@ -42,7 +46,7 @@ internal fun resolvePlaybackVisualizationRoute(
                             visualDisplayedSamples = visualDisplayedSamples,
                             followDisplayedSamples = displayedSamples,
                             followData = followData,
-                            useFollowTimelineBuckets = isWaveformPreview,
+                            useFollowTimelineBuckets = useFlashFollowTimelineBuckets,
                         ),
                 )
             }
@@ -57,7 +61,7 @@ internal fun resolvePlaybackVisualizationRoute(
             }
 
         null ->
-            if (isFlashMode && !useLightweightVisualization) {
+            if (isFlashMode && !useFlashLightweightVisualization) {
                 PlaybackVisualizationRoute.FlashSignal(
                     input =
                         flashSignalVisualizationInput(
@@ -66,7 +70,7 @@ internal fun resolvePlaybackVisualizationRoute(
                             visualDisplayedSamples = visualDisplayedSamples,
                             followDisplayedSamples = displayedSamples,
                             followData = followData,
-                            useFollowTimelineBuckets = isWaveformPreview,
+                            useFollowTimelineBuckets = useFlashFollowTimelineBuckets,
                         ),
                 )
             } else {
@@ -74,5 +78,13 @@ internal fun resolvePlaybackVisualizationRoute(
             }
     }
 }
+
+private fun PayloadFollowViewData.canDriveFlashSignalBuckets(): Boolean =
+    // Flash visualizations need one binary token per timeline group so the
+    // follow timeline can drive low/high buckets without falling back to PCM
+    // frequency analysis for long or preview-only audio.
+    followAvailable &&
+        binaryGroupTimeline.isNotEmpty() &&
+        binaryTokens.size >= binaryGroupTimeline.size
 
 private const val LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD = 44100 * 120

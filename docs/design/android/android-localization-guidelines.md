@@ -4,12 +4,13 @@
 
 补充执行说明：
 
+- `docs/design/android/android-translation-workflow.md`
 - `docs/design/android/translation/android-split-strings-translation-guide.md`
 
 ## Source Of Truth
 
-- 工程基线以 `apps/audio_android/app/src/main/res/values/strings.xml` 为准。
-- 新增 `string` key 时，先落 `values/strings.xml`，再同步到其他语言目录。
+- 工程基线以 `apps/audio_android/app/src/main/res/values/` 下的英文 XML 为准。
+- 新增 `string` key 时，先落英文对应职责文件，再同步到其他语言目录。
 - 但翻译语义不以“英文逐词直译”为唯一标准；真正的语义真源是：
   - `string key` 表达的职责
   - 当前 UI 场景中的产品意图
@@ -17,24 +18,24 @@
 
 换句话说：
 
-- **工程真源**：`values/strings.xml`
+- **工程真源**：英文 `values/strings*.xml`
 - **语义真源**：`key + 场景 + 术语口径`
 
 ## Required Locales
 
 修改可见 XML 文案时，至少同步检查：
 
-- `apps/audio_android/app/src/main/res/values/strings.xml`
-- `apps/audio_android/app/src/main/res/values-zh/strings.xml`
-- `apps/audio_android/app/src/main/res/values-zh-rTW/strings.xml`
-- `apps/audio_android/app/src/main/res/values-ja/strings.xml`
+- `apps/audio_android/app/src/main/res/values/strings*.xml`
+- `apps/audio_android/app/src/main/res/values-zh/strings*.xml`
+- `apps/audio_android/app/src/main/res/values-zh-rTW/strings*.xml`
+- `apps/audio_android/app/src/main/res/values-ja/strings*.xml`
 
 当前仓库还维护：
 
-- `apps/audio_android/app/src/main/res/values-de/strings.xml`
-- `apps/audio_android/app/src/main/res/values-es/strings.xml`
-- `apps/audio_android/app/src/main/res/values-pt-rBR/strings.xml`
-- `apps/audio_android/app/src/main/res/values-ru/strings.xml`
+- `apps/audio_android/app/src/main/res/values-de/strings*.xml`
+- `apps/audio_android/app/src/main/res/values-es/strings*.xml`
+- `apps/audio_android/app/src/main/res/values-pt-rBR/strings*.xml`
+- `apps/audio_android/app/src/main/res/values-ru/strings*.xml`
 
 如果本次改动涉及用户可见文案，默认应一起补齐，不要只改英文后留下其它语言漂移。
 
@@ -109,7 +110,7 @@
 
 ## Review Checklist
 
-- 新 key 是否先落在 `values/strings.xml`
+- 新 key 是否先落在英文对应职责文件
 - 其它语言是否同步补齐
 - 术语是否和现有页面保持一致
 - 按钮/标题是否因为直译过长而破坏布局
@@ -119,4 +120,4 @@
 
 可以把这条规则记成一句话：
 
-> 以英文 `values/strings.xml` 做工程基线，以产品语义和稳定术语做翻译基线。
+> 以英文 `values/strings*.xml` 做工程基线，以产品语义和稳定术语做翻译基线。

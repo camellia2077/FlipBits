@@ -156,8 +156,9 @@
     <string name="audio_player_detail_saved_payload_bytes_value">%1$d 바이트</string>
     <string name="audio_generated_input_source_manual">수동</string>
     <string name="audio_generated_input_source_sample">샘플</string>
-    <string name="audio_flash_visualizer_mode_tone_tracks">FSK 레인</string>
-    <string name="audio_flash_visualizer_mode_tone_energy">톤 에너지</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">레인</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">에너지</string>
+    <string name="audio_flash_visualizer_mode_pitch_ladder">피치</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. Do not translate flash/pro/ultra as ordinary adjectives. -->
     <string name="transport_mode_flash_label">flash</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->

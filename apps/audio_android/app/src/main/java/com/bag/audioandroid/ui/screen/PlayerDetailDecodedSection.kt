@@ -105,6 +105,7 @@ internal fun PlayerDetailDecodedSection(
             }
             if (expanded) {
                 DecodedPayloadContent(
+                    accentTokens = accentTokens,
                     decodedPayload = decodedPayload,
                     emptyTextResId = R.string.audio_player_detail_decoded_empty,
                     bodyExpanded = contentExpanded,

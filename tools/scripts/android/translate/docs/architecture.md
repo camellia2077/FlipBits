@@ -79,6 +79,14 @@
     - 语气约束
     - 就来这里
 
+- [language_prompt_profiles.py](/C:/code/WaveBits/tools/scripts/android/translate/prompts/language_prompt_profiles.py)
+  - locale 级 prompt profile
+  - 如果你要改：
+    - 某个语言的专属写作人格
+    - `values-la` 这类非标准翻译 locale 的特殊要求
+    - review / key-alignment 产物里暴露给 agent 的 locale note
+    - 就来这里
+
 ### Replace
 
 - [apply_translation_replacements.py](/C:/code/WaveBits/tools/scripts/android/translate/commands/apply_translation_replacements.py)

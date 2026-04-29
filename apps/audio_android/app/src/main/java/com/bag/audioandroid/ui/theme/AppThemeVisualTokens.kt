@@ -7,6 +7,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 
@@ -24,6 +25,7 @@ data class AppThemeVisualTokens(
     val supportSurfaceColor: Color,
     val supportStrongSurfaceColor: Color,
     val inputContainerColor: Color,
+    val inputContentColor: Color,
     val inputFocusedBorderColor: Color,
     val inputUnfocusedBorderColor: Color,
     val actionContainerColor: Color,
@@ -41,7 +43,7 @@ data class AppThemeVisualTokens(
     val visualizationInactiveToneColor: Color,
 )
 
-private val DefaultAppThemeVisualTokens =
+internal val DefaultAppThemeVisualTokens =
     AppThemeVisualTokens(
         themeStyle = ThemeStyleOption.Material,
         dockContainerColor = Color.Unspecified,
@@ -55,6 +57,7 @@ private val DefaultAppThemeVisualTokens =
         supportSurfaceColor = Color.Unspecified,
         supportStrongSurfaceColor = Color.Unspecified,
         inputContainerColor = Color.Unspecified,
+        inputContentColor = Color.Unspecified,
         inputFocusedBorderColor = Color.Unspecified,
         inputUnfocusedBorderColor = Color.Unspecified,
         actionContainerColor = Color.Unspecified,
@@ -70,6 +73,14 @@ private val DefaultAppThemeVisualTokens =
         timelineInactiveTrackColor = Color.Unspecified,
         visualizationBaseBackgroundColor = Color.Unspecified,
         visualizationInactiveToneColor = Color.Unspecified,
+    )
+
+internal val DefaultAppThemeAccentTokens =
+    AppThemeAccentTokens(
+        disclosureAccentTint = Color.Unspecified,
+        actionAccentTint = Color.Unspecified,
+        selectionLabelAccentTint = Color.Unspecified,
+        selectionBorderAccentTint = Color.Unspecified,
     )
 
 val LocalAppThemeVisualTokens = staticCompositionLocalOf { DefaultAppThemeVisualTokens }
@@ -92,6 +103,7 @@ fun materialThemeVisualTokens(colorScheme: ColorScheme): AppThemeVisualTokens =
         supportSurfaceColor = colorScheme.surfaceVariant.copy(alpha = 0.72f),
         supportStrongSurfaceColor = colorScheme.primaryContainer,
         inputContainerColor = colorScheme.surface,
+        inputContentColor = colorScheme.onSurface,
         inputFocusedBorderColor = colorScheme.primary,
         inputUnfocusedBorderColor = colorScheme.outline,
         actionContainerColor = colorScheme.primaryContainer,
@@ -115,8 +127,13 @@ fun brandThemeVisualTokens(
 ): AppThemeVisualTokens {
     val base = theme.backgroundColor
     val accent = theme.accentColor
-    val outline = theme.outlineColor
     val onSurface = theme.colorScheme.onSurface
+    val isDarkTheme = theme.backgroundColor.luminance() < 0.5f
+
+    // "Ancient Alloy" philosophy: Use a recessed shadow derived from the background
+    // for structural elements instead of a decorative third color.
+    val depthShadow = blend(base, Color.Black, if (isDarkTheme) 0.62f else 0.28f)
+
     return AppThemeVisualTokens(
         themeStyle = ThemeStyleOption.BrandDualTone,
         // Keep the dock on the main color lane with just enough accent tint to separate it from
@@ -124,16 +141,17 @@ fun brandThemeVisualTokens(
         dockContainerColor = blend(base, accent, 0.10f),
         modalContainerColor = base,
         modalContentColor = onSurface,
-        segmentedInactiveContainerColor = base,
+        segmentedInactiveContainerColor = Color.Transparent,
         segmentedInactiveContentColor = onSurface,
         // Selected and idle rows should stay on the main color lane; only text/border switch to
         // the accent lane. This avoids turning every settings row into a tinted accent chip.
         selectionSelectedContainerColor = blend(base, accent, 0.08f),
-        selectionUnselectedContainerColor = blend(base, onSurface, 0.05f),
+        selectionUnselectedContainerColor = Color.Transparent,
         groupContainerColor = blend(base, accent, 0.06f),
         supportSurfaceColor = blend(base, onSurface, 0.07f),
         supportStrongSurfaceColor = blend(base, accent, 0.12f),
-        inputContainerColor = base,
+        inputContainerColor = blend(base, accent, 0.08f),
+        inputContentColor = onSurface,
         inputFocusedBorderColor = accentTokens.selectionBorderAccentTint,
         inputUnfocusedBorderColor = accentTokens.selectionBorderAccentTint.copy(alpha = 0.42f),
         actionContainerColor = blend(base, accent, 0.12f),
@@ -145,12 +163,12 @@ fun brandThemeVisualTokens(
         annotationChipContainerColor = blend(base, accent, 0.10f),
         annotationChipContentColor = onSurface,
         followTokenContainerColor = blend(base, accent, 0.06f),
-        subtleOutlineColor = outline.copy(alpha = 0.46f),
+        subtleOutlineColor = depthShadow.copy(alpha = 0.52f),
         timelineInactiveTrackColor = blend(base, accent, 0.10f),
         visualizationBaseBackgroundColor = blend(base, accent, 0.10f),
-        // Inactive waveform/tone rails are one of the few places where the auxiliary color reads
-        // naturally as a mechanical support tone instead of a stateful accent.
-        visualizationInactiveToneColor = outline,
+        // Inactive waveform/tone rails now always use the recessed shadow 
+        // to match the Ancient Alloy philosophy of depth.
+        visualizationInactiveToneColor = depthShadow,
     )
 }
 

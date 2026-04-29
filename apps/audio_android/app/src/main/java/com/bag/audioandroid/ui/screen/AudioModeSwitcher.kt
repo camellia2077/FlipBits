@@ -1,6 +1,7 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -8,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.model.TransportModeOption
 
@@ -34,7 +36,12 @@ internal fun AudioModeSwitcher(
                 colors = appSegmentedButtonColors(),
                 modifier = Modifier.weight(1f),
                 label = {
-                    Text(stringResource(option.labelResId))
+                    val isSelected = transportMode == option
+                    Text(
+                        text = stringResource(option.labelResId),
+                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                    )
                 },
             )
         }

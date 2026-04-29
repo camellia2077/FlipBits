@@ -243,6 +243,7 @@ internal fun AudioAndroidMainScaffold(
                     encodePhase = uiState.currentSession.encodePhase,
                     isEncodeCancelling = uiState.currentSession.isEncodeCancelling,
                     onTransportModeSelected = viewModel::onTransportModeSelected,
+                    isFlashVoicingEnabled = uiState.isFlashVoicingEnabled,
                     selectedFlashVoicingStyle = uiState.selectedFlashVoicingStyle,
                     onFlashVoicingStyleSelected = viewModel::onFlashVoicingStyleSelected,
                     inputText = currentSession.inputText,

@@ -156,8 +156,9 @@
     <string name="audio_player_detail_saved_payload_bytes_value">%1$d バイト</string>
     <string name="audio_generated_input_source_manual">手動</string>
     <string name="audio_generated_input_source_sample">サンプル</string>
-    <string name="audio_flash_visualizer_mode_tone_tracks">FSKレーン</string>
-    <string name="audio_flash_visualizer_mode_tone_energy">トーンエネルギー</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">レーン</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">エネルギー</string>
+    <string name="audio_flash_visualizer_mode_pitch_ladder">ピッチ</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. Do not translate flash/pro/ultra as ordinary adjectives. -->
     <string name="transport_mode_flash_label">flash</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->

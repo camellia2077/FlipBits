@@ -4,7 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -78,16 +77,8 @@ internal fun AudioFlashSignalVisualizer(
             ?.displayedSamples
             ?.coerceIn(0, followTimelineTotalSamples)
             ?: clampedDisplayedSamples
-    val animatedDisplayedSamples by animateFloatAsState(
-        targetValue = clampedDisplayedSamples.toFloat(),
-        animationSpec = tween(durationMillis = if (isPlaying) 120 else 0, easing = FastOutSlowInEasing),
-        label = "flashSignalDisplayedSamples",
-    )
-    val animatedFollowDisplayedSamples by animateFloatAsState(
-        targetValue = clampedFollowDisplayedSamples.toFloat(),
-        animationSpec = tween(durationMillis = if (isPlaying) 120 else 0, easing = FastOutSlowInEasing),
-        label = "flashSignalFollowDisplayedSamples",
-    )
+    val displayedSamplePosition = clampedDisplayedSamples.toFloat()
+    val followDisplayedSamplePosition = clampedFollowDisplayedSamples.toFloat()
     val glowPulse = if (isPlaying) glowPulseAnimated else 0.82f
     val sweepPhase = if (isPlaying) sweepAnimated else 0.24f
 
@@ -120,21 +111,21 @@ internal fun AudioFlashSignalVisualizer(
                 input.bucketSource,
                 targetBucketCount,
                 windowSampleCount,
-                animatedDisplayedSamples,
-                animatedFollowDisplayedSamples,
+                displayedSamplePosition,
+                followDisplayedSamplePosition,
             ) {
                 when (val bucketSource = input.bucketSource) {
                     is FlashSignalBucketSource.FollowTimeline ->
                         buildFskEnergyBucketsFromFollowData(
                             followData = bucketSource.followData,
-                            currentSample = animatedFollowDisplayedSamples,
+                            currentSample = followDisplayedSamplePosition,
                             windowSampleCount = windowSampleCount,
                             targetBucketCount = targetBucketCount,
                         ).ifEmpty {
                             buildFskEnergyBuckets(
                                 pcm = pcm,
                                 sampleRateHz = sampleRateHz,
-                                currentSample = animatedDisplayedSamples,
+                                currentSample = displayedSamplePosition,
                                 windowSampleCount = windowSampleCount,
                                 targetBucketCount = targetBucketCount,
                             )
@@ -144,7 +135,7 @@ internal fun AudioFlashSignalVisualizer(
                         buildFskEnergyBuckets(
                             pcm = pcm,
                             sampleRateHz = sampleRateHz,
-                            currentSample = animatedDisplayedSamples,
+                            currentSample = displayedSamplePosition,
                             windowSampleCount = windowSampleCount,
                             targetBucketCount = targetBucketCount,
                         )
@@ -215,6 +206,22 @@ internal fun AudioFlashSignalVisualizer(
 
                 FlashSignalVisualizationMode.ToneEnergy ->
                     drawToneEnergy(
+                        buckets = buckets,
+                        scanHeadBucketIndex = scanHeadBucketIndex,
+                        activeWindowBucketCount = activeWindowBucketCount,
+                        leftPadding = leftPadding,
+                        topPadding = topPadding,
+                        innerWidth = innerWidth,
+                        innerHeight = innerHeight,
+                        bucketWidth = bucketWidth,
+                        activeToneColor = activeToneColor,
+                        inactiveToneColor = inactiveToneColor,
+                        centerLineColor = centerLineColor,
+                        glowPulse = glowPulse,
+                    )
+
+                FlashSignalVisualizationMode.PitchLadder ->
+                    drawPitchLadder(
                         buckets = buckets,
                         scanHeadBucketIndex = scanHeadBucketIndex,
                         activeWindowBucketCount = activeWindowBucketCount,

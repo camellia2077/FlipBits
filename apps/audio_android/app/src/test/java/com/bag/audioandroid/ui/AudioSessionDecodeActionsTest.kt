@@ -437,6 +437,108 @@ class AudioSessionDecodeActionsTest {
             assertEquals(R.string.status_mode_decode_completed, status.resId)
         }
 
+    @Test
+    fun `flash decode falls back to other styles until text succeeds`() =
+        runTest {
+            val successful =
+                DecodedAudioPayloadResult(
+                    decodedPayload =
+                        DecodedPayloadViewData(
+                            text = "decoded by fallback",
+                            rawBytesHex = "64 65 63 6F 64 65 64",
+                            rawBitsBinary = "01100100 01100101 01100011 01101111 01100100 01100101 01100100",
+                            textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                            rawPayloadAvailable = true,
+                        ),
+                    followData =
+                        PayloadFollowViewData(
+                            lyricLines = listOf("decoded by fallback"),
+                            lyricLineTimeline = listOf(TextFollowLyricLineTimelineEntry(0, 8, 0)),
+                            lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 1)),
+                            lyricLineFollowAvailable = true,
+                            hexTokens = listOf("64", "65", "63", "6F", "64", "65", "64"),
+                            binaryTokens = listOf("01100100"),
+                            byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 8, 0)),
+                            binaryGroupTimeline = listOf(PayloadFollowBinaryGroupTimelineEntry(0, 8, 0, 0, 8)),
+                            payloadBeginSample = 0,
+                            payloadSampleCount = 8,
+                            totalPcmSampleCount = 8,
+                            followAvailable = true,
+                        ),
+                )
+            val fallbackResults =
+                mapOf(
+                    2 to
+                        DecodedAudioPayloadResult(
+                            decodedPayload =
+                                DecodedPayloadViewData(
+                                    text = "",
+                                    rawBytesHex = "",
+                                    rawBitsBinary = "",
+                                    textDecodeStatusCode = BagDecodeContentCodes.STATUS_INTERNAL_ERROR,
+                                    rawPayloadAvailable = false,
+                                ),
+                            followData = PayloadFollowViewData.Empty,
+                        ),
+                    1 to
+                        DecodedAudioPayloadResult(
+                            decodedPayload =
+                                DecodedPayloadViewData(
+                                    text = "",
+                                    rawBytesHex = "",
+                                    rawBitsBinary = "",
+                                    textDecodeStatusCode = BagDecodeContentCodes.STATUS_INTERNAL_ERROR,
+                                    rawPayloadAvailable = false,
+                                ),
+                            followData = PayloadFollowViewData.Empty,
+                        ),
+                    0 to successful,
+                )
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeDecodeAudioCodecGateway(
+                            decodeResultBySignalProfile = fallbackResults,
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    selectedFlashVoicingStyle = com.bag.audioandroid.ui.model.FlashVoicingStyleOption.DeepRitual,
+                    sessions =
+                        fixture.uiState.value.sessions +
+                            (
+                                TransportModeOption.Flash to
+                                    fixture.uiState.value.sessions.getValue(TransportModeOption.Flash).copy(
+                                        generatedPcm = shortArrayOf(1, 2, 3),
+                                        generatedAudioMetadata =
+                                            GeneratedAudioMetadata(
+                                                mode = TransportModeOption.Flash,
+                                                createdAtIsoUtc = "2026-04-27T00:00:00Z",
+                                                durationMs = 10,
+                                                sampleRateHz = 44_100,
+                                                frameSamples = 2205,
+                                                pcmSampleCount = 3,
+                                                payloadByteCount = 7,
+                                                inputSourceKind = GeneratedAudioInputSourceKind.Manual,
+                                                appVersion = "test",
+                                                coreVersion = "test",
+                                            ),
+                                    )
+                            ),
+                    currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),
+                    transportMode = TransportModeOption.Flash,
+                )
+
+            fixture.actions.onDecode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.sessions.getValue(TransportModeOption.Flash)
+            assertEquals("decoded by fallback", session.decodedPayload.text)
+            assertEquals(listOf(2, 0), (fixture.actionsGateway as FakeDecodeAudioCodecGateway).decodeSignalProfiles)
+        }
+
     private fun createFixture(
         gateway: AudioCodecGateway,
         testScope: TestScope,
@@ -457,6 +559,7 @@ class AudioSessionDecodeActionsTest {
                     frameSamples = 2_205,
                     workerDispatcher = dispatcher,
                 ),
+            actionsGateway = gateway,
             sessionActions =
                 AudioAndroidSessionActions(
                     uiState = uiState,
@@ -489,6 +592,7 @@ class AudioSessionDecodeActionsTest {
         val uiState: MutableStateFlow<AudioAppUiState>,
         val actions: AudioSessionDecodeActions,
         val sessionActions: AudioAndroidSessionActions,
+        val actionsGateway: AudioCodecGateway,
     )
 }
 
@@ -505,7 +609,10 @@ private class FakeDecodeAudioCodecGateway(
                 ),
         ),
     private val decodeResultsQueue: ArrayDeque<DecodedAudioPayloadResult> = ArrayDeque(),
+    private val decodeResultBySignalProfile: Map<Int, DecodedAudioPayloadResult> = emptyMap(),
 ) : AudioCodecGateway {
+    val decodeSignalProfiles = mutableListOf<Int>()
+
     override fun validateEncodeRequest(
         text: String,
         sampleRateHz: Int,
@@ -549,7 +656,12 @@ private class FakeDecodeAudioCodecGateway(
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): DecodedAudioPayloadResult = decodeResultsQueue.removeFirstOrNull() ?: decodedResult
+    ): DecodedAudioPayloadResult {
+        decodeSignalProfiles += flashSignalProfile
+        return decodeResultBySignalProfile[flashSignalProfile]
+            ?: decodeResultsQueue.removeFirstOrNull()
+            ?: decodedResult
+    }
 
     override fun getCoreVersion(): String = "test"
 }

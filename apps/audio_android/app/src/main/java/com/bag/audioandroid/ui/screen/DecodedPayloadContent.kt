@@ -34,6 +34,7 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.DecodedPayloadViewData
+import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 
 private enum class DecodedPayloadTab {
     Text,
@@ -45,6 +46,7 @@ private const val DECODED_PAYLOAD_TAB_RAW_TAG = "decodedPayloadTabRaw"
 
 @Composable
 internal fun DecodedPayloadContent(
+    accentTokens: AppThemeAccentTokens,
     decodedPayload: DecodedPayloadViewData,
     emptyTextResId: Int,
     bodyExpanded: Boolean = true,
@@ -124,7 +126,7 @@ internal fun DecodedPayloadContent(
                             },
                         ),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = accentTokens.disclosureAccentTint,
                 )
                 Icon(
                     imageVector = if (bodyExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
@@ -136,7 +138,7 @@ internal fun DecodedPayloadContent(
                                 R.string.audio_action_expand_result_content
                             },
                         ),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = accentTokens.disclosureAccentTint,
                 )
             }
         }

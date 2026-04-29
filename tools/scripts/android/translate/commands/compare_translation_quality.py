@@ -26,6 +26,7 @@ from core.translation_reporting import (
     ReportKeyBlock,
 )
 from core.translation_resources import AndroidStringResourceRepository, ResourceFile
+from prompts.language_prompt_profiles import get_locale_prompt_profile
 from prompts.translation_review_prompts import (
     build_english_source_review_prompt_for_text_type,
     build_manual_english_source_review_prompt_for_text_type,
@@ -243,6 +244,7 @@ class TranslationQualityReportGenerator:
         available_files = {name: base_files[name] for name in xml_names}
         lang_output_dir = self.output_manager.output_dir / lang_code
         language_tag = display_language_tag(lang_code)
+        profile = get_locale_prompt_profile(lang_code)
         written_paths: list[str] = []
 
         for text_type in TEXT_TYPES:
@@ -271,6 +273,9 @@ class TranslationQualityReportGenerator:
                     prompt=None,
                     metadata_lines=(
                         "NOTE: Pro sample keys that contain '_ascii_' are intentionally excluded here. They are fixed ASCII protocol samples and are not translation tasks.",
+                        f"LOCALE_PROFILE: {profile.profile_id}",
+                        f"LOCALE_MODE: {profile.mode}",
+                        f"LOCALE_NOTE: {profile.locale_note}",
                         f"PROMPT_MODE: {self.prompt_mode}",
                         f"PROMPT_VERSION: {PROMPT_VERSION}",
                         f"GENERATED_AT: {self.generated_at}",
@@ -294,6 +299,7 @@ class TranslationQualityReportGenerator:
 
         available_files = {name: base_files[name] for name in xml_names}
         lang_output_dir = self.output_manager.output_dir / lang_code
+        profile = get_locale_prompt_profile(lang_code)
         written_paths: list[str] = []
 
         for text_type in TEXT_TYPES:
@@ -329,6 +335,7 @@ class TranslationQualityReportGenerator:
                     group=faction,
                     prompt_text_type=text_type,
                     prompt_doc_path=prompt_path,
+                    locale_profile=profile,
                     entries=entries,
                 )
                 written_paths.append(write_agent_task_payload(output_path, payload))
@@ -350,6 +357,7 @@ class TranslationQualityReportGenerator:
 
         for lang_code, _folder_path in self._iter_review_directories():
             language_tag = display_language_tag(lang_code)
+            profile = get_locale_prompt_profile(lang_code)
             for text_type in TEXT_TYPES:
                 if self.text_type_filter is not None and text_type != self.text_type_filter:
                     continue
@@ -358,7 +366,12 @@ class TranslationQualityReportGenerator:
                     prompt_path,
                     title="Shared Review Prompt",
                     scope=f"{language_tag}/{text_type}",
-                    prompt=self._build_translation_prompt(language_tag, text_type),
+                    prompt=self._build_translation_prompt(lang_code, language_tag, text_type),
+                    metadata_lines=(
+                        f"LOCALE_PROFILE: {profile.profile_id}",
+                        f"LOCALE_MODE: {profile.mode}",
+                        f"LOCALE_NOTE: {profile.locale_note}",
+                    ),
                 )
                 written_paths.append(str(prompt_path))
         return written_paths
@@ -370,6 +383,7 @@ class TranslationQualityReportGenerator:
         title: str,
         scope: str,
         prompt: str,
+        metadata_lines: tuple[str, ...] = (),
     ) -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         lines = [
@@ -379,9 +393,14 @@ class TranslationQualityReportGenerator:
             f"PROMPT_VERSION: {PROMPT_VERSION}",
             f"GENERATED_AT: {self.generated_at}",
             f"SCOPE: {scope}",
+        ]
+        lines.extend(metadata_lines)
+        lines.extend(
+            [
             f"PROMPT: {prompt}",
             "",
-        ]
+            ]
+        )
         output_path.write_text("\n".join(lines), encoding="utf-8")
 
     def _shared_prompt_path(self, language_code: str, text_type: str) -> Path:
@@ -395,10 +414,10 @@ class TranslationQualityReportGenerator:
             return build_manual_english_source_review_prompt_for_text_type(text_type)
         return build_english_source_review_prompt_for_text_type(text_type)
 
-    def _build_translation_prompt(self, language_tag: str, text_type: str) -> str:
+    def _build_translation_prompt(self, locale_code: str, language_tag: str, text_type: str) -> str:
         if self.prompt_mode == "manual_notes":
-            return build_manual_translation_review_prompt_for_text_type(language_tag, text_type)
-        return build_translation_review_prompt_for_text_type(language_tag, text_type)
+            return build_manual_translation_review_prompt_for_text_type(locale_code, language_tag, text_type)
+        return build_translation_review_prompt_for_text_type(locale_code, language_tag, text_type)
 
     def _build_english_file_blocks(
         self,

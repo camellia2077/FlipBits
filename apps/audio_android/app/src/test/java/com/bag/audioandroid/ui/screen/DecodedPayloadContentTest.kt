@@ -1,12 +1,13 @@
 package com.bag.audioandroid.ui.screen
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.activity.ComponentActivity
+import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.DecodedPayloadViewData
-import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,6 +24,7 @@ class DecodedPayloadContentTest {
     fun `defaults to text view`() {
         composeRule.setContent {
             DecodedPayloadContent(
+                accentTokens = appThemeAccentTokens(),
                 decodedPayload =
                     DecodedPayloadViewData(
                         text = "decoded text",
@@ -42,6 +44,7 @@ class DecodedPayloadContentTest {
     fun `raw tab shows binary and hex`() {
         composeRule.setContent {
             DecodedPayloadContent(
+                accentTokens = appThemeAccentTokens(),
                 decodedPayload =
                     DecodedPayloadViewData(
                         text = "decoded text",
@@ -65,6 +68,7 @@ class DecodedPayloadContentTest {
     fun `text failure still allows raw tab`() {
         composeRule.setContent {
             DecodedPayloadContent(
+                accentTokens = appThemeAccentTokens(),
                 decodedPayload =
                     DecodedPayloadViewData(
                         text = "",
@@ -86,6 +90,7 @@ class DecodedPayloadContentTest {
     fun `text view shows fallback message when payload is not valid text`() {
         composeRule.setContent {
             DecodedPayloadContent(
+                accentTokens = appThemeAccentTokens(),
                 decodedPayload =
                     DecodedPayloadViewData(
                         text = "",

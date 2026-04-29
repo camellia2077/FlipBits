@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -48,7 +49,7 @@ internal fun playerDockContainerColor(uiState: AudioAppUiState): Color =
 internal fun playerSegmentedButtonColors() =
     SegmentedButtonDefaults.colors(
         // Keep player control switchers on one shared color recipe so Visual/Lyrics,
-        // FSK lanes/Tone energy, and other playback toggles stay visually aligned.
+        // Flash visualizer mode chips and other playback toggles stay visually aligned.
         activeContainerColor = MaterialTheme.colorScheme.primary,
         activeContentColor = MaterialTheme.colorScheme.onPrimary,
         activeBorderColor = MaterialTheme.colorScheme.primary,
@@ -77,6 +78,12 @@ internal fun audioInputTextFieldColors(selectedThemeStyle: ThemeStyleOption): Te
     return when (selectedThemeStyle) {
         ThemeStyleOption.BrandDualTone -> {
             OutlinedTextFieldDefaults.colors(
+                focusedTextColor = visualTokens.inputContentColor,
+                unfocusedTextColor = visualTokens.inputContentColor,
+                disabledTextColor = visualTokens.inputContentColor.copy(alpha = 0.38f),
+                errorTextColor = visualTokens.inputContentColor,
+                focusedLabelColor = visualTokens.inputContentColor,
+                unfocusedLabelColor = visualTokens.inputContentColor.copy(alpha = 0.72f),
                 focusedContainerColor = visualTokens.inputContainerColor,
                 unfocusedContainerColor = visualTokens.inputContainerColor,
                 disabledContainerColor = visualTokens.inputContainerColor,
@@ -122,20 +129,15 @@ internal fun playbackLyricsAccentTextColor(): Color =
 internal fun navigationBarItemColors(uiState: AudioAppUiState): NavigationBarItemColors =
     when (uiState.selectedThemeStyle) {
         ThemeStyleOption.BrandDualTone -> {
-            // Light dual-tone themes need a corrected unselected foreground so the brighter
-            // paired color does not disappear into the navigation container. Dark dual-tone
-            // themes already separate strongly enough, so they keep the raw paired color.
             val brandTheme = uiState.activeBrandTheme
-            val unselectedDualToneForeground =
-                if (brandTheme.isDarkTheme) {
-                    brandTheme.accentColor
-                } else {
-                    lerp(
-                        brandTheme.accentColor,
-                        brandTheme.colorScheme.onPrimaryContainer,
-                        LightDualToneNavUnselectedMix,
-                    )
-                }
+            // All dual-tone themes now blend the unselected foreground with the background 
+            // color. This ensures unselected tabs visually "sink" into the background, 
+            // making the flipped selection (with its accent indicator) much more prominent.
+            val unselectedDualToneForeground = lerp(
+                brandTheme.accentColor,
+                brandTheme.backgroundColor,
+                0.42f,
+            )
             NavigationBarItemDefaults.colors(
                 // Dual-tone navigation keeps selected/unselected states on the original
                 // paired colors instead of relying on Material's derived alpha variants.

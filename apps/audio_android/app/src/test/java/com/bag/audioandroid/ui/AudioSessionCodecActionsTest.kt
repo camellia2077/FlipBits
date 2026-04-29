@@ -21,6 +21,7 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.PlaybackUiState
+import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -310,6 +311,40 @@ class AudioSessionCodecActionsTest {
         assertEquals(longText, plan.segments.joinToString(separator = ""))
         assertTrue(plan.segments.all { it.toByteArray(UTF_8).size <= 512 })
     }
+
+    @Test
+    fun `flash encode uses base preset when voicing effect is disabled`() =
+        runTest {
+            val seenPresets = mutableListOf<Pair<Int, Int>>()
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            validateEncodeRequestBlock = { _, _, _, _, flashSignalProfile, flashVoicingFlavor ->
+                                seenPresets += flashSignalProfile to flashVoicingFlavor
+                                BagApiCodes.VALIDATION_OK
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    transportMode = TransportModeOption.Flash,
+                    isFlashVoicingEnabled = false,
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.DeepRitual,
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = "flash baseline")
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            assertTrue(seenPresets.isNotEmpty())
+            assertEquals(listOf(0 to 0), seenPresets.distinct())
+        }
 
     private fun createFixture(
         gateway: AudioCodecGateway,

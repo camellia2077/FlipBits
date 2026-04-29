@@ -18,28 +18,44 @@ fun randomCustomBrandThemeColors(random: Random = Random.Default): RandomCustomB
     // Keep the first pass intentionally simple: randomize in HSV so colors stay
     // vivid enough to read, force primary/accent apart, and derive outline from
     // their mix so the gear edge feels related instead of like a third random actor.
-    repeat(12) {
+    repeat(16) {
         val backgroundHue = random.nextInt(360).toFloat()
-        val background =
-            hsvColor(
-                hue = backgroundHue,
-                saturation = random.nextFloat().lerp(0.35f, 0.72f),
-                value = random.nextFloat().lerp(0.42f, 0.76f),
-            )
+        val isLightMode = random.nextBoolean()
 
-        val accentHueOffset = random.nextFloat().lerp(80f, 160f)
-        val accentHue =
-            if (random.nextBoolean()) {
-                (backgroundHue + accentHueOffset) % 360f
-            } else {
-                (backgroundHue - accentHueOffset + 360f) % 360f
-            }
-        val accent =
-            hsvColor(
-                hue = accentHue,
-                saturation = random.nextFloat().lerp(0.50f, 0.90f),
-                value = random.nextFloat().lerp(0.56f, 0.92f),
+        val background: Color
+        val accent: Color
+
+        if (isLightMode) {
+            // Light Profile: Low saturation, very high brightness for background
+            // High saturation, medium brightness for accent (to ensure contrast)
+            background = hsvColor(
+                hue = backgroundHue,
+                saturation = random.nextFloat().lerp(0.04f, 0.16f),
+                value = random.nextFloat().lerp(0.88f, 0.98f),
             )
+            val accentHueOffset = random.nextFloat().lerp(60f, 180f)
+            val accentHue = (backgroundHue + accentHueOffset) % 360f
+            accent = hsvColor(
+                hue = accentHue,
+                saturation = random.nextFloat().lerp(0.65f, 0.95f),
+                value = random.nextFloat().lerp(0.35f, 0.60f),
+            )
+        } else {
+            // Dark Profile: Medium saturation, low brightness for background
+            // Medium-high saturation, high brightness for accent
+            background = hsvColor(
+                hue = backgroundHue,
+                saturation = random.nextFloat().lerp(0.20f, 0.50f),
+                value = random.nextFloat().lerp(0.12f, 0.28f),
+            )
+            val accentHueOffset = random.nextFloat().lerp(60f, 180f)
+            val accentHue = (backgroundHue + accentHueOffset) % 360f
+            accent = hsvColor(
+                hue = accentHue,
+                saturation = random.nextFloat().lerp(0.55f, 0.95f),
+                value = random.nextFloat().lerp(0.75f, 0.98f),
+            )
+        }
 
         if (!colorsLookSeparated(background, accent)) {
             return@repeat

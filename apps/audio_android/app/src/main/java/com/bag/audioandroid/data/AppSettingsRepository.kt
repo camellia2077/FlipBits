@@ -38,6 +38,16 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SelectedFlashVoicingStyleId] }
 
+    val isFlashVoicingEnabled: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.FlashVoicingEnabled] ?: true }
+
     val selectedThemeModeId: Flow<String?> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -122,6 +132,12 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setFlashVoicingEnabled(enabled: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.FlashVoicingEnabled] = enabled
+        }
+    }
+
     suspend fun setSelectedThemeModeId(themeModeId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedThemeModeId] = themeModeId
@@ -167,6 +183,7 @@ class AppSettingsRepository(
     private object Keys {
         val SelectedPaletteId: Preferences.Key<String> = stringPreferencesKey("palette_id")
         val SelectedFlashVoicingStyleId: Preferences.Key<String> = stringPreferencesKey("flash_voicing_style")
+        val FlashVoicingEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("flash_voicing_enabled")
         val SelectedThemeModeId: Preferences.Key<String> = stringPreferencesKey("theme_mode")
         val SelectedThemeStyleId: Preferences.Key<String> = stringPreferencesKey("theme_style")
         val SelectedBrandThemeId: Preferences.Key<String> = stringPreferencesKey("brand_theme_id")

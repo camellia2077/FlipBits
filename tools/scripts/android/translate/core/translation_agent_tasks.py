@@ -6,6 +6,7 @@ from pathlib import Path
 
 from core.translation_paths import display_language_tag
 from core.translation_resources import ResourceFile
+from prompts.language_prompt_profiles import LocalePromptProfile
 
 
 @dataclass(frozen=True)
@@ -30,17 +31,27 @@ def build_agent_task_payload(
     group: str | None,
     prompt_text_type: str,
     prompt_doc_path: Path | str,
+    locale_profile: LocalePromptProfile,
     entries: list[AgentTaskEntry],
 ) -> dict[str, object]:
     output_dir = Path(output_dir)
     prompt_doc_path = Path(prompt_doc_path)
     return {
-        "task_version": 1,
+        "task_version": 2,
         "prompt_mode": prompt_mode,
         "prompt_version": prompt_version,
         "generated_at": generated_at,
         "language": language_code,
         "language_tag": display_language_tag(language_code),
+        "locale_profile": {
+            "id": locale_profile.profile_id,
+            "mode": locale_profile.mode,
+            "note": locale_profile.locale_note,
+            "identity_rule": locale_profile.identity_rule,
+            "app_text_rule": locale_profile.app_text_rule,
+            "sample_text_rule": locale_profile.sample_text_rule,
+            "key_alignment_rule": locale_profile.key_alignment_rule,
+        },
         "text_type": text_type or "",
         "prompt_text_type": prompt_text_type,
         "group": group or "",

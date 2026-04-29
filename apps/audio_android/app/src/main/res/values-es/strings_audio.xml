@@ -138,8 +138,9 @@
     <string name="audio_player_detail_saved_payload_bytes_value">%1$d bytes</string>
     <string name="audio_generated_input_source_manual">Manual</string>
     <string name="audio_generated_input_source_sample">Ejemplo</string>
-    <string name="audio_flash_visualizer_mode_tone_tracks">Canales FSK</string>
-    <string name="audio_flash_visualizer_mode_tone_energy">Energía tonal</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">Canales</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">Energía</string>
+    <string name="audio_flash_visualizer_mode_pitch_ladder">Tono</string>
     <string name="transport_mode_flash_label">flash</string>
     <string name="transport_mode_pro_label">pro</string>
     <string name="transport_mode_ultra_label">ultra</string>

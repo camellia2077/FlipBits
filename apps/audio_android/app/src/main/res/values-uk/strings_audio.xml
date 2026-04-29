@@ -138,8 +138,9 @@
     <string name="audio_player_detail_saved_payload_bytes_value">%1$d байт</string>
     <string name="audio_generated_input_source_manual">Вручну</string>
     <string name="audio_generated_input_source_sample">Зразок</string>
-    <string name="audio_flash_visualizer_mode_tone_tracks">Доріжки FSK</string>
-    <string name="audio_flash_visualizer_mode_tone_energy">Енергія тону</string>
+    <string name="audio_flash_visualizer_mode_tone_tracks">Доріжки</string>
+    <string name="audio_flash_visualizer_mode_tone_energy">Енергія</string>
+    <string name="audio_flash_visualizer_mode_pitch_ladder">Тон</string>
     <string name="transport_mode_flash_label">flash</string>
     <string name="transport_mode_pro_label">pro</string>
     <string name="transport_mode_ultra_label">ultra</string>

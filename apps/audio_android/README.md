@@ -6,6 +6,8 @@
 
 - Android 应用层架构：
   - `docs/architecture/android-app-architecture.md`
+- Android agent read-order：
+  - `docs/design/android/android-agent-read-order.md`
 - Android UI 结构与职责：
   - `docs/architecture/android-ui-structure.md`
 - Android native 策略：
@@ -16,6 +18,8 @@
   - `docs/design/android/android-player-ui.md`
 - Android 本地化规则：
   - `docs/design/android/android-localization-guidelines.md`
+  - `docs/design/android/android-translation-workflow.md`
+  - `docs/design/android/android-translation-tooling-agent-index.md`
   - `docs/design/android/translation/android-split-strings-translation-guide.md`
 - Android 子项目规则：
   - `apps/audio_android/AGENTS.md`
@@ -39,21 +43,22 @@
   - `strings_about.xml`
   - `strings_validation.xml`
 - 其他语言当前仍主要保留在各自目录下的单文件 `strings.xml`，例如：
-  - `app/src/main/res/values-zh/strings.xml`
-  - `app/src/main/res/values-zh-rTW/strings.xml`
-  - `app/src/main/res/values-ja/strings.xml`
-  - `app/src/main/res/values-fr/strings.xml`
-- 修改用户可见文案时，先按职责定位英文基线文件，再同步检查对应语言目录下的 `strings.xml`。
+  - `app/src/main/res/values-zh/strings_audio.xml`
+  - `app/src/main/res/values-zh-rTW/strings_audio.xml`
+  - `app/src/main/res/values-ja/strings_audio.xml`
+  - `app/src/main/res/values-fr/strings_audio.xml`
+- 修改用户可见文案时，先按职责定位英文基线文件，再同步检查对应语言目录下的 `strings*.xml`。
 - `audio_samples_*` 一类示例文本资源仍保持独立 XML，不在上述 `strings_*.xml` 中。
 
 ## 使用方式
 
-- 想快速找入口：先看本文件的“快速定位 / 常见改动入口”
+- 想快速找入口：先看本文件的“代码地图 / 常见起点”
+- 想先判断这次改动还要不要展开别的 Android 文档：去 `docs/design/android/android-agent-read-order.md`
 - 想看 UI 设计原则：去 `docs/design/android/`
 - 想看 UI 职责和代码归属：去 `docs/architecture/android-ui-structure.md`
 - 想看 agent 必须遵守的硬规则：去 `apps/audio_android/AGENTS.md`
 
-## 快速定位
+## 代码地图
 
 - App 根装配与页面壳层：
   - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidApp.kt`
@@ -113,47 +118,26 @@
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
 
-## 常见改动入口
+## 常见起点
 
-- 改编码进度、取消、结果落态：
-  - 先看 `AudioSessionEncodeActions.kt`
-  - 再看 `data/NativeAudioCodecGateway.kt`
-  - 再看 `app/src/main/cpp/jni_bridge.cpp`
-- 改导出 WAV、文件元数据、媒体库识别：
-  - 先看 `MediaStoreAudioExportGateway.kt`
-  - 再看 `MediaStoreSavedAudioLibraryGateway.kt`
-  - 再看 `NativeAudioIoGateway.kt` / `audio_io_jni.cpp`
-  - 最后看 `libs/audio_io/`
-- 改播放区 UI：
-  - 先看 `PlayerDetailSheet.kt`
-  - 再看 `AudioPlaybackProgressSection.kt`
-  - 再看 `AudioPlaybackTransportControls.kt`
-  - 如涉及视觉规则或配色统一，再看 `docs/design/android/android-player-ui.md`
-- 改 flash / pro / ultra 可视化：
-  - `AudioFlashSignalVisualizer.kt`
-  - `FlashSignalVisualizationAnalysis.kt`
-  - `FlashSignalVisualizationDrawing.kt`
-- 新增/修改 dual-tone 主题阵容：
-  - 先看 `docs/design/android/android-dual-tone-theme.md`
-  - 主题颜色入口：`app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`
-  - dual-tone UI token 入口：
-    - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeAccentTokens.kt`
-    - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeVisualTokens.kt`
-    - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
-  - 齿轮 / encode glyph 颜色入口：`app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
-  - Settings 分组展示入口（代码仍在 `Config*` 文件中）：`app/src/main/java/com/bag/audioandroid/ui/screen/ConfigThemeAppearanceSection.kt`
-  - 示例文本入口：`AndroidSampleInputTextProvider.kt` 与对应 `audio_samples_*` 资源
-- 改 Audio 页输入卡与随机样例：
-  - `AudioInputActionsCard.kt`
-  - `AudioSessionEditingActions.kt`
-  - `SampleInputSessionUpdater.kt`
-  - `AndroidSampleInputTextProvider.kt`
-- 改媒体库导入/重命名/删除/分享：
-  - `AudioSavedAudioMutationActions.kt`
-  - `MediaStoreSavedAudioLibraryGateway.kt`
-- 改底部抽屉摘要与已保存音频信息：
-  - `PlayerDetailSummarySection.kt`
-  - `PlayerDetailSavedInfoSection.kt`
+- 编码进度、取消、结果落态：
+  - `AudioSessionEncodeActions.kt` -> `data/NativeAudioCodecGateway.kt` -> `app/src/main/cpp/jni_bridge.cpp`
+- 导出 WAV、文件元数据、媒体库识别：
+  - `MediaStoreAudioExportGateway.kt` -> `MediaStoreSavedAudioLibraryGateway.kt` -> `NativeAudioIoGateway.kt` / `audio_io_jni.cpp` -> `libs/audio_io/`
+- 播放区 UI：
+  - `PlayerDetailSheet.kt` -> `AudioPlaybackProgressSection.kt` -> `AudioPlaybackTransportControls.kt`
+- flash / pro / ultra 可视化：
+  - `AudioFlashSignalVisualizer.kt` -> `FlashSignalVisualizationAnalysis.kt` -> `FlashSignalVisualizationDrawing.kt`
+- 主题、palette、glyph：
+  - `BrandThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
+- Audio 页输入卡、随机样例、示例文本：
+  - `AudioInputActionsCard.kt` -> `AudioSessionEditingActions.kt` -> `SampleInputSessionUpdater.kt` -> `AndroidSampleInputTextProvider.kt`
+- XML 文案与本地化资源：
+  - `app/src/main/res/values/strings_*.xml` -> `app/src/main/res/values-*/strings*.xml` -> `app/src/main/res/values*/audio_samples_*.xml`
+- 媒体库导入、重命名、删除、分享：
+  - `AudioSavedAudioMutationActions.kt` -> `MediaStoreSavedAudioLibraryGateway.kt`
+- 底部抽屉摘要与已保存音频信息：
+  - `PlayerDetailSummarySection.kt` -> `PlayerDetailSavedInfoSection.kt`
 
 ## 说明
 
@@ -166,10 +150,8 @@
     - 从 `BrandThemeCatalog.kt` 的 `backgroundColor` / `accentColor` / `outlineColor` 出发。
     - 通过 `AppThemeAccentTokens.kt`、`AppThemeVisualTokens.kt` 和 `AudioAndroidThemeMappings.kt` 显式映射到 UI。
     - `Material` 组件继续提供结构、状态与可读性基础，但不再负责决定 dual-tone 的最终视觉语义。
-- Android XML 多语言当前以 `app/src/main/res/values/strings.xml` 为英文基线，中文与日语分别位于：
-  - `app/src/main/res/values-zh/strings.xml`
-  - `app/src/main/res/values-ja/strings.xml`
-- 新增或修改可见 XML 文案时，需要同步更新以上三个目录，避免语言版本漂移。
+- Android XML 多语言当前以 `app/src/main/res/values/strings*.xml` 为英文基线。
+- 新增或修改可见 XML 文案时，需要同步更新对应语言目录下的 `strings*.xml`，避免语言版本漂移。
 - UI 设计细则不要继续堆在 `README.md` 或 `AGENTS.md` 里；优先写进 `docs/design/android/`，再由这里做导航。
 - 代码职责、颜色入口、共享 helper 等结构性说明，优先写进 `docs/architecture/`，再由这里做导航。
 - 当前底部 tab 用户文案以 `Audio / Saved / Settings` 为准；代码入口文件仍沿用历史命名，如 `LibraryTabScreen.kt`、`ConfigTabScreen.kt`。

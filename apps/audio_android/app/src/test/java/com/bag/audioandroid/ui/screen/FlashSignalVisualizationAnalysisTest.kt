@@ -2,11 +2,70 @@ package com.bag.audioandroid.ui.screen
 
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
+import com.bag.audioandroid.ui.model.TransportModeOption
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FlashSignalVisualizationAnalysisTest {
+    @Test
+    fun `flash route uses follow timeline buckets for full pcm when available`() {
+        val route =
+            resolvePlaybackVisualizationRoute(
+                transportMode = TransportModeOption.Flash,
+                isFlashMode = true,
+                waveformPcm = shortArrayOf(1, 2, 3, 4),
+                isWaveformPreview = false,
+                sampleRateHz = 44100,
+                visualDisplayedSamples = 120,
+                displayedSamples = 120,
+                followData =
+                    PayloadFollowViewData(
+                        binaryTokens = listOf("0", "1"),
+                        binaryGroupTimeline =
+                            listOf(
+                                PayloadFollowBinaryGroupTimelineEntry(0, 100, 0, 0, 1),
+                                PayloadFollowBinaryGroupTimelineEntry(100, 100, 1, 1, 1),
+                            ),
+                        totalPcmSampleCount = 200,
+                        followAvailable = true,
+                    ),
+            )
+
+        assertTrue(route is PlaybackVisualizationRoute.FlashSignal)
+        val input = (route as PlaybackVisualizationRoute.FlashSignal).input
+        assertTrue(input.bucketSource is FlashSignalBucketSource.FollowTimeline)
+    }
+
+    @Test
+    fun `flash route falls back to pcm buckets when follow bits are incomplete`() {
+        val route =
+            resolvePlaybackVisualizationRoute(
+                transportMode = TransportModeOption.Flash,
+                isFlashMode = true,
+                waveformPcm = shortArrayOf(1, 2, 3, 4),
+                isWaveformPreview = false,
+                sampleRateHz = 44100,
+                visualDisplayedSamples = 120,
+                displayedSamples = 120,
+                followData =
+                    PayloadFollowViewData(
+                        binaryTokens = listOf("0"),
+                        binaryGroupTimeline =
+                            listOf(
+                                PayloadFollowBinaryGroupTimelineEntry(0, 100, 0, 0, 1),
+                                PayloadFollowBinaryGroupTimelineEntry(100, 100, 1, 1, 1),
+                            ),
+                        totalPcmSampleCount = 200,
+                        followAvailable = true,
+                    ),
+            )
+
+        assertTrue(route is PlaybackVisualizationRoute.FlashSignal)
+        val input = (route as PlaybackVisualizationRoute.FlashSignal).input
+        assertTrue(input.bucketSource is FlashSignalBucketSource.Pcm)
+    }
+
     @Test
     fun `follow timeline buckets move with real playback samples`() {
         val followData =
@@ -44,5 +103,34 @@ class FlashSignalVisualizationAnalysisTest {
         assertEquals(FskDominantTone.High, laterBuckets[2].dominantTone)
         assertTrue(laterBuckets.any { it.dominantTone == FskDominantTone.High })
         assertTrue(laterBuckets.any { it.dominantTone == FskDominantTone.Low })
+    }
+
+    @Test
+    fun `follow timeline buckets keep a visible dip between repeated same tone symbols`() {
+        val followData =
+            PayloadFollowViewData(
+                binaryTokens = listOf("0", "0", "0"),
+                binaryGroupTimeline =
+                    listOf(
+                        PayloadFollowBinaryGroupTimelineEntry(0, 100, 0, 0, 1),
+                        PayloadFollowBinaryGroupTimelineEntry(100, 100, 1, 1, 1),
+                        PayloadFollowBinaryGroupTimelineEntry(200, 100, 2, 2, 1),
+                    ),
+                totalPcmSampleCount = 300,
+                followAvailable = true,
+            )
+
+        val buckets =
+            buildFskEnergyBucketsFromFollowData(
+                followData = followData,
+                currentSample = 180f,
+                windowSampleCount = 300,
+                targetBucketCount = 30,
+            )
+
+        val boundaryBucket = buckets[4]
+        val interiorBucket = buckets[8]
+        assertEquals(FskDominantTone.Low, interiorBucket.dominantTone)
+        assertTrue(boundaryBucket.lowStrength < interiorBucket.lowStrength * 0.5f)
     }
 }

@@ -203,7 +203,7 @@ private class EncodeRequestFactory {
             sampleInputId = current.currentSession.sampleInputId,
             selectedFlashVoicingStyle = current.selectedFlashVoicingStyle,
             flashPreset =
-                if (current.transportMode == TransportModeOption.Flash) {
+                if (current.transportMode == TransportModeOption.Flash && current.isFlashVoicingEnabled) {
                     current.selectedFlashVoicingStyle
                 } else {
                     FlashVoicingStyleOption.CodedBurst
@@ -614,7 +614,7 @@ private class EncodeStateReducer(
         val previousFilePath = uiState.value.sessions.getValue(request.mode).generatedPcmFilePath
         val generatedFlashStyle =
             if (request.mode == TransportModeOption.Flash && result.pcmSampleCount > 0) {
-                request.selectedFlashVoicingStyle
+                request.flashPreset
             } else {
                 null
             }

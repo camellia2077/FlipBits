@@ -101,7 +101,7 @@ fun ConfigTabScreen(
 
         Surface(
             shape = MaterialTheme.shapes.medium,
-            tonalElevation = 2.dp,
+            tonalElevation = 0.dp,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Row(

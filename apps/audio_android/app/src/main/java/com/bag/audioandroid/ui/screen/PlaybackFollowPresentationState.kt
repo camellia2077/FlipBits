@@ -41,11 +41,28 @@ internal fun rememberPlaybackFollowPresentationState(
                 rawDisplayUnitsByToken = rawDisplayUnitsByToken,
             )
         }
+    val activeBitIndexWithinByte =
+        remember(
+            activeTextIndex,
+            activeByteIndexWithinToken,
+            displayedSamples,
+            followData,
+            rawDisplayUnitsByToken,
+        ) {
+            activeBitIndexWithinByte(
+                activeTextIndex = activeTextIndex,
+                activeByteIndexWithinToken = activeByteIndexWithinToken,
+                displayedSamples = displayedSamples,
+                followData = followData,
+                rawDisplayUnitsByToken = rawDisplayUnitsByToken,
+            )
+        }
     return remember(
         followViewMode,
         activeLineIndex,
         activeTextIndex,
         activeByteIndexWithinToken,
+        activeBitIndexWithinByte,
         rawDisplayUnitsByToken,
     ) {
         PlaybackFollowPresentationState(
@@ -53,6 +70,7 @@ internal fun rememberPlaybackFollowPresentationState(
             activeLineIndex = activeLineIndex,
             activeTextIndex = activeTextIndex,
             activeByteIndexWithinToken = activeByteIndexWithinToken,
+            activeBitIndexWithinByte = activeBitIndexWithinByte,
             rawDisplayUnitsByToken = rawDisplayUnitsByToken,
         )
     }
@@ -64,5 +82,6 @@ internal data class PlaybackFollowPresentationState(
     val activeLineIndex: Int,
     val activeTextIndex: Int,
     val activeByteIndexWithinToken: Int,
+    val activeBitIndexWithinByte: Int,
     val rawDisplayUnitsByToken: Map<Int, List<TextFollowRawDisplayUnitViewData>>,
 )

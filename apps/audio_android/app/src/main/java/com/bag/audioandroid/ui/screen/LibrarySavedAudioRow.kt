@@ -70,6 +70,7 @@ internal fun LibrarySavedAudioRow(
                 Text(
                     text = item.displayName,
                     style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text =
@@ -87,7 +88,7 @@ internal fun LibrarySavedAudioRow(
                     Text(
                         text = stringResource(R.string.library_folder_row_label, resolvedFolderName),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }

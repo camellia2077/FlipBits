@@ -65,6 +65,13 @@ internal fun PlaybackFollowLineStrip(
                     } else {
                         -1
                     },
+                activeBitIndexWithinByte =
+                    if (absoluteTokenIndex == presentationState.activeTextIndex) {
+                        presentationState.activeBitIndexWithinByte
+                    } else {
+                        -1
+                    },
+                isPast = absoluteTokenIndex < presentationState.activeTextIndex,
             )
         }
     }

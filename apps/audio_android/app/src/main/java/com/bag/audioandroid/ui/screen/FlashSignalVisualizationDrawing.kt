@@ -4,7 +4,11 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.unit.dp
 
 internal fun DrawScope.drawToneTracks(
@@ -32,11 +36,8 @@ internal fun DrawScope.drawToneTracks(
         end = Offset(leftPadding + innerWidth, upperTop + laneHeight + laneGap / 2f),
         strokeWidth = 1.dp.toPx(),
     )
-    val activeWindowEndExclusive =
-        (scanHeadBucketIndex + activeWindowBucketCount).coerceAtMost(buckets.size)
-
     buckets.forEachIndexed { index, bucket ->
-        val isActiveBucket = index in scanHeadBucketIndex until activeWindowEndExclusive
+        val isActiveBucket = index <= scanHeadBucketIndex
         val x = leftPadding + bucketWidth * index.toFloat()
         val contentWidth = (bucketWidth - 1.dp.toPx()).coerceAtLeast(1.6f)
         val highAlpha =
@@ -111,11 +112,8 @@ internal fun DrawScope.drawToneEnergy(
         end = Offset(leftPadding + innerWidth, centerY),
         strokeWidth = 1.dp.toPx(),
     )
-    val activeWindowEndExclusive =
-        (scanHeadBucketIndex + activeWindowBucketCount).coerceAtMost(buckets.size)
-
     buckets.forEachIndexed { index, bucket ->
-        val isActiveBucket = index in scanHeadBucketIndex until activeWindowEndExclusive
+        val isActiveBucket = index <= scanHeadBucketIndex
         val x = leftPadding + bucketWidth * index.toFloat() + bucketWidth / 2f
         val highHeight = maxEnergyHeight * bucket.highStrength
         val lowHeight = maxEnergyHeight * bucket.lowStrength
@@ -159,6 +157,114 @@ internal fun DrawScope.drawToneEnergy(
             start = Offset(x, centerY + lowerGap),
             end = Offset(x, centerY + lowerGap + lowHeight),
             strokeWidth = strokeWidth,
+        )
+    }
+}
+
+internal fun DrawScope.drawPitchLadder(
+    buckets: List<FskEnergyBucket>,
+    scanHeadBucketIndex: Int,
+    activeWindowBucketCount: Int,
+    leftPadding: Float,
+    topPadding: Float,
+    innerWidth: Float,
+    innerHeight: Float,
+    bucketWidth: Float,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+    centerLineColor: Color,
+    glowPulse: Float,
+) {
+    val highY = topPadding + innerHeight * 0.24f
+    val lowY = topPadding + innerHeight * 0.76f
+    val midY = topPadding + innerHeight * 0.50f
+    val strokeWidth = 3.dp.toPx()
+    val pointRadius = (bucketWidth * 0.34f).coerceIn(1.6f, 4.8f)
+
+    drawLine(
+        color = centerLineColor.copy(alpha = 0.70f),
+        start = Offset(leftPadding, highY),
+        end = Offset(leftPadding + innerWidth, highY),
+        strokeWidth = 1.dp.toPx(),
+    )
+    drawLine(
+        color = centerLineColor.copy(alpha = 0.54f),
+        start = Offset(leftPadding, midY),
+        end = Offset(leftPadding + innerWidth, midY),
+        strokeWidth = 1.dp.toPx(),
+    )
+    drawLine(
+        color = centerLineColor.copy(alpha = 0.70f),
+        start = Offset(leftPadding, lowY),
+        end = Offset(leftPadding + innerWidth, lowY),
+        strokeWidth = 1.dp.toPx(),
+    )
+
+    fun yForTone(bucket: FskEnergyBucket): Float =
+        when (bucket.dominantTone) {
+            FskDominantTone.High -> highY
+            FskDominantTone.Low -> lowY
+            FskDominantTone.Unknown -> midY
+        }
+
+    val pastPath = Path()
+    val futurePath = Path()
+    var pastStarted = false
+    var futureStarted = false
+    buckets.forEachIndexed { index, bucket ->
+        val segmentStartX = leftPadding + bucketWidth * index.toFloat()
+        val segmentEndX = segmentStartX + bucketWidth
+        val y = yForTone(bucket)
+        val targetPath = if (index <= scanHeadBucketIndex) pastPath else futurePath
+        val hasStarted = if (index <= scanHeadBucketIndex) pastStarted else futureStarted
+        if (!hasStarted) {
+            targetPath.moveTo(segmentStartX, y)
+            if (index <= scanHeadBucketIndex) {
+                pastStarted = true
+            } else {
+                futureStarted = true
+            }
+        } else {
+            targetPath.lineTo(segmentStartX, y)
+        }
+        targetPath.lineTo(segmentEndX, y)
+    }
+
+    if (futureStarted) {
+        drawPath(
+            path = futurePath,
+            color = inactiveToneColor.copy(alpha = 0.42f),
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+    }
+    if (pastStarted) {
+        drawPath(
+            path = pastPath,
+            color = activeToneColor.copy(alpha = 0.72f + 0.16f * glowPulse),
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+    }
+
+    buckets.forEachIndexed { index, bucket ->
+        val isActiveBucket = index <= scanHeadBucketIndex
+        val centerX = leftPadding + bucketWidth * (index.toFloat() + 0.5f)
+        val y = yForTone(bucket)
+        val color =
+            if (isActiveBucket) {
+                activeToneColor.copy(alpha = 0.72f + 0.16f * glowPulse)
+            } else {
+                inactiveToneColor.copy(alpha = 0.34f + 0.18f * bucket.confidence)
+            }
+        drawLine(
+            color = centerLineColor.copy(alpha = if (isActiveBucket) 0.20f else 0.12f),
+            start = Offset(centerX, highY),
+            end = Offset(centerX, lowY),
+            strokeWidth = 0.7.dp.toPx(),
+        )
+        drawCircle(
+            color = color,
+            radius = pointRadius,
+            center = Offset(centerX, y),
         )
     }
 }

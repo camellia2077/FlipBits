@@ -37,6 +37,7 @@ internal class AudioAndroidPreferencesBindings(
         observeCustomBrandThemeSettings()
         observeSelectedBrandTheme()
         observeSelectedFlashVoicingStyle()
+        observeFlashVoicingEnabled()
         observeSelectedPlaybackSequenceMode()
         observeConfigLanguageExpanded()
         observeConfigThemeAppearanceExpanded()
@@ -163,6 +164,22 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(selectedFlashVoicingStyle = style)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeFlashVoicingEnabled() {
+        scope.launch {
+            appSettingsRepository.isFlashVoicingEnabled
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    uiState.update { state ->
+                        if (state.isFlashVoicingEnabled == enabled) {
+                            state
+                        } else {
+                            state.copy(isFlashVoicingEnabled = enabled)
                         }
                     }
                 }

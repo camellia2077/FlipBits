@@ -126,9 +126,16 @@ internal class AudioAndroidPreferencesActions(
     }
 
     fun onFlashVoicingStyleSelected(style: FlashVoicingStyleOption) {
-        uiState.update { it.copy(selectedFlashVoicingStyle = style) }
+        val isEnhancedStyle = style != FlashVoicingStyleOption.CodedBurst
+        uiState.update {
+            it.copy(
+                selectedFlashVoicingStyle = style,
+                isFlashVoicingEnabled = isEnhancedStyle,
+            )
+        }
         scope.launch {
             appSettingsRepository.setSelectedFlashVoicingStyleId(style.id)
+            appSettingsRepository.setFlashVoicingEnabled(isEnhancedStyle)
         }
     }
 

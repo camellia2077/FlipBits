@@ -154,7 +154,13 @@ internal fun PlaybackDisplaySection(
         PlaybackTokenContextTape(
             followData = followData,
             displayedSamples = displayedSamples,
-            visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 3,
+            visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 2,
+            modifier =
+                if (playbackDisplayMode == PlaybackDisplayMode.Lyrics) {
+                    Modifier.padding(top = 12.dp)
+                } else {
+                    Modifier
+                },
         )
     }
 }

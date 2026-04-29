@@ -42,6 +42,7 @@ data class AudioAppUiState(
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
     val isConfigLanguageExpanded: Boolean = true,
     val isConfigThemeAppearanceExpanded: Boolean = true,
+    val isFlashVoicingEnabled: Boolean = true,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.CodedBurst,
     val transportMode: TransportModeOption = TransportModeOption.Flash,
     val sessions: Map<TransportModeOption, ModeAudioSessionState> = defaultModeSessions(),

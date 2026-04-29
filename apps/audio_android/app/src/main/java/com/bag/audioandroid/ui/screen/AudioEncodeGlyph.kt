@@ -26,6 +26,7 @@ internal fun AudioEncodeGlyph(
     encodeProgress: Float,
     isEncodingBusy: Boolean,
     modifier: Modifier = Modifier,
+    baseSize: androidx.compose.ui.unit.Dp = 108.dp,
 ) {
     val glyphColors = audioEncodeGlyphColors()
     var isGlyphExpanded by rememberSaveable { mutableStateOf(false) }
@@ -85,7 +86,7 @@ internal fun AudioEncodeGlyph(
         modifier =
             modifier
                 .clickable { isGlyphExpanded = !isGlyphExpanded }
-                .size((108.dp * glyphScale)),
+                .size((baseSize * glyphScale)),
     ) {
         val iconScale = size.minDimension / IconViewportSize
         val iconWidth = IconViewportSize * iconScale

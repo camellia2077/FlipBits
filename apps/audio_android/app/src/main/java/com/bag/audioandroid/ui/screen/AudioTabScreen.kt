@@ -36,6 +36,7 @@ fun AudioTabScreen(
     encodePhase: AudioEncodePhase?,
     isEncodeCancelling: Boolean,
     onTransportModeSelected: (TransportModeOption) -> Unit,
+    isFlashVoicingEnabled: Boolean,
     selectedFlashVoicingStyle: FlashVoicingStyleOption,
     onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
     inputText: String,
@@ -112,6 +113,7 @@ fun AudioTabScreen(
                 encodeProgress = encodeProgress,
                 encodePhase = encodePhase,
                 isEncodeCancelling = isEncodeCancelling,
+                isFlashVoicingEnabled = isFlashVoicingEnabled,
                 selectedFlashVoicingStyle = selectedFlashVoicingStyle,
                 onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
                 inputCardExpanded = inputCardExpanded,
@@ -132,7 +134,13 @@ fun AudioTabScreen(
                 onEncode = onEncode,
                 onCancelEncode = onCancelEncode,
                 flashVoicingExpanded = flashVoicingExpanded,
-                onToggleFlashVoicingExpanded = { flashVoicingExpanded = !flashVoicingExpanded },
+                onToggleFlashVoicingExpanded = {
+                    val nextExpanded = !flashVoicingExpanded
+                    flashVoicingExpanded = nextExpanded
+                    if (!nextExpanded && selectedFlashVoicingStyle != FlashVoicingStyleOption.CodedBurst) {
+                        onFlashVoicingStyleSelected(FlashVoicingStyleOption.CodedBurst)
+                    }
+                },
             )
             AudioResultCard(
                 decodedPayload = decodedPayload,

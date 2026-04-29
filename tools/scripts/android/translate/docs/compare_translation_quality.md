@@ -60,7 +60,17 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py compare --l
 When `--lang` is used, English source review files are still generated because they remain the semantic baseline for the localized review.
 Generated review files now also include `PROMPT_MODE`, `PROMPT_VERSION`, `GENERATED_AT`, and `PROMPT_REF` header lines so an agent can tell whether a pasted review file is current, which prompt contract it was built for, and which shared prompt document to read.
 
+For locale-specific writing modes, generated localized review files and shared prompt docs may also include:
+
+- `LOCALE_PROFILE`
+- `LOCALE_MODE`
+- `LOCALE_NOTE`
+
+This is intentional. Some locales are not standard "translate English into natural target language" outputs. For example, `values-la` is treated as a stylized High Gothic / Dog Latin profile rather than classical Latin, so the generated artifacts must carry those instructions directly.
+
 To reduce token duplication, `compare` now writes shared prompt documents under each language directory, such as `temp/ai_translation_reviews/de/_prompts`. Review files reference those prompt docs instead of inlining the full prompt text into every `.md`.
+
+Structured `*.task.json` artifacts now also carry a `locale_profile` object so agent workflows that do not read Markdown can still receive locale-specific writing instructions directly.
 
 ## What it generates
 
@@ -115,6 +125,8 @@ NAME: audio_sample_ancient_dynasty_themed_alloy_hand_no_warmth
 EN: The immortal alloy hand closes, and no warmth answers inside it
 JA: 不朽合金の手が閉じる。その内側に、もう温度は返らない。
 ```
+
+For a locale with a custom prompt profile such as `la`, the file header also carries the locale-specific writing brief before `PROMPT_REF`.
 
 The target-language label is parsed from the `values-*` folder name. Examples: `values-ja` becomes `[JA]`, and `values-zh-rTW` becomes `[ZH-RTW]`.
 
