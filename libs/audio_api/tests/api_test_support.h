@@ -30,12 +30,12 @@ struct EncodeJobCompletion {
 
 bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
                                      bag_transport_mode mode = BAG_TRANSPORT_FLASH,
-                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY);
 bag_decoder_config MakeDecoderConfig(const test::ConfigCase& config_case,
                                      bag_transport_mode mode = BAG_TRANSPORT_FLASH,
-                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST);
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY);
 std::size_t RoundHalfUpFrameScale(int frame_samples, int numerator, int denominator);
 std::size_t ExpectedFlashSampleCount(const std::string& text,
                                      const test::ConfigCase& config_case,

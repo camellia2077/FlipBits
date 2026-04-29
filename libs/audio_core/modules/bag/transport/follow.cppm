@@ -9,6 +9,7 @@ export import bag.common.types;
 
 import bag.flash.signal;
 import bag.flash.voicing;
+import bag.mini.codec;
 import bag.pro.codec;
 import bag.ultra.codec;
 

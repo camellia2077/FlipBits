@@ -169,8 +169,8 @@ void TestApiEncodeJobImmediateCancel() {
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+            BAG_FLASH_SIGNAL_PROFILE_LITANY,
+            BAG_FLASH_VOICING_FLAVOR_LITANY);
 
     bag_encode_job* job = nullptr;
     test::AssertEq(
@@ -213,8 +213,8 @@ void TestApiEncodeJobCancelWhileRunning() {
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+            BAG_FLASH_SIGNAL_PROFILE_LITANY,
+            BAG_FLASH_VOICING_FLAVOR_LITANY);
 
     bag_encode_job* job = nullptr;
     test::AssertEq(
@@ -247,8 +247,8 @@ void TestApiEncodeJobDestroyWhileRunningIsSafe() {
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+            BAG_FLASH_SIGNAL_PROFILE_LITANY,
+            BAG_FLASH_VOICING_FLAVOR_LITANY);
 
     bag_encode_job* job = nullptr;
     test::AssertEq(

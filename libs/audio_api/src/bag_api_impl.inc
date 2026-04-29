@@ -24,6 +24,7 @@ namespace {
 inline constexpr const char kModeFlash[] = "flash";
 inline constexpr const char kModePro[] = "pro";
 inline constexpr const char kModeUltra[] = "ultra";
+inline constexpr const char kModeMini[] = "mini";
 
 std::string FormatRawBytesHex(const std::vector<std::uint8_t>& bytes);
 std::string FormatRawBitsBinary(const std::vector<std::uint8_t>& bytes);
@@ -69,19 +70,25 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz, int frame_samples,
     case BAG_TRANSPORT_ULTRA:
       core_config.mode = bag::TransportMode::kUltra;
       break;
+    case BAG_TRANSPORT_MINI:
+      core_config.mode = bag::TransportMode::kMini;
+      break;
     default:
       core_config.mode = static_cast<bag::TransportMode>(-1);
       break;
   }
   switch (flash_signal_profile) {
-    case BAG_FLASH_SIGNAL_PROFILE_CODED_BURST:
-      core_config.flash_signal_profile = bag::FlashSignalProfile::kCodedBurst;
+    case BAG_FLASH_SIGNAL_PROFILE_STEADY:
+      core_config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
       break;
-    case BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT:
-      core_config.flash_signal_profile = bag::FlashSignalProfile::kRitualChant;
+    case BAG_FLASH_SIGNAL_PROFILE_LITANY:
+      core_config.flash_signal_profile = bag::FlashSignalProfile::kLitany;
       break;
-    case BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL:
-      core_config.flash_signal_profile = bag::FlashSignalProfile::kDeepRitual;
+    case BAG_FLASH_SIGNAL_PROFILE_HOSTILE:
+      core_config.flash_signal_profile = bag::FlashSignalProfile::kHostile;
+      break;
+    case BAG_FLASH_SIGNAL_PROFILE_COLLAPSE:
+      core_config.flash_signal_profile = bag::FlashSignalProfile::kCollapse;
       break;
     default:
       core_config.flash_signal_profile =
@@ -89,14 +96,17 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz, int frame_samples,
       break;
   }
   switch (flash_voicing_flavor) {
-    case BAG_FLASH_VOICING_FLAVOR_CODED_BURST:
-      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kCodedBurst;
+    case BAG_FLASH_VOICING_FLAVOR_STEADY:
+      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kSteady;
       break;
-    case BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT:
-      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kRitualChant;
+    case BAG_FLASH_VOICING_FLAVOR_LITANY:
+      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
       break;
-    case BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL:
-      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kDeepRitual;
+    case BAG_FLASH_VOICING_FLAVOR_HOSTILE:
+      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostile;
+      break;
+    case BAG_FLASH_VOICING_FLAVOR_COLLAPSE:
+      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kCollapse;
       break;
     default:
       core_config.flash_voicing_flavor =
@@ -115,6 +125,8 @@ bag_transport_mode ToApiMode(bag::TransportMode mode) {
       return BAG_TRANSPORT_PRO;
     case bag::TransportMode::kUltra:
       return BAG_TRANSPORT_ULTRA;
+    case bag::TransportMode::kMini:
+      return BAG_TRANSPORT_MINI;
     default:
       return BAG_TRANSPORT_FLASH;
   }
@@ -221,6 +233,8 @@ bag_validation_issue ToApiValidationIssue(bag::TransportValidationIssue issue) {
       return BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE;
     case bag::TransportValidationIssue::kInvalidFlashVoicingFlavor:
       return BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR;
+    case bag::TransportValidationIssue::kMiniMorseOnly:
+      return BAG_VALIDATION_MINI_MORSE_ONLY;
     default:
       return BAG_VALIDATION_INVALID_MODE;
   }
@@ -235,6 +249,8 @@ const char* bag_transport_mode_name(bag_transport_mode mode) {
       return kModePro;
     case BAG_TRANSPORT_ULTRA:
       return kModeUltra;
+    case BAG_TRANSPORT_MINI:
+      return kModeMini;
     default:
       return "unknown";
   }
@@ -256,6 +272,10 @@ int bag_try_parse_transport_mode(const char* raw_mode,
   }
   if (mode_text == kModeUltra) {
     *out_mode = BAG_TRANSPORT_ULTRA;
+    return 1;
+  }
+  if (mode_text == kModeMini) {
+    *out_mode = BAG_TRANSPORT_MINI;
     return 1;
   }
   return 0;
@@ -304,20 +324,24 @@ const char* bag_validation_issue_message(bag_validation_issue issue) {
     case BAG_VALIDATION_INVALID_FRAME_SAMPLES:
       return "Frame sample count must be greater than 0.";
     case BAG_VALIDATION_INVALID_MODE:
-      return "Unsupported transport mode. Use flash, pro, or ultra. Charset "
-             "rules: flash accepts unrestricted text bytes, pro requires "
-             "ASCII, ultra is for UTF-8 text.";
+      return "Unsupported transport mode. Use mini, flash, pro, or ultra. "
+             "Charset rules: mini accepts Morse-compatible ASCII, flash "
+             "accepts unrestricted text bytes, pro requires ASCII, and ultra "
+             "is for UTF-8 text.";
     case BAG_VALIDATION_PRO_ASCII_ONLY:
       return "`pro` mode only supports ASCII input. Use `flash` for "
              "unrestricted text bytes or `ultra` for UTF-8 text.";
     case BAG_VALIDATION_PAYLOAD_TOO_LARGE:
       return "Payload exceeds the 512-byte single-frame limit.";
     case BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE:
-      return "Unsupported flash signal profile. Use coded_burst, "
-             "ritual_chant, or deep_ritual.";
+      return "Unsupported flash signal profile. Use steady, hostile, litany, "
+             "or collapse.";
     case BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR:
-      return "Unsupported flash voicing flavor. Use coded_burst, "
-             "ritual_chant, or deep_ritual.";
+      return "Unsupported flash voicing flavor. Use steady, hostile, litany, "
+             "or collapse.";
+    case BAG_VALIDATION_MINI_MORSE_ONLY:
+      return "`mini` Morse mode supports A-Z, 0-9, spaces, and common Morse "
+             "punctuation.";
     default:
       return "Unknown validation issue.";
   }

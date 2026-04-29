@@ -10,6 +10,7 @@ bag::flash::BfskConfig MakeSignalConfig();
 bag::CoreConfig MakeCoreConfig();
 bag::CoreConfig MakeAndroidSizedCoreConfig();
 
+std::size_t SecondsToSampleCount(int sample_rate_hz, double seconds);
 std::size_t FormalPreambleSampleCountForFlavor(const bag::CoreConfig& config,
                                                bag::FlashVoicingFlavor flavor);
 std::size_t FormalEpilogueSampleCountForFlavor(const bag::CoreConfig& config,
@@ -46,6 +47,9 @@ double AverageNormalizedFirstDifference(const std::vector<std::int16_t>& pcm,
 std::pair<std::size_t, std::size_t> FractionalRange(std::size_t sample_count,
                                                     double begin_ratio,
                                                     double end_ratio);
+std::pair<std::size_t, std::size_t> SecondsRange(int sample_rate_hz,
+                                                 double begin_seconds,
+                                                 double end_seconds);
 
 void RegisterFlashVoicingPayloadTests(test::Runner& runner);
 void RegisterFlashVoicingFormalTests(test::Runner& runner);

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -18,8 +19,8 @@ struct DecodeOutcome {
 
 bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
                                      bag_transport_mode mode = BAG_TRANSPORT_FLASH,
-                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
     bag_encoder_config config{};
     config.sample_rate_hz = config_case.sample_rate_hz;
     config.frame_samples = config_case.frame_samples;
@@ -33,8 +34,8 @@ bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
 
 bag_decoder_config MakeDecoderConfig(const test::ConfigCase& config_case,
                                      bag_transport_mode mode = BAG_TRANSPORT_FLASH,
-                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
     bag_decoder_config config{};
     config.sample_rate_hz = config_case.sample_rate_hz;
     config.frame_samples = config_case.frame_samples;
@@ -83,33 +84,109 @@ DecodeOutcome DecodeFromVector(const bag_decoder_config& config, const std::vect
     return out;
 }
 
+bool IsUtf8ContinuationByte(unsigned char value) {
+    return (value & 0xC0U) == 0x80U;
+}
+
+bool IsLikelyUtf8CodePointBoundaryAfter(const std::string& text, size_t byte_index) {
+    return byte_index + static_cast<size_t>(1) >= text.size() ||
+           !IsUtf8ContinuationByte(static_cast<unsigned char>(text[byte_index + static_cast<size_t>(1)]));
+}
+
+bool EndsWithUtf8Bytes(const std::string& text,
+                       size_t byte_index,
+                       unsigned char first,
+                       unsigned char second,
+                       unsigned char third) {
+    if (byte_index < static_cast<size_t>(2)) {
+        return false;
+    }
+    return static_cast<unsigned char>(text[byte_index - static_cast<size_t>(2)]) == first &&
+           static_cast<unsigned char>(text[byte_index - static_cast<size_t>(1)]) == second &&
+           static_cast<unsigned char>(text[byte_index]) == third;
+}
+
+size_t LitanyPauseSlotCountAfterByte(const std::string& text, size_t byte_index) {
+    const unsigned char value = static_cast<unsigned char>(text[byte_index]);
+    switch (value) {
+    case static_cast<unsigned char>(' '):
+    case static_cast<unsigned char>('\t'):
+        return 3;
+    case static_cast<unsigned char>('\n'):
+    case static_cast<unsigned char>('\r'):
+        return 6;
+    case static_cast<unsigned char>(','):
+    case static_cast<unsigned char>(';'):
+    case static_cast<unsigned char>(':'):
+        return 4;
+    case static_cast<unsigned char>('.'):
+    case static_cast<unsigned char>('!'):
+    case static_cast<unsigned char>('?'):
+        return 8;
+    default:
+        break;
+    }
+
+    if (EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x8C) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x9B) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x9A)) {
+        return 4;
+    }
+    if (EndsWithUtf8Bytes(text, byte_index, 0xE3, 0x80, 0x82) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x81) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x9F)) {
+        return 8;
+    }
+    if (byte_index + static_cast<size_t>(1) >= text.size() ||
+        !IsLikelyUtf8CodePointBoundaryAfter(text, byte_index)) {
+        return 1;
+    }
+
+    const size_t cadence_position = byte_index + static_cast<size_t>(1);
+    if ((cadence_position % static_cast<size_t>(12)) == 0) {
+        return 5;
+    }
+    return 1;
+}
+
+size_t LitanyPauseSlotCount(const std::string& text) {
+    size_t pause_slots = 0;
+    for (size_t byte_index = 0; byte_index < text.size(); ++byte_index) {
+        pause_slots += static_cast<size_t>(14) + LitanyPauseSlotCountAfterByte(text, byte_index);
+    }
+    return pause_slots;
+}
+
+size_t SecondsToSampleCount(int sample_rate_hz, double seconds) {
+    return sample_rate_hz > 0 && seconds > 0.0
+               ? static_cast<size_t>(std::lround(static_cast<double>(sample_rate_hz) * seconds))
+               : static_cast<size_t>(0);
+}
+
 size_t ExpectedPcmSampleCount(const std::string& text,
                               bag_transport_mode mode,
                               const test::ConfigCase& config_case,
-                              bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                              bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
+                              bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                              bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
     if (mode == BAG_TRANSPORT_FLASH) {
         const auto frame_samples =
             config_case.frame_samples > 0 ? static_cast<size_t>(config_case.frame_samples) : static_cast<size_t>(0);
         const auto payload_samples_per_bit =
-            flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL
-                ? frame_samples * static_cast<size_t>(5)
-                : flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT
-                      ? frame_samples * static_cast<size_t>(3)
-                      : frame_samples;
-        const auto payload_samples = text.size() * 8 * payload_samples_per_bit;
+            flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_LITANY
+                ? frame_samples * static_cast<size_t>(6)
+                : frame_samples;
+        const bool uses_litany_pauses = flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY;
+        const auto payload_samples =
+            text.size() * 8 * payload_samples_per_bit +
+            (uses_litany_pauses ? LitanyPauseSlotCount(text) * frame_samples : static_cast<size_t>(0));
         const auto leading_nonpayload_samples =
-            flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL
-                ? frame_samples * static_cast<size_t>(24)
-                : flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
-                      ? frame_samples * static_cast<size_t>(16)
-                      : frame_samples * static_cast<size_t>(3);
+            flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY
+                ? SecondsToSampleCount(config_case.sample_rate_hz, 1.35)
+                : frame_samples * static_cast<size_t>(3);
         const auto trailing_nonpayload_samples =
-            flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL
-                ? frame_samples * static_cast<size_t>(14)
-                : flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
-                      ? frame_samples * static_cast<size_t>(8)
-                      : frame_samples * static_cast<size_t>(3);
+            flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY
+                ? SecondsToSampleCount(config_case.sample_rate_hz, 1.15)
+                : frame_samples * static_cast<size_t>(3);
         return payload_samples + leading_nonpayload_samples + trailing_nonpayload_samples;
     }
 
@@ -127,8 +204,8 @@ void AssertPcmProperties(const std::vector<int16_t>& pcm,
                          const std::string& text,
                          bag_transport_mode mode,
                          const test::ConfigCase& config_case,
-                         bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST,
-                         bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST) {
+                         bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                         bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
     const auto expected_length =
         ExpectedPcmSampleCount(text, mode, config_case, flash_signal_profile, flash_voicing_flavor);
     test::AssertEq(pcm.size(), expected_length, "PCM length should match the selected mode's symbol layout.");
@@ -258,60 +335,32 @@ void TestArtifactVersionMatchesRelease() {
         "Artifact layer should observe the current release version.");
 }
 
-void TestArtifactFlashRitualChantRoundTrip() {
+void TestArtifactFlashLitanyRoundTrip() {
     const auto config_case = test::ConfigCases().front();
     const auto text = std::string("Artifact");
     const auto encoder_config =
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+            BAG_FLASH_SIGNAL_PROFILE_LITANY,
+            BAG_FLASH_VOICING_FLAVOR_LITANY);
     const auto decoder_config =
         MakeDecoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-            BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+            BAG_FLASH_SIGNAL_PROFILE_LITANY,
+            BAG_FLASH_VOICING_FLAVOR_LITANY);
     const auto pcm = EncodeToVector(encoder_config, text);
     AssertPcmProperties(
         pcm,
         text,
         BAG_TRANSPORT_FLASH,
         config_case,
-        BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-        BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT);
+        BAG_FLASH_SIGNAL_PROFILE_LITANY,
+        BAG_FLASH_VOICING_FLAVOR_LITANY);
     const auto decoded = DecodeFromVector(decoder_config, pcm);
-    test::AssertEq(decoded.text, text, "Artifact ritual_chant flash should roundtrip.");
-    test::AssertEq(decoded.mode, BAG_TRANSPORT_FLASH, "Artifact ritual_chant flash should preserve mode.");
-}
-
-void TestArtifactFlashDeepRitualRoundTrip() {
-    const auto config_case = test::ConfigCases().front();
-    const auto text = std::string("DeepArtifact");
-    const auto encoder_config =
-        MakeEncoderConfig(
-            config_case,
-            BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
-            BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL);
-    const auto decoder_config =
-        MakeDecoderConfig(
-            config_case,
-            BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
-            BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL);
-    const auto pcm = EncodeToVector(encoder_config, text);
-    AssertPcmProperties(
-        pcm,
-        text,
-        BAG_TRANSPORT_FLASH,
-        config_case,
-        BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
-        BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL);
-    const auto decoded = DecodeFromVector(decoder_config, pcm);
-    test::AssertEq(decoded.text, text, "Artifact deep_ritual flash should roundtrip.");
-    test::AssertEq(decoded.mode, BAG_TRANSPORT_FLASH, "Artifact deep_ritual flash should preserve mode.");
+    test::AssertEq(decoded.text, text, "Artifact litany flash should roundtrip.");
+    test::AssertEq(decoded.mode, BAG_TRANSPORT_FLASH, "Artifact litany flash should preserve mode.");
 }
 
 }  // namespace
@@ -322,8 +371,7 @@ int main() {
     runner.Add("Artifact.WavRoundTripAcrossModes", TestArtifactWavRoundTripAcrossModes);
     runner.Add("Artifact.ModeSpecificLongRoundTrip", TestArtifactModeSpecificLongRoundTrip);
     runner.Add("Artifact.DecodeUnderGainDrop", TestArtifactDecodeUnderGainDrop);
-    runner.Add("Artifact.FlashRitualChantRoundTrip", TestArtifactFlashRitualChantRoundTrip);
-    runner.Add("Artifact.FlashDeepRitualRoundTrip", TestArtifactFlashDeepRitualRoundTrip);
+    runner.Add("Artifact.FlashLitanyRoundTrip", TestArtifactFlashLitanyRoundTrip);
     runner.Add("Artifact.VersionMatchesRelease", TestArtifactVersionMatchesRelease);
     return runner.Run();
 }

@@ -19,7 +19,7 @@ constexpr std::size_t kMetadataModeOffset = kWavChunkPayloadOffset + 1;
 constexpr std::size_t kMetadataFlashStyleOffset = kWavChunkPayloadOffset + 3;
 constexpr std::size_t kMetadataInputSourceKindOffset = kWavChunkPayloadOffset + 4;
 constexpr std::size_t kMetadataCreatedAtOffset = kWavChunkPayloadOffset + 12;
-constexpr std::size_t kMetadataAppVersionOffset = kWavChunkPayloadOffset + 44;
+constexpr std::size_t kMetadataAppVersionOffset = kWavChunkPayloadOffset + 48;
 
 std::vector<std::uint32_t> MakeValidSegmentSampleCounts(
     std::uint32_t pcm_sample_count) {
@@ -35,7 +35,7 @@ audio_io::FlipBitsAudioMetadata MakeValidMetadata(std::uint32_t pcm_sample_count
     metadata.version = 6;
     metadata.mode = audio_io::FlipBitsAudioMetadataMode::kFlash;
     metadata.has_flash_voicing_style = true;
-    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kDeepRitual;
+    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile;
     metadata.created_at_iso_utc = "2026-03-17T09:45:00Z";
     metadata.duration_ms = 4321u;
     metadata.sample_rate_hz = 44100u;
@@ -78,7 +78,7 @@ ApiMetadataFixture MakeApiMetadataView(std::uint32_t pcm_sample_count) {
         6u,
         AUDIO_IO_METADATA_MODE_FLASH,
         1u,
-        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_DEEP_RITUAL,
+        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE,
         MakeStringView("2026-03-17T09:45:00Z"),
         4321u,
         44100u,
@@ -258,7 +258,7 @@ void TestWavIoCApiMetadataRoundTripContract() {
                    static_cast<std::uint8_t>(1u),
                    "C ABI metadata flash-style presence should round-trip.");
     test::AssertEq(decoded.metadata.flash_voicing_style,
-                   AUDIO_IO_METADATA_FLASH_VOICING_STYLE_DEEP_RITUAL,
+                   AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE,
                    "C ABI metadata flash-style value should round-trip.");
     test::AssertEq(std::string(decoded.metadata.created_at_iso_utc.data, decoded.metadata.created_at_iso_utc.size),
                    std::string("2026-03-17T09:45:00Z"),
@@ -375,7 +375,7 @@ void TestWavIoMetadataRoundTripContract() {
     test::AssertTrue(parsed_metadata.metadata.has_flash_voicing_style,
                      "Metadata should preserve the flash voicing style flag.");
     test::AssertEq(parsed_metadata.metadata.flash_voicing_style,
-                   audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kDeepRitual,
+                   audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile,
                    "Metadata flash voicing style should round-trip.");
     test::AssertEq(parsed_metadata.metadata.created_at_iso_utc,
                    std::string("2026-03-17T09:45:00Z"),
@@ -411,6 +411,36 @@ void TestWavIoMetadataRoundTripContract() {
     test::AssertEq(parsed_metadata.metadata.core_version,
                    std::string(kTestCoreVersion),
                    "Metadata core version should round-trip.");
+}
+
+void TestWavIoMetadataModeValuesRoundTrip() {
+    const audio_io::FlipBitsAudioMetadataMode modes[] = {
+        audio_io::FlipBitsAudioMetadataMode::kFlash,
+        audio_io::FlipBitsAudioMetadataMode::kPro,
+        audio_io::FlipBitsAudioMetadataMode::kUltra,
+        audio_io::FlipBitsAudioMetadataMode::kMini,
+    };
+    const auto& test_case = MetadataRoundTripCase();
+
+    for (const auto mode : modes) {
+        auto metadata = MakeValidMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size()));
+        metadata.mode = mode;
+        metadata.has_flash_voicing_style = mode == audio_io::FlipBitsAudioMetadataMode::kFlash;
+        const auto wav_bytes = audio_io::SerializeMonoPcm16WavWithMetadata(
+            test_case.sample_rate_hz,
+            test_case.mono_pcm,
+            metadata);
+        test::AssertTrue(!wav_bytes.empty(), "Metadata WAV serialization should accept all transport modes.");
+        const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
+        test::AssertEq(
+            parsed_metadata.status,
+            audio_io::FlipBitsAudioMetadataStatus::kOk,
+            "Metadata parsing should accept all transport modes.");
+        test::AssertEq(
+            parsed_metadata.metadata.mode,
+            mode,
+            "Metadata transport mode should round-trip.");
+    }
 }
 
 void TestWavIoMetadataMissingOnCanonicalWav() {
@@ -532,6 +562,35 @@ void TestWavIoMetadataRejectsUnknownFlashStyleValues() {
                    "Metadata parsing should reject unknown flash voicing styles.");
 }
 
+void TestWavIoMetadataFlashEmotionValuesRoundTrip() {
+    const audio_io::FlipBitsAudioMetadataFlashVoicingStyle styles[] = {
+        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kSteady,
+        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany,
+        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile,
+        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCollapse,
+    };
+    const auto& test_case = MetadataRoundTripCase();
+
+    for (const auto style : styles) {
+        auto metadata = MakeValidMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size()));
+        metadata.flash_voicing_style = style;
+        const auto wav_bytes = audio_io::SerializeMonoPcm16WavWithMetadata(
+            test_case.sample_rate_hz,
+            test_case.mono_pcm,
+            metadata);
+        test::AssertTrue(!wav_bytes.empty(), "Metadata WAV serialization should accept flash emotion values.");
+        const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
+        test::AssertEq(
+            parsed_metadata.status,
+            audio_io::FlipBitsAudioMetadataStatus::kOk,
+            "Metadata parsing should accept flash emotion values.");
+        test::AssertEq(
+            parsed_metadata.metadata.flash_voicing_style,
+            style,
+            "Metadata flash emotion value should round-trip.");
+    }
+}
+
 void TestWavIoMetadataRejectsCorruptedFields() {
     {
         auto wav_bytes = MakeMetadataWavBytes();
@@ -569,6 +628,7 @@ int main() {
     runner.Add("Unit.WavIoCApiTruncatedWavPreservesMetadataStatus", TestWavIoCApiTruncatedWavPreservesMetadataStatus);
     runner.Add("Unit.WavIoCApiFreeFunctionsAreIdempotentOnZeroedBuffers", TestWavIoCApiFreeFunctionsAreIdempotentOnZeroedBuffers);
     runner.Add("Unit.WavIoMetadataRoundTripContract", TestWavIoMetadataRoundTripContract);
+    runner.Add("Unit.WavIoMetadataModeValuesRoundTrip", TestWavIoMetadataModeValuesRoundTrip);
     runner.Add("Unit.WavIoMetadataMissingOnCanonicalWav", TestWavIoMetadataMissingOnCanonicalWav);
     runner.Add("Unit.WavIoMetadataRespectsChunkPadding", TestWavIoMetadataRespectsChunkPadding);
     runner.Add("Unit.WavIoMetadataRejectsOlderVersions", TestWavIoMetadataRejectsOlderVersions);
@@ -577,6 +637,7 @@ int main() {
     runner.Add("Unit.WavIoMetadataRejectsShortChunkPayload", TestWavIoMetadataRejectsShortChunkPayload);
     runner.Add("Unit.WavIoMetadataRejectsUnknownModeValues", TestWavIoMetadataRejectsUnknownModeValues);
     runner.Add("Unit.WavIoMetadataRejectsUnknownFlashStyleValues", TestWavIoMetadataRejectsUnknownFlashStyleValues);
+    runner.Add("Unit.WavIoMetadataFlashEmotionValuesRoundTrip", TestWavIoMetadataFlashEmotionValuesRoundTrip);
     runner.Add("Unit.WavIoMetadataRejectsCorruptedFields", TestWavIoMetadataRejectsCorruptedFields);
     runner.Add("Unit.WavIoMetadataRejectsSegmentBoundariesThatDoNotMatchPcm", TestWavIoMetadataRejectsSegmentBoundariesThatDoNotMatchPcm);
     return runner.Run();

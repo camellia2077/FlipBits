@@ -18,16 +18,18 @@ enum class WavPcm16Status {
 
 enum class FlipBitsAudioMetadataMode : std::uint8_t {
   kUnknown = 0,
-  kFlash = 1,
-  kPro = 2,
-  kUltra = 3,
+  kMini = 1,
+  kFlash = 2,
+  kPro = 3,
+  kUltra = 4,
 };
 
 enum class FlipBitsAudioMetadataFlashVoicingStyle : std::uint8_t {
   kUnknown = 0,
-  kCodedBurst = 1,
-  kRitualChant = 2,
-  kDeepRitual = 3,
+  kSteady = 1,
+  kLitany = 2,
+  kHostile = 4,
+  kCollapse = 5,
 };
 
 enum class FlipBitsAudioMetadataInputSourceKind : std::uint8_t {

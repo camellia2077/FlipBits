@@ -11,122 +11,125 @@ namespace {
 
 using namespace flash_voicing_test;
 
-void TestRitualChantPreambleUsesThreePhrasedBursts() {
-    constexpr std::size_t kPreambleSampleCount = 3000;
+void TestLitanyPreambleUsesThreeEvenBellStrikes() {
+    constexpr int kSampleRateHz = 44100;
+    constexpr std::size_t kPreambleSampleCount =
+        static_cast<std::size_t>(kSampleRateHz * 135 / 100);
 
     const auto clean_payload = MakeCleanPayload("AB");
     const auto layout = MakePayloadLayout("AB");
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kRitualChant,
+        bag::FlashVoicingFlavor::kLitany,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
 
-    const auto [phrase1_begin, phrase1_end] = FractionalRange(kPreambleSampleCount, 0.08, 0.18);
-    const auto [gap1_begin, gap1_end] = FractionalRange(kPreambleSampleCount, 0.25, 0.29);
-    const auto [phrase2_begin, phrase2_end] = FractionalRange(kPreambleSampleCount, 0.40, 0.50);
-    const auto [gap2_begin, gap2_end] = FractionalRange(kPreambleSampleCount, 0.61, 0.65);
-    const auto [phrase3_begin, phrase3_end] = FractionalRange(kPreambleSampleCount, 0.76, 0.86);
+    const auto [strike1_begin, strike1_end] = SecondsRange(kSampleRateHz, 0.20, 0.26);
+    const auto [gap1_begin, gap1_end] = SecondsRange(kSampleRateHz, 0.43, 0.48);
+    const auto [strike2_begin, strike2_end] = SecondsRange(kSampleRateHz, 0.60, 0.66);
+    const auto [gap2_begin, gap2_end] = SecondsRange(kSampleRateHz, 0.78, 0.81);
+    const auto [strike3_begin, strike3_end] = SecondsRange(kSampleRateHz, 1.00, 1.06);
 
-    const double phrase1_energy = AverageAbsoluteSample(voiced.pcm, phrase1_begin, phrase1_end);
+    constexpr double kStrike1Center = 0.20;
+    constexpr double kStrike2Center = 0.60;
+    constexpr double kStrike3Center = 1.00;
+    test::AssertTrue(
+        std::abs((kStrike2Center - kStrike1Center) -
+                 (kStrike3Center - kStrike2Center)) < 0.0001,
+        "litany preamble bell strike centers should be strictly evenly spaced.");
+
+    const double strike1_energy = AverageAbsoluteSample(voiced.pcm, strike1_begin, strike1_end);
     const double gap1_energy = AverageAbsoluteSample(voiced.pcm, gap1_begin, gap1_end);
-    const double phrase2_energy = AverageAbsoluteSample(voiced.pcm, phrase2_begin, phrase2_end);
+    const double strike2_energy = AverageAbsoluteSample(voiced.pcm, strike2_begin, strike2_end);
     const double gap2_energy = AverageAbsoluteSample(voiced.pcm, gap2_begin, gap2_end);
-    const double phrase3_energy = AverageAbsoluteSample(voiced.pcm, phrase3_begin, phrase3_end);
+    const double strike3_energy = AverageAbsoluteSample(voiced.pcm, strike3_begin, strike3_end);
+    const auto [strike1_tail_begin, strike1_tail_end] = SecondsRange(kSampleRateHz, 0.30, 0.40);
+    const auto [strike3_tail_begin, strike3_tail_end] = SecondsRange(kSampleRateHz, 1.14, 1.26);
+    const auto [terminal_quiet_begin, terminal_quiet_end] = SecondsRange(kSampleRateHz, 1.32, 1.345);
+    const double strike1_tail_energy = AverageAbsoluteSample(voiced.pcm, strike1_tail_begin, strike1_tail_end);
+    const double strike3_tail_energy = AverageAbsoluteSample(voiced.pcm, strike3_tail_begin, strike3_tail_end);
+    const double terminal_quiet_energy =
+        AverageAbsoluteSample(voiced.pcm, terminal_quiet_begin, terminal_quiet_end);
 
     test::AssertTrue(
-        phrase1_energy > gap1_energy * 3.0,
-        "ritual_chant preamble should leave a clear short pause between phrase one and phrase two.");
+        strike1_energy > gap1_energy * 1.15,
+        "litany preamble should make the first bell attack stronger than its long tail.");
     test::AssertTrue(
-        phrase2_energy > gap1_energy * 3.0,
-        "ritual_chant preamble should re-enter strongly after the first short pause.");
+        strike2_energy > strike1_tail_energy * 1.25,
+        "litany preamble should ring the second bell strike after the first long tail.");
     test::AssertTrue(
-        phrase2_energy > gap2_energy * 3.0,
-        "ritual_chant preamble should leave a second clear short pause before phrase three.");
+        strike2_energy > gap2_energy * 1.15,
+        "litany preamble should keep the second bell attack clear through its long tail.");
     test::AssertTrue(
-        phrase3_energy > gap2_energy * 3.0,
-        "ritual_chant preamble should end with a third voiced phrase after the second short pause.");
+        strike3_energy > gap2_energy * 1.15,
+        "litany preamble should end with a third bell strike after the second long tail.");
+    test::AssertTrue(
+        strike3_tail_energy > terminal_quiet_energy * 2.0,
+        "litany preamble bell should carry a long low-metal tail instead of a desk-tap transient.");
 }
 
-void TestRitualChantEpilogueUsesTwoPhrasedBursts() {
-    constexpr std::size_t kEpilogueSampleCount = 1800;
+void TestLitanyEpilogueUsesLongThenShortBellStrikes() {
+    constexpr int kSampleRateHz = 44100;
+    constexpr std::size_t kEpilogueSampleCount =
+        static_cast<std::size_t>(kSampleRateHz * 115 / 100);
 
     const auto clean_payload = MakeCleanPayload("AB");
     const auto layout = MakePayloadLayout("AB");
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kRitualChant,
+        bag::FlashVoicingFlavor::kLitany,
         MakeTrimEnabledConfig(static_cast<std::size_t>(0), kEpilogueSampleCount));
 
     const std::size_t epilogue_begin = voiced.descriptor.leading_nonpayload_samples +
                                        voiced.descriptor.payload_sample_count;
-    const auto [phrase1_begin_local, phrase1_end_local] =
-        FractionalRange(kEpilogueSampleCount, 0.16, 0.32);
+    const auto [long_begin_local, long_end_local] =
+        SecondsRange(kSampleRateHz, 0.20, 0.30);
+    const auto [long_tail_begin_local, long_tail_end_local] =
+        SecondsRange(kSampleRateHz, 0.48, 0.66);
     const auto [gap_begin_local, gap_end_local] =
-        FractionalRange(kEpilogueSampleCount, 0.48, 0.54);
-    const auto [phrase2_begin_local, phrase2_end_local] =
-        FractionalRange(kEpilogueSampleCount, 0.70, 0.84);
+        SecondsRange(kSampleRateHz, 0.70, 0.78);
+    const auto [short_begin_local, short_end_local] =
+        SecondsRange(kSampleRateHz, 0.82, 0.90);
+    const auto [short_tail_begin_local, short_tail_end_local] =
+        SecondsRange(kSampleRateHz, 0.98, 1.10);
 
-    const double phrase1_energy = AverageAbsoluteSample(
+    const double long_energy = AverageAbsoluteSample(
         voiced.pcm,
-        epilogue_begin + phrase1_begin_local,
-        epilogue_begin + phrase1_end_local);
+        epilogue_begin + long_begin_local,
+        epilogue_begin + long_end_local);
+    const double long_tail_energy = AverageAbsoluteSample(
+        voiced.pcm,
+        epilogue_begin + long_tail_begin_local,
+        epilogue_begin + long_tail_end_local);
     const double gap_energy = AverageAbsoluteSample(
         voiced.pcm,
         epilogue_begin + gap_begin_local,
         epilogue_begin + gap_end_local);
-    const double phrase2_energy = AverageAbsoluteSample(
+    const double short_energy = AverageAbsoluteSample(
         voiced.pcm,
-        epilogue_begin + phrase2_begin_local,
-        epilogue_begin + phrase2_end_local);
+        epilogue_begin + short_begin_local,
+        epilogue_begin + short_end_local);
+    const double short_tail_energy = AverageAbsoluteSample(
+        voiced.pcm,
+        epilogue_begin + short_tail_begin_local,
+        epilogue_begin + short_tail_end_local);
 
     test::AssertTrue(
-        phrase1_energy > gap_energy * 3.0,
-        "ritual_chant epilogue should insert a short pause after the first closure phrase.");
+        long_energy > gap_energy * 1.25,
+        "litany epilogue should begin with a louder long closing bell strike.");
     test::AssertTrue(
-        phrase2_energy > gap_energy * 3.0,
-        "ritual_chant epilogue should resume with a second closure phrase after the short pause.");
+        long_tail_energy > gap_energy * 0.55,
+        "litany epilogue long bell should keep an audible low-metal tail before the short bell.");
+    test::AssertTrue(
+        short_energy > gap_energy * 1.25,
+        "litany epilogue should answer with a short second bell strike after the pause.");
+    test::AssertTrue(
+        short_tail_energy < long_tail_energy * 0.82,
+        "litany epilogue second bell should decay faster than the long closing bell.");
 }
 
-void TestDeepRitualPreambleUsesWiderThreePhrasedBursts() {
-    constexpr std::size_t kPreambleSampleCount = 4200;
-
-    const auto clean_payload = MakeCleanPayload("AB");
-    const auto layout = MakePayloadLayout("AB");
-    const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
-        clean_payload,
-        layout,
-        bag::FlashVoicingFlavor::kDeepRitual,
-        MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
-
-    const auto [phrase1_begin, phrase1_end] = FractionalRange(kPreambleSampleCount, 0.07, 0.19);
-    const auto [gap1_begin, gap1_end] = FractionalRange(kPreambleSampleCount, 0.23, 0.29);
-    const auto [phrase2_begin, phrase2_end] = FractionalRange(kPreambleSampleCount, 0.36, 0.52);
-    const auto [gap2_begin, gap2_end] = FractionalRange(kPreambleSampleCount, 0.57, 0.64);
-    const auto [phrase3_begin, phrase3_end] = FractionalRange(kPreambleSampleCount, 0.72, 0.90);
-
-    const double phrase1_energy = AverageAbsoluteSample(voiced.pcm, phrase1_begin, phrase1_end);
-    const double gap1_energy = AverageAbsoluteSample(voiced.pcm, gap1_begin, gap1_end);
-    const double phrase2_energy = AverageAbsoluteSample(voiced.pcm, phrase2_begin, phrase2_end);
-    const double gap2_energy = AverageAbsoluteSample(voiced.pcm, gap2_begin, gap2_end);
-    const double phrase3_energy = AverageAbsoluteSample(voiced.pcm, phrase3_begin, phrase3_end);
-
-    test::AssertTrue(
-        phrase1_energy > gap1_energy * 3.0,
-        "deep_ritual preamble should leave a broad pause after the first phrase.");
-    test::AssertTrue(
-        phrase2_energy > gap1_energy * 3.0,
-        "deep_ritual preamble should re-enter strongly after the first broad pause.");
-    test::AssertTrue(
-        phrase2_energy > gap2_energy * 3.0,
-        "deep_ritual preamble should leave a second broad pause before the final phrase.");
-    test::AssertTrue(
-        phrase3_energy > gap2_energy * 3.0,
-        "deep_ritual preamble should finish with a third elongated voiced phrase.");
-}
-
-void TestCodedBurstPreambleUsesThreeHandshakeBursts() {
+void TestSteadyPreambleUsesThreeHandshakeBursts() {
     constexpr std::size_t kPreambleSampleCount = 1600;
 
     const auto clean_payload = MakeCleanPayload("AB");
@@ -134,7 +137,7 @@ void TestCodedBurstPreambleUsesThreeHandshakeBursts() {
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kCodedBurst,
+        bag::FlashVoicingFlavor::kSteady,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
 
     const auto [burst1_begin, burst1_end] = FractionalRange(kPreambleSampleCount, 0.05, 0.18);
@@ -151,19 +154,19 @@ void TestCodedBurstPreambleUsesThreeHandshakeBursts() {
 
     test::AssertTrue(
         burst1_energy > gap1_energy * 3.0,
-        "coded_burst preamble should open with a strong short handshake burst.");
+        "steady preamble should open with a strong short handshake burst.");
     test::AssertTrue(
         burst2_energy > gap1_energy * 3.0,
-        "coded_burst preamble should re-enter with a short confirmation burst after the first gap.");
+        "steady preamble should re-enter with a short confirmation burst after the first gap.");
     test::AssertTrue(
         burst2_energy > gap2_energy * 3.0,
-        "coded_burst preamble should leave a clear second gap before the sync burst.");
+        "steady preamble should leave a clear second gap before the sync burst.");
     test::AssertTrue(
         burst3_energy > gap2_energy * 3.0,
-        "coded_burst preamble should finish with a third sync burst that pushes directly into payload onset.");
+        "steady preamble should finish with a third sync burst that pushes directly into payload onset.");
 }
 
-void TestCodedBurstPreambleContrastsPayloadOnset() {
+void TestSteadyPreambleContrastsPayloadOnset() {
     constexpr std::size_t kPreambleSampleCount = 1600;
 
     const auto clean_payload = MakeCleanPayload("AB");
@@ -171,7 +174,7 @@ void TestCodedBurstPreambleContrastsPayloadOnset() {
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kCodedBurst,
+        bag::FlashVoicingFlavor::kSteady,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
 
     const auto [sync_begin, sync_end] = FractionalRange(kPreambleSampleCount, 0.58, 0.70);
@@ -194,16 +197,16 @@ void TestCodedBurstPreambleContrastsPayloadOnset() {
 
     test::AssertTrue(
         sync_delta > 5500.0,
-        "coded_burst preamble sync burst should not sound like a continuation of payload onset.");
+        "steady preamble sync burst should not sound like a continuation of payload onset.");
     test::AssertTrue(
         sync_brightness > payload_brightness * 1.08,
-        "coded_burst preamble sync burst should sound brighter than the payload start.");
+        "steady preamble sync burst should sound brighter than the payload start.");
     test::AssertTrue(
         seam_energy < sync_energy * 0.18,
-        "coded_burst preamble should leave a low-energy seam before payload begins.");
+        "steady preamble should leave a low-energy seam before payload begins.");
 }
 
-void TestCodedBurstEpilogueUsesClosingBurstAndAckChirp() {
+void TestSteadyEpilogueUsesClosingBurstAndAckChirp() {
     constexpr std::size_t kEpilogueSampleCount = 1200;
 
     const auto clean_payload = MakeCleanPayload("AB");
@@ -211,7 +214,7 @@ void TestCodedBurstEpilogueUsesClosingBurstAndAckChirp() {
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kCodedBurst,
+        bag::FlashVoicingFlavor::kSteady,
         MakeTrimEnabledConfig(static_cast<std::size_t>(0), kEpilogueSampleCount));
 
     const std::size_t epilogue_begin = voiced.descriptor.leading_nonpayload_samples +
@@ -244,16 +247,16 @@ void TestCodedBurstEpilogueUsesClosingBurstAndAckChirp() {
 
     test::AssertTrue(
         burst_energy > gap_energy * 3.0,
-        "coded_burst epilogue should begin with a short closing burst before the acknowledgement gap.");
+        "steady epilogue should begin with a short closing burst before the acknowledgement gap.");
     test::AssertTrue(
         ack_energy > gap_energy * 3.0,
-        "coded_burst epilogue should emit a distinct ack chirp after the main closing burst.");
+        "steady epilogue should emit a distinct ack chirp after the main closing burst.");
     test::AssertTrue(
         tail_energy < ack_energy * 0.45,
-        "coded_burst epilogue should decay quickly after the ack chirp instead of trailing like ritual_chant.");
+        "steady epilogue should decay quickly after the ack chirp instead of trailing like litany.");
 }
 
-void TestCodedBurstEpilogueContrastsPayloadTailAndStopsHard() {
+void TestSteadyEpilogueContrastsPayloadTailAndStopsHard() {
     constexpr std::size_t kPreambleSampleCount = 1600;
     constexpr std::size_t kEpilogueSampleCount = 1200;
 
@@ -262,12 +265,12 @@ void TestCodedBurstEpilogueContrastsPayloadTailAndStopsHard() {
     const auto preamble_voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kCodedBurst,
+        bag::FlashVoicingFlavor::kSteady,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
     const auto epilogue_voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kCodedBurst,
+        bag::FlashVoicingFlavor::kSteady,
         MakeTrimEnabledConfig(static_cast<std::size_t>(0), kEpilogueSampleCount));
 
     const auto [sync_begin, sync_end] = FractionalRange(kPreambleSampleCount, 0.58, 0.70);
@@ -308,13 +311,137 @@ void TestCodedBurstEpilogueContrastsPayloadTailAndStopsHard() {
 
     test::AssertTrue(
         closing_delta > 4200.0,
-        "coded_burst closing burst should not sound like an extension of the payload tail.");
+        "steady closing burst should not sound like an extension of the payload tail.");
     test::AssertTrue(
         ack_brightness < preamble_sync_brightness * 0.92,
-        "coded_burst ack chirp should sound lower and less bright than the preamble sync burst.");
+        "steady ack chirp should sound lower and less bright than the preamble sync burst.");
     test::AssertTrue(
         tail_energy < ack_energy * 0.12,
-        "coded_burst epilogue should hard-stop after the ack chirp.");
+        "steady epilogue should hard-stop after the ack chirp.");
+}
+
+void TestEmotionShellProfilesAreDistinct() {
+    constexpr std::size_t kShortPreambleSampleCount = 2400;
+    constexpr std::size_t kShortEpilogueSampleCount = 1800;
+    constexpr std::size_t kLitanyPreambleSampleCount = 44100 * 135 / 100;
+    constexpr std::size_t kLitanyEpilogueSampleCount = 44100 * 115 / 100;
+
+    const auto clean_payload = MakeCleanPayload("AB");
+    const auto layout = MakePayloadLayout("AB");
+    const auto short_config = MakeTrimEnabledConfig(kShortPreambleSampleCount, kShortEpilogueSampleCount);
+    const auto litany_config = MakeTrimEnabledConfig(kLitanyPreambleSampleCount, kLitanyEpilogueSampleCount);
+
+    const auto steady = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload, layout, bag::FlashVoicingFlavor::kSteady, short_config);
+    const auto hostile = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload, layout, bag::FlashVoicingFlavor::kHostile, short_config);
+    const auto litany = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload, layout, bag::FlashVoicingFlavor::kLitany, litany_config);
+    const auto collapse = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload, layout, bag::FlashVoicingFlavor::kCollapse, short_config);
+
+    const std::size_t epilogue_begin =
+        steady.descriptor.leading_nonpayload_samples + steady.descriptor.payload_sample_count;
+    const std::size_t epilogue_end = epilogue_begin + kShortEpilogueSampleCount;
+    const auto [litany_attack_begin, litany_attack_end] = SecondsRange(44100, 0.20, 0.26);
+    const std::size_t litany_epilogue_begin =
+        litany.descriptor.leading_nonpayload_samples + litany.descriptor.payload_sample_count;
+
+    test::AssertTrue(
+        AverageAbsoluteDelta(steady.pcm, hostile.pcm, 0, kShortPreambleSampleCount) > 500.0,
+        "hostile preamble should have a distinct aggressive shell instead of reusing steady.");
+    test::AssertTrue(
+        AverageAbsoluteSample(litany.pcm, litany_attack_begin, litany_attack_end) > 500.0,
+        "litany preamble should have a distinct ceremonial shell instead of reusing steady.");
+    test::AssertTrue(
+        AverageAbsoluteDelta(steady.pcm, hostile.pcm, epilogue_begin, epilogue_end) > 0.0,
+        "hostile epilogue should have a distinct aggressive shell instead of reusing steady.");
+    test::AssertTrue(
+        AverageAbsoluteSample(
+            litany.pcm,
+            litany_epilogue_begin + SecondsToSampleCount(44100, 0.20),
+            litany_epilogue_begin + SecondsToSampleCount(44100, 0.30)) > 500.0,
+        "litany epilogue should have a distinct ceremonial shell instead of reusing steady.");
+    test::AssertTrue(
+        AverageAbsoluteDelta(steady.pcm, collapse.pcm, epilogue_begin, epilogue_end) > 0.0,
+        "collapse epilogue should have a distinct failure shell instead of reusing the old closure.");
+}
+
+void TestCollapseEpilogueUsesBrokenFailureCadence() {
+    constexpr std::size_t kEpilogueSampleCount = 1800;
+
+    const auto clean_payload = MakeCleanPayload("AB");
+    const auto layout = MakePayloadLayout("AB");
+    const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload,
+        layout,
+        bag::FlashVoicingFlavor::kCollapse,
+        MakeTrimEnabledConfig(static_cast<std::size_t>(0), kEpilogueSampleCount));
+
+    const std::size_t epilogue_begin =
+        voiced.descriptor.leading_nonpayload_samples + voiced.descriptor.payload_sample_count;
+    const auto [failure1_begin_local, failure1_end_local] =
+        FractionalRange(kEpilogueSampleCount, 0.06, 0.12);
+    const auto [failure2_begin_local, failure2_end_local] =
+        FractionalRange(kEpilogueSampleCount, 0.20, 0.25);
+    const auto [gap_begin_local, gap_end_local] =
+        FractionalRange(kEpilogueSampleCount, 0.29, 0.34);
+    const auto [tail_begin_local, tail_end_local] =
+        FractionalRange(kEpilogueSampleCount, 0.78, 0.94);
+
+    const double failure1_energy = AverageAbsoluteSample(
+        voiced.pcm,
+        epilogue_begin + failure1_begin_local,
+        epilogue_begin + failure1_end_local);
+    const double failure2_energy = AverageAbsoluteSample(
+        voiced.pcm,
+        epilogue_begin + failure2_begin_local,
+        epilogue_begin + failure2_end_local);
+    const double gap_energy = AverageAbsoluteSample(
+        voiced.pcm,
+        epilogue_begin + gap_begin_local,
+        epilogue_begin + gap_end_local);
+    const double tail_energy = AverageAbsoluteSample(
+        voiced.pcm,
+        epilogue_begin + tail_begin_local,
+        epilogue_begin + tail_end_local);
+
+    test::AssertTrue(
+        failure1_energy > gap_energy * 2.5,
+        "collapse epilogue should start with a broken failure fragment.");
+    test::AssertTrue(
+        failure2_energy > gap_energy * 2.0,
+        "collapse epilogue should briefly re-enter after the first failure fragment.");
+    test::AssertTrue(
+        tail_energy < failure1_energy * 0.18,
+        "collapse epilogue should fall away instead of keeping the old audible tail.");
+}
+
+void TestEmotionShellsStayOutsidePayloadDecode() {
+    constexpr std::size_t kPreambleSampleCount = 2400;
+    constexpr std::size_t kEpilogueSampleCount = 1800;
+
+    const std::string text = "AB";
+    const auto clean_payload = MakeCleanPayload(text);
+    const auto layout = MakePayloadLayout(text);
+    const auto config = MakeTrimEnabledConfig(kPreambleSampleCount, kEpilogueSampleCount);
+    const bag::FlashVoicingFlavor flavors[] = {
+        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kHostile,
+        bag::FlashVoicingFlavor::kLitany,
+        bag::FlashVoicingFlavor::kCollapse,
+    };
+
+    for (const bag::FlashVoicingFlavor flavor : flavors) {
+        const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
+            clean_payload, layout, flavor, config);
+        const auto trimmed_payload = bag::flash::TrimToPayloadPcm(voiced.pcm, voiced.descriptor);
+
+        test::AssertEq(
+            bag::flash::DecodePcm16ToBytes(trimmed_payload, MakeSignalConfig()),
+            AsBytes(text),
+            "emotion-specific preamble and epilogue shells must stay outside payload decode.");
+    }
 }
 
 void TestTrimDescriptorTracksNonpayloadSamples() {
@@ -411,20 +538,22 @@ void TestTrimRejectsDescriptorMismatch() {
 namespace flash_voicing_test {
 
 void RegisterFlashVoicingShellTests(test::Runner& runner) {
-    runner.Add("FlashVoicing.RitualChantPreambleUsesThreePhrasedBursts",
-               TestRitualChantPreambleUsesThreePhrasedBursts);
-    runner.Add("FlashVoicing.RitualChantEpilogueUsesTwoPhrasedBursts",
-               TestRitualChantEpilogueUsesTwoPhrasedBursts);
-    runner.Add("FlashVoicing.DeepRitualPreambleUsesWiderThreePhrasedBursts",
-               TestDeepRitualPreambleUsesWiderThreePhrasedBursts);
-    runner.Add("FlashVoicing.CodedBurstPreambleUsesThreeHandshakeBursts",
-               TestCodedBurstPreambleUsesThreeHandshakeBursts);
-    runner.Add("FlashVoicing.CodedBurstPreambleContrastsPayloadOnset",
-               TestCodedBurstPreambleContrastsPayloadOnset);
-    runner.Add("FlashVoicing.CodedBurstEpilogueUsesClosingBurstAndAckChirp",
-               TestCodedBurstEpilogueUsesClosingBurstAndAckChirp);
-    runner.Add("FlashVoicing.CodedBurstEpilogueContrastsPayloadTailAndStopsHard",
-               TestCodedBurstEpilogueContrastsPayloadTailAndStopsHard);
+    runner.Add("FlashVoicing.LitanyPreambleUsesThreeEvenBellStrikes",
+               TestLitanyPreambleUsesThreeEvenBellStrikes);
+    runner.Add("FlashVoicing.LitanyEpilogueUsesLongThenShortBellStrikes",
+               TestLitanyEpilogueUsesLongThenShortBellStrikes);
+    runner.Add("FlashVoicing.SteadyPreambleUsesThreeHandshakeBursts",
+               TestSteadyPreambleUsesThreeHandshakeBursts);
+    runner.Add("FlashVoicing.SteadyPreambleContrastsPayloadOnset",
+               TestSteadyPreambleContrastsPayloadOnset);
+    runner.Add("FlashVoicing.SteadyEpilogueUsesClosingBurstAndAckChirp",
+               TestSteadyEpilogueUsesClosingBurstAndAckChirp);
+    runner.Add("FlashVoicing.SteadyEpilogueContrastsPayloadTailAndStopsHard",
+               TestSteadyEpilogueContrastsPayloadTailAndStopsHard);
+    runner.Add("FlashVoicing.EmotionShellProfilesAreDistinct", TestEmotionShellProfilesAreDistinct);
+    runner.Add("FlashVoicing.CollapseEpilogueUsesBrokenFailureCadence",
+               TestCollapseEpilogueUsesBrokenFailureCadence);
+    runner.Add("FlashVoicing.EmotionShellsStayOutsidePayloadDecode", TestEmotionShellsStayOutsidePayloadDecode);
     runner.Add("FlashVoicing.TrimDescriptorTracksNonpayloadSamples", TestTrimDescriptorTracksNonpayloadSamples);
     runner.Add("FlashVoicing.TrimToPayloadPcmExtractsPayloadForDecode", TestTrimToPayloadPcmExtractsPayloadForDecode);
     runner.Add("FlashVoicing.PreambleAndEpilogueSegmentsAreInserted", TestPreambleAndEpilogueSegmentsAreInserted);

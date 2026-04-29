@@ -123,7 +123,7 @@
   - third-party/backend owner 继续被限制在 private include-based surface
 
 ## Host `import std;` Required Baseline
-- 当前 required baseline 已包含全部 `16` 个 promoted `audio_core` module interfaces：
+- 当前 required baseline 已包含全部 `18` 个 promoted `audio_core` module interfaces：
   - `libs/audio_core/modules/bag/common/config.cppm`
   - `libs/audio_core/modules/bag/common/types.cppm`
   - `libs/audio_core/modules/bag/flash/codec.cppm`
@@ -137,6 +137,8 @@
   - `libs/audio_core/modules/bag/ultra/codec.cppm`
   - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
   - `libs/audio_core/modules/bag/ultra/phy_compat.cppm`
+  - `libs/audio_core/modules/bag/mini/codec.cppm`
+  - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
   - `libs/audio_core/modules/bag/transport/compat/frame_codec.cppm`
   - `libs/audio_core/modules/bag/transport/facade.cppm`
   - `libs/audio_core/modules/bag/pipeline/pipeline.cppm`

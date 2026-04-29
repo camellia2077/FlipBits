@@ -8,8 +8,8 @@
   - `docs/architecture/repo-map.md`
   - `docs/architecture/compatibility-layer-inventory.md`
   - `docs/design/transports.md`
+  - `docs/design/flash-voicing-emotions.md`
   - `docs/testing.md`
-  - `docs/notes/legacy-retirement-preconditions.md`
 
 ## 扫描策略
 - 不要先全量扫描 `libs/audio_core/`。

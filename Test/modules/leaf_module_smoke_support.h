@@ -9,8 +9,9 @@ namespace modules_leaf_smoke {
 bag::flash::BfskConfig MakeBfskConfig();
 bag::flash::FlashVoicingConfig MakeStyledVoicingConfig();
 bag::CoreConfig MakeFlashCoreConfig();
-bag::CoreConfig MakeRitualFlashCoreConfig();
-bag::CoreConfig MakeDeepRitualFlashCoreConfig();
+bag::CoreConfig MakeLitanyFlashCoreConfig();
+bag::CoreConfig MakeHostileFlashCoreConfig();
+bag::CoreConfig MakeCollapseFlashCoreConfig();
 bag::CoreConfig MakeExplicitDecoupledFlashCoreConfig();
 
 std::size_t FormalFlashLeadingSamples(const bag::CoreConfig& config);

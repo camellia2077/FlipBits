@@ -7,25 +7,29 @@ import std;
 export namespace bag {
 
 enum class TransportMode : std::uint8_t {
-  kFlash = 0,
-  kPro = 1,
-  kUltra = 2,
+  kMini = 0,
+  kFlash = 1,
+  kPro = 2,
+  kUltra = 3,
 };
 
 enum class FlashSignalProfile : std::uint8_t {
-  kCodedBurst = 0,
-  kRitualChant = 1,
-  kDeepRitual = 2,
+  kSteady = 0,
+  kLitany = 1,
+  kHostile = 3,
+  kCollapse = 4,
 };
 
 enum class FlashVoicingFlavor : std::uint8_t {
-  kCodedBurst = 0,
-  kRitualChant = 1,
-  kDeepRitual = 2,
+  kSteady = 0,
+  kLitany = 1,
+  kHostile = 3,
+  kCollapse = 4,
 };
 
 inline constexpr bool IsValidTransportMode(TransportMode mode) {
   switch (mode) {
+    case TransportMode::kMini:
     case TransportMode::kFlash:
     case TransportMode::kPro:
     case TransportMode::kUltra:
@@ -36,14 +40,16 @@ inline constexpr bool IsValidTransportMode(TransportMode mode) {
 }
 
 inline constexpr bool IsFramedTransportMode(TransportMode mode) {
-  return mode == TransportMode::kPro || mode == TransportMode::kUltra;
+  return mode == TransportMode::kMini || mode == TransportMode::kPro ||
+         mode == TransportMode::kUltra;
 }
 
 inline constexpr bool IsValidFlashSignalProfile(FlashSignalProfile profile) {
   switch (profile) {
-    case FlashSignalProfile::kCodedBurst:
-    case FlashSignalProfile::kRitualChant:
-    case FlashSignalProfile::kDeepRitual:
+    case FlashSignalProfile::kSteady:
+    case FlashSignalProfile::kLitany:
+    case FlashSignalProfile::kHostile:
+    case FlashSignalProfile::kCollapse:
       return true;
     default:
       return false;
@@ -52,9 +58,10 @@ inline constexpr bool IsValidFlashSignalProfile(FlashSignalProfile profile) {
 
 inline constexpr bool IsValidFlashVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
-    case FlashVoicingFlavor::kCodedBurst:
-    case FlashVoicingFlavor::kRitualChant:
-    case FlashVoicingFlavor::kDeepRitual:
+    case FlashVoicingFlavor::kSteady:
+    case FlashVoicingFlavor::kLitany:
+    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kCollapse:
       return true;
     default:
       return false;
@@ -66,8 +73,8 @@ struct CoreConfig {
   int frame_samples = 480;
   bool enable_diagnostics = false;
   TransportMode mode = TransportMode::kFlash;
-  FlashSignalProfile flash_signal_profile = FlashSignalProfile::kCodedBurst;
-  FlashVoicingFlavor flash_voicing_flavor = FlashVoicingFlavor::kCodedBurst;
+  FlashSignalProfile flash_signal_profile = FlashSignalProfile::kSteady;
+  FlashVoicingFlavor flash_voicing_flavor = FlashVoicingFlavor::kSteady;
   int reserved = 0;
 };
 

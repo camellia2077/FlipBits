@@ -76,13 +76,15 @@
   - `docs/notes/legacy-retirement-preconditions.md`
 
 ## 为什么必须按模式分开测试
-三种模式共用部分底层链路，但业务语义不同，不能用同一套文本机械套用：
+四种模式共用部分底层链路，但业务语义不同，不能用同一套文本机械套用：
 - `flash`
   - 不限字符集的原始直通模式，重点验证 clean raw-byte 语义。
 - `pro`
   - ASCII-only 正式模式，文本先转 ASCII byte，再按 nibble 进入 `DTMF-like` 双音 clean PHY。
 - `ultra`
   - UTF-8 正式模式，文本先转 UTF-8 byte，再按 nibble 进入 clean `16-FSK`。
+- `mini`
+  - Morse code 模式，文本先规范化为 Morse-compatible text，再按 dot / dash / silence units 进入 clean Morse tone PHY。
 
 因此测试必须同时覆盖：
 - 模式本身的成功语义
@@ -136,27 +138,32 @@
 | `flash` | 必须成功 | 必须成功 | 可直接跑 UTF-8 长文本 | 不限字符集，暂无模式专属失败语义 |
 | `pro` | 必须成功 | 必须失败 | `170` / `171` ASCII 字符都应成功 | 非 ASCII 必须失败 |
 | `ultra` | 必须成功 | 必须成功 | `512` / `513` UTF-8 字节都应成功 | 暂无模式专属长度失败语义 |
+| `mini` | Morse-compatible ASCII 必须成功 | 必须失败 | 当前以短 Morse 文本为主 | 非 Morse-compatible 字符必须失败；小写 / 连续空格应规范化 |
 
 ## 当前门禁要求
 - `unit_tests`
   - `wav_io.h` header boundary 的多组 mono roundtrip contract、bytes roundtrip、缺失文件失败语义，以及 invalid header / unsupported format 的失败语义。
 - `api_tests`
-  - 三模式 roundtrip 必须通过。
+  - `mini / flash / pro / ultra` roundtrip 必须通过。
   - `pro` 非 ASCII 必须返回 `BAG_INVALID_ARGUMENT`。
+  - `mini` 非 Morse-compatible 文本必须返回 `BAG_INVALID_ARGUMENT` 或 validation helper 的 `BAG_VALIDATION_MINI_MORSE_ONLY`。
+  - `mini` 小写与连续空格输入 roundtrip 后必须返回规范化文本。
   - `pro` 的 `171` ASCII 回归语料必须成功。
   - `ultra` 的 `513` UTF-8 回归语料必须成功。
   - 解码结果的 `mode` 必须与配置一致。
 - `artifact_tests`
-  - 三模式 direct/WAV roundtrip 必须通过。
+  - `mini / flash / pro / ultra` direct/WAV roundtrip 必须通过。
   - 只允许通过 `bag_api.h + wav_io.h` 验证边界行为，不应反向依赖内部 `bag/...` 头。
   - `pro` 的 PCM 长度必须按 `ASCII byte * 2 nibble symbol * frame_samples` 断言。
   - `ultra` 的 PCM 长度必须按 `UTF-8 byte * 2 nibble symbol * frame_samples` 断言。
+  - `mini` 的 PCM 长度必须按 Morse dot / dash / silence units 与 `frame_samples` 断言，silence gap 不应出现在 dot/dash follow group 中。
   - `ultra` 的中文 / emoji / 混合 UTF-8 必须在产物级往返一致。
 - `flash_voicing_tests`
   - `bag.flash.voicing` 的 no-op、envelope-only、harmonic-only、click-only、trim descriptor / trim payload、固定 preamble / epilogue 与 styled 确定性测试。
 - `cli_smoke_tests`
-  - `encode/decode --mode flash|pro|ultra` 代表性语料必须通过。
+  - `encode/decode --mode mini|flash|pro|ultra` 代表性语料必须通过。
   - `pro` 非 ASCII 失败提示必须包含 `ASCII`。
+  - `mini` 非 Morse-compatible 失败提示必须包含 `Morse`。
   - `pro` 的 extended ASCII 文本文件 roundtrip 必须通过。
   - `ultra` 的 extended UTF-8 文本文件 roundtrip 必须通过。
   - 属于额外产品 smoke，不在默认 `verify` 最小集里。

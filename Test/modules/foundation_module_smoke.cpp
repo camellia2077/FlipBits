@@ -15,70 +15,73 @@ void TestConfigModuleDefaults() {
     test::AssertEq(config.mode, bag::TransportMode::kFlash, "Module import should preserve mode defaults.");
     test::AssertEq(
         config.flash_signal_profile,
-        bag::FlashSignalProfile::kCodedBurst,
-        "Module import should default flash signal profile to coded_burst.");
+        bag::FlashSignalProfile::kSteady,
+        "Module import should default flash signal profile to steady.");
     test::AssertEq(
         config.flash_voicing_flavor,
-        bag::FlashVoicingFlavor::kCodedBurst,
-        "Module import should default flash voicing flavor to coded_burst.");
+        bag::FlashVoicingFlavor::kSteady,
+        "Module import should default flash voicing flavor to steady.");
     test::AssertTrue(bag::IsValidTransportMode(bag::TransportMode::kUltra), "Imported helper should validate known modes.");
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kCodedBurst),
-        "Imported helper should validate the coded burst signal profile.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kSteady),
+        "Imported helper should validate the steady signal profile.");
     test::AssertTrue(
-        bag::IsValidFlashVoicingFlavor(bag::FlashVoicingFlavor::kRitualChant),
-        "Imported helper should validate the ritual chant voicing flavor.");
+        bag::IsValidFlashVoicingFlavor(bag::FlashVoicingFlavor::kLitany),
+        "Imported helper should validate the litany voicing flavor.");
     test::AssertTrue(
-        bag::IsValidFlashVoicingFlavor(bag::FlashVoicingFlavor::kDeepRitual),
-        "Imported helper should validate the deep ritual voicing flavor.");
+        bag::IsValidFlashVoicingFlavor(bag::FlashVoicingFlavor::kCollapse),
+        "Imported helper should validate the collapse voicing flavor.");
 }
 
 void TestFlashSignalProfilesRemainDistinct() {
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kCodedBurst),
-        "coded_burst signal profile should remain valid.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kSteady),
+        "steady signal profile should remain valid.");
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kRitualChant),
-        "ritual_chant signal profile should remain valid.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kLitany),
+        "litany signal profile should remain valid.");
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kDeepRitual),
-        "deep_ritual signal profile should remain valid.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kHostile),
+        "hostile signal profile should remain valid.");
     test::AssertTrue(
-        static_cast<int>(bag::FlashSignalProfile::kCodedBurst) !=
-            static_cast<int>(bag::FlashSignalProfile::kRitualChant),
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kCollapse),
+        "collapse signal profile should remain valid.");
+    test::AssertTrue(
+        static_cast<int>(bag::FlashSignalProfile::kSteady) !=
+            static_cast<int>(bag::FlashSignalProfile::kLitany),
         "flash signal profiles should remain distinct enum values.");
     test::AssertTrue(
-        static_cast<int>(bag::FlashSignalProfile::kRitualChant) !=
-            static_cast<int>(bag::FlashSignalProfile::kDeepRitual),
-        "deep_ritual signal profile should remain a distinct enum value.");
+        static_cast<int>(bag::FlashSignalProfile::kHostile) !=
+            static_cast<int>(bag::FlashSignalProfile::kCollapse),
+        "hostile and collapse signal profiles should remain distinct enum values.");
 }
 
 void TestFlashVoicingFlavorsRemainDistinct() {
     bag::CoreConfig config{};
-    config.flash_signal_profile = bag::FlashSignalProfile::kRitualChant;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kRitualChant;
+    config.flash_signal_profile = bag::FlashSignalProfile::kLitany;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
 
     test::AssertTrue(
         bag::IsValidFlashVoicingFlavor(config.flash_voicing_flavor),
         "Configured flash voicing flavor should remain valid.");
     test::AssertEq(
         config.flash_signal_profile,
-        bag::FlashSignalProfile::kRitualChant,
-        "CoreConfig should store explicit ritual signal timing directly.");
+        bag::FlashSignalProfile::kLitany,
+        "CoreConfig should store explicit litany signal timing directly.");
     test::AssertEq(
         config.flash_voicing_flavor,
-        bag::FlashVoicingFlavor::kRitualChant,
-        "CoreConfig should store explicit ritual voicing flavor directly.");
-    config.flash_signal_profile = bag::FlashSignalProfile::kDeepRitual;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kDeepRitual;
+        bag::FlashVoicingFlavor::kLitany,
+        "CoreConfig should store explicit litany voicing flavor directly.");
+    config.flash_signal_profile = bag::FlashSignalProfile::kHostile;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostile;
     test::AssertEq(
         config.flash_signal_profile,
-        bag::FlashSignalProfile::kDeepRitual,
-        "CoreConfig should store explicit deep ritual signal timing directly.");
+        bag::FlashSignalProfile::kHostile,
+        "CoreConfig should store explicit hostile signal timing directly.");
     test::AssertEq(
         config.flash_voicing_flavor,
-        bag::FlashVoicingFlavor::kDeepRitual,
-        "CoreConfig should store explicit deep ritual voicing flavor directly.");
+        bag::FlashVoicingFlavor::kHostile,
+        "CoreConfig should store explicit hostile voicing flavor directly.");
 }
 
 void TestTypesAndAudioIoModules() {

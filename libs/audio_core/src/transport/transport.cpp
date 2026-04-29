@@ -6,6 +6,8 @@ module bag.transport.facade;
 
 import bag.flash.phy_clean;
 import bag.flash.codec;
+import bag.mini.phy_clean;
+import bag.mini.codec;
 import bag.pro.phy_clean;
 import bag.pro.codec;
 import bag.transport.follow;

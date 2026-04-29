@@ -137,6 +137,19 @@
   - `UTF-8 byte -> nibble`
   - clean `16-FSK`
 
+### `mini`
+- 先看：
+  - `libs/audio_core/modules/bag/mini/codec.cppm`
+  - `libs/audio_core/src/mini/codec.cpp`
+  - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
+  - `libs/audio_core/src/mini/phy_clean.cpp`
+- 当前语义：
+  - Morse-compatible text
+  - 小写转大写，连续空格折叠
+  - `normalized char -> dot/dash/silence units`
+  - clean Morse tone PHY
+  - 不做录音环境 decode 鲁棒性
+
 ### `fsk` / compat helper
 - 先看：
   - `libs/audio_core/modules/bag/fsk/codec.cppm`
@@ -212,6 +225,18 @@
 - 再看：
   - `libs/audio_api/tests/api_tests.cpp`
   - `Test/artifact/artifact_tests.cpp`
+
+### 改 `mini` / Morse 编解码
+- 先看：
+  - `libs/audio_core/src/mini/codec.cpp`
+  - `libs/audio_core/src/mini/phy_clean.cpp`
+  - `libs/audio_core/src/transport/transport.cpp`
+  - `libs/audio_core/src/transport/follow.cpp`
+- 再看：
+  - `libs/audio_api/tests/api_sync_tests.cpp`
+  - `libs/audio_io/tests/unit_tests.cpp`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/model/MorseCode.kt`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/screen/MorseTimelineVisualizer.kt`
 
 ### 改 C API / JNI / CLI 接入
 - 先看：

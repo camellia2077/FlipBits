@@ -31,18 +31,18 @@ bag::CoreConfig MakeAndroidSizedCoreConfig() {
     return config;
 }
 
+std::size_t SecondsToSampleCount(int sample_rate_hz, double seconds) {
+    return sample_rate_hz > 0 && seconds > 0.0
+               ? static_cast<std::size_t>(std::lround(static_cast<double>(sample_rate_hz) * seconds))
+               : static_cast<std::size_t>(0);
+}
+
 std::size_t FormalPreambleSampleCountForFlavor(const bag::CoreConfig& config,
                                                bag::FlashVoicingFlavor flavor) {
     switch (flavor) {
-    case bag::FlashVoicingFlavor::kDeepRitual:
-        return config.frame_samples > 0
-                   ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(24)
-                   : static_cast<std::size_t>(0);
-    case bag::FlashVoicingFlavor::kRitualChant:
-        return config.frame_samples > 0
-                   ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(16)
-                   : static_cast<std::size_t>(0);
-    case bag::FlashVoicingFlavor::kCodedBurst:
+    case bag::FlashVoicingFlavor::kLitany:
+        return SecondsToSampleCount(config.sample_rate_hz, 1.35);
+    case bag::FlashVoicingFlavor::kSteady:
     default:
         return config.frame_samples > 0
                    ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
@@ -53,15 +53,9 @@ std::size_t FormalPreambleSampleCountForFlavor(const bag::CoreConfig& config,
 std::size_t FormalEpilogueSampleCountForFlavor(const bag::CoreConfig& config,
                                                bag::FlashVoicingFlavor flavor) {
     switch (flavor) {
-    case bag::FlashVoicingFlavor::kDeepRitual:
-        return config.frame_samples > 0
-                   ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(14)
-                   : static_cast<std::size_t>(0);
-    case bag::FlashVoicingFlavor::kRitualChant:
-        return config.frame_samples > 0
-                   ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(8)
-                   : static_cast<std::size_t>(0);
-    case bag::FlashVoicingFlavor::kCodedBurst:
+    case bag::FlashVoicingFlavor::kLitany:
+        return SecondsToSampleCount(config.sample_rate_hz, 1.15);
+    case bag::FlashVoicingFlavor::kSteady:
     default:
         return config.frame_samples > 0
                    ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
@@ -229,6 +223,16 @@ std::pair<std::size_t, std::size_t> FractionalRange(std::size_t sample_count,
         std::min(begin, sample_count),
         std::clamp(end, begin + static_cast<std::size_t>(1), sample_count)
     };
+}
+
+std::pair<std::size_t, std::size_t> SecondsRange(int sample_rate_hz,
+                                                 double begin_seconds,
+                                                 double end_seconds) {
+    const std::size_t begin = SecondsToSampleCount(sample_rate_hz, begin_seconds);
+    const std::size_t end = std::max(
+        begin + static_cast<std::size_t>(1),
+        SecondsToSampleCount(sample_rate_hz, end_seconds));
+    return {begin, end};
 }
 
 }  // namespace flash_voicing_test

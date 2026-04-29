@@ -13,6 +13,24 @@ bool IsAsciiText(std::string_view text) {
   return true;
 }
 
+bool IsMiniMorseText(std::string_view text) {
+  return bag::mini_mode::IsMorseText(text);
+}
+
+std::string TextFollowSourceForPayload(TransportMode mode,
+                                       const std::string& text,
+                                       const std::vector<std::uint8_t>& payload) {
+  if (mode != TransportMode::kMini) {
+    return text;
+  }
+  std::string normalized_text;
+  if (bag::mini_mode::DecodePayloadToText(payload, &normalized_text) ==
+      ErrorCode::kOk) {
+    return normalized_text;
+  }
+  return text;
+}
+
 TransportValidationIssue ValidateCommonConfig(const CoreConfig& config) {
   if (config.sample_rate_hz <= 0) {
     return TransportValidationIssue::kInvalidSampleRate;
@@ -50,6 +68,11 @@ TransportValidationIssue ValidateEncodeRequest(const CoreConfig& config,
                              : TransportValidationIssue::kProAsciiOnly;
   }
 
+  if (config.mode == TransportMode::kMini) {
+    return IsMiniMorseText(text) ? TransportValidationIssue::kOk
+                                : TransportValidationIssue::kMiniMorseOnly;
+  }
+
   return TransportValidationIssue::kOk;
 }
 
@@ -81,6 +104,9 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
     case TransportMode::kUltra:
       return bag::ultra::EncodeTextToPcm16(config, text, out_pcm,
                                            progress_sink);
+    case TransportMode::kMini:
+      return bag::mini_mode::EncodeTextToPcm16(config, text, out_pcm,
+                                              progress_sink);
     default:
       return ErrorCode::kInvalidArgument;
   }
@@ -115,6 +141,10 @@ ErrorCode EncodeTextToPcm16WithFollowData(
     case TransportMode::kUltra:
       payload_code = bag::ultra::EncodeTextToPayload(text, &raw_payload_bytes);
       break;
+    case TransportMode::kMini:
+      payload_code =
+          bag::mini_mode::EncodeTextToPayload(text, &raw_payload_bytes);
+      break;
     default:
       return ErrorCode::kInvalidArgument;
   }
@@ -123,7 +153,9 @@ ErrorCode EncodeTextToPcm16WithFollowData(
   }
 
   out_result->follow_data = BuildPayloadFollowData(config, raw_payload_bytes);
-  out_result->text_follow_data = BuildTextFollowData(out_result->follow_data, text);
+  out_result->text_follow_data = BuildTextFollowData(
+      out_result->follow_data,
+      TextFollowSourceForPayload(config.mode, text, raw_payload_bytes));
   return EncodeTextToPcm16(config, text, &out_result->pcm, progress_sink);
 }
 
@@ -150,6 +182,10 @@ ErrorCode BuildEncodeFollowData(const CoreConfig& config,
     case TransportMode::kUltra:
       payload_code = bag::ultra::EncodeTextToPayload(text, &raw_payload_bytes);
       break;
+    case TransportMode::kMini:
+      payload_code =
+          bag::mini_mode::EncodeTextToPayload(text, &raw_payload_bytes);
+      break;
     default:
       return ErrorCode::kInvalidArgument;
   }
@@ -158,7 +194,9 @@ ErrorCode BuildEncodeFollowData(const CoreConfig& config,
   }
 
   *out_follow_data = BuildPayloadFollowData(config, raw_payload_bytes);
-  *out_text_follow_data = BuildTextFollowData(*out_follow_data, text);
+  *out_text_follow_data = BuildTextFollowData(
+      *out_follow_data,
+      TextFollowSourceForPayload(config.mode, text, raw_payload_bytes));
   return ErrorCode::kOk;
 }
 
@@ -175,6 +213,8 @@ std::unique_ptr<ITransportDecoder> CreateTransportDecoder(
       return bag::pro::CreateDecoder(config);
     case TransportMode::kUltra:
       return bag::ultra::CreateDecoder(config);
+    case TransportMode::kMini:
+      return bag::mini_mode::CreateDecoder(config);
     default:
       return nullptr;
   }

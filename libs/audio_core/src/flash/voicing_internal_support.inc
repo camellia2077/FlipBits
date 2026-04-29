@@ -19,6 +19,8 @@ constexpr double kInvocationSweepGain = 0.14;
 constexpr double kInvocationPulseGain = 0.18;
 constexpr double kClosurePulseGain = 0.20;
 constexpr double kClosureTailGain = 0.11;
+constexpr double kLitanyPreambleSeconds = 1.35;
+constexpr double kLitanyEpilogueSeconds = 1.15;
 
 float LerpProgress(float begin, float end, float ratio) {
   return begin + (end - begin) * std::clamp(ratio, 0.0f, 1.0f);
@@ -80,13 +82,19 @@ struct SanitizedVoicingConfig {
 
 enum class FixedShellCadenceProfile {
   kProtocolHandshake = 0,
-  kRitualChant = 1,
-  kDeepRitual = 2,
+  kSteadyProtocol = 3,
+  kHostileChallenge = 4,
+  kCollapseFailure = 5,
+  kLitanyInvocation = 6,
 };
 
 enum class FixedShellTimbreProfile {
   kInvocationClosure = 0,
   kProtocolBoundary = 1,
+  kSteadyBoundary = 2,
+  kHostileEdge = 3,
+  kCollapseFailure = 4,
+  kLitanyInvocation = 5,
 };
 
 struct CadenceWindow {
@@ -110,6 +118,22 @@ struct VoicingStyleTraits {
   double payload_envelope_floor = 0.0;
   double metallic_layer_gain_scale = 1.0;
   double chant_resonance_gain = 0.0;
+  double chant_drone_gain = 0.0;
+  double chant_swell_depth = 0.0;
+  double chant_swell_freq_hz = 0.65;
+  double mechanical_throat_gain = 0.0;
+  double litany_phrase_dip_depth = 0.0;
+  double litany_phrase_tail_begin = 1.0;
+  double litany_text_pause_tail_begin = 1.0;
+  double steady_low_voice_gain = 0.0;
+  double steady_low_voice_freq_hz = 120.0;
+  double hostile_edge_gain = 0.0;
+  double collapse_tremor_depth = 0.0;
+  double collapse_hesitation_depth = 0.0;
+  double collapse_hesitation_density = 0.0;
+  double collapse_hesitation_tail_begin = 1.0;
+  double payload_softclip_drive = 1.0;
+  double payload_softclip_mix = 0.0;
   double tremolo_depth_scale = 1.0;
   double tremolo_freq_hz = kTremoloFreqHz;
   double spectral_band_mix_scale = 1.0;
@@ -132,12 +156,13 @@ struct VoicingStyleTraits {
 
 FlashVoicingFlavor NormalizeVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
-    case FlashVoicingFlavor::kCodedBurst:
-    case FlashVoicingFlavor::kRitualChant:
-    case FlashVoicingFlavor::kDeepRitual:
+    case FlashVoicingFlavor::kSteady:
+    case FlashVoicingFlavor::kLitany:
+    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kCollapse:
       return flavor;
     default:
-      return FlashVoicingFlavor::kCodedBurst;
+      return FlashVoicingFlavor::kSteady;
   }
 }
 
@@ -149,6 +174,13 @@ std::size_t LeadingNonpayloadSamples(const FlashVoicingConfig& config) {
 std::size_t TrailingNonpayloadSamples(const FlashVoicingConfig& config) {
   return config.enable_epilogue ? config.epilogue_sample_count
                                 : static_cast<std::size_t>(0);
+}
+
+std::size_t SecondsToSampleCount(int sample_rate_hz, double seconds) {
+  return sample_rate_hz > 0 && seconds > 0.0
+             ? static_cast<std::size_t>(
+                   std::lround(static_cast<double>(sample_rate_hz) * seconds))
+             : static_cast<std::size_t>(0);
 }
 
 void ValidatePayloadLayout(const std::vector<int16_t>& clean_payload_pcm,
@@ -299,6 +331,110 @@ bool IsNibbleBoundaryChunk(size_t chunk_index) {
          !IsByteBoundaryChunk(chunk_index);
 }
 
+bool IsNibblePhraseTailChunk(size_t chunk_index) {
+  return (chunk_index % static_cast<size_t>(4)) == static_cast<size_t>(3);
+}
+
+bool IsBytePhraseTailChunk(size_t chunk_index) {
+  return (chunk_index % static_cast<size_t>(8)) == static_cast<size_t>(7);
+}
+
+bool IsByteTailChunk(const FlashPayloadChunk& chunk) {
+  return chunk.bit_index_in_byte == static_cast<std::uint8_t>(7);
+}
+
+std::uint8_t SourceByteAt(const FlashPayloadLayout& payload_layout,
+                          std::size_t byte_index) {
+  const std::size_t expected_chunk_index =
+      byte_index * static_cast<std::size_t>(8);
+  if (expected_chunk_index < payload_layout.chunks.size() &&
+      payload_layout.chunks[expected_chunk_index].byte_index == byte_index) {
+    return payload_layout.chunks[expected_chunk_index].source_byte;
+  }
+
+  for (const FlashPayloadChunk& chunk : payload_layout.chunks) {
+    if (chunk.byte_index == byte_index) {
+      return chunk.source_byte;
+    }
+  }
+  return static_cast<std::uint8_t>(0);
+}
+
+bool EndsWithUtf8Bytes(const FlashPayloadLayout& payload_layout,
+                       std::size_t byte_index, std::uint8_t first,
+                       std::uint8_t second, std::uint8_t third) {
+  if (byte_index < static_cast<std::size_t>(2)) {
+    return false;
+  }
+  return SourceByteAt(payload_layout, byte_index - static_cast<std::size_t>(2)) ==
+             first &&
+         SourceByteAt(payload_layout, byte_index - static_cast<std::size_t>(1)) ==
+             second &&
+         SourceByteAt(payload_layout, byte_index) == third;
+}
+
+double ComputeLitanyTextPauseWeight(const FlashPayloadLayout& payload_layout,
+                                    std::size_t chunk_index) {
+  if (chunk_index >= payload_layout.chunks.size()) {
+    return 0.0;
+  }
+  const FlashPayloadChunk& chunk = payload_layout.chunks[chunk_index];
+  if (!IsByteTailChunk(chunk)) {
+    return 0.0;
+  }
+
+  switch (chunk.source_byte) {
+    case static_cast<std::uint8_t>(' '):
+    case static_cast<std::uint8_t>('\t'):
+      return 0.52;
+    case static_cast<std::uint8_t>('\n'):
+    case static_cast<std::uint8_t>('\r'):
+      return 0.66;
+    case static_cast<std::uint8_t>(','):
+    case static_cast<std::uint8_t>(';'):
+    case static_cast<std::uint8_t>(':'):
+      return 0.70;
+    case static_cast<std::uint8_t>('.'):
+    case static_cast<std::uint8_t>('!'):
+    case static_cast<std::uint8_t>('?'):
+      return 0.86;
+    default:
+      break;
+  }
+
+  const std::size_t byte_index = chunk.byte_index;
+  if (EndsWithUtf8Bytes(payload_layout, byte_index, 0xEF, 0xBC, 0x8C) ||
+      EndsWithUtf8Bytes(payload_layout, byte_index, 0xEF, 0xBC, 0x9B) ||
+      EndsWithUtf8Bytes(payload_layout, byte_index, 0xEF, 0xBC, 0x9A)) {
+    return 0.72;
+  }
+  if (EndsWithUtf8Bytes(payload_layout, byte_index, 0xE3, 0x80, 0x82) ||
+      EndsWithUtf8Bytes(payload_layout, byte_index, 0xEF, 0xBC, 0x81) ||
+      EndsWithUtf8Bytes(payload_layout, byte_index, 0xEF, 0xBC, 0x9F)) {
+    return 0.88;
+  }
+  return 0.0;
+}
+
+double ComputeTailDipArticulation(double pause_weight, double tail_begin,
+                                  double min_articulation,
+                                  size_t local_index, size_t sample_count) {
+  if (pause_weight <= 0.0 || tail_begin >= 1.0 || sample_count == 0) {
+    return 1.0;
+  }
+
+  const double progress =
+      static_cast<double>(local_index) / static_cast<double>(sample_count);
+  if (progress <= tail_begin) {
+    return 1.0;
+  }
+
+  const double local =
+      std::clamp((progress - tail_begin) / (1.0 - tail_begin), 0.0, 1.0);
+  const double eased = 0.5 - 0.5 * std::cos(kPi * local);
+  return std::clamp(1.0 - pause_weight * eased, min_articulation, 1.0);
+}
+
 size_t ComputeClickWindow(size_t chunk_sample_count) {
   if (chunk_sample_count == 0) {
     return 0;
@@ -365,42 +501,100 @@ double ComputeGroupedBurstPattern(size_t local_index, size_t sample_count) {
   return std::clamp(beat_gain * (primary_burst + secondary_burst), 0.0, 1.0);
 }
 
+double ComputeLitanyPhraseArticulation(size_t chunk_index, size_t local_index,
+                                       size_t sample_count,
+                                       const VoicingStyleTraits& style_traits) {
+  if (style_traits.litany_phrase_dip_depth <= 0.0 || sample_count == 0 ||
+      style_traits.litany_phrase_tail_begin >= 1.0) {
+    return 1.0;
+  }
+
+  const bool byte_tail = IsBytePhraseTailChunk(chunk_index);
+  const bool nibble_tail = IsNibblePhraseTailChunk(chunk_index);
+  if (!byte_tail && !nibble_tail) {
+    return 1.0;
+  }
+
+  const double progress =
+      static_cast<double>(local_index) / static_cast<double>(sample_count);
+  if (progress <= style_traits.litany_phrase_tail_begin) {
+    return 1.0;
+  }
+
+  const double local = std::clamp(
+      (progress - style_traits.litany_phrase_tail_begin) /
+          (1.0 - style_traits.litany_phrase_tail_begin),
+      0.0, 1.0);
+  const double eased = 0.5 - 0.5 * std::cos(kPi * local);
+  const double depth = style_traits.litany_phrase_dip_depth *
+                       (byte_tail ? 1.0 : 0.66);
+  return std::clamp(1.0 - depth * eased, 0.34, 1.0);
+}
+
+double ComputeLitanyTextPauseArticulation(
+    double pause_weight, size_t local_index, size_t sample_count,
+    const VoicingStyleTraits& style_traits) {
+  return ComputeTailDipArticulation(pause_weight,
+                                    style_traits.litany_text_pause_tail_begin,
+                                    0.10, local_index, sample_count);
+}
+
+std::uint32_t HashCollapseChunk(const FlashPayloadChunk& chunk,
+                                std::size_t chunk_index) {
+  std::uint32_t value = 2166136261U;
+  value ^= static_cast<std::uint32_t>(chunk_index + 0x9E3779B9U);
+  value *= 16777619U;
+  value ^= static_cast<std::uint32_t>(chunk.byte_index * 131U);
+  value *= 16777619U;
+  value ^= static_cast<std::uint32_t>(chunk.source_byte);
+  value *= 16777619U;
+  value ^= static_cast<std::uint32_t>(chunk.bit_index_in_byte);
+  value *= 16777619U;
+  return value;
+}
+
+double ComputeCollapseHesitationWeight(
+    const FlashPayloadChunk& chunk, std::size_t chunk_index,
+    const VoicingStyleTraits& style_traits) {
+  if (style_traits.collapse_hesitation_depth <= 0.0 ||
+      style_traits.collapse_hesitation_density <= 0.0) {
+    return 0.0;
+  }
+
+  const std::uint32_t hash = HashCollapseChunk(chunk, chunk_index);
+  const double select =
+      static_cast<double>(hash & 0x3FFU) / static_cast<double>(0x3FFU);
+  double density = std::clamp(style_traits.collapse_hesitation_density, 0.0, 1.0);
+  if (IsByteTailChunk(chunk)) {
+    density = std::min(1.0, density + 0.22);
+  }
+  if (select > density) {
+    return 0.0;
+  }
+
+  const double depth_variation = static_cast<double>((hash >> 10U) & 0xFFU) /
+                                 static_cast<double>(0xFFU);
+  const double byte_tail_boost = IsByteTailChunk(chunk) ? 0.12 : 0.0;
+  return std::clamp(style_traits.collapse_hesitation_depth *
+                        (0.52 + 0.48 * depth_variation) +
+                    byte_tail_boost,
+                    0.0, 0.92);
+}
+
+double ComputeCollapseHesitationArticulation(
+    double hesitation_weight, size_t local_index, size_t sample_count,
+    const VoicingStyleTraits& style_traits) {
+  return ComputeTailDipArticulation(
+      hesitation_weight, style_traits.collapse_hesitation_tail_begin, 0.08,
+      local_index, sample_count);
+}
+
 VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
   switch (NormalizeVoicingFlavor(flavor)) {
-    case FlashVoicingFlavor::kDeepRitual:
-      return VoicingStyleTraits{
-          .nibble_boundary_accent_factor = 0.06,
-          .byte_boundary_click_scale = 0.42,
-          .preamble_grouped_burst_mix = 0.10,
-          .preamble_invocation_shell_mix = 1.26,
-          .epilogue_grouped_burst_mix = 0.08,
-          .epilogue_closure_shell_mix = 1.24,
-          .preamble_rise_ratio = 0.07,
-          .preamble_fall_ratio = 0.12,
-          .epilogue_rise_ratio = 0.05,
-          .epilogue_fall_ratio = 0.15,
-          .epilogue_decay_exponent = 4.8,
-          .payload_release_scale = 1.22,
-          .payload_envelope_floor = 0.20,
-          .metallic_layer_gain_scale = 0.0,
-          .chant_resonance_gain = 0.014,
-          .tremolo_depth_scale = 0.03,
-          .tremolo_freq_hz = 3.9,
-          .spectral_band_mix_scale = 0.10,
-          .spectral_softclip_mix_scale = 0.06,
-          .preamble_cadence_profile = FixedShellCadenceProfile::kDeepRitual,
-          .epilogue_cadence_profile = FixedShellCadenceProfile::kDeepRitual,
-          .preamble_phrase_mask_mix = 1.0,
-          .epilogue_phrase_mask_mix = 1.0,
-          .preamble_terminal_mute_begin = 0.92,
-          .preamble_terminal_mute_end = 1.0,
-          .epilogue_terminal_mute_begin = 0.88,
-          .epilogue_terminal_mute_end = 1.0,
-      };
-    case FlashVoicingFlavor::kRitualChant:
+    case FlashVoicingFlavor::kLitany:
       return VoicingStyleTraits{
           .nibble_boundary_accent_factor = 0.08,
-          .byte_boundary_click_scale = 0.46,
+          .byte_boundary_click_scale = 0.18,
           .preamble_grouped_burst_mix = 0.14,
           .preamble_invocation_shell_mix = 1.18,
           .epilogue_grouped_burst_mix = 0.12,
@@ -412,22 +606,110 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .epilogue_decay_exponent = 3.8,
           .payload_release_scale = 1.16,
           .payload_envelope_floor = 0.16,
-          .metallic_layer_gain_scale = 0.02,
-          .chant_resonance_gain = 0.012,
+          .metallic_layer_gain_scale = 0.00,
+          .chant_resonance_gain = 0.010,
+          .chant_drone_gain = 0.055,
+          .chant_swell_depth = 0.10,
+          .chant_swell_freq_hz = 0.65,
+          .mechanical_throat_gain = 0.018,
+          .litany_phrase_dip_depth = 0.58,
+          .litany_phrase_tail_begin = 0.62,
+          .litany_text_pause_tail_begin = 0.50,
           .tremolo_depth_scale = 0.07,
           .tremolo_freq_hz = 4.8,
           .spectral_band_mix_scale = 0.12,
           .spectral_softclip_mix_scale = 0.08,
-          .preamble_cadence_profile = FixedShellCadenceProfile::kRitualChant,
-          .epilogue_cadence_profile = FixedShellCadenceProfile::kRitualChant,
+          .preamble_cadence_profile =
+              FixedShellCadenceProfile::kLitanyInvocation,
+          .epilogue_cadence_profile =
+              FixedShellCadenceProfile::kLitanyInvocation,
+          .preamble_timbre_profile =
+              FixedShellTimbreProfile::kLitanyInvocation,
+          .epilogue_timbre_profile =
+              FixedShellTimbreProfile::kLitanyInvocation,
           .preamble_phrase_mask_mix = 1.0,
           .epilogue_phrase_mask_mix = 1.0,
-          .preamble_terminal_mute_begin = 0.88,
+          .preamble_terminal_mute_begin = 0.95,
           .preamble_terminal_mute_end = 1.0,
-          .epilogue_terminal_mute_begin = 0.84,
+          .epilogue_terminal_mute_begin = 0.93,
           .epilogue_terminal_mute_end = 1.0,
       };
-    case FlashVoicingFlavor::kCodedBurst:
+    case FlashVoicingFlavor::kHostile:
+      return VoicingStyleTraits{
+          .nibble_boundary_accent_factor = 0.28,
+          .byte_boundary_click_scale = 1.18,
+          .preamble_grouped_burst_mix = 0.82,
+          .preamble_invocation_shell_mix = 1.22,
+          .epilogue_grouped_burst_mix = 0.74,
+          .epilogue_closure_shell_mix = 1.16,
+          .preamble_rise_ratio = 0.025,
+          .preamble_fall_ratio = 0.16,
+          .epilogue_rise_ratio = 0.025,
+          .epilogue_fall_ratio = 0.17,
+          .epilogue_decay_exponent = 4.7,
+          .payload_release_scale = 0.74,
+          .payload_envelope_floor = 0.03,
+          .metallic_layer_gain_scale = 0.48,
+          .hostile_edge_gain = 0.044,
+          .payload_softclip_drive = 1.42,
+          .payload_softclip_mix = 0.28,
+          .tremolo_depth_scale = 0.18,
+          .tremolo_freq_hz = 9.8,
+          .spectral_band_mix_scale = 0.62,
+          .spectral_softclip_mix_scale = 0.54,
+          .preamble_cadence_profile =
+              FixedShellCadenceProfile::kHostileChallenge,
+          .epilogue_cadence_profile =
+              FixedShellCadenceProfile::kHostileChallenge,
+          .preamble_timbre_profile = FixedShellTimbreProfile::kHostileEdge,
+          .epilogue_timbre_profile = FixedShellTimbreProfile::kHostileEdge,
+          .preamble_phrase_mask_mix = 1.0,
+          .epilogue_phrase_mask_mix = 1.0,
+          .preamble_terminal_mute_begin = 0.72,
+          .preamble_terminal_mute_end = 1.0,
+          .epilogue_terminal_mute_begin = 0.68,
+          .epilogue_terminal_mute_end = 1.0,
+      };
+    case FlashVoicingFlavor::kCollapse:
+      return VoicingStyleTraits{
+          .nibble_boundary_accent_factor = 0.10,
+          .byte_boundary_click_scale = 0.58,
+          .preamble_grouped_burst_mix = 0.24,
+          .preamble_invocation_shell_mix = 0.92,
+          .epilogue_grouped_burst_mix = 0.18,
+          .epilogue_closure_shell_mix = 0.84,
+          .preamble_rise_ratio = 0.12,
+          .preamble_fall_ratio = 0.30,
+          .epilogue_rise_ratio = 0.04,
+          .epilogue_fall_ratio = 0.36,
+          .epilogue_decay_exponent = 2.6,
+          .payload_release_scale = 1.38,
+          .payload_envelope_floor = 0.08,
+          .metallic_layer_gain_scale = 0.08,
+          .collapse_tremor_depth = 0.115,
+          .collapse_hesitation_depth = 0.78,
+          .collapse_hesitation_density = 0.28,
+          .collapse_hesitation_tail_begin = 0.56,
+          .payload_softclip_drive = 1.12,
+          .payload_softclip_mix = 0.12,
+          .tremolo_depth_scale = 1.15,
+          .tremolo_freq_hz = 11.4,
+          .spectral_band_mix_scale = 0.24,
+          .spectral_softclip_mix_scale = 0.16,
+          .preamble_cadence_profile =
+              FixedShellCadenceProfile::kProtocolHandshake,
+          .epilogue_cadence_profile =
+              FixedShellCadenceProfile::kCollapseFailure,
+          .preamble_timbre_profile = FixedShellTimbreProfile::kProtocolBoundary,
+          .epilogue_timbre_profile = FixedShellTimbreProfile::kCollapseFailure,
+          .preamble_phrase_mask_mix = 1.0,
+          .epilogue_phrase_mask_mix = 1.0,
+          .preamble_terminal_mute_begin = 0.70,
+          .preamble_terminal_mute_end = 1.0,
+          .epilogue_terminal_mute_begin = 0.58,
+          .epilogue_terminal_mute_end = 1.0,
+      };
+    case FlashVoicingFlavor::kSteady:
     default:
       return VoicingStyleTraits{
           .nibble_boundary_accent_factor = 0.16,
@@ -443,18 +725,20 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .epilogue_decay_exponent = 5.4,
           .payload_release_scale = 1.0,
           .payload_envelope_floor = 0.0,
-          .metallic_layer_gain_scale = 0.22,
+          .metallic_layer_gain_scale = 0.06,
           .chant_resonance_gain = 0.0,
-          .tremolo_depth_scale = 0.28,
+          .steady_low_voice_gain = 0.018,
+          .steady_low_voice_freq_hz = 120.0,
+          .tremolo_depth_scale = 0.04,
           .tremolo_freq_hz = 6.2,
-          .spectral_band_mix_scale = 0.42,
-          .spectral_softclip_mix_scale = 0.30,
+          .spectral_band_mix_scale = 0.12,
+          .spectral_softclip_mix_scale = 0.08,
           .preamble_cadence_profile =
-              FixedShellCadenceProfile::kProtocolHandshake,
+              FixedShellCadenceProfile::kSteadyProtocol,
           .epilogue_cadence_profile =
-              FixedShellCadenceProfile::kProtocolHandshake,
-          .preamble_timbre_profile = FixedShellTimbreProfile::kProtocolBoundary,
-          .epilogue_timbre_profile = FixedShellTimbreProfile::kProtocolBoundary,
+              FixedShellCadenceProfile::kSteadyProtocol,
+          .preamble_timbre_profile = FixedShellTimbreProfile::kSteadyBoundary,
+          .epilogue_timbre_profile = FixedShellTimbreProfile::kSteadyBoundary,
           .preamble_phrase_mask_mix = 1.0,
           .epilogue_phrase_mask_mix = 1.0,
           .preamble_terminal_mute_begin = 0.76,
@@ -542,4 +826,123 @@ double ComputeChantResonanceLayer(double carrier_freq_hz,
     layer += 0.38 * std::sin(2.0 * kPi * upper_freq_hz * time + 0.52);
   }
   return gain * layer;
+}
+
+double ComputeChantDroneLayer(std::size_t sample_index, int sample_rate_hz,
+                              double gain) {
+  if (gain <= 0.0 || sample_rate_hz <= 0) {
+    return 0.0;
+  }
+
+  const double time =
+      static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
+  const double breath =
+      0.68 + 0.32 * std::sin(2.0 * kPi * 0.65 * time + 0.35);
+  const double drone =
+      0.56 * std::sin(2.0 * kPi * 60.0 * time + 0.12) +
+      0.29 * std::sin(2.0 * kPi * 120.0 * time + 0.41) +
+      0.15 * std::sin(2.0 * kPi * 180.0 * time + 0.73);
+  return gain * breath * drone;
+}
+
+double ComputeChantSwellGain(std::size_t sample_index, int sample_rate_hz,
+                             const VoicingStyleTraits& style_traits) {
+  if (style_traits.chant_swell_depth <= 0.0 ||
+      style_traits.chant_swell_freq_hz <= 0.0 || sample_rate_hz <= 0) {
+    return 1.0;
+  }
+
+  const double time =
+      static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
+  const double depth = std::clamp(style_traits.chant_swell_depth, 0.0, 0.24);
+  const double swell =
+      std::sin(2.0 * kPi * style_traits.chant_swell_freq_hz * time + 0.35);
+  return std::clamp(1.0 + depth * swell, 1.0 - depth, 1.0 + depth);
+}
+
+double ComputeMechanicalThroatLayer(std::size_t sample_index,
+                                    int sample_rate_hz, double gain) {
+  if (gain <= 0.0 || sample_rate_hz <= 0) {
+    return 0.0;
+  }
+
+  const double time =
+      static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
+  const double throat =
+      0.48 * std::sin(2.0 * kPi * 160.0 * time + 0.27) +
+      0.34 * std::sin(2.0 * kPi * 420.0 * time + 0.61) +
+      0.18 * std::sin(2.0 * kPi * 560.0 * time + 1.04);
+  const double motor_buzz =
+      0.62 + 0.38 * std::sin(2.0 * kPi * 18.0 * time + 0.44);
+  return gain * motor_buzz * throat;
+}
+
+double ComputeSteadyLowVoiceLayer(std::size_t sample_index, int sample_rate_hz,
+                                  const VoicingStyleTraits& style_traits) {
+  if (style_traits.steady_low_voice_gain <= 0.0 ||
+      style_traits.steady_low_voice_freq_hz <= 0.0 || sample_rate_hz <= 0) {
+    return 0.0;
+  }
+
+  const double time =
+      static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
+  const double phase =
+      2.0 * kPi * style_traits.steady_low_voice_freq_hz * time;
+  const double square_like =
+      (std::sin(phase) + std::sin(3.0 * phase) / 3.0 +
+       std::sin(5.0 * phase) / 5.0) /
+      (1.0 + 1.0 / 3.0 + 1.0 / 5.0);
+  return style_traits.steady_low_voice_gain * square_like;
+}
+
+double ComputeHostileEdgeLayer(double carrier_freq_hz, std::size_t local_index,
+                               int sample_rate_hz, double gain) {
+  if (gain <= 0.0 || carrier_freq_hz <= 0.0 || sample_rate_hz <= 0) {
+    return 0.0;
+  }
+
+  const double time =
+      static_cast<double>(local_index) / static_cast<double>(sample_rate_hz);
+  const double nyquist_hz = static_cast<double>(sample_rate_hz) / 2.0;
+  double layer = 0.0;
+  const double second_freq_hz = carrier_freq_hz * 2.0;
+  const double fifth_freq_hz = carrier_freq_hz * 5.0;
+  if (second_freq_hz < nyquist_hz) {
+    layer += 0.46 * std::sin(2.0 * kPi * second_freq_hz * time + 0.10);
+  }
+  if (fifth_freq_hz < nyquist_hz) {
+    layer += 0.24 * std::sin(2.0 * kPi * fifth_freq_hz * time + 0.38);
+  }
+  layer += 0.30 * std::copysign(1.0, std::sin(2.0 * kPi * carrier_freq_hz *
+                                               time + 0.18));
+  return gain * layer;
+}
+
+double ApplyPayloadSoftClip(double sample,
+                            const VoicingStyleTraits& style_traits) {
+  if (style_traits.payload_softclip_mix <= 0.0 ||
+      style_traits.payload_softclip_drive <= 1.0) {
+    return sample;
+  }
+
+  const double clipped =
+      SoftClipSample(sample, style_traits.payload_softclip_drive);
+  const double mix = std::clamp(style_traits.payload_softclip_mix, 0.0, 1.0);
+  return sample * (1.0 - mix) + clipped * mix;
+}
+
+double ComputeCollapseTremor(std::size_t payload_sample_index,
+                             int sample_rate_hz,
+                             const VoicingStyleTraits& style_traits) {
+  if (style_traits.collapse_tremor_depth <= 0.0 || sample_rate_hz <= 0) {
+    return 1.0;
+  }
+
+  const double time = static_cast<double>(payload_sample_index) /
+                      static_cast<double>(sample_rate_hz);
+  const double primary = std::sin(2.0 * kPi * 8.6 * time + 0.33);
+  const double secondary = std::sin(2.0 * kPi * 13.7 * time + 1.10);
+  const double tremor =
+      style_traits.collapse_tremor_depth * (0.72 * primary + 0.28 * secondary);
+  return std::clamp(1.0 + tremor, 0.72, 1.18);
 }

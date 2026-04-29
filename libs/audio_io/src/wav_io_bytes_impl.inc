@@ -63,16 +63,18 @@ constexpr std::size_t kBytesPerSample = 2;
 constexpr std::uint32_t kMaxChunkByteCount = 0xFFFFFFFFu;
 
 bool IsSupportedMode(FlipBitsAudioMetadataMode mode) {
-  return mode == FlipBitsAudioMetadataMode::kFlash ||
+  return mode == FlipBitsAudioMetadataMode::kMini ||
+         mode == FlipBitsAudioMetadataMode::kFlash ||
          mode == FlipBitsAudioMetadataMode::kPro ||
          mode == FlipBitsAudioMetadataMode::kUltra;
 }
 
 bool IsSupportedFlashVoicingStyle(
     FlipBitsAudioMetadataFlashVoicingStyle style) {
-  return style == FlipBitsAudioMetadataFlashVoicingStyle::kCodedBurst ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kRitualChant ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kDeepRitual;
+  return style == FlipBitsAudioMetadataFlashVoicingStyle::kSteady ||
+         style == FlipBitsAudioMetadataFlashVoicingStyle::kLitany ||
+         style == FlipBitsAudioMetadataFlashVoicingStyle::kHostile ||
+         style == FlipBitsAudioMetadataFlashVoicingStyle::kCollapse;
 }
 
 bool IsIsoUtcTimestampChar(char value, std::size_t index) {

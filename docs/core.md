@@ -1,6 +1,6 @@
 # Audio Core 现状
 
-更新时间：2026-03-15
+更新时间：2026-04-30
 
 ## 版本更新说明
 - [v0.4.0](./core/v0.4/v0.4.0.md)
@@ -55,13 +55,14 @@
    - 但长期边界、平台例外和 third-party/backend owner 不属于“必须纯 module 化”的范围
 
 ## 当前已实现能力
-1. `transport facade + flash/pro/ultra` 的 mode-first 内部主线。
+1. `transport facade + mini/flash/pro/ultra` 的 mode-first 内部主线。
 2. `flash` 的原始文本/字节直通 + clean `BFSK` signal 层 + `phy_clean` facade。
-3. `flash` 当前已通过 `CoreConfig.flash_style` / `bag_api.h` 正式公开 `coded_burst` 与 `ritual_chant` 两种 style：`bag.flash.signal` 负责按 style 派生不同的 payload `samples_per_bit`，`bag.flash.voicing` 负责按同一 style 派生固定 preamble / epilogue、payload voicing、三段式/两段式短停顿与 trim descriptor。正式默认仍为 `coded_burst`；`ritual_chant` 则在保留 decode 自洽的前提下，同时拉长 payload timing、前后壳时长与仪式化外观。
+3. `flash` 当前已通过 `CoreConfig` / `bag_api.h` 正式公开四个用户可见 emotion preset：`Steady / Hostile / Litany / Collapse`。内部拆成 `flash_signal_profile` 与 `flash_voicing_flavor` 两轴：`bag.flash.signal` 负责按 signal profile 派生 payload `samples_per_bit` 与可跳过 silence layout，`bag.flash.voicing` 负责按 emotion 派生固定 preamble / epilogue、payload texture、句尾收束、结巴停顿与 trim descriptor。详细设计见 `docs/design/flash-voicing-emotions.md`。
 4. `pro` 的 ASCII byte + `DTMF-like` 双音 clean PHY。
 5. `ultra` 的 UTF-8 byte + clean `16-FSK` PHY。
-6. Pipeline 最小闭环：`PushPcm -> PollTextResult -> Reset`。
-7. 稳定 C API 编码/解码入口：
+6. `mini` 的 Morse-compatible text + clean Morse tone PHY：输入仅支持 `A-Z / 0-9 / space / 常见 Morse 标点`，小写和连续空格会先规范化，音频层按 dot / dash / silence units 渲染。
+7. Pipeline 最小闭环：`PushPcm -> PollTextResult -> Reset`。
+8. 稳定 C API 编码/解码入口：
    - `bag_encode_text`
    - `bag_free_pcm16_result`
    - `bag_create_decoder`
@@ -70,7 +71,7 @@
    - `bag_reset`
    - `bag_destroy_decoder`
    - `bag_core_version`
-8. 稳定 WAV 边界能力：
+9. 稳定 WAV 边界能力：
    - `SerializeMonoPcm16Wav`
    - `ParseMonoPcm16Wav`
    - `WriteMonoPcm16Wav`
@@ -122,6 +123,8 @@
   - `libs/audio_core/modules/bag/ultra/codec.cppm`
   - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
   - `libs/audio_core/modules/bag/ultra/phy_compat.cppm`
+  - `libs/audio_core/modules/bag/mini/codec.cppm`
+  - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
   - `libs/audio_core/modules/bag/transport/compat/frame_codec.cppm`
   - `libs/audio_core/modules/bag/transport/facade.cppm`
   - `libs/audio_core/modules/bag/pipeline/pipeline.cppm`
@@ -132,15 +135,15 @@
 - `Gate 2` promotion list 已全部完成 closeout：
   - `bag.common.config.cppm`
   - `bag.common.types.cppm`
-  - `flash/pro/ultra codec.cppm`
+  - `mini/flash/pro/ultra codec.cppm`
   - `flash signal/voicing.cppm`
-  - `flash/pro/ultra phy_clean.cppm`
+  - `mini/flash/pro/ultra phy_clean.cppm`
   - `fsk/codec.cppm`
   - `pro/ultra phy_compat.cppm`
   - `transport/compat/frame_codec.cppm`
   - `transport/facade.cppm`
   - `pipeline.cppm`
-  - 以上 `16` 个 `audio_core` module interface 已收成 `import-std-only`，不再保留 fallback `#include <...>` guard
+  - 以上 `18` 个 `audio_core` module interface 已收成 `import-std-only`，不再保留 fallback `#include <...>` guard
 - 在 promoted set 全部收口后，当前 required baseline 只保留以下受控形态：
   - core module implementation single-path
     - `module;` + `import std;` + `module bag.*;`
@@ -172,6 +175,8 @@
   - 仅允许 ASCII。
 - `ultra`
   - 面向 UTF-8 文本，输入按 UTF-8 byte 处理。
+- `mini`
+  - Morse code 模式，仅支持 Morse-compatible text，小写规范化为大写。
 
 ### `flash`
 - 定位：娱乐化、强调仪式感与二进制氛围的原始直通模式。
@@ -191,13 +196,20 @@
 - 编码方式：每个 byte 拆成两个 nibble；每个 nibble 映射到 `16-FSK` 的一个固定频点。
 - 结构特征：`1 byte = 2 symbol`；每个 symbol 只发一个频点。
 
+### `mini`
+- 定位：Morse code 文本音频模式，面向点 / 划 / 静音间隔的可听、可视、可跟随表达。
+- 信息层：输入先规范化为 Morse-compatible text；支持 `A-Z / 0-9 / space / . , ? ' ! / ( ) & : ; = + - _ " $ @`，小写转大写，连续空格折叠。
+- 编码方式：每个字符通过 International Morse 表映射为 dot / dash pattern；dot 为 `1` unit tone，dash 为 `3` unit tone，字符内 / 字符间 / 单词间 silence 分别为 `1 / 3 / 7` units。
+- 结构特征：payload byte 保存规范化字符；follow 的 `byte_timeline` 跟字符，`binary_group_timeline` 跟 dot/dash tone element，silence 不作为 tone group 发布。
+
 ## MVP 暂不做
 - [x] `pro` 当前只做 `ASCII byte -> nibble -> DTMF-like 双音` 的 clean 闭环。
 - [x] `ultra` 当前只做 `UTF-8 byte -> nibble -> clean 16-FSK` 的 clean 闭环。
+- [x] `mini` 当前只做 `Morse-compatible text -> dot/dash/silence -> clean tone` 的生成音频闭环，不承诺录音环境 decode 鲁棒性。
 - [ ] 自动拆帧、多帧重组、长文本流式会话管理不在当前 MVP 范围内。
 - [x] 用户可感知的最小 style layer 已在正式 `flash` 输出中启用，当前包括安全 payload voicing 与固定 preamble / epilogue。
 - [x] `bag.flash.voicing` 已接入正式 `flash` 输出，同时仍保留默认 no-op 口径供 clean 验证使用。
-- [x] formal `flash` 当前已通过 `CoreConfig` / `bag_api.h` 公开 `flash_style`，并统一用同一配置同时驱动 signal timing、voicing、trim 与 decode；`coded_burst` 仍作为默认 style 和零值语义。
+- [x] formal `flash` 当前已通过 `CoreConfig` / `bag_api.h` 公开四个 emotion preset，并由同一配置同时驱动 signal timing、voicing、trim 与 decode；`Steady` 仍作为默认 emotion 和零值语义。
 - [x] `flash` 当前仍不做随机化、立体声、可变长度背景层或不可预测的风格处理。
 
 ## 对外集成建议

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -45,9 +46,110 @@ std::vector<std::string> SplitLineSeparatedTokens(const std::string& value) {
     return tokens;
 }
 
+std::size_t MorseToneElementCountForText(const std::string& value) {
+    auto pattern_size = [](const char raw) -> std::size_t {
+        const char ch = raw >= 'a' && raw <= 'z' ? static_cast<char>('A' + (raw - 'a')) : raw;
+        switch (ch) {
+            case 'A':
+                return 2;
+            case 'B':
+                return 4;
+            case 'C':
+                return 4;
+            case 'D':
+                return 3;
+            case 'E':
+                return 1;
+            case 'F':
+                return 4;
+            case 'G':
+                return 3;
+            case 'H':
+                return 4;
+            case 'I':
+                return 2;
+            case 'J':
+                return 4;
+            case 'K':
+                return 3;
+            case 'L':
+                return 4;
+            case 'M':
+                return 2;
+            case 'N':
+                return 2;
+            case 'O':
+                return 3;
+            case 'P':
+                return 4;
+            case 'Q':
+                return 4;
+            case 'R':
+                return 3;
+            case 'S':
+                return 3;
+            case 'T':
+                return 1;
+            case 'U':
+                return 3;
+            case 'V':
+                return 4;
+            case 'W':
+                return 3;
+            case 'X':
+                return 4;
+            case 'Y':
+                return 4;
+            case 'Z':
+                return 4;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return 5;
+            case '.':
+            case ',':
+            case '?':
+            case '\'':
+            case '!':
+            case '(':
+            case ')':
+            case ':':
+            case ';':
+            case '-':
+            case '_':
+            case '"':
+            case '@':
+                return 6;
+            case '/':
+            case '&':
+            case '+':
+            case '=':
+                return 5;
+            case '$':
+                return 7;
+            default:
+                return 0;
+        }
+    };
+
+    std::size_t count = 0;
+    for (const char ch : value) {
+        count += pattern_size(ch);
+    }
+    return count;
+}
+
 void AssertFollowTimelineIsContinuous(
     const bag_payload_follow_data& follow_data,
-    const std::vector<bag_payload_follow_binary_group_entry>& binary_entries) {
+    const std::vector<bag_payload_follow_binary_group_entry>& binary_entries,
+    bool allow_payload_gaps = false) {
     if (!follow_data.available) {
         test::Fail("Follow data should be available.");
     }
@@ -61,18 +163,38 @@ void AssertFollowTimelineIsContinuous(
         "Binary timeline should begin at the payload start sample.");
     std::size_t covered_samples = 0;
     std::size_t expected_start = follow_data.payload_begin_sample;
+    bool saw_gap = false;
     for (const auto& entry : binary_entries) {
-        test::AssertEq(
-            entry.start_sample,
-            expected_start,
-            "Binary timeline entries should be contiguous without gaps.");
-        expected_start += entry.sample_count;
+        if (allow_payload_gaps) {
+            test::AssertTrue(
+                entry.start_sample >= expected_start,
+                "Binary timeline entries with payload gaps should stay ordered.");
+            saw_gap = saw_gap || entry.start_sample > expected_start;
+        } else {
+            test::AssertEq(
+                entry.start_sample,
+                expected_start,
+                "Binary timeline entries should be contiguous without gaps.");
+        }
+        expected_start = entry.start_sample + entry.sample_count;
         covered_samples += entry.sample_count;
     }
-    test::AssertEq(
-        covered_samples,
-        follow_data.payload_sample_count,
-        "Binary timeline should cover the full payload sample range.");
+    if (allow_payload_gaps) {
+        test::AssertTrue(
+            saw_gap,
+            "Binary timeline should expose transport silence as payload gaps.");
+        test::AssertTrue(
+            covered_samples < follow_data.payload_sample_count,
+            "Binary timeline should leave transport silence outside bit entries.");
+        test::AssertTrue(
+            expected_start <= follow_data.payload_begin_sample + follow_data.payload_sample_count,
+            "Binary timeline entries should stay inside the payload sample range.");
+    } else {
+        test::AssertEq(
+            covered_samples,
+            follow_data.payload_sample_count,
+            "Binary timeline should cover the full payload sample range.");
+    }
     test::AssertTrue(
         follow_data.payload_begin_sample + follow_data.payload_sample_count <=
             follow_data.total_pcm_sample_count,
@@ -89,6 +211,40 @@ void TestApiProRoundTripAcrossCorpusAndConfigs() {
 
 void TestApiUltraRoundTripAcrossCorpusAndConfigs() {
     AssertRoundTripAcrossCorpus(test::UltraCorpusCases(), BAG_TRANSPORT_ULTRA);
+}
+
+void TestApiMiniMorseRoundTripAcrossConfigs() {
+    struct MaxCase {
+        std::string input;
+        std::string expected_text;
+    };
+    const std::array<MaxCase, 5> cases = {{
+        {"PRAISE THE OMNISSIAH", "PRAISE THE OMNISSIAH"},
+        {"SOS", "SOS"},
+        {"MINI-ASCII 123", "MINI-ASCII 123"},
+        {"HELLO, WORLD?", "HELLO, WORLD?"},
+        {"praise   the omnissiah", "PRAISE THE OMNISSIAH"},
+    }};
+
+    for (const auto& config_case : test::ConfigCases()) {
+        const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
+        const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_MINI);
+        for (const auto& item : cases) {
+            bag_pcm16_result pcm{};
+            test::AssertEq(
+                bag_encode_text(&encoder_config, item.input.c_str(), &pcm),
+                BAG_OK,
+                "Mini Morse encode should accept Morse-compatible text.");
+            const auto decoded = DecodeViaApi(decoder_config, pcm);
+            test::AssertEq(decoded.code, BAG_OK, "Mini Morse decode should succeed.");
+            test::AssertEq(
+                decoded.text,
+                item.expected_text,
+                "Mini Morse roundtrip should preserve normalized text.");
+            test::AssertEq(decoded.mode, BAG_TRANSPORT_MINI, "Mini Morse decode should preserve mode.");
+            bag_free_pcm16_result(&pcm);
+        }
+    }
 }
 
 void TestApiEncodeRejectsInvalidArguments() {
@@ -230,6 +386,18 @@ void TestApiModeSpecificValidation() {
         BAG_OK,
         "Ultra mode should no longer inherit the compat single-frame limit.");
     bag_free_pcm16_result(&pcm);
+
+    auto mini_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
+    const auto mini_non_morse = test::Utf8Literal(u8"二进制祷文");
+    test::AssertEq(
+        bag_encode_text(&mini_config, mini_non_morse.c_str(), &pcm),
+        BAG_INVALID_ARGUMENT,
+        "Mini Morse mode should reject non-Morse text.");
+    test::AssertEq(
+        bag_encode_text(&mini_config, "PRAISE THE OMNISSIAH", &pcm),
+        BAG_OK,
+        "Mini Morse mode should accept the pro-style ASCII example text.");
+    bag_free_pcm16_result(&pcm);
 }
 
 void TestApiBoundarySuccessCases() {
@@ -293,10 +461,11 @@ void TestApiChunkedPushRoundTripAcrossModes() {
         bag_transport_mode mode;
         std::string text;
     };
-    const std::array<ChunkedCase, 3> cases = {{
+    const std::array<ChunkedCase, 4> cases = {{
         {BAG_TRANSPORT_FLASH, test::Utf8Literal(u8"Chunk-Flash-你好")},
         {BAG_TRANSPORT_PRO, "Chunk-Pro-123"},
         {BAG_TRANSPORT_ULTRA, test::Utf8Literal(u8"Chunk-Ultra-超级")},
+        {BAG_TRANSPORT_MINI, "CHUNK MINI 123"},
     }};
 
     for (const auto& config_case : test::ConfigCases()) {
@@ -324,22 +493,23 @@ void TestApiDecodeResultPublishesRawPayloadAcrossModes() {
     struct RawCase {
         bag_transport_mode mode;
         std::string text;
-        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST;
-        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST;
+        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY;
+        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY;
     };
-    const std::array<RawCase, 6> cases = {{
+    const std::array<RawCase, 7> cases = {{
         {BAG_TRANSPORT_FLASH, "FlashRaw"},
         {BAG_TRANSPORT_FLASH,
          test::Utf8Literal(u8"Flash深仪"),
-         BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL,
-         BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL},
+         BAG_FLASH_SIGNAL_PROFILE_LITANY,
+         BAG_FLASH_VOICING_FLAVOR_LITANY},
         {BAG_TRANSPORT_FLASH,
          "MidRitual",
-         BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT,
-         BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT},
+         BAG_FLASH_SIGNAL_PROFILE_LITANY,
+         BAG_FLASH_VOICING_FLAVOR_LITANY},
         {BAG_TRANSPORT_PRO, "PRO-ASCII-123"},
         {BAG_TRANSPORT_ULTRA, "UltraRaw"},
         {BAG_TRANSPORT_ULTRA, test::Utf8Literal(u8"Ultra原始")},
+        {BAG_TRANSPORT_MINI, "MINI RAW 123"},
     }};
 
     for (const auto& config_case : test::ConfigCases()) {
@@ -439,15 +609,17 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
     struct FollowCase {
         bag_transport_mode mode;
         std::string text;
-        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_CODED_BURST;
-        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_CODED_BURST;
+        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY;
+        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY;
     };
-    const std::array<FollowCase, 5> cases = {{
+    const std::array<FollowCase, 7> cases = {{
         {BAG_TRANSPORT_FLASH, "Flash"},
-        {BAG_TRANSPORT_FLASH, "Deep", BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL, BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL},
+        {BAG_TRANSPORT_FLASH, "Deep", BAG_FLASH_SIGNAL_PROFILE_LITANY, BAG_FLASH_VOICING_FLAVOR_LITANY},
+        {BAG_TRANSPORT_FLASH, "Collapse", BAG_FLASH_SIGNAL_PROFILE_COLLAPSE, BAG_FLASH_VOICING_FLAVOR_COLLAPSE},
         {BAG_TRANSPORT_PRO, "PRO-123"},
         {BAG_TRANSPORT_ULTRA, "Ultra"},
         {BAG_TRANSPORT_ULTRA, test::Utf8Literal(u8"超频")},
+        {BAG_TRANSPORT_MINI, "MINI 123"},
     }};
 
     for (const auto& config_case : test::ConfigCases()) {
@@ -481,7 +653,9 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
             const auto expected_binary_group_count =
                 item.mode == BAG_TRANSPORT_FLASH
                     ? hex_tokens.size() * static_cast<std::size_t>(8)
-                    : hex_tokens.size() * static_cast<std::size_t>(2);
+                    : item.mode == BAG_TRANSPORT_MINI
+                          ? MorseToneElementCountForText(item.text)
+                          : hex_tokens.size() * static_cast<std::size_t>(2);
             test::AssertEq(
                 result.follow_data.byte_timeline_count,
                 hex_tokens.size(),
@@ -490,11 +664,31 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
                 result.follow_data.binary_group_timeline_count,
                 expected_binary_group_count,
                 "Binary group timeline count should match the transport-specific grouping.");
+            if (item.mode == BAG_TRANSPORT_MINI) {
+                bool saw_dash_duration = false;
+                for (std::size_t index = 0; index < result.follow_data.binary_group_timeline_count; ++index) {
+                    const auto& entry = binary_entries[index];
+                    test::AssertEq(
+                        entry.bit_count,
+                        static_cast<std::size_t>(1),
+                        "Mini Morse follow groups should advance one source element at a time.");
+                    saw_dash_duration = saw_dash_duration ||
+                                        entry.sample_count >=
+                                            static_cast<std::size_t>(config_case.frame_samples) * 3U;
+                }
+                test::AssertTrue(
+                    saw_dash_duration,
+                    "Mini Morse follow should keep dash length in sample_count, not bit_count.");
+            }
             AssertFollowTimelineIsContinuous(
                 result.follow_data,
                 std::vector<bag_payload_follow_binary_group_entry>(
                     binary_entries.begin(),
-                    binary_entries.begin() + result.follow_data.binary_group_timeline_count));
+                    binary_entries.begin() + result.follow_data.binary_group_timeline_count),
+                (item.mode == BAG_TRANSPORT_FLASH &&
+                        (item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY ||
+                         item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_COLLAPSE)) ||
+                    item.mode == BAG_TRANSPORT_MINI);
 
             bag_free_encode_result(&result);
         }
@@ -720,12 +914,14 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
         bag_flash_signal_profile signal_profile;
         bag_flash_voicing_flavor voicing_flavor;
         std::size_t expected_payload_multiplier;
-        std::size_t expected_payload_begin_multiplier;
+        std::size_t expected_payload_begin_frame_multiplier;
+        double expected_payload_begin_seconds;
     };
-    const std::array<StyleCase, 3> cases = {{
-        {BAG_FLASH_SIGNAL_PROFILE_CODED_BURST, BAG_FLASH_VOICING_FLAVOR_CODED_BURST, 1, 3},
-        {BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT, BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT, 3, 16},
-        {BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL, BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL, 5, 24},
+    const std::array<StyleCase, 4> cases = {{
+        {BAG_FLASH_SIGNAL_PROFILE_STEADY, BAG_FLASH_VOICING_FLAVOR_STEADY, 1, 3, 0.0},
+        {BAG_FLASH_SIGNAL_PROFILE_LITANY, BAG_FLASH_VOICING_FLAVOR_LITANY, 6, 0, 1.35},
+        {BAG_FLASH_SIGNAL_PROFILE_HOSTILE, BAG_FLASH_VOICING_FLAVOR_HOSTILE, 1, 3, 0.0},
+        {BAG_FLASH_SIGNAL_PROFILE_COLLAPSE, BAG_FLASH_VOICING_FLAVOR_COLLAPSE, 1, 3, 0.0},
     }};
     const auto config_case = test::ConfigCases().front();
 
@@ -752,7 +948,12 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
             "Structured flash encode should succeed for timing assertions.");
         test::AssertEq(
             result.follow_data.payload_begin_sample,
-            static_cast<std::size_t>(config_case.frame_samples) * item.expected_payload_begin_multiplier,
+            item.expected_payload_begin_frame_multiplier > 0
+                ? static_cast<std::size_t>(config_case.frame_samples) *
+                      item.expected_payload_begin_frame_multiplier
+                : static_cast<std::size_t>(
+                      std::lround(static_cast<double>(config_case.sample_rate_hz) *
+                                  item.expected_payload_begin_seconds)),
             "Flash follow payload begin should stay style-aware.");
         test::AssertTrue(
             result.follow_data.binary_group_timeline_count > 0,
@@ -1179,7 +1380,7 @@ void TestApiStructuredDecodePublishesTextFollowAndKeepsRawOnlyFallback() {
     const auto lyric_lines =
         SplitLineSeparatedTokens(std::string(lyric_lines_buffer.data(), result.text_follow_data.lyric_lines_size));
     test::AssertTrue(result.text_follow_data.available != 0, "Structured decode should publish text follow.");
-    test::AssertEq(tokens.size(), static_cast<std::size_t>(2), "Decoded text should reuse the tokenized text follow.");
+    test::AssertEq(tokens.size(), static_cast<std::size_t>(3), "Decoded text should reuse the tokenized text follow.");
     test::AssertEq(
         lyric_lines.size(),
         static_cast<std::size_t>(2),
@@ -1630,6 +1831,10 @@ void TestApiValidationHelpers() {
         "Mode parser should accept ultra.");
     test::AssertEq(mode, BAG_TRANSPORT_ULTRA, "Mode parser should map ultra correctly.");
     test::AssertTrue(
+        bag_try_parse_transport_mode("mini", &mode) != 0,
+        "Mode parser should accept mini.");
+    test::AssertEq(mode, BAG_TRANSPORT_MINI, "Mode parser should map mini correctly.");
+    test::AssertTrue(
         bag_try_parse_transport_mode("warp", &mode) == 0,
         "Mode parser should reject unsupported values.");
 
@@ -1637,6 +1842,10 @@ void TestApiValidationHelpers() {
         std::string(bag_transport_mode_name(BAG_TRANSPORT_PRO)),
         std::string("pro"),
         "Mode name helper should return the stable CLI spelling.");
+    test::AssertEq(
+        std::string(bag_transport_mode_name(BAG_TRANSPORT_MINI)),
+        std::string("mini"),
+        "Mode name helper should return the stable Morse spelling.");
 
     const auto config_case = test::ConfigCases().front();
     auto pro_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_PRO);
@@ -1659,6 +1868,17 @@ void TestApiValidationHelpers() {
         bag_validate_encode_request(&ultra_config, test::BuildTooLongUltraCorpus().c_str()),
         BAG_VALIDATION_OK,
         "Validation helper should reflect that ultra no longer inherits the compat frame limit.");
+
+    auto mini_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
+    const auto mini_non_morse = test::Utf8Literal(u8"中文");
+    test::AssertEq(
+        bag_validate_encode_request(&mini_config, mini_non_morse.c_str()),
+        BAG_VALIDATION_MINI_MORSE_ONLY,
+        "Validation helper should expose the mini Morse-compatible text rule.");
+    test::AssertContains(
+        bag_validation_issue_message(BAG_VALIDATION_MINI_MORSE_ONLY),
+        "Morse",
+        "Validation helper message should explain the mini Morse-only rule.");
 
     auto invalid_decoder = MakeDecoderConfig(config_case, static_cast<bag_transport_mode>(99));
     test::AssertEq(
@@ -1700,6 +1920,7 @@ void RegisterApiSyncTests(test::Runner& runner) {
     runner.Add("Api.FlashRoundTripAcrossCorpusAndConfigs", TestApiFlashRoundTripAcrossCorpusAndConfigs);
     runner.Add("Api.ProRoundTripAcrossCorpusAndConfigs", TestApiProRoundTripAcrossCorpusAndConfigs);
     runner.Add("Api.UltraRoundTripAcrossCorpusAndConfigs", TestApiUltraRoundTripAcrossCorpusAndConfigs);
+    runner.Add("Api.MiniMorseRoundTripAcrossConfigs", TestApiMiniMorseRoundTripAcrossConfigs);
     runner.Add("Api.EncodeRejectsInvalidArguments", TestApiEncodeRejectsInvalidArguments);
     runner.Add("Api.CreateDecoderRejectsInvalidArguments", TestApiCreateDecoderRejectsInvalidArguments);
     runner.Add("Api.PollAndResetLifecycle", TestApiPollAndResetLifecycle);

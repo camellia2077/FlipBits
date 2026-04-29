@@ -47,24 +47,31 @@ bag::CoreConfig MakeFlashCoreConfig() {
     return config;
 }
 
-bag::CoreConfig MakeRitualFlashCoreConfig() {
+bag::CoreConfig MakeLitanyFlashCoreConfig() {
     auto config = MakeFlashCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kRitualChant;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kRitualChant;
+    config.flash_signal_profile = bag::FlashSignalProfile::kLitany;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
     return config;
 }
 
-bag::CoreConfig MakeDeepRitualFlashCoreConfig() {
+bag::CoreConfig MakeHostileFlashCoreConfig() {
     auto config = MakeFlashCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kDeepRitual;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kDeepRitual;
+    config.flash_signal_profile = bag::FlashSignalProfile::kHostile;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostile;
+    return config;
+}
+
+bag::CoreConfig MakeCollapseFlashCoreConfig() {
+    auto config = MakeFlashCoreConfig();
+    config.flash_signal_profile = bag::FlashSignalProfile::kCollapse;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kCollapse;
     return config;
 }
 
 bag::CoreConfig MakeExplicitDecoupledFlashCoreConfig() {
     auto config = MakeFlashCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kCodedBurst;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kRitualChant;
+    config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
     return config;
 }
 

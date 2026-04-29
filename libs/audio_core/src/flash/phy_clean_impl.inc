@@ -17,23 +17,25 @@ namespace {
 FlashSignalProfile NormalizeFormalSignalProfile(
     FlashSignalProfile signal_profile) {
   switch (signal_profile) {
-    case FlashSignalProfile::kCodedBurst:
-    case FlashSignalProfile::kRitualChant:
-    case FlashSignalProfile::kDeepRitual:
+    case FlashSignalProfile::kSteady:
+    case FlashSignalProfile::kLitany:
+    case FlashSignalProfile::kHostile:
+    case FlashSignalProfile::kCollapse:
       return signal_profile;
     default:
-      return FlashSignalProfile::kCodedBurst;
+      return FlashSignalProfile::kSteady;
   }
 }
 
 FlashVoicingFlavor NormalizeFormalVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
-    case FlashVoicingFlavor::kCodedBurst:
-    case FlashVoicingFlavor::kRitualChant:
-    case FlashVoicingFlavor::kDeepRitual:
+    case FlashVoicingFlavor::kSteady:
+    case FlashVoicingFlavor::kLitany:
+    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kCollapse:
       return flavor;
     default:
-      return FlashVoicingFlavor::kCodedBurst;
+      return FlashVoicingFlavor::kSteady;
   }
 }
 
@@ -81,11 +83,11 @@ struct FlashEncodeWorkBudget {
 };
 
 FlashEncodeWorkBudget BuildFlashEncodeWorkBudget(
-    const std::vector<uint8_t>& bytes, const BfskConfig& signal_config,
+    const std::vector<uint8_t>& bytes,
+    const FlashPayloadLayout& payload_layout,
     const FlashVoicingConfig& voicing_config) {
   const std::size_t bit_count = bytes.size() * static_cast<std::size_t>(8);
-  const std::size_t payload_sample_count =
-      bit_count * signal_config.samples_per_bit;
+  const std::size_t payload_sample_count = payload_layout.payload_sample_count;
   const std::size_t leading_nonpayload_samples =
       voicing_config.enable_preamble ? voicing_config.preamble_sample_count
                                      : static_cast<std::size_t>(0);
@@ -101,7 +103,7 @@ FlashEncodeWorkBudget BuildFlashEncodeWorkBudget(
 
   FlashEncodeWorkBudget budget{};
   budget.prepare_text_work = NonZeroWork(bytes.size());
-  budget.prepare_layout_work = NonZeroWork(bit_count);
+  budget.prepare_layout_work = NonZeroWork(payload_layout.chunks.size());
   budget.render_work = NonZeroWork(payload_sample_count);
   budget.postprocess_work =
       NonZeroWork(voiced_total_samples + spectral_texture_work);
@@ -110,6 +112,23 @@ FlashEncodeWorkBudget BuildFlashEncodeWorkBudget(
                       budget.render_work + budget.postprocess_work +
                       budget.finalize_work;
   return budget;
+}
+
+std::vector<uint8_t> DecodeFormalPayloadBytes(
+    const CoreConfig& config, FlashSignalProfile signal_profile,
+    FlashVoicingFlavor flavor, const std::vector<int16_t>& trimmed_payload_pcm) {
+  const BfskConfig signal_config =
+      MakeBfskConfigForSignalProfile(config, signal_profile);
+  switch (NormalizeFormalVoicingFlavor(flavor)) {
+    case FlashVoicingFlavor::kLitany:
+    case FlashVoicingFlavor::kCollapse:
+      return DecodePcm16ToBytesSkippingSilence(trimmed_payload_pcm,
+                                               signal_config);
+    case FlashVoicingFlavor::kSteady:
+    case FlashVoicingFlavor::kHostile:
+    default:
+      return DecodePcm16ToBytes(trimmed_payload_pcm, signal_config);
+  }
 }
 
 class FlashDecoder final : public ITransportDecoder {
@@ -153,9 +172,9 @@ class FlashDecoder final : public ITransportDecoder {
       const std::vector<int16_t> trimmed_payload_pcm =
           TrimFormalPayloadPcmForFlavor(config_, normalized_flavor,
                                         buffered_pcm_);
-      const std::vector<uint8_t> bytes = DecodePcm16ToBytes(
-          trimmed_payload_pcm,
-          MakeBfskConfigForSignalProfile(config_, normalized_signal_profile));
+      const std::vector<uint8_t> bytes = DecodeFormalPayloadBytes(
+          config_, normalized_signal_profile, normalized_flavor,
+          trimmed_payload_pcm);
       out_result->raw_payload_bytes = bytes;
       out_result->raw_payload_available = true;
       out_result->follow_data = BuildPayloadFollowData(config_, bytes);
@@ -287,8 +306,10 @@ ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(
         MakeBfskConfigForSignalProfile(config, normalized_signal_profile);
     const FlashVoicingConfig formal_voicing =
         MakeFormalVoicingConfigForFlavor(config, normalized_flavor);
+    const FlashPayloadLayout payload_layout =
+        BuildPayloadLayoutForVoicing(bytes, signal_config, normalized_flavor);
     const FlashEncodeWorkBudget work_budget =
-        BuildFlashEncodeWorkBudget(bytes, signal_config, formal_voicing);
+        BuildFlashEncodeWorkBudget(bytes, payload_layout, formal_voicing);
     std::size_t completed_work = work_budget.prepare_text_work;
     ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPreparingInput,
                          static_cast<float>(completed_work) /
@@ -296,8 +317,6 @@ ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(
     if (ShouldCancelEncode(progress_sink)) {
       return ErrorCode::kCancelled;
     }
-    const FlashPayloadLayout payload_layout =
-        BuildPayloadLayout(bytes, signal_config);
     completed_work += work_budget.prepare_layout_work;
     ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPreparingInput,
                          static_cast<float>(completed_work) /
@@ -312,8 +331,9 @@ ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(
         static_cast<float>(completed_work + work_budget.render_work) /
         static_cast<float>(work_budget.total_work);
     const std::vector<int16_t> clean_payload_pcm =
-        EncodeBytesToPcm16(bytes, signal_config, progress_sink,
-                           render_progress_begin, render_progress_end);
+        EncodePayloadLayoutToPcm16(payload_layout, signal_config,
+                                   progress_sink, render_progress_begin,
+                                   render_progress_end);
     completed_work += work_budget.render_work;
     const float postprocess_progress_begin =
         static_cast<float>(completed_work) /
@@ -376,9 +396,9 @@ ErrorCode DecodePcm16ToTextWithSignalProfileAndFlavor(
         NormalizeFormalVoicingFlavor(flavor);
     const std::vector<int16_t> trimmed_payload_pcm =
         TrimFormalPayloadPcmForFlavor(config, normalized_flavor, pcm);
-    const std::vector<uint8_t> bytes = DecodePcm16ToBytes(
-        trimmed_payload_pcm,
-        MakeBfskConfigForSignalProfile(config, normalized_signal_profile));
+    const std::vector<uint8_t> bytes = DecodeFormalPayloadBytes(
+        config, normalized_signal_profile, normalized_flavor,
+        trimmed_payload_pcm);
     return DecodeBytesToText(bytes, out_text);
   } catch (...) {
     return ErrorCode::kInvalidArgument;

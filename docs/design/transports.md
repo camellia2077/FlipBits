@@ -1,14 +1,14 @@
-# `flash / pro / ultra` 模式设计
+# `mini / flash / pro / ultra` 模式设计
 
-更新时间：2026-03-15
+更新时间：2026-04-30
 
 ## 总体原则
-- 三种模式按 mode-first 架构解耦。
+- 四种模式按 mode-first 架构解耦。
 - 每种模式内部至少区分：
   - 信息层：文本 / 字节 / symbol 的变换
   - clean PHY：symbol 与 PCM 的互转
 - 当前先保证“生成音频 -> 解析生成音频”闭环。
-- 当前不做复杂风格层、抗干扰、FEC、自动拆帧或复杂同步搜索。
+- 当前不做复杂风格层、抗干扰、FEC、自动拆帧、录音环境 decode 或复杂同步搜索。
 
 ## 字符集约束一览
 - `flash`
@@ -21,6 +21,11 @@
 - `ultra`
   - 面向 UTF-8 文本使用。
   - 输入文本按 UTF-8 byte 进入后续 nibble / PHY 链路。
+- `mini`
+  - Morse code 模式。
+  - 仅支持 `A-Z / 0-9 / space / 常见 Morse 标点`。
+  - 小写会在信息层规范化为大写；连续空格会折叠为单个空格，首尾空格不进入 payload。
+  - 不做录音 decode 鲁棒性承诺；当前目标是生成音频与程序内 decode 的闭环。
 
 ## `flash`
 
@@ -74,11 +79,16 @@
 - `1` 对应高频
 - `1 byte = 8 bit symbol`
 - `bag.flash.signal` 负责 clean payload render / decode 与 payload layout
-- `bag.flash.signal` 当前会按 `CoreConfig.flash_style` / `bag_api.h` 里的 `flash_style` 派生 payload timing：`coded_burst` 继续使用 `frame_samples` 作为每 bit 样本数，`ritual_chant` 则固定为 `3x` 的每 bit 时长。
-- `bag.flash.voicing` 负责 payload voicing、固定 preamble / epilogue 与 trim 相关描述信息，并已接入正式 `flash` 输出；当前内部已拆出 `coded_burst` 与 `ritual_chant` 两种 style，其中 `coded_burst` 保留 grouped burst preamble / epilogue、非语义化的唤起 / 闭锁外观、nibble / byte 层级 accent、轻度带通 / 低噪声底 / 软削波，以及 payload 内部的轻量金属层、空气层和微弱 AM 脉动，`ritual_chant` 则在更长 payload timing 的基础上继续走更连续、更具共鸣感的风格路径，并通过更长 release、更高 payload floor、更弱边界 click、更强 resonance、显著更长前后壳，以及 preamble 三段式 / epilogue 两段式的短停顿外壳弱化 bit 之间的断开感
-- formal `flash` 当前已对外暴露 preset 选择，但仍只保留 `coded_burst` / `ritual_chant` 这一组统一 style，不拆 signal / voicing 两套独立配置
-- `bag.flash.phy_clean` 负责 text facade 与 decoder 组合
-- decode 入口当前会先按 voicing trim descriptor 去掉非 payload 区域，再进入 `bag.flash.signal` 解调
+- `bag.flash.signal` 当前通过 `flash_signal_profile` 派生 payload timing：
+  - `Steady`: `1x frame_samples`
+  - `Hostile`: `1x frame_samples`
+  - `Litany`: `6x frame_samples`，可跳过 silence slot 为 `1x frame_samples`
+  - `Collapse`: `1x frame_samples`
+- `bag.flash.voicing` 负责 emotion voicing、固定 preamble / epilogue、payload texture、可跳过 silence、trim descriptor 与 trim payload。
+- formal `flash` 当前对外暴露四个用户可见 emotion preset：`Steady / Hostile / Litany / Collapse`。
+- Android 仍使用一个 flash voicing 选择器，但每个 preset 内部同时指定 `signalProfileValue` 与 `voicingFlavorValue` 两轴。
+- decode 入口当前会先按 voicing trim descriptor 去掉非 payload 区域，再进入 `bag.flash.signal` 解调；`Litany` / `Collapse` 的变长 silence payload 使用 gap-aware decode 跳过静音。
+- 四种 flash emotion 的详细设计、当前声效方法与后续调音方向见 `docs/design/flash-voicing-emotions.md`。
 
 ### 主链路文件
 - `libs/audio_core/src/flash/codec.cpp`
@@ -134,6 +144,72 @@
 - `libs/audio_core/src/ultra/codec.cpp`
 - `libs/audio_core/src/ultra/phy_clean.cpp`
 
+## `mini`
+
+### 定位
+- Morse code 文本音频模式。
+- 它不是 `pro` 的更强版本，而是面向“点 / 划 / 静音间隔”这种经典电报码听感的独立 transport。
+- `mini` 当前优先追求清晰、可解释、可视化友好的 Morse 表达；不做录音环境 decode、抗噪同步搜索或纠错。
+- Android 使用 `pro` 的示例文本族作为 `mini` 示例来源，但 `mini` 会按 Morse 规则校验和规范化输入。
+
+### 输入规范
+- 支持：
+  - `A-Z`
+  - `0-9`
+  - space
+  - 常见 International Morse punctuation：`.,?'!/()&:;=+-_"$@`
+- 小写输入会自动转成大写。
+- 多个连续空格会折叠为一个空格。
+- 开头和结尾的空格不会进入 payload。
+- 非支持字符应在校验阶段失败，公共 API 通过 `BAG_VALIDATION_MINI_MORSE_ONLY` 暴露失败语义。
+- Android 输入区会显示 normalization 预览、Morse 点划预览与 unsupported character 提示；这些 UI 提示是编辑辅助，不改变 core 的最终校验权威。
+
+### 信息层
+- 输入文本先规范化为 Morse-compatible text。
+- 规范化后的每个字符仍以 byte 形式保存到 payload 中：
+  - 字母 / 数字 / 标点保存其 ASCII byte
+  - space 保存为 `0x20`
+- 与 `flash` 不同，`mini` 不是原始 byte 透明传输；它只接受 Morse 表中存在的字符。
+- 与 `pro` 不同，`mini` 的 payload byte 不是再拆成 nibble symbol，而是通过 Morse 表映射到 dot / dash pattern。
+- decode 后返回的是规范化文本：
+  - 例如 `"praise   the omnissiah"` roundtrip 后返回 `"PRAISE THE OMNISSIAH"`。
+
+### 音频层
+- 使用 clean Morse tone PHY。
+- 基本单位为 `frame_samples`：
+  - dot：`1` unit tone
+  - dash：`3` unit tone
+  - 同一字符内部 dot/dash 之间：`1` unit silence
+  - 字符之间：`3` unit silence
+  - 单词之间：`7` unit silence
+- `mini` 的静音是协议语义的一部分，不是装饰层；visual 和 follow 都应该把 silence 留空，而不是画成 tone。
+- Android speed preset 通过改变 `frame_samples` 控制 unit 长度：
+  - `Slow`: `1.5x`
+  - `Standard`: `1.0x`
+  - `Fast`: `0.5x`
+- WAV metadata 保存实际使用的 `frame_samples`，这样保存后的音频重新加载时仍能按当时的 Morse speed 对齐播放、visual 与 decode。
+
+### Follow / Visual
+- `BuildPayloadFollowData` 对 `mini` 发布两层 timeline：
+  - `byte_timeline`：按规范化字符跟随，字符跨度包含该字符 tone 与后续协议 silence。
+  - `binary_group_timeline`：按 Morse tone element 跟随，只发布 dot / dash，不发布 silence。
+- Text lyrics 使用规范化后的文本，因此小写和连续空格输入不会导致 lyrics token 与 payload byte 错位。
+- Morse lyrics 显示 dot/dash pattern，例如 `.--. .-. .- .. ... .`，按 dot / dash element 高亮。
+- Android 的 Morse Timeline Visual 使用朴素 block：
+  - dot / dash 是实心块
+  - dash 比 dot 更长
+  - silence gap 保持空白
+  - 不显示无意义背景竖线
+
+### 主链路文件
+- `libs/audio_core/src/mini/codec.cpp`
+- `libs/audio_core/src/mini/phy_clean.cpp`
+- `libs/audio_core/src/transport/follow.cpp`
+- `libs/audio_core/src/transport/transport.cpp`
+- Android package lane 对应：
+  - `apps/audio_android/native_package/src/audio_core_mini_codec.cpp`
+  - `apps/audio_android/native_package/src/audio_core_mini_phy_clean.cpp`
+
 ## 外部统一入口
 - transport 分发：
   - `libs/audio_core/src/transport/transport.cpp`
@@ -145,4 +221,5 @@
 - FEC / CRC / 重传
 - 多帧拆分与长文本协议
 - 真实环境同步搜索
+- `mini` 的录音环境 decode 鲁棒性
 - 噪声、衰减、截断下的鲁棒性承诺

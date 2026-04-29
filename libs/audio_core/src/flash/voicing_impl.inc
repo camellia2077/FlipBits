@@ -15,51 +15,64 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
   FlashVoicingConfig voicing{};
   voicing.sample_rate_hz = config.sample_rate_hz;
   switch (NormalizeVoicingFlavor(flavor)) {
-    case FlashVoicingFlavor::kDeepRitual:
-      voicing.attack_ratio = 0.04;
-      voicing.release_ratio = 0.06;
-      voicing.second_harmonic_gain = 0.028;
-      voicing.third_harmonic_gain = 0.004;
-      voicing.boundary_click_gain = 0.006;
-      voicing.enable_preamble = true;
-      voicing.enable_epilogue = true;
-      voicing.preamble_sample_count =
-          config.frame_samples > 0
-              ? static_cast<std::size_t>(config.frame_samples) *
-                    static_cast<std::size_t>(24)
-              : static_cast<std::size_t>(0);
-      voicing.epilogue_sample_count =
-          config.frame_samples > 0
-              ? static_cast<std::size_t>(config.frame_samples) *
-                    static_cast<std::size_t>(14)
-              : static_cast<std::size_t>(0);
-      break;
-    case FlashVoicingFlavor::kRitualChant:
+    case FlashVoicingFlavor::kLitany:
       voicing.attack_ratio = 0.05;
       voicing.release_ratio = 0.05;
-      voicing.second_harmonic_gain = 0.032;
-      voicing.third_harmonic_gain = 0.004;
-      voicing.boundary_click_gain = 0.008;
+      voicing.second_harmonic_gain = 0.008;
+      voicing.third_harmonic_gain = 0.001;
+      voicing.boundary_click_gain = 0.002;
+      voicing.enable_preamble = true;
+      voicing.enable_epilogue = true;
+      voicing.preamble_sample_count =
+          SecondsToSampleCount(config.sample_rate_hz, kLitanyPreambleSeconds);
+      voicing.epilogue_sample_count =
+          SecondsToSampleCount(config.sample_rate_hz, kLitanyEpilogueSeconds);
+      break;
+    case FlashVoicingFlavor::kHostile:
+      voicing.attack_ratio = 0.035;
+      voicing.release_ratio = 0.045;
+      voicing.second_harmonic_gain = 0.095;
+      voicing.third_harmonic_gain = 0.045;
+      voicing.boundary_click_gain = 0.022;
       voicing.enable_preamble = true;
       voicing.enable_epilogue = true;
       voicing.preamble_sample_count =
           config.frame_samples > 0
               ? static_cast<std::size_t>(config.frame_samples) *
-                    static_cast<std::size_t>(16)
+                    static_cast<std::size_t>(3)
               : static_cast<std::size_t>(0);
       voicing.epilogue_sample_count =
           config.frame_samples > 0
               ? static_cast<std::size_t>(config.frame_samples) *
-                    static_cast<std::size_t>(8)
+                    static_cast<std::size_t>(3)
               : static_cast<std::size_t>(0);
       break;
-    case FlashVoicingFlavor::kCodedBurst:
+    case FlashVoicingFlavor::kCollapse:
+      voicing.attack_ratio = 0.10;
+      voicing.release_ratio = 0.12;
+      voicing.second_harmonic_gain = 0.035;
+      voicing.third_harmonic_gain = 0.006;
+      voicing.boundary_click_gain = 0.010;
+      voicing.enable_preamble = true;
+      voicing.enable_epilogue = true;
+      voicing.preamble_sample_count =
+          config.frame_samples > 0
+              ? static_cast<std::size_t>(config.frame_samples) *
+                    static_cast<std::size_t>(3)
+              : static_cast<std::size_t>(0);
+      voicing.epilogue_sample_count =
+          config.frame_samples > 0
+              ? static_cast<std::size_t>(config.frame_samples) *
+                    static_cast<std::size_t>(3)
+              : static_cast<std::size_t>(0);
+      break;
+    case FlashVoicingFlavor::kSteady:
     default:
-      voicing.attack_ratio = 0.08;
-      voicing.release_ratio = 0.08;
-      voicing.second_harmonic_gain = 0.06;
-      voicing.third_harmonic_gain = 0.012;
-      voicing.boundary_click_gain = 0.012;
+      voicing.attack_ratio = 0.045;
+      voicing.release_ratio = 0.045;
+      voicing.second_harmonic_gain = 0.020;
+      voicing.third_harmonic_gain = 0.002;
+      voicing.boundary_click_gain = 0.006;
       voicing.enable_preamble = true;
       voicing.enable_epilogue = true;
       voicing.preamble_sample_count =
@@ -122,7 +135,7 @@ FlashVoicingResult ApplyVoicingToPayload(
     const EncodeProgressSink* progress_sink, float progress_begin,
     float progress_end) {
   return ApplyVoicingToPayloadWithFlavor(
-      clean_payload_pcm, payload_layout, FlashVoicingFlavor::kCodedBurst,
+      clean_payload_pcm, payload_layout, FlashVoicingFlavor::kSteady,
       config, progress_sink, progress_begin, progress_end);
 }
 
@@ -135,6 +148,12 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
   const SanitizedVoicingConfig sanitized = SanitizeVoicingConfig(config);
   const VoicingStyleTraits style_traits = MakeFlavorTraits(flavor);
   const bool use_layered_timbre = ShouldApplyLayeredTimbre(config);
+  const bool use_chant_drone = style_traits.chant_drone_gain > 0.0;
+  const bool use_mechanical_throat =
+      style_traits.mechanical_throat_gain > 0.0;
+  const bool use_steady_low_voice =
+      use_layered_timbre && style_traits.steady_low_voice_gain > 0.0;
+  const bool use_hostile_edge = style_traits.hostile_edge_gain > 0.0;
   const FlashVoicingDescriptor descriptor = DescribeVoicingOutput(
       clean_payload_pcm.size() + LeadingNonpayloadSamples(config) +
           TrailingNonpayloadSamples(config),
@@ -197,6 +216,29 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
             sanitized.release_ratio * style_traits.payload_release_scale,
             chunk.sample_count));
     const size_t click_window = ComputeClickWindow(chunk.sample_count);
+    const double litany_text_pause_weight =
+        ComputeLitanyTextPauseWeight(payload_layout, chunk_index);
+    const double collapse_hesitation_weight =
+        ComputeCollapseHesitationWeight(chunk, chunk_index, style_traits);
+
+    if (chunk.kind == FlashPayloadSegmentKind::kSilence) {
+      for (size_t local_index = 0; local_index < chunk.sample_count;
+           ++local_index) {
+        const size_t sample_index = descriptor.leading_nonpayload_samples +
+                                    chunk.sample_offset + local_index;
+        result.pcm[sample_index] = 0;
+        ++completed_postprocess_work;
+        MaybeReportCompletedSampleProgress(
+            progress_sink, EncodeProgressPhase::kPostprocessing,
+            progress_begin, progress_end, completed_postprocess_work,
+            total_postprocess_work, &last_reported_postprocess_work);
+      }
+      MaybeReportCompletedSampleProgress(
+          progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
+          progress_end, completed_postprocess_work, total_postprocess_work,
+          &last_reported_postprocess_work, true);
+      continue;
+    }
 
     for (size_t local_index = 0; local_index < chunk.sample_count;
          ++local_index) {
@@ -211,15 +253,30 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
       const double envelope =
           base_envelope +
           style_traits.payload_envelope_floor * (1.0 - base_envelope);
+      const double phrase_articulation = ComputeLitanyPhraseArticulation(
+          chunk_index, local_index, chunk.sample_count, style_traits);
+      const double litany_text_articulation =
+          ComputeLitanyTextPauseArticulation(litany_text_pause_weight,
+                                             local_index, chunk.sample_count,
+                                             style_traits);
+      const double collapse_hesitation_articulation =
+          ComputeCollapseHesitationArticulation(collapse_hesitation_weight,
+                                                local_index, chunk.sample_count,
+                                                style_traits);
+      const double payload_articulation = phrase_articulation *
+                                          litany_text_articulation *
+                                          collapse_hesitation_articulation;
       const double harmonic_mix =
-          envelope * ComputeHarmonicSample(sanitized.second_harmonic_gain, 2,
-                                           chunk.carrier_freq_hz, local_index,
-                                           sanitized.sample_rate_hz) +
-          envelope * ComputeHarmonicSample(sanitized.third_harmonic_gain, 3,
-                                           chunk.carrier_freq_hz, local_index,
-                                           sanitized.sample_rate_hz);
+          envelope * payload_articulation *
+              ComputeHarmonicSample(sanitized.second_harmonic_gain, 2,
+                                    chunk.carrier_freq_hz, local_index,
+                                    sanitized.sample_rate_hz) +
+          envelope * payload_articulation *
+              ComputeHarmonicSample(sanitized.third_harmonic_gain, 3,
+                                    chunk.carrier_freq_hz, local_index,
+                                    sanitized.sample_rate_hz);
       const double metallic_layer =
-          use_layered_timbre ? envelope *
+          use_layered_timbre ? envelope * payload_articulation *
                                    ComputeSecondaryMetallicLayer(
                                        chunk.carrier_freq_hz, local_index,
                                        sanitized.sample_rate_hz) *
@@ -227,10 +284,38 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
                              : 0.0;
       const double chant_resonance =
           use_layered_timbre
-              ? envelope * ComputeChantResonanceLayer(
+              ? envelope * payload_articulation * ComputeChantResonanceLayer(
                                chunk.carrier_freq_hz, payload_sample_index,
                                sanitized.sample_rate_hz,
                                style_traits.chant_resonance_gain)
+              : 0.0;
+      const double chant_drone =
+          use_chant_drone
+              ? envelope * payload_articulation *
+                    ComputeChantDroneLayer(payload_sample_index,
+                                           sanitized.sample_rate_hz,
+                                           style_traits.chant_drone_gain)
+              : 0.0;
+      const double mechanical_throat =
+          use_mechanical_throat
+              ? envelope * payload_articulation *
+                    ComputeMechanicalThroatLayer(
+                        payload_sample_index, sanitized.sample_rate_hz,
+                        style_traits.mechanical_throat_gain)
+              : 0.0;
+      const double steady_low_voice =
+          use_steady_low_voice
+              ? envelope * payload_articulation *
+                    ComputeSteadyLowVoiceLayer(payload_sample_index,
+                                               sanitized.sample_rate_hz,
+                                               style_traits)
+              : 0.0;
+      const double hostile_edge =
+          use_hostile_edge
+              ? envelope * payload_articulation *
+                    ComputeHostileEdgeLayer(chunk.carrier_freq_hz, local_index,
+                                            sanitized.sample_rate_hz,
+                                            style_traits.hostile_edge_gain)
               : 0.0;
       const double boundary_click =
           ComputeBoundaryClick(sanitized.boundary_click_gain, style_traits,
@@ -240,13 +325,20 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
               ? ComputePayloadTremolo(payload_sample_index,
                                       sanitized.sample_rate_hz, style_traits)
               : 1.0;
+      const double collapse_tremor =
+          ComputeCollapseTremor(payload_sample_index, sanitized.sample_rate_hz,
+                                style_traits);
+      const double chant_swell = ComputeChantSwellGain(
+          payload_sample_index, sanitized.sample_rate_hz, style_traits);
 
-      const double voiced_sample =
-          std::clamp((clean_sample * envelope + harmonic_mix + metallic_layer +
-                      chant_resonance) *
-                             tremolo +
-                         boundary_click,
-                     -1.0, 1.0);
+      const double mixed_sample =
+          (clean_sample * envelope * payload_articulation + harmonic_mix +
+           metallic_layer + chant_resonance + chant_drone +
+           mechanical_throat + steady_low_voice + hostile_edge) *
+              tremolo * collapse_tremor * chant_swell +
+          boundary_click;
+      const double voiced_sample = std::clamp(
+          ApplyPayloadSoftClip(mixed_sample, style_traits), -1.0, 1.0);
       result.pcm[sample_index] =
           static_cast<int16_t>(std::lround(voiced_sample * kPcmScale));
       ++completed_postprocess_work;

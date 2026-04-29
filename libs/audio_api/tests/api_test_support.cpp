@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <string>
 #include <thread>
 #include <vector>
@@ -44,6 +45,89 @@ std::size_t RoundHalfUpFrameScale(int frame_samples, int numerator, int denomina
                : static_cast<std::size_t>(0);
 }
 
+std::size_t SecondsToSampleCount(int sample_rate_hz, double seconds) {
+    return sample_rate_hz > 0 && seconds > 0.0
+               ? static_cast<std::size_t>(std::lround(static_cast<double>(sample_rate_hz) * seconds))
+               : static_cast<std::size_t>(0);
+}
+
+bool IsUtf8ContinuationByte(unsigned char value) {
+    return (value & 0xC0U) == 0x80U;
+}
+
+bool IsLikelyUtf8CodePointBoundaryAfter(const std::string& text, std::size_t byte_index) {
+    return byte_index + static_cast<std::size_t>(1) >= text.size() ||
+           !IsUtf8ContinuationByte(static_cast<unsigned char>(text[byte_index + static_cast<std::size_t>(1)]));
+}
+
+bool EndsWithUtf8Bytes(const std::string& text,
+                       std::size_t byte_index,
+                       unsigned char first,
+                       unsigned char second,
+                       unsigned char third) {
+    if (byte_index < static_cast<std::size_t>(2)) {
+        return false;
+    }
+    return static_cast<unsigned char>(text[byte_index - static_cast<std::size_t>(2)]) == first &&
+           static_cast<unsigned char>(text[byte_index - static_cast<std::size_t>(1)]) == second &&
+           static_cast<unsigned char>(text[byte_index]) == third;
+}
+
+std::size_t LitanyPauseSlotCountAfterByte(const std::string& text, std::size_t byte_index) {
+    const unsigned char value = static_cast<unsigned char>(text[byte_index]);
+    switch (value) {
+    case static_cast<unsigned char>(' '):
+    case static_cast<unsigned char>('\t'):
+        return 3;
+    case static_cast<unsigned char>('\n'):
+    case static_cast<unsigned char>('\r'):
+        return 6;
+    case static_cast<unsigned char>(','):
+    case static_cast<unsigned char>(';'):
+    case static_cast<unsigned char>(':'):
+        return 4;
+    case static_cast<unsigned char>('.'):
+    case static_cast<unsigned char>('!'):
+    case static_cast<unsigned char>('?'):
+        return 8;
+    default:
+        break;
+    }
+
+    if (EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x8C) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x9B) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x9A)) {
+        return 4;
+    }
+    if (EndsWithUtf8Bytes(text, byte_index, 0xE3, 0x80, 0x82) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x81) ||
+        EndsWithUtf8Bytes(text, byte_index, 0xEF, 0xBC, 0x9F)) {
+        return 8;
+    }
+    if (byte_index + static_cast<std::size_t>(1) >= text.size() ||
+        !IsLikelyUtf8CodePointBoundaryAfter(text, byte_index)) {
+        return 1;
+    }
+
+    const std::size_t cadence_position = byte_index + static_cast<std::size_t>(1);
+    if ((cadence_position % static_cast<std::size_t>(12)) == 0) {
+        return 5;
+    }
+    return 1;
+}
+
+std::size_t LitanyPauseSlotCount(const std::string& text) {
+    std::size_t pause_slots = 0;
+    for (std::size_t byte_index = 0; byte_index < text.size(); ++byte_index) {
+        pause_slots += static_cast<std::size_t>(14) + LitanyPauseSlotCountAfterByte(text, byte_index);
+    }
+    return pause_slots;
+}
+
+std::size_t LitanyPauseSampleCount(const std::string& text, std::size_t silence_slot_samples) {
+    return LitanyPauseSlotCount(text) * silence_slot_samples;
+}
+
 std::size_t ExpectedFlashSampleCount(const std::string& text,
                                      const test::ConfigCase& config_case,
                                      bag_flash_signal_profile flash_signal_profile,
@@ -51,24 +135,26 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
     const std::size_t frame_samples =
         config_case.frame_samples > 0 ? static_cast<std::size_t>(config_case.frame_samples) : static_cast<std::size_t>(0);
     const std::size_t payload_samples_per_bit =
-        flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_DEEP_RITUAL
-            ? RoundHalfUpFrameScale(config_case.frame_samples, 5, 1)
-            : flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_RITUAL_CHANT
-                  ? RoundHalfUpFrameScale(config_case.frame_samples, 3, 1)
-                  : frame_samples;
+        flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_LITANY
+            ? RoundHalfUpFrameScale(config_case.frame_samples, 6, 1)
+            : frame_samples;
+    const std::size_t payload_samples_per_litany_silence_slot =
+        flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_LITANY
+            ? frame_samples
+            : payload_samples_per_bit;
     const std::size_t leading_nonpayload_samples =
-        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL
-            ? frame_samples * static_cast<std::size_t>(24)
-            : flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
-                  ? frame_samples * static_cast<std::size_t>(16)
-                  : frame_samples * static_cast<std::size_t>(3);
+        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY
+            ? SecondsToSampleCount(config_case.sample_rate_hz, 1.35)
+            : frame_samples * static_cast<std::size_t>(3);
     const std::size_t trailing_nonpayload_samples =
-        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_DEEP_RITUAL
-            ? frame_samples * static_cast<std::size_t>(14)
-            : flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_RITUAL_CHANT
-                  ? frame_samples * static_cast<std::size_t>(8)
-                  : frame_samples * static_cast<std::size_t>(3);
+        flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY
+            ? SecondsToSampleCount(config_case.sample_rate_hz, 1.15)
+            : frame_samples * static_cast<std::size_t>(3);
+    const bool uses_litany_pauses = flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY;
     return text.size() * static_cast<std::size_t>(8) * payload_samples_per_bit +
+           (uses_litany_pauses
+                ? LitanyPauseSampleCount(text, payload_samples_per_litany_silence_slot)
+                : static_cast<std::size_t>(0)) +
            leading_nonpayload_samples +
            trailing_nonpayload_samples;
 }
