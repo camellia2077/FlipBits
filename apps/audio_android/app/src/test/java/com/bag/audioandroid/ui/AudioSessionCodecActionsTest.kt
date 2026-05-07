@@ -281,6 +281,108 @@ class AudioSessionCodecActionsTest {
         }
 
     @Test
+    fun `file backed segmented generation does not allocate wav probe pcm`() =
+        runTest {
+            val longText = "A".repeat(1_025)
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeTextBlock = { text, _ ->
+                                EncodeAudioResult.Success(ShortArray(text.length))
+                            },
+                        ),
+                    audioIoGateway = CodecFakeAudioIoGateway(failOnEncode = true),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = longText)
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.currentSession
+            val wavInfo = session.generatedWavAudioInfo
+            assertEquals(0, session.generatedPcm.size)
+            assertTrue(session.generatedPcmFilePath?.let { File(it).exists() } == true)
+            assertTrue(wavInfo.isWavSuccess)
+            assertEquals(session.generatedAudioMetadata?.pcmSampleCount?.toLong(), wavInfo.pcmSampleCount)
+            assertEquals(wavInfo.pcmSampleCount * 2L, wavInfo.dataByteCount)
+            assertEquals(44L + wavInfo.dataByteCount, wavInfo.fileByteCount)
+        }
+
+    @Test
+    fun `very long flash payload still hydrates follow data for visual and lyrics`() =
+        runTest {
+            val longText = "汉".repeat(8_832)
+            val segmentSamples = 110_250
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeTextBlock = { text, _ ->
+                                EncodeAudioResult.Success(ShortArray(text.length / 3 + segmentSamples))
+                            },
+                            buildFollowDataBlock = { text ->
+                                val byteCount = text.toByteArray(UTF_8).size
+                                val sampleCount = text.length / 3 + segmentSamples
+                                DefaultFollowData.copy(
+                                    textTokens = listOf(text),
+                                    textTokenTimeline = listOf(TextFollowTimelineEntry(0, sampleCount, 0)),
+                                    lyricLines = listOf(text),
+                                    lyricLineTimeline = listOf(TextFollowLyricLineTimelineEntry(0, sampleCount, 0)),
+                                    lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 1)),
+                                    hexTokens = List(byteCount) { "E6" },
+                                    binaryTokens = List(byteCount) { "11100110" },
+                                    byteTimeline = List(byteCount) { index -> PayloadFollowByteTimelineEntry(index * 8, 8, index) },
+                                    binaryGroupTimeline =
+                                        List(byteCount) { index ->
+                                            PayloadFollowBinaryGroupTimelineEntry(index * 8, 8, index, index * 8, 8)
+                                        },
+                                    payloadSampleCount = byteCount * 8,
+                                    totalPcmSampleCount = sampleCount,
+                                )
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    transportMode = TransportModeOption.Flash,
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = longText)
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.currentSession
+            assertEquals(26_496, session.generatedAudioMetadata?.payloadByteCount)
+            assertTrue((session.generatedAudioMetadata?.segmentCount ?: 0) > 8)
+            assertEquals(0, session.generatedPcm.size)
+            assertTrue(session.generatedWaveformPcm.isNotEmpty())
+            assertTrue(session.followWindowSource != null)
+            assertTrue(session.followWindow.endSampleExclusive < session.generatedAudioMetadata!!.pcmSampleCount)
+            assertTrue(session.flashVisualWindowSource != null)
+            assertTrue(session.flashVisualWindow.available)
+            assertTrue(session.flashVisualWindow.segments.isNotEmpty())
+            assertTrue(session.followData.followAvailable)
+            assertTrue(session.followData.textFollowAvailable)
+            assertTrue(session.followData.lyricLineFollowAvailable)
+            assertTrue(session.followData.binaryGroupTimeline.isNotEmpty())
+            assertTrue(session.followData.textTokens.size < session.generatedAudioMetadata!!.segmentCount)
+        }
+
+    @Test
     fun `segmented long duration still hydrates follow data`() =
         runTest {
             val longText = "A".repeat(513)
@@ -401,6 +503,7 @@ class AudioSessionCodecActionsTest {
     private fun createFixture(
         gateway: AudioCodecGateway,
         testScope: TestScope,
+        audioIoGateway: AudioIoGateway = CodecFakeAudioIoGateway(),
     ): Fixture {
         val dispatcher = StandardTestDispatcher(testScope.testScheduler)
         val uiState = MutableStateFlow(AudioAppUiState())
@@ -409,7 +512,7 @@ class AudioSessionCodecActionsTest {
                 uiState = uiState,
                 scope = CoroutineScope(dispatcher),
                 audioCodecGateway = gateway,
-                audioIoGateway = CodecFakeAudioIoGateway(),
+                audioIoGateway = audioIoGateway,
                 sessionStateStore = AudioSessionStateStore(uiState),
                 uiTextMapper = BagUiTextMapper(),
                 playbackRuntimeGateway = FakePlaybackRuntimeGateway(),
@@ -576,12 +679,17 @@ private class FakePlaybackRuntimeGateway : PlaybackRuntimeGateway {
     override fun totalMs(state: PlaybackUiState): Long = 0L
 }
 
-private class CodecFakeAudioIoGateway : AudioIoGateway {
+private class CodecFakeAudioIoGateway(
+    private val failOnEncode: Boolean = false,
+) : AudioIoGateway {
     override fun encodeMonoPcm16ToWavBytes(
         sampleRateHz: Int,
         pcm: ShortArray,
         metadata: GeneratedAudioMetadata?,
-    ): ByteArray = ByteArray(44 + pcm.size * 2)
+    ): ByteArray {
+        check(!failOnEncode) { "WAV encode should not be called for file-backed generated audio." }
+        return ByteArray(44 + pcm.size * 2)
+    }
 
     override fun decodeMonoPcm16WavBytes(wavBytes: ByteArray): DecodedAudioData =
         DecodedAudioData(

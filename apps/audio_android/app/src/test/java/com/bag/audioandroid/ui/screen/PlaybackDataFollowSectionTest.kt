@@ -142,6 +142,33 @@ class PlaybackDataFollowSectionTest {
     }
 
     @Test
+    fun `wide lyrics token card stays inside strip for long ukrainian token`() {
+        composeRule.setContent {
+            Box(
+                modifier =
+                    androidx.compose.ui.Modifier
+                        .width(360.dp),
+            ) {
+                PlaybackDataFollowSection(
+                    followData = ukrainianFollowData(),
+                    displayedSamples = 0,
+                    transportMode = TransportModeOption.Flash,
+                )
+            }
+        }
+        composeRule.waitForIdle()
+
+        val stripBounds = composeRule.onNodeWithTag("follow-token-strip").getUnclippedBoundsInRoot()
+        val activeBounds =
+            composeRule
+                .onNodeWithTag("follow-token-active", useUnmergedTree = true)
+                .getUnclippedBoundsInRoot()
+
+        assertTrue(activeBounds.left >= stripBounds.left)
+        assertTrue(activeBounds.right <= stripBounds.right)
+    }
+
+    @Test
     fun `main token strip card is preview only and does not seek`() {
         var seekTarget: Int? = null
         composeRule.setContent {
@@ -251,6 +278,34 @@ class PlaybackDataFollowSectionTest {
             )
 
         assertEquals(listOf("11100110", "10011100", "10111010"), annotation)
+    }
+
+    @Test
+    fun `annotation rows fit more byte groups when lyrics card is wide`() {
+        assertEquals(8, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 320f))
+        assertEquals(6, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 288f))
+        assertEquals(4, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 220f))
+        assertEquals(4, annotationByteGroupsPerRow(PlaybackFollowViewMode.Binary, availableWidthDp = 320f))
+        assertEquals(3, annotationByteGroupsPerRow(PlaybackFollowViewMode.Binary, availableWidthDp = 300f))
+        assertEquals(3, annotationByteGroupsPerRow(PlaybackFollowViewMode.Binary, availableWidthDp = 220f))
+    }
+
+    @Test
+    fun `annotation character boundaries split non cjk token bytes`() {
+        assertEquals(
+            setOf(2, 4),
+            annotationCharacterBoundaryByteIndexes("під"),
+        )
+        assertEquals(
+            setOf(1, 2),
+            annotationCharacterBoundaryByteIndexes("ABC"),
+        )
+    }
+
+    @Test
+    fun `annotation character boundaries are hidden for cjk token`() {
+        assertEquals(emptySet<Int>(), annotationCharacterBoundaryByteIndexes("漢字"))
+        assertEquals(emptySet<Int>(), annotationCharacterBoundaryByteIndexes("日"))
     }
 
     @Test
@@ -431,6 +486,44 @@ class PlaybackDataFollowSectionTest {
                     TextFollowRawDisplayUnitViewData(2, 9, 1, 1, 8, 1, "49", "01001001"),
                     TextFollowRawDisplayUnitViewData(2, 10, 1, 2, 9, 1, "54", "01010100"),
                     TextFollowRawDisplayUnitViewData(2, 11, 1, 3, 10, 1, "45", "01000101"),
+                ),
+            textFollowAvailable = true,
+            followAvailable = true,
+        )
+
+    private fun ukrainianFollowData(): PayloadFollowViewData =
+        PayloadFollowViewData(
+            textTokens = listOf("підтверджено"),
+            textTokenTimeline =
+                listOf(
+                    TextFollowTimelineEntry(0, 12, 0),
+                ),
+            textRawDisplayUnits =
+                listOf(
+                    TextFollowRawDisplayUnitViewData(0, 0, 1, 0, 0, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 1, 1, 1, 1, 1, "BF", "10111111"),
+                    TextFollowRawDisplayUnitViewData(0, 2, 1, 2, 2, 1, "D1", "11010001"),
+                    TextFollowRawDisplayUnitViewData(0, 3, 1, 3, 3, 1, "96", "10010110"),
+                    TextFollowRawDisplayUnitViewData(0, 4, 1, 4, 4, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 5, 1, 5, 5, 1, "B4", "10110100"),
+                    TextFollowRawDisplayUnitViewData(0, 6, 1, 6, 6, 1, "D1", "11010001"),
+                    TextFollowRawDisplayUnitViewData(0, 7, 1, 7, 7, 1, "82", "10000010"),
+                    TextFollowRawDisplayUnitViewData(0, 8, 1, 8, 8, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 9, 1, 9, 9, 1, "B2", "10110010"),
+                    TextFollowRawDisplayUnitViewData(0, 10, 1, 10, 10, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 11, 1, 11, 11, 1, "B5", "10110101"),
+                    TextFollowRawDisplayUnitViewData(0, 12, 1, 12, 12, 1, "D1", "11010001"),
+                    TextFollowRawDisplayUnitViewData(0, 13, 1, 13, 13, 1, "80", "10000000"),
+                    TextFollowRawDisplayUnitViewData(0, 14, 1, 14, 14, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 15, 1, 15, 15, 1, "B4", "10110100"),
+                    TextFollowRawDisplayUnitViewData(0, 16, 1, 16, 16, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 17, 1, 17, 17, 1, "B6", "10110110"),
+                    TextFollowRawDisplayUnitViewData(0, 18, 1, 18, 18, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 19, 1, 19, 19, 1, "B5", "10110101"),
+                    TextFollowRawDisplayUnitViewData(0, 20, 1, 20, 20, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 21, 1, 21, 21, 1, "BD", "10111101"),
+                    TextFollowRawDisplayUnitViewData(0, 22, 1, 22, 22, 1, "D0", "11010000"),
+                    TextFollowRawDisplayUnitViewData(0, 23, 1, 23, 23, 1, "BE", "10111110"),
                 ),
             textFollowAvailable = true,
             followAvailable = true,

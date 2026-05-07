@@ -96,6 +96,20 @@ internal fun characterDisplayUnits(token: String): List<CharacterDisplayUnit> {
     return units
 }
 
+internal fun annotationCharacterBoundaryByteIndexes(
+    token: String,
+    characterDisplayUnits: List<CharacterDisplayUnit> = characterDisplayUnits(token),
+): Set<Int> {
+    if (characterDisplayUnits.size <= 1 || token.containsCjkCodePoint()) {
+        return emptySet()
+    }
+    return characterDisplayUnits
+        .dropLast(1)
+        .mapTo(LinkedHashSet()) { unit ->
+            unit.byteStartIndexWithinToken + unit.byteCount
+        }
+}
+
 internal data class HexNibbleGroup(
     val hex: String,
     val binary: String,

@@ -19,6 +19,7 @@ import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerSegmentedButtonColors
+import com.bag.audioandroid.ui.state.FlashVisualWindowState
 
 @Composable
 internal fun PlaybackDisplaySection(
@@ -32,6 +33,7 @@ internal fun PlaybackDisplaySection(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     isPlaying: Boolean,
     playbackDisplayMode: PlaybackDisplayMode,
     flashVisualizationModeName: String,
@@ -166,7 +168,7 @@ internal fun PlaybackDisplaySection(
         PlaybackTokenContextTape(
             followData = followData,
             displayedSamples = displayedSamples,
-            visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 2,
+            visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 1,
             onSeekToSample = onSeekToSample,
             modifier =
                 if (playbackDisplayMode == PlaybackDisplayMode.Lyrics) {

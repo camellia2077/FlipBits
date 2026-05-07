@@ -25,6 +25,7 @@ import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.screen.LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
 import com.bag.audioandroid.ui.screen.formatDurationMillis
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
@@ -124,7 +125,17 @@ data class AudioAppUiState(
                     val totalSamples =
                         session.generatedAudioMetadata?.pcmSampleCount?.takeIf { it > 0 }
                             ?: session.generatedPcm.size
-                    if (session.generatedPcm.isNotEmpty()) {
+                    val shouldUseWaveformPreview =
+                        source.mode == TransportModeOption.Flash &&
+                            session.generatedWaveformPcm.isNotEmpty() &&
+                            totalSamples >= LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
+                    if (shouldUseWaveformPreview) {
+                        PlaybackPcmVisualData(
+                            samples = session.generatedWaveformPcm,
+                            kind = PlaybackPcmVisualKind.WaveformPreview,
+                            totalSamples = totalSamples,
+                        )
+                    } else if (session.generatedPcm.isNotEmpty()) {
                         PlaybackPcmVisualData(
                             samples = session.generatedPcm,
                             kind = PlaybackPcmVisualKind.FullPcm,
@@ -261,6 +272,13 @@ data class AudioAppUiState(
                         ?.takeIf { it.item.itemId == source.itemId }
                         ?.followData
                         ?: PayloadFollowViewData.Empty
+            }
+
+    val currentPlaybackFlashVisualWindow: FlashVisualWindowState
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).flashVisualWindow
+                is AudioPlaybackSource.Saved -> FlashVisualWindowState()
             }
 
     val currentPlaybackFlashSignalInfo: FlashSignalInfo

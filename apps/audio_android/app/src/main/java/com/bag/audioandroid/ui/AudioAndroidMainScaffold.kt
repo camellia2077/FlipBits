@@ -150,6 +150,7 @@ internal fun AudioAndroidMainScaffold(
                         uiState.currentPlaybackSource is AudioPlaybackSource.Generated &&
                             uiState.currentPlaybackSampleCount > 0,
                     followData = uiState.currentPlaybackFollowData,
+                    flashVisualWindow = uiState.currentPlaybackFlashVisualWindow,
                     savedAudioItem = uiState.currentSavedAudioItem,
                     onTogglePlayback = viewModel::onTogglePlayback,
                     onSkipToPreviousTrack = viewModel::onSkipToPreviousTrack,

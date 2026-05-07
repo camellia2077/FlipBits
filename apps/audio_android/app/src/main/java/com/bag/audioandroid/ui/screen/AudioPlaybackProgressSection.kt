@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.state.FlashVisualWindowState
 
 @Composable
 internal fun AudioPlaybackProgressSection(
@@ -23,6 +24,7 @@ internal fun AudioPlaybackProgressSection(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     displayedTime: String,
     totalTime: String,
     isPlaying: Boolean,
@@ -55,6 +57,7 @@ internal fun AudioPlaybackProgressSection(
             isFlashMode = isFlashMode,
             flashVoicingStyle = flashVoicingStyle,
             followData = followData,
+            flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
             displaySectionState = displaySectionState,
             onSeekToSample = { targetSamples ->

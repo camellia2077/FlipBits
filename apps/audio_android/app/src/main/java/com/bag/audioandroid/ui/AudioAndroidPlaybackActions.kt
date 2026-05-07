@@ -18,6 +18,8 @@ internal class AudioAndroidPlaybackActions(
     playbackSessionReducer: PlaybackSessionReducer,
     sampleRateHz: Int,
     onPlaybackCompleted: (AudioPlaybackSource) -> Boolean,
+    followDataWindowActions: FollowDataWindowActions? = null,
+    flashVisualWindowActions: FlashVisualWindowActions? = null,
 ) {
     private val playbackUiStateSync =
         AudioPlaybackUiStateSync(
@@ -27,6 +29,8 @@ internal class AudioAndroidPlaybackActions(
             playbackSourceCoordinator = playbackSourceCoordinator,
             playbackSessionReducer = playbackSessionReducer,
             sampleRateHz = sampleRateHz,
+            followDataWindowActions = followDataWindowActions,
+            flashVisualWindowActions = flashVisualWindowActions,
         )
     private val commandActions =
         AudioPlaybackCommandActions(

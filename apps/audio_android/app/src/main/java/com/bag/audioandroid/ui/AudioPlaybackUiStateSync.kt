@@ -17,6 +17,8 @@ internal class AudioPlaybackUiStateSync(
     private val playbackSourceCoordinator: PlaybackSourceCoordinator,
     private val playbackSessionReducer: PlaybackSessionReducer,
     private val sampleRateHz: Int,
+    private val followDataWindowActions: FollowDataWindowActions? = null,
+    private val flashVisualWindowActions: FlashVisualWindowActions? = null,
 ) {
     private val lastProgressUiUpdateNanosBySource = ConcurrentHashMap<String, Long>()
 
@@ -83,6 +85,10 @@ internal class AudioPlaybackUiStateSync(
                     currentPlayback
                 }
             playbackRuntimeGateway.progress(playbackBase, playedSamples)
+        }
+        if (source is AudioPlaybackSource.Generated) {
+            followDataWindowActions?.ensureCurrentWindow(source.mode, playedSamples)
+            flashVisualWindowActions?.ensureCurrentWindow(source.mode, playedSamples)
         }
     }
 

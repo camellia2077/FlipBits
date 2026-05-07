@@ -5,6 +5,7 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.AudioIoGateway
+import com.bag.audioandroid.domain.AudioIoWavCodes
 import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
@@ -21,7 +22,13 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.model.analyzeMorseText
+import com.bag.audioandroid.ui.screen.FlashSignalToneSegment
+import com.bag.audioandroid.ui.screen.buildFlashSignalToneSegments
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.FlashVisualWindowSource
+import com.bag.audioandroid.ui.state.FlashVisualWindowState
+import com.bag.audioandroid.ui.state.FollowDataWindowSource
+import com.bag.audioandroid.ui.state.FollowDataWindowState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -149,16 +156,38 @@ internal class AudioSessionEncodeActions(
                     LONG_AUDIO_LOG_TAG,
                     "followHydration:start mode=${request.mode.wireName} revision=${request.generatedContentRevision} segments=${request.encodeRequest.segmentation?.segmentCount ?: 1}",
                 )
-                val followData = encodeRunner.buildFollowData(request.encodeRequest)
+                val windowSource = request.toFollowDataWindowSource()
+                val window =
+                    windowSource?.followWindowAround(0)
+                        ?: FollowDataWindowState(
+                            startSample = 0,
+                            endSampleExclusive = initialFollowWindowEndSample(request.totalPcmSampleCount),
+                        )
+                val followData =
+                    encodeRunner.buildFollowDataWindow(
+                        request = request.encodeRequest,
+                        windowStartSample = window.startSample,
+                        windowEndSampleExclusive = window.endSampleExclusive,
+                    )
                 if (followData != null) {
+                    val flashVisualWindowSource =
+                        if (request.mode == TransportModeOption.Flash) {
+                            encodeRunner.buildFlashVisualWindowSource(request.encodeRequest)
+                        } else {
+                            null
+                        }
+                    val flashVisualWindow = flashVisualWindowSource?.flashVisualWindowAround(0) ?: FlashVisualWindowState()
                     safeLogE(
                         LONG_AUDIO_LOG_TAG,
-                        "followHydration:built mode=${request.mode.wireName} revision=${request.generatedContentRevision} followAvailable=${followData.followAvailable} textFollowAvailable=${followData.textFollowAvailable} totalSamples=${followData.totalPcmSampleCount}",
+                        "followHydration:built mode=${request.mode.wireName} revision=${request.generatedContentRevision} followAvailable=${followData.followAvailable} textFollowAvailable=${followData.textFollowAvailable} totalSamples=${followData.totalPcmSampleCount} window=${window.startSample}-${window.endSampleExclusive}",
                     )
                     stateReducer.applyHydratedFollowData(
                         mode = request.mode,
                         revision = request.generatedContentRevision,
                         followData = followData,
+                        window = window,
+                        flashVisualWindowSource = flashVisualWindowSource,
+                        flashVisualWindow = flashVisualWindow,
                     )
                 } else {
                     safeLogE(
@@ -279,6 +308,12 @@ private class EncodeRunner(
             ) {
                 is EncodeAudioResult.Success -> {
                     val flashSignalInfo = describeFlashSignalForRequest(request)
+                    val flashVisualTimelineSegments =
+                        if (request.mode == TransportModeOption.Flash) {
+                            buildFlashSignalToneSegments(gatewayResult.followData)
+                        } else {
+                            emptyList()
+                        }
                     safeLogE(
                         LONG_AUDIO_LOG_TAG,
                         "execute:singleSuccess mode=${request.mode.wireName} payloadBytes=$payloadByteCount samples=${gatewayResult.pcm.size}",
@@ -287,6 +322,7 @@ private class EncodeRunner(
                         pcm = gatewayResult.pcm,
                         segmentCount = 1,
                         flashSignalInfo = flashSignalInfo,
+                        flashVisualTimelineSegments = flashVisualTimelineSegments,
                     )
                 }
                 EncodeAudioResult.Cancelled -> EncodeResult.Cancelled
@@ -308,12 +344,24 @@ private class EncodeRunner(
             }
         }
 
-    suspend fun buildFollowData(request: EncodeRequest): PayloadFollowViewData? =
+    suspend fun buildFollowDataWindow(
+        request: EncodeRequest,
+        windowStartSample: Int,
+        windowEndSampleExclusive: Int,
+    ): PayloadFollowViewData? =
         kotlinx.coroutines.withContext(workerDispatcher) {
             val segmentation = request.segmentation
             if (segmentation != null) {
-                val followSegments =
-                    segmentation.segments.map { segmentText ->
+                val segmentSampleCounts = request.segmentSampleCounts
+                if (segmentSampleCounts.size != segmentation.segmentCount) {
+                    return@withContext null
+                }
+                val selectedSegments = ArrayList<PayloadFollowViewData>()
+                var segmentStartSample = 0
+                segmentation.segments.forEachIndexed { index, segmentText ->
+                    val segmentSampleCount = segmentSampleCounts[index]
+                    val segmentEndSample = segmentStartSample + segmentSampleCount
+                    if (segmentEndSample > windowStartSample && segmentStartSample < windowEndSampleExclusive) {
                         val result =
                             audioCodecGateway.buildEncodeFollowData(
                                 segmentText,
@@ -323,9 +371,20 @@ private class EncodeRunner(
                                 request.flashPreset.signalProfileValue,
                                 request.flashPreset.voicingFlavorValue,
                             )
-                        result.followData.takeIf { it.followAvailable } ?: return@withContext null
+                        selectedSegments += result.followData.takeIf { it.followAvailable } ?: return@withContext null
                     }
-                return@withContext mergeSegmentedFollowData(followSegments)
+                    segmentStartSample = segmentEndSample
+                }
+                return@withContext mergeSegmentedFollowDataWindow(
+                    segments = selectedSegments,
+                    firstSampleOffset =
+                        selectedWindowSampleOffset(
+                            segmentSampleCounts = segmentSampleCounts,
+                            windowStartSample = windowStartSample,
+                            windowEndSampleExclusive = windowEndSampleExclusive,
+                        ),
+                    totalPcmSampleCount = segmentSampleCounts.sum(),
+                )
             }
             val result =
                 audioCodecGateway.buildEncodeFollowData(
@@ -337,6 +396,63 @@ private class EncodeRunner(
                     request.flashPreset.voicingFlavorValue,
                 )
             result.followData.takeIf { it.followAvailable }
+        }
+
+    suspend fun buildFlashVisualWindowSource(request: EncodeRequest): FlashVisualWindowSource? =
+        kotlinx.coroutines.withContext(workerDispatcher) {
+            if (request.mode != TransportModeOption.Flash || request.totalPcmSampleCount <= 0) {
+                return@withContext null
+            }
+
+            val timelineSegments = ArrayList<FlashSignalToneSegment>()
+            val segmentation = request.segmentation
+            if (segmentation != null) {
+                val segmentSampleCounts = request.segmentSampleCounts
+                if (segmentSampleCounts.size != segmentation.segmentCount) {
+                    return@withContext null
+                }
+                var segmentStartSample = 0
+                segmentation.segments.forEachIndexed { index, segmentText ->
+                    val result =
+                        audioCodecGateway.buildEncodeFollowData(
+                            segmentText,
+                            sampleRateHz,
+                            request.frameSamples,
+                            request.mode.nativeValue,
+                            request.flashPreset.signalProfileValue,
+                            request.flashPreset.voicingFlavorValue,
+                        )
+                    timelineSegments +=
+                        buildFlashSignalToneSegments(result.followData)
+                            .map { segment ->
+                                segment.copy(
+                                    startSample = segment.startSample + segmentStartSample,
+                                    endSample = segment.endSample + segmentStartSample,
+                                )
+                            }
+                    segmentStartSample += segmentSampleCounts[index]
+                }
+            } else {
+                val result =
+                    audioCodecGateway.buildEncodeFollowData(
+                        request.inputText,
+                        sampleRateHz,
+                        request.frameSamples,
+                        request.mode.nativeValue,
+                        request.flashPreset.signalProfileValue,
+                        request.flashPreset.voicingFlavorValue,
+                    )
+                timelineSegments += buildFlashSignalToneSegments(result.followData)
+            }
+
+            if (timelineSegments.isEmpty()) {
+                null
+            } else {
+                FlashVisualWindowSource(
+                    timelineSegments = timelineSegments,
+                    totalPcmSampleCount = request.totalPcmSampleCount,
+                )
+            }
         }
 
     private suspend fun encodeSegmented(request: EncodeRequest): EncodeResult {
@@ -353,6 +469,7 @@ private class EncodeRunner(
                 modeWireName = request.mode.wireName,
                 previewPointCount = LONG_AUDIO_WAVEFORM_PREVIEW_POINTS,
             )
+        val flashVisualTimelineSegments = ArrayList<FlashSignalToneSegment>()
 
         try {
             segmentation.segments.forEachIndexed { index, segmentText ->
@@ -391,7 +508,18 @@ private class EncodeRunner(
                         )
                 ) {
                     is EncodeAudioResult.Success -> {
+                        val segmentStartSample = audioAssembler.totalPcmSamples
                         audioAssembler.appendSegment(gatewayResult.pcm)
+                        if (request.mode == TransportModeOption.Flash) {
+                            flashVisualTimelineSegments +=
+                                buildFlashSignalToneSegments(gatewayResult.followData)
+                                    .map { segment ->
+                                        segment.copy(
+                                            startSample = segment.startSample + segmentStartSample,
+                                            endSample = segment.endSample + segmentStartSample,
+                                        )
+                                    }
+                        }
                         safeLogE(
                             LONG_AUDIO_LOG_TAG,
                             "encodeSegmented:segmentSuccess mode=${request.mode.wireName} index=${index + 1}/${segmentation.segmentCount} segmentSamples=${gatewayResult.pcm.size} totalSamples=${audioAssembler.totalPcmSamples}",
@@ -452,6 +580,7 @@ private class EncodeRunner(
                     request,
                     text = segmentation.segments.firstOrNull() ?: request.inputText,
                 ),
+            flashVisualTimelineSegments = flashVisualTimelineSegments,
         )
     }
 
@@ -704,6 +833,10 @@ private class EncodeStateReducer(
                 generatedContentRevision = nextRevision,
                 decodedPayload = DecodedPayloadViewData.Empty,
                 followData = PayloadFollowViewData.Empty,
+                followWindowSource = result.toFollowDataWindowSource(request),
+                followWindow = FollowDataWindowState(),
+                flashVisualWindowSource = result.toFlashVisualWindowSource(request),
+                flashVisualWindow = result.initialFlashVisualWindow(request),
                 statusText =
                     UiText.Resource(
                         if (result.segmentCount > 1) {
@@ -740,7 +873,7 @@ private class EncodeStateReducer(
                 "applySuccess:playbackSourceUpdated mode=${request.mode.wireName} transportModeMatches=true",
             )
         }
-        if (!shouldHydrateFollowData(request, result)) {
+        if (!shouldHydrateFollowData(result)) {
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
                 "applySuccess:skipFollowHydration mode=${request.mode.wireName} pcmSamples=${result.pcmSampleCount} segments=${result.segmentCount} fileBacked=${result.generatedPcmFilePath != null}",
@@ -753,24 +886,26 @@ private class EncodeStateReducer(
         )
         return FollowDataHydrationRequest(
             mode = request.mode,
-            encodeRequest = request.copy(segmentation = result.segmentation),
+            encodeRequest =
+                request.copy(
+                    segmentation = result.segmentation,
+                    segmentSampleCounts = result.segmentSampleCounts,
+                    totalPcmSampleCount = result.pcmSampleCount,
+                ),
             generatedContentRevision = nextRevision,
+            totalPcmSampleCount = result.pcmSampleCount,
         )
     }
 
-    private fun shouldHydrateFollowData(
-        request: EncodeRequest,
-        result: EncodeResult.Success,
-    ): Boolean {
-        val payloadByteCount = request.payloadByteCount
-        return payloadByteCount <= MAX_FOLLOW_DATA_PAYLOAD_BYTES &&
-            result.segmentCount <= MAX_FOLLOW_DATA_SEGMENTS
-    }
+    private fun shouldHydrateFollowData(result: EncodeResult.Success): Boolean = result.pcmSampleCount > 0
 
     private fun probeGeneratedWavInfo(
         result: EncodeResult.Success,
         metadata: GeneratedAudioMetadata,
     ): WavAudioInfo {
+        if (result.pcm.isEmpty() && result.generatedPcmFilePath != null) {
+            return metadata.toGeneratedWavAudioInfo()
+        }
         val pcmForProbe =
             if (result.pcm.isNotEmpty()) {
                 result.pcm
@@ -791,6 +926,9 @@ private class EncodeStateReducer(
         mode: TransportModeOption,
         revision: Long,
         followData: PayloadFollowViewData,
+        window: FollowDataWindowState,
+        flashVisualWindowSource: FlashVisualWindowSource?,
+        flashVisualWindow: FlashVisualWindowState,
     ) {
         sessionStateStore.updateSession(mode) { session ->
             if (session.generatedContentRevision != revision) {
@@ -804,10 +942,86 @@ private class EncodeStateReducer(
                     LONG_AUDIO_LOG_TAG,
                     "followHydration:applied mode=${mode.wireName} revision=$revision followAvailable=${followData.followAvailable} textFollowAvailable=${followData.textFollowAvailable}",
                 )
-                session.copy(followData = followData)
+                session.copy(
+                    followData = followData,
+                    followWindow = window,
+                    flashVisualWindowSource = flashVisualWindowSource ?: session.flashVisualWindowSource,
+                    flashVisualWindow = flashVisualWindow.takeIf { it.available } ?: session.flashVisualWindow,
+                )
             }
         }
     }
+}
+
+private fun initialFollowWindowEndSample(totalPcmSampleCount: Int): Int =
+    minOf(totalPcmSampleCount, FollowWindowInitialSamples).coerceAtLeast(1)
+
+private fun GeneratedAudioMetadata.toGeneratedWavAudioInfo(): WavAudioInfo =
+    WavAudioInfo(
+        wavStatusCode = AudioIoWavCodes.STATUS_OK,
+        sampleRateHz = sampleRateHz,
+        channels = 1,
+        bitsPerSample = 16,
+        pcmSampleCount = pcmSampleCount.toLong(),
+        dataByteCount = pcmSampleCount.toLong() * 2L,
+        fileByteCount = 44L + pcmSampleCount.toLong() * 2L,
+        durationMs = durationMs,
+    )
+
+private fun selectedWindowSampleOffset(
+    segmentSampleCounts: List<Int>,
+    windowStartSample: Int,
+    windowEndSampleExclusive: Int,
+): Int {
+    var segmentStartSample = 0
+    segmentSampleCounts.forEach { segmentSampleCount ->
+        val segmentEndSample = segmentStartSample + segmentSampleCount
+        if (segmentEndSample > windowStartSample && segmentStartSample < windowEndSampleExclusive) {
+            return segmentStartSample
+        }
+        segmentStartSample = segmentEndSample
+    }
+    return 0
+}
+
+private fun EncodeResult.Success.toFollowDataWindowSource(request: EncodeRequest): FollowDataWindowSource? {
+    val segmentation = segmentation ?: return null
+    val counts = segmentSampleCounts.takeIf { it.size == segmentation.segmentCount } ?: return null
+    return FollowDataWindowSource(
+        segmentTexts = segmentation.segments,
+        segmentSampleCounts = counts,
+        totalPcmSampleCount = pcmSampleCount,
+        flashSignalProfile = if (request.mode == TransportModeOption.Flash) request.flashPreset.signalProfileValue else 0,
+        flashVoicingFlavor = if (request.mode == TransportModeOption.Flash) request.flashPreset.voicingFlavorValue else 0,
+    )
+}
+
+private fun EncodeResult.Success.toFlashVisualWindowSource(request: EncodeRequest): FlashVisualWindowSource? {
+    if (request.mode != TransportModeOption.Flash) {
+        return null
+    }
+    if (flashVisualTimelineSegments.isEmpty()) {
+        return null
+    }
+    return FlashVisualWindowSource(
+        timelineSegments = flashVisualTimelineSegments,
+        totalPcmSampleCount = pcmSampleCount,
+    )
+}
+
+private fun EncodeResult.Success.initialFlashVisualWindow(request: EncodeRequest): FlashVisualWindowState =
+    toFlashVisualWindowSource(request)?.flashVisualWindowAround(0) ?: FlashVisualWindowState()
+
+private fun FollowDataHydrationRequest.toFollowDataWindowSource(): FollowDataWindowSource? {
+    val segmentation = encodeRequest.segmentation ?: return null
+    val counts = encodeRequest.segmentSampleCounts.takeIf { it.size == segmentation.segmentCount } ?: return null
+    return FollowDataWindowSource(
+        segmentTexts = segmentation.segments,
+        segmentSampleCounts = counts,
+        totalPcmSampleCount = totalPcmSampleCount,
+        flashSignalProfile = if (encodeRequest.mode == TransportModeOption.Flash) encodeRequest.flashPreset.signalProfileValue else 0,
+        flashVoicingFlavor = if (encodeRequest.mode == TransportModeOption.Flash) encodeRequest.flashPreset.voicingFlavorValue else 0,
+    )
 }
 
 private data class EncodeRequest(
@@ -820,6 +1034,8 @@ private data class EncodeRequest(
     val appVersion: String,
     val coreVersion: String,
     val segmentation: SegmentedInputPlan? = null,
+    val segmentSampleCounts: List<Int> = emptyList(),
+    val totalPcmSampleCount: Int = 0,
 ) {
     val payloadByteCount: Int
         get() =
@@ -850,6 +1066,7 @@ private sealed interface EncodeResult {
         val segmentation: SegmentedInputPlan? = null,
         val segmentSampleCounts: List<Int> = emptyList(),
         val flashSignalInfo: FlashSignalInfo = FlashSignalInfo.Empty,
+        val flashVisualTimelineSegments: List<FlashSignalToneSegment> = emptyList(),
     ) : EncodeResult
 }
 
@@ -857,8 +1074,8 @@ private data class FollowDataHydrationRequest(
     val mode: TransportModeOption,
     val encodeRequest: EncodeRequest,
     val generatedContentRevision: Long,
+    val totalPcmSampleCount: Int,
 )
 
-private const val MAX_FOLLOW_DATA_PAYLOAD_BYTES = 4096
-private const val MAX_FOLLOW_DATA_SEGMENTS = 8
 private const val LONG_AUDIO_WAVEFORM_PREVIEW_POINTS = 4096
+private const val FollowWindowInitialSamples = 44_100 * 60

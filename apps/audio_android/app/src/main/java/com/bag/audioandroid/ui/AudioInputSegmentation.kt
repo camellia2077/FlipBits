@@ -54,11 +54,33 @@ internal fun splitInputIntoPayloadSegments(
     return SegmentedInputPlan(segments = segments.filter { it.isNotEmpty() }.ifEmpty { listOf("") })
 }
 
-internal fun mergeSegmentedFollowData(segments: List<PayloadFollowViewData>): PayloadFollowViewData {
+internal fun mergeSegmentedFollowData(segments: List<PayloadFollowViewData>): PayloadFollowViewData =
+    mergeSegmentedFollowData(
+        segments = segments,
+        firstSampleOffset = 0,
+        totalPcmSampleCount = null,
+    )
+
+internal fun mergeSegmentedFollowDataWindow(
+    segments: List<PayloadFollowViewData>,
+    firstSampleOffset: Int,
+    totalPcmSampleCount: Int,
+): PayloadFollowViewData =
+    mergeSegmentedFollowData(
+        segments = segments,
+        firstSampleOffset = firstSampleOffset,
+        totalPcmSampleCount = totalPcmSampleCount,
+    )
+
+private fun mergeSegmentedFollowData(
+    segments: List<PayloadFollowViewData>,
+    firstSampleOffset: Int,
+    totalPcmSampleCount: Int?,
+): PayloadFollowViewData {
     if (segments.isEmpty()) {
         return PayloadFollowViewData.Empty
     }
-    if (segments.size == 1) {
+    if (segments.size == 1 && firstSampleOffset == 0 && totalPcmSampleCount == null) {
         return segments.first()
     }
 
@@ -75,7 +97,7 @@ internal fun mergeSegmentedFollowData(segments: List<PayloadFollowViewData>): Pa
     val byteTimeline = ArrayList<PayloadFollowByteTimelineEntry>()
     val binaryGroupTimeline = ArrayList<PayloadFollowBinaryGroupTimelineEntry>()
 
-    var sampleOffset = 0
+    var sampleOffset = firstSampleOffset
     var tokenOffset = 0
     var lineOffset = 0
     var byteOffset = 0
@@ -182,7 +204,7 @@ internal fun mergeSegmentedFollowData(segments: List<PayloadFollowViewData>): Pa
         binaryGroupTimeline = binaryGroupTimeline,
         payloadBeginSample = payloadBeginSample,
         payloadSampleCount = payloadSampleCount,
-        totalPcmSampleCount = sampleOffset,
+        totalPcmSampleCount = totalPcmSampleCount ?: sampleOffset,
         followAvailable = true,
     )
 }

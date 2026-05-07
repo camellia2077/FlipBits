@@ -167,7 +167,9 @@ internal fun PlaybackTokenContextTape(
     val spacingDp = 4f
     val totalHeightDp = singleLineHeightDp * visibleLineCount + spacingDp * (visibleLineCount - 1)
     val verticalPaddingDp =
-        if (visibleLineCount <= 2) {
+        if (visibleLineCount <= 1) {
+            0f
+        } else if (visibleLineCount == 2) {
             singleLineHeightDp + spacingDp
         } else {
             (totalHeightDp - singleLineHeightDp) / 2f
@@ -176,8 +178,8 @@ internal fun PlaybackTokenContextTape(
     // A fixed-height LazyColumn with userScrollEnabled = false prevents nested scrolling
     // conflicts with the outer parent's verticalScroll.
     // The vertical padding positions the active item: centered for wide lyric
-    // stacks, or on the lower row in the compact two-line Lyrics view so the
-    // just-played line can remain fully visible above it instead of being clipped.
+    // stacks, on the lower row in compact two-line views, and flush in the
+    // one-line Lyrics view so token detail cards keep the vertical focus.
     androidx.compose.foundation.lazy.LazyColumn(
         state = listState,
         userScrollEnabled = false,

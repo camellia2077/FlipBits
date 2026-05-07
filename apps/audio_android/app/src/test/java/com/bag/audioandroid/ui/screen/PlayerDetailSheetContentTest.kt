@@ -23,6 +23,7 @@ import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.state.FlashVisualWindowState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -315,6 +316,12 @@ class PlayerDetailSheetContentTest {
     }
 
     private fun setPreviewPlayerDetailContent(initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual) {
+        val flashVisualSegments =
+            listOf(
+                FlashSignalToneSegment(0, 5_000, FskDominantTone.Low),
+                FlashSignalToneSegment(5_000, 10_000, FskDominantTone.High),
+                FlashSignalToneSegment(15_000, 20_000, FskDominantTone.Low),
+            )
         composeRule.setContent {
             PlayerDetailSheetContent(
                 miniPlayerModel =

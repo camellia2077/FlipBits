@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.state.FlashVisualWindowState
 
 @Composable
 internal fun AudioPlaybackDisplayBlock(
@@ -18,6 +19,7 @@ internal fun AudioPlaybackDisplayBlock(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     isPlaying: Boolean,
     displaySectionState: PlaybackDisplaySectionState,
     modifier: Modifier = Modifier,
@@ -25,6 +27,7 @@ internal fun AudioPlaybackDisplayBlock(
 ) {
     PlaybackDisplaySection(
         followData = followData,
+        flashVisualWindow = flashVisualWindow,
         displayedSamples = displayedSamples,
         visualDisplayedSamples = visualDisplayedSamples,
         waveformPcm = waveformPcm,

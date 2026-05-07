@@ -11,7 +11,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-internal enum class FskDominantTone {
+enum class FskDominantTone {
     Low,
     High,
     Unknown,
@@ -25,7 +25,7 @@ internal data class FskEnergyBucket(
     val confidence: Float,
 )
 
-internal data class FlashSignalToneSegment(
+data class FlashSignalToneSegment(
     val startSample: Int,
     val endSample: Int,
     val tone: FskDominantTone,

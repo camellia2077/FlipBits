@@ -149,7 +149,7 @@ internal fun AudioPcmWaveform(
                     abs(
                         bucketCenterX(
                             bucket = bucket,
-                            windowCenterSample = animatedDisplayedSamples,
+                            windowCenterSample = bucketDisplayedSamples,
                             windowSampleCount = windowSampleCount.toFloat(),
                             leftPadding = leftPadding,
                             innerWidth = innerWidth,
@@ -178,7 +178,7 @@ internal fun AudioPcmWaveform(
                 val x =
                     bucketCenterX(
                         bucket = bucket,
-                        windowCenterSample = animatedDisplayedSamples,
+                        windowCenterSample = bucketDisplayedSamples,
                         windowSampleCount = windowSampleCount.toFloat(),
                         leftPadding = leftPadding,
                         innerWidth = innerWidth,

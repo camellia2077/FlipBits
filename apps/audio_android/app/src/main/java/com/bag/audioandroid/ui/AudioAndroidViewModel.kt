@@ -51,6 +51,23 @@ class AudioAndroidViewModel(
     private val playbackSourceCoordinator = PlaybackSourceCoordinator(SAMPLE_RATE_HZ)
     private val playbackSessionReducer = PlaybackSessionReducer(playbackRuntimeGateway, SAMPLE_RATE_HZ)
     private val playbackSequenceNavigator = PlaybackSequenceNavigator()
+    private val followDataWindowActions =
+        FollowDataWindowActions(
+            uiState = uiStateFlow,
+            scope = viewModelScope,
+            audioCodecGateway = audioCodecGateway,
+            sessionStateStore = sessionStateStore,
+            sampleRateHz = SAMPLE_RATE_HZ,
+            frameSamples = FRAME_SAMPLES,
+            workerDispatcher = Dispatchers.IO,
+        )
+    private val flashVisualWindowActions =
+        FlashVisualWindowActions(
+            uiState = uiStateFlow,
+            scope = viewModelScope,
+            sessionStateStore = sessionStateStore,
+            workerDispatcher = Dispatchers.IO,
+        )
     private val playbackActions =
         AudioAndroidPlaybackActions(
             uiState = uiStateFlow,
@@ -62,6 +79,8 @@ class AudioAndroidViewModel(
             playbackSessionReducer = playbackSessionReducer,
             sampleRateHz = SAMPLE_RATE_HZ,
             onPlaybackCompleted = ::handlePlaybackCompleted,
+            followDataWindowActions = followDataWindowActions,
+            flashVisualWindowActions = flashVisualWindowActions,
         )
     private val libraryActions =
         AudioAndroidLibraryActions(
@@ -99,6 +118,7 @@ class AudioAndroidViewModel(
             refreshSavedAudioItems = libraryActions::refreshSavedAudioItems,
             workerDispatcher = Dispatchers.IO,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
+            followDataWindowActions = followDataWindowActions,
         )
     private val navigationActions =
         AudioAndroidNavigationActions(

@@ -9,7 +9,35 @@ import org.junit.Test
 
 class FlashSignalVisualizationAnalysisTest {
     @Test
-    fun `flash route uses follow timeline buckets for full pcm when available`() {
+    fun `flash route without visual window uses pcm buckets for long preview`() {
+        val route =
+            resolvePlaybackVisualizationRoute(
+                transportMode = TransportModeOption.Flash,
+                isFlashMode = true,
+                waveformPcm = shortArrayOf(1, 2, 3, 4),
+                isWaveformPreview = true,
+                sampleRateHz = 44100,
+                visualDisplayedSamples = 120,
+                displayedSamples = 120,
+                followData = PayloadFollowViewData.Empty,
+            )
+
+        assertTrue(route is PlaybackVisualizationRoute.PcmWaveform)
+    }
+
+    @Test
+    fun `flash route uses follow timeline buckets when follow data can drive it`() {
+        val followData =
+            PayloadFollowViewData(
+                binaryTokens = listOf("0", "1"),
+                binaryGroupTimeline =
+                    listOf(
+                        PayloadFollowBinaryGroupTimelineEntry(0, 100, 0, 0, 1),
+                        PayloadFollowBinaryGroupTimelineEntry(100, 100, 1, 1, 1),
+                    ),
+                totalPcmSampleCount = 200,
+                followAvailable = true,
+            )
         val route =
             resolvePlaybackVisualizationRoute(
                 transportMode = TransportModeOption.Flash,
@@ -19,17 +47,7 @@ class FlashSignalVisualizationAnalysisTest {
                 sampleRateHz = 44100,
                 visualDisplayedSamples = 120,
                 displayedSamples = 120,
-                followData =
-                    PayloadFollowViewData(
-                        binaryTokens = listOf("0", "1"),
-                        binaryGroupTimeline =
-                            listOf(
-                                PayloadFollowBinaryGroupTimelineEntry(0, 100, 0, 0, 1),
-                                PayloadFollowBinaryGroupTimelineEntry(100, 100, 1, 1, 1),
-                            ),
-                        totalPcmSampleCount = 200,
-                        followAvailable = true,
-                    ),
+                followData = followData,
             )
 
         assertTrue(route is PlaybackVisualizationRoute.FlashSignal)
@@ -38,7 +56,7 @@ class FlashSignalVisualizationAnalysisTest {
     }
 
     @Test
-    fun `flash route falls back to pcm buckets when follow bits are incomplete`() {
+    fun `flash route falls back to pcm buckets when visual window is missing`() {
         val route =
             resolvePlaybackVisualizationRoute(
                 transportMode = TransportModeOption.Flash,
@@ -48,17 +66,7 @@ class FlashSignalVisualizationAnalysisTest {
                 sampleRateHz = 44100,
                 visualDisplayedSamples = 120,
                 displayedSamples = 120,
-                followData =
-                    PayloadFollowViewData(
-                        binaryTokens = listOf("0"),
-                        binaryGroupTimeline =
-                            listOf(
-                                PayloadFollowBinaryGroupTimelineEntry(0, 100, 0, 0, 1),
-                                PayloadFollowBinaryGroupTimelineEntry(100, 100, 1, 1, 1),
-                            ),
-                        totalPcmSampleCount = 200,
-                        followAvailable = true,
-                    ),
+                followData = PayloadFollowViewData.Empty,
             )
 
         assertTrue(route is PlaybackVisualizationRoute.FlashSignal)

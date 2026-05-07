@@ -45,7 +45,8 @@ internal fun DrawScope.drawToneTrackSegments(
     visibleFlashSegments(segments, viewport).forEach { segment ->
         val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
         val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
-        val segmentWidth = (endX - startX).coerceAtLeast(1.6f)
+        val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.6f)
+        val segmentWidth = (drawBounds.endX - drawBounds.startX).coerceAtLeast(1.6f)
         val top =
             when (segment.tone) {
                 FskDominantTone.High -> upperTop
@@ -55,8 +56,8 @@ internal fun DrawScope.drawToneTrackSegments(
         drawMicroBarsAcrossSegment(
             segment = segment,
             viewport = viewport,
-            startX = startX,
-            endX = endX,
+            startX = drawBounds.startX,
+            endX = drawBounds.endX,
             minBarHeight = laneHeight * 0.48f,
             maxBarHeight = laneHeight * 0.82f,
             centerY = top + laneHeight / 2f,
@@ -94,14 +95,15 @@ internal fun DrawScope.drawToneEnergySegments(
     visibleFlashSegments(segments, viewport).forEach { segment ->
         val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
         val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
-        val segmentWidth = (endX - startX).coerceAtLeast(1.8f)
+        val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.8f)
+        val segmentWidth = (drawBounds.endX - drawBounds.startX).coerceAtLeast(1.8f)
         when (segment.tone) {
             FskDominantTone.High ->
                 drawEnergyPulseClusterAcrossSegment(
                     segment = segment,
                     viewport = viewport,
-                    startX = startX,
-                    endX = endX,
+                    startX = drawBounds.startX,
+                    endX = drawBounds.endX,
                     baselineY = centerY - upperGap,
                     direction = -1f,
                     minBarHeight = maxEnergyHeight * 0.28f,
@@ -116,8 +118,8 @@ internal fun DrawScope.drawToneEnergySegments(
                 drawEnergyPulseClusterAcrossSegment(
                     segment = segment,
                     viewport = viewport,
-                    startX = startX,
-                    endX = endX,
+                    startX = drawBounds.startX,
+                    endX = drawBounds.endX,
                     baselineY = centerY + lowerGap,
                     direction = 1f,
                     minBarHeight = maxEnergyHeight * 0.28f,
@@ -481,6 +483,35 @@ private fun visibleFlashSegments(
             segment.startSample.toFloat() <= viewport.endSample
     }
 
+private data class SegmentVisualBounds(
+    val startX: Float,
+    val endX: Float,
+)
+
+private fun DrawScope.segmentVisualBounds(
+    segment: FlashSignalToneSegment,
+    viewport: FlashSignalViewport,
+    startX: Float,
+    endX: Float,
+    minVisibleWidth: Float,
+): SegmentVisualBounds {
+    val availableWidth = endX - startX
+    if (availableWidth <= minVisibleWidth) {
+        return SegmentVisualBounds(startX, endX)
+    }
+    // The timeline stays exact: sample boundaries still map to startX/endX.
+    // This inset only changes paint geometry so adjacent same-tone bits read as
+    // separate symbols without moving the playhead or changing durations.
+    val halfGap = FlashBitSegmentGapDp.dp.toPx() / 2f
+    val drawStart = if (segment.startSample.toFloat() >= viewport.startSample) startX + halfGap else startX
+    val drawEnd = if (segment.endSample.toFloat() <= viewport.endSample) endX - halfGap else endX
+    return if (drawEnd - drawStart >= minVisibleWidth) {
+        SegmentVisualBounds(drawStart, drawEnd)
+    } else {
+        SegmentVisualBounds(startX, endX)
+    }
+}
+
 private fun DrawScope.drawMicroBarsAcrossSegment(
     segment: FlashSignalToneSegment,
     viewport: FlashSignalViewport,
@@ -495,19 +526,22 @@ private fun DrawScope.drawMicroBarsAcrossSegment(
     minVisualWidth: Float,
 ) {
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
-    val spacing = FlashSegmentMicroBarSpacingDp.dp.toPx()
-    val barWidth = FlashSegmentMicroBarWidthDp.dp.toPx().coerceAtMost(visualWidth)
-    val barCount = (visualWidth / spacing).toInt().coerceAtLeast(1)
+    val barCount = 3
+    val minBarWidth = FlashSegmentMicroBarWidthDp.dp.toPx()
+    val maxBarWidth = (visualWidth / 2.6f).coerceAtLeast(minBarWidth)
+    val barWidth = (visualWidth / 4.6f).coerceIn(minBarWidth, maxBarWidth)
     val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
     val visibleEndSample = minOf(segment.endSample.toFloat(), viewport.endSample)
+    val barFractions = floatArrayOf(0.18f, 0.5f, 0.82f)
     repeat(barCount) { barIndex ->
-        val fraction = (barIndex + 0.5f) / barCount.toFloat()
+        val fraction = barFractions[barIndex]
         val x = startX + visualWidth * fraction
         val sample = visibleStartSample + (visibleEndSample - visibleStartSample) * fraction
         val isActive = sample <= viewport.playheadSample
         val edgeGlow = activeEdgeGlow(sample, viewport, segment.sampleCount)
         val texture = deterministicSignalTexture(segment, barIndex)
-        val height = minBarHeight + (maxBarHeight - minBarHeight) * texture
+        val envelope = bitTripletEnvelope(barIndex)
+        val height = minBarHeight + (maxBarHeight - minBarHeight) * (0.34f + 0.66f * texture * envelope)
         val color =
             flashSegmentColor(
                 isActive = isActive,
@@ -543,22 +577,17 @@ private fun DrawScope.drawEnergyPulseClusterAcrossSegment(
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
     val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
     val visibleEndSample = minOf(segment.endSample.toFloat(), viewport.endSample)
-    val pulseCount =
-        when {
-            visualWidth < 10.dp.toPx() -> 1
-            visualWidth < 22.dp.toPx() -> 2
-            visualWidth < 42.dp.toPx() -> 3
-            else -> 5
-        }
-    val strokeWidth = (visualWidth / (pulseCount * 2.4f)).coerceIn(2.2.dp.toPx(), 7.dp.toPx())
+    val pulseCount = 3
+    val strokeWidth = (visualWidth / 9.2f).coerceIn(2.2.dp.toPx(), 6.4.dp.toPx())
+    val pulseFractions = floatArrayOf(0.18f, 0.5f, 0.82f)
     repeat(pulseCount) { pulseIndex ->
-        val fraction = (pulseIndex + 0.5f) / pulseCount.toFloat()
+        val fraction = pulseFractions[pulseIndex]
         val x = startX + visualWidth * fraction
         val sample = visibleStartSample + (visibleEndSample - visibleStartSample) * fraction
         val edgeGlow = activeEdgeGlow(sample, viewport, segment.sampleCount)
         val texture = deterministicSignalTexture(segment, pulseIndex)
-        val envelope = 1f - kotlin.math.abs(fraction - 0.5f) * 0.72f
-        val height = minBarHeight + (maxBarHeight - minBarHeight) * (0.42f + 0.58f * texture * envelope)
+        val envelope = bitTripletEnvelope(pulseIndex)
+        val height = minBarHeight + (maxBarHeight - minBarHeight) * (0.32f + 0.68f * texture * envelope)
         val color =
             flashSegmentColor(
                 isActive = sample <= viewport.playheadSample,
@@ -673,6 +702,13 @@ private fun deterministicSignalTexture(
     return 0.58f + 0.42f * folded
 }
 
+private fun bitTripletEnvelope(index: Int): Float =
+    when (index) {
+        0, 2 -> 1.18f
+        1 -> 0.54f
+        else -> 0.84f
+    }
+
 private fun FskEnergyBucket.heldToneStrength(
     buckets: List<FskEnergyBucket>,
     index: Int,
@@ -704,5 +740,6 @@ private val FlashToneHoldDecayByBucketOffset = floatArrayOf(0.52f, 0.26f)
 private const val FlashToneHoldAlphaBoost = 0.18f
 private const val FlashSegmentMicroBarSpacingDp = 4
 private const val FlashSegmentMicroBarWidthDp = 2
+private const val FlashBitSegmentGapDp = 1.6f
 private const val FlashPitchSegmentGapDp = 3
 private const val FlashPitchSegmentMinVisibleWidthDp = 2

@@ -7,6 +7,7 @@ import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.screen.LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -19,6 +20,46 @@ class AudioAppUiStateTest {
             )
 
         assertEquals(2205, state.currentPlaybackFrameSamples)
+    }
+
+    @Test
+    fun `long generated flash visual data prefers waveform preview`() {
+        val fullPcm = ShortArray(16) { it.toShort() }
+        val previewPcm = shortArrayOf(1, 2, 3)
+        val state =
+            AudioAppUiState(
+                currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),
+                sessions =
+                    mapOf(
+                        TransportModeOption.Flash to
+                            ModeAudioSessionState(
+                                generatedPcm = fullPcm,
+                                generatedWaveformPcm = previewPcm,
+                                generatedAudioMetadata =
+                                    GeneratedAudioMetadata(
+                                        mode = TransportModeOption.Flash,
+                                        createdAtIsoUtc = "2026-01-01T00:00:00Z",
+                                        durationMs = 120_000L,
+                                        sampleRateHz = 44_100,
+                                        frameSamples = 2205,
+                                        pcmSampleCount = LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD,
+                                        payloadByteCount = 1_656,
+                                        inputSourceKind = GeneratedAudioInputSourceKind.Manual,
+                                        appVersion = "1.0.0",
+                                        coreVersion = "1.0.0",
+                                    ),
+                            ),
+                        TransportModeOption.Pro to ModeAudioSessionState(),
+                        TransportModeOption.Ultra to ModeAudioSessionState(),
+                        TransportModeOption.Mini to ModeAudioSessionState(),
+                    ),
+            )
+
+        val visualData = state.currentPlaybackVisualData
+
+        assertEquals(PlaybackPcmVisualKind.WaveformPreview, visualData.kind)
+        assertEquals(previewPcm.toList(), visualData.samples.toList())
+        assertEquals(LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD, visualData.totalSamples)
     }
 
     @Test

@@ -181,4 +181,4 @@ internal fun PlaybackFollowTokenCard(
 }
 
 private val PlaybackFollowTokenCardMinimumWidth = 92.dp
-private val PlaybackFollowTokenCardMaximumWidth = 360.dp
+private val PlaybackFollowTokenCardMaximumWidth = 420.dp

@@ -26,7 +26,14 @@ data class ModeAudioSessionState(
     val generatedFlashSignalInfo: FlashSignalInfo = FlashSignalInfo.Empty,
     val generatedContentRevision: Long = 0L,
     val decodedPayload: DecodedPayloadViewData = DecodedPayloadViewData.Empty,
+    // For long generated audio this is only the active playback window. The
+    // source above lets playback/Lyrics load adjacent windows without keeping
+    // all token and timeline lists in Compose state.
     val followData: PayloadFollowViewData = PayloadFollowViewData.Empty,
+    val followWindowSource: FollowDataWindowSource? = null,
+    val followWindow: FollowDataWindowState = FollowDataWindowState(),
+    val flashVisualWindowSource: FlashVisualWindowSource? = null,
+    val flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     val statusText: UiText = UiText.Resource(R.string.status_ready_to_encode),
     val isCodecBusy: Boolean = false,
     val encodeProgress: Float? = null,

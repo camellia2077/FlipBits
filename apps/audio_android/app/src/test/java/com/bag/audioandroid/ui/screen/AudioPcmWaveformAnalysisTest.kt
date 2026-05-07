@@ -13,8 +13,68 @@ class AudioPcmWaveformAnalysisTest {
 
     @Test
     fun `pcm waveform displayed samples quantize to analysis windows`() {
-        assertEquals(0f, quantizePcmWaveformDisplayedSamples(displayedSamples = 10f, sampleStep = 100, totalSamples = 1_000))
-        assertEquals(100f, quantizePcmWaveformDisplayedSamples(displayedSamples = 51f, sampleStep = 100, totalSamples = 1_000))
-        assertEquals(1_000f, quantizePcmWaveformDisplayedSamples(displayedSamples = 1_020f, sampleStep = 100, totalSamples = 1_000))
+        assertEquals(
+            0f,
+            quantizePcmWaveformDisplayedSamples(
+                displayedSamples = 10f,
+                sampleStep = 100,
+                totalSamples = 1_000,
+            ),
+        )
+        assertEquals(
+            100f,
+            quantizePcmWaveformDisplayedSamples(
+                displayedSamples = 51f,
+                sampleStep = 100,
+                totalSamples = 1_000,
+            ),
+        )
+        assertEquals(
+            1_000f,
+            quantizePcmWaveformDisplayedSamples(
+                displayedSamples = 1_020f,
+                sampleStep = 100,
+                totalSamples = 1_000,
+            ),
+        )
+    }
+
+    @Test
+    fun `pcm waveform bucket centers remain stable inside quantized analysis window`() {
+        val pcm = ShortArray(1_000) { index -> index.toShort() }
+        val sampleStep = 100
+        val windowSampleCount = 1_000
+        val targetBucketCount = 100
+        val firstQuantizedSample =
+            quantizePcmWaveformDisplayedSamples(
+                displayedSamples = 120f,
+                sampleStep = sampleStep,
+                totalSamples = pcm.size,
+            )
+        val nextQuantizedSample =
+            quantizePcmWaveformDisplayedSamples(
+                displayedSamples = 149f,
+                sampleStep = sampleStep,
+                totalSamples = pcm.size,
+            )
+
+        val firstBucket =
+            buildPcmWaveBuckets(
+                pcm = pcm,
+                currentSample = firstQuantizedSample,
+                windowSampleCount = windowSampleCount,
+                targetBucketCount = targetBucketCount,
+            )[50]
+        val nextBucket =
+            buildPcmWaveBuckets(
+                pcm = pcm,
+                currentSample = nextQuantizedSample,
+                windowSampleCount = windowSampleCount,
+                targetBucketCount = targetBucketCount,
+            )[50]
+
+        assertEquals(firstQuantizedSample, nextQuantizedSample)
+        assertEquals(firstBucket.startSample, nextBucket.startSample)
+        assertEquals(firstBucket.endSample, nextBucket.endSample)
     }
 }

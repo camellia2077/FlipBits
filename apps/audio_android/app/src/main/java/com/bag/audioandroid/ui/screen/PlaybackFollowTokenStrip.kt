@@ -80,7 +80,7 @@ internal fun PlaybackFollowTokenStrip(
         val stripModifier =
             Modifier
                 .fillMaxWidth()
-                .heightIn(min = 188.dp, max = 240.dp)
+                .heightIn(min = 188.dp, max = 320.dp)
                 .pointerInput(Unit) {
                     awaitEachGesture {
                         awaitFirstDown(pass = PointerEventPass.Initial)
@@ -128,8 +128,8 @@ internal fun PlaybackFollowTokenStrip(
     }
 }
 
-private const val PlaybackFollowTokenCenterWidthFraction = 0.82f
+private const val PlaybackFollowTokenCenterWidthFraction = 1.0f
 private val PlaybackFollowTokenMinimumWidth = 92.dp
-private val PlaybackFollowTokenMaximumWidth = 360.dp
-private val PlaybackFollowTokenMinimumEdgePadding = 24.dp
+private val PlaybackFollowTokenMaximumWidth = 420.dp
+private val PlaybackFollowTokenMinimumEdgePadding = 0.dp
 private const val TokenStripAutoFollowResumeDelayMs = 650L

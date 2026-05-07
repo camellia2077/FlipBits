@@ -35,6 +35,7 @@ internal class AudioAndroidSessionActions(
     refreshSavedAudioItems: () -> Unit,
     workerDispatcher: CoroutineDispatcher = Dispatchers.IO,
     generatedAudioCacheGateway: GeneratedAudioCacheGateway,
+    private val followDataWindowActions: FollowDataWindowActions? = null,
 ) {
     private val editingActions =
         AudioSessionEditingActions(
@@ -95,6 +96,13 @@ internal class AudioAndroidSessionActions(
     }
 
     fun ensureCurrentPlaybackDecodedForLyrics() {
+        val current = uiState.value
+        if (current.currentPlaybackSource is AudioPlaybackSource.Generated) {
+            followDataWindowActions?.ensureCurrentWindow(
+                mode = current.currentPlaybackSource.mode,
+                displayedSamples = current.currentPlayback.displayedSamples,
+            )
+        }
         codecActions.ensureCurrentPlaybackDecodedForLyrics()
     }
 

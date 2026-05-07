@@ -341,7 +341,7 @@ private fun PlaybackSpeedControl(
             onClick = onCyclePlaybackSpeed,
             contentDescription = stringResource(R.string.audio_action_cycle_playback_speed, PlaybackSpeedOption.format(playbackSpeed)),
             contentColor = contentColor,
-            label = PlaybackSpeedOption.labelFor(playbackSpeed),
+            label = PlaybackSpeedOption.format(playbackSpeed),
             size = 64.dp,
         )
         UtilityIconButton(

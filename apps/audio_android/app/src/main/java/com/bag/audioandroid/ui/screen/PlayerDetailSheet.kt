@@ -21,6 +21,7 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.state.FlashVisualWindowState
 
 @Composable
 internal fun PlayerDetailSheetContent(
@@ -44,6 +45,7 @@ internal fun PlayerDetailSheetContent(
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
     followData: PayloadFollowViewData,
+    flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     savedAudioItem: SavedAudioItem?,
     onTogglePlayback: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
@@ -96,6 +98,7 @@ internal fun PlayerDetailSheetContent(
             isFlashMode = miniPlayerModel.isFlashMode,
             flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
             followData = followData,
+            flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
             displaySectionState = displaySectionState,
             savedAudioItem = savedAudioItem,
@@ -149,6 +152,7 @@ private fun PlayerDetailScrollContent(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    flashVisualWindow: FlashVisualWindowState,
     isPlaying: Boolean,
     displaySectionState: PlaybackDisplaySectionState,
     savedAudioItem: SavedAudioItem?,
@@ -171,6 +175,7 @@ private fun PlayerDetailScrollContent(
             isFlashMode = isFlashMode,
             flashVoicingStyle = flashVoicingStyle,
             followData = followData,
+            flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
             displaySectionState = displaySectionState,
             onSeekToSample = onSeekToSample,

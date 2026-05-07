@@ -100,4 +100,4 @@ private fun PayloadFollowViewData.canDriveFlashSignalBuckets(): Boolean =
         binaryGroupTimeline.isNotEmpty() &&
         binaryTokens.size >= binaryGroupTimeline.size
 
-private const val LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD = 44100 * 120
+internal const val LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD = 44100 * 120
