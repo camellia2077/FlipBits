@@ -48,6 +48,7 @@ import com.bag.audioandroid.domain.TextFollowTimelineEntry
 
 private const val TokenTapeAnimationDurationMs = 180
 private const val TokenTapeAnchorRatio = 0.72f
+private const val TokenTapeAnimatedLineJumpLimit = 3
 private const val DisplayLinePreferredUnits = 24
 private const val DisplayLineHardUnits = 32
 private val TokenTapeVerticalPadding = 6.dp
@@ -154,10 +155,17 @@ internal fun PlaybackTokenContextTape(
         androidx.compose.foundation.lazy
             .rememberLazyListState()
 
-    // Smoothly scroll the list so the active line moves to the center spot
     androidx.compose.runtime.LaunchedEffect(activeLineIndex) {
         if (activeLineIndex >= 0) {
-            listState.animateScrollToItem(activeLineIndex)
+            val currentLineIndex = listState.firstVisibleItemIndex
+            val lineJump = kotlin.math.abs(activeLineIndex - currentLineIndex)
+            if (lineJump <= TokenTapeAnimatedLineJumpLimit) {
+                listState.animateScrollToItem(activeLineIndex)
+            } else {
+                // Large seeks should land immediately; animating across many
+                // lyric rows makes long generated audio feel frozen.
+                listState.scrollToItem(activeLineIndex)
+            }
         }
     }
 
@@ -487,10 +495,12 @@ internal fun followActiveTextTimelineIndex(
     followData: PayloadFollowViewData,
     displayedSamples: Int,
 ): Int =
-    followData.textTokenTimeline.indexOfLast { entry ->
-        displayedSamples >= entry.startSample &&
-            displayedSamples < entry.startSample + entry.sampleCount
-    }
+    activeTimelineIndexBySample(
+        entries = followData.textTokenTimeline,
+        displayedSamples = displayedSamples,
+        startSample = TextFollowTimelineEntry::startSample,
+        sampleCount = TextFollowTimelineEntry::sampleCount,
+    )
 
 internal fun resolveActiveTokenLineRange(
     lineTokenRanges: List<TextFollowLineTokenRangeViewData>,

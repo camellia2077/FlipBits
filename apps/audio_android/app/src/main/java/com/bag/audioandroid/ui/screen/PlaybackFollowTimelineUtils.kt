@@ -26,19 +26,45 @@ internal fun activeTextTimelineIndex(
     entries: List<TextFollowTimelineEntry>,
     displayedSamples: Int,
 ): Int =
-    entries.indexOfLast { entry ->
-        displayedSamples >= entry.startSample &&
-            displayedSamples < entry.startSample + entry.sampleCount
-    }
+    activeTimelineIndexBySample(
+        entries = entries,
+        displayedSamples = displayedSamples,
+        startSample = TextFollowTimelineEntry::startSample,
+        sampleCount = TextFollowTimelineEntry::sampleCount,
+    )
 
 internal fun activeLineTimelineIndex(
     entries: List<TextFollowLyricLineTimelineEntry>,
     displayedSamples: Int,
 ): Int =
-    entries.indexOfLast { entry ->
-        displayedSamples >= entry.startSample &&
-            displayedSamples < entry.startSample + entry.sampleCount
+    activeTimelineIndexBySample(
+        entries = entries,
+        displayedSamples = displayedSamples,
+        startSample = TextFollowLyricLineTimelineEntry::startSample,
+        sampleCount = TextFollowLyricLineTimelineEntry::sampleCount,
+    )
+
+internal fun <T> activeTimelineIndexBySample(
+    entries: List<T>,
+    displayedSamples: Int,
+    startSample: (T) -> Int,
+    sampleCount: (T) -> Int,
+): Int {
+    var low = 0
+    var high = entries.lastIndex
+    while (low <= high) {
+        val mid = (low + high).ushr(1)
+        val entry = entries[mid]
+        val start = startSample(entry)
+        val end = start + sampleCount(entry)
+        when {
+            displayedSamples < start -> high = mid - 1
+            displayedSamples >= end -> low = mid + 1
+            else -> return mid
+        }
     }
+    return -1
+}
 
 internal fun activeByteIndexWithinToken(
     activeTextIndex: Int,

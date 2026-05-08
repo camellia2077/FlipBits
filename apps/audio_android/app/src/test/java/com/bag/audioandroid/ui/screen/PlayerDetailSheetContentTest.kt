@@ -23,7 +23,6 @@ import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
-import com.bag.audioandroid.ui.state.FlashVisualWindowState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -91,8 +91,10 @@
     <string name="audio_input_editor_done">Done</string>
     <!-- CONTEXT: Character counter shown under the input editor text field. %1$d is the current character count. -->
     <string name="audio_input_editor_count">%1$d characters</string>
-    <!-- CONTEXT: Input counter shown for all transports. %1$d is the visible character count and %2$d is the UTF-8 byte count. -->
+    <!-- CONTEXT: Input counter shown for UTF-8-friendly transports. %1$d is the visible character count and %2$d is the UTF-8 byte count. -->
     <string name="audio_input_metrics">%1$d chars • %2$d bytes</string>
+    <!-- CONTEXT: Compact one-line input summary for ASCII-only transports. %1$d is the visible character count and %2$d is the byte count. -->
+    <string name="audio_input_ascii_metrics">ASCII text • %1$d chars • %2$d bytes</string>
     <!-- CONTEXT: Accessibility/action label for expanding the decoded result panel. -->
     <string name="audio_action_expand_result">Expand result</string>
     <!-- CONTEXT: Accessibility/action label for collapsing the decoded result panel. -->
@@ -406,9 +408,9 @@
     <string name="audio_follow_tokenizer_title">Tokenizer</string>
     <string name="audio_action_open_tokenizer">Open tokenizer</string>
     <!-- CONTEXT: CONTEXT: Dialog title for mode-specific input encoding rules. -->
-    <string name="audio_input_encoding_rules_title">Encoding rules</string>
+    <string name="audio_input_encoding_rules_title">Input rules</string>
     <!-- CONTEXT: CONTEXT: Text button beside input validation feedback that opens a dialog explaining mode-specific input encoding rules. -->
-    <string name="audio_input_encoding_rules">Encoding rules</string>
+    <string name="audio_input_encoding_rules">Input rules</string>
     <!-- CONTEXT: CONTEXT: Confirmation button that closes the input encoding rules dialog. -->
     <string name="audio_input_encoding_rules_done">Done</string>
     <!-- CONTEXT: CONTEXT: Body text in the input encoding rules dialog for pro mode. -->

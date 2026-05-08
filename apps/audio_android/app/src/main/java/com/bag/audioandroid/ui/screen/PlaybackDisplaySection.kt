@@ -3,7 +3,6 @@ package com.bag.audioandroid.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -60,7 +59,7 @@ internal fun PlaybackDisplaySection(
             modifier
                 .fillMaxWidth()
                 .testTag("playback-display-section"),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(if (playbackDisplayMode == PlaybackDisplayMode.Lyrics) 6.dp else 10.dp),
     ) {
         SingleChoiceSegmentedButtonRow(
             modifier =
@@ -171,11 +170,11 @@ internal fun PlaybackDisplaySection(
         PlaybackTokenContextTape(
             followData = followData,
             displayedSamples = displayedSamples,
-            visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 1,
+            visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 4,
             onSeekToSample = onSeekToSample,
             modifier =
                 if (playbackDisplayMode == PlaybackDisplayMode.Lyrics) {
-                    Modifier.padding(top = 12.dp)
+                    Modifier
                 } else {
                     Modifier
                 },

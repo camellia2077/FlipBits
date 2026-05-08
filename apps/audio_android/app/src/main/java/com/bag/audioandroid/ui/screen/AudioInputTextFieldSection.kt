@@ -31,6 +31,7 @@ internal fun AudioInputTextFieldSection(
     inputText: String,
     inputPlaceholderText: String,
     onInputTextChange: (String) -> Unit,
+    onOpenInputRules: () -> Unit,
 ) {
     var isInputFocused by remember { mutableStateOf(false) }
     OutlinedTextField(
@@ -48,13 +49,10 @@ internal fun AudioInputTextFieldSection(
             val inputMetrics = measureAudioInputText(inputText)
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 AudioInputMetricsSummaryRow(
-                    charsetHint = stringResource(transportMode.charsetHintResId),
-                    metricsText =
-                        stringResource(
-                            R.string.audio_input_metrics,
-                            inputMetrics.characterCount,
-                            inputMetrics.byteCount,
-                        ),
+                    transportMode = transportMode,
+                    characterCount = inputMetrics.characterCount,
+                    byteCount = inputMetrics.byteCount,
+                    onOpenInputRules = onOpenInputRules,
                 )
             }
         },

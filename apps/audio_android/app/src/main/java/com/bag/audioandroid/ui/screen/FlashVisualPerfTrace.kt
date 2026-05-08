@@ -395,9 +395,13 @@ internal object FlashVisualPerfTrace {
                 "raw=${lastRawSample.toInt()} smooth=${lastSmoothSample.toInt()} " +
                 "rawUpdate/s=${rate(rawPositionUpdateCount, seconds)} rawStepMs=${ms(rawStepAvgMs)} rawStepMaxMs=${ms(rawStepMaxMs)} " +
                 "smoothStepMs=${ms(smoothStepAvgMs)} smoothStepMaxMs=${ms(smoothStepMaxMs)} " +
-                "visualErrorMs=${ms(lastVisualErrorMs.toDouble())} pxStep=${ms(visualPxStepAvg.toDouble())} pxStepMax=${ms(visualPxStepMax.toDouble())} " +
+                "visualErrorMs=${ms(
+                    lastVisualErrorMs.toDouble(),
+                )} pxStep=${ms(visualPxStepAvg.toDouble())} pxStepMax=${ms(visualPxStepMax.toDouble())} " +
                 "anchorJumpMaxMs=${ms(anchorJumpMaxMs)} smoothReset=$smoothResetCount " +
-                "windowShiftMaxMs=${ms(windowShiftMaxMs)} viewportStartStepMaxMs=${ms(viewportStartStepMaxMs)} largePxStep=$largePxStepCount " +
+                "windowShiftMaxMs=${ms(
+                    windowShiftMaxMs,
+                )} viewportStartStepMaxMs=${ms(viewportStartStepMaxMs)} largePxStep=$largePxStepCount " +
                 "buckets=$lastBuckets fixed=$lastFixedTimeline fallback=$lastFallbackTimeline " +
                 "bitReadout=$lastBitReadout window=[$lastWindowStart,$lastWindowEnd) " +
                 "distStart=${lastDistanceToWindowStart.toInt()} distEnd=${lastDistanceToWindowEnd.toInt()} " +

@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -67,6 +71,13 @@ internal fun AudioInputActionsCard(
             analyzeAudioInputEncoding(transportMode, inputText)
         }
     val canEncodeInput = !inputEncodingAnalysis.isBlockingInvalid
+    var showInputRules by remember { mutableStateOf(false) }
+    if (showInputRules) {
+        InputEncodingRulesDialog(
+            transportMode = transportMode,
+            onDismiss = { showInputRules = false },
+        )
+    }
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -115,6 +126,7 @@ internal fun AudioInputActionsCard(
                     inputText = inputText,
                     inputPlaceholderText = inputPlaceholderText,
                     onInputTextChange = onInputTextChange,
+                    onOpenInputRules = { showInputRules = true },
                 )
 
                 if (inputText.isNotBlank()) {
@@ -183,19 +195,45 @@ internal fun AudioInputActionsCard(
 
 @Composable
 internal fun AudioInputMetricsSummaryRow(
-    charsetHint: String,
-    metricsText: String,
+    transportMode: TransportModeOption,
+    characterCount: Int,
+    byteCount: Int,
+    onOpenInputRules: () -> Unit,
 ) {
+    val summaryText =
+        when (transportMode) {
+            TransportModeOption.Mini,
+            TransportModeOption.Pro,
+            ->
+                stringResource(
+                    R.string.audio_input_ascii_metrics,
+                    characterCount,
+                    byteCount,
+                )
+
+            TransportModeOption.Flash,
+            TransportModeOption.Ultra,
+            ->
+                stringResource(
+                    R.string.audio_input_metrics,
+                    characterCount,
+                    byteCount,
+                )
+        }
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = charsetHint,
+            text = summaryText,
             modifier = Modifier.weight(1f),
         )
-        Text(text = metricsText)
+        IconButton(onClick = onOpenInputRules) {
+            Icon(
+                imageVector = Icons.Rounded.Info,
+                contentDescription = stringResource(R.string.audio_input_encoding_rules),
+            )
+        }
     }
 }
 

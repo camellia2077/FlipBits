@@ -35,6 +35,7 @@ internal fun DrawScope.drawToneTrackSegments(
     val laneHeight = (innerHeight - laneGap).coerceAtLeast(1f) / 2f
     val upperTop = topPadding
     val lowerTop = topPadding + laneHeight + laneGap
+    val edgeFadeSamples = edgeFadeSampleCount(segments, viewport)
 
     drawLine(
         color = centerLineColor,
@@ -68,6 +69,7 @@ internal fun DrawScope.drawToneTrackSegments(
             inactiveToneColor = inactiveToneColor,
             glowPulse = glowPulse,
             minVisualWidth = segmentWidth,
+            edgeFadeSamples = edgeFadeSamples,
         )
     }
 }
@@ -88,6 +90,7 @@ internal fun DrawScope.drawToneEnergySegments(
     val upperGap = 3.dp.toPx()
     val lowerGap = 3.dp.toPx()
     val maxEnergyHeight = innerHeight * 0.42f
+    val edgeFadeSamples = edgeFadeSampleCount(segments, viewport)
 
     drawLine(
         color = centerLineColor,
@@ -118,6 +121,7 @@ internal fun DrawScope.drawToneEnergySegments(
                     inactiveToneColor = inactiveToneColor,
                     glowPulse = glowPulse,
                     minVisualWidth = segmentWidth,
+                    edgeFadeSamples = edgeFadeSamples,
                 )
 
             FskDominantTone.Low ->
@@ -134,6 +138,7 @@ internal fun DrawScope.drawToneEnergySegments(
                     inactiveToneColor = inactiveToneColor,
                     glowPulse = glowPulse,
                     minVisualWidth = segmentWidth,
+                    edgeFadeSamples = edgeFadeSamples,
                 )
 
             FskDominantTone.Unknown -> Unit
@@ -157,6 +162,7 @@ internal fun DrawScope.drawPitchLadderSegments(
     val lowY = topPadding + innerHeight * 0.88f
     val activeStrokeWidth = 4.8.dp.toPx()
     val inactiveStrokeWidth = 3.6.dp.toPx()
+    val edgeFadeSamples = edgeFadeSampleCount(segments, viewport)
 
     drawLine(
         color = centerLineColor.copy(alpha = 0.48f),
@@ -194,6 +200,7 @@ internal fun DrawScope.drawPitchLadderSegments(
             activeToneColor = activeToneColor,
             inactiveToneColor = inactiveToneColor,
             glowPulse = glowPulse,
+            edgeFadeSamples = edgeFadeSamples,
         )
     }
 }
@@ -524,6 +531,7 @@ private fun DrawScope.drawMicroBarsAcrossSegment(
     inactiveToneColor: Color,
     glowPulse: Float,
     minVisualWidth: Float,
+    edgeFadeSamples: Float,
 ) {
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
     val minBarWidth = FlashSegmentMicroBarWidthDp.dp.toPx()
@@ -548,6 +556,7 @@ private fun DrawScope.drawMicroBarsAcrossSegment(
                 confidence = 0.78f + 0.22f * texture,
                 glowPulse = glowPulse,
                 edgeGlow = edgeGlow,
+                alphaMultiplier = viewportEdgeFadeMultiplier(sample, viewport, edgeFadeSamples),
             )
         drawRoundRect(
             color = color,
@@ -571,6 +580,7 @@ private fun DrawScope.drawEnergyPulseClusterAcrossSegment(
     inactiveToneColor: Color,
     glowPulse: Float,
     minVisualWidth: Float,
+    edgeFadeSamples: Float,
 ) {
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
     val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
@@ -592,6 +602,7 @@ private fun DrawScope.drawEnergyPulseClusterAcrossSegment(
                 confidence = 0.72f + 0.28f * texture,
                 glowPulse = glowPulse,
                 edgeGlow = edgeGlow,
+                alphaMultiplier = viewportEdgeFadeMultiplier(sample, viewport, edgeFadeSamples),
             )
         drawLine(
             color = color,
@@ -614,6 +625,7 @@ private fun DrawScope.drawPitchSegmentedBar(
     activeToneColor: Color,
     inactiveToneColor: Color,
     glowPulse: Float,
+    edgeFadeSamples: Float,
 ) {
     val availableWidth = endX - startX
     if (availableWidth <= 0f) {
@@ -640,6 +652,7 @@ private fun DrawScope.drawPitchSegmentedBar(
             confidence = 1f,
             glowPulse = glowPulse,
             edgeGlow = edgeGlow,
+            alphaMultiplier = viewportEdgeFadeMultiplier(centerSample, viewport, edgeFadeSamples),
         )
     // Draw Pitch as real segmented bars. Round line caps visually bridge short
     // gaps, so the bar geometry owns the cut between adjacent low/high symbols.
@@ -672,12 +685,50 @@ private fun flashSegmentColor(
     confidence: Float,
     glowPulse: Float,
     edgeGlow: Float = 0f,
+    alphaMultiplier: Float = 1f,
 ): Color =
     if (isActive) {
-        activeColor.copy(alpha = (0.58f + 0.20f * glowPulse + 0.20f * edgeGlow).coerceIn(0f, 1f))
+        activeColor.copy(alpha = ((0.58f + 0.20f * glowPulse + 0.20f * edgeGlow) * alphaMultiplier).coerceIn(0f, 1f))
     } else {
-        inactiveColor.copy(alpha = (0.26f + 0.18f * confidence.coerceIn(0f, 1f) + 0.16f * edgeGlow).coerceIn(0f, 0.76f))
+        inactiveColor.copy(
+            alpha =
+                ((0.26f + 0.18f * confidence.coerceIn(0f, 1f) + 0.16f * edgeGlow) * alphaMultiplier)
+                    .coerceIn(0f, 0.76f),
+        )
     }
+
+private fun edgeFadeSampleCount(
+    segments: List<FlashSignalToneSegment>,
+    viewport: FlashSignalViewport,
+): Float {
+    var visibleCount = 0
+    var sampleTotal = 0f
+    segments.forEach { segment ->
+        if (segment.overlaps(viewport)) {
+            visibleCount += 1
+            sampleTotal += segment.sampleCount.coerceAtLeast(1)
+        }
+    }
+    if (visibleCount <= 0) {
+        return 0f
+    }
+    // Fade roughly two visible bits at each viewport edge. This only changes
+    // visual emphasis; sample positions and segment widths remain exact.
+    return (sampleTotal / visibleCount.toFloat()) * 2f
+}
+
+private fun viewportEdgeFadeMultiplier(
+    sample: Float,
+    viewport: FlashSignalViewport,
+    edgeFadeSamples: Float,
+): Float {
+    if (edgeFadeSamples <= 0f) {
+        return 1f
+    }
+    val distanceToEdge = minOf(sample - viewport.startSample, viewport.endSample - sample)
+    val progress = (distanceToEdge / edgeFadeSamples).coerceIn(0f, 1f)
+    return FlashViewportEdgeMinAlpha + (1f - FlashViewportEdgeMinAlpha) * progress
+}
 
 private fun activeEdgeGlow(
     sample: Float,
@@ -745,6 +796,7 @@ private fun FskEnergyBucket.strengthForTone(tone: FskDominantTone): Float =
 
 private val FlashToneHoldDecayByBucketOffset = floatArrayOf(0.52f, 0.26f)
 private const val FlashToneHoldAlphaBoost = 0.18f
+private const val FlashViewportEdgeMinAlpha = 0.52f
 private const val FlashSegmentMicroBarSpacingDp = 4
 private const val FlashSegmentMicroBarWidthDp = 2
 private const val FlashBitSegmentGapDp = 1.6f

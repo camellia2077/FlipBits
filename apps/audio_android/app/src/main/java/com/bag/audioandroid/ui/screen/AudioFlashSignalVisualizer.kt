@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -46,6 +45,11 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.state.FlashVisualWindowState
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.ceil
+import kotlin.math.roundToInt
+
+// Controls only the Flash Visual viewport density. Playback progress and audio
+// timeline semantics stay based on absolute samples.
+private const val FlashSignalViewportSeconds = 0.80f
 
 @Composable
 internal fun AudioFlashSignalVisualizer(
@@ -138,7 +142,9 @@ internal fun AudioFlashSignalVisualizer(
             }
         val windowSampleCount =
             remember(sampleRateHz) {
-                sampleRateHz.coerceAtLeast(1)
+                (sampleRateHz.coerceAtLeast(1) * FlashSignalViewportSeconds)
+                    .roundToInt()
+                    .coerceAtLeast(1)
             }
         val activeWindowBucketCount =
             remember(flashVoicingStyle) {
@@ -164,7 +170,7 @@ internal fun AudioFlashSignalVisualizer(
                             null
                         }
                     }
-        }
+            }
         val fixedTimelineFrame = windowedTimelineFrame ?: fallbackTimelineFrame
         val visualSegments = fixedTimelineFrame?.segments.orEmpty()
         val usesFallbackTimeline = windowedTimelineFrame == null && fallbackTimelineFrame != null
@@ -428,203 +434,203 @@ private fun FlashSignalCanvas(
                 return@Canvas
             }
 
-        val corner = CornerRadius(24f, 24f)
-        val leftPadding = 12.dp.toPx()
-        val rightPadding = 12.dp.toPx()
-        val topPadding = 12.dp.toPx()
-        val bottomPadding = 12.dp.toPx()
-        val innerWidth = (size.width - leftPadding - rightPadding).coerceAtLeast(1f)
-        val innerHeight = (size.height - topPadding - bottomPadding).coerceAtLeast(1f)
-        val bucketWidth = if (buckets.isNotEmpty()) innerWidth / buckets.size.toFloat() else 1f
-        val analysisBucketSampleWidth = if (buckets.isNotEmpty()) windowSampleCount.toFloat() / buckets.size.toFloat() else 1f
-        val bucketOffset =
-            if (buckets.isNotEmpty()) {
-                ((bucketFrame.displayedSamplePosition - bucketFrame.analysisDisplayedSamplePosition) / analysisBucketSampleWidth)
-                    .coerceIn(-FlashSignalMaxVisualBucketOffset, FlashSignalMaxVisualBucketOffset)
-            } else {
-                0f
-            }
-        val scanHeadBucketIndex =
-            if (buckets.isNotEmpty()) {
-                (buckets.size * FlashSignalPlayheadAnchorRatio).coerceIn(0f, buckets.lastIndex.toFloat())
-            } else {
-                0f
-            }
-        val activeThresholdBucketIndex =
-            if (buckets.isNotEmpty()) {
-                (scanHeadBucketIndex + bucketOffset).coerceIn(0f, buckets.lastIndex.toFloat())
-            } else {
-                0f
-            }
-        val playheadX = leftPadding + innerWidth * FlashSignalPlayheadAnchorRatio
-        val fixedViewport =
-            fixedTimelineFrame?.let {
-                // Follow timeline rendering is fixed in absolute sample space; playback only
-                // moves the viewport, so short Flash bits do not change shape while playing.
-                val windowStart = followDisplayedSamplePosition - windowSampleCount * FlashSignalPlayheadAnchorRatio
-                FlashSignalViewport(
-                    startSample = windowStart,
-                    endSample = windowStart + windowSampleCount,
-                    playheadSample = followDisplayedSamplePosition,
+            val corner = CornerRadius(24f, 24f)
+            val leftPadding = 12.dp.toPx()
+            val rightPadding = 12.dp.toPx()
+            val topPadding = 12.dp.toPx()
+            val bottomPadding = 12.dp.toPx()
+            val innerWidth = (size.width - leftPadding - rightPadding).coerceAtLeast(1f)
+            val innerHeight = (size.height - topPadding - bottomPadding).coerceAtLeast(1f)
+            val bucketWidth = if (buckets.isNotEmpty()) innerWidth / buckets.size.toFloat() else 1f
+            val analysisBucketSampleWidth = if (buckets.isNotEmpty()) windowSampleCount.toFloat() / buckets.size.toFloat() else 1f
+            val bucketOffset =
+                if (buckets.isNotEmpty()) {
+                    ((bucketFrame.displayedSamplePosition - bucketFrame.analysisDisplayedSamplePosition) / analysisBucketSampleWidth)
+                        .coerceIn(-FlashSignalMaxVisualBucketOffset, FlashSignalMaxVisualBucketOffset)
+                } else {
+                    0f
+                }
+            val scanHeadBucketIndex =
+                if (buckets.isNotEmpty()) {
+                    (buckets.size * FlashSignalPlayheadAnchorRatio).coerceIn(0f, buckets.lastIndex.toFloat())
+                } else {
+                    0f
+                }
+            val activeThresholdBucketIndex =
+                if (buckets.isNotEmpty()) {
+                    (scanHeadBucketIndex + bucketOffset).coerceIn(0f, buckets.lastIndex.toFloat())
+                } else {
+                    0f
+                }
+            val playheadX = leftPadding + innerWidth * FlashSignalPlayheadAnchorRatio
+            val fixedViewport =
+                fixedTimelineFrame?.let {
+                    // Follow timeline rendering is fixed in absolute sample space; playback only
+                    // moves the viewport, so short Flash bits do not change shape while playing.
+                    val windowStart = followDisplayedSamplePosition - windowSampleCount * FlashSignalPlayheadAnchorRatio
+                    FlashSignalViewport(
+                        startSample = windowStart,
+                        endSample = windowStart + windowSampleCount,
+                        playheadSample = followDisplayedSamplePosition,
+                    )
+                }
+            FlashVisualPerfTrace.recordMotion(
+                rawSample = anchorFollowDisplayedSamplePosition,
+                smoothSample = followDisplayedSamplePosition,
+                sampleRateHz = sampleRateHz,
+                viewportWidthPx = innerWidth,
+                viewportSamples = windowSampleCount,
+                windowStartSample = traceWindowStartSample,
+                viewportStartSample = fixedViewport?.startSample ?: 0f,
+            )
+            val visibleSegmentCount =
+                fixedViewport
+                    ?.let { viewport -> visualSegments.count { segment -> segment.overlaps(viewport) } }
+                    ?: 0
+            val visiblePrimitiveEstimate =
+                flashVisualPrimitiveEstimate(
+                    mode = mode,
+                    drawableSegments = visibleSegmentCount,
+                    buckets = buckets.size,
+                    hasFixedTimeline = fixedTimelineFrame != null,
                 )
+            val drawStartNanos = System.nanoTime()
+
+            drawRoundRect(
+                color = baseBackground,
+                size = size,
+                cornerRadius = corner,
+            )
+            drawRoundRect(
+                brush = ambientBrush,
+                size = size,
+                cornerRadius = corner,
+            )
+
+            when (mode) {
+                FlashSignalVisualizationMode.ToneTracks ->
+                    if (fixedTimelineFrame != null && fixedViewport != null) {
+                        drawToneTrackSegments(
+                            segments = visualSegments,
+                            viewport = fixedViewport,
+                            leftPadding = leftPadding,
+                            topPadding = topPadding,
+                            innerWidth = innerWidth,
+                            innerHeight = innerHeight,
+                            activeToneColor = activeToneColor,
+                            inactiveToneColor = inactiveToneColor,
+                            centerLineColor = centerLineColor,
+                            glowPulse = glowPulse,
+                        )
+                    } else {
+                        drawToneTracks(
+                            buckets = buckets,
+                            activeThresholdBucketIndex = activeThresholdBucketIndex,
+                            activeWindowBucketCount = activeWindowBucketCount,
+                            bucketOffset = bucketOffset,
+                            leftPadding = leftPadding,
+                            topPadding = topPadding,
+                            innerWidth = innerWidth,
+                            innerHeight = innerHeight,
+                            bucketWidth = bucketWidth,
+                            activeToneColor = activeToneColor,
+                            inactiveToneColor = inactiveToneColor,
+                            centerLineColor = centerLineColor,
+                            glowPulse = glowPulse,
+                        )
+                    }
+
+                FlashSignalVisualizationMode.ToneEnergy ->
+                    if (fixedTimelineFrame != null && fixedViewport != null) {
+                        drawToneEnergySegments(
+                            segments = visualSegments,
+                            viewport = fixedViewport,
+                            leftPadding = leftPadding,
+                            topPadding = topPadding,
+                            innerWidth = innerWidth,
+                            innerHeight = innerHeight,
+                            activeToneColor = activeToneColor,
+                            inactiveToneColor = inactiveToneColor,
+                            centerLineColor = centerLineColor,
+                            glowPulse = glowPulse,
+                        )
+                    } else {
+                        drawToneEnergy(
+                            buckets = buckets,
+                            activeThresholdBucketIndex = activeThresholdBucketIndex,
+                            activeWindowBucketCount = activeWindowBucketCount,
+                            bucketOffset = bucketOffset,
+                            leftPadding = leftPadding,
+                            topPadding = topPadding,
+                            innerWidth = innerWidth,
+                            innerHeight = innerHeight,
+                            bucketWidth = bucketWidth,
+                            activeToneColor = activeToneColor,
+                            inactiveToneColor = inactiveToneColor,
+                            centerLineColor = centerLineColor,
+                            glowPulse = glowPulse,
+                        )
+                    }
+
+                FlashSignalVisualizationMode.PitchLadder ->
+                    if (fixedTimelineFrame != null && fixedViewport != null) {
+                        drawPitchLadderSegments(
+                            segments = visualSegments,
+                            viewport = fixedViewport,
+                            leftPadding = leftPadding,
+                            topPadding = topPadding,
+                            innerWidth = innerWidth,
+                            innerHeight = innerHeight,
+                            activeToneColor = activeToneColor,
+                            inactiveToneColor = inactiveToneColor,
+                            centerLineColor = centerLineColor,
+                            glowPulse = glowPulse,
+                        )
+                    } else {
+                        drawPitchLadder(
+                            buckets = buckets,
+                            activeThresholdBucketIndex = activeThresholdBucketIndex,
+                            activeWindowBucketCount = activeWindowBucketCount,
+                            bucketOffset = bucketOffset,
+                            leftPadding = leftPadding,
+                            topPadding = topPadding,
+                            innerWidth = innerWidth,
+                            innerHeight = innerHeight,
+                            bucketWidth = bucketWidth,
+                            activeToneColor = activeToneColor,
+                            inactiveToneColor = inactiveToneColor,
+                            centerLineColor = centerLineColor,
+                            glowPulse = glowPulse,
+                        )
+                    }
             }
-        FlashVisualPerfTrace.recordMotion(
-            rawSample = anchorFollowDisplayedSamplePosition,
-            smoothSample = followDisplayedSamplePosition,
-            sampleRateHz = sampleRateHz,
-            viewportWidthPx = innerWidth,
-            viewportSamples = windowSampleCount,
-            windowStartSample = traceWindowStartSample,
-            viewportStartSample = fixedViewport?.startSample ?: 0f,
-        )
-        val visibleSegmentCount =
-            fixedViewport
-                ?.let { viewport -> visualSegments.count { segment -> segment.overlaps(viewport) } }
-                ?: 0
-        val visiblePrimitiveEstimate =
-            flashVisualPrimitiveEstimate(
+
+            drawLine(
+                color = glowColor.copy(alpha = 0.80f),
+                start = Offset(playheadX, topPadding),
+                end = Offset(playheadX, size.height - bottomPadding),
+                strokeWidth = 2.dp.toPx(),
+            )
+            val drawDurationNanos = System.nanoTime() - drawStartNanos
+            FlashVisualPerfTrace.recordDraw(
                 mode = mode,
-                drawableSegments = visibleSegmentCount,
+                isPlaying = isPlaying,
+                displayedSample = followDisplayedSamplePosition,
+                drawableSegments = visualSegments.size,
+                exactSegments = fixedTimelineFrame?.segments?.size ?: 0,
+                primitiveEstimate = primitiveEstimate,
+                visibleSegments = visibleSegmentCount,
+                visiblePrimitiveEstimate = visiblePrimitiveEstimate,
+                drawDurationNanos = drawDurationNanos,
                 buckets = buckets.size,
                 hasFixedTimeline = fixedTimelineFrame != null,
+                usesFallbackTimeline = usesFallbackTimeline,
+                hasBitReadout = hasBitReadout,
+                windowSamples = traceWindowSamples,
+                totalSamples = totalSamples,
+                windowStartSample = traceWindowStartSample,
+                windowEndSample = traceWindowEndSample,
             )
-        val drawStartNanos = System.nanoTime()
-
-        drawRoundRect(
-            color = baseBackground,
-            size = size,
-            cornerRadius = corner,
-        )
-        drawRoundRect(
-            brush = ambientBrush,
-            size = size,
-            cornerRadius = corner,
-        )
-
-        when (mode) {
-            FlashSignalVisualizationMode.ToneTracks ->
-                if (fixedTimelineFrame != null && fixedViewport != null) {
-                    drawToneTrackSegments(
-                        segments = visualSegments,
-                        viewport = fixedViewport,
-                        leftPadding = leftPadding,
-                        topPadding = topPadding,
-                        innerWidth = innerWidth,
-                        innerHeight = innerHeight,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
-                        centerLineColor = centerLineColor,
-                        glowPulse = glowPulse,
-                    )
-                } else {
-                    drawToneTracks(
-                        buckets = buckets,
-                        activeThresholdBucketIndex = activeThresholdBucketIndex,
-                        activeWindowBucketCount = activeWindowBucketCount,
-                        bucketOffset = bucketOffset,
-                        leftPadding = leftPadding,
-                        topPadding = topPadding,
-                        innerWidth = innerWidth,
-                        innerHeight = innerHeight,
-                        bucketWidth = bucketWidth,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
-                        centerLineColor = centerLineColor,
-                        glowPulse = glowPulse,
-                    )
-                }
-
-            FlashSignalVisualizationMode.ToneEnergy ->
-                if (fixedTimelineFrame != null && fixedViewport != null) {
-                    drawToneEnergySegments(
-                        segments = visualSegments,
-                        viewport = fixedViewport,
-                        leftPadding = leftPadding,
-                        topPadding = topPadding,
-                        innerWidth = innerWidth,
-                        innerHeight = innerHeight,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
-                        centerLineColor = centerLineColor,
-                        glowPulse = glowPulse,
-                    )
-                } else {
-                    drawToneEnergy(
-                        buckets = buckets,
-                        activeThresholdBucketIndex = activeThresholdBucketIndex,
-                        activeWindowBucketCount = activeWindowBucketCount,
-                        bucketOffset = bucketOffset,
-                        leftPadding = leftPadding,
-                        topPadding = topPadding,
-                        innerWidth = innerWidth,
-                        innerHeight = innerHeight,
-                        bucketWidth = bucketWidth,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
-                        centerLineColor = centerLineColor,
-                        glowPulse = glowPulse,
-                    )
-                }
-
-            FlashSignalVisualizationMode.PitchLadder ->
-                if (fixedTimelineFrame != null && fixedViewport != null) {
-                    drawPitchLadderSegments(
-                        segments = visualSegments,
-                        viewport = fixedViewport,
-                        leftPadding = leftPadding,
-                        topPadding = topPadding,
-                        innerWidth = innerWidth,
-                        innerHeight = innerHeight,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
-                        centerLineColor = centerLineColor,
-                        glowPulse = glowPulse,
-                    )
-                } else {
-                    drawPitchLadder(
-                        buckets = buckets,
-                        activeThresholdBucketIndex = activeThresholdBucketIndex,
-                        activeWindowBucketCount = activeWindowBucketCount,
-                        bucketOffset = bucketOffset,
-                        leftPadding = leftPadding,
-                        topPadding = topPadding,
-                        innerWidth = innerWidth,
-                        innerHeight = innerHeight,
-                        bucketWidth = bucketWidth,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
-                        centerLineColor = centerLineColor,
-                        glowPulse = glowPulse,
-                    )
-                }
-        }
-
-        drawLine(
-            color = glowColor.copy(alpha = 0.80f),
-            start = Offset(playheadX, topPadding),
-            end = Offset(playheadX, size.height - bottomPadding),
-            strokeWidth = 2.dp.toPx(),
-        )
-        val drawDurationNanos = System.nanoTime() - drawStartNanos
-        FlashVisualPerfTrace.recordDraw(
-            mode = mode,
-            isPlaying = isPlaying,
-            displayedSample = followDisplayedSamplePosition,
-            drawableSegments = visualSegments.size,
-            exactSegments = fixedTimelineFrame?.segments?.size ?: 0,
-            primitiveEstimate = primitiveEstimate,
-            visibleSegments = visibleSegmentCount,
-            visiblePrimitiveEstimate = visiblePrimitiveEstimate,
-            drawDurationNanos = drawDurationNanos,
-            buckets = buckets.size,
-            hasFixedTimeline = fixedTimelineFrame != null,
-            usesFallbackTimeline = usesFallbackTimeline,
-            hasBitReadout = hasBitReadout,
-            windowSamples = traceWindowSamples,
-            totalSamples = totalSamples,
-            windowStartSample = traceWindowStartSample,
-            windowEndSample = traceWindowEndSample,
-        )
         }
     }
 }
@@ -810,17 +816,17 @@ private fun rememberSmoothedFlashVisualSamplePosition(
     val safeSpeed = playbackSpeed.coerceIn(0.1f, 4f)
     val latestAnchorSample by rememberUpdatedState(anchorSample)
     val latestTotalSamples by rememberUpdatedState(totalSamples)
-    LaunchedEffect(isPlaying, safeSpeed, sampleRateHz) {
+    if (!isPlaying || sampleRateHz <= 0 || totalSamples <= 0) {
+        return visualSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
+    }
+    LaunchedEffect(safeSpeed, sampleRateHz, totalSamples) {
         FlashVisualPerfTrace.recordSmoothReset(
             anchorSample = latestAnchorSample,
             previousSmoothSample = visualSample,
             sampleRateHz = sampleRateHz,
         )
         val maxSample = latestTotalSamples.toFloat()
-        visualSample = latestAnchorSample.coerceIn(0f, maxSample)
-        if (!isPlaying || sampleRateHz <= 0 || latestTotalSamples <= 0) {
-            return@LaunchedEffect
-        }
+        visualSample = visualSample.coerceIn(0f, maxSample)
         var frameAnchorNanos = withFrameNanos { it }
         var frameAnchorSample = visualSample
         while (true) {

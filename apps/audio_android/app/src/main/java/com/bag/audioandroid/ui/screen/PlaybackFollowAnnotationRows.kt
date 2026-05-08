@@ -180,9 +180,7 @@ internal fun PlaybackFollowAnnotationRows(
 }
 
 @Composable
-private fun PlaybackByteGroupRow(
-    content: @Composable () -> Unit,
-) {
+private fun PlaybackByteGroupRow(content: @Composable () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,

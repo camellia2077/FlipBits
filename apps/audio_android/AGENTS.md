@@ -20,6 +20,9 @@
   - `docs/design/modes/flash/voicing-emotions.md`
   - 具体 preset 细节看 `docs/design/modes/flash/<preset>.md`
 - 如果改动涉及 XML 文案 / 本地化 / 样例文本 / 翻译检查失败，再按需读：
+  - `.agent/workflows/translations/README.md`
+  - `.agent/workflows/translations/android-app-text.md`
+  - `.agent/workflows/translations/android-sample-text.md`
   - `docs/design/android/android-translation-workflow.md`
   - `docs/design/android/android-translation-tooling-agent-index.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
@@ -31,10 +34,7 @@
 
 - 优先按职责找入口，不要默认从最大文件开始搜。
 - 动画卡顿、跳动、闪烁或长音频 visual 性能问题，不要先靠猜测重构；先读 `docs/architecture/android/android-flash-visual.md`，再用 debug-only `FlashVisualPerf` 指标和 adb 日志确认瓶颈层级。
-- 修改可见 XML 文案时，必须同步检查：
-  - 英文基线按职责拆在 `app/src/main/res/values/strings_*.xml`
-  - 本地化目录的对应 `strings*.xml`
-- 修改 XML 文案、本地化结构或样例文本时，必须按 `docs/design/android/android-translation-workflow.md` 的流程处理，不要跳过 translation key alignment。
+- 修改可见 XML 文案、本地化结构或样例文本时，必须先按 `.agent/workflows/translations/README.md` 选择 app text 或 sample text workflow；不要跳过 translation key alignment。
 - 新增 XML 文案 key 时，必须使用脚手架：`python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`。
 - `strings-add` 默认只写英文 `values/` 基线，并生成 translation key alignment 报告；不要手工把英文原文复制到 `values-*` 当本地化。
 - 只有品牌名、协议 token、不可翻译 UI 符号等明确全语言共享的文本，才允许给 `strings-add` 传 `--localized`。

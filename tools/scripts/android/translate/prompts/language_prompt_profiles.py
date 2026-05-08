@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -15,67 +16,71 @@ class LocalePromptProfile:
     locale_note: str
 
 
-DEFAULT_PROFILE = LocalePromptProfile(
-    locale_code="default",
-    profile_id="default_translation",
-    mode="standard_translation",
-    identity_rule=(
-        "Treat this locale as a normal target-language localization. "
-        "Prefer natural native phrasing over literal English structure, while keeping the broad source meaning intact. "
-    ),
-    app_text_rule=(
-        "For app UI text, optimize for clarity, brevity, stable terminology, and immediate usability. "
-        "Do not turn short product labels into literary prose. "
-    ),
-    sample_text_rule=(
-        "For sample prose, preserve lineup tone and atmosphere, but still write as natural target-language text rather than calqued English. "
-    ),
-    key_alignment_rule=(
-        "When filling missing entries, write normal target-language localization that matches the existing locale's tone and terminology. "
-    ),
-    locale_note=(
-        "This locale uses the standard translation profile: natural target-language wording first, with no special pseudo-language register. "
-    ),
-)
-
-
-HIGH_GOTHIC_LA_PROFILE = LocalePromptProfile(
-    locale_code="la",
-    profile_id="high_gothic_dog_latin",
-    mode="stylized_dog_latin",
-    identity_rule=(
-        "This locale is High Gothic, not classical Latin and not a standard translation locale. "
-        "Treat it as a deliberate Dog Latin / pseudo-Latin / Latinized-English register built for immersion, ritual atmosphere, liturgical religious texture, and classical authority. "
-        "A controlled mixture of Latin, ecclesiastical-sounding diction, invented pseudo-Latin phrasing, and selective English carry-over is acceptable when it strengthens the setting voice. "
-    ),
-    app_text_rule=(
-        "For app UI text, keep labels usable and recognizable, but still favor elevated, ceremonial, archaic wording over plain utilitarian phrasing. "
-        "Do not force strict classical correctness if it weakens product clarity or the High Gothic voice. "
-    ),
-    sample_text_rule=(
-        "For sample prose, atmosphere outranks literal fidelity. "
-        "Prefer ornate vocabulary, denser phrasing, longer cadence, subordinate clauses, and a solemn liturgical register when that strengthens immersion. "
-        "Do not flatten the writing into simple textbook Latin or plain English paraphrase. "
-        "The goal is convincing High Gothic mood, not academically correct Latin. "
-    ),
-    key_alignment_rule=(
-        "When filling missing entries, write in the repository's High Gothic house style rather than attempting faithful classical Latin translation. "
-        "Preserve atmosphere, ceremonial gravity, liturgical religious texture, and worldbuilding voice. "
-        "Short UI labels may stay compact, but sample prose should prefer elevated diction and immersive cadence. "
-    ),
-    locale_note=(
-        "High Gothic (`values-la`) is a stylized Dog Latin / pseudo-Latin locale. It intentionally prioritizes immersion, ritual atmosphere, liturgical religious texture, and classical authority over true Latin accuracy or literal translation fidelity. "
-    ),
-)
-
-
-PROFILE_BY_LOCALE = {
-    "la": HIGH_GOTHIC_LA_PROFILE,
+PROFILE_DIRECTORY = Path(__file__).resolve().parent / "locales"
+PROFILE_FIELDS = {
+    "profile_id",
+    "mode",
+    "locale_note",
+    "identity_rule",
+    "app_text_rule",
+    "sample_text_rule",
+    "key_alignment_rule",
 }
 
 
+def _parse_profile_file(path: Path) -> dict[str, str]:
+    values: dict[str, list[str]] = {}
+    current_key: str | None = None
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.rstrip()
+        if not line or line.lstrip().startswith("#"):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            key = line[1:-1].strip()
+            if key not in PROFILE_FIELDS:
+                raise ValueError(f"Unknown locale prompt profile field '{key}' in {path}")
+            current_key = key
+            values.setdefault(current_key, [])
+            continue
+        if current_key is None:
+            raise ValueError(f"Locale prompt profile text appears before a field header in {path}: {line}")
+        values[current_key].append(line.strip())
+
+    parsed = {}
+    for key, parts in values.items():
+        value = " ".join(parts).strip()
+        parsed[key] = value if key in {"profile_id", "mode"} else _ensure_sentence_gap(value)
+    missing = sorted(PROFILE_FIELDS.difference(parsed))
+    if missing:
+        raise ValueError(f"Locale prompt profile {path} is missing fields: {', '.join(missing)}")
+    return parsed
+
+
+def _ensure_sentence_gap(value: str) -> str:
+    if not value:
+        return value
+    return value if value.endswith(" ") else f"{value} "
+
+
+def _load_profile(locale_code: str) -> LocalePromptProfile:
+    path = PROFILE_DIRECTORY / f"{locale_code}.md"
+    parsed = _parse_profile_file(path)
+    return LocalePromptProfile(
+        locale_code=locale_code,
+        profile_id=parsed["profile_id"],
+        mode=parsed["mode"],
+        identity_rule=parsed["identity_rule"],
+        app_text_rule=parsed["app_text_rule"],
+        sample_text_rule=parsed["sample_text_rule"],
+        key_alignment_rule=parsed["key_alignment_rule"],
+        locale_note=parsed["locale_note"],
+    )
+
+
 def get_locale_prompt_profile(locale_code: str | None) -> LocalePromptProfile:
-    if not locale_code:
-        return DEFAULT_PROFILE
-    normalized = locale_code.strip()
-    return PROFILE_BY_LOCALE.get(normalized, DEFAULT_PROFILE)
+    normalized = locale_code.strip() if locale_code else "default"
+    path = PROFILE_DIRECTORY / f"{normalized}.md"
+    if not path.exists():
+        normalized = "default"
+    return _load_profile(normalized)

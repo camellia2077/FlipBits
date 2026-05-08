@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <strong>An entertainment-first text-to-audio signaling toolkit for generating retro-tech atmospheric audio</strong><br />
-  <em>Stylized acoustic text encoding with a strong science-fiction mood</em>
+  <strong>A stylized text/audio signaling and decoding toolkit that uses FSK rhythm, tone, and pause to make encoded audio feel spoken</strong><br />
+  <em>Text-to-audio signaling with emotional FSK pacing, visual follow, and readable encoding structure</em>
 </p>
 
 <p align="center">
@@ -28,22 +28,22 @@
 [![CI Host Verify](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml)
 
 ## Project Overview
-FlipBits is an experimental audio project built around retro-futurist communication aesthetics. It encodes text into audible signal patterns and decodes those patterns back into text, combining DSP experimentation with a deliberately stylized industrial-tech presentation.
+FlipBits is a toolkit for encoding text into audible signal patterns and decoding those generated patterns back into text. It does more than convert text into sound: in its bit-by-bit FSK path, it shapes bit duration, pause spacing, frequency choices, and playback rhythm so generated audio can resemble different emotional tones or speaking styles.
 
-The project provides multiple transport modes that map text into waveform structures through different frequency organizations, then recover text from those waveforms. It does not provide cryptographic encryption.
+The project provides multiple acoustic text-encoding methods, including Morse code (`mini`), bit-by-bit BFSK / FSK (`flash`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` frequency mapping (`ultra`). It maps text into waveform structures and can recover text from project-generated waveforms. It does not provide cryptographic encryption.
 
-- **Core modes**: the project currently includes `flash`, `pro`, `ultra`, and `mini`.
-- **Mode positioning**: `flash` favors ritualistic atmosphere and stylized presentation, `pro` favors a cleaner and more structured signaling path, `ultra` favors denser mapping for UTF-8 text, and `mini` favors clear Morse code dot/dash rhythm.
-- **Design intent**: the goal is not just to transmit content, but to make the generated audio feel deliberate, dramatic, and technologically evocative.
-- **Entertainment-first focus**: some modes intentionally sacrifice efficiency in exchange for stronger atmosphere and a more distinctive listening experience.
+- **Expressive focus**: bit-by-bit BFSK / FSK (`flash`) intentionally sacrifices encoding efficiency, using longer bits, pauses, and frequency changes to create stronger emotional tone and ritual-like listening character.
+- **Efficient alternatives**: if shorter audio or more formal transport is needed, Morse code (`mini`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`) provide more compact paths. `16-FSK` (`ultra`) is not only shorter than bit-by-bit BFSK / FSK (`flash`) for the same input; generation cost and decode time are usually much lower as well. Speed is available, but it is not the only goal.
+- **Visual learning value**: Android provides two complementary follow views. Visual focuses on the signal layer, showing how encoded text becomes FSK low/high bits, tone segments, and playback timing. Lyrics focuses on the text-encoding layer, using tokens to show how text becomes UTF-8 bytes, hex/bin, and bits, then highlighting them during playback. The current token display design treats CJK text (Chinese/Japanese, etc.) as usually one character per token, Latin text as word or word-like tokens rather than always single letters, and punctuation as independent tokens.
+- **Design intent**: FlipBits balances implementation, encoding explanation, and stylized expression rather than optimizing every mode for shortest duration or highest throughput.
 
-## Naming Map
-For fast orientation, the project-specific mode names roughly map to these more familiar technical categories:
+## Technical Modes And Naming Map
+This README introduces the common technical category first, with the app's internal mode name in parentheses:
 
-- `mini` -> Morse code
-- `flash` -> BFSK / bit-by-bit FSK-style signaling
-- `pro` -> DTMF-like dual-tone mapping
-- `ultra` -> `16-FSK` frequency mapping
+- Morse code (`mini`)
+- Bit-by-bit BFSK / FSK (`flash`)
+- DTMF-like dual-tone mapping (`pro`)
+- `16-FSK` frequency mapping (`ultra`)
 
 These names are product-facing labels, not a simple ladder of "basic to advanced" versions of the same protocol. Each mode emphasizes a different listening character, expressive goal, and transport structure.
 
@@ -59,10 +59,14 @@ In the current reference build, the install package is about `5.5 MB`, and the i
 
 ## Modes
 
-### `flash`
-`flash` is intentionally the most stylized mode. It uses two high / low Hz states to represent bits, then shapes bit duration, frequency choices, and pause spacing to simulate a more human-like emotional tone and stylized delivery. The same input text may produce audio close to a minute long in `flash`, while `ultra` may finish in only a few seconds. That gap is intentional: the project values the feeling of "being played like a ritual signal" more than raw throughput.
+### Bit-by-bit BFSK / FSK (`flash`)
+Bit-by-bit BFSK / FSK (`flash`) is intentionally the most stylized mode. It uses two high / low Hz states to represent bits, then shapes bit duration, frequency choices, and pause spacing to simulate a more human-like emotional tone and stylized delivery. The same input text may produce audio close to a minute long in bit-by-bit BFSK / FSK (`flash`), while `16-FSK` (`ultra`) may finish in only a few seconds. That gap is intentional: the project values the feeling of "being played like a ritual signal" more than raw throughput.
 
-`flash` currently provides six styles. Each style uses a low / high Hz pair to define bit states, then combines bit duration, frequency shaping, and pause spacing to create a distinct emotional "speaking tone":
+The feel of bit-by-bit BFSK / FSK (`flash`) comes from the binary nature of the signal itself: each bit switches between only two frequency states, low and high, similar to 0 and 1 in binary. Instead of sounding like continuous natural speech, it turns text into an audible chain of low/high pulses, giving the audio a mechanical, ritual-like communication character.
+
+The low efficiency of bit-by-bit BFSK / FSK (`flash`) is intentional. It does not encode multiple bits into one simultaneous symbol; low and high tones appear one after another in bit order. Style-specific bit duration, pauses, and frequency changes make the audio much longer. The goal is not throughput, but audibility and explainability: a listener can use the sound, Visual, and Lyrics views together to understand or even write down the corresponding low/high bit sequence.
+
+Bit-by-bit BFSK / FSK (`flash`) currently provides six styles. Each style uses a low / high Hz pair to define bit states, then combines bit duration, frequency shaping, and pause spacing to create a distinct emotional "speaking tone":
 
 
 
@@ -92,8 +96,8 @@ For deeper `flash` voicing-style semantics, emotional intent, and preset design 
 - [`docs/design/modes/flash/voicing-emotions.md`](docs/design/modes/flash/voicing-emotions.md)
 - [`docs/design/modes/flash/`](docs/design/modes/flash/)
 
-### `mini`
-`mini` is the Morse code mode. Input is normalized through Morse-compatible text rules, emphasizing clear rhythm, visual readability, and follow-along playback. The current speed presets are:
+### Morse code (`mini`)
+Morse code (`mini`) normalizes input through Morse-compatible text rules, emphasizing clear rhythm, visual readability, and follow-along playback. The current speed presets are:
 
 | Speed | Role |
 | --- | --- |
@@ -119,8 +123,8 @@ For deeper `flash` voicing-style semantics, emotional intent, and preset design 
 For deeper `mini` rules, follow/visual behavior, and implementation notes, see:
 - [`docs/design/modes/mini.md`](docs/design/modes/mini.md)
 
-### `pro`
-`pro` is the more formal ASCII-only mode: input text is first converted into ASCII bytes, then each byte is split into a high nibble and a low nibble, each of which maps to a `DTMF-like` dual-tone symbol, so `1 byte = 2 symbol`. It favors a cleaner and more regular acoustic signaling structure.
+### DTMF-like dual-tone mapping (`pro`)
+DTMF-like dual-tone mapping (`pro`) is the more formal ASCII-only mode: input text is first converted into ASCII bytes, then each byte is split into a high nibble and a low nibble, each of which maps to a dual-tone symbol, so `1 byte = 2 symbol`. It favors a cleaner and more regular acoustic signaling structure.
 
 
 
@@ -141,8 +145,10 @@ For deeper `pro` mode positioning and implementation notes, see:
 - [`docs/design/transports.md`](docs/design/transports.md)
 - [`docs/architecture/repo-map.md`](docs/architecture/repo-map.md)
 
-### `ultra`
-`ultra` is the denser UTF-8-oriented mode: input text is processed directly as UTF-8 bytes, each byte is split into two nibbles, and each nibble maps to a fixed frequency in clean `16-FSK`, so `1 byte = 2 symbol`, with each symbol emitting only one frequency. It favors higher information density and a more formal UTF-8 text transport path.
+### `16-FSK` frequency mapping (`ultra`)
+`16-FSK` frequency mapping (`ultra`) is the denser UTF-8-oriented mode: input text is processed directly as UTF-8 bytes, each byte is split into two nibbles, and each nibble maps to a fixed frequency in clean `16-FSK`, so `1 byte = 2 symbol`, with each symbol emitting only one frequency. It favors higher information density and a more formal UTF-8 text transport path.
+
+Compared with bit-by-bit BFSK / FSK (`flash`), `16-FSK` (`ultra`) is not only shorter for the same input; its generation and decoding paths are also lighter. In one reference test with 7000 chars / 7000 bytes of text, bit-by-bit BFSK / FSK (`flash`) took about 1 min 56 sec to generate about 43 min of audio, while `16-FSK` (`ultra`) generated in about 2 sec and produced about 11 min 40 sec of audio. Exact numbers vary by device, style, and parameters, but the scale difference reflects the mode split: `flash` prioritizes audibility, explainability, and emotional delivery, while `ultra` prioritizes higher throughput and faster processing.
 
 
 <p align="center">

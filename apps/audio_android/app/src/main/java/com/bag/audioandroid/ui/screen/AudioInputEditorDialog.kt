@@ -25,6 +25,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -56,6 +60,13 @@ internal fun AudioInputEditorDialog(
 ) {
     val accentTokens = appThemeAccentTokens()
     val inputMetrics = measureAudioInputText(inputText)
+    var showInputRules by remember { mutableStateOf(false) }
+    if (showInputRules) {
+        InputEncodingRulesDialog(
+            transportMode = transportMode,
+            onDismiss = { showInputRules = false },
+        )
+    }
     val topAppBarColors =
         TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -142,13 +153,10 @@ internal fun AudioInputEditorDialog(
                         supportingText = {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 AudioInputMetricsSummaryRow(
-                                    charsetHint = stringResource(transportMode.charsetHintResId),
-                                    metricsText =
-                                        stringResource(
-                                            R.string.audio_input_metrics,
-                                            inputMetrics.characterCount,
-                                            inputMetrics.byteCount,
-                                        ),
+                                    transportMode = transportMode,
+                                    characterCount = inputMetrics.characterCount,
+                                    byteCount = inputMetrics.byteCount,
+                                    onOpenInputRules = { showInputRules = true },
                                 )
                             }
                         },

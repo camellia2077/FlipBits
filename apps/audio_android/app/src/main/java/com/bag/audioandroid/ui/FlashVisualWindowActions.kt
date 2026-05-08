@@ -253,8 +253,7 @@ private fun FlashVisualWindowState.toRange(): FlashVisualWindowRange =
         endSampleExclusive = endSampleExclusive,
     )
 
-private fun FlashVisualWindowState.toRangeOrNull(): FlashVisualWindowRange? =
-    takeIf { it.available }?.toRange()
+private fun FlashVisualWindowState.toRangeOrNull(): FlashVisualWindowRange? = takeIf { it.available }?.toRange()
 
 private fun Int.quantizeDown(step: Int): Int =
     if (step <= 0) {

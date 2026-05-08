@@ -129,3 +129,6 @@ class AndroidStringResourceRepository:
 
     def load_localized_strings(self, folder_path: Path, filename: str) -> dict[str, str]:
         return self.extract_strings_from_xml(folder_path / filename).strings
+
+    def load_localized_string_order(self, folder_path: Path, filename: str) -> list[str]:
+        return list(self.extract_strings_from_xml(folder_path / filename).strings.keys())
