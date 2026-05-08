@@ -28,6 +28,7 @@ internal fun AudioPlaybackProgressSection(
     displayedTime: String,
     totalTime: String,
     isPlaying: Boolean,
+    playbackSpeed: Float = 1f,
     modifier: Modifier = Modifier,
     onScrubStarted: () -> Unit,
     onScrubChanged: (Int) -> Unit,
@@ -59,6 +60,7 @@ internal fun AudioPlaybackProgressSection(
             followData = followData,
             flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
+            playbackSpeed = playbackSpeed,
             displaySectionState = displaySectionState,
             onSeekToSample = { targetSamples ->
                 onScrubStarted()

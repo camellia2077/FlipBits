@@ -100,6 +100,7 @@ internal fun PlayerDetailSheetContent(
             followData = followData,
             flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
+            playbackSpeed = playbackSpeed,
             displaySectionState = displaySectionState,
             savedAudioItem = savedAudioItem,
             onSeekToSample = onSeekToSample,
@@ -154,6 +155,7 @@ private fun PlayerDetailScrollContent(
     followData: PayloadFollowViewData,
     flashVisualWindow: FlashVisualWindowState,
     isPlaying: Boolean,
+    playbackSpeed: Float,
     displaySectionState: PlaybackDisplaySectionState,
     savedAudioItem: SavedAudioItem?,
     onSeekToSample: (Int) -> Unit,
@@ -177,6 +179,7 @@ private fun PlayerDetailScrollContent(
             followData = followData,
             flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
+            playbackSpeed = playbackSpeed,
             displaySectionState = displaySectionState,
             onSeekToSample = onSeekToSample,
         )

@@ -130,7 +130,7 @@
   - `app/src/main/cpp/CMakeLists.txt -> native_package/CMakeLists.txt -> bag_android_native`
   - `native_package/src/*.cpp -> android_bag/** / android_audio_io/**`
 - 更详细的 native 策略见：
-  - `docs/architecture/android-native-strategy.md`
+  - `docs/architecture/android/android-native-strategy.md`
 
 ## 修改建议
 

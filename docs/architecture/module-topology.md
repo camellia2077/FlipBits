@@ -91,7 +91,7 @@
 
 更细的分类与消费端边界说明见：
 - `docs/architecture/compatibility-layer-inventory.md`
-- `docs/architecture/android-native-strategy.md`
+- `docs/architecture/android/android-native-strategy.md`
 
 ## `audio_io` 当前拓扑
 - module interface：

@@ -35,6 +35,7 @@ internal fun PlaybackDisplaySection(
     followData: PayloadFollowViewData,
     flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     isPlaying: Boolean,
+    playbackSpeed: Float = 1f,
     playbackDisplayMode: PlaybackDisplayMode,
     flashVisualizationModeName: String,
     onDisplayModeSelected: (PlaybackDisplayMode) -> Unit,
@@ -124,6 +125,8 @@ internal fun PlaybackDisplaySection(
                             isPlaying = isPlaying,
                             mode = flashVisualizationMode,
                             flashVoicingStyle = flashVoicingStyle,
+                            flashVisualWindow = flashVisualWindow,
+                            playbackSpeed = playbackSpeed,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }

@@ -42,7 +42,10 @@ internal fun DrawScope.drawToneTrackSegments(
         end = Offset(leftPadding + innerWidth, upperTop + laneHeight + laneGap / 2f),
         strokeWidth = 1.dp.toPx(),
     )
-    visibleFlashSegments(segments, viewport).forEach { segment ->
+    segments.forEach { segment ->
+        if (!segment.overlaps(viewport)) {
+            return@forEach
+        }
         val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
         val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
         val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.6f)
@@ -92,7 +95,10 @@ internal fun DrawScope.drawToneEnergySegments(
         end = Offset(leftPadding + innerWidth, centerY),
         strokeWidth = 1.dp.toPx(),
     )
-    visibleFlashSegments(segments, viewport).forEach { segment ->
+    segments.forEach { segment ->
+        if (!segment.overlaps(viewport)) {
+            return@forEach
+        }
         val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
         val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
         val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.8f)
@@ -165,7 +171,10 @@ internal fun DrawScope.drawPitchLadderSegments(
         strokeWidth = 1.dp.toPx(),
     )
 
-    visibleFlashSegments(segments, viewport).forEach { segment ->
+    segments.forEach { segment ->
+        if (!segment.overlaps(viewport)) {
+            return@forEach
+        }
         val y =
             when (segment.tone) {
                 FskDominantTone.High -> highY
@@ -474,15 +483,6 @@ private fun toneBucketColor(
         )
     }
 
-private fun visibleFlashSegments(
-    segments: List<FlashSignalToneSegment>,
-    viewport: FlashSignalViewport,
-): List<FlashSignalToneSegment> =
-    segments.filter { segment ->
-        segment.endSample.toFloat() >= viewport.startSample &&
-            segment.startSample.toFloat() <= viewport.endSample
-    }
-
 private data class SegmentVisualBounds(
     val startX: Float,
     val endX: Float,
@@ -526,21 +526,19 @@ private fun DrawScope.drawMicroBarsAcrossSegment(
     minVisualWidth: Float,
 ) {
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
-    val barCount = 3
     val minBarWidth = FlashSegmentMicroBarWidthDp.dp.toPx()
     val maxBarWidth = (visualWidth / 2.6f).coerceAtLeast(minBarWidth)
     val barWidth = (visualWidth / 4.6f).coerceIn(minBarWidth, maxBarWidth)
     val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
     val visibleEndSample = minOf(segment.endSample.toFloat(), viewport.endSample)
-    val barFractions = floatArrayOf(0.18f, 0.5f, 0.82f)
-    repeat(barCount) { barIndex ->
-        val fraction = barFractions[barIndex]
+    val barFractions = floatArrayOf(0.30f, 0.70f)
+    barFractions.forEachIndexed { barIndex, fraction ->
         val x = startX + visualWidth * fraction
         val sample = visibleStartSample + (visibleEndSample - visibleStartSample) * fraction
         val isActive = sample <= viewport.playheadSample
         val edgeGlow = activeEdgeGlow(sample, viewport, segment.sampleCount)
         val texture = deterministicSignalTexture(segment, barIndex)
-        val envelope = bitTripletEnvelope(barIndex)
+        val envelope = bitSegmentEnvelope(barIndex, barFractions.size)
         val height = minBarHeight + (maxBarHeight - minBarHeight) * (0.34f + 0.66f * texture * envelope)
         val color =
             flashSegmentColor(
@@ -577,16 +575,14 @@ private fun DrawScope.drawEnergyPulseClusterAcrossSegment(
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
     val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
     val visibleEndSample = minOf(segment.endSample.toFloat(), viewport.endSample)
-    val pulseCount = 3
     val strokeWidth = (visualWidth / 9.2f).coerceIn(2.2.dp.toPx(), 6.4.dp.toPx())
-    val pulseFractions = floatArrayOf(0.18f, 0.5f, 0.82f)
-    repeat(pulseCount) { pulseIndex ->
-        val fraction = pulseFractions[pulseIndex]
+    val pulseFractions = floatArrayOf(0.30f, 0.70f)
+    pulseFractions.forEachIndexed { pulseIndex, fraction ->
         val x = startX + visualWidth * fraction
         val sample = visibleStartSample + (visibleEndSample - visibleStartSample) * fraction
         val edgeGlow = activeEdgeGlow(sample, viewport, segment.sampleCount)
         val texture = deterministicSignalTexture(segment, pulseIndex)
-        val envelope = bitTripletEnvelope(pulseIndex)
+        val envelope = bitSegmentEnvelope(pulseIndex, pulseFractions.size)
         val height = minBarHeight + (maxBarHeight - minBarHeight) * (0.32f + 0.68f * texture * envelope)
         val color =
             flashSegmentColor(
@@ -665,6 +661,10 @@ private fun sampleToViewportX(
         ((sample - viewport.startSample) / viewport.sampleCount)
             .coerceIn(0f, 1f) * innerWidth
 
+internal fun FlashSignalToneSegment.overlaps(viewport: FlashSignalViewport): Boolean =
+    endSample.toFloat() >= viewport.startSample &&
+        startSample.toFloat() <= viewport.endSample
+
 private fun flashSegmentColor(
     isActive: Boolean,
     activeColor: Color,
@@ -702,11 +702,18 @@ private fun deterministicSignalTexture(
     return 0.58f + 0.42f * folded
 }
 
-private fun bitTripletEnvelope(index: Int): Float =
-    when (index) {
-        0, 2 -> 1.18f
-        1 -> 0.54f
-        else -> 0.84f
+private fun bitSegmentEnvelope(
+    index: Int,
+    count: Int,
+): Float =
+    if (count <= 2) {
+        if (index == 0) 1.12f else 0.96f
+    } else {
+        when (index) {
+            0, 2 -> 1.18f
+            1 -> 0.54f
+            else -> 0.84f
+        }
     }
 
 private fun FskEnergyBucket.heldToneStrength(

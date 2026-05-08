@@ -37,6 +37,6 @@ data class FlashVisualWindowState(
             endSampleExclusive - sample > RefreshMarginSamples
 
     companion object {
-        private const val RefreshMarginSamples = 44_100 / 8
+        private const val RefreshMarginSamples = 44_100
     }
 }

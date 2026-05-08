@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.screen.FlashSignalPlayheadAnchorRatio
 import com.bag.audioandroid.ui.screen.FlashSignalToneSegment
+import com.bag.audioandroid.ui.screen.FlashVisualPerfTrace
 import com.bag.audioandroid.ui.screen.FskDominantTone
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.FlashVisualWindowSource
@@ -22,6 +23,7 @@ internal class FlashVisualWindowActions(
     private val workerDispatcher: CoroutineDispatcher,
 ) {
     private val jobs = mutableMapOf<TransportModeOption, Job>()
+    private val pendingWindowRanges = mutableMapOf<TransportModeOption, FlashVisualWindowRange>()
 
     fun ensureCurrentWindow(
         mode: TransportModeOption,
@@ -33,14 +35,27 @@ internal class FlashVisualWindowActions(
         val session = uiState.value.sessions[mode] ?: return
         val source = session.flashVisualWindowSource ?: return
         val sample = displayedSamples.coerceIn(0, source.totalPcmSampleCount)
-        if (session.flashVisualWindow.isComfortablyInside(sample)) {
+        val comfortablyInside = session.flashVisualWindow.isComfortablyInside(sample)
+        if (comfortablyInside) {
             return
         }
         val revision = session.generatedContentRevision
         val window = source.flashVisualWindowAround(sample)
-        if (jobs[mode]?.isActive == true) {
+        val requestedRange = window.toRange()
+        val currentRange = session.flashVisualWindow.toRangeOrNull()
+        if (requestedRange == currentRange || requestedRange == pendingWindowRanges[mode]) {
             return
         }
+        FlashVisualPerfTrace.recordWindowRequest(
+            sample = sample,
+            currentWindow = session.flashVisualWindow,
+            comfortablyInside = comfortablyInside,
+        )
+        if (jobs[mode]?.isActive == true) {
+            FlashVisualPerfTrace.recordWindowActiveJobSkip()
+            return
+        }
+        pendingWindowRanges[mode] = requestedRange
         jobs[mode] =
             scope.launch {
                 val state = buildWindow(source, window)
@@ -51,6 +66,9 @@ internal class FlashVisualWindowActions(
                         current.copy(flashVisualWindow = state)
                     }
                 }
+                if (pendingWindowRanges[mode] == requestedRange) {
+                    pendingWindowRanges.remove(mode)
+                }
             }
     }
 
@@ -59,27 +77,41 @@ internal class FlashVisualWindowActions(
         window: FlashVisualWindowState,
     ): FlashVisualWindowState =
         withContext(workerDispatcher) {
-            window.copy(
-                segments =
-                    source.segmentsForRange(
-                        startSample = window.startSample,
-                        endSampleExclusive = window.endSampleExclusive,
-                    ),
-                drawableSegments =
-                    source.drawableSegmentsForRange(
-                        startSample = window.startSample,
-                        endSampleExclusive = window.endSampleExclusive,
-                        maxSegments = source.maxDrawableSegmentsForWindow(window),
-                    ),
+            val exactSegments =
+                source.segmentsForRange(
+                    startSample = window.startSample,
+                    endSampleExclusive = window.endSampleExclusive,
+                )
+            val drawableSegments =
+                source.drawableSegmentsForRange(
+                    startSample = window.startSample,
+                    endSampleExclusive = window.endSampleExclusive,
+                    maxSegments = source.maxDrawableSegmentsForWindow(window),
+                )
+            val state =
+                window.copy(
+                    segments = exactSegments,
+                    drawableSegments = drawableSegments,
+                )
+            FlashVisualPerfTrace.recordWindowBuilt(
+                displayedSample = state.displayedSamples,
+                exactSegments = state.segments.size,
+                drawableSegments = state.drawableSegments.size,
+                windowStart = state.startSample,
+                windowEnd = state.endSampleExclusive,
+                windowSamples = state.endSampleExclusive - state.startSample,
+                totalSamples = state.totalPcmSampleCount,
             )
+            state
         }
 }
 
 internal fun FlashVisualWindowSource.flashVisualWindowAround(sample: Int): FlashVisualWindowState {
     val lookBehindSamples = (VisualViewportSampleCount * FlashSignalPlayheadAnchorRatio).toInt()
     val lookAheadSamples = (VisualViewportSampleCount * (1f - FlashSignalPlayheadAnchorRatio)).toInt()
-    val start = (sample - lookBehindSamples - VisualWindowPaddingSamples).coerceAtLeast(0)
-    val end = (sample + lookAheadSamples + VisualWindowPaddingSamples).coerceAtMost(totalPcmSampleCount)
+    val anchorSample = sample.quantizeDown(VisualWindowAnchorStepSamples)
+    val start = (anchorSample - lookBehindSamples - VisualWindowPaddingSamples).coerceAtLeast(0)
+    val end = (anchorSample + lookAheadSamples + VisualWindowPaddingSamples).coerceAtMost(totalPcmSampleCount)
     val safeEnd = end.coerceAtLeast((start + 1).coerceAtMost(totalPcmSampleCount.coerceAtLeast(1)))
     val window =
         FlashVisualWindowState(
@@ -87,7 +119,7 @@ internal fun FlashVisualWindowSource.flashVisualWindowAround(sample: Int): Flash
             drawableSegments = emptyList(),
             startSample = start,
             endSampleExclusive = safeEnd,
-            displayedSamples = sample,
+            displayedSamples = anchorSample,
             totalPcmSampleCount = totalPcmSampleCount,
         )
     return window.copy(
@@ -104,7 +136,7 @@ internal fun FlashVisualWindowSource.flashVisualWindowAround(sample: Int): Flash
             ),
         startSample = start,
         endSampleExclusive = safeEnd,
-        displayedSamples = sample,
+        displayedSamples = anchorSample,
         totalPcmSampleCount = totalPcmSampleCount,
     )
 }
@@ -152,6 +184,8 @@ internal fun FlashVisualWindowSource.drawableSegmentsForRange(
 internal fun FlashVisualWindowSource.maxDrawableSegmentsForWindow(window: FlashVisualWindowState): Int {
     val viewportSamples = (window.endSampleExclusive - window.startSample).coerceAtLeast(1)
     val estimatedVisibleBits = (viewportSamples / FlashEstimatedSamplesPerBit).coerceAtLeast(1)
+    // ToneTracks and ToneEnergy expand each segment into multiple paint primitives,
+    // so keep the drawable budget below the raw visible-bit estimate.
     return minOf(
         estimatedVisibleBits * FlashVisualSegmentsPerVisibleBit,
         FlashVisualMaxDrawableSegments,
@@ -208,8 +242,30 @@ private fun List<FlashSignalToneSegment>.downsampleToBudget(maxSegments: Int): L
     return compacted
 }
 
+private data class FlashVisualWindowRange(
+    val startSample: Int,
+    val endSampleExclusive: Int,
+)
+
+private fun FlashVisualWindowState.toRange(): FlashVisualWindowRange =
+    FlashVisualWindowRange(
+        startSample = startSample,
+        endSampleExclusive = endSampleExclusive,
+    )
+
+private fun FlashVisualWindowState.toRangeOrNull(): FlashVisualWindowRange? =
+    takeIf { it.available }?.toRange()
+
+private fun Int.quantizeDown(step: Int): Int =
+    if (step <= 0) {
+        this
+    } else {
+        (this / step) * step
+    }
+
 private const val VisualViewportSampleCount = 44_100
-private const val VisualWindowPaddingSamples = 44_100 / 4
+private const val VisualWindowAnchorStepSamples = 44_100
+private const val VisualWindowPaddingSamples = 44_100 * 2
 private const val FlashEstimatedSamplesPerBit = 1_024
-private const val FlashVisualSegmentsPerVisibleBit = 4
-private const val FlashVisualMaxDrawableSegments = 160
+private const val FlashVisualSegmentsPerVisibleBit = 2
+private const val FlashVisualMaxDrawableSegments = 96

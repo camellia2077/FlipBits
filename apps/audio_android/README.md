@@ -5,17 +5,19 @@
 ## 文档导航
 
 - Android 应用层架构：
-  - `docs/architecture/android-app-architecture.md`
+  - `docs/architecture/android/android-app-architecture.md`
 - Android agent read-order：
   - `docs/design/android/android-agent-read-order.md`
 - Android UI 结构与职责：
-  - `docs/architecture/android-ui-structure.md`
+  - `docs/architecture/android/android-ui-structure.md`
 - Android native 策略：
-  - `docs/architecture/android-native-strategy.md`
+  - `docs/architecture/android/android-native-strategy.md`
 - Android 双色主题规则：
   - `docs/design/android/android-dual-tone-theme.md`
 - Android 播放器 UI：
   - `docs/design/android/android-player-ui.md`
+- Android Flash Visual 数据流与性能诊断：
+  - `docs/architecture/android/android-flash-visual.md`
 - Android 本地化规则：
   - `docs/design/android/android-localization-guidelines.md`
   - `docs/design/android/android-translation-workflow.md`
@@ -55,7 +57,7 @@
 - 想快速找入口：先看本文件的“代码地图 / 常见起点”
 - 想先判断这次改动还要不要展开别的 Android 文档：去 `docs/design/android/android-agent-read-order.md`
 - 想看 UI 设计原则：去 `docs/design/android/`
-- 想看 UI 职责和代码归属：去 `docs/architecture/android-ui-structure.md`
+- 想看 UI 职责和代码归属：去 `docs/architecture/android/android-ui-structure.md`
 - 想看 agent 必须遵守的硬规则：去 `apps/audio_android/AGENTS.md`
 
 ## 代码地图
@@ -92,6 +94,9 @@
   - `app/src/main/java/com/bag/audioandroid/ui/screen/AudioFlashSignalVisualizer.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/FlashSignalVisualizationAnalysis.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/FlashSignalVisualizationDrawing.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/screen/FlashVisualPerfTrace.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/FlashVisualWindowActions.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/state/FlashVisualWindowState.kt`
 - 状态与 UI model：
   - `app/src/main/java/com/bag/audioandroid/ui/state/AudioAppUiState.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/state/ModeAudioSessionState.kt`
@@ -129,6 +134,9 @@
 - mini / flash / pro / ultra 可视化：
   - `AudioFlashSignalVisualizer.kt` -> `FlashSignalVisualizationAnalysis.kt` -> `FlashSignalVisualizationDrawing.kt`
   - `MorseTimelineVisualizer.kt` 负责 `mini` 的 dot/dash block timeline；silence gap 保持空白，不画成 tone。
+- Flash Visual 卡顿、跳动、长音频性能或 bit 密度问题：
+  - 先读 `docs/architecture/android/android-flash-visual.md`。
+  - 先用 debug 指标和 `adb logcat FlashVisualPerf:D *:S` 判断是 draw、Compose、window、raw playback position、smoother reset 还是视觉密度问题，再决定改哪个层级。
 - 主题、palette、glyph：
   - `BrandThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
 - Audio 页输入卡、随机样例、示例文本：

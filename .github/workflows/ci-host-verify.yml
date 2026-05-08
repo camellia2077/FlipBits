@@ -11,10 +11,6 @@ on:
       - "cmake/**"
       - "libs/**"
       - "tools/**"
-    paths-ignore:
-      - "apps/audio_cli/AGENTS.md"
-      - "libs/AGENTS.md"
-      - "libs/README.md"
   push:
     paths:
       - ".github/workflows/ci-host-verify.yml"
@@ -24,10 +20,6 @@ on:
       - "cmake/**"
       - "libs/**"
       - "tools/**"
-    paths-ignore:
-      - "apps/audio_cli/AGENTS.md"
-      - "libs/AGENTS.md"
-      - "libs/README.md"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

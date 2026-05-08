@@ -15,7 +15,7 @@
   - `docs/design/android/android-player-ui.md`
   - `docs/design/android/android-dual-tone-theme.md`
 - 如果改动涉及 JNI / native 编解码 / WAV metadata / release-only native 问题，再按需读：
-  - `docs/architecture/android-native-strategy.md`
+  - `docs/architecture/android/android-native-strategy.md`
 - 如果改动涉及 flash voicing 选择器、preset、emotion 文案或 `{signalProfileValue, voicingFlavorValue}` 接线，再按需读：
   - `docs/design/modes/flash/voicing-emotions.md`
   - 具体 preset 细节看 `docs/design/modes/flash/<preset>.md`
@@ -23,11 +23,14 @@
   - `docs/design/android/android-translation-workflow.md`
   - `docs/design/android/android-translation-tooling-agent-index.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
-  - `docs/architecture/android-ui-structure.md`
+  - `docs/architecture/android/android-ui-structure.md`
+- 如果改动涉及 Flash Visual、Lyrics 跟随、长音频可视化、动画卡顿/跳动或 debug 指标，再按需读：
+  - `docs/architecture/android/android-flash-visual.md`
 
 ## Hard Rules
 
 - 优先按职责找入口，不要默认从最大文件开始搜。
+- 动画卡顿、跳动、闪烁或长音频 visual 性能问题，不要先靠猜测重构；先读 `docs/architecture/android/android-flash-visual.md`，再用 debug-only `FlashVisualPerf` 指标和 adb 日志确认瓶颈层级。
 - 修改可见 XML 文案时，必须同步检查：
   - 英文基线按职责拆在 `app/src/main/res/values/strings_*.xml`
   - 本地化目录的对应 `strings*.xml`

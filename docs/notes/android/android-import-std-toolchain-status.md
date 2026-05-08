@@ -11,7 +11,7 @@
 - 这份文档只记录当前 Android `import std;` 的正式状态口径。
 - 它回答的是“当前这条 Android lane 是否已经具备标准库模块 provider”。
 - 它不重开 Android owner 迁移计划，也不替代：
-  - `docs/architecture/android-native-strategy.md`
+  - `docs/architecture/android/android-native-strategy.md`
   - `docs/testing.md`
 - 如需判断后续是否值得升级 `NDK/CMake`，见：
   - `docs/notes/android-ndk-cmake-upgrade-decision.md`

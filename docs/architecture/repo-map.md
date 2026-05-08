@@ -268,8 +268,8 @@
   - `apps/audio_android/app/build.gradle.kts`
   - `apps/audio_android/app/src/main/cpp/CMakeLists.txt`
   - `apps/audio_android/native_package/CMakeLists.txt`
-  - `docs/architecture/android-app-architecture.md`
-  - `docs/architecture/android-native-strategy.md`
+  - `docs/architecture/android/android-app-architecture.md`
+  - `docs/architecture/android/android-native-strategy.md`
 
 ### 改 WAV / I/O
 - 先看：

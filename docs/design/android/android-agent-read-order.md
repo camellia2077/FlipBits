@@ -20,7 +20,21 @@
 - [android-player-ui.md](/C:/code/WaveBits/docs/design/android/android-player-ui.md)
 
 再按需读：
-- [android-ui-structure.md](/C:/code/WaveBits/docs/architecture/android-ui-structure.md)
+- [android-ui-structure.md](/C:/code/WaveBits/docs/architecture/android/android-ui-structure.md)
+
+### Visual Playback
+
+适用场景：
+- 改 Flash Visual、Lyrics 跟随、bit readout、播放位置平滑
+- 排查长音频 Visual 卡顿、跳动、闪烁或人眼跟不上的信息密度
+- 需要判断问题属于 Canvas、Compose、window source、raw playback position 还是 smoother
+
+先读：
+- [android-flash-visual.md](/C:/code/WaveBits/docs/architecture/android/android-flash-visual.md)
+
+再按需读：
+- [android-player-ui.md](/C:/code/WaveBits/docs/design/android/android-player-ui.md)
+- [android-ui-structure.md](/C:/code/WaveBits/docs/architecture/android/android-ui-structure.md)
 
 ### Theme
 
@@ -55,15 +69,16 @@
 - 改 `@Keep`、混淆、native 反射访问、release-only 崩溃排查
 
 先读：
-- [android-native-strategy.md](/C:/code/WaveBits/docs/architecture/android-native-strategy.md)
+- [android-native-strategy.md](/C:/code/WaveBits/docs/architecture/android/android-native-strategy.md)
 
 再按需读：
-- [android-app-architecture.md](/C:/code/WaveBits/docs/architecture/android-app-architecture.md)
+- [android-app-architecture.md](/C:/code/WaveBits/docs/architecture/android/android-app-architecture.md)
 
 ## Minimal Read Combos
 
 - 只改 Kotlin 业务逻辑：`README.md`
 - 改页面和交互：`README.md` -> `android-player-ui.md`
+- 改 Flash Visual / Lyrics 跟随 / 动画性能：`README.md` -> `android-flash-visual.md`
 - 改主题和配色：`README.md` -> `android-dual-tone-theme.md`
 - 改 XML 文案或翻译：`README.md` -> `android-translation-workflow.md`
 - 改 JNI / metadata / release-only native 问题：`README.md` -> `android-native-strategy.md`

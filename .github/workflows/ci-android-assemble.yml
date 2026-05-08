@@ -12,9 +12,6 @@ on:
       - "libs/**"
       - "tooling/**"
       - "tools/**"
-    paths-ignore:
-      - "apps/audio_android/AGENTS.md"
-      - "apps/audio_android/README.md"
   push:
     paths:
       - ".github/workflows/ci-android-assemble.yml"
@@ -25,9 +22,6 @@ on:
       - "libs/**"
       - "tooling/**"
       - "tools/**"
-    paths-ignore:
-      - "apps/audio_android/AGENTS.md"
-      - "apps/audio_android/README.md"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
