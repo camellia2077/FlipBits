@@ -9,4 +9,5 @@
     <string name="about_licenses_subtitle">Переглянути бібліотеки та ліцензії</string>
     <string name="licenses_title">Ліцензії відкритого коду</string>
     <string name="licenses_loading">Завантаження ліцензій</string>
+    <string name="about_bilibili">%1$s</string>
 </resources>

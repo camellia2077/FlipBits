@@ -1,8 +1,10 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.ui.model.AppTab
+import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
+import com.bag.audioandroid.ui.state.SnackbarMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -60,6 +62,22 @@ internal class AudioAndroidNavigationActions(
             } else {
                 state
             }
+        }
+    }
+
+    fun showSnackbar(
+        text: UiText,
+        durationMillis: Long? = null,
+    ) {
+        uiState.update { state ->
+            state.copy(
+                snackbarMessage =
+                    SnackbarMessage(
+                        id = System.currentTimeMillis(),
+                        text = text,
+                        durationMillis = durationMillis,
+                    ),
+            )
         }
     }
 }

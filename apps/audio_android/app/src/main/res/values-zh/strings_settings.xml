@@ -49,10 +49,10 @@
     <string name="config_dual_tone_group_sacred_machine">神圣机器</string>
     <string name="config_dual_tone_group_custom">自定义</string>
     <string name="config_dual_tone_group_ancient_dynasty">远古王朝</string>
-    <string name="config_dual_tone_group_immortal_rot">永恒腐朽</string>
+    <string name="config_dual_tone_group_immortal_rot">不朽凋零</string>
     <string name="config_dual_tone_group_scarlet_carnage">猩红杀戮</string>
-    <string name="config_dual_tone_group_exquisite_fall">精美陨落</string>
-    <string name="config_dual_tone_group_labyrinth_of_mutability">易变迷宫</string>
+    <string name="config_dual_tone_group_exquisite_fall">极致沉沦</string>
+    <string name="config_dual_tone_group_labyrinth_of_mutability">万变诡道</string>
     <string name="palette_family_brand">双色调</string>
     <string name="palette_family_reds_pinks">红色与粉色</string>
     <string name="palette_family_oranges">橙色</string>
@@ -104,18 +104,18 @@
     <string name="brand_theme_ancient_alloy_title">远古合金</string>
     <string name="brand_theme_ancient_alloy_description">风化的金属阴影与冷青色，呈现墓穴锻炉的火光。</string>
     <string name="brand_theme_ancient_alloy_accessibility">远古合金主题，深青铜灰色配亮青色。</string>
-    <string name="brand_theme_immortal_rot_title">永恒腐朽</string>
+    <string name="brand_theme_immortal_rot_title">不朽凋零</string>
     <string name="brand_theme_immortal_rot_description">蕨绿色与雪松黄，打造潮湿、繁茂的双色调调色盘。</string>
-    <string name="brand_theme_immortal_rot_accessibility">永恒腐朽主题，蕨绿色配雪松黄色。</string>
+    <string name="brand_theme_immortal_rot_accessibility">不朽凋零主题，蕨绿色配雪松黄色。</string>
     <string name="brand_theme_scarlet_carnage_title">猩红杀戮</string>
     <string name="brand_theme_scarlet_carnage_description">深红与黄铜，打造充满血腥与战争金属感的粗犷双色调调色盘。</string>
     <string name="brand_theme_scarlet_carnage_accessibility">猩红杀戮主题，深红色配深金黄铜色。</string>
-    <string name="brand_theme_exquisite_fall_title">精美陨落</string>
+    <string name="brand_theme_exquisite_fall_title">极致沉沦</string>
     <string name="brand_theme_exquisite_fall_description">深暗紫色与尖叫粉，打造极尽奢华的双色调调色盘。</string>
-    <string name="brand_theme_exquisite_fall_accessibility">精美陨落主题，深暗紫色配尖叫粉及金色轮廓。</string>
-    <string name="brand_theme_labyrinth_of_mutability_title">易变迷宫</string>
+    <string name="brand_theme_exquisite_fall_accessibility">极致沉沦主题，深暗紫色配尖叫粉及金色轮廓。</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">万变诡道</string>
     <string name="brand_theme_labyrinth_of_mutability_description">低饱和度的青蓝色与鲜艳的荧光紫，形成一个变幻莫测的双色调迷宫。</string>
-    <string name="brand_theme_labyrinth_of_mutability_accessibility">易变迷宫主题，低饱和度青蓝色配亮荧光紫及金色轮廓。</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">万变诡道主题，低饱和度青蓝色配亮荧光紫及金色轮廓。</string>
     <string name="brand_theme_custom_title">自定义双色调</string>
     <string name="brand_theme_custom_description">使用你自己的双色调颜色，并沿用神圣机器的示例文本。</string>
     <string name="brand_theme_custom_accessibility">自定义双色调主题预览。</string>
@@ -127,7 +127,7 @@
     <string name="config_custom_brand_theme_dialog_title_new">新建自定义双色调</string>
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
     <string name="config_custom_brand_theme_dialog_title_edit">编辑自定义双色调</string>
-    <string name="config_custom_brand_theme_dialog_description">请输入 `#RRGGBB` 格式的十六进制颜色。描边留空时会复用辅色。</string>
+    <string name="config_custom_brand_theme_dialog_description">请输入 #RRGGBB 格式的十六进制颜色。描边留空时会复用辅色。</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
     <string name="config_custom_brand_theme_randomize">随机颜色</string>
     <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
@@ -147,7 +147,7 @@
     <string name="config_custom_brand_theme_delete_message">删除预设 %1$s？</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">请输入预设名称。</string>
-    <string name="config_custom_brand_theme_invalid_hex">请输入 `#RRGGBB`。</string>
+    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">猩红</string>
     <string name="palette_rose_title">玫瑰粉</string>
     <string name="palette_sakura_title">樱花粉</string>
@@ -180,7 +180,7 @@
     <string name="palette_violet_title">紫罗兰脉冲</string>
     <string name="palette_plum_title">李子之夜</string>
     <string name="palette_magenta_title">洋红波普</string>
-    <string name="palette_fuchsia_title">桃红闪烁</string>
+    <string name="palette_fuchsia_title">桃红 flash</string>
     <string name="palette_orchid_title">兰花雾</string>
     <string name="palette_lilac_title">丁香迷蒙</string>
     <string name="palette_mocha_title">摩卡棕</string>
@@ -189,4 +189,11 @@
     <string name="palette_stone_title">石青灰</string>
     <string name="palette_graphite_title">石墨墨迹</string>
     <string name="palette_ivory_title">象牙白</string>
+
+    <string name="config_sample_decoration_title">Sample decoration</string>
+    <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_decoration_style_title">Style</string>
+    <string name="config_sample_decoration_style_none">None</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>     <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
 </resources>

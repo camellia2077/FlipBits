@@ -9,4 +9,5 @@
     <string name="about_licenses_subtitle">查看函式庫與授權</string>
     <string name="licenses_title">開源授權</string>
     <string name="licenses_loading">載入授權中</string>
+    <string name="about_bilibili">%1$s</string>
 </resources>

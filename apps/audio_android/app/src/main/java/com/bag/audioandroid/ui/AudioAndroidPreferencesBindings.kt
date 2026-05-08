@@ -5,6 +5,7 @@ import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -41,6 +42,9 @@ internal class AudioAndroidPreferencesBindings(
         observeSelectedPlaybackSequenceMode()
         observeConfigLanguageExpanded()
         observeConfigThemeAppearanceExpanded()
+        observeDemoModeEnabled()
+        observeSampleDecorationEnabled()
+        observeSampleDecorationStyle()
     }
 
     private fun observeSelectedPalette() {
@@ -225,6 +229,55 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(isConfigThemeAppearanceExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeDemoModeEnabled() {
+        scope.launch {
+            appSettingsRepository.isDemoModeEnabled
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    uiState.update { state ->
+                        if (state.isDemoModeEnabled == enabled) {
+                            state
+                        } else {
+                            state.copy(isDemoModeEnabled = enabled)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSampleDecorationEnabled() {
+        scope.launch {
+            appSettingsRepository.isSampleDecorationEnabled
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    uiState.update { state ->
+                        if (state.isSampleDecorationEnabled == enabled) {
+                            state
+                        } else {
+                            state.copy(isSampleDecorationEnabled = enabled)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSampleDecorationStyle() {
+        scope.launch {
+            appSettingsRepository.sampleDecorationStyleId
+                .distinctUntilChanged()
+                .collect { styleId ->
+                    val style = SampleDecorationStyleOption.fromId(styleId)
+                    uiState.update { state ->
+                        if (state.sampleDecorationStyle == style) {
+                            state
+                        } else {
+                            state.copy(sampleDecorationStyle = style)
                         }
                     }
                 }

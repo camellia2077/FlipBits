@@ -82,6 +82,7 @@ def key_alignment_payload(result) -> dict[str, object]:
         "exit_code": result.exit_code,
         "summary": {
             "alignment_issue_count": result.alignment_issue_count,
+            "stale_issue_count": result.stale_issue_count,
             "report_file_count": result.report_file_count,
             "task_json_paths": list(result.task_json_paths),
         },

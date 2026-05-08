@@ -27,6 +27,7 @@ from core.translation_reporting import (
 )
 from core.translation_resources import AndroidStringResourceRepository, ResourceFile
 from prompts.language_prompt_profiles import get_locale_prompt_profile
+from prompts.sample_text_profiles import get_sample_text_style_profile
 from prompts.translation_review_prompts import (
     build_english_source_review_prompt_for_text_type,
     build_manual_english_source_review_prompt_for_text_type,
@@ -336,6 +337,11 @@ class TranslationQualityReportGenerator:
                     prompt_text_type=text_type,
                     prompt_doc_path=prompt_path,
                     locale_profile=profile,
+                    style_profile=get_sample_text_style_profile(
+                        locale_code=lang_code,
+                        text_type=text_type,
+                        group=faction,
+                    ),
                     entries=entries,
                 )
                 written_paths.append(write_agent_task_payload(output_path, payload))

@@ -60,6 +60,7 @@ internal fun PlayerDetailSheetContent(
     onScrubChanged: (Int) -> Unit,
     onScrubFinished: () -> Unit,
     onLyricsRequested: () -> Unit = {},
+    onPlaybackDisplayModeSelected: (PlaybackDisplayMode) -> Unit = {},
     onSeekToSample: (Int) -> Unit = { targetSamples ->
         onScrubStarted()
         onScrubChanged(targetSamples)
@@ -74,6 +75,7 @@ internal fun PlayerDetailSheetContent(
             isFlashMode = miniPlayerModel.isFlashMode,
             onLyricsRequested = onLyricsRequested,
             initialDisplayMode = initialDisplayMode,
+            onDisplayModeSelected = onPlaybackDisplayModeSelected,
         )
 
     Column(

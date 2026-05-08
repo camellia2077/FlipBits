@@ -174,10 +174,16 @@ fun customBrandTheme(settings: CustomBrandThemeSettings): BrandThemeOption {
 
 fun normalizeBrandThemeHex(value: String?): String? {
     val trimmed = value?.trim()?.uppercase().orEmpty()
-    if (!BrandThemeHexRegex.matches(trimmed)) {
+    val normalized =
+        if (trimmed.startsWith("#")) {
+            trimmed
+        } else {
+            "#$trimmed"
+        }
+    if (!BrandThemeHexRegex.matches(normalized)) {
         return null
     }
-    return trimmed
+    return normalized
 }
 
 fun normalizeBrandThemeHexOrNull(value: String?): String? {

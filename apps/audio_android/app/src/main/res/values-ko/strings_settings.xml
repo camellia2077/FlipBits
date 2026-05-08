@@ -160,7 +160,7 @@
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">프리셋 이름을 입력하세요.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">#RRGGBB 형식을 사용하세요.</string>
+    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">크림슨 레드</string>
     <string name="palette_rose_title">로즈 핑크</string>
     <string name="palette_sakura_title">사쿠라 핑크</string>
@@ -202,4 +202,11 @@
     <string name="palette_stone_title">스톤 토프</string>
     <string name="palette_graphite_title">그라파이트 잉크</string>
     <string name="palette_ivory_title">아이보리 린넨</string>
+
+    <string name="config_sample_decoration_title">Sample decoration</string>
+    <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_decoration_style_title">Style</string>
+    <string name="config_sample_decoration_style_none">None</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>`r`n    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
 </resources>

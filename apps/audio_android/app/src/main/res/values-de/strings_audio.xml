@@ -154,7 +154,7 @@
     <string name="audio_transport_pro_hint">pro verwendet nur ASCII-Text.</string>
     <string name="audio_transport_pro_example">GLOCKEN MARKIEREN DIE ERSTE WACHE</string>
     <string name="audio_transport_ultra_hint">ultra verwendet UTF-8-Text.</string>
-    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_transport_mini_hint">mini verwendet Morse-kompatiblen ASCII-Text.</string>
     <string name="audio_morse_speed_slow">Langsam</string>
     <string name="audio_morse_speed_standard">Standard</string>
     <string name="audio_morse_speed_fast">Schnell</string>
@@ -227,4 +227,18 @@
     <string name="audio_info_flash_decode_path">Decode-Pfad</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s Samples</string>
+
+    <string name="demo_hint_demo_mode_on">Demo-Modus aktiviert</string>
+    <string name="demo_hint_tab_audio">Zu Audio gewechselt</string>
+    <string name="demo_hint_tab_saved">Zu Gespeichert gewechselt</string>
+    <string name="demo_hint_tab_settings">Zu Einstellungen gewechselt</string>
+    <string name="demo_hint_generate_audio">Audio erstellen</string>
+    <string name="demo_hint_decode_audio">Audio dekodieren</string>
+    <string name="demo_hint_open_mini_player">Mini-Player öffnen</string>
+    <string name="demo_hint_switch_to_lyrics">Zu Lyrics gewechselt</string>
+    <string name="demo_hint_switch_to_visual">Zu Visual gewechselt</string>
+    <string name="demo_hint_play">Wiedergabe gestartet</string>
+    <string name="demo_hint_pause">Wiedergabe pausiert</string>
+    <string name="demo_hint_theme_changed">Design geändert</string>
+    <string name="demo_hint_language_changed">Sprache geändert und Sample aktualisiert</string>
 </resources>

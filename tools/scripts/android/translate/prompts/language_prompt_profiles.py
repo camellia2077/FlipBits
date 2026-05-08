@@ -17,6 +17,7 @@ class LocalePromptProfile:
 
 
 PROFILE_DIRECTORY = Path(__file__).resolve().parent / "locales"
+SHARED_PROFILE_PATH = PROFILE_DIRECTORY / "_shared.md"
 PROFILE_FIELDS = {
     "profile_id",
     "mode",
@@ -64,8 +65,14 @@ def _ensure_sentence_gap(value: str) -> str:
 
 
 def _load_profile(locale_code: str) -> LocalePromptProfile:
+    shared = _parse_profile_file(SHARED_PROFILE_PATH) if SHARED_PROFILE_PATH.exists() else None
     path = PROFILE_DIRECTORY / f"{locale_code}.md"
     parsed = _parse_profile_file(path)
+    if shared:
+        parsed["identity_rule"] = f"{shared['identity_rule']}{parsed['identity_rule']}"
+        parsed["app_text_rule"] = f"{shared['app_text_rule']}{parsed['app_text_rule']}"
+        parsed["sample_text_rule"] = f"{shared['sample_text_rule']}{parsed['sample_text_rule']}"
+        parsed["key_alignment_rule"] = f"{shared['key_alignment_rule']}{parsed['key_alignment_rule']}"
     return LocalePromptProfile(
         locale_code=locale_code,
         profile_id=parsed["profile_id"],

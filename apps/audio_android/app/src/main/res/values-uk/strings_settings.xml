@@ -137,7 +137,7 @@
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_outline_label">Колір контуру</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
-    <string name="config_custom_brand_theme_outline_optional">Необов\'язково</string>
+    <string name="config_custom_brand_theme_outline_optional">Необов’язково</string>
     <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
     <string name="config_custom_brand_theme_save">Зберегти</string>
     <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
@@ -149,7 +149,7 @@
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">Введіть назву пресета.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">Використовуйте #RRGGBB.</string>
+    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">Багряно-червоний</string>
     <string name="palette_rose_title">Трояндовий рожевий</string>
     <string name="palette_sakura_title">Сакуровий рожевий</string>
@@ -191,4 +191,11 @@
     <string name="palette_stone_title">Кам’яний taupe</string>
     <string name="palette_graphite_title">Графітове чорнило</string>
     <string name="palette_ivory_title">Слонова кістка й льон</string>
+
+    <string name="config_sample_decoration_title">Sample decoration</string>
+    <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_decoration_style_title">Style</string>
+    <string name="config_sample_decoration_style_none">None</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>     <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
 </resources>

@@ -42,3 +42,7 @@ python tools/scripts/android/translate/run.py compare --text-type sample_text
 ```
 
 For generated agent jobs, prefer `*.task.json` over parsing markdown.
+- Use [android-translation-review-and-fix-from-english.md](android-translation-review-and-fix-from-english.md) for EN-baseline comparison and translation review execution:
+  - command-first discovery (`--help`, `list-*`)
+  - scoped EN vs localized review artifacts (`compare`)
+  - optional low-markup EN/localized inspection (`dump-xml-md --with-en`)

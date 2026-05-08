@@ -20,6 +20,7 @@ import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
@@ -44,6 +45,9 @@ data class AudioAppUiState(
     val customBrandThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomBrandThemeSettings),
     val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.BrandDualTone,
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
+    val isDemoModeEnabled: Boolean = false,
+    val isSampleDecorationEnabled: Boolean = true,
+    val sampleDecorationStyle: SampleDecorationStyleOption = SampleDecorationStyleOption.Emoji,
     val isConfigLanguageExpanded: Boolean = true,
     val isConfigThemeAppearanceExpanded: Boolean = true,
     val isFlashVoicingEnabled: Boolean = true,

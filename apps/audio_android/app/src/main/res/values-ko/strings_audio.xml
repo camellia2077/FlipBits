@@ -112,7 +112,7 @@
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">바이트 완료</string>
     <!-- CONTEXT: Teaching text in the Pro visualizer. Keep Token / byte / ASCII protocol terms stable and concise. -->
-    <string name="audio_pro_visual_token_mapping">토큰 #%1$d \"%2$s\" -&gt; 바이트 %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">토큰 #%1$d &amp;quot;%2$s&amp;quot; -&gt; 바이트 %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">다음 심볼 주파수: %1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">두 번째 니블이므로, 이후 플레이어가 다음 바이트로 넘어갑니다.</string>
     <string name="audio_pro_visual_ascii_byte">ASCII 바이트 %1$d</string>
@@ -199,7 +199,7 @@
     <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
     <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
     <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
-    <string name="status_ready_to_encode">텍스트를 입력하고 \"생성\"을 누르세요</string>
+    <string name="status_ready_to_encode">텍스트를 입력하고 &amp;quot;생성&amp;quot;을 누르세요</string>
     <string name="status_input_empty">입력 내용이 없습니다.</string>
     <string name="status_mode_audio_generating">%1$s 오디오 생성 중…</string>
     <string name="status_mode_audio_generating_progress">%1$s 오디오 생성 중… %2$d%%</string>
@@ -248,4 +248,18 @@
     <string name="audio_info_flash_decode_path">디코드 경로</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s개 샘플</string>
+
+    <string name="demo_hint_demo_mode_on">Demo mode enabled</string>
+    <string name="demo_hint_tab_audio">Switched to Audio</string>
+    <string name="demo_hint_tab_saved">Switched to Saved</string>
+    <string name="demo_hint_tab_settings">Switched to Settings</string>
+    <string name="demo_hint_generate_audio">Generate audio</string>
+    <string name="demo_hint_decode_audio">Decode audio</string>
+    <string name="demo_hint_open_mini_player">Open mini player</string>
+    <string name="demo_hint_switch_to_lyrics">Switched to Lyrics</string>
+    <string name="demo_hint_switch_to_visual">Switched to Visual</string>
+    <string name="demo_hint_play">Playback started</string>
+    <string name="demo_hint_pause">Playback paused</string>
+    <string name="demo_hint_theme_changed">Theme changed</string>
+    <string name="demo_hint_language_changed">Language changed and sample refreshed</string>
 </resources>

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +29,7 @@ import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteOption
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
@@ -50,6 +53,12 @@ fun ConfigTabScreen(
     onThemeModeSelected: (ThemeModeOption) -> Unit,
     isThemeAppearanceExpanded: Boolean,
     onThemeAppearanceExpandedChanged: (Boolean) -> Unit,
+    isDemoModeEnabled: Boolean,
+    onDemoModeEnabledChange: (Boolean) -> Unit,
+    isSampleDecorationEnabled: Boolean,
+    onSampleDecorationEnabledChange: (Boolean) -> Unit,
+    sampleDecorationStyle: SampleDecorationStyleOption,
+    onSampleDecorationStyleSelected: (SampleDecorationStyleOption) -> Unit,
     selectedPalette: PaletteOption,
     onPaletteSelected: (PaletteOption) -> Unit,
     materialPalettes: List<PaletteOption>,
@@ -97,6 +106,87 @@ fun ConfigTabScreen(
             brandThemes = brandThemes,
             accentTokens = accentTokens,
         )
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 0.dp,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(stringResource(R.string.config_demo_mode_title), fontWeight = FontWeight.SemiBold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(R.string.config_demo_mode_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+                Switch(
+                    checked = isDemoModeEnabled,
+                    onCheckedChange = onDemoModeEnabledChange,
+                )
+            }
+        }
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 0.dp,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        Text(stringResource(R.string.config_sample_decoration_title), fontWeight = FontWeight.SemiBold)
+                        Text(
+                            stringResource(R.string.config_sample_decoration_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Switch(
+                        checked = isSampleDecorationEnabled,
+                        onCheckedChange = onSampleDecorationEnabledChange,
+                    )
+                }
+
+                if (isSampleDecorationEnabled) {
+                    Text(
+                        text = stringResource(R.string.config_sample_decoration_style_title),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        SampleDecorationStyleOption.entries.forEach { option ->
+                            androidx.compose.material3.FilterChip(
+                                selected = sampleDecorationStyle == option,
+                                onClick = { onSampleDecorationStyleSelected(option) },
+                                label = { Text(stringResource(option.labelResId)) },
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         Surface(
             shape = MaterialTheme.shapes.medium,

@@ -11,6 +11,7 @@ from core.replacement_json_preflight import load_replacement_json_with_preflight
 from core.replacement_entries import ReplacementEntry, load_replacement_entries
 from core.translation_paths import DEFAULT_RES_DIRECTORY
 from commands.fix_android_resource_escapes import run_fix_android_resource_escapes
+from core.ko_resource_guardrails import autofix_ko_xml_text, validate_ko_values_xml_files
 from core.xml_string_replacement import (
     AppliedReplacement,
     apply_replacement_in_string,
@@ -288,6 +289,46 @@ def apply_translation_replacements(
 
     target_dir = res_dir / replacement_batch.dir_name
     if target_dir.exists() and target_dir.is_dir():
+        if target_dir.name == "values-ko":
+            ko_files = [path for path in sorted(target_dir.glob("*.xml")) if path.is_file()]
+            for ko_file in ko_files:
+                original = ko_file.read_text(encoding="utf-8")
+                fixed, changed = autofix_ko_xml_text(original)
+                if changed > 0:
+                    ko_file.write_text(fixed, encoding="utf-8")
+            guardrail_issues = validate_ko_values_xml_files(ko_files)
+            if guardrail_issues:
+                guidance = (
+                    "KO resource guardrail check failed before XML replacement.\n"
+                    "Fix guidance for agent:\n"
+                    "1) Replace raw \\\" with &quot; inside string bodies.\n"
+                    "2) Replace raw \\' with ' unless Android escaping explicitly requires otherwise.\n"
+                    "3) Remove malformed \\u escapes; use plain Unicode characters directly.\n"
+                    "4) Re-run: python tools/scripts/android/translate/run.py fix-resource-escapes --res-dir apps/audio_android/app/src/main/res\n"
+                )
+                details = "\n".join(
+                    f"- {issue.file}\n  reason: {issue.reason}\n  sample: {issue.sample}"
+                    for issue in guardrail_issues
+                )
+                error = f"{guidance}\n{details}"
+                if emit_text:
+                    print(error)
+                return ReplaceCommandResult(
+                    exit_code=2,
+                    dir_name=replacement_batch.dir_name if 'replacement_batch' in locals() else "values-ko",
+                    applied_replacements=0,
+                    already_applied_count=0,
+                    skipped_unchanged_count=0,
+                    failed_not_found_count=0,
+                    failed_ambiguous_count=0,
+                    failed_validation_count=len(guardrail_issues),
+                    validation_error_count=len(guardrail_issues),
+                    smoke_check_ran=False,
+                    smoke_check_ok=True,
+                    errors=(error,),
+                    auto_fix_applied=preflight_result.changed,
+                    auto_fix_summary=preflight_result.fix_summary,
+                )
         run_fix_android_resource_escapes(
             res_dir=res_dir,
             files=[str(path) for path in sorted(target_dir.glob("*.xml")) if path.is_file()],

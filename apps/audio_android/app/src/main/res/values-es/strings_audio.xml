@@ -61,11 +61,11 @@
     <string name="audio_result_title">Resultado de lectura</string>
     <string name="audio_result_empty">Aún no hay resultado.</string>
     <string name="audio_decode_view_text">Texto</string>
-    <string name="audio_decode_view_raw">Raw</string>
+    <string name="audio_decode_view_raw">En bruto</string>
     <string name="audio_decode_raw_binary_label">Binario</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
-    <string name="audio_decode_text_unavailable">No se pudo interpretar esta carga como texto. Los datos raw siguen disponibles.</string>
-    <string name="audio_decode_raw_unavailable">Aún no hay datos raw disponibles.</string>
+    <string name="audio_decode_text_unavailable">No se pudo interpretar esta carga como texto. Los datos en bruto siguen disponibles.</string>
+    <string name="audio_decode_raw_unavailable">Aún no hay datos en bruto disponibles.</string>
     <string name="audio_flash_style_hint">Se aplica al siguiente audio generado. El audio ya generado conserva el estilo con el que fue creado.</string>
     <string name="audio_flash_voicing_style_title">Estilo de voz</string>
     <string name="audio_action_select_flash_voicing_style">Seleccionar estilo de voz</string>
@@ -154,7 +154,7 @@
     <string name="audio_transport_pro_hint">pro usa solo texto ASCII.</string>
     <string name="audio_transport_pro_example">LAS CAMPANAS MARCAN LA PRIMERA GUARDIA</string>
     <string name="audio_transport_ultra_hint">ultra usa texto UTF-8.</string>
-    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_transport_mini_hint">mini usa texto ASCII compatible con Morse.</string>
     <string name="audio_morse_speed_slow">Lento</string>
     <string name="audio_morse_speed_standard">Estándar</string>
     <string name="audio_morse_speed_fast">Rápido</string>
@@ -227,4 +227,18 @@
     <string name="audio_info_flash_decode_path">Ruta de decodificación</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s muestras</string>
+
+    <string name="demo_hint_demo_mode_on">Modo demo activado</string>
+    <string name="demo_hint_tab_audio">Cambio a Audio</string>
+    <string name="demo_hint_tab_saved">Cambio a Guardado</string>
+    <string name="demo_hint_tab_settings">Cambio a Ajustes</string>
+    <string name="demo_hint_generate_audio">Generar audio</string>
+    <string name="demo_hint_decode_audio">Decodificar audio</string>
+    <string name="demo_hint_open_mini_player">Abrir mini reproductor</string>
+    <string name="demo_hint_switch_to_lyrics">Cambio a Lyrics</string>
+    <string name="demo_hint_switch_to_visual">Cambio a Visual</string>
+    <string name="demo_hint_play">Reproducción iniciada</string>
+    <string name="demo_hint_pause">Reproducción en pausa</string>
+    <string name="demo_hint_theme_changed">Tema cambiado</string>
+    <string name="demo_hint_language_changed">Idioma cambiado y sample actualizado</string>
 </resources>

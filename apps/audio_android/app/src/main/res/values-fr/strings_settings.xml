@@ -119,7 +119,7 @@
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
     <string name="config_custom_brand_theme_dialog_title_edit">Modifier le Dual-tone personnalisé</string>
     <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
-    <string name="config_custom_brand_theme_dialog_description">Saisissez des couleurs hexadécimales au format `#RRGGBB`. Laissez le contour vide pour réutiliser la couleur d’accent.</string>
+    <string name="config_custom_brand_theme_dialog_description">Saisissez des couleurs hexadécimales au format #RRGGBB. Laissez le contour vide pour réutiliser la couleur d’accent.</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
     <string name="config_custom_brand_theme_randomize">Aléatoiriser les couleurs</string>
     <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
@@ -145,7 +145,7 @@
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">Entrez un nom de préréglage.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">Utilisez `#RRGGBB`.</string>
+    <string name="config_custom_brand_theme_invalid_hex">Utilisez RRGGBB ou #RRGGBB.</string>
     <string name="palette_crimson_title">Rouge cramoisi</string>
     <string name="palette_rose_title">Rose rosé</string>
     <string name="palette_sakura_title">Rose sakura</string>
@@ -187,4 +187,12 @@
     <string name="palette_stone_title">Taupe pierre</string>
     <string name="palette_graphite_title">Encre graphite</string>
     <string name="palette_ivory_title">Lin ivoire</string>
+
+    <string name="config_sample_decoration_title">Décoration des samples</string>
+    <string name="config_sample_decoration_subtitle">Ajoute des marqueurs de préfixe optionnels au sample aléatoire.</string>
+    <string name="config_sample_decoration_style_title">Style</string>
+    <string name="config_sample_decoration_style_none">Aucun</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (selon la faction)</string>
+    <string name="config_demo_mode_title">Mode démo</string>
+    <string name="config_demo_mode_subtitle">Affiche un retour tactile et des indications d’action pour l’enregistrement.</string>
 </resources>

@@ -2,6 +2,10 @@
   <img src="ui/app/icon-foreground.svg" alt="FlipBits icon" width="128" />
 </p>
 
+<p align="center">
+  <em>Icon designed by camellia2077 (FlipBits Project)</em>
+</p>
+
 <h1 align="center">FlipBits</h1>
 
 <p align="center">
@@ -13,19 +17,21 @@
   <em>Text-to-audio signaling with emotional FSK pacing, visual follow, and readable encoding structure</em>
 </p>
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/302d55da-1c86-4b68-a944-ecaae1027d52" width="180" title="Chinese" />
-  <img src="https://github.com/user-attachments/assets/751dcf01-7456-4ddd-aa6d-d0beec567a19" width="180" title="English" />
-  <img src="https://github.com/user-attachments/assets/b52a3996-27b2-44c7-953d-189e2109e1c1" width="180" title="Deutsch" />
-  <img src="https://github.com/user-attachments/assets/8013d351-83ad-45f5-84bd-97ca82354714" width="180" title="Français" />
-</p>
-
-
 [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](LICENSE)
 [![Platform Android](https://img.shields.io/badge/Platform-Android-3DDC84.svg)]()
 [![CI Android Assemble](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-assemble.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-assemble.yml)
 [![CI Android Quality](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-quality.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-quality.yml)
 [![CI Host Verify](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml)
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5c2433f5-37b8-4524-a0a0-ce65f6fe4e4d" width="160" title="Chinese" />
+  <img src="https://github.com/user-attachments/assets/a288707b-1186-4083-b134-c861dd2abf1a" width="160" title="English" />
+  <img src="https://github.com/user-attachments/assets/6d578c41-3487-4c89-937e-a55a575ed58e" width="160" title="Deutsch" />
+  <img src="https://github.com/user-attachments/assets/21ab29a9-a81f-4f26-8770-91403984ef38" width="160" title="Latin" />
+  <img src="https://github.com/user-attachments/assets/9d517c89-4c80-4a37-ba9d-78b4b3177f26" width="160" title="French" />
+  <img src="https://github.com/user-attachments/assets/e2bf65a3-e747-4f77-bfc9-f0717c0bcec1" width="160" title="Russian" />
+</p>
 
 ## Project Overview
 FlipBits is a toolkit for encoding text into audible signal patterns and decoding those generated patterns back into text. It does more than convert text into sound: in its bit-by-bit FSK path, it shapes bit duration, pause spacing, frequency choices, and playback rhythm so generated audio can resemble different emotional tones or speaking styles.
@@ -55,7 +61,7 @@ It is not primarily designed around real-time over-speaker playback decoding by 
 ## Android App Footprint
 The Android app is intentionally lightweight and native-leaning, with fast cold start behavior and a small package footprint for audio generation, conversion, sharing, and export.
 
-In the current reference build, the install package is about `5.5 MB`, and the installed size is about `5.9 MB`. These numbers may change across versions, ABIs, and build configurations.
+In the current reference build, the install package is about `5.59 MB`, and the installed size is about `5.96 MB`. These numbers may change across versions, ABIs, and build configurations.
 
 ## Modes
 
@@ -167,9 +173,26 @@ For deeper `ultra` mode positioning and implementation notes, see:
 - [`docs/design/transports.md`](docs/design/transports.md)
 - [`docs/architecture/repo-map.md`](docs/architecture/repo-map.md)
 
+The implementation direction of the `ultra` mode was informed by the public engineering ideas and acoustic transport practice in [ggerganov/ggwave](https://github.com/ggerganov/ggwave), and we gratefully acknowledge that reference.  
+This repository remains an independent implementation; except for third-party components explicitly marked in-tree, no affiliation, endorsement, or official relationship is claimed.
+
 ---
 
 ## Usage & Liability
+
+### Icon Usage (Public Resource)
+FlipBits icon assets (including source and component SVG files) are provided to the community as a public resource.
+
+Subject to this repository's license and applicable law, you may use these icons for badges, derivative creations, videos, and commercial distribution (including sales) without requesting additional one-off permission from the project.
+
+For public distribution, attribution is recommended:
+`Icon designed by FlipBits Project`
+
+Limits and boundaries (legally conservative):
+- This permission covers the icon assets only and does not grant trademark rights, patent rights, personality/publicity rights, or any rights not explicitly granted.
+- The assets are provided "as is" without express or implied warranties; users are responsible for their own compliance and risk assessment.
+- Do not privatize, exclusively claim, or re-license these icon assets as proprietary/exclusive resources.
+- Do not imply official representation, endorsement, or exclusive authorization from the FlipBits project or its author.
 
 ### 1. Principles & Limitations
 - **Transparent signaling methods**: the project uses open and conventional acoustic signaling methods, including high/low frequency switching, dual-tone mapping, and multi-frequency mapping. These are structured encoding schemes, not encryption or steganography.

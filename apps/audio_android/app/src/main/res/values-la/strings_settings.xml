@@ -149,7 +149,7 @@
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">Inscribe nomen pro hoc sigillo.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">Adhibere #RRGGBB.</string>
+    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">Rubrum Coccineum</string>
     <string name="palette_rose_title">Roseum Rosae</string>
     <string name="palette_sakura_title">Roseum Sakurae</string>
@@ -191,4 +191,11 @@
     <string name="palette_stone_title">Taupe Lapideus</string>
     <string name="palette_graphite_title">Atramentum Graphitae</string>
     <string name="palette_ivory_title">Linum Eburneum</string>
+
+    <string name="config_sample_decoration_title">Sample decoration</string>
+    <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_decoration_style_title">Style</string>
+    <string name="config_sample_decoration_style_none">None</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>`r`n    <string name="config_demo_mode_title">Modus Demonstratio</string>
+    <string name="config_demo_mode_subtitle">Monstra signum tactus et monita ad capturam.</string>
 </resources>

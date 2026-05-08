@@ -28,6 +28,7 @@ class TranslationKeyAlignmentResult:
     exit_code: int
     output_dir: Path
     alignment_issue_count: int
+    stale_issue_count: int
     report_file_count: int
     task_json_paths: tuple[str, ...]
 
@@ -46,6 +47,8 @@ class TranslationKeyAlignmentChecker:
     def run(
         self,
         *,
+        lang: str | None = None,
+        fail_on_stale: bool = False,
         quiet: bool = False,
         emit_text: bool = True,
     ) -> TranslationKeyAlignmentResult:
@@ -54,11 +57,15 @@ class TranslationKeyAlignmentChecker:
         self.output_manager.reset()
 
         total_issues = 0
+        stale_issues = 0
         written_reports = 0
         task_json_paths: list[str] = []
 
+        normalized_lang = lang.strip() if lang else None
         for lang_code, folder_path in self.repository.iter_localized_directories():
-            file_blocks, task_entries = self._build_language_issue_blocks(lang_code, folder_path, base_files)
+            if normalized_lang and lang_code != normalized_lang:
+                continue
+            file_blocks, task_entries, stale_count = self._build_language_issue_blocks(lang_code, folder_path, base_files)
             if not file_blocks:
                 continue
             profile = get_locale_prompt_profile(lang_code)
@@ -89,6 +96,7 @@ class TranslationKeyAlignmentChecker:
                 )
             )
             total_issues += sum(len(block.key_blocks) for block in file_blocks)
+            stale_issues += stale_count
             written_reports += 1
 
         if total_issues == 0:
@@ -101,11 +109,19 @@ class TranslationKeyAlignmentChecker:
 
         if emit_text and not quiet:
             print(f"Done. Alignment issues: {total_issues}")
+            print(f"Stale issues (localized-only keys/files): {stale_issues}")
             print(f"Reports generated under: {self.output_manager.output_dir} ({written_reports} files)")
+        if total_issues == 0:
+            exit_code = 0
+        elif fail_on_stale:
+            exit_code = 2 if stale_issues > 0 else 0
+        else:
+            exit_code = 2
         return TranslationKeyAlignmentResult(
-            exit_code=0 if total_issues == 0 else 2,
+            exit_code=exit_code,
             output_dir=self.output_manager.output_dir,
             alignment_issue_count=total_issues,
+            stale_issue_count=stale_issues,
             report_file_count=written_reports,
             task_json_paths=tuple(task_json_paths),
         )
@@ -115,15 +131,17 @@ class TranslationKeyAlignmentChecker:
         lang_code: str,
         folder_path: Path,
         base_files: dict[str, ResourceFile],
-    ) -> tuple[list[ReportFileBlock], list[dict[str, object]]]:
+    ) -> tuple[list[ReportFileBlock], list[dict[str, object]], int]:
         localized_xml_paths = iter_translation_text_xml_paths(folder_path)
         localized_by_name = {path.name: path for path in localized_xml_paths}
 
         file_blocks: list[ReportFileBlock] = []
         task_entries: list[dict[str, object]] = []
+        stale_count = 0
 
         extra_filenames = sorted(name for name in localized_by_name if name not in base_files)
         for filename in extra_filenames:
+            stale_count += 1
             file_blocks.append(
                 ReportFileBlock(
                     filename=filename,
@@ -251,6 +269,7 @@ class TranslationKeyAlignmentChecker:
                 )
                 previous_missing_keys.add(key)
             for key in extra_keys:
+                stale_count += 1
                 key_blocks.append(
                     ReportKeyBlock(
                         key=key,
@@ -272,7 +291,7 @@ class TranslationKeyAlignmentChecker:
                 )
             file_blocks.append(ReportFileBlock(filename=filename, key_blocks=tuple(key_blocks)))
 
-        return file_blocks, task_entries
+        return file_blocks, task_entries, stale_count
 
     def _write_key_alignment_task_json(
         self,
@@ -346,8 +365,15 @@ class TranslationKeyAlignmentChecker:
 def run_translation_key_alignment_check(
     res_dir: Path | str = DEFAULT_RES_DIRECTORY,
     output_dir: Path | str = DEFAULT_OUTPUT_DIRECTORY,
+    lang: str | None = None,
+    fail_on_stale: bool = False,
     quiet: bool = False,
     emit_text: bool = True,
 ) -> TranslationKeyAlignmentResult:
     checker = TranslationKeyAlignmentChecker(res_dir=res_dir, output_dir=output_dir)
-    return checker.run(quiet=quiet, emit_text=emit_text)
+    return checker.run(
+        lang=lang,
+        fail_on_stale=fail_on_stale,
+        quiet=quiet,
+        emit_text=emit_text,
+    )

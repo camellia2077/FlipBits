@@ -21,4 +21,5 @@
     <string name="licenses_title">开源许可</string>
     <!-- CONTEXT: Short loading state shown while the licenses page is still loading. -->
     <string name="licenses_loading">正在加载许可协议</string>
+    <string name="about_bilibili">%1$s</string>
 </resources>

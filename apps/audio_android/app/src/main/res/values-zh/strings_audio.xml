@@ -75,8 +75,8 @@
     <string name="audio_result_empty">暂无结果。</string>
     <string name="audio_decode_view_text">文本</string>
     <string name="audio_decode_view_raw">原始数据</string>
-    <string name="audio_decode_raw_binary_label">二进制</string>
-    <string name="audio_decode_raw_hex_label">十六进制</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
+    <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">无法将此载荷解析为文本。原始数据仍可用。</string>
     <string name="audio_decode_raw_unavailable">原始载荷数据暂不可用。</string>
     <string name="audio_flash_style_hint">应用于下次生成的音频。已生成的音频将保留其创建时的风格。</string>
@@ -145,8 +145,8 @@
     <string name="audio_follow_text_unavailable">当前音频暂不可用文本跟踪。</string>
     <string name="audio_follow_display_lyrics">歌词</string>
     <string name="audio_follow_display_data">数据</string>
-    <string name="audio_follow_view_hex">十六进制</string>
-    <string name="audio_follow_view_binary">二进制</string>
+    <string name="audio_follow_view_hex">Hex</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">详情</string>
     <string name="audio_player_detail_saved_mode">模式</string>
@@ -248,4 +248,18 @@
     <string name="audio_info_flash_decode_path">解码路径</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s 个采样</string>
+
+    <string name="demo_hint_demo_mode_on">Demo mode enabled</string>
+    <string name="demo_hint_tab_audio">Switched to Audio</string>
+    <string name="demo_hint_tab_saved">Switched to Saved</string>
+    <string name="demo_hint_tab_settings">Switched to Settings</string>
+    <string name="demo_hint_generate_audio">Generate audio</string>
+    <string name="demo_hint_decode_audio">Decode audio</string>
+    <string name="demo_hint_open_mini_player">Open mini player</string>
+    <string name="demo_hint_switch_to_lyrics">Switched to Lyrics</string>
+    <string name="demo_hint_switch_to_visual">Switched to Visual</string>
+    <string name="demo_hint_play">Playback started</string>
+    <string name="demo_hint_pause">Playback paused</string>
+    <string name="demo_hint_theme_changed">Theme changed</string>
+    <string name="demo_hint_language_changed">Language changed and sample refreshed</string>
 </resources>

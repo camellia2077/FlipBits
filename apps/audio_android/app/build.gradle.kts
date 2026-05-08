@@ -55,6 +55,7 @@ fun requiredGradleStringProperty(name: String): String =
 
 val repoRootDir = rootProject.projectDir.parentFile.parentFile
 val translateRunScript = repoRootDir.resolve("tools/scripts/android/translate/run.py")
+val translateLintBaselineFile = repoRootDir.resolve("tools/scripts/android/translate/lint-baseline.json")
 val pythonCommand =
     if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
         listOf("py", "-3")
@@ -281,6 +282,7 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 tasks.named("preBuild").configure {
     dependsOn("exportLibraryDefinitions")
     dependsOn(checkTranslationKeyAlignment)
+    dependsOn(translationLintWarn)
 }
 
 val checkTranslationKeyAlignment by tasks.registering(Exec::class) {
@@ -295,8 +297,48 @@ val checkTranslationKeyAlignment by tasks.registering(Exec::class) {
     commandLine(*(pythonCommand + listOf(translateRunScript.absolutePath, "key-alignment", "--quiet")).toTypedArray())
 }
 
+val translationLintWarn by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Runs translation lint in non-blocking mode for local/debug loops."
+    workingDir = repoRootDir
+    isIgnoreExitValue = true
+    commandLine(*(pythonCommand + listOf(translateRunScript.absolutePath, "lint")).toTypedArray())
+    doLast {
+        val code = executionResult.get().exitValue
+        if (code != 0) {
+            logger.warn(
+                "Translation lint reported issues (exit=$code). " +
+                    "Debug/local build continues; release build will fail on translationLintStrict.",
+            )
+        }
+    }
+}
+
+val translationLintStrict by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Runs translation lint in blocking mode for release builds."
+    workingDir = repoRootDir
+    commandLine(
+        *(
+            pythonCommand +
+                listOf(
+                    translateRunScript.absolutePath,
+                    "lint",
+                    "--fail-on-new",
+                    "--baseline-file",
+                    translateLintBaselineFile.absolutePath,
+                )
+        ).toTypedArray(),
+    )
+}
+
 tasks.named("check").configure {
     dependsOn(checkTranslationKeyAlignment)
+    dependsOn(translationLintWarn)
+}
+
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    dependsOn(translationLintStrict)
 }
 
 dependencies {

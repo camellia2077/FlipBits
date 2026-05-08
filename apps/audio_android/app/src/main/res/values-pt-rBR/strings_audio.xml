@@ -62,7 +62,7 @@
     <string name="audio_result_empty">Ainda não há resultado.</string>
     <string name="audio_decode_view_text">Texto</string>
     <string name="audio_decode_view_raw">Bruto</string>
-    <string name="audio_decode_raw_binary_label">Binário</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">Este payload não pôde ser interpretado como texto. Os dados brutos ainda estão disponíveis.</string>
     <string name="audio_decode_raw_unavailable">Ainda não há dados brutos disponíveis.</string>
@@ -128,7 +128,7 @@
     <string name="audio_follow_display_lyrics">Letra</string>
     <string name="audio_follow_display_data">Dados</string>
     <string name="audio_follow_view_hex">Hex</string>
-    <string name="audio_follow_view_binary">Binário</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">Detalhes</string>
     <string name="audio_player_detail_saved_mode">Modo</string>
@@ -227,4 +227,18 @@
     <string name="audio_info_flash_decode_path">Caminho de decodificação</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s amostras</string>
+
+    <string name="demo_hint_demo_mode_on">Modo demo ativado</string>
+    <string name="demo_hint_tab_audio">Mudou para Áudio</string>
+    <string name="demo_hint_tab_saved">Mudou para Salvos</string>
+    <string name="demo_hint_tab_settings">Mudou para Configurações</string>
+    <string name="demo_hint_generate_audio">Gerar áudio</string>
+    <string name="demo_hint_decode_audio">Decodificar áudio</string>
+    <string name="demo_hint_open_mini_player">Abrir mini player</string>
+    <string name="demo_hint_switch_to_lyrics">Mudou para Letra</string>
+    <string name="demo_hint_switch_to_visual">Mudou para Visual</string>
+    <string name="demo_hint_play">Reprodução iniciada</string>
+    <string name="demo_hint_pause">Reprodução pausada</string>
+    <string name="demo_hint_theme_changed">Tema alterado</string>
+    <string name="demo_hint_language_changed">Idioma alterado e amostra atualizada</string>
 </resources>

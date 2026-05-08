@@ -62,7 +62,7 @@
     <string name="audio_result_empty">Nessun risultato al momento.</string>
     <string name="audio_decode_view_text">Testo</string>
     <string name="audio_decode_view_raw">Raw</string>
-    <string name="audio_decode_raw_binary_label">Binario</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">Questo payload non può essere interpretato come testo. I dati raw sono comunque disponibili.</string>
     <string name="audio_decode_raw_unavailable">Nessun payload raw disponibile al momento.</string>
@@ -80,7 +80,7 @@
     <string name="audio_player_detail_decoded_title">Risultato lettura</string>
     <string name="audio_player_detail_decoded_empty">Nessun risultato al momento. Tocca Leggi quando serve.</string>
     <string name="audio_playback_view_visual">Visuale</string>
-    <string name="audio_playback_view_lyrics">Lyrics</string>
+    <string name="audio_playback_view_lyrics">Testi</string>
     <string name="audio_pro_visual_waiting_follow">In attesa dei dati di follow</string>
     <string name="audio_pro_visual_symbol_order">Il byte corrente emette 2 simboli: prima il nibble alto, poi quello basso</string>
     <string name="audio_pro_visual_step_1">Passo 1</string>
@@ -125,10 +125,10 @@
     <string name="audio_ultra_visual_level_low">Basso</string>
     <string name="audio_follow_unavailable">Il follow del payload non è disponibile per questo audio al momento.</string>
     <string name="audio_follow_text_unavailable">Il follow del testo non è disponibile per questo audio al momento.</string>
-    <string name="audio_follow_display_lyrics">Lyrics</string>
+    <string name="audio_follow_display_lyrics">Testi</string>
     <string name="audio_follow_display_data">Dati</string>
     <string name="audio_follow_view_hex">Hex</string>
-    <string name="audio_follow_view_binary">Binario</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">Dettagli</string>
     <string name="audio_player_detail_saved_mode">Modalità</string>
@@ -227,4 +227,18 @@
     <string name="audio_info_flash_decode_path">Percorso di decodifica</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s campioni</string>
+
+    <string name="demo_hint_demo_mode_on">Modalità demo attivata</string>
+    <string name="demo_hint_tab_audio">Passato ad Audio</string>
+    <string name="demo_hint_tab_saved">Passato a Salvati</string>
+    <string name="demo_hint_tab_settings">Passato a Impostazioni</string>
+    <string name="demo_hint_generate_audio">Genera audio</string>
+    <string name="demo_hint_decode_audio">Decodifica audio</string>
+    <string name="demo_hint_open_mini_player">Apri mini lettore</string>
+    <string name="demo_hint_switch_to_lyrics">Passato a Testi</string>
+    <string name="demo_hint_switch_to_visual">Passato a Visuale</string>
+    <string name="demo_hint_play">Riproduzione avviata</string>
+    <string name="demo_hint_pause">Riproduzione in pausa</string>
+    <string name="demo_hint_theme_changed">Tema cambiato</string>
+    <string name="demo_hint_language_changed">Lingua cambiata ed esempio aggiornato</string>
 </resources>

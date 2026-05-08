@@ -62,7 +62,7 @@
     <string name="audio_result_empty">Результату ще немає.</string>
     <string name="audio_decode_view_text">Текст</string>
     <string name="audio_decode_view_raw">Сирі дані</string>
-    <string name="audio_decode_raw_binary_label">Бінарний</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">Цей payload не вдалося інтерпретувати як текст. Сирі дані все ще доступні.</string>
     <string name="audio_decode_raw_unavailable">Сирі дані payload поки недоступні.</string>
@@ -128,7 +128,7 @@
     <string name="audio_follow_display_lyrics">Лірика</string>
     <string name="audio_follow_display_data">Дані</string>
     <string name="audio_follow_view_hex">Hex</string>
-    <string name="audio_follow_view_binary">Бінарний</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">Деталі</string>
     <string name="audio_player_detail_saved_mode">Режим</string>
@@ -154,7 +154,7 @@
     <string name="audio_transport_pro_hint">pro використовує лише ASCII-текст.</string>
     <string name="audio_transport_pro_example">DZVONY SPOVISHCHAIUT PERSHU VARTU</string>
     <string name="audio_transport_ultra_hint">ultra використовує текст UTF-8.</string>
-    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_transport_mini_hint">mini використовує ASCII-текст, сумісний із Morse.</string>
     <string name="audio_morse_speed_slow">Повільно</string>
     <string name="audio_morse_speed_standard">Стандарт</string>
     <string name="audio_morse_speed_fast">Швидко</string>
@@ -227,4 +227,18 @@
     <string name="audio_info_flash_decode_path">Шлях декодування</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s зразків</string>
+
+    <string name="demo_hint_demo_mode_on">Демо-режим увімкнено</string>
+    <string name="demo_hint_tab_audio">Перемкнено на Аудіо</string>
+    <string name="demo_hint_tab_saved">Перемкнено на Збережене</string>
+    <string name="demo_hint_tab_settings">Перемкнено на Налаштування</string>
+    <string name="demo_hint_generate_audio">Створити аудіо</string>
+    <string name="demo_hint_decode_audio">Декодувати аудіо</string>
+    <string name="demo_hint_open_mini_player">Відкрити mini player</string>
+    <string name="demo_hint_switch_to_lyrics">Перемкнено на Lyrics</string>
+    <string name="demo_hint_switch_to_visual">Перемкнено на Visual</string>
+    <string name="demo_hint_play">Відтворення розпочато</string>
+    <string name="demo_hint_pause">Відтворення призупинено</string>
+    <string name="demo_hint_theme_changed">Тему змінено</string>
+    <string name="demo_hint_language_changed">Мову змінено, зразок оновлено</string>
 </resources>

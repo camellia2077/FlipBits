@@ -8,6 +8,7 @@ import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -157,6 +158,27 @@ internal class AudioAndroidPreferencesActions(
         uiState.update { it.copy(isConfigThemeAppearanceExpanded = expanded) }
         scope.launch {
             appSettingsRepository.setConfigThemeAppearanceExpanded(expanded)
+        }
+    }
+
+    fun onDemoModeEnabledChanged(enabled: Boolean) {
+        uiState.update { it.copy(isDemoModeEnabled = enabled) }
+        scope.launch {
+            appSettingsRepository.setDemoModeEnabled(enabled)
+        }
+    }
+
+    fun onSampleDecorationEnabledChanged(enabled: Boolean) {
+        uiState.update { it.copy(isSampleDecorationEnabled = enabled) }
+        scope.launch {
+            appSettingsRepository.setSampleDecorationEnabled(enabled)
+        }
+    }
+
+    fun onSampleDecorationStyleSelected(style: SampleDecorationStyleOption) {
+        uiState.update { it.copy(sampleDecorationStyle = style) }
+        scope.launch {
+            appSettingsRepository.setSampleDecorationStyleId(style.id)
         }
     }
 }

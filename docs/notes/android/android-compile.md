@@ -20,6 +20,20 @@ python tools/run.py android assemble-release
 python tools/run.py android assemble-release --clean
 ```
 
+## Release adb install 
+
+```powershell
+python tools/run.py android assemble-release
+
+adb install -r apps\audio_android\app\build\outputs\apk\release\FlipBits-release.apk
+```
+
+如果签名不一致又想装，只能先卸载旧包再装（会丢应用数据）：
+
+adb uninstall com.your.package
+adb install path\to\app-release.apk
+
+
 ## Native Debug 构建
 
 如果只想验证 Android native/CMake 链路，可运行：

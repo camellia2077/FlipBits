@@ -17,6 +17,7 @@ data class ModeAudioSessionState(
     val inputText: String = "",
     val sampleInputId: String? = null,
     val sampleShuffleState: SampleInputShuffleState? = null,
+    val sampleEmojiShuffleState: SampleEmojiShuffleState? = null,
     val generatedPcm: ShortArray = shortArrayOf(),
     val generatedWaveformPcm: ShortArray = shortArrayOf(),
     val generatedPcmFilePath: String? = null,
@@ -41,6 +42,12 @@ data class ModeAudioSessionState(
     val isEncodeCancelling: Boolean = false,
     val playback: PlaybackUiState = PlaybackUiState(),
     val playbackSpeed: Float = PlaybackSpeedOption.default.speed,
+)
+
+data class SampleEmojiShuffleState(
+    val shuffledEmojis: List<String>,
+    val nextEmojiIndex: Int,
+    val lastPresentedEmoji: String?,
 )
 
 data class SampleInputShuffleState(

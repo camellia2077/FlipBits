@@ -432,4 +432,17 @@
     <string name="audio_info_flash_decode_path">Decode path</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s samples</string>
+    <string name="demo_hint_demo_mode_on">Demo mode enabled</string>
+    <string name="demo_hint_tab_audio">Switched to Audio</string>
+    <string name="demo_hint_tab_saved">Switched to Saved</string>
+    <string name="demo_hint_tab_settings">Switched to Settings</string>
+    <string name="demo_hint_generate_audio">Generate audio</string>
+    <string name="demo_hint_decode_audio">Decode audio</string>
+    <string name="demo_hint_open_mini_player">Open mini player</string>
+    <string name="demo_hint_switch_to_lyrics">Switched to Lyrics</string>
+    <string name="demo_hint_switch_to_visual">Switched to Visual</string>
+    <string name="demo_hint_play">Playback started</string>
+    <string name="demo_hint_pause">Playback paused</string>
+    <string name="demo_hint_theme_changed">Theme changed</string>
+    <string name="demo_hint_language_changed">Language changed and sample refreshed</string>
 </resources>

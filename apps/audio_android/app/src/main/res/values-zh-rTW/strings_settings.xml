@@ -136,7 +136,7 @@
     <string name="config_custom_brand_theme_delete_message">刪除預設 %1$s？</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">請輸入預設名稱。</string>
-    <string name="config_custom_brand_theme_invalid_hex">請輸入 `#RRGGBB`。</string>
+    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">深紅</string>
     <string name="palette_rose_title">玫瑰粉</string>
     <string name="palette_sakura_title">櫻花粉</string>
@@ -178,4 +178,11 @@
     <string name="palette_stone_title">石褐</string>
     <string name="palette_graphite_title">石墨墨色</string>
     <string name="palette_ivory_title">象牙亞麻</string>
+
+    <string name="config_sample_decoration_title">Sample decoration</string>
+    <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_decoration_style_title">Style</string>
+    <string name="config_sample_decoration_style_none">None</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>`r`n    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
 </resources>

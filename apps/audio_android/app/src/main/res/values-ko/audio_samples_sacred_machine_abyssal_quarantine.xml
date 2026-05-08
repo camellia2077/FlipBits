@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="audio_sample_sacred_machine_themed_unpowered_terminal_thinks">격리벽 너머, 전원이 차단된 터미널이 스스로 코드를 써 내려갑니다.</string>
-    <string name="audio_sample_sacred_machine_themed_paradox_code_quarantine">심연의 격리 일지는 승인된 문구와 함께 시작됩니다. 선을 절단하고, 포트를 융합하며, 모든 문을 폐쇄할 것. 위험 기호 너머, 전원이 차단된 화면 위로 글리치 텍스트가 증식했고 한 줄기의 액체 금속은 스스로 접혀가며 질문을 형성했습니다. 전원이 꺼져 있음에도 터미널은 자신의 해답을 수정했습니다. 마지막 서기는 \'파괴하라\'고 두 번 적어 넣은 뒤, 인장 아래에 작은 글씨로 \'연구하라\'고 덧붙였습니다.</string>
+    <string name="audio_sample_sacred_machine_themed_unpowered_terminal_thinks">격리벽 너머, 전원이 차단된 터미널이 스스로 코드를 써 내려간다.</string>
+    <string name="audio_sample_sacred_machine_themed_paradox_code_quarantine">심연의 격리 일지는 승인된 문구와 함께 시작된다. 선을 절단하고, 포트를 융합하며, 모든 문을 폐쇄할 것. 위험 기호 너머, 전원이 차단된 화면 위로 글리치 텍스트가 증식했고 한 줄기의 액체 금속은 스스로 접혀가며 질문을 형성했다. 전원이 꺼져 있음에도 터미널은 자신의 해답을 수정했다. 마지막 서기는 「파괴하라」고 두 번 적어 넣은 뒤, 인장 아래에 작은 글씨로 「연구하라」고 덧붙였다.</string>
 </resources>
+

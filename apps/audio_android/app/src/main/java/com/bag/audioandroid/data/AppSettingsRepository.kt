@@ -120,6 +120,36 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.ConfigThemeAppearanceExpanded] ?: true }
 
+    val isDemoModeEnabled: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.DemoModeEnabled] ?: false }
+
+    val isSampleDecorationEnabled: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SampleDecorationEnabled] ?: true }
+
+    val sampleDecorationStyleId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SampleDecorationStyleId] }
+
     suspend fun setSelectedPaletteId(paletteId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedPaletteId] = paletteId
@@ -180,6 +210,24 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setDemoModeEnabled(enabled: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.DemoModeEnabled] = enabled
+        }
+    }
+
+    suspend fun setSampleDecorationEnabled(enabled: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SampleDecorationEnabled] = enabled
+        }
+    }
+
+    suspend fun setSampleDecorationStyleId(styleId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SampleDecorationStyleId] = styleId
+        }
+    }
+
     private object Keys {
         val SelectedPaletteId: Preferences.Key<String> = stringPreferencesKey("palette_id")
         val SelectedFlashVoicingStyleId: Preferences.Key<String> = stringPreferencesKey("flash_voicing_style")
@@ -191,5 +239,8 @@ class AppSettingsRepository(
         val SelectedPlaybackSequenceModeId: Preferences.Key<String> = stringPreferencesKey("playback_sequence_mode")
         val ConfigLanguageExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_language_expanded")
         val ConfigThemeAppearanceExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_theme_appearance_expanded")
+        val DemoModeEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("demo_mode_enabled")
+        val SampleDecorationEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("sample_decoration_enabled")
+        val SampleDecorationStyleId: Preferences.Key<String> = stringPreferencesKey("sample_decoration_style_id")
     }
 }

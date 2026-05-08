@@ -9,4 +9,5 @@
     <string name="about_licenses_subtitle">Ver bibliotecas e licenças</string>
     <string name="licenses_title">Licenças de código aberto</string>
     <string name="licenses_loading">Carregando licenças</string>
+    <string name="about_bilibili">%1$s</string>
 </resources>

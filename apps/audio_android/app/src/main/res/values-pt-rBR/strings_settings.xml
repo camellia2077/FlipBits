@@ -149,7 +149,7 @@
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">Insira um nome para a predefinição.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">Use #RRGGBB.</string>
+    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">Vermelho carmesim</string>
     <string name="palette_rose_title">Rosa rosado</string>
     <string name="palette_sakura_title">Rosa sakura</string>
@@ -191,4 +191,12 @@
     <string name="palette_stone_title">Taupe de pedra</string>
     <string name="palette_graphite_title">Tinta grafite</string>
     <string name="palette_ivory_title">Linho marfim</string>
+
+    <string name="config_sample_decoration_title">Decoração de exemplo</string>
+    <string name="config_sample_decoration_subtitle">Adiciona marcadores de prefixo opcionais ao texto de exemplo aleatório.</string>
+    <string name="config_sample_decoration_style_title">Estilo</string>
+    <string name="config_sample_decoration_style_none">Nenhum</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (por facção)</string>
+    <string name="config_demo_mode_title">Modo demonstração</string>
+    <string name="config_demo_mode_subtitle">Mostra feedback de toque e dicas para gravação.</string>
 </resources>

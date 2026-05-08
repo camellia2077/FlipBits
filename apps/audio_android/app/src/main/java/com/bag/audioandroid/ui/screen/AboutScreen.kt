@@ -78,6 +78,14 @@ fun AboutScreen(
                                 uriHandler.openUri(GITHUB_URL)
                             },
                     )
+                    Text(
+                        text = stringResource(R.string.about_bilibili, BILIBILI_URL),
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier =
+                            Modifier.clickable {
+                                uriHandler.openUri(BILIBILI_URL)
+                            },
+                    )
                 }
             }
 
@@ -114,3 +122,4 @@ fun AboutScreen(
 
 private const val AUTHOR_NAME = "camellia2077"
 private const val GITHUB_URL = "https://github.com/camellia2077/FlipBits"
+private const val BILIBILI_URL = "https://space.bilibili.com/3706961073801392"

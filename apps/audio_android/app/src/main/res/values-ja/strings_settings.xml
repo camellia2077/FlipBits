@@ -62,8 +62,8 @@
     <string name="palette_family_purples_magentas">パープル＆マゼンタ</string>
     <string name="palette_family_neutrals">ニュートラル</string>
     <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
-    <string name="config_flash_style_title">Flashスタイル</string>
-    <string name="config_flash_style_subtitle">Flashオーディオのサウンド方式を選択します。</string>
+    <string name="config_flash_style_title">flashスタイル</string>
+    <string name="config_flash_style_subtitle">flashオーディオのサウンド方式を選択します。</string>
     <string name="config_flash_style_steady_label">停滞</string>
     <string name="config_flash_style_steady_description">明瞭で安定した機械信号。</string>
     <string name="config_flash_style_hostile_label">敵意</string>
@@ -123,7 +123,7 @@
     <string name="config_custom_brand_theme_add">追加</string>
     <string name="config_custom_brand_theme_edit">カスタム色を編集</string>
     <string name="config_custom_brand_theme_dialog_title">カスタム・デュアルトーン色</string>
-    <string name="config_custom_brand_theme_dialog_description">`#RRGGBB` 形式の 16 進カラーを入力します。輪郭を空欄にすると accent 色を再利用します。</string>
+    <string name="config_custom_brand_theme_dialog_description">#RRGGBB 形式の 16 進カラーを入力します。輪郭を空欄にすると accent 色を再利用します。</string>
     <string name="config_custom_brand_theme_background_label">主色</string>
     <string name="config_custom_brand_theme_accent_label">accent 色</string>
     <string name="config_custom_brand_theme_outline_label">輪郭色</string>
@@ -147,7 +147,7 @@
     <string name="config_custom_brand_theme_name_label">プリセット名</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">プリセット名を入力してください。</string>
-    <string name="config_custom_brand_theme_invalid_hex">`#RRGGBB` を入力してください。</string>
+    <string name="config_custom_brand_theme_invalid_hex">RRGGBB または #RRGGBB を使用してください。</string>
     <string name="palette_crimson_title">クリムゾンレッド</string>
     <string name="palette_rose_title">ローズピンク</string>
     <string name="palette_sakura_title">桜ピンク</string>
@@ -180,7 +180,7 @@
     <string name="palette_violet_title">バイオレット・パルス</string>
     <string name="palette_plum_title">プラムナイト</string>
     <string name="palette_magenta_title">マゼンタ・ポップ</string>
-    <string name="palette_fuchsia_title">フューシャ・フラッシュ</string>
+    <string name="palette_fuchsia_title">フューシャ・flash</string>
     <string name="palette_orchid_title">オーキッド・ミスト</string>
     <string name="palette_lilac_title">ライラック・ヘイズ</string>
     <string name="palette_mocha_title">モカブラウン</string>
@@ -189,4 +189,12 @@
     <string name="palette_stone_title">ストーン・トープ</string>
     <string name="palette_graphite_title">グラファイト・インク</string>
     <string name="palette_ivory_title">アイボリーリネン</string>
+
+    <string name="config_sample_decoration_title">サンプル装飾</string>
+    <string name="config_sample_decoration_subtitle">ランダム化されたサンプルテキストに任意の接頭マーカーを追加します。</string>
+    <string name="config_sample_decoration_style_title">スタイル</string>
+    <string name="config_sample_decoration_style_none">なし</string>
+    <string name="config_sample_decoration_style_emoji">Emoji（勢力別）</string>
+    <string name="config_demo_mode_title">デモモード</string>
+    <string name="config_demo_mode_subtitle">録画向けにタップの視覚フィードバックと操作ヒントを表示します。</string>
 </resources>

@@ -229,6 +229,18 @@ class AudioAndroidViewModel(
         uiStateFlow.update { it.copy(selectedMorseSpeed = speed) }
     }
 
+    fun onDemoModeEnabledChanged(enabled: Boolean) {
+        preferencesActions.onDemoModeEnabledChanged(enabled)
+    }
+
+    fun onSampleDecorationEnabledChanged(enabled: Boolean) {
+        preferencesActions.onSampleDecorationEnabledChanged(enabled)
+    }
+
+    fun onSampleDecorationStyleSelected(style: com.bag.audioandroid.ui.model.SampleDecorationStyleOption) {
+        preferencesActions.onSampleDecorationStyleSelected(style)
+    }
+
     fun onOpenPlayerDetailSheet() {
         playbackActions.onPlaybackSpeedSelected(PlaybackSpeedOption.default.speed)
         navigationActions.onOpenPlayerDetailSheet()
@@ -286,6 +298,13 @@ class AudioAndroidViewModel(
 
     fun onPlaybackSpeedSelected(playbackSpeed: Float) {
         playbackActions.onPlaybackSpeedSelected(playbackSpeed)
+    }
+
+    fun onPlaybackDisplayModeSelected(showLyrics: Boolean) {
+        // Playback display mode is currently local UI state in the sheet.
+        // Keep this callback for scaffold API compatibility.
+        @Suppress("UNUSED_VARIABLE")
+        val ignored = showLyrics
     }
 
     fun onSkipToPreviousTrack() {

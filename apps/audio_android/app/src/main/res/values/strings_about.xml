@@ -18,4 +18,5 @@
     <string name="licenses_title">Open Source Licenses</string>
     <!-- CONTEXT: Short loading state shown while the licenses screen is still loading. -->
     <string name="licenses_loading">Loading licenses</string>
+    <string name="about_bilibili">%1$s</string>
 </resources>

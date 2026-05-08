@@ -1,5 +1,8 @@
 package com.bag.audioandroid.ui.screen
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,42 +95,82 @@ internal fun CustomBrandThemeDialog(
             }
         }
 
-    val dialogContentColor =
-        remember(previewBackground) {
-            if (previewBackground != null) {
-                if (previewBackground.luminance() < 0.5f) Color.White else Color(0xFF1A1C1E) // BrandInkLight
-            } else {
-                Color.Unspecified
-            }
+    var isPreviewDark by rememberSaveable { mutableStateOf(false) }
+    val backgroundLuminance = previewBackground?.luminance()
+    if (backgroundLuminance != null) {
+        when {
+            isPreviewDark && backgroundLuminance > PreviewLightExitThreshold -> isPreviewDark = false
+            !isPreviewDark && backgroundLuminance < PreviewDarkEnterThreshold -> isPreviewDark = true
         }
+    }
+
+    val dialogContentColor =
+        if (previewBackground != null) {
+            if (isPreviewDark) Color.White else Color(0xFF1A1C1E) // BrandInkLight
+        } else {
+            Color.Unspecified
+        }
+
+    val previewInputContainerColorTarget =
+        if (previewBackground != null && previewAccent != null) {
+            lerp(previewBackground, previewAccent, 0.08f)
+        } else {
+            previewBackground ?: Color.Transparent
+        }
+    val previewInputContainerColor by animateColorAsState(
+        targetValue = previewInputContainerColorTarget,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeInputContainer",
+    )
+    val previewModalContainerColorTarget = previewBackground ?: Color.Transparent
+    val previewModalContainerColor by animateColorAsState(
+        targetValue = previewModalContainerColorTarget,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeModalContainer",
+    )
+    val previewModalContentColorTarget =
+        if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White
+    val previewModalContentColor by animateColorAsState(
+        targetValue = previewModalContentColorTarget,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeModalContent",
+    )
+    val previewFocusedBorderColorTarget = previewAccent ?: Color.Unspecified
+    val previewFocusedBorderColor by animateColorAsState(
+        targetValue = previewFocusedBorderColorTarget,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeFocusedBorder",
+    )
+    val previewUnfocusedBorderColor by animateColorAsState(
+        targetValue = previewFocusedBorderColorTarget.copy(alpha = 0.42f),
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeUnfocusedBorder",
+    )
+
+    val previewAccentAnimated by animateColorAsState(
+        targetValue = previewAccent ?: Color.Unspecified,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeAccentAnimated",
+    )
 
     val previewVisualTokens =
-        remember(previewBackground, previewAccent, dialogContentColor) {
-            DefaultAppThemeVisualTokens.copy(
-                themeStyle = ThemeStyleOption.BrandDualTone,
-                inputContainerColor =
-                    if (previewBackground != null && previewAccent != null) {
-                        lerp(previewBackground, previewAccent, 0.08f)
-                    } else {
-                        previewBackground ?: Color.Transparent
-                    },
-                inputContentColor = if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White,
-                inputFocusedBorderColor = previewAccent ?: Color.Unspecified,
-                inputUnfocusedBorderColor = (previewAccent ?: Color.Unspecified).copy(alpha = 0.42f),
-                modalContainerColor = previewBackground ?: Color.Transparent,
-                modalContentColor = if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White,
-            )
-        }
+        DefaultAppThemeVisualTokens.copy(
+            themeStyle = ThemeStyleOption.BrandDualTone,
+            inputContainerColor = previewInputContainerColor,
+            inputContentColor = previewModalContentColor,
+            inputFocusedBorderColor = previewFocusedBorderColor,
+            inputUnfocusedBorderColor = previewUnfocusedBorderColor,
+            modalContainerColor = previewModalContainerColor,
+            modalContentColor = previewModalContentColor,
+        )
 
     val previewAccentTokens =
-        remember(previewAccent) {
-            DefaultAppThemeAccentTokens.copy(
-                disclosureAccentTint = previewAccent ?: Color.Unspecified,
-                actionAccentTint = previewAccent ?: Color.Unspecified,
-                selectionLabelAccentTint = previewAccent ?: Color.Unspecified,
-                selectionBorderAccentTint = previewAccent ?: Color.Unspecified,
-            )
-        }
+        DefaultAppThemeAccentTokens.copy(
+            disclosureAccentTint = previewAccentAnimated,
+            actionAccentTint = previewAccentAnimated,
+            selectionLabelAccentTint = previewAccentAnimated,
+            selectionBorderAccentTint = previewAccentAnimated,
+        )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -235,7 +278,7 @@ internal fun CustomBrandThemeDialog(
                         isError = normalizedBackground == null,
                         previewColor = previewBackground,
                         fallbackSwatchColor = previewVisualTokens.supportSurfaceColor,
-                        fallbackBorderColor = previewVisualTokens.subtleOutlineColor,
+                        fallbackBorderColor = previewAccent ?: previewVisualTokens.subtleOutlineColor,
                     )
                     HexColorField(
                         value = accentHex,
@@ -361,7 +404,9 @@ private fun HexColorField(
     ) {
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { incoming ->
+                onValueChange(sanitizeHexInput(incoming))
+            },
             singleLine = true,
             label = {
                 Text(
@@ -393,6 +438,25 @@ private fun HexColorField(
             borderColor = fallbackBorderColor,
             modifier = Modifier.padding(top = 6.dp),
         )
+    }
+}
+
+private const val PreviewDarkEnterThreshold = 0.46f
+private const val PreviewLightExitThreshold = 0.54f
+
+private fun sanitizeHexInput(input: String): String {
+    val trimmed = input.trim()
+    val hasHashPrefix = trimmed.startsWith("#")
+    val hexChars =
+        trimmed
+            .replace("#", "")
+            .filter { it.isDigit() || it.lowercaseChar() in 'a'..'f' }
+            .take(6)
+            .uppercase()
+    return if (hasHashPrefix) {
+        "#$hexChars"
+    } else {
+        hexChars
     }
 }
 

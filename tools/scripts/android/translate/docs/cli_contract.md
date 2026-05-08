@@ -41,6 +41,11 @@ Current implementation supports both:
 - `0`: review markdown generation completed
 - non-zero: unexpected runtime failure
 
+### `dump-xml-md`
+
+- `0`: dump markdown generation completed
+- `1`: invalid filter or setup failure
+
 ### `mixed-language`
 
 - `0`: command completed
@@ -114,6 +119,7 @@ Supported commands:
 - `mixed-language`
 - `key-alignment`
 - `replace`
+- `dump-xml-md`
 
 `--quiet` means:
 
@@ -147,6 +153,8 @@ Supported commands:
 - `mixed-language`
 - `key-alignment`
 - `replace`
+
+`dump-xml-md` currently focuses on human-readable low-markup artifacts and does not emit JSON payloads.
 
 `--json-output` does not change business logic.
 It only changes presentation format.
@@ -295,6 +303,23 @@ Stability notes:
 - `task_version` is the top-level schema version for agent task files.
 - `locale_profile` is the stable place for locale-specific writing persona data.
 - Agents that skip Markdown should read `locale_profile` directly instead of inferring persona only from `prompt_ref`.
+
+For subgroup-specific sample style overlays, `*.task.json` may include an optional `style_profile` object.  
+Current rollout adds this for `ko + sample_text + labyrinth_of_mutability`.
+
+Example:
+
+```json
+{
+  "style_profile": {
+    "id": "sample_text.ko.labyrinth_of_mutability.v1",
+    "locale": "ko",
+    "group": "labyrinth_of_mutability",
+    "prompt_ref": "tools/scripts/android/translate/prompts/sample_text_profiles/ko_labyrinth_of_mutability.md",
+    "prompt_text": "..."
+  }
+}
+```
 
 `run.py replace` accepts `--summary-out <path>`, which writes the same structured JSON result payload to disk for agent-job audit trails.
 `run.py compare` and `run.py replace` also accept `--job-dir <path>`, which updates `<job-dir>/job_manifest.json` so a single job folder can point to:

@@ -19,6 +19,7 @@ internal fun rememberPlaybackDisplaySectionState(
     isFlashMode: Boolean,
     onLyricsRequested: () -> Unit,
     initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
+    onDisplayModeSelected: (PlaybackDisplayMode) -> Unit = {},
 ): PlaybackDisplaySectionState {
     var playbackDisplayModeName by rememberSaveable { mutableStateOf(initialDisplayMode.name) }
     var flashVisualizationModeName by rememberSaveable(isFlashMode) {
@@ -33,12 +34,14 @@ internal fun rememberPlaybackDisplaySectionState(
         playbackDisplayMode,
         flashVisualizationModeName,
         onLyricsRequested,
+        onDisplayModeSelected,
     ) {
         PlaybackDisplaySectionState(
             playbackDisplayMode = playbackDisplayMode,
             flashVisualizationModeName = flashVisualizationModeName,
             onDisplayModeSelected = { option ->
                 playbackDisplayModeName = option.name
+                onDisplayModeSelected(option)
                 if (option == PlaybackDisplayMode.Lyrics) {
                     onLyricsRequested()
                 }

@@ -15,6 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
@@ -64,6 +67,28 @@ internal fun AudioAndroidMainScaffold(
     val waveformPcm = playbackVisualData.samples
     val waveformDisplayedSamples = playbackVisualData.displayedSamplesFor(currentPlayback.displayedSamples)
     val navigationBarColors = navigationBarItemColors(uiState)
+    val demoTouchStrokeColor =
+        if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.BrandDualTone) {
+            uiState.activeBrandTheme.accentColor
+        } else {
+            androidx.compose.material3.MaterialTheme.colorScheme.primary
+        }
+    val demoTouchFillColor =
+        if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.BrandDualTone) {
+            val bg = uiState.activeBrandTheme.backgroundColor
+            if (bg.luminance() < 0.5f) {
+                lerp(Color.White, bg, 0.15f)
+            } else {
+                lerp(Color.Black, bg, 0.15f)
+            }
+        } else {
+            val materialBg = androidx.compose.material3.MaterialTheme.colorScheme.background
+            if (materialBg.luminance() < 0.5f) {
+                lerp(Color.White, materialBg, 0.12f)
+            } else {
+                lerp(Color.Black, materialBg, 0.12f)
+            }
+        }
 
     LaunchedEffect(snackbarMessage?.id) {
         val message = snackbarMessage ?: return@LaunchedEffect
@@ -165,6 +190,9 @@ internal fun AudioAndroidMainScaffold(
                     onScrubChanged = viewModel::onScrubChanged,
                     onScrubFinished = viewModel::onScrubFinished,
                     onLyricsRequested = viewModel::ensureCurrentPlaybackDecodedForLyrics,
+                    onPlaybackDisplayModeSelected = { mode ->
+                        viewModel.onPlaybackDisplayModeSelected(mode == com.bag.audioandroid.ui.screen.PlaybackDisplayMode.Lyrics)
+                    },
                     modifier = Modifier.padding(sheetInnerPadding),
                 )
             }
@@ -173,6 +201,9 @@ internal fun AudioAndroidMainScaffold(
 
     PlayerScaffold(
         modifier = modifier,
+        isDemoModeEnabled = uiState.isDemoModeEnabled,
+        demoTouchFillColor = demoTouchFillColor,
+        demoTouchStrokeColor = demoTouchStrokeColor,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -220,6 +251,12 @@ internal fun AudioAndroidMainScaffold(
                     onThemeModeSelected = viewModel::onThemeModeSelected,
                     isThemeAppearanceExpanded = uiState.isConfigThemeAppearanceExpanded,
                     onThemeAppearanceExpandedChanged = viewModel::onConfigThemeAppearanceExpandedChanged,
+                    isDemoModeEnabled = uiState.isDemoModeEnabled,
+                    onDemoModeEnabledChange = viewModel::onDemoModeEnabledChanged,
+                    isSampleDecorationEnabled = uiState.isSampleDecorationEnabled,
+                    onSampleDecorationEnabledChange = viewModel::onSampleDecorationEnabledChanged,
+                    sampleDecorationStyle = uiState.sampleDecorationStyle,
+                    onSampleDecorationStyleSelected = viewModel::onSampleDecorationStyleSelected,
                     selectedPalette = uiState.selectedPalette,
                     onPaletteSelected = viewModel::onPaletteSelected,
                     materialPalettes = materialPalettes,

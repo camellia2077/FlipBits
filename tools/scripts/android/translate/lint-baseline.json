@@ -1,0 +1,670 @@
+{
+  "version": 1,
+  "issues": [
+    {
+      "fingerprint": "values-de/strings_audio.xml|audio_decode_raw_binary_label|locked_term_missing|error",
+      "file": "values-de/strings_audio.xml",
+      "key": "audio_decode_raw_binary_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-de/strings_audio.xml|audio_follow_view_binary|locked_term_missing|error",
+      "file": "values-de/strings_audio.xml",
+      "key": "audio_follow_view_binary",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-es/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|locked_term_missing|error",
+      "file": "values-es/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-es/strings_audio.xml|audio_decode_raw_binary_label|locked_term_missing|error",
+      "file": "values-es/strings_audio.xml",
+      "key": "audio_decode_raw_binary_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-es/strings_audio.xml|audio_follow_view_binary|locked_term_missing|error",
+      "file": "values-es/strings_audio.xml",
+      "key": "audio_follow_view_binary",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_immortal_rot_entropic_chime.xml|audio_sample_immortal_rot_themed_patient_rain_takes_the_wall|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_immortal_rot_entropic_chime.xml",
+      "key": "audio_sample_immortal_rot_themed_patient_rain_takes_the_wall",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_immortal_rot_entropic_chime.xml|audio_sample_immortal_rot_themed_rust_bell_in_fog|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_immortal_rot_entropic_chime.xml",
+      "key": "audio_sample_immortal_rot_themed_rust_bell_in_fog",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_immortal_rot_lethargic_embrace.xml|audio_sample_immortal_rot_themed_shield_sinks_from_hand|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_immortal_rot_lethargic_embrace.xml",
+      "key": "audio_sample_immortal_rot_themed_shield_sinks_from_hand",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_immortal_rot_lethargic_embrace.xml|audio_sample_immortal_rot_themed_warm_mire_stillness|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_immortal_rot_lethargic_embrace.xml",
+      "key": "audio_sample_immortal_rot_themed_warm_mire_stillness",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_labyrinth_of_mutability_abyssal_archives.xml|audio_sample_labyrinth_of_mutability_themed_library_bleeds_prophecy|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_labyrinth_of_mutability_abyssal_archives.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_library_bleeds_prophecy",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_labyrinth_of_mutability_abyssal_archives.xml|audio_sample_labyrinth_of_mutability_themed_truth_crushes_the_seer|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_labyrinth_of_mutability_abyssal_archives.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_truth_crushes_the_seer",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_labyrinth_of_mutability_kaleidoscope_flesh.xml|audio_sample_labyrinth_of_mutability_themed_flesh_refuses_one_shape|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_labyrinth_of_mutability_kaleidoscope_flesh.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_flesh_refuses_one_shape",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_labyrinth_of_mutability_kaleidoscope_flesh.xml|audio_sample_labyrinth_of_mutability_themed_new_eye_blesses_spine|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_labyrinth_of_mutability_kaleidoscope_flesh.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_new_eye_blesses_spine",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_labyrinth_of_mutability_paradox_arcanum.xml|audio_sample_labyrinth_of_mutability_themed_cold_fire_folds_space|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_labyrinth_of_mutability_paradox_arcanum.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_cold_fire_folds_space",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_labyrinth_of_mutability_paradox_arcanum.xml|audio_sample_labyrinth_of_mutability_themed_laws_unwrite_themselves|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_labyrinth_of_mutability_paradox_arcanum.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_laws_unwrite_themselves",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_abyssal_quarantine.xml|audio_sample_sacred_machine_themed_paradox_code_quarantine|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_abyssal_quarantine.xml",
+      "key": "audio_sample_sacred_machine_themed_paradox_code_quarantine",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_engine_awakening.xml|audio_sample_sacred_machine_themed_ancient_engine_grants_motion|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_engine_awakening.xml",
+      "key": "audio_sample_sacred_machine_themed_ancient_engine_grants_motion",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_engine_awakening.xml|audio_sample_sacred_machine_themed_plasma_matrix_wakes|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_engine_awakening.xml",
+      "key": "audio_sample_sacred_machine_themed_plasma_matrix_wakes",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_flesh_transcendence.xml|audio_sample_sacred_machine_themed_chromium_spine_rite|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_flesh_transcendence.xml",
+      "key": "audio_sample_sacred_machine_themed_chromium_spine_rite",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_forge_chronicle.xml|audio_sample_sacred_machine_themed_endless_quota_chronicle|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_forge_chronicle.xml",
+      "key": "audio_sample_sacred_machine_themed_endless_quota_chronicle",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_forge_chronicle.xml|audio_sample_sacred_machine_themed_serials_from_red_steel|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_forge_chronicle.xml",
+      "key": "audio_sample_sacred_machine_themed_serials_from_red_steel",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_origin_pilgrimage.xml|audio_sample_sacred_machine_themed_ancient_database_pilgrimage|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_origin_pilgrimage.xml",
+      "key": "audio_sample_sacred_machine_themed_ancient_database_pilgrimage",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_purge_calculus.xml|audio_sample_sacred_machine_themed_ballistic_debug_grid|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_purge_calculus.xml",
+      "key": "audio_sample_sacred_machine_themed_ballistic_debug_grid",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_purge_calculus.xml|audio_sample_sacred_machine_themed_kill_confirmed_equation|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_purge_calculus.xml",
+      "key": "audio_sample_sacred_machine_themed_kill_confirmed_equation",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|locked_term_missing|error",
+      "file": "values-fr/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_crimson_frenzy.xml|audio_sample_scarlet_carnage_themed_iron_tastes_sweet|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_crimson_frenzy.xml",
+      "key": "audio_sample_scarlet_carnage_themed_iron_tastes_sweet",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_crimson_frenzy.xml|audio_sample_scarlet_carnage_themed_pure_rage_burns|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_crimson_frenzy.xml",
+      "key": "audio_sample_scarlet_carnage_themed_pure_rage_burns",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_crimson_frenzy.xml|audio_sample_scarlet_carnage_themed_reason_breaks_blood_runs|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_crimson_frenzy.xml",
+      "key": "audio_sample_scarlet_carnage_themed_reason_breaks_blood_runs",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_iron_credo.xml|audio_sample_scarlet_carnage_themed_face_to_face_truth|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_iron_credo.xml",
+      "key": "audio_sample_scarlet_carnage_themed_face_to_face_truth",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_iron_credo.xml|audio_sample_scarlet_carnage_themed_iron_splits_bone|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_iron_credo.xml",
+      "key": "audio_sample_scarlet_carnage_themed_iron_splits_bone",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_iron_credo.xml|audio_sample_scarlet_carnage_themed_metal_crushes_magic|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_iron_credo.xml",
+      "key": "audio_sample_scarlet_carnage_themed_metal_crushes_magic",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_ossuary_tribute.xml|audio_sample_scarlet_carnage_themed_red_river_pays_the_stair|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_ossuary_tribute.xml",
+      "key": "audio_sample_scarlet_carnage_themed_red_river_pays_the_stair",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_ossuary_tribute.xml|audio_sample_scarlet_carnage_themed_sacred_harvest_living|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_ossuary_tribute.xml",
+      "key": "audio_sample_scarlet_carnage_themed_sacred_harvest_living",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/audio_samples_scarlet_carnage_ossuary_tribute.xml|audio_sample_scarlet_carnage_themed_skull_step_receives|escaped_apostrophe|warn",
+      "file": "values-fr/audio_samples_scarlet_carnage_ossuary_tribute.xml",
+      "key": "audio_sample_scarlet_carnage_themed_skull_step_receives",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/strings_audio.xml|audio_decode_raw_binary_label|locked_term_missing|error",
+      "file": "values-fr/strings_audio.xml",
+      "key": "audio_decode_raw_binary_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-fr/strings_audio.xml|audio_follow_view_binary|locked_term_missing|error",
+      "file": "values-fr/strings_audio.xml",
+      "key": "audio_follow_view_binary",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-fr/strings_audio.xml|audio_player_detail_saved_input_source|escaped_apostrophe|warn",
+      "file": "values-fr/strings_audio.xml",
+      "key": "audio_player_detail_saved_input_source",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-fr/strings_audio.xml|audio_player_detail_saved_sample_rate|escaped_apostrophe|warn",
+      "file": "values-fr/strings_audio.xml",
+      "key": "audio_player_detail_saved_sample_rate",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_ancient_dynasty_aeonic_sleep_awakening.xml|audio_sample_ancient_dynasty_themed_obsidian_obelisks_rise|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_ancient_dynasty_aeonic_sleep_awakening.xml",
+      "key": "audio_sample_ancient_dynasty_themed_obsidian_obelisks_rise",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_ancient_dynasty_curse_extreme_alienation.xml|audio_sample_ancient_dynasty_themed_extinction_logic_harvests_life|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_ancient_dynasty_curse_extreme_alienation.xml",
+      "key": "audio_sample_ancient_dynasty_themed_extinction_logic_harvests_life",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_ancient_dynasty_mind_decay_aristocracy.xml|audio_sample_ancient_dynasty_themed_rusted_throne_bad_memory|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_ancient_dynasty_mind_decay_aristocracy.xml",
+      "key": "audio_sample_ancient_dynasty_themed_rusted_throne_bad_memory",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_dissolution_of_ego.xml|audio_sample_exquisite_fall_themed_self_dissolves_in_touch|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_dissolution_of_ego.xml",
+      "key": "audio_sample_exquisite_fall_themed_self_dissolves_in_touch",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_dissolution_of_ego.xml|audio_sample_exquisite_fall_themed_velvet_barbs_kiss|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_dissolution_of_ego.xml",
+      "key": "audio_sample_exquisite_fall_themed_velvet_barbs_kiss",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_seduction_of_stasis.xml|audio_sample_exquisite_fall_themed_lullaby_closes_the_eyes|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_seduction_of_stasis.xml",
+      "key": "audio_sample_exquisite_fall_themed_lullaby_closes_the_eyes",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_solipsistic_apex.xml|audio_sample_exquisite_fall_themed_dream_throne_commands_all|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_solipsistic_apex.xml",
+      "key": "audio_sample_exquisite_fall_themed_dream_throne_commands_all",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_trap_of_accumulation.xml|audio_sample_exquisite_fall_themed_gold_dust_inhaled|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_trap_of_accumulation.xml",
+      "key": "audio_sample_exquisite_fall_themed_gold_dust_inhaled",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_trap_of_accumulation.xml|audio_sample_exquisite_fall_themed_vault_without_enough|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_trap_of_accumulation.xml",
+      "key": "audio_sample_exquisite_fall_themed_vault_without_enough",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_tyranny_of_perfection.xml|audio_sample_exquisite_fall_themed_statue_of_self_praise|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_tyranny_of_perfection.xml",
+      "key": "audio_sample_exquisite_fall_themed_statue_of_self_praise",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_exquisite_fall_void_of_consumption.xml|audio_sample_exquisite_fall_themed_banquet_eats_the_tongue|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_exquisite_fall_void_of_consumption.xml",
+      "key": "audio_sample_exquisite_fall_themed_banquet_eats_the_tongue",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_immortal_rot_lethargic_embrace.xml|audio_sample_immortal_rot_themed_warm_mire_stillness|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_immortal_rot_lethargic_embrace.xml",
+      "key": "audio_sample_immortal_rot_themed_warm_mire_stillness",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_labyrinth_of_mutability_abyssal_archives.xml|audio_sample_labyrinth_of_mutability_themed_truth_crushes_the_seer|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_labyrinth_of_mutability_abyssal_archives.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_truth_crushes_the_seer",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_labyrinth_of_mutability_fractal_conspiracy.xml|audio_sample_labyrinth_of_mutability_themed_final_trap_needs_rebellion|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_labyrinth_of_mutability_fractal_conspiracy.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_final_trap_needs_rebellion",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_labyrinth_of_mutability_paradox_arcanum.xml|audio_sample_labyrinth_of_mutability_themed_laws_unwrite_themselves|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_labyrinth_of_mutability_paradox_arcanum.xml",
+      "key": "audio_sample_labyrinth_of_mutability_themed_laws_unwrite_themselves",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_abyssal_quarantine.xml|audio_sample_sacred_machine_themed_paradox_code_quarantine|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_abyssal_quarantine.xml",
+      "key": "audio_sample_sacred_machine_themed_paradox_code_quarantine",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_engine_awakening.xml|audio_sample_sacred_machine_themed_ancient_engine_grants_motion|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_engine_awakening.xml",
+      "key": "audio_sample_sacred_machine_themed_ancient_engine_grants_motion",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_flesh_transcendence.xml|audio_sample_sacred_machine_themed_chromium_spine_rite|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_flesh_transcendence.xml",
+      "key": "audio_sample_sacred_machine_themed_chromium_spine_rite",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_forge_chronicle.xml|audio_sample_sacred_machine_themed_endless_quota_chronicle|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_forge_chronicle.xml",
+      "key": "audio_sample_sacred_machine_themed_endless_quota_chronicle",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_forge_chronicle.xml|audio_sample_sacred_machine_themed_serials_from_red_steel|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_forge_chronicle.xml",
+      "key": "audio_sample_sacred_machine_themed_serials_from_red_steel",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_origin_pilgrimage.xml|audio_sample_sacred_machine_themed_ancient_database_pilgrimage|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_origin_pilgrimage.xml",
+      "key": "audio_sample_sacred_machine_themed_ancient_database_pilgrimage",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_purge_calculus.xml|audio_sample_sacred_machine_themed_ballistic_debug_grid|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_purge_calculus.xml",
+      "key": "audio_sample_sacred_machine_themed_ballistic_debug_grid",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_rite_of_maintenance.xml|audio_sample_sacred_machine_themed_bolt_sequence_litany|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_rite_of_maintenance.xml",
+      "key": "audio_sample_sacred_machine_themed_bolt_sequence_litany",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_rite_of_maintenance.xml|audio_sample_sacred_machine_themed_caliper_oil_rite|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_rite_of_maintenance.xml",
+      "key": "audio_sample_sacred_machine_themed_caliper_oil_rite",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_brass_inferno.xml|audio_sample_scarlet_carnage_themed_brass_gears_drink_blood|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_brass_inferno.xml",
+      "key": "audio_sample_scarlet_carnage_themed_brass_gears_drink_blood",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_brass_inferno.xml|audio_sample_scarlet_carnage_themed_eternal_conflict_fuel|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_brass_inferno.xml",
+      "key": "audio_sample_scarlet_carnage_themed_eternal_conflict_fuel",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_brass_inferno.xml|audio_sample_scarlet_carnage_themed_war_engine_eats_the_sky|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_brass_inferno.xml",
+      "key": "audio_sample_scarlet_carnage_themed_war_engine_eats_the_sky",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_iron_credo.xml|audio_sample_scarlet_carnage_themed_face_to_face_truth|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_iron_credo.xml",
+      "key": "audio_sample_scarlet_carnage_themed_face_to_face_truth",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_iron_credo.xml|audio_sample_scarlet_carnage_themed_iron_splits_bone|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_iron_credo.xml",
+      "key": "audio_sample_scarlet_carnage_themed_iron_splits_bone",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_iron_credo.xml|audio_sample_scarlet_carnage_themed_metal_crushes_magic|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_iron_credo.xml",
+      "key": "audio_sample_scarlet_carnage_themed_metal_crushes_magic",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_ossuary_tribute.xml|audio_sample_scarlet_carnage_themed_red_river_pays_the_stair|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_ossuary_tribute.xml",
+      "key": "audio_sample_scarlet_carnage_themed_red_river_pays_the_stair",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/audio_samples_scarlet_carnage_ossuary_tribute.xml|audio_sample_scarlet_carnage_themed_sacred_harvest_living|escaped_apostrophe|warn",
+      "file": "values-it/audio_samples_scarlet_carnage_ossuary_tribute.xml",
+      "key": "audio_sample_scarlet_carnage_themed_sacred_harvest_living",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/strings_settings.xml|config_custom_brand_theme_accent_label|escaped_apostrophe|warn",
+      "file": "values-it/strings_settings.xml",
+      "key": "config_custom_brand_theme_accent_label",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/strings_settings.xml|config_custom_brand_theme_dialog_description|escaped_apostrophe|warn",
+      "file": "values-it/strings_settings.xml",
+      "key": "config_custom_brand_theme_dialog_description",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/strings_settings.xml|config_dual_tone_group_ancient_dynasty|escaped_apostrophe|warn",
+      "file": "values-it/strings_settings.xml",
+      "key": "config_dual_tone_group_ancient_dynasty",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-it/strings_settings.xml|config_sample_decoration_subtitle|escaped_apostrophe|warn",
+      "file": "values-it/strings_settings.xml",
+      "key": "config_sample_decoration_subtitle",
+      "level": "warn",
+      "rule": "escaped_apostrophe"
+    },
+    {
+      "fingerprint": "values-ko/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|locked_term_missing|error",
+      "file": "values-ko/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-ko/strings_audio.xml|audio_decode_raw_binary_label|locked_term_missing|error",
+      "file": "values-ko/strings_audio.xml",
+      "key": "audio_decode_raw_binary_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-ko/strings_audio.xml|audio_decode_raw_hex_label|locked_term_missing|error",
+      "file": "values-ko/strings_audio.xml",
+      "key": "audio_decode_raw_hex_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-ko/strings_audio.xml|audio_follow_view_binary|locked_term_missing|error",
+      "file": "values-ko/strings_audio.xml",
+      "key": "audio_follow_view_binary",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-ko/strings_audio.xml|audio_follow_view_hex|locked_term_missing|error",
+      "file": "values-ko/strings_audio.xml",
+      "key": "audio_follow_view_hex",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-ko/strings_settings.xml|palette_fuchsia_title|locked_term_missing|error",
+      "file": "values-ko/strings_settings.xml",
+      "key": "palette_fuchsia_title",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|locked_term_missing|error",
+      "file": "values-la/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/strings_audio.xml|audio_decode_raw_binary_label|locked_term_missing|error",
+      "file": "values-la/strings_audio.xml",
+      "key": "audio_decode_raw_binary_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/strings_audio.xml|audio_follow_view_binary|locked_term_missing|error",
+      "file": "values-la/strings_audio.xml",
+      "key": "audio_follow_view_binary",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/strings_settings.xml|config_flash_style_subtitle|locked_term_missing|error",
+      "file": "values-la/strings_settings.xml",
+      "key": "config_flash_style_subtitle",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/strings_settings.xml|config_flash_style_title|locked_term_missing|error",
+      "file": "values-la/strings_settings.xml",
+      "key": "config_flash_style_title",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/strings_validation.xml|validation_invalid_flash_signal_profile|locked_term_missing|error",
+      "file": "values-la/strings_validation.xml",
+      "key": "validation_invalid_flash_signal_profile",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-la/strings_validation.xml|validation_invalid_flash_voicing_flavor|locked_term_missing|error",
+      "file": "values-la/strings_validation.xml",
+      "key": "validation_invalid_flash_voicing_flavor",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-zh-rTW/audio_samples_sacred_machine_signal_litany.xml|audio_sample_sacred_machine_themed_deep_array_handshake|locked_term_missing|error",
+      "file": "values-zh-rTW/audio_samples_sacred_machine_signal_litany.xml",
+      "key": "audio_sample_sacred_machine_themed_deep_array_handshake",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-zh-rTW/strings_audio.xml|audio_decode_raw_binary_label|locked_term_missing|error",
+      "file": "values-zh-rTW/strings_audio.xml",
+      "key": "audio_decode_raw_binary_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-zh-rTW/strings_audio.xml|audio_decode_raw_hex_label|locked_term_missing|error",
+      "file": "values-zh-rTW/strings_audio.xml",
+      "key": "audio_decode_raw_hex_label",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-zh-rTW/strings_audio.xml|audio_follow_view_binary|locked_term_missing|error",
+      "file": "values-zh-rTW/strings_audio.xml",
+      "key": "audio_follow_view_binary",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-zh-rTW/strings_audio.xml|audio_follow_view_hex|locked_term_missing|error",
+      "file": "values-zh-rTW/strings_audio.xml",
+      "key": "audio_follow_view_hex",
+      "level": "error",
+      "rule": "locked_term_missing"
+    },
+    {
+      "fingerprint": "values-zh-rTW/strings_settings.xml|palette_fuchsia_title|locked_term_missing|error",
+      "file": "values-zh-rTW/strings_settings.xml",
+      "key": "palette_fuchsia_title",
+      "level": "error",
+      "rule": "locked_term_missing"
+    }
+  ]
+}

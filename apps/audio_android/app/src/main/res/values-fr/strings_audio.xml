@@ -80,7 +80,7 @@
     <string name="audio_player_detail_decoded_title">Résultat de lecture</string>
     <string name="audio_player_detail_decoded_empty">Pas encore de résultat. Appuyez sur Lire si nécessaire.</string>
     <string name="audio_playback_view_visual">Visuel</string>
-    <string name="audio_playback_view_lyrics">Lyrics</string>
+    <string name="audio_playback_view_lyrics">Paroles</string>
     <string name="audio_pro_visual_waiting_follow">En attente des données de suivi</string>
     <string name="audio_pro_visual_symbol_order">L’octet actuel émet 2 symboles : d’abord le nibble haut, puis le nibble bas</string>
     <string name="audio_pro_visual_step_1">Étape 1</string>
@@ -125,7 +125,7 @@
     <string name="audio_ultra_visual_level_low">Bas</string>
     <string name="audio_follow_unavailable">Le suivi de payload n’est pas disponible pour cet audio pour le moment.</string>
     <string name="audio_follow_text_unavailable">Le suivi de texte n’est pas disponible pour cet audio pour le moment.</string>
-    <string name="audio_follow_display_lyrics">Lyrics</string>
+    <string name="audio_follow_display_lyrics">Paroles</string>
     <string name="audio_follow_display_data">Données</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binaire</string>
@@ -154,7 +154,7 @@
     <string name="audio_transport_pro_hint">pro utilise uniquement du texte ASCII.</string>
     <string name="audio_transport_pro_example">LES CLOCHES MARQUENT LA PREMIERE GARDE</string>
     <string name="audio_transport_ultra_hint">ultra utilise du texte UTF-8.</string>
-    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_transport_mini_hint">mini utilise un texte ASCII compatible Morse.</string>
     <string name="audio_morse_speed_slow">Lent</string>
     <string name="audio_morse_speed_standard">Standard</string>
     <string name="audio_morse_speed_fast">Rapide</string>
@@ -227,4 +227,18 @@
     <string name="audio_info_flash_decode_path">Chemin de décodage</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s échantillons</string>
+
+    <string name="demo_hint_demo_mode_on">Mode démo activé</string>
+    <string name="demo_hint_tab_audio">Passage à Audio</string>
+    <string name="demo_hint_tab_saved">Passage à Enregistré</string>
+    <string name="demo_hint_tab_settings">Passage à Réglages</string>
+    <string name="demo_hint_generate_audio">Générer l’audio</string>
+    <string name="demo_hint_decode_audio">Décoder l’audio</string>
+    <string name="demo_hint_open_mini_player">Ouvrir le mini-lecteur</string>
+    <string name="demo_hint_switch_to_lyrics">Passage à Paroles</string>
+    <string name="demo_hint_switch_to_visual">Passage à Visuel</string>
+    <string name="demo_hint_play">Lecture démarrée</string>
+    <string name="demo_hint_pause">Lecture en pause</string>
+    <string name="demo_hint_theme_changed">Thème modifié</string>
+    <string name="demo_hint_language_changed">Langue changée et exemple actualisé</string>
 </resources>

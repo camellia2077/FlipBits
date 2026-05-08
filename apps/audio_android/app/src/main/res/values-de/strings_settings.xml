@@ -149,7 +149,7 @@
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">Namen für Voreinstellung eingeben.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">#RRGGBB verwenden.</string>
+    <string name="config_custom_brand_theme_invalid_hex">RRGGBB oder #RRGGBB verwenden.</string>
     <string name="palette_crimson_title">Karmesinrot</string>
     <string name="palette_rose_title">Rosenpink</string>
     <string name="palette_sakura_title">Sakura-Pink</string>
@@ -191,4 +191,12 @@
     <string name="palette_stone_title">Steintaupe</string>
     <string name="palette_graphite_title">Graphittinte</string>
     <string name="palette_ivory_title">Elfenbeinleinen</string>
+
+    <string name="config_sample_decoration_title">Sample-Dekoration</string>
+    <string name="config_sample_decoration_subtitle">Fügt dem zufälligen Sample-Text optionale Präfixmarker hinzu.</string>
+    <string name="config_sample_decoration_style_title">Stil</string>
+    <string name="config_sample_decoration_style_none">Keine</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (fraktionsbasiert)</string>
+    <string name="config_demo_mode_title">Demo-Modus</string>
+    <string name="config_demo_mode_subtitle">Zeigt Tipp-Feedback und Aktionshinweise für Aufnahmen.</string>
 </resources>

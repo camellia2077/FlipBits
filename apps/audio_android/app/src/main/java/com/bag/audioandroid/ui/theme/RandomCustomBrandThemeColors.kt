@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui.theme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -65,13 +66,7 @@ fun randomCustomBrandThemeColors(random: Random = Random.Default): RandomCustomB
             return@repeat
         }
 
-        val mixed = lerp(background, accent, 0.5f)
-        val outline =
-            if ((background.luminance() + accent.luminance()) / 2f > 0.45f) {
-                lerp(mixed, Color.Black, 0.35f)
-            } else {
-                lerp(mixed, Color.White, 0.22f)
-            }
+        val outline = chooseOutlineColor(background = background, accent = accent)
 
         return RandomCustomBrandThemeColors(
             backgroundHex = background.toHexString(),
@@ -88,6 +83,98 @@ fun randomCustomBrandThemeColors(random: Random = Random.Default): RandomCustomB
         accentHex = fallbackAccent.toHexString(),
         outlineHex = fallbackOutline.toHexString(),
     )
+}
+
+private fun chooseOutlineColor(
+    background: Color,
+    accent: Color,
+): Color {
+    val mixed = lerp(background, accent, 0.5f)
+    val darkCandidate = lerp(mixed, Color.Black, 0.38f)
+    val lightCandidate = lerp(mixed, Color.White, 0.26f)
+
+    val bestCandidate =
+        if (outlineMinContrast(darkCandidate, background, accent) >= outlineMinContrast(lightCandidate, background, accent)) {
+            darkCandidate
+        } else {
+            lightCandidate
+        }
+
+    val desaturated = desaturateColor(bestCandidate, amount = 0.18f)
+    val targetMinContrast = 1.55f
+    val adjusted = nudgeOutlineContrast(desaturated, background, accent, targetMinContrast)
+    val finalCandidate =
+        if (outlineMinContrast(adjusted, background, accent) >= targetMinContrast) {
+            adjusted
+        } else {
+            fallbackOutlineColor(background, accent)
+        }
+
+    return finalCandidate
+}
+
+private fun outlineMinContrast(
+    outline: Color,
+    background: Color,
+    accent: Color,
+): Float = minOf(contrastRatio(outline, background), contrastRatio(outline, accent))
+
+private fun contrastRatio(
+    first: Color,
+    second: Color,
+): Float {
+    val firstL = first.luminance()
+    val secondL = second.luminance()
+    val lighter = maxOf(firstL, secondL)
+    val darker = minOf(firstL, secondL)
+    return ((lighter + 0.05f) / (darker + 0.05f))
+}
+
+private fun desaturateColor(
+    color: Color,
+    amount: Float,
+): Color {
+    val hsv = FloatArray(3)
+    AndroidColor.colorToHSV(color.toArgb(), hsv)
+    hsv[1] = (hsv[1] * (1f - amount)).coerceIn(0f, 1f)
+    return Color(AndroidColor.HSVToColor(hsv))
+}
+
+private fun nudgeOutlineContrast(
+    outline: Color,
+    background: Color,
+    accent: Color,
+    targetMinContrast: Float,
+): Color {
+    var current = outline
+    repeat(8) {
+        val minContrast = outlineMinContrast(current, background, accent)
+        if (minContrast >= targetMinContrast) {
+            return current
+        }
+        val towardBlack = lerp(current, Color.Black, 0.14f)
+        val towardWhite = lerp(current, Color.White, 0.14f)
+        current =
+            if (outlineMinContrast(towardBlack, background, accent) >= outlineMinContrast(towardWhite, background, accent)) {
+                towardBlack
+            } else {
+                towardWhite
+            }
+    }
+    return current
+}
+
+private fun fallbackOutlineColor(
+    background: Color,
+    accent: Color,
+): Color {
+    val darkFallback = Color(0xFF2A2F35)
+    val lightFallback = Color(0xFFC7D0DA)
+    return if (outlineMinContrast(darkFallback, background, accent) >= outlineMinContrast(lightFallback, background, accent)) {
+        darkFallback
+    } else {
+        lightFallback
+    }
 }
 
 private fun colorsLookSeparated(
