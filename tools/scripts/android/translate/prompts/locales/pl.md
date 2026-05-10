@@ -12,7 +12,7 @@ Polish (`values-pl`) is a standard Polish localization for Android UI, playback,
 [identity_rule]
 Treat this locale as contemporary Polish UI localization.
 Use natural Polish case, gender, and word order rather than literal English structure.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Polish locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Polish locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.

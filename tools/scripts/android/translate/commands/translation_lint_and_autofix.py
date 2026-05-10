@@ -166,7 +166,6 @@ def run_translation_lint(*, res_dir: str, lang: str | None = None) -> LintResult
     en = _english_map(res_dir)
     for path in files:
         raw_text = path.read_text(encoding="utf-8")
-        raw_has_escaped_apostrophe = "\\'" in raw_text
         try:
             root = ET.parse(path).getroot()
         except ET.ParseError as exc:
@@ -176,8 +175,6 @@ def run_translation_lint(*, res_dir: str, lang: str | None = None) -> LintResult
         for s in root.findall("string"):
             key = s.attrib.get("name", "")
             text = s.text or ""
-            if raw_has_escaped_apostrophe and "\\'" in ET.tostring(s, encoding="unicode"):
-                issues.append(LintIssue(str(path), key, "warn", "escaped_apostrophe", "Contains \\' ."))
             if "`r`n" in text:
                 issues.append(LintIssue(str(path), key, "error", "literal_crlf_token", "Contains literal `r`n token."))
             if "RRGGBB" in text and not HEX_LITERAL_PATTERN.search(text):

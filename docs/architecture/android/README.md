@@ -14,3 +14,7 @@ Use it for Android-only behavior such as player UI structure, native bridge stra
   - Android native consumption strategy, CMake/NDK constraints, and release-like native checks.
 - `android-flash-visual.md`
   - Flash Visual data flow, windowing boundary, debug metrics, ADB capture, and animation stutter diagnosis.
+- `android-flash-automation.md`
+  - Flash real-device UI regression coverage, debug adb scenario, stable test tags, and current automation limits.
+- `android-mini-automation.md`
+  - Mini real-device adb scenario and Visual/Lyrics timing capture prework for slow, standard, and fast Morse speeds.

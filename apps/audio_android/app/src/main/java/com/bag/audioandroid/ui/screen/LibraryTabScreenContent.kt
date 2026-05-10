@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Input
 import androidx.compose.material.icons.rounded.CreateNewFolder
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DriveFileRenameOutline
-import androidx.compose.material.icons.rounded.UploadFile
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +62,7 @@ internal fun LibraryTabScreenContent(
                 colors = utilityActionIconButtonColors(),
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.UploadFile,
+                    imageVector = Icons.AutoMirrored.Rounded.Input,
                     contentDescription = stringResource(R.string.library_action_import),
                 )
             }

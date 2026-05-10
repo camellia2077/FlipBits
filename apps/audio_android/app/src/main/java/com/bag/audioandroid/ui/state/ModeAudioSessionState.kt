@@ -18,6 +18,7 @@ data class ModeAudioSessionState(
     val sampleInputId: String? = null,
     val sampleShuffleState: SampleInputShuffleState? = null,
     val sampleEmojiShuffleState: SampleEmojiShuffleState? = null,
+    val appliedSampleEmojiPrefix: String? = null,
     val generatedPcm: ShortArray = shortArrayOf(),
     val generatedWaveformPcm: ShortArray = shortArrayOf(),
     val generatedPcmFilePath: String? = null,

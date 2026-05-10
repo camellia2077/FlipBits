@@ -13,7 +13,7 @@ Spanish (`values-es`) is a neutral Spanish localization. Do not force Spain-only
 Treat this locale as neutral Spanish for broad Spanish-language UI use.
 Prefer wording that is understandable across Spanish-speaking regions.
 Avoid regional idioms when a neutral product expression works.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Spanish locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Spanish locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -106,6 +107,7 @@ private fun FlashPresetOptionRow(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .testTag("flash-voicing-style-${option.id}")
                 .clickable(onClick = onClick),
     ) {
         Row(

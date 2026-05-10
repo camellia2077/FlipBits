@@ -46,6 +46,7 @@ internal fun AudioAndroidMainScaffold(
     brandThemes: List<com.bag.audioandroid.ui.model.BrandThemeOption>,
     onImportAudio: () -> Unit,
     viewModel: AudioAndroidViewModel,
+    debugScenario: FlashDebugScenario? = null,
     modifier: Modifier = Modifier,
 ) {
     val currentSession = uiState.currentSession
@@ -193,6 +194,7 @@ internal fun AudioAndroidMainScaffold(
                     onPlaybackDisplayModeSelected = { mode ->
                         viewModel.onPlaybackDisplayModeSelected(mode == com.bag.audioandroid.ui.screen.PlaybackDisplayMode.Lyrics)
                     },
+                    initialFlashVisualizationMode = debugScenario?.visualMode,
                     modifier = Modifier.padding(sheetInnerPadding),
                 )
             }
@@ -246,6 +248,7 @@ internal fun AudioAndroidMainScaffold(
                     customBrandThemes = uiState.customBrandThemes,
                     onCustomBrandThemeSaved = viewModel::onCustomBrandThemeSaved,
                     onCustomBrandThemeDeleted = viewModel::onCustomBrandThemeDeleted,
+                    onCustomBrandThemesImported = viewModel::onCustomBrandThemesImported,
                     customBrandThemePresets = uiState.customBrandThemePresets,
                     selectedThemeMode = uiState.selectedThemeMode,
                     onThemeModeSelected = viewModel::onThemeModeSelected,

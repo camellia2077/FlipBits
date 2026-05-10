@@ -100,6 +100,7 @@ internal data class TokenPixelBounds(
 internal fun PlaybackTokenContextTape(
     followData: PayloadFollowViewData,
     displayedSamples: Int,
+    isPlaying: Boolean,
     visibleLineCount: Int = 3,
     modifier: Modifier = Modifier,
     onSeekToSample: (Int) -> Unit = {},
@@ -114,6 +115,28 @@ internal fun PlaybackTokenContextTape(
         }
     val activeTimelineEntry = followData.textTokenTimeline.getOrNull(activeTimelineIndex)
     val activeTokenIndex = activeTimelineEntry?.tokenIndex ?: -1
+    val rawDisplayUnitsByToken =
+        remember(followData.textRawDisplayUnits) {
+            followData.textRawDisplayUnits.groupBy { it.tokenIndex }
+        }
+    val activeByteIndexWithinToken =
+        remember(activeTokenIndex, displayedSamples, rawDisplayUnitsByToken) {
+            activeByteIndexWithinToken(
+                activeTextIndex = activeTokenIndex,
+                displayedSamples = displayedSamples,
+                rawDisplayUnitsByToken = rawDisplayUnitsByToken,
+            )
+        }
+    val activeBitPosition =
+        remember(activeTokenIndex, activeByteIndexWithinToken, displayedSamples, followData, rawDisplayUnitsByToken) {
+            activeBitPositionWithinByte(
+                activeTextIndex = activeTokenIndex,
+                activeByteIndexWithinToken = activeByteIndexWithinToken,
+                displayedSamples = displayedSamples,
+                followData = followData,
+                rawDisplayUnitsByToken = rawDisplayUnitsByToken,
+            )
+        }
     val tokenStartSamples =
         remember(followData.textTokenTimeline) {
             followData.textTokenTimeline
@@ -150,7 +173,18 @@ internal fun PlaybackTokenContextTape(
                 activeTokenIndex = activeTokenIndex,
             )
         }
-
+    FlashLyricsPerfTrace.record(
+        followData = followData,
+        displayedSamples = displayedSamples,
+        isPlaying = isPlaying,
+        activeTimelineEntry = activeTimelineEntry,
+        activeTokenIndex = activeTokenIndex,
+        activeLineIndex = activeLineIndex,
+        displayLineRange = displayLineRanges.getOrNull(activeLineIndex),
+        sourceLineRanges = sourceLineRanges,
+        activeByteIndexWithinToken = activeByteIndexWithinToken,
+        activeBitPosition = activeBitPosition,
+    )
     val listState =
         androidx.compose.foundation.lazy
             .rememberLazyListState()

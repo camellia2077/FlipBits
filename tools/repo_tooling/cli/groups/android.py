@@ -15,6 +15,7 @@ def register_android_group(subparsers: argparse._SubParsersAction[argparse.Argum
             "Behavior:\n"
             "- Uses the Gradle wrapper inside apps/audio_android.\n"
             "- `install-sdk` installs the Android SDK components declared in tooling/build.toml.\n"
+            "- `install-debug-fresh` builds debug, uninstalls the app from the connected test device, then installs app-debug.apk.\n"
             "- Resolves the action to the matching :app Gradle task.\n"
             "- Optionally prepends `clean` before the selected task.\n"
             "- `assemble-staging` builds a minified, shrink-enabled, debuggable APK for catching release-only issues earlier.\n"
@@ -32,6 +33,7 @@ def register_android_group(subparsers: argparse._SubParsersAction[argparse.Argum
         "action",
         choices=[
             "install-sdk",
+            "install-debug-fresh",
             "assemble-debug",
             "assemble-staging",
             "assemble-release",

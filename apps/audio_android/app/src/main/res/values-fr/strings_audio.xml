@@ -62,7 +62,7 @@
     <string name="audio_result_empty">Pas encore de résultat.</string>
     <string name="audio_decode_view_text">Texte</string>
     <string name="audio_decode_view_raw">Brut</string>
-    <string name="audio_decode_raw_binary_label">Binaire</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">Cette charge n’a pas pu être interprétée comme du texte. Les données brutes restent disponibles.</string>
     <string name="audio_decode_raw_unavailable">Aucune donnée brute n’est encore disponible.</string>
@@ -128,7 +128,7 @@
     <string name="audio_follow_display_lyrics">Paroles</string>
     <string name="audio_follow_display_data">Données</string>
     <string name="audio_follow_view_hex">Hex</string>
-    <string name="audio_follow_view_binary">Binaire</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">Détails</string>
     <string name="audio_player_detail_saved_mode">Mode</string>

@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -49,6 +50,7 @@ internal fun FlashVoicingSelectorSection(
             title = stringResource(R.string.audio_flash_voicing_style_title),
             value = stringResource(effectiveSelectedStyle.labelResId),
             contentDescription = stringResource(R.string.audio_action_select_flash_voicing_style),
+            testTag = "flash-voicing-style-selector",
             enabled = enabled,
             onClick = { isVoicingStyleSheetOpen = true },
         )
@@ -76,6 +78,7 @@ private fun FlashPresetEntryRow(
     title: String,
     value: String,
     contentDescription: String,
+    testTag: String,
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
@@ -86,6 +89,7 @@ private fun FlashPresetEntryRow(
             Modifier
                 .fillMaxWidth()
                 .clickable(enabled = enabled, onClick = onClick)
+                .testTag(testTag)
                 .semantics { this.contentDescription = contentDescription }
                 .padding(horizontal = 2.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

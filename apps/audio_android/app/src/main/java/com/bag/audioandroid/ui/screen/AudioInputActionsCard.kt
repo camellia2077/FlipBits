@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -186,6 +187,10 @@ internal fun AudioInputActionsCard(
                         textColor = accentTokens.disclosureAccentTint,
                         borderColor = accentTokens.selectionBorderAccentTint,
                         borderWidth = 2.dp,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .testTag("audio-encode-button"),
                     )
                 }
             }

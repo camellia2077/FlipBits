@@ -14,7 +14,7 @@ Treat this locale as standard Ukrainian localization for Ukrainian users.
 Prefer natural contemporary Ukrainian wording, terminology, grammar, rhythm, and UI phrasing.
 Do not treat Ukrainian as interchangeable with any neighboring language.
 Avoid calques, mixed-language phrasing, or wording that sounds mechanically transferred from another language.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Ukrainian locale keeps them as technical product terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Ukrainian locale keeps them as technical product terms.
 
 [app_text_rule]
 For app UI text, keep labels concise and natural in Ukrainian.

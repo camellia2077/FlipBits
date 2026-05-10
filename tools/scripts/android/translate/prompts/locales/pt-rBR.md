@@ -13,7 +13,7 @@ Brazilian Portuguese (`values-pt-rBR`) is a standard Brazilian Portuguese locali
 Treat this locale as Brazilian Portuguese, not European Portuguese.
 Prefer Brazilian product wording, spelling, and UI terminology.
 Avoid European Portuguese-only terms when a clearer Brazilian expression exists, especially for app, file, screen, playback, and settings text.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Brazilian Portuguese locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Brazilian Portuguese locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.

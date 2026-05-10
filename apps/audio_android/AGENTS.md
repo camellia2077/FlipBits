@@ -29,11 +29,16 @@
   - `docs/architecture/android/android-ui-structure.md`
 - 如果改动涉及 Flash Visual、Lyrics 跟随、长音频可视化、动画卡顿/跳动或 debug 指标，再按需读：
   - `docs/architecture/android/android-flash-visual.md`
+- 如果改动涉及 Flash 真机 UI 回归、agent/adb 驱动调试、自动化 scenario 或稳定 test tags，再按需读：
+  - `docs/architecture/android/android-flash-automation.md`
+- 如果改动涉及 Mini 真机 UI 回归、agent/adb 驱动调试、slow/standard/fast Morse speed 采集或 Mini Visual/Lyrics 对齐数据，再按需读：
+  - `docs/architecture/android/android-mini-automation.md`
 
 ## Hard Rules
 
 - 优先按职责找入口，不要默认从最大文件开始搜。
 - 动画卡顿、跳动、闪烁或长音频 visual 性能问题，不要先靠猜测重构；先读 `docs/architecture/android/android-flash-visual.md`，再用 debug-only `FlashVisualPerf` 指标和 adb 日志确认瓶颈层级。
+- Flash 真机自动化优先使用 `docs/architecture/android/android-flash-automation.md` 里的 debug scenario，不要默认走坐标点击、随机 sample 或无障碍服务。
 - 修改可见 XML 文案、本地化结构或样例文本时，必须先按 `.agent/workflows/translations/README.md` 选择 app text 或 sample text workflow；不要跳过 translation key alignment。
 - 新增 XML 文案 key 时，必须使用脚手架：`python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`。
 - `strings-add` 默认只写英文 `values/` 基线，并生成 translation key alignment 报告；不要手工把英文原文复制到 `values-*` 当本地化。
@@ -71,6 +76,8 @@
 - 修改 Android Kotlin 源码后，最小验证优先运行：
   - `python tools/run.py android test-debug`
   - `python tools/run.py android assemble-debug`
+- 需要在专用真机测试设备上清装 debug 包时，优先运行：
+  - `python tools/run.py android install-debug-fresh`
 - 涉及 JNI / `proguard-rules.pro` / `@Keep` / 反射 / `FindClass` / `GetMethodID` /
   `NewObject` / 资源收缩 / release-only 崩溃时，不要只验证 debug；默认还要运行：
   - `python tools/run.py android assemble-staging`

@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
+import android.content.ClipData
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -8,12 +9,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Casino
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -30,6 +33,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +42,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,6 +52,7 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.audioInputTextFieldColors
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.ThemeStyleOption
+import com.bag.audioandroid.ui.model.toConfigText
 import com.bag.audioandroid.ui.theme.AudioEncodeGlyphColors
 import com.bag.audioandroid.ui.theme.DefaultAppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.DefaultAppThemeVisualTokens
@@ -55,6 +63,7 @@ import com.bag.audioandroid.ui.theme.brandThemeColorOrNull
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHexOrNull
 import com.bag.audioandroid.ui.theme.randomCustomBrandThemeColors
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun CustomBrandThemeDialog(
@@ -71,6 +80,8 @@ internal fun CustomBrandThemeDialog(
     var outlineHexValue by rememberSaveable { mutableStateOf(initialSettings.outlineHexOrNull ?: "") }
 
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
 
     val trimmedDisplayName = displayName.trim()
 
@@ -111,17 +122,6 @@ internal fun CustomBrandThemeDialog(
             Color.Unspecified
         }
 
-    val previewInputContainerColorTarget =
-        if (previewBackground != null && previewAccent != null) {
-            lerp(previewBackground, previewAccent, 0.08f)
-        } else {
-            previewBackground ?: Color.Transparent
-        }
-    val previewInputContainerColor by animateColorAsState(
-        targetValue = previewInputContainerColorTarget,
-        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
-        label = "customThemeInputContainer",
-    )
     val previewModalContainerColorTarget = previewBackground ?: Color.Transparent
     val previewModalContainerColor by animateColorAsState(
         targetValue = previewModalContainerColorTarget,
@@ -129,11 +129,26 @@ internal fun CustomBrandThemeDialog(
         label = "customThemeModalContainer",
     )
     val previewModalContentColorTarget =
-        if (dialogContentColor != Color.Unspecified) dialogContentColor else Color.White
+        if (dialogContentColor != Color.Unspecified) {
+            dialogContentColor
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        }
     val previewModalContentColor by animateColorAsState(
         targetValue = previewModalContentColorTarget,
         animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
         label = "customThemeModalContent",
+    )
+    val previewInputContainerColorTarget =
+        if (previewBackground != null && previewAccent != null) {
+            lerp(previewBackground, previewAccent, 0.08f)
+        } else {
+            MaterialTheme.colorScheme.surface
+        }
+    val previewInputContainerColor by animateColorAsState(
+        targetValue = previewInputContainerColorTarget,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeInputContainer",
     )
     val previewFocusedBorderColorTarget = previewAccent ?: Color.Unspecified
     val previewFocusedBorderColor by animateColorAsState(
@@ -201,46 +216,41 @@ internal fun CustomBrandThemeDialog(
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        val previewGlyphColors =
+                            AudioEncodeGlyphColors(
+                                primarySplit = previewAccent ?: Color.Unspecified,
+                                secondarySplit = previewBackground ?: Color.Unspecified,
+                                outline = previewOutline ?: previewAccent ?: Color.Unspecified,
+                            )
+                        CompositionLocalProvider(LocalAudioEncodeGlyphColors provides previewGlyphColors) {
+                            AudioEncodeGlyph(
+                                encodeProgress = 0.65f,
+                                isEncodingBusy = false,
+                                baseSize = 72.dp,
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                val random = randomCustomBrandThemeColors()
+                                backgroundHex = random.backgroundHex
+                                accentHex = random.accentHex
+                                outlineHexValue = random.outlineHex ?: ""
+                            },
+                            colors =
+                                IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = previewAccent?.copy(alpha = 0.15f) ?: Color.Unspecified,
+                                    contentColor = previewAccent ?: Color.Unspecified,
+                                ),
+                            modifier = Modifier.size(48.dp),
                         ) {
-                            IconButton(
-                                onClick = {
-                                    val random = randomCustomBrandThemeColors()
-                                    backgroundHex = random.backgroundHex
-                                    accentHex = random.accentHex
-                                    outlineHexValue = random.outlineHex ?: ""
-                                },
-                                colors =
-                                    IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = previewAccent?.copy(alpha = 0.15f) ?: Color.Unspecified,
-                                        contentColor = previewAccent ?: Color.Unspecified,
-                                    ),
-                                modifier = Modifier.size(48.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Casino,
-                                    contentDescription = stringResource(R.string.config_custom_brand_theme_randomize),
-                                    modifier = Modifier.size(24.dp),
-                                )
-                            }
-
-                            val previewGlyphColors =
-                                AudioEncodeGlyphColors(
-                                    primarySplit = previewAccent ?: Color.Unspecified,
-                                    secondarySplit = previewBackground ?: Color.Unspecified,
-                                    outline = previewOutline ?: previewAccent ?: Color.Unspecified,
-                                )
-                            CompositionLocalProvider(LocalAudioEncodeGlyphColors provides previewGlyphColors) {
-                                AudioEncodeGlyph(
-                                    encodeProgress = 0.65f,
-                                    isEncodingBusy = false,
-                                    baseSize = 72.dp,
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Rounded.Casino,
+                                contentDescription = stringResource(R.string.config_custom_brand_theme_randomize),
+                                modifier = Modifier.size(24.dp),
+                            )
                         }
                     }
                     var isNameFocused by remember { mutableStateOf(false) }
@@ -299,6 +309,52 @@ internal fun CustomBrandThemeDialog(
                         fallbackBorderColor = previewVisualTokens.subtleOutlineColor,
                         supportingText = stringResource(R.string.config_custom_brand_theme_outline_optional),
                     )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextButton(
+                            enabled = canSave,
+                            onClick = {
+                                coroutineScope.launch {
+                                    copyCustomThemeConfig(
+                                        clipboard = clipboard,
+                                        settings =
+                                            CustomBrandThemeSettings(
+                                                displayName = trimmedDisplayName,
+                                                backgroundHex = normalizedBackground!!,
+                                                accentHex = normalizedAccent!!,
+                                                outlineHexOrNull = normalizedOutline,
+                                            ),
+                                    )
+                                }
+                            },
+                            colors =
+                                ButtonDefaults.textButtonColors(
+                                    contentColor = previewAccent ?: MaterialTheme.colorScheme.primary,
+                                ),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.ContentCopy,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                            Text(text = stringResource(R.string.config_custom_brand_theme_copy_config))
+                        }
+                        if (canDelete) {
+                            TextButton(
+                                onClick = { showDeleteConfirm = true },
+                                colors =
+                                    ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error,
+                                    ),
+                            ) {
+                                Text(text = stringResource(R.string.config_custom_brand_theme_delete))
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -324,27 +380,14 @@ internal fun CustomBrandThemeDialog(
             }
         },
         dismissButton = {
-            Row {
-                if (canDelete) {
-                    TextButton(
-                        onClick = { showDeleteConfirm = true },
-                        colors =
-                            ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error,
-                            ),
-                    ) {
-                        Text(text = stringResource(R.string.config_custom_brand_theme_delete))
-                    }
-                }
-                TextButton(
-                    onClick = onDismiss,
-                    colors =
-                        ButtonDefaults.textButtonColors(
-                            contentColor = previewAccent ?: MaterialTheme.colorScheme.primary,
-                        ),
-                ) {
-                    Text(text = stringResource(R.string.common_cancel))
-                }
+            TextButton(
+                onClick = onDismiss,
+                colors =
+                    ButtonDefaults.textButtonColors(
+                        contentColor = previewAccent ?: MaterialTheme.colorScheme.primary,
+                    ),
+            ) {
+                Text(text = stringResource(R.string.common_cancel))
             }
         },
     )
@@ -384,6 +427,13 @@ internal fun CustomBrandThemeDialog(
             },
         )
     }
+}
+
+suspend fun copyCustomThemeConfig(
+    clipboard: Clipboard,
+    settings: CustomBrandThemeSettings,
+) {
+    clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("FlipBits custom theme config", settings.toConfigText())))
 }
 
 @Composable

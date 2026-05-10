@@ -8,6 +8,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.bag.audioandroid.ui.appSegmentedButtonColors
@@ -34,7 +35,10 @@ internal fun AudioModeSwitcher(
                         count = TransportModeOption.entries.size,
                     ),
                 colors = appSegmentedButtonColors(),
-                modifier = Modifier.weight(1f),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .testTag("audio-mode-${option.wireName}"),
                 label = {
                     val isSelected = transportMode == option
                     Text(

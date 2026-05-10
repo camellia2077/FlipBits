@@ -146,7 +146,7 @@ internal class AudioSessionDecodeActions(
     }
 }
 
-private const val LONG_AUDIO_LOG_TAG = "WaveBitsLongAudio"
+private const val LONG_AUDIO_LOG_TAG = "FlipBitsLongAudio"
 
 private fun safeLogE(
     tag: String,

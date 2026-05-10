@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
-from ..constants import ANDROID_APP_DIR
+from ..constants import ANDROID_APP_DIR, ROOT_DIR
 from ..errors import ToolError
 
 KOTLIN_SOURCE_ROOT = ANDROID_APP_DIR / "src" / "main" / "java"
@@ -33,7 +33,10 @@ class KotlinPolicyViolation:
 
 
 def _repo_relative(path: Path) -> str:
-    return path.as_posix().split("WaveBits/", 1)[-1]
+    try:
+        return path.resolve().relative_to(ROOT_DIR).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def _is_allowed(path: Path) -> bool:

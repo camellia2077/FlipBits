@@ -12,7 +12,7 @@ Russian (`values-ru`) is a standard Russian localization for Android UI, playbac
 [identity_rule]
 Treat this locale as contemporary Russian UI localization.
 Prefer natural Russian wording, grammar, and compact UI phrasing over literal English word order.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Russian locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Russian locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels concise enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.

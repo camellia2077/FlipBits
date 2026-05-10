@@ -25,6 +25,7 @@ internal fun AudioAndroidAppShell(
     uiState: AudioAppUiState,
     savedAudioFilter: SavedAudioModeFilter,
     onSavedAudioFilterChange: (SavedAudioModeFilter) -> Unit,
+    debugScenario: FlashDebugScenario? = null,
     onImportAudio: () -> Unit,
     viewModel: AudioAndroidViewModel,
     modifier: Modifier = Modifier,
@@ -87,6 +88,7 @@ internal fun AudioAndroidAppShell(
                         materialPalettes = MaterialPalettes,
                         brandThemes = BrandDualToneThemes,
                         viewModel = viewModel,
+                        debugScenario = debugScenario,
                         onImportAudio = onImportAudio,
                         modifier = modifier,
                     )

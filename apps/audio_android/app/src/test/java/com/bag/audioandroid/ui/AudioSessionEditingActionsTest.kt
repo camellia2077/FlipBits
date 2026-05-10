@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -22,6 +23,7 @@ class AudioSessionEditingActionsTest {
             MutableStateFlow(
                 AudioAppUiState(
                     selectedLanguage = AppLanguageOption.English,
+                    isSampleDecorationEnabled = false,
                     transportMode = TransportModeOption.Flash,
                     sessions =
                         sessionsWithCurrentFlash(
@@ -55,6 +57,7 @@ class AudioSessionEditingActionsTest {
             MutableStateFlow(
                 AudioAppUiState(
                     selectedLanguage = AppLanguageOption.English,
+                    isSampleDecorationEnabled = false,
                     transportMode = TransportModeOption.Flash,
                     sessions =
                         sessionsWithCurrentFlash(
@@ -111,6 +114,7 @@ class AudioSessionEditingActionsTest {
         assertEquals("typed by user", state.value.currentSession.inputText)
         assertNull(state.value.currentSession.sampleInputId)
         assertNull(state.value.currentSession.sampleShuffleState)
+        assertNull(state.value.currentSession.appliedSampleEmojiPrefix)
 
         actions.onTransportModeSelected(TransportModeOption.Ultra)
         assertEquals(TransportModeOption.Ultra, state.value.transportMode)
@@ -121,6 +125,71 @@ class AudioSessionEditingActionsTest {
                 .inputText,
         )
         assertEquals("ultra-custom", state.value.currentSession.inputText)
+    }
+
+    @Test
+    fun `sample decoration toggle removes and reapplies only app generated emoji prefix`() {
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                isSampleDecorationEnabled = true,
+                sampleDecorationStyle = SampleDecorationStyleOption.Emoji,
+                transportMode = TransportModeOption.Flash,
+                sessions =
+                    sessionsWithCurrentFlash(
+                        ModeAudioSessionState(
+                            inputText = "\uD83D\uDEE0\uFE0F flash-a",
+                            sampleInputId = "a",
+                            appliedSampleEmojiPrefix = "\uD83D\uDEE0\uFE0F",
+                        ),
+                    ),
+            )
+
+        val disabled =
+            state.withSampleDecoration(
+                isDecorationEnabled = false,
+                decorationStyle = SampleDecorationStyleOption.Emoji,
+            )
+        assertEquals("flash-a", disabled.currentSession.inputText)
+        assertNull(disabled.currentSession.appliedSampleEmojiPrefix)
+
+        val enabled =
+            disabled.withSampleDecoration(
+                isDecorationEnabled = true,
+                decorationStyle = SampleDecorationStyleOption.Emoji,
+            )
+        assertTrue(enabled.currentSession.inputText.endsWith("flash-a"))
+        assertTrue(enabled.currentSession.inputText != "flash-a")
+        assertEquals(enabled.currentSession.appliedSampleEmojiPrefix, enabled.currentSession.sampleEmojiShuffleState?.lastPresentedEmoji)
+    }
+
+    @Test
+    fun `sample decoration toggle does not remove user authored emoji text`() {
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                isSampleDecorationEnabled = true,
+                sampleDecorationStyle = SampleDecorationStyleOption.Emoji,
+                transportMode = TransportModeOption.Flash,
+                sessions =
+                    sessionsWithCurrentFlash(
+                        ModeAudioSessionState(
+                            inputText = "\uD83D\uDE80 user text",
+                            sampleInputId = null,
+                            appliedSampleEmojiPrefix = null,
+                        ),
+                    ),
+            )
+
+        val disabled =
+            state.withSampleDecoration(
+                isDecorationEnabled = false,
+                decorationStyle = SampleDecorationStyleOption.Emoji,
+            )
+
+        assertEquals("\uD83D\uDE80 user text", disabled.currentSession.inputText)
+        assertNull(disabled.currentSession.sampleInputId)
+        assertNull(disabled.currentSession.appliedSampleEmojiPrefix)
     }
 
     private fun createActions(

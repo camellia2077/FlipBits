@@ -7,7 +7,7 @@ default_translation
 standard_translation
 
 [locale_note]
-This locale uses the standard translation profile for the WaveBits Android app. WaveBits converts text into audible signal modes, plays generated audio, and shows Visual/Lyrics views that explain bytes, tokens, and low/high bit signals.
+This locale uses the standard translation profile for the FlipBits Android app. FlipBits converts text into audible signal modes, plays generated audio, and shows Visual/Lyrics views that explain bytes, tokens, and low/high bit signals.
 
 [identity_rule]
 Treat this locale as a normal target-language localization.

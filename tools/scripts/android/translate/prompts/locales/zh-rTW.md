@@ -15,7 +15,7 @@ Prefer natural contemporary Traditional Chinese wording, terminology, grammar, p
 Use Traditional Chinese characters consistently.
 Avoid calques, mixed-locale phrasing, or wording that sounds mechanically transferred from English or Simplified Chinese.
 Focus on script, locale terminology, punctuation, and natural UI phrasing.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Traditional Chinese locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Traditional Chinese locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels concise and natural in Taiwan Traditional Chinese.

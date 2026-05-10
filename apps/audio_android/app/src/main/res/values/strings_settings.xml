@@ -119,17 +119,17 @@
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
     <string name="config_custom_brand_theme_dialog_title_edit">Edit custom dual-tone</string>
     <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
-    <string name="config_custom_brand_theme_dialog_description">Enter hex colors in #RRGGBB format. Leave outline empty to reuse the accent color.</string>
+    <string name="config_custom_brand_theme_dialog_description">Enter hex colors in #RRGGBB format. Leave outline empty to reuse the secondary color.</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
     <string name="config_custom_brand_theme_randomize">Randomize colors</string>
     <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
-    <string name="config_custom_brand_theme_randomize_hint">Use the dice to roll a fresh primary, accent, and outline combination.</string>
+    <string name="config_custom_brand_theme_randomize_hint">Use the dice to roll a fresh primary, secondary, and outline combination.</string>
     <!-- CONTEXT: Form field label for the user-defined preset name. -->
     <string name="config_custom_brand_theme_name_label">Preset name</string>
     <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_background_label">Primary color</string>
     <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Accent color</string>
+    <string name="config_custom_brand_theme_accent_label">Secondary color</string>
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_outline_label">Outline color</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
@@ -195,6 +195,41 @@
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
     <string name="config_sample_decoration_style_title">Style</string>
     <string name="config_sample_decoration_style_none">None</string>
-    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>`r`n    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>
+    <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
+    <!-- CONTEXT: Dialog title for importing one custom dual-tone preset from pasted text. -->
+    <string name="config_custom_brand_theme_import_title">Import custom dual-tone</string>
+    <!-- CONTEXT: Action label for importing a custom dual-tone preset from pasted text. -->
+    <string name="config_custom_brand_theme_import">Import</string>
+    <!-- CONTEXT: Action label for copying one custom dual-tone preset as plain text. -->
+    <string name="config_custom_brand_theme_copy_config">Copy config</string>
+    <!-- CONTEXT: Helper text in the custom dual-tone import dialog. -->
+    <string name="config_custom_brand_theme_import_description">Paste a FlipBits custom theme config.</string>
+    <!-- CONTEXT: Text field label for pasted custom dual-tone theme configuration. -->
+    <string name="config_custom_brand_theme_import_config_label">Theme config</string>
+    <!-- CONTEXT: Validation error shown when pasted custom dual-tone theme configuration cannot be parsed. -->
+    <string name="config_custom_brand_theme_import_invalid">Paste a valid FlipBits custom theme config.</string>
+    <!-- CONTEXT: Dialog message shown when importing a custom dual-tone preset that exactly matches an existing preset. -->
+    <string name="config_custom_brand_theme_import_duplicate_message">This config matches an existing custom theme. Overwrite it or add another copy?</string>
+    <!-- CONTEXT: Action label for replacing an existing custom dual-tone preset during import. -->
+    <string name="config_custom_brand_theme_import_overwrite">Overwrite</string>
+    <!-- CONTEXT: Dialog title shown when importing a custom dual-tone preset that exactly matches an existing preset. -->
+    <string name="config_custom_brand_theme_import_duplicate_title">Theme already exists</string>
+    <!-- CONTEXT: Action label for importing a duplicate custom dual-tone preset as a separate copy. -->
+    <string name="config_custom_brand_theme_import_add_copy">Add copy</string>
+    <!-- CONTEXT: Helper text in the custom dual-tone export dialog. -->
+    <string name="config_custom_brand_theme_export_description">Choose whether to copy the selected custom dual-tone or every custom dual-tone.</string>
+    <!-- CONTEXT: Dialog title for exporting the selected custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_export_title">Export custom dual-tone</string>
+    <!-- CONTEXT: Segmented control option for exporting only the selected custom dual-tone preset. -->
+    <string name="config_custom_brand_theme_export_scope_selected">Selected</string>
+    <!-- CONTEXT: Segmented control option for exporting all custom dual-tone presets. -->
+    <string name="config_custom_brand_theme_export_scope_all">All</string>
+    <!-- CONTEXT: Dialog title for confirming a batch custom dual-tone import. -->
+    <string name="config_custom_brand_theme_batch_import_title">Import custom dual-tones</string>
+    <!-- CONTEXT: Batch import summary. Placeholder 1 is total themes, 2 is new themes, 3 is exact duplicates. -->
+    <string name="config_custom_brand_theme_batch_import_summary">%1$d themes found. %2$d new, %3$d exact duplicates.</string>
+    <!-- CONTEXT: Helper text shown when confirming batch custom dual-tone import. -->
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">Exact duplicates will be skipped.</string>
 </resources>

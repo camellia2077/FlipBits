@@ -133,7 +133,7 @@
     <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_background_label">Основной цвет</string>
     <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Акцентный цвет</string>
+    <string name="config_custom_brand_theme_accent_label">Вторичный цвет</string>
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_outline_label">Цвет контура</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
@@ -199,4 +199,21 @@
     <string name="config_sample_decoration_style_emoji">Emoji (по фракции)</string>
     <string name="config_demo_mode_title">Демо-режим</string>
     <string name="config_demo_mode_subtitle">Показывает отклик касаний и подсказки действий для записи.</string>
+    <string name="config_custom_brand_theme_import_title">Импорт пользовательского dual-tone</string>
+    <string name="config_custom_brand_theme_import">Импорт</string>
+    <string name="config_custom_brand_theme_copy_config">Копировать конфиг</string>
+    <string name="config_custom_brand_theme_import_description">Вставьте конфиг пользовательской темы FlipBits.</string>
+    <string name="config_custom_brand_theme_import_config_label">Конфиг темы</string>
+    <string name="config_custom_brand_theme_import_invalid">Вставьте корректный конфиг пользовательской темы FlipBits.</string>
+    <string name="config_custom_brand_theme_import_duplicate_message">Этот конфиг совпадает с существующей пользовательской темой. Перезаписать ее или добавить еще одну копию?</string>
+    <string name="config_custom_brand_theme_import_overwrite">Перезаписать</string>
+    <string name="config_custom_brand_theme_import_duplicate_title">Тема уже существует</string>
+    <string name="config_custom_brand_theme_import_add_copy">Добавить копию</string>
+    <string name="config_custom_brand_theme_export_title">Экспорт пользовательских dual-tone</string>
+    <string name="config_custom_brand_theme_export_description">Выберите, что копировать: выбранный пользовательский dual-tone или все пользовательские dual-tones.</string>
+    <string name="config_custom_brand_theme_export_scope_selected">Выбранный</string>
+    <string name="config_custom_brand_theme_export_scope_all">Все</string>
+    <string name="config_custom_brand_theme_batch_import_title">Импорт пользовательских dual-tone</string>
+    <string name="config_custom_brand_theme_batch_import_summary">Найдено тем: %1$d. Новых: %2$d, точных дубликатов: %3$d.</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">Точные дубликаты будут пропущены.</string>
 </resources>

@@ -56,8 +56,7 @@ internal fun MorseTimelineVisualizer(
         }
 
     val toneColor = MaterialTheme.colorScheme.primary
-    val pastToneColor = MaterialTheme.colorScheme.secondary
-    val dashColor = MaterialTheme.colorScheme.tertiary
+    val inactiveToneColor = visualTokens.visualizationInactiveToneColor
     val playheadColor = MaterialTheme.colorScheme.onPrimaryContainer
     val backgroundColor = visualTokens.visualizationBaseBackgroundColor
 
@@ -91,33 +90,34 @@ internal fun MorseTimelineVisualizer(
             }
             val visibleStart = entryStart.coerceAtLeast(window.startSample)
             val visibleEnd = entryEnd.coerceAtMost(window.endSample)
-            val x =
-                leftPadding +
-                    ((visibleStart - window.startSample).toFloat() / visibleSamples.toFloat()) * innerWidth
-            val width =
-                (((visibleEnd - visibleStart).coerceAtLeast(1)).toFloat() / visibleSamples.toFloat()) *
-                    innerWidth
             val isDash = entry.sampleCount >= frameSamples * MorseDashUnitThreshold
-            val isPast = entryEnd <= currentSample
-            val isActive = currentSample in entryStart until entryEnd
             val blockHeight =
                 if (isDash) {
                     innerHeight * 0.68f
                 } else {
                     innerHeight * 0.42f
                 }
-            val color =
-                when {
-                    isActive -> toneColor
-                    isPast -> pastToneColor.copy(alpha = if (isPlaying) 0.78f else 0.62f)
-                    isDash -> dashColor.copy(alpha = 0.72f)
-                    else -> toneColor.copy(alpha = 0.48f)
-                }
-            drawRoundRect(
-                color = color,
-                topLeft = Offset(x, centerY - blockHeight / 2f),
-                size = Size(width.coerceAtLeast(2.dp.toPx()), blockHeight),
-                cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx()),
+            drawMorseTimelineSegmentPart(
+                visibleStart = visibleStart,
+                visibleEnd = visibleEnd.coerceAtMost(currentSample),
+                window = window,
+                visibleSamples = visibleSamples,
+                leftPadding = leftPadding,
+                innerWidth = innerWidth,
+                centerY = centerY,
+                blockHeight = blockHeight,
+                color = toneColor.copy(alpha = if (isPlaying) 0.88f else 0.72f),
+            )
+            drawMorseTimelineSegmentPart(
+                visibleStart = visibleStart.coerceAtLeast(currentSample),
+                visibleEnd = visibleEnd,
+                window = window,
+                visibleSamples = visibleSamples,
+                leftPadding = leftPadding,
+                innerWidth = innerWidth,
+                centerY = centerY,
+                blockHeight = blockHeight,
+                color = inactiveToneColor.copy(alpha = 0.48f),
             )
         }
 
@@ -133,12 +133,40 @@ internal fun MorseTimelineVisualizer(
     }
 }
 
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawMorseTimelineSegmentPart(
+    visibleStart: Int,
+    visibleEnd: Int,
+    window: MorseTimelineWindow,
+    visibleSamples: Int,
+    leftPadding: Float,
+    innerWidth: Float,
+    centerY: Float,
+    blockHeight: Float,
+    color: androidx.compose.ui.graphics.Color,
+) {
+    if (visibleEnd <= visibleStart) {
+        return
+    }
+    val x =
+        leftPadding +
+            ((visibleStart - window.startSample).toFloat() / visibleSamples.toFloat()) * innerWidth
+    val width =
+        (((visibleEnd - visibleStart).coerceAtLeast(1)).toFloat() / visibleSamples.toFloat()) *
+            innerWidth
+    drawRoundRect(
+        color = color,
+        topLeft = Offset(x, centerY - blockHeight / 2f),
+        size = Size(width.coerceAtLeast(2.dp.toPx()), blockHeight),
+        cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx()),
+    )
+}
+
 internal fun resolveMorseTimelineWindow(
     currentSample: Int,
     windowSamples: Int,
 ): MorseTimelineWindow {
     val safeWindowSamples = windowSamples.coerceAtLeast(1)
-    val windowStart = (currentSample - (safeWindowSamples * MorseTimelinePlayheadAnchorRatio).toInt()).coerceAtLeast(0)
+    val windowStart = currentSample - (safeWindowSamples * MorseTimelinePlayheadAnchorRatio).toInt()
     return MorseTimelineWindow(
         startSample = windowStart,
         sampleCount = safeWindowSamples,

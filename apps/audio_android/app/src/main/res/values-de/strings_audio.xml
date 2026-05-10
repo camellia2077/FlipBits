@@ -62,7 +62,7 @@
     <string name="audio_result_empty">Noch kein Ergebnis.</string>
     <string name="audio_decode_view_text">Text</string>
     <string name="audio_decode_view_raw">Rohdaten</string>
-    <string name="audio_decode_raw_binary_label">Binär</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">Diese Nutzdaten konnten nicht als Text interpretiert werden. Die Rohdaten sind weiterhin verfügbar.</string>
     <string name="audio_decode_raw_unavailable">Noch keine Rohdaten der Nutzdaten verfügbar.</string>
@@ -128,7 +128,7 @@
     <string name="audio_follow_display_lyrics">Lyrics</string>
     <string name="audio_follow_display_data">Daten</string>
     <string name="audio_follow_view_hex">Hex</string>
-    <string name="audio_follow_view_binary">Binär</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">Details</string>
     <string name="audio_player_detail_saved_mode">Modus</string>

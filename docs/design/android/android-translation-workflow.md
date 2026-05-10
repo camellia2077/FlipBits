@@ -9,15 +9,15 @@
 相关文档：
 
 - agent 速查索引：
-  - [android-translation-tooling-agent-index.md](/C:/code/WaveBits/docs/design/android/android-translation-tooling-agent-index.md)
+  - [android-translation-tooling-agent-index.md](/C:/code/FlipBits/docs/design/android/android-translation-tooling-agent-index.md)
 - 翻译语义与术语规则：
-  - [android-localization-guidelines.md](/C:/code/WaveBits/docs/design/android/android-localization-guidelines.md)
+  - [android-localization-guidelines.md](/C:/code/FlipBits/docs/design/android/android-localization-guidelines.md)
 - 英文拆分资源的翻译说明：
-  - [android-split-strings-translation-guide.md](/C:/code/WaveBits/docs/design/android/translation/android-split-strings-translation-guide.md)
+  - [android-split-strings-translation-guide.md](/C:/code/FlipBits/docs/design/android/translation/android-split-strings-translation-guide.md)
 - translate 工具总览：
-  - [tools/scripts/android/translate/docs/architecture.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/architecture.md)
+  - [tools/scripts/android/translate/docs/architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
 - key 对齐检查说明：
-  - [tools/scripts/android/translate/docs/check_translation_key_alignment.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
+  - [tools/scripts/android/translate/docs/check_translation_key_alignment.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
 
 ## When To Read
 
@@ -69,7 +69,7 @@
 
 统一入口：
 
-- [tools/scripts/android/translate/run.py](/C:/code/WaveBits/tools/scripts/android/translate/run.py)
+- [tools/scripts/android/translate/run.py](/C:/code/FlipBits/tools/scripts/android/translate/run.py)
 
 最常用命令：
 
@@ -102,8 +102,8 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignme
 
 更多子命令见：
 
-- [android-translation-tooling-agent-index.md](/C:/code/WaveBits/docs/design/android/android-translation-tooling-agent-index.md)
-- [tools/scripts/android/translate/docs/architecture.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/architecture.md)
+- [android-translation-tooling-agent-index.md](/C:/code/FlipBits/docs/design/android/android-translation-tooling-agent-index.md)
+- [tools/scripts/android/translate/docs/architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
 
 ## Gradle Integration
 
@@ -111,7 +111,7 @@ Android app 的 Gradle 已经把翻译结构检查接进默认构建链路。
 
 定义位置：
 
-- [apps/audio_android/app/build.gradle.kts](/C:/code/WaveBits/apps/audio_android/app/build.gradle.kts)
+- [apps/audio_android/app/build.gradle.kts](/C:/code/FlipBits/apps/audio_android/app/build.gradle.kts)
 
 当前行为：
 
@@ -184,7 +184,7 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignme
 
 语义、术语、长度与产品口径，还是要回到：
 
-- [android-localization-guidelines.md](/C:/code/WaveBits/docs/design/android/android-localization-guidelines.md)
+- [android-localization-guidelines.md](/C:/code/FlipBits/docs/design/android/android-localization-guidelines.md)
 
 ## Agent Guidance
 

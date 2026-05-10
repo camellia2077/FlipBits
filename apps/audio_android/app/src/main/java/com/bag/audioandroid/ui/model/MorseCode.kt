@@ -18,6 +18,14 @@ enum class MorseSpeedOption(
 
     companion object {
         val default: MorseSpeedOption = Standard
+
+        fun fromFrameSamples(
+            frameSamples: Int,
+            defaultFrameSamples: Int = 2205,
+        ): MorseSpeedOption =
+            entries.minBy { option ->
+                kotlin.math.abs(option.frameSamples(defaultFrameSamples) - frameSamples)
+            }
     }
 }
 

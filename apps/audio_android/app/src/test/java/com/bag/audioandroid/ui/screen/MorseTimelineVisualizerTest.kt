@@ -5,6 +5,15 @@ import org.junit.Test
 
 class MorseTimelineVisualizerTest {
     @Test
+    fun `timeline window keeps playhead anchored at audio start`() {
+        val window = resolveMorseTimelineWindow(currentSample = 0, windowSamples = 9_600)
+
+        assertEquals(-3_840, window.startSample)
+        assertEquals(9_600, window.sampleCount)
+        assertEquals(5_760, window.endSample)
+    }
+
+    @Test
     fun `timeline window keeps fixed sample count near audio end`() {
         val window = resolveMorseTimelineWindow(currentSample = 10_000, windowSamples = 9_600)
 

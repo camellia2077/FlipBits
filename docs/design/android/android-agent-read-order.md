@@ -4,7 +4,7 @@
 
 ## Default Start
 
-1. 先看 [apps/audio_android/README.md](/C:/code/WaveBits/apps/audio_android/README.md) 的“快速定位 / 常见改动入口”。
+1. 先看 [apps/audio_android/README.md](/C:/code/FlipBits/apps/audio_android/README.md) 的“快速定位 / 常见改动入口”。
 2. 再按当前任务类型，只展开下面一个分支。
 3. 如果改动跨了多个方向，再补读第二篇，不要一上来把所有 Android 文档全展开。
 
@@ -17,10 +17,10 @@
 - 改 Audio / Saved / Settings 页入口或共享 UI helper
 
 先读：
-- [android-player-ui.md](/C:/code/WaveBits/docs/design/android/android-player-ui.md)
+- [android-player-ui.md](/C:/code/FlipBits/docs/design/android/android-player-ui.md)
 
 再按需读：
-- [android-ui-structure.md](/C:/code/WaveBits/docs/architecture/android/android-ui-structure.md)
+- [android-ui-structure.md](/C:/code/FlipBits/docs/architecture/android/android-ui-structure.md)
 
 ### Visual Playback
 
@@ -30,11 +30,11 @@
 - 需要判断问题属于 Canvas、Compose、window source、raw playback position 还是 smoother
 
 先读：
-- [android-flash-visual.md](/C:/code/WaveBits/docs/architecture/android/android-flash-visual.md)
+- [android-flash-visual.md](/C:/code/FlipBits/docs/architecture/android/android-flash-visual.md)
 
 再按需读：
-- [android-player-ui.md](/C:/code/WaveBits/docs/design/android/android-player-ui.md)
-- [android-ui-structure.md](/C:/code/WaveBits/docs/architecture/android/android-ui-structure.md)
+- [android-player-ui.md](/C:/code/FlipBits/docs/design/android/android-player-ui.md)
+- [android-ui-structure.md](/C:/code/FlipBits/docs/architecture/android/android-ui-structure.md)
 
 ### Theme
 
@@ -43,10 +43,10 @@
 - 改 encode glyph、Settings 里的主题展示
 
 先读：
-- [android-dual-tone-theme.md](/C:/code/WaveBits/docs/design/android/android-dual-tone-theme.md)
+- [android-dual-tone-theme.md](/C:/code/FlipBits/docs/design/android/android-dual-tone-theme.md)
 
 再按需读：
-- [android-player-ui.md](/C:/code/WaveBits/docs/design/android/android-player-ui.md)
+- [android-player-ui.md](/C:/code/FlipBits/docs/design/android/android-player-ui.md)
 
 ### Translation
 
@@ -56,11 +56,11 @@
 - 需要生成翻译任务 markdown 或排查语言 key 不对齐
 
 先读：
-- [android-translation-workflow.md](/C:/code/WaveBits/docs/design/android/android-translation-workflow.md)
+- [android-translation-workflow.md](/C:/code/FlipBits/docs/design/android/android-translation-workflow.md)
 
 再按需读：
-- [android-translation-tooling-agent-index.md](/C:/code/WaveBits/docs/design/android/android-translation-tooling-agent-index.md)
-- [android-localization-guidelines.md](/C:/code/WaveBits/docs/design/android/android-localization-guidelines.md)
+- [android-translation-tooling-agent-index.md](/C:/code/FlipBits/docs/design/android/android-translation-tooling-agent-index.md)
+- [android-localization-guidelines.md](/C:/code/FlipBits/docs/design/android/android-localization-guidelines.md)
 
 ### Native
 
@@ -69,10 +69,10 @@
 - 改 `@Keep`、混淆、native 反射访问、release-only 崩溃排查
 
 先读：
-- [android-native-strategy.md](/C:/code/WaveBits/docs/architecture/android/android-native-strategy.md)
+- [android-native-strategy.md](/C:/code/FlipBits/docs/architecture/android/android-native-strategy.md)
 
 再按需读：
-- [android-app-architecture.md](/C:/code/WaveBits/docs/architecture/android/android-app-architecture.md)
+- [android-app-architecture.md](/C:/code/FlipBits/docs/architecture/android/android-app-architecture.md)
 
 ## Minimal Read Combos
 

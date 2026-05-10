@@ -34,7 +34,10 @@ internal fun FlashSignalVisualizationModeSwitcher(
                     ),
                 colors =
                     playerSegmentedButtonColors(),
-                modifier = Modifier.weight(1f),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .testTag("flash-visualization-mode-${mode.name.lowercase()}"),
                 label = {
                     Text(text = stringResource(mode.labelResId))
                 },

@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerSegmentedButtonColors
 import com.bag.audioandroid.ui.state.FlashVisualWindowState
@@ -53,6 +54,16 @@ internal fun PlaybackDisplaySection(
             displayedSamples = displayedSamples,
             followData = followData,
         )
+    if (transportMode == TransportModeOption.Mini) {
+        MiniAlignmentPerfTrace.record(
+            followData = followData,
+            isPlaying = isPlaying,
+            visualSample = displayedSamples,
+            lyricsSample = visualDisplayedSamples,
+            frameSamples = frameSamples,
+            speed = MorseSpeedOption.fromFrameSamples(frameSamples).name.lowercase(),
+        )
+    }
 
     Column(
         modifier =
@@ -169,7 +180,8 @@ internal fun PlaybackDisplaySection(
         }
         PlaybackTokenContextTape(
             followData = followData,
-            displayedSamples = displayedSamples,
+            displayedSamples = visualDisplayedSamples,
+            isPlaying = isPlaying,
             visibleLineCount = if (playbackDisplayMode == PlaybackDisplayMode.Visual) 5 else 4,
             onSeekToSample = onSeekToSample,
             modifier =

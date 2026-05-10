@@ -9,7 +9,7 @@
 
 建议先看：
 
-- [tools/scripts/loc/docs/agent_responsibility_scan.md](/C:/code/WaveBits/tools/scripts/loc/docs/agent_responsibility_scan.md)
+- [tools/scripts/loc/docs/agent_responsibility_scan.md](/C:/code/FlipBits/tools/scripts/loc/docs/agent_responsibility_scan.md)
   - 解释职责混杂扫描 JSON 的字段含义，以及 agent 应该如何把这些字段转成重构方向
 
 ## Windows BAT 快捷入口
@@ -178,9 +178,9 @@ python tools/scripts/loc/run.py --lang py --under 120 --log-file logs/loc_scan_p
 - `--log-file` 的相对路径不是相对“你当前在哪个终端目录执行命令”，而是固定相对 `tools/scripts/loc/`
 - 例如：
   - `--log-file logs/scan_py.json`
-    - 实际落到 [tools/scripts/loc/logs/scan_py.json](/C:/code/WaveBits/tools/scripts/loc/logs/scan_py.json)
+    - 实际落到 [tools/scripts/loc/logs/scan_py.json](/C:/code/FlipBits/tools/scripts/loc/logs/scan_py.json)
   - `--log-file scan_py_custom.json`
-    - 实际落到 [tools/scripts/loc/scan_py_custom.json](/C:/code/WaveBits/tools/scripts/loc/scan_py_custom.json)
+    - 实际落到 [tools/scripts/loc/scan_py_custom.json](/C:/code/FlipBits/tools/scripts/loc/scan_py_custom.json)
 - 如果你不想依赖这条相对路径规则，最稳的是直接传绝对路径
 
 职责混杂扫描写出的 JSON 日志中，风险条目除了原有的 `score / lines / state_signal_hits / top_level_composables / role_kinds / mode_branch_hits`，还会按语言带出额外字段。

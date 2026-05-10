@@ -19,11 +19,12 @@ internal fun rememberPlaybackDisplaySectionState(
     isFlashMode: Boolean,
     onLyricsRequested: () -> Unit,
     initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
+    initialFlashVisualizationMode: FlashSignalVisualizationMode = FlashSignalVisualizationMode.ToneTracks,
     onDisplayModeSelected: (PlaybackDisplayMode) -> Unit = {},
 ): PlaybackDisplaySectionState {
     var playbackDisplayModeName by rememberSaveable { mutableStateOf(initialDisplayMode.name) }
-    var flashVisualizationModeName by rememberSaveable(isFlashMode) {
-        mutableStateOf(FlashSignalVisualizationMode.ToneTracks.name)
+    var flashVisualizationModeName by rememberSaveable(isFlashMode, initialFlashVisualizationMode) {
+        mutableStateOf(initialFlashVisualizationMode.name)
     }
     val playbackDisplayMode =
         remember(playbackDisplayModeName) {

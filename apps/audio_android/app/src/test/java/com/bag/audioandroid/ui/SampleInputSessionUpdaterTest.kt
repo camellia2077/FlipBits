@@ -3,6 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -34,6 +35,49 @@ class SampleInputSessionUpdaterTest {
             assertEquals(1, session.sampleShuffleState?.nextSampleIndex)
             assertEquals(session.sampleInputId, session.sampleShuffleState?.lastPresentedSampleId)
         }
+    }
+
+    @Test
+    fun `initialize decorates the first flash sample with emoji when decoration is enabled`() {
+        val updated =
+            updater.initialize(
+                sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
+                language = AppLanguageOption.English,
+                flavor = SampleFlavor.SacredMachine,
+                isDecorationEnabled = true,
+                decorationStyle = SampleDecorationStyleOption.Emoji,
+            )
+
+        val flashSession = updated.getValue(TransportModeOption.Flash)
+        assertTrue(flashSession.inputText.contains("sacred-en-"))
+        assertTrue(flashSession.inputText != "sacred-en-${flashSession.sampleInputId}")
+        assertTrue(flashSession.inputText.endsWith("sacred-en-${flashSession.sampleInputId}"))
+        assertEquals(1, flashSession.sampleEmojiShuffleState?.nextEmojiIndex)
+        assertEquals(flashSession.appliedSampleEmojiPrefix, flashSession.sampleEmojiShuffleState?.lastPresentedEmoji)
+        assertEquals(
+            "PRO-SACRED-${updated.getValue(TransportModeOption.Pro).sampleInputId?.uppercase()}",
+            updated.getValue(TransportModeOption.Pro).inputText,
+        )
+        assertEquals(
+            "PRO-SACRED-${updated.getValue(TransportModeOption.Mini).sampleInputId?.uppercase()}",
+            updated.getValue(TransportModeOption.Mini).inputText,
+        )
+    }
+
+    @Test
+    fun `initialize leaves the first flash sample plain when emoji decoration is disabled`() {
+        val updated =
+            updater.initialize(
+                sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
+                language = AppLanguageOption.English,
+                flavor = SampleFlavor.SacredMachine,
+                isDecorationEnabled = false,
+            )
+
+        val flashSession = updated.getValue(TransportModeOption.Flash)
+        assertEquals("sacred-en-${flashSession.sampleInputId}", flashSession.inputText)
+        assertNull(flashSession.sampleEmojiShuffleState)
+        assertNull(flashSession.appliedSampleEmojiPrefix)
     }
 
     @Test

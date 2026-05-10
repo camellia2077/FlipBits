@@ -196,4 +196,21 @@
     <string name="config_sample_decoration_style_none">None</string>
     <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
+    <string name="config_custom_brand_theme_import_title">导入自定义 dual-tone</string>
+    <string name="config_custom_brand_theme_import">导入</string>
+    <string name="config_custom_brand_theme_copy_config">复制配置</string>
+    <string name="config_custom_brand_theme_import_description">粘贴 FlipBits 自定义主题配置。</string>
+    <string name="config_custom_brand_theme_import_config_label">主题配置</string>
+    <string name="config_custom_brand_theme_import_invalid">粘贴有效的 FlipBits 自定义主题配置。</string>
+    <string name="config_custom_brand_theme_import_duplicate_message">此配置与现有自定义主题完全相同。要覆盖它，还是再添加一个副本？</string>
+    <string name="config_custom_brand_theme_import_overwrite">覆盖</string>
+    <string name="config_custom_brand_theme_import_duplicate_title">主题已存在</string>
+    <string name="config_custom_brand_theme_import_add_copy">添加副本</string>
+    <string name="config_custom_brand_theme_export_title">导出自定义 dual-tone</string>
+    <string name="config_custom_brand_theme_export_description">选择复制当前选中的自定义 dual-tone，或复制全部自定义 dual-tone。</string>
+    <string name="config_custom_brand_theme_export_scope_selected">当前选中</string>
+    <string name="config_custom_brand_theme_export_scope_all">全部</string>
+    <string name="config_custom_brand_theme_batch_import_title">导入自定义 dual-tone</string>
+    <string name="config_custom_brand_theme_batch_import_summary">找到 %1$d 个主题，其中 %2$d 个为新增，%3$d 个为完全重复。</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">完全重复的主题会被跳过。</string>
 </resources>

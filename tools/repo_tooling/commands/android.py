@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -67,6 +68,9 @@ RELEASE_APK_OUTPUT_PATH = (
 STAGING_APK_OUTPUT_PATH = (
     ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "staging" / "FlipBits-staging.apk"
 )
+DEBUG_APK_OUTPUT_PATH = ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"
+ANDROID_APP_ID = "com.bag.audioandroid"
+MIN_DEBUG_APK_BYTES = 10 * 1024 * 1024
 
 
 def _resolve_sdkmanager() -> str:
@@ -211,9 +215,44 @@ def _add_android_string_key(args: argparse.Namespace) -> None:
     raise SystemExit(completed.returncode)
 
 
+def _install_debug_fresh(args: argparse.Namespace) -> None:
+    command = gradle_wrapper()
+    if args.clean:
+        command.append("clean")
+    command.append(":app:assembleDebug")
+    run(command, cwd=ANDROID_GRADLE_ROOT)
+
+    if not DEBUG_APK_OUTPUT_PATH.exists():
+        raise ToolError(f"Debug APK was not produced: {DEBUG_APK_OUTPUT_PATH}")
+    apk_size = DEBUG_APK_OUTPUT_PATH.stat().st_size
+    if apk_size < MIN_DEBUG_APK_BYTES:
+        raise ToolError(
+            "Debug APK is unexpectedly small; refusing to install a likely incomplete artifact.\n"
+            f"APK: {DEBUG_APK_OUTPUT_PATH}\n"
+            f"Size: {apk_size} bytes"
+        )
+
+    adb = shutil.which("adb")
+    if adb is None:
+        raise ToolError("Could not find 'adb' on PATH.")
+
+    uninstall_command = [adb, "uninstall", ANDROID_APP_ID]
+    print_command(uninstall_command)
+    uninstall_result = subprocess.run(uninstall_command)
+    if uninstall_result.returncode != 0:
+        print(f"[android] adb uninstall returned {uninstall_result.returncode}; continuing with fresh install.")
+
+    install_command = [adb, "install", os.fspath(DEBUG_APK_OUTPUT_PATH)]
+    run(install_command)
+    print(f"[android] Installed fresh debug APK: {DEBUG_APK_OUTPUT_PATH}")
+
+
 def cmd_android(args: argparse.Namespace) -> None:
     if getattr(args, "action", None) == "strings-add":
         _add_android_string_key(args)
+        return
+    if args.action == "install-debug-fresh":
+        _install_debug_fresh(args)
         return
     if args.action == "install-sdk":
         _install_android_sdk_components(accept_licenses=args.accept_licenses)

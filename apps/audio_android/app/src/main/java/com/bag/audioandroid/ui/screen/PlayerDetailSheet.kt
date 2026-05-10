@@ -67,6 +67,7 @@ internal fun PlayerDetailSheetContent(
         onScrubFinished()
     },
     initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
+    initialFlashVisualizationMode: FlashSignalVisualizationMode? = null,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -75,6 +76,7 @@ internal fun PlayerDetailSheetContent(
             isFlashMode = miniPlayerModel.isFlashMode,
             onLyricsRequested = onLyricsRequested,
             initialDisplayMode = initialDisplayMode,
+            initialFlashVisualizationMode = initialFlashVisualizationMode ?: FlashSignalVisualizationMode.ToneTracks,
             onDisplayModeSelected = onPlaybackDisplayModeSelected,
         )
 

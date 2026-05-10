@@ -213,6 +213,10 @@ class AudioAndroidViewModel(
         preferencesActions.onCustomBrandThemeDeleted(presetId)
     }
 
+    fun onCustomBrandThemesImported(settings: List<CustomBrandThemeSettings>) {
+        preferencesActions.onCustomBrandThemesImported(settings)
+    }
+
     fun onConfigLanguageExpandedChanged(expanded: Boolean) {
         preferencesActions.onConfigLanguageExpandedChanged(expanded)
     }
@@ -258,6 +262,30 @@ class AudioAndroidViewModel(
         sessionActions.onInputTextChange(value)
     }
 
+    fun startFlashDebugScenario(scenario: FlashDebugScenario) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        onTransportModeSelected(TransportModeOption.Flash)
+        onFlashVoicingStyleSelected(scenario.style)
+        onInputTextChange(scenario.text)
+        if (scenario.encode) {
+            onEncode()
+        }
+    }
+
+    fun startMiniDebugScenario(scenario: MiniDebugScenario) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        onTransportModeSelected(TransportModeOption.Mini)
+        onMorseSpeedSelected(scenario.speed)
+        onInputTextChange(scenario.text)
+        if (scenario.encode) {
+            onEncode()
+        }
+    }
+
     fun onRandomizeSampleInput(length: SampleInputLengthOption) {
         sessionActions.onRandomizeSampleInput(length)
     }
@@ -290,6 +318,10 @@ class AudioAndroidViewModel(
 
     fun onTogglePlayback() {
         playbackActions.onTogglePlayback()
+    }
+
+    fun stopPlayback() {
+        playbackActions.stopPlayback()
     }
 
     fun onPlaybackSequenceModeSelected(mode: PlaybackSequenceMode) {

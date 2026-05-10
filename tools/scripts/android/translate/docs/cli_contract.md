@@ -216,7 +216,7 @@ Recommended shape:
     "prompt_version": "v2"
   },
   "artifacts": {
-    "output_dir": "C:/code/WaveBits/temp/ai_translation_reviews"
+    "output_dir": "C:/code/FlipBits/temp/ai_translation_reviews"
   },
   "errors": []
 }
@@ -348,7 +348,7 @@ Example:
     "alignment_issue_count": 14
   },
   "artifacts": {
-    "output_dir": "C:/code/WaveBits/temp/translation_key_alignment_reports"
+    "output_dir": "C:/code/FlipBits/temp/translation_key_alignment_reports"
   },
   "errors": []
 }
@@ -365,7 +365,7 @@ Example:
     "suspicious_issue_count": 3
   },
   "artifacts": {
-    "output_dir": "C:/code/WaveBits/temp/mixed_language_reports"
+    "output_dir": "C:/code/FlipBits/temp/mixed_language_reports"
   },
   "errors": []
 }

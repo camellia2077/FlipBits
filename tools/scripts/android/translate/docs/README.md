@@ -1,20 +1,20 @@
 # Translate Docs
 
-- [sop.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/sop.md)
-- [architecture.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/architecture.md)
-- [cli_contract.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/cli_contract.md)
-- [compare_translation_quality.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
-- [apply_translation_replacements.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
-- [check_mixed_language.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/check_mixed_language.md)
-- [check_translation_key_alignment.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
+- [sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md)
+- [architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
+- [cli_contract.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/cli_contract.md)
+- [compare_translation_quality.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
+- [apply_translation_replacements.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
+- [check_mixed_language.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_mixed_language.md)
+- [check_translation_key_alignment.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
 
 Human workflow first:
 
-- [sop.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/sop.md)
+- [sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md)
 
 Agent workflow now lives separately:
 
-- [AGENTS.md](/C:/code/WaveBits/tools/scripts/android/translate/AGENTS.md)
+- [AGENTS.md](/C:/code/FlipBits/tools/scripts/android/translate/AGENTS.md)
 
 ## Directory Map
 
@@ -43,4 +43,4 @@ Default human workflow input for `replace`.
 
 If you are running agent jobs, prefer the isolated job flow described in:
 
-- [AGENTS.md](/C:/code/WaveBits/tools/scripts/android/translate/AGENTS.md)
+- [AGENTS.md](/C:/code/FlipBits/tools/scripts/android/translate/AGENTS.md)

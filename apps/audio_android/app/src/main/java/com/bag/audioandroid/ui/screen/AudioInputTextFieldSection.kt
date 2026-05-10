@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
@@ -66,6 +67,10 @@ internal fun AudioInputTextFieldSection(
             ),
         colors = audioInputTextFieldColors(selectedThemeStyle),
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.fillMaxWidth().onFocusChanged { isInputFocused = it.isFocused },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag("audio-input-text-field")
+                .onFocusChanged { isInputFocused = it.isFocused },
     )
 }

@@ -34,7 +34,7 @@ description: Agent 专用 CI / tooling / libs 提交消息写法
 
 - `refactor`
   - 重构现有 tooling / CI / infra 结构，但外部职责不新增
-  - 例如 `tools/wavebits_tools -> tools/repo_tooling`
+  - 例如 `tools/flipbits_tools -> tools/repo_tooling`
   - 例如拆分大文件、拆分 policy、重整命令分组
 
 - `chore`
@@ -159,7 +159,7 @@ Reshape the repository tooling entrypoints around clearer command groups and his
 - repo-tooling: changed
 
 [Changed & Refactored]
-- Move internal tooling from `tools/wavebits_tools` to `tools/repo_tooling`.
+- Move internal tooling from `tools/flipbits_tools` to `tools/repo_tooling`.
 - Split history, message, and file-name workflows into dedicated paths.
 
 [Fixed]

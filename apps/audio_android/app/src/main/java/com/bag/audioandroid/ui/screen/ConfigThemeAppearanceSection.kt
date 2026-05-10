@@ -1,35 +1,56 @@
 package com.bag.audioandroid.ui.screen
 
+import android.content.ClipData
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Input
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.CustomBrandThemeImportParseResult
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
+import com.bag.audioandroid.ui.model.hasSameConfigAs
+import com.bag.audioandroid.ui.model.parseCustomBrandThemeImportText
+import com.bag.audioandroid.ui.model.toBatchConfigText
+import com.bag.audioandroid.ui.model.toConfigText
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ConfigThemeAppearanceSection(
@@ -41,6 +62,7 @@ internal fun ConfigThemeAppearanceSection(
     customBrandThemePresets: List<CustomBrandThemeSettings>,
     onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
     onCustomBrandThemeDeleted: (String) -> Unit,
+    onCustomBrandThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
     selectedThemeMode: ThemeModeOption,
     onThemeModeSelected: (ThemeModeOption) -> Unit,
     isExpanded: Boolean,
@@ -114,6 +136,19 @@ internal fun ConfigThemeAppearanceSection(
     var customExpanded by rememberSaveable { mutableStateOf(false) }
     var showCustomThemeDialog by rememberSaveable { mutableStateOf(false) }
     var customThemeDialogPresetId by rememberSaveable { mutableStateOf<String?>(null) }
+    var showCustomThemeImportDialog by rememberSaveable { mutableStateOf(false) }
+    var showCustomThemeExportDialog by rememberSaveable { mutableStateOf(false) }
+    var pendingBatchImport by remember { mutableStateOf<CustomBrandThemeBatchImportPreview?>(null) }
+    var duplicateImportCandidate by remember { mutableStateOf<CustomBrandThemeSettings?>(null) }
+    var duplicateImportPresetId by remember { mutableStateOf<String?>(null) }
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+    val selectedCustomBrandThemePreset =
+        remember(selectedBrandTheme.id, customBrandThemePresets) {
+            customBrandThemePresets.firstOrNull { preset ->
+                selectedBrandTheme.id == customBrandThemeOptionId(preset.presetId)
+            }
+        }
 
     LaunchedEffect(isBrandStyle, selectedBrandTheme.id, brandThemes) {
         if (!isBrandStyle) {
@@ -153,6 +188,88 @@ internal fun ConfigThemeAppearanceSection(
                 onCustomBrandThemeDeleted(presetId)
                 showCustomThemeDialog = false
                 customThemeDialogPresetId = null
+            },
+        )
+    }
+    if (showCustomThemeImportDialog) {
+        CustomBrandThemeImportDialog(
+            onDismiss = { showCustomThemeImportDialog = false },
+            onImport = { importedSettings ->
+                if (importedSettings.size == 1) {
+                    val singleSettings = importedSettings.single()
+                    val duplicate =
+                        customBrandThemePresets.firstOrNull { preset ->
+                            preset.hasSameConfigAs(singleSettings)
+                        }
+                    if (duplicate == null) {
+                        onCustomBrandThemeSaved(singleSettings, null)
+                    } else {
+                        duplicateImportCandidate = singleSettings
+                        duplicateImportPresetId = duplicate.presetId
+                    }
+                } else {
+                    pendingBatchImport =
+                        buildCustomBrandThemeBatchImportPreview(
+                            existing = customBrandThemePresets,
+                            imported = importedSettings,
+                        )
+                }
+                showCustomThemeImportDialog = false
+            },
+        )
+    }
+    if (showCustomThemeExportDialog) {
+        CustomBrandThemeExportDialog(
+            selectedConfigText = selectedCustomBrandThemePreset?.toConfigText().orEmpty(),
+            allConfigText = customBrandThemePresets.toBatchConfigText(),
+            canExportSelected = selectedCustomBrandThemePreset != null,
+            clipboard = clipboard,
+            coroutineScope = coroutineScope,
+            onDismiss = { showCustomThemeExportDialog = false },
+        )
+    }
+    pendingBatchImport?.let { preview ->
+        CustomBrandThemeBatchImportConfirmDialog(
+            preview = preview,
+            onDismiss = { pendingBatchImport = null },
+            onImport = {
+                onCustomBrandThemesImported(preview.newSettings)
+                pendingBatchImport = null
+            },
+        )
+    }
+    if (duplicateImportCandidate != null && duplicateImportPresetId != null) {
+        AlertDialog(
+            onDismissRequest = {
+                duplicateImportCandidate = null
+                duplicateImportPresetId = null
+            },
+            title = { Text(text = stringResource(R.string.config_custom_brand_theme_import_duplicate_title)) },
+            text = { Text(text = stringResource(R.string.config_custom_brand_theme_import_duplicate_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val settings = duplicateImportCandidate ?: return@TextButton
+                        val presetId = duplicateImportPresetId ?: return@TextButton
+                        onCustomBrandThemeSaved(settings, presetId)
+                        duplicateImportCandidate = null
+                        duplicateImportPresetId = null
+                    },
+                ) {
+                    Text(text = stringResource(R.string.config_custom_brand_theme_import_overwrite))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        val settings = duplicateImportCandidate ?: return@TextButton
+                        onCustomBrandThemeSaved(settings, null)
+                        duplicateImportCandidate = null
+                        duplicateImportPresetId = null
+                    },
+                ) {
+                    Text(text = stringResource(R.string.config_custom_brand_theme_import_add_copy))
+                }
             },
         )
     }
@@ -307,6 +424,20 @@ internal fun ConfigThemeAppearanceSection(
                                     customThemeDialogPresetId = null
                                     showCustomThemeDialog = true
                                 },
+                                iconActions =
+                                    listOf(
+                                        BrandThemeSectionIconAction(
+                                            label = stringResource(R.string.config_custom_brand_theme_import),
+                                            icon = Icons.AutoMirrored.Rounded.Input,
+                                            onClick = { showCustomThemeImportDialog = true },
+                                        ),
+                                        BrandThemeSectionIconAction(
+                                            label = stringResource(R.string.config_custom_brand_theme_copy_config),
+                                            icon = Icons.Rounded.Share,
+                                            enabled = selectedCustomBrandThemePreset != null,
+                                            onClick = { showCustomThemeExportDialog = true },
+                                        ),
+                                    ),
                             )
                             BrandThemeSection(
                                 accentTokens = accentTokens,
@@ -368,4 +499,207 @@ internal fun ConfigThemeAppearanceSection(
             }
         }
     }
+}
+
+@Composable
+private fun CustomBrandThemeImportDialog(
+    onDismiss: () -> Unit,
+    onImport: (List<CustomBrandThemeSettings>) -> Unit,
+) {
+    var configText by rememberSaveable { mutableStateOf("") }
+    var showError by rememberSaveable { mutableStateOf(false) }
+    val parseResult = remember(configText) { parseCustomBrandThemeImportText(configText) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.config_custom_brand_theme_import_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(text = stringResource(R.string.config_custom_brand_theme_import_description))
+                OutlinedTextField(
+                    value = configText,
+                    onValueChange = {
+                        configText = it
+                        showError = false
+                    },
+                    minLines = 6,
+                    maxLines = 10,
+                    label = { Text(text = stringResource(R.string.config_custom_brand_theme_import_config_label)) },
+                    isError = showError,
+                    supportingText = {
+                        if (showError) {
+                            Text(text = stringResource(R.string.config_custom_brand_theme_import_invalid))
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    when (parseResult) {
+                        is CustomBrandThemeImportParseResult.Valid -> onImport(parseResult.settings)
+                        CustomBrandThemeImportParseResult.Invalid -> showError = true
+                    }
+                },
+            ) {
+                Text(text = stringResource(R.string.config_custom_brand_theme_import))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.common_cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun CustomBrandThemeExportDialog(
+    selectedConfigText: String,
+    allConfigText: String,
+    canExportSelected: Boolean,
+    clipboard: Clipboard,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    onDismiss: () -> Unit,
+) {
+    var exportScope by rememberSaveable {
+        mutableStateOf(
+            if (canExportSelected) {
+                CustomBrandThemeExportScope.Selected
+            } else {
+                CustomBrandThemeExportScope.All
+            },
+        )
+    }
+    val effectiveExportScope =
+        if (exportScope == CustomBrandThemeExportScope.Selected && !canExportSelected) {
+            CustomBrandThemeExportScope.All
+        } else {
+            exportScope
+        }
+    val configText =
+        when (effectiveExportScope) {
+            CustomBrandThemeExportScope.Selected -> selectedConfigText
+            CustomBrandThemeExportScope.All -> allConfigText
+        }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.config_custom_brand_theme_export_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(text = stringResource(R.string.config_custom_brand_theme_export_description))
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    CustomBrandThemeExportScope.entries.forEachIndexed { index, scope ->
+                        SegmentedButton(
+                            selected = effectiveExportScope == scope,
+                            onClick = { exportScope = scope },
+                            shape =
+                                SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = CustomBrandThemeExportScope.entries.size,
+                                ),
+                            enabled = scope != CustomBrandThemeExportScope.Selected || canExportSelected,
+                            colors = appSegmentedButtonColors(),
+                        ) {
+                            Text(text = stringResource(scope.labelResId))
+                        }
+                    }
+                }
+                OutlinedTextField(
+                    value = configText,
+                    onValueChange = {},
+                    readOnly = true,
+                    minLines = 8,
+                    maxLines = 12,
+                    label = { Text(text = stringResource(R.string.config_custom_brand_theme_import_config_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    coroutineScope.launch {
+                        clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("FlipBits custom theme config", configText)))
+                        onDismiss()
+                    }
+                },
+            ) {
+                Text(text = stringResource(R.string.config_custom_brand_theme_copy_config))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.common_cancel))
+            }
+        },
+    )
+}
+
+private enum class CustomBrandThemeExportScope(
+    val labelResId: Int,
+) {
+    Selected(R.string.config_custom_brand_theme_export_scope_selected),
+    All(R.string.config_custom_brand_theme_export_scope_all),
+}
+
+@Composable
+private fun CustomBrandThemeBatchImportConfirmDialog(
+    preview: CustomBrandThemeBatchImportPreview,
+    onDismiss: () -> Unit,
+    onImport: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.config_custom_brand_theme_batch_import_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text =
+                        stringResource(
+                            R.string.config_custom_brand_theme_batch_import_summary,
+                            preview.totalCount,
+                            preview.newSettings.size,
+                            preview.duplicateCount,
+                        ),
+                )
+                Text(text = stringResource(R.string.config_custom_brand_theme_batch_import_duplicate_note))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = preview.newSettings.isNotEmpty(),
+                onClick = onImport,
+            ) {
+                Text(text = stringResource(R.string.config_custom_brand_theme_import))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.common_cancel))
+            }
+        },
+    )
+}
+
+private data class CustomBrandThemeBatchImportPreview(
+    val totalCount: Int,
+    val duplicateCount: Int,
+    val newSettings: List<CustomBrandThemeSettings>,
+)
+
+private fun buildCustomBrandThemeBatchImportPreview(
+    existing: List<CustomBrandThemeSettings>,
+    imported: List<CustomBrandThemeSettings>,
+): CustomBrandThemeBatchImportPreview {
+    val newSettings =
+        imported.filterNot { importedSettings ->
+            existing.any { preset -> preset.hasSameConfigAs(importedSettings) }
+        }
+    return CustomBrandThemeBatchImportPreview(
+        totalCount = imported.size,
+        duplicateCount = imported.size - newSettings.size,
+        newSettings = newSettings,
+    )
 }

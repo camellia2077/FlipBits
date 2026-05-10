@@ -218,16 +218,16 @@
 
 该项目不应被机械照搬的点：
 
-- 它的 Windows CLI 运行时核心是 `tracer_core.dll`，而 WaveBits 当前不是这套架构
-- 它的第三方依赖问题不等同于 WaveBits 当前的 `libsndfile` 问题
+- 它的 Windows CLI 运行时核心是 `tracer_core.dll`，而 FlipBits 当前不是这套架构
+- 它的第三方依赖问题不等同于 FlipBits 当前的 `libsndfile` 问题
 - 它“没有 MinGW 那批 DLL”不等于“完全没有 Windows DLL”
-- WaveBits 不应为了模仿它而把整个仓库主线改成 Windows-only
+- FlipBits 不应为了模仿它而把整个仓库主线改成 Windows-only
 
-对 WaveBits 的实际启示是：
+对 FlipBits 的实际启示是：
 
 - 应借鉴它对 `windows-msvc`、VS/SDK 前置条件、命令入口和文档分层的做法
 - 不应直接照搬它的 `core.dll` 架构和依赖处理策略
-- WaveBits 仍应保持 `clang++ / Clang-family` 作为开发主线，只把 Windows 发布 lane 独立出来
+- FlipBits 仍应保持 `clang++ / Clang-family` 作为开发主线，只把 Windows 发布 lane 独立出来
 
 ## 一句话判断
 

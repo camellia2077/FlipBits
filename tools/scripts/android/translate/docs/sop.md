@@ -14,14 +14,14 @@ The replacement step is intentionally strict so it can update XML safely.
 
 Agent-specific workflow now lives in:
 
-- [AGENTS.md](/C:/code/WaveBits/tools/scripts/android/translate/AGENTS.md)
+- [AGENTS.md](/C:/code/FlipBits/tools/scripts/android/translate/AGENTS.md)
 
 ## Human Workflow
 
 1. Generate review markdown.
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" compare
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" compare
 ```
 
 2. Open the generated review file under:
@@ -48,19 +48,19 @@ Each review block includes:
 5. Run replace.
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" replace
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" replace
 ```
 
 Windows wrapper:
 
 ```powershell
-"C:\code\WaveBits\tools\scripts\android\translate\replace.cmd"
+"C:\code\FlipBits\tools\scripts\android\translate\replace.cmd"
 ```
 
 6. If the JSON has a high-confidence syntax issue such as unescaped quotes inside a JSON string, use:
 
 ```powershell
-"C:\code\WaveBits\tools\scripts\android\translate\replace_auto_fix_json.cmd"
+"C:\code\FlipBits\tools\scripts\android\translate\replace_auto_fix_json.cmd"
 ```
 
 ## Review Rules
@@ -77,29 +77,29 @@ Windows wrapper:
 Generate review markdown:
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" compare
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" compare
 ```
 
 Run mixed-language report:
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" mixed-language
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" mixed-language
 ```
 
 Run translation key alignment report:
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" key-alignment
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" key-alignment
 ```
 
 Run replace:
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" replace
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" replace
 ```
 
 Run replace with JSON auto-fix:
 
 ```powershell
-py "C:\code\WaveBits\tools\scripts\android\translate\run.py" replace --auto-fix-json
+py "C:\code\FlipBits\tools\scripts\android\translate\run.py" replace --auto-fix-json
 ```

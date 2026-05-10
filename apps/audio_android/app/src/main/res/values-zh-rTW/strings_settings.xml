@@ -116,7 +116,7 @@
     <string name="config_custom_brand_theme_dialog_title_new">新建自訂 Dual-tone</string>
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
     <string name="config_custom_brand_theme_dialog_title_edit">編輯自訂 Dual-tone</string>
-    <string name="config_custom_brand_theme_dialog_description">請輸入 `#RRGGBB` 格式的十六進位顏色。描邊留空時會重用 accent 色。</string>
+    <string name="config_custom_brand_theme_dialog_description">請輸入 #RRGGBB 格式的十六進位顏色。描邊留空時會重用 accent 色。</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
     <string name="config_custom_brand_theme_randomize">隨機顏色</string>
     <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
@@ -124,7 +124,7 @@
     <!-- CONTEXT: Form field label for the user-defined preset name. -->
     <string name="config_custom_brand_theme_name_label">預設名稱</string>
     <string name="config_custom_brand_theme_background_label">主色</string>
-    <string name="config_custom_brand_theme_accent_label">accent 色</string>
+    <string name="config_custom_brand_theme_accent_label">輔色</string>
     <string name="config_custom_brand_theme_outline_label">描邊色</string>
     <string name="config_custom_brand_theme_outline_optional">選填</string>
     <string name="config_custom_brand_theme_save">儲存</string>
@@ -169,7 +169,7 @@
     <string name="palette_violet_title">紫羅蘭脈衝</string>
     <string name="palette_plum_title">梅夜</string>
     <string name="palette_magenta_title">洋紅躍動</string>
-    <string name="palette_fuchsia_title">桃紅閃光</string>
+    <string name="palette_fuchsia_title">Fuchsia flash</string>
     <string name="palette_orchid_title">蘭霧</string>
     <string name="palette_lilac_title">淡紫霧</string>
     <string name="palette_mocha_title">摩卡棕</string>
@@ -183,6 +183,23 @@
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
     <string name="config_sample_decoration_style_title">Style</string>
     <string name="config_sample_decoration_style_none">None</string>
-    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>`r`n    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
+    <string name="config_custom_brand_theme_import_title">匯入自訂 dual-tone</string>
+    <string name="config_custom_brand_theme_import">匯入</string>
+    <string name="config_custom_brand_theme_copy_config">複製設定</string>
+    <string name="config_custom_brand_theme_import_description">貼上 FlipBits 自訂主題設定。</string>
+    <string name="config_custom_brand_theme_import_config_label">主題設定</string>
+    <string name="config_custom_brand_theme_import_invalid">貼上有效的 FlipBits 自訂主題設定。</string>
+    <string name="config_custom_brand_theme_import_duplicate_message">此設定與現有自訂主題完全相同。要覆寫它，還是新增另一個副本？</string>
+    <string name="config_custom_brand_theme_import_overwrite">覆寫</string>
+    <string name="config_custom_brand_theme_import_duplicate_title">主題已存在</string>
+    <string name="config_custom_brand_theme_import_add_copy">新增副本</string>
+    <string name="config_custom_brand_theme_export_title">匯出自訂 dual-tone</string>
+    <string name="config_custom_brand_theme_export_description">選擇要複製目前選取的自訂 dual-tone，或複製全部自訂 dual-tone。</string>
+    <string name="config_custom_brand_theme_export_scope_selected">目前選取</string>
+    <string name="config_custom_brand_theme_export_scope_all">全部</string>
+    <string name="config_custom_brand_theme_batch_import_title">匯入自訂 dual-tone</string>
+    <string name="config_custom_brand_theme_batch_import_summary">找到 %1$d 個主題，其中 %2$d 個為新增，%3$d 個為完全重複。</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">完全重複的主題會被略過。</string>
 </resources>

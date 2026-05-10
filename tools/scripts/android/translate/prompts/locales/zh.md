@@ -15,7 +15,7 @@ Prefer natural contemporary Simplified Chinese wording, terminology, grammar, pu
 Use Simplified Chinese characters consistently.
 Avoid calques, mixed-locale phrasing, or wording that sounds mechanically transferred from English or another Chinese locale.
 Focus on script, locale terminology, punctuation, and natural UI phrasing.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Simplified Chinese locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Simplified Chinese locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels concise and natural in Simplified Chinese.

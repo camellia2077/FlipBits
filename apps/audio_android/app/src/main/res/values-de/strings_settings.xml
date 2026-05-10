@@ -133,7 +133,7 @@
     <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_background_label">Primärfarbe</string>
     <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Akzentfarbe</string>
+    <string name="config_custom_brand_theme_accent_label">Sekundärfarbe</string>
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_outline_label">Umrandungsfarbe</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
@@ -199,4 +199,21 @@
     <string name="config_sample_decoration_style_emoji">Emoji (fraktionsbasiert)</string>
     <string name="config_demo_mode_title">Demo-Modus</string>
     <string name="config_demo_mode_subtitle">Zeigt Tipp-Feedback und Aktionshinweise für Aufnahmen.</string>
+    <string name="config_custom_brand_theme_import_title">Benutzerdefinierten dual-tone importieren</string>
+    <string name="config_custom_brand_theme_import">Importieren</string>
+    <string name="config_custom_brand_theme_copy_config">Konfiguration kopieren</string>
+    <string name="config_custom_brand_theme_import_description">Füge eine FlipBits-Konfiguration für ein benutzerdefiniertes Theme ein.</string>
+    <string name="config_custom_brand_theme_import_config_label">Theme-Konfiguration</string>
+    <string name="config_custom_brand_theme_import_invalid">Füge eine gültige FlipBits-Konfiguration für ein benutzerdefiniertes Theme ein.</string>
+    <string name="config_custom_brand_theme_import_duplicate_message">Diese Konfiguration entspricht einem vorhandenen benutzerdefinierten Theme. Überschreiben oder als weitere Kopie hinzufügen?</string>
+    <string name="config_custom_brand_theme_import_overwrite">Überschreiben</string>
+    <string name="config_custom_brand_theme_import_duplicate_title">Theme ist bereits vorhanden</string>
+    <string name="config_custom_brand_theme_import_add_copy">Kopie hinzufügen</string>
+    <string name="config_custom_brand_theme_export_title">Benutzerdefinierte dual-tones exportieren</string>
+    <string name="config_custom_brand_theme_export_description">Wähle, ob du den ausgewählten benutzerdefinierten dual-tone oder alle benutzerdefinierten dual-tones kopieren möchtest.</string>
+    <string name="config_custom_brand_theme_export_scope_selected">Ausgewählt</string>
+    <string name="config_custom_brand_theme_export_scope_all">Alle</string>
+    <string name="config_custom_brand_theme_batch_import_title">Benutzerdefinierte dual-tones importieren</string>
+    <string name="config_custom_brand_theme_batch_import_summary">%1$d Themes gefunden. %2$d neu, %3$d exakte Duplikate.</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">Exakte Duplikate werden übersprungen.</string>
 </resources>

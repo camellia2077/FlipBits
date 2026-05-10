@@ -10,11 +10,11 @@
 
 如果你要看完整工具地图，再去：
 
-- [tools/scripts/android/translate/docs/architecture.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/architecture.md)
+- [tools/scripts/android/translate/docs/architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
 
 如果你要看 Android app 里的日常落地流程，再去：
 
-- [android-translation-workflow.md](/C:/code/WaveBits/docs/design/android/android-translation-workflow.md)
+- [android-translation-workflow.md](/C:/code/FlipBits/docs/design/android/android-translation-workflow.md)
 
 ## Start Here
 
@@ -35,7 +35,7 @@
 
 先看：
 
-- [android-translation-workflow.md](/C:/code/WaveBits/docs/design/android/android-translation-workflow.md)
+- [android-translation-workflow.md](/C:/code/FlipBits/docs/design/android/android-translation-workflow.md)
 
 然后至少知道这两件事：
 
@@ -53,7 +53,7 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignme
 
 说明文档：
 
-- [check_translation_key_alignment.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
+- [check_translation_key_alignment.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
 
 ### 3. 构建失败了，提示 translation key alignment
 
@@ -67,7 +67,7 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignme
 
 然后再回：
 
-- [android-translation-workflow.md](/C:/code/WaveBits/docs/design/android/android-translation-workflow.md)
+- [android-translation-workflow.md](/C:/code/FlipBits/docs/design/android/android-translation-workflow.md)
 
 ### 4. 我刚新增了英文 key，要补其他语言
 
@@ -80,39 +80,39 @@ pwsh -NoLogo -Command "python tools/run.py android strings-add --file strings_au
 然后按报告补齐：
 
 - `temp/translation_key_alignment_reports/<locale>/<locale>_translation_tasks.md`
-- [tools/scripts/android/translate/AGENTS.md](/C:/code/WaveBits/tools/scripts/android/translate/AGENTS.md)
+- [tools/scripts/android/translate/AGENTS.md](/C:/code/FlipBits/tools/scripts/android/translate/AGENTS.md)
 
 ### 5. 我想生成给 LLM / 人工审校的翻译对照 Markdown
 
 先看：
 
-- [compare_translation_quality.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
+- [compare_translation_quality.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
 
 再决定是否需要：
 
-- [sop.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/sop.md)
+- [sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md)
 
 ### 6. 我已经拿到翻译修订 JSON，想安全写回 XML
 
 先看：
 
-- [apply_translation_replacements.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
+- [apply_translation_replacements.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
 
 如果 JSON 质量不稳，再补看：
 
-- [sop.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/sop.md)
+- [sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md)
 
 ### 7. 我怀疑某个语言文件里混进了别的语言
 
 看：
 
-- [check_mixed_language.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/check_mixed_language.md)
+- [check_mixed_language.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_mixed_language.md)
 
 ### 8. 我是来改工具本身，不是用工具
 
 直接看完整地图：
 
-- [architecture.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/architecture.md)
+- [architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
 
 ## Commands You Will Actually Use
 
@@ -153,19 +153,19 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py replace --j
 按任务选文档：
 
 - Android 改文案时的日常流程：
-  - [android-translation-workflow.md](/C:/code/WaveBits/docs/design/android/android-translation-workflow.md)
+  - [android-translation-workflow.md](/C:/code/FlipBits/docs/design/android/android-translation-workflow.md)
 - 翻译语义、术语、长度规则：
-  - [android-localization-guidelines.md](/C:/code/WaveBits/docs/design/android/android-localization-guidelines.md)
+  - [android-localization-guidelines.md](/C:/code/FlipBits/docs/design/android/android-localization-guidelines.md)
 - 英文拆分资源如何对应到多语言文件：
-  - [android-split-strings-translation-guide.md](/C:/code/WaveBits/docs/design/android/translation/android-split-strings-translation-guide.md)
+  - [android-split-strings-translation-guide.md](/C:/code/FlipBits/docs/design/android/translation/android-split-strings-translation-guide.md)
 - 想生成 review markdown：
-  - [compare_translation_quality.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
+  - [compare_translation_quality.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
 - 想把 JSON 写回 XML：
-  - [apply_translation_replacements.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
+  - [apply_translation_replacements.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
 - 想查 key 对齐问题：
-  - [check_translation_key_alignment.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
+  - [check_translation_key_alignment.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
 - 想查工具代码结构：
-  - [architecture.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/architecture.md)
+  - [architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
 
 ## One-Line Memory
 

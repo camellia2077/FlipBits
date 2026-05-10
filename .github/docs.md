@@ -14,4 +14,4 @@
 ## 说明
 
 - 当前 CI 职责地图、触发范围与修改口径统一看：
-  - `C:\code\WaveBits\docs\tools\ci-workflow.md`
+  - `C:\code\FlipBits\docs\tools\ci-workflow.md`

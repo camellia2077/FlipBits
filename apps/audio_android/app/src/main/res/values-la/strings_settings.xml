@@ -55,8 +55,8 @@
     <string name="palette_family_cyans_blues">Cyanea et caerulea</string>
     <string name="palette_family_purples_magentas">Purpurea et magenta</string>
     <string name="palette_family_neutrals">Neutra</string>
-    <string name="config_flash_style_title">Ritus Vocis</string>
-    <string name="config_flash_style_subtitle">Confirma quomodo vox resonare debeat.</string>
+    <string name="config_flash_style_title">flash Ritus Vocis</string>
+    <string name="config_flash_style_subtitle">Confirma quomodo flash vox resonare debeat.</string>
     <string name="config_flash_style_steady_label">Stasis</string>
     <string name="config_flash_style_steady_description">Signum machinale clarum et stabile.</string>
     <string name="config_flash_style_hostile_label">Hostilitas</string>
@@ -133,7 +133,7 @@
     <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_background_label">Color Primarius</string>
     <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Color Accentus</string>
+    <string name="config_custom_brand_theme_accent_label">Color Secundarius</string>
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
     <string name="config_custom_brand_theme_outline_label">Color Marginis</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
@@ -196,6 +196,23 @@
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
     <string name="config_sample_decoration_style_title">Style</string>
     <string name="config_sample_decoration_style_none">None</string>
-    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>`r`n    <string name="config_demo_mode_title">Modus Demonstratio</string>
+    <string name="config_sample_decoration_style_emoji">Emoji (flavor-based)</string>     <string name="config_demo_mode_title">Modus Demonstratio</string>
     <string name="config_demo_mode_subtitle">Monstra signum tactus et monita ad capturam.</string>
+    <string name="config_custom_brand_theme_import_title">Importare dual-tone custom</string>
+    <string name="config_custom_brand_theme_import">Importare</string>
+    <string name="config_custom_brand_theme_copy_config">Configurationem imitari</string>
+    <string name="config_custom_brand_theme_import_description">Configurationem thematis FlipBits custom insere.</string>
+    <string name="config_custom_brand_theme_import_config_label">Configuratio thematis</string>
+    <string name="config_custom_brand_theme_import_invalid">Configurationem validam thematis FlipBits custom insere.</string>
+    <string name="config_custom_brand_theme_import_duplicate_message">Haec configuratio cum themate custom iam existente congruit. Superscribere an exemplum alterum addere?</string>
+    <string name="config_custom_brand_theme_import_overwrite">Superscribere</string>
+    <string name="config_custom_brand_theme_import_duplicate_title">Thema iam exstat</string>
+    <string name="config_custom_brand_theme_import_add_copy">Exemplum addere</string>
+    <string name="config_custom_brand_theme_export_title">Exportare dual-tone custom</string>
+    <string name="config_custom_brand_theme_export_description">Elige utrum dual-tone custom selectum an omnia dual-tones custom imiteris.</string>
+    <string name="config_custom_brand_theme_export_scope_selected">Selectum</string>
+    <string name="config_custom_brand_theme_export_scope_all">Omnia</string>
+    <string name="config_custom_brand_theme_batch_import_title">Importare dual-tone custom</string>
+    <string name="config_custom_brand_theme_batch_import_summary">%1$d themata inventa. %2$d nova, %3$d duplicata exacta.</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">Duplicata exacta omittentur.</string>
 </resources>

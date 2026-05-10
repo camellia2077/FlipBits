@@ -62,8 +62,8 @@
     <string name="audio_result_empty">尚無結果。</string>
     <string name="audio_decode_view_text">文字</string>
     <string name="audio_decode_view_raw">原始資料</string>
-    <string name="audio_decode_raw_binary_label">二進位</string>
-    <string name="audio_decode_raw_hex_label">十六進位</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
+    <string name="audio_decode_raw_hex_label">Hex</string>
     <string name="audio_decode_text_unavailable">這段 payload 無法解讀為文字，但仍可查看原始資料。</string>
     <string name="audio_decode_raw_unavailable">目前尚無原始 payload 資料。</string>
     <string name="audio_flash_style_hint">會套用到下一段新建立的音訊。已產生的音訊會保留原本建立時使用的風格。</string>
@@ -127,8 +127,8 @@
     <string name="audio_follow_text_unavailable">目前此音訊無法提供文字 follow。</string>
     <string name="audio_follow_display_lyrics">歌詞</string>
     <string name="audio_follow_display_data">資料</string>
-    <string name="audio_follow_view_hex">十六進位</string>
-    <string name="audio_follow_view_binary">二進位</string>
+    <string name="audio_follow_view_hex">Hex</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">詳細資料</string>
     <string name="audio_player_detail_saved_mode">模式</string>

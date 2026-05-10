@@ -2,13 +2,11 @@ package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
-import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
-import com.bag.audioandroid.ui.state.SampleEmojiShuffleState
 import com.bag.audioandroid.ui.state.SampleInputShuffleState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,81 +20,13 @@ internal class AudioSessionEditingActions(
     private val refreshSavedAudioItems: () -> Unit,
     private val random: Random = Random.Default,
 ) {
-    private companion object {
-        private val SacredMachineEmojiStyle =
-            FlavorEmojiStyle(
-                rotatingEmojis =
-                    listOf(
-                        "\uD83D\uDEE0\uFE0F", // 🛠️
-                        "\uD83D\uDD29", // 🔩
-                        "\u26D3\uFE0F", // ⛓️
-                        "\uD83E\uDDEA", // 🧪
-                        "\uD83D\uDD6F\uFE0F", // 🕯️
-                        "\uD83D\uDCBE", // 💾
-                        "\uD83D\uDEF0\uFE0F", // 🛰️
-                    ),
-            )
-        private val AncientDynastyEmojiStyle =
-            FlavorEmojiStyle(
-                rotatingEmojis =
-                    listOf(
-                        "\u26B1\uFE0F", // ⚱️
-                        "\uD83D\uDD3A", // 🔺
-                        "\uD83E\uDDFF", // 🧿
-                        "\uD83D\uDCA0", // 💠
-                        "\u2600\uFE0F", // ☀️
-                    ),
-            )
-        private val LabyrinthEmojiStyle =
-            FlavorEmojiStyle(
-                rotatingEmojis =
-                    listOf(
-                        "\uD83C\uDF00", // 🌀
-                        "\uD83D\uDC41\uFE0F", // 👁️
-                        "\uD83C\uDFAD", // 🎭
-                        "\uD83E\uDDE9", // 🧩
-                        "\uD83D\uDD2E", // 🔮
-                    ),
-            )
-        private val ExquisiteEmojiStyle =
-            FlavorEmojiStyle(
-                rotatingEmojis =
-                    listOf(
-                        "\uD83D\uDC8E", // 💎
-                        "\uD83C\uDF39", // 🌹
-                        "\uD83C\uDFBC", // 🎼
-                        "\uD83E\uDE9E", // 🪞
-                        "\u2728", // ✨
-                    ),
-            )
-        private val ImmortalEmojiStyle =
-            FlavorEmojiStyle(
-                rotatingEmojis =
-                    listOf(
-                        "\uD83E\uDEB0", // 🪰
-                        "\u2623\uFE0F", // ☣️
-                        "\uD83E\uDDA0", // 🦠
-                        "\uD83D\uDC80", // 💀
-                    ),
-            )
-        private val ScarletEmojiStyle =
-            FlavorEmojiStyle(
-                rotatingEmojis =
-                    listOf(
-                        "\uD83E\uDE78", // 🩸
-                        "\uD83D\uDDE1\uFE0F", // 🗡️
-                        "\uD83D\uDEE1\uFE0F", // 🛡️
-                        "\uD83D\uDD25", // 🔥
-                    ),
-            )
-    }
-
     fun onInputTextChange(value: String) {
         sessionStateStore.updateCurrentSession {
             it.copy(
                 inputText = value,
                 sampleInputId = null,
                 sampleShuffleState = null,
+                appliedSampleEmojiPrefix = null,
             )
         }
     }
@@ -131,18 +61,20 @@ internal class AudioSessionEditingActions(
             ) ?: return
         sessionStateStore.updateCurrentSession {
             val emojiPrefix =
-                nextEmojiPrefix(
+                nextSampleEmojiPrefix(
                     mode = currentState.transportMode,
                     flavor = currentState.currentSampleFlavor,
                     isDecorationEnabled = currentState.isSampleDecorationEnabled,
                     decorationStyle = currentState.sampleDecorationStyle,
                     currentState = it.sampleEmojiShuffleState,
+                    random = random,
                 )
             it.copy(
-                inputText = withEmojiPrefix(sample.text, emojiPrefix?.emoji),
+                inputText = withSampleEmojiPrefix(sample.text, emojiPrefix?.emoji),
                 sampleInputId = sample.id,
                 sampleShuffleState = nextSampleSelection.shuffleState,
                 sampleEmojiShuffleState = emojiPrefix?.state ?: it.sampleEmojiShuffleState,
+                appliedSampleEmojiPrefix = emojiPrefix?.emoji,
             )
         }
     }
@@ -267,88 +199,5 @@ internal class AudioSessionEditingActions(
     private data class NextSampleSelection(
         val sampleId: String,
         val shuffleState: SampleInputShuffleState,
-    )
-
-    private data class NextEmojiPrefix(
-        val emoji: String,
-        val state: SampleEmojiShuffleState,
-    )
-
-    private fun nextEmojiPrefix(
-        mode: TransportModeOption,
-        flavor: SampleFlavor,
-        isDecorationEnabled: Boolean,
-        decorationStyle: SampleDecorationStyleOption,
-        currentState: SampleEmojiShuffleState?,
-    ): NextEmojiPrefix? {
-        if (!isDecorationEnabled || decorationStyle != SampleDecorationStyleOption.Emoji) {
-            return null
-        }
-        val style = styleFor(flavor) ?: return null
-        if (mode != TransportModeOption.Flash || style.rotatingEmojis.isEmpty()) {
-            return null
-        }
-        val activeState =
-            currentState
-                ?.takeIf { it.shuffledEmojis.toSet() == style.rotatingEmojis.toSet() }
-                ?: SampleEmojiShuffleState(
-                    shuffledEmojis = style.rotatingEmojis.shuffled(random),
-                    nextEmojiIndex = 0,
-                    lastPresentedEmoji = null,
-                )
-        val reshuffledWhenConsumed =
-            if (activeState.nextEmojiIndex >= activeState.shuffledEmojis.size) {
-                val nextDeck = activeState.shuffledEmojis.shuffled(random).toMutableList()
-                val avoid = activeState.lastPresentedEmoji
-                if (avoid != null && nextDeck.size > 1 && nextDeck.first() == avoid) {
-                    val swapIndex = nextDeck.indexOfFirst { it != avoid }
-                    if (swapIndex > 0) {
-                        val first = nextDeck.first()
-                        nextDeck[0] = nextDeck[swapIndex]
-                        nextDeck[swapIndex] = first
-                    }
-                }
-                SampleEmojiShuffleState(
-                    shuffledEmojis = nextDeck,
-                    nextEmojiIndex = 0,
-                    lastPresentedEmoji = activeState.lastPresentedEmoji,
-                )
-            } else {
-                activeState
-            }
-        val emoji = reshuffledWhenConsumed.shuffledEmojis[reshuffledWhenConsumed.nextEmojiIndex]
-        return NextEmojiPrefix(
-            emoji = emoji,
-            state =
-                reshuffledWhenConsumed.copy(
-                    nextEmojiIndex = reshuffledWhenConsumed.nextEmojiIndex + 1,
-                    lastPresentedEmoji = emoji,
-                ),
-        )
-    }
-
-    private fun withEmojiPrefix(
-        text: String,
-        emoji: String?,
-    ): String {
-        if (emoji.isNullOrBlank()) {
-            return text
-        }
-        val stripped = text.trimStart().replace(Regex("^[\\p{So}\\p{Sk}\\uFE0F]+\\s*"), "")
-        return "$emoji $stripped"
-    }
-
-    private fun styleFor(flavor: SampleFlavor): FlavorEmojiStyle? =
-        when (flavor) {
-            SampleFlavor.SacredMachine -> SacredMachineEmojiStyle
-            SampleFlavor.AncientDynasty -> AncientDynastyEmojiStyle
-            SampleFlavor.LabyrinthOfMutability -> LabyrinthEmojiStyle
-            SampleFlavor.ExquisiteFall -> ExquisiteEmojiStyle
-            SampleFlavor.ImmortalRot -> ImmortalEmojiStyle
-            SampleFlavor.ScarletCarnage -> ScarletEmojiStyle
-        }
-
-    private data class FlavorEmojiStyle(
-        val rotatingEmojis: List<String>,
     )
 }

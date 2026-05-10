@@ -19,49 +19,60 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](LICENSE)
 [![Platform Android](https://img.shields.io/badge/Platform-Android-3DDC84.svg)]()
-[![CI Android Assemble](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-assemble.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-assemble.yml)
-[![CI Android Quality](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-quality.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-quality.yml)
-[![CI Host Verify](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml)
+[![CI Android Assemble](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-assemble.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-assemble.yml)
+[![CI Android Quality](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-quality.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-quality.yml)
+[![CI Host Verify](https://github.com/camellia2077/FlipBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-host-verify.yml)
 
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/5c2433f5-37b8-4524-a0a0-ce65f6fe4e4d" width="160" title="Chinese" />
   <img src="https://github.com/user-attachments/assets/a288707b-1186-4083-b134-c861dd2abf1a" width="160" title="English" />
   <img src="https://github.com/user-attachments/assets/6d578c41-3487-4c89-937e-a55a575ed58e" width="160" title="Deutsch" />
-  <img src="https://github.com/user-attachments/assets/21ab29a9-a81f-4f26-8770-91403984ef38" width="160" title="Latin" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/21ab29a9-a81f-4f26-8770-91403984ef38" width="160" title="dog Latin" />
   <img src="https://github.com/user-attachments/assets/9d517c89-4c80-4a37-ba9d-78b4b3177f26" width="160" title="French" />
   <img src="https://github.com/user-attachments/assets/e2bf65a3-e747-4f77-bfc9-f0717c0bcec1" width="160" title="Russian" />
 </p>
 
+## Quick Overview
+- Native Android app for generating, playing, saving, importing, and exporting stylized encoded audio.
+- Supports Morse code (`mini`), bit-by-bit BFSK / FSK (`flash`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`).
+- Provides Visual and Lyrics follow views for signal-level and text-encoding-level inspection.
+- Localized UI: English, German, Spanish, French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Ukrainian, Simplified Chinese, Traditional Chinese, and dog Latin for a solemn, liturgical, techno-futurist space-opera atmosphere.
+
+## Download / Install
+Android APKs will be published through GitHub Releases.
+
+In the current reference build, the install package is about `5.64 MB`, and the installed size is about `6.10 MB`. These numbers may change across versions, ABIs, and build configurations.
+
+## Mode Overview
+| Mode | Technical category | Best for |
+| --- | --- | --- |
+| `mini` | Morse code | short, clear, readable dot/dash rhythm |
+| `flash` | bit-by-bit BFSK / FSK | expressive audio and Visual/Lyrics learning |
+| `pro` | DTMF-like dual-tone mapping | compact dual-tone structure |
+| `ultra` | `16-FSK` frequency mapping | shorter audio, faster generation and decoding |
+
+These names are product-facing labels, not a simple ladder of "basic to advanced" versions of the same protocol. Each mode emphasizes a different listening character, expressive goal, and transport structure.
+
 ## Project Overview
 FlipBits is a toolkit for encoding text into audible signal patterns and decoding those generated patterns back into text. It does more than convert text into sound: in its bit-by-bit FSK path, it shapes bit duration, pause spacing, frequency choices, and playback rhythm so generated audio can resemble different emotional tones or speaking styles.
 
-The project provides multiple acoustic text-encoding methods, including Morse code (`mini`), bit-by-bit BFSK / FSK (`flash`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` frequency mapping (`ultra`). It maps text into waveform structures and can recover text from project-generated waveforms. It does not provide cryptographic encryption.
+It maps text into waveform structures and can recover text from project-generated waveforms. It does not provide cryptographic encryption.
 
 - **Expressive focus**: bit-by-bit BFSK / FSK (`flash`) intentionally sacrifices encoding efficiency, using longer bits, pauses, and frequency changes to create stronger emotional tone and ritual-like listening character.
 - **Efficient alternatives**: if shorter audio or more formal transport is needed, Morse code (`mini`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`) provide more compact paths. `16-FSK` (`ultra`) is not only shorter than bit-by-bit BFSK / FSK (`flash`) for the same input; generation cost and decode time are usually much lower as well. Speed is available, but it is not the only goal.
-- **Visual learning value**: Android provides two complementary follow views. Visual focuses on the signal layer, showing how encoded text becomes FSK low/high bits, tone segments, and playback timing. Lyrics focuses on the text-encoding layer, using tokens to show how text becomes UTF-8 bytes, hex/bin, and bits, then highlighting them during playback. The current token display design treats CJK text (Chinese/Japanese, etc.) as usually one character per token, Latin text as word or word-like tokens rather than always single letters, and punctuation as independent tokens.
-- **Design intent**: FlipBits balances implementation, encoding explanation, and stylized expression rather than optimizing every mode for shortest duration or highest throughput.
+- **Visual learning value**: Android provides two complementary follow views. Visual focuses on the signal layer, showing how encoded text becomes FSK low/high bits, tone segments, and playback timing. Lyrics focuses on the text-encoding layer, using tokens to show how text becomes UTF-8 bytes, hex/bin, and bits, then highlighting them during playback.
 
-## Technical Modes And Naming Map
-This README introduces the common technical category first, with the app's internal mode name in parentheses:
-
-- Morse code (`mini`)
-- Bit-by-bit BFSK / FSK (`flash`)
-- DTMF-like dual-tone mapping (`pro`)
-- `16-FSK` frequency mapping (`ultra`)
-
-These names are product-facing labels, not a simple ladder of "basic to advanced" versions of the same protocol. Each mode emphasizes a different listening character, expressive goal, and transport structure.
+## Android App Footprint
+The Android app is intentionally lightweight and native-leaning, with fast cold start behavior and a small package footprint for audio generation, conversion, sharing, and export.
 
 ## Design Boundary
 The current project focus is the controlled loop of "text -> stylized audio -> in-project decoding", with particular emphasis on Android app workflows for audio generation, conversion, sharing, and export.
 
 It is not primarily designed around real-time over-speaker playback decoding by another device, nor around noise robustness, echo resistance, far-field reception, or complex real-world synchronization. In this project, atmosphere, recognizable stylistic expression, and controlled mode behavior take priority over real-world acoustic communication robustness.
-
-## Android App Footprint
-The Android app is intentionally lightweight and native-leaning, with fast cold start behavior and a small package footprint for audio generation, conversion, sharing, and export.
-
-In the current reference build, the install package is about `5.59 MB`, and the installed size is about `5.96 MB`. These numbers may change across versions, ABIs, and build configurations.
 
 ## Modes
 
@@ -217,7 +228,7 @@ Limits and boundaries (legally conservative):
 If you are an AI / agent, start with [`.agent/AGENTS.md`](.agent/AGENTS.md) and then read the relevant subsystem `AGENTS.md` files for a faster overview of repository structure, tooling entry points, and editing conventions.
 
 ### Android
-- The official Android project root is `C:\code\WaveBits\apps\audio_android`.
+- The official Android project root is `C:\code\FlipBits\apps\audio_android`.
 - Run these commands from the repository root:
   - `python tools/run.py android assemble-debug`
   - `python tools/run.py android assemble-release`

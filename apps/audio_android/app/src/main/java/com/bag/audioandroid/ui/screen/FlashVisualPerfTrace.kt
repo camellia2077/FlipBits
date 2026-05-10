@@ -59,6 +59,14 @@ internal object FlashVisualPerfTrace {
     private var lastDistanceToWindowEnd = 0f
     private var lastComfortablyInside = false
     private var lastTotalSamples = 0
+    private var lastReadoutSample = 0f
+    private var lastReadoutCurrentBitOffset: Int? = null
+    private var lastReadoutRevealedBitOffset = -1
+    private var lastReadoutGroupStart = -1
+    private var lastReadoutPreviousBits = ""
+    private var lastReadoutCurrentBits = ""
+    private var lastVisualBitOffset: Int? = null
+    private var lastRawBitOffset: Int? = null
     private var latestSnapshot = FlashVisualPerfSnapshot()
 
     fun recordCompose(
@@ -265,6 +273,29 @@ internal object FlashVisualPerfTrace {
         anchorJumpMaxSamples = maxOf(anchorJumpMaxSamples, kotlin.math.abs(anchorSample - previousSmoothSample))
     }
 
+    fun recordBitReadout(
+        readoutSample: Float,
+        currentBitOffset: Int?,
+        revealedBitOffset: Int,
+        groupStart: Int,
+        previousBits: String,
+        currentBits: String,
+        visualBitOffset: Int?,
+        rawBitOffset: Int?,
+    ) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        lastReadoutSample = readoutSample
+        lastReadoutCurrentBitOffset = currentBitOffset
+        lastReadoutRevealedBitOffset = revealedBitOffset
+        lastReadoutGroupStart = groupStart
+        lastReadoutPreviousBits = previousBits
+        lastReadoutCurrentBits = currentBits
+        lastVisualBitOffset = visualBitOffset
+        lastRawBitOffset = rawBitOffset
+    }
+
     private fun captureFrame(
         mode: FlashSignalVisualizationMode,
         isPlaying: Boolean,
@@ -404,6 +435,10 @@ internal object FlashVisualPerfTrace {
                 )} viewportStartStepMaxMs=${ms(viewportStartStepMaxMs)} largePxStep=$largePxStepCount " +
                 "buckets=$lastBuckets fixed=$lastFixedTimeline fallback=$lastFallbackTimeline " +
                 "bitReadout=$lastBitReadout window=[$lastWindowStart,$lastWindowEnd) " +
+                "readoutSample=${lastReadoutSample.toInt()} readoutBit=${lastReadoutCurrentBitOffset ?: -1} " +
+                "revealedBit=$lastReadoutRevealedBitOffset readoutGroup=$lastReadoutGroupStart " +
+                "readoutPrev=$lastReadoutPreviousBits readoutCurrent=$lastReadoutCurrentBits " +
+                "visualBit=${lastVisualBitOffset ?: -1} rawBit=${lastRawBitOffset ?: -1} " +
                 "distStart=${lastDistanceToWindowStart.toInt()} distEnd=${lastDistanceToWindowEnd.toInt()} " +
                 "inside=$lastComfortablyInside windowSamples=$lastWindowSamples totalSamples=$lastTotalSamples",
         )

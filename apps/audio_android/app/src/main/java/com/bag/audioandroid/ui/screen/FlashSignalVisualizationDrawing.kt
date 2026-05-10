@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.dp
 
 internal data class FlashSignalViewport(
@@ -30,12 +31,13 @@ internal fun DrawScope.drawToneTrackSegments(
     inactiveToneColor: Color,
     centerLineColor: Color,
     glowPulse: Float,
+    enableViewportEdgeFade: Boolean = true,
 ) {
     val laneGap = 10.dp.toPx()
     val laneHeight = (innerHeight - laneGap).coerceAtLeast(1f) / 2f
     val upperTop = topPadding
     val lowerTop = topPadding + laneHeight + laneGap
-    val edgeFadeSamples = edgeFadeSampleCount(segments, viewport)
+    val edgeFadeSamples = if (enableViewportEdgeFade) edgeFadeSampleCount(segments, viewport) else 0f
 
     drawLine(
         color = centerLineColor,
@@ -43,34 +45,36 @@ internal fun DrawScope.drawToneTrackSegments(
         end = Offset(leftPadding + innerWidth, upperTop + laneHeight + laneGap / 2f),
         strokeWidth = 1.dp.toPx(),
     )
-    segments.forEach { segment ->
-        if (!segment.overlaps(viewport)) {
-            return@forEach
-        }
-        val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
-        val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
-        val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.6f)
-        val segmentWidth = (drawBounds.endX - drawBounds.startX).coerceAtLeast(1.6f)
-        val top =
-            when (segment.tone) {
-                FskDominantTone.High -> upperTop
-                FskDominantTone.Low -> lowerTop
-                FskDominantTone.Unknown -> return@forEach
+    clipFlashViewport(leftPadding, topPadding, innerWidth, innerHeight) {
+        segments.forEach { segment ->
+            if (!segment.overlaps(viewport)) {
+                return@forEach
             }
-        drawMicroBarsAcrossSegment(
-            segment = segment,
-            viewport = viewport,
-            startX = drawBounds.startX,
-            endX = drawBounds.endX,
-            minBarHeight = laneHeight * 0.48f,
-            maxBarHeight = laneHeight * 0.82f,
-            centerY = top + laneHeight / 2f,
-            activeToneColor = activeToneColor,
-            inactiveToneColor = inactiveToneColor,
-            glowPulse = glowPulse,
-            minVisualWidth = segmentWidth,
-            edgeFadeSamples = edgeFadeSamples,
-        )
+            val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
+            val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
+            val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.6f)
+            val segmentWidth = (drawBounds.endX - drawBounds.startX).coerceAtLeast(1.6f)
+            val top =
+                when (segment.tone) {
+                    FskDominantTone.High -> upperTop
+                    FskDominantTone.Low -> lowerTop
+                    FskDominantTone.Unknown -> return@forEach
+                }
+            drawMicroBarsAcrossSegment(
+                segment = segment,
+                viewport = viewport,
+                startX = drawBounds.startX,
+                endX = drawBounds.endX,
+                minBarHeight = laneHeight * 0.48f,
+                maxBarHeight = laneHeight * 0.82f,
+                centerY = top + laneHeight / 2f,
+                activeToneColor = activeToneColor,
+                inactiveToneColor = inactiveToneColor,
+                glowPulse = glowPulse,
+                minVisualWidth = segmentWidth,
+                edgeFadeSamples = edgeFadeSamples,
+            )
+        }
     }
 }
 
@@ -85,12 +89,13 @@ internal fun DrawScope.drawToneEnergySegments(
     inactiveToneColor: Color,
     centerLineColor: Color,
     glowPulse: Float,
+    enableViewportEdgeFade: Boolean = true,
 ) {
     val centerY = topPadding + innerHeight / 2f
     val upperGap = 3.dp.toPx()
     val lowerGap = 3.dp.toPx()
     val maxEnergyHeight = innerHeight * 0.42f
-    val edgeFadeSamples = edgeFadeSampleCount(segments, viewport)
+    val edgeFadeSamples = if (enableViewportEdgeFade) edgeFadeSampleCount(segments, viewport) else 0f
 
     drawLine(
         color = centerLineColor,
@@ -98,50 +103,52 @@ internal fun DrawScope.drawToneEnergySegments(
         end = Offset(leftPadding + innerWidth, centerY),
         strokeWidth = 1.dp.toPx(),
     )
-    segments.forEach { segment ->
-        if (!segment.overlaps(viewport)) {
-            return@forEach
-        }
-        val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
-        val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
-        val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.8f)
-        val segmentWidth = (drawBounds.endX - drawBounds.startX).coerceAtLeast(1.8f)
-        when (segment.tone) {
-            FskDominantTone.High ->
-                drawEnergyPulseClusterAcrossSegment(
-                    segment = segment,
-                    viewport = viewport,
-                    startX = drawBounds.startX,
-                    endX = drawBounds.endX,
-                    baselineY = centerY - upperGap,
-                    direction = -1f,
-                    minBarHeight = maxEnergyHeight * 0.28f,
-                    maxBarHeight = maxEnergyHeight,
-                    activeToneColor = activeToneColor,
-                    inactiveToneColor = inactiveToneColor,
-                    glowPulse = glowPulse,
-                    minVisualWidth = segmentWidth,
-                    edgeFadeSamples = edgeFadeSamples,
-                )
+    clipFlashViewport(leftPadding, topPadding, innerWidth, innerHeight) {
+        segments.forEach { segment ->
+            if (!segment.overlaps(viewport)) {
+                return@forEach
+            }
+            val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
+            val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
+            val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.8f)
+            val segmentWidth = (drawBounds.endX - drawBounds.startX).coerceAtLeast(1.8f)
+            when (segment.tone) {
+                FskDominantTone.High ->
+                    drawEnergyPulseClusterAcrossSegment(
+                        segment = segment,
+                        viewport = viewport,
+                        startX = drawBounds.startX,
+                        endX = drawBounds.endX,
+                        baselineY = centerY - upperGap,
+                        direction = -1f,
+                        minBarHeight = maxEnergyHeight * 0.28f,
+                        maxBarHeight = maxEnergyHeight,
+                        activeToneColor = activeToneColor,
+                        inactiveToneColor = inactiveToneColor,
+                        glowPulse = glowPulse,
+                        minVisualWidth = segmentWidth,
+                        edgeFadeSamples = edgeFadeSamples,
+                    )
 
-            FskDominantTone.Low ->
-                drawEnergyPulseClusterAcrossSegment(
-                    segment = segment,
-                    viewport = viewport,
-                    startX = drawBounds.startX,
-                    endX = drawBounds.endX,
-                    baselineY = centerY + lowerGap,
-                    direction = 1f,
-                    minBarHeight = maxEnergyHeight * 0.28f,
-                    maxBarHeight = maxEnergyHeight,
-                    activeToneColor = activeToneColor,
-                    inactiveToneColor = inactiveToneColor,
-                    glowPulse = glowPulse,
-                    minVisualWidth = segmentWidth,
-                    edgeFadeSamples = edgeFadeSamples,
-                )
+                FskDominantTone.Low ->
+                    drawEnergyPulseClusterAcrossSegment(
+                        segment = segment,
+                        viewport = viewport,
+                        startX = drawBounds.startX,
+                        endX = drawBounds.endX,
+                        baselineY = centerY + lowerGap,
+                        direction = 1f,
+                        minBarHeight = maxEnergyHeight * 0.28f,
+                        maxBarHeight = maxEnergyHeight,
+                        activeToneColor = activeToneColor,
+                        inactiveToneColor = inactiveToneColor,
+                        glowPulse = glowPulse,
+                        minVisualWidth = segmentWidth,
+                        edgeFadeSamples = edgeFadeSamples,
+                    )
 
-            FskDominantTone.Unknown -> Unit
+                FskDominantTone.Unknown -> Unit
+            }
         }
     }
 }
@@ -157,12 +164,13 @@ internal fun DrawScope.drawPitchLadderSegments(
     inactiveToneColor: Color,
     centerLineColor: Color,
     glowPulse: Float,
+    enableViewportEdgeFade: Boolean = true,
 ) {
     val highY = topPadding + innerHeight * 0.12f
     val lowY = topPadding + innerHeight * 0.88f
     val activeStrokeWidth = 4.8.dp.toPx()
     val inactiveStrokeWidth = 3.6.dp.toPx()
-    val edgeFadeSamples = edgeFadeSampleCount(segments, viewport)
+    val edgeFadeSamples = if (enableViewportEdgeFade) edgeFadeSampleCount(segments, viewport) else 0f
 
     drawLine(
         color = centerLineColor.copy(alpha = 0.48f),
@@ -177,31 +185,33 @@ internal fun DrawScope.drawPitchLadderSegments(
         strokeWidth = 1.dp.toPx(),
     )
 
-    segments.forEach { segment ->
-        if (!segment.overlaps(viewport)) {
-            return@forEach
-        }
-        val y =
-            when (segment.tone) {
-                FskDominantTone.High -> highY
-                FskDominantTone.Low -> lowY
-                FskDominantTone.Unknown -> return@forEach
+    clipFlashViewport(leftPadding, topPadding, innerWidth, innerHeight) {
+        segments.forEach { segment ->
+            if (!segment.overlaps(viewport)) {
+                return@forEach
             }
-        val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
-        val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
-        drawPitchSegmentedBar(
-            segment = segment,
-            viewport = viewport,
-            startX = startX,
-            endX = endX,
-            y = y,
-            activeBarHeight = activeStrokeWidth,
-            inactiveBarHeight = inactiveStrokeWidth,
-            activeToneColor = activeToneColor,
-            inactiveToneColor = inactiveToneColor,
-            glowPulse = glowPulse,
-            edgeFadeSamples = edgeFadeSamples,
-        )
+            val y =
+                when (segment.tone) {
+                    FskDominantTone.High -> highY
+                    FskDominantTone.Low -> lowY
+                    FskDominantTone.Unknown -> return@forEach
+                }
+            val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
+            val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
+            drawPitchSegmentedBar(
+                segment = segment,
+                viewport = viewport,
+                startX = startX,
+                endX = endX,
+                y = y,
+                activeBarHeight = activeStrokeWidth,
+                inactiveBarHeight = inactiveStrokeWidth,
+                activeToneColor = activeToneColor,
+                inactiveToneColor = inactiveToneColor,
+                glowPulse = glowPulse,
+                edgeFadeSamples = edgeFadeSamples,
+            )
+        }
     }
 }
 
@@ -519,6 +529,22 @@ private fun DrawScope.segmentVisualBounds(
     }
 }
 
+private inline fun DrawScope.clipFlashViewport(
+    leftPadding: Float,
+    topPadding: Float,
+    innerWidth: Float,
+    innerHeight: Float,
+    block: DrawScope.() -> Unit,
+) {
+    clipRect(
+        left = leftPadding,
+        top = topPadding,
+        right = leftPadding + innerWidth,
+        bottom = topPadding + innerHeight,
+        block = block,
+    )
+}
+
 private fun DrawScope.drawMicroBarsAcrossSegment(
     segment: FlashSignalToneSegment,
     viewport: FlashSignalViewport,
@@ -534,15 +560,11 @@ private fun DrawScope.drawMicroBarsAcrossSegment(
     edgeFadeSamples: Float,
 ) {
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
-    val minBarWidth = FlashSegmentMicroBarWidthDp.dp.toPx()
-    val maxBarWidth = (visualWidth / 2.6f).coerceAtLeast(minBarWidth)
-    val barWidth = (visualWidth / 4.6f).coerceIn(minBarWidth, maxBarWidth)
-    val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
-    val visibleEndSample = minOf(segment.endSample.toFloat(), viewport.endSample)
-    val barFractions = floatArrayOf(0.30f, 0.70f)
+    val barWidth = FlashSegmentMicroBarWidthDp.dp.toPx()
+    val barFractions = segmentPulseFractions(visualWidth, FlashSegmentPulseSpacingDp.dp.toPx())
     barFractions.forEachIndexed { barIndex, fraction ->
         val x = startX + visualWidth * fraction
-        val sample = visibleStartSample + (visibleEndSample - visibleStartSample) * fraction
+        val sample = segment.startSample.toFloat() + segment.sampleCount.toFloat() * fraction
         val isActive = sample <= viewport.playheadSample
         val edgeGlow = activeEdgeGlow(sample, viewport, segment.sampleCount)
         val texture = deterministicSignalTexture(segment, barIndex)
@@ -583,13 +605,11 @@ private fun DrawScope.drawEnergyPulseClusterAcrossSegment(
     edgeFadeSamples: Float,
 ) {
     val visualWidth = (endX - startX).coerceAtLeast(minVisualWidth)
-    val visibleStartSample = maxOf(segment.startSample.toFloat(), viewport.startSample)
-    val visibleEndSample = minOf(segment.endSample.toFloat(), viewport.endSample)
-    val strokeWidth = (visualWidth / 9.2f).coerceIn(2.2.dp.toPx(), 6.4.dp.toPx())
-    val pulseFractions = floatArrayOf(0.30f, 0.70f)
+    val strokeWidth = FlashEnergyPulseStrokeWidthDp.dp.toPx()
+    val pulseFractions = segmentPulseFractions(visualWidth, FlashSegmentPulseSpacingDp.dp.toPx())
     pulseFractions.forEachIndexed { pulseIndex, fraction ->
         val x = startX + visualWidth * fraction
-        val sample = visibleStartSample + (visibleEndSample - visibleStartSample) * fraction
+        val sample = segment.startSample.toFloat() + segment.sampleCount.toFloat() * fraction
         val edgeGlow = activeEdgeGlow(sample, viewport, segment.sampleCount)
         val texture = deterministicSignalTexture(segment, pulseIndex)
         val envelope = bitSegmentEnvelope(pulseIndex, pulseFractions.size)
@@ -611,6 +631,20 @@ private fun DrawScope.drawEnergyPulseClusterAcrossSegment(
             strokeWidth = strokeWidth,
             cap = StrokeCap.Round,
         )
+    }
+}
+
+private fun segmentPulseFractions(
+    visualWidth: Float,
+    spacingPx: Float,
+): FloatArray {
+    val safeSpacingPx = spacingPx.coerceAtLeast(1f)
+    val pulseCount = (visualWidth / safeSpacingPx).toInt().coerceAtLeast(2)
+    val occupiedWidth = safeSpacingPx * (pulseCount - 1).toFloat()
+    val firstX = (visualWidth - occupiedWidth).coerceAtLeast(0f) / 2f
+    return FloatArray(pulseCount) { index ->
+        ((firstX + safeSpacingPx * index.toFloat()) / visualWidth.coerceAtLeast(1f))
+            .coerceIn(0f, 1f)
     }
 }
 
@@ -671,8 +705,7 @@ private fun sampleToViewportX(
     innerWidth: Float,
 ): Float =
     leftPadding +
-        ((sample - viewport.startSample) / viewport.sampleCount)
-            .coerceIn(0f, 1f) * innerWidth
+        ((sample - viewport.startSample) / viewport.sampleCount) * innerWidth
 
 internal fun FlashSignalToneSegment.overlaps(viewport: FlashSignalViewport): Boolean =
     endSample.toFloat() >= viewport.startSample &&
@@ -797,8 +830,9 @@ private fun FskEnergyBucket.strengthForTone(tone: FskDominantTone): Float =
 private val FlashToneHoldDecayByBucketOffset = floatArrayOf(0.52f, 0.26f)
 private const val FlashToneHoldAlphaBoost = 0.18f
 private const val FlashViewportEdgeMinAlpha = 0.52f
-private const val FlashSegmentMicroBarSpacingDp = 4
 private const val FlashSegmentMicroBarWidthDp = 2
+private const val FlashEnergyPulseStrokeWidthDp = 3
+private const val FlashSegmentPulseSpacingDp = 8
 private const val FlashBitSegmentGapDp = 1.6f
 private const val FlashPitchSegmentGapDp = 3
 private const val FlashPitchSegmentMinVisibleWidthDp = 2

@@ -12,7 +12,7 @@ Korean (`values-ko`) is a standard Korean localization for Android UI, playback,
 [identity_rule]
 Treat this locale as contemporary Korean UI localization.
 Avoid literal English word order in strings about playback speed, input rules, byte counts, token lyrics, and low/high bit visualization.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Korean locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Korean locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels concise enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.

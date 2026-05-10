@@ -174,25 +174,23 @@ class FlashSignalVisualizationAnalysisTest {
 
     @Test
     fun `flash bit readout reveals current eight bit group by playback`() {
-        val segments =
-            listOf(
-                FskDominantTone.Low,
-                FskDominantTone.High,
-                FskDominantTone.High,
-                FskDominantTone.Low,
-                FskDominantTone.High,
-                FskDominantTone.Low,
-                FskDominantTone.Low,
-                FskDominantTone.High,
-            ).mapIndexed { index, tone ->
-                FlashSignalToneSegment(
-                    startSample = index * 10,
-                    endSample = index * 10 + 10,
-                    tone = tone,
-                )
-            }
+        val followData =
+            PayloadFollowViewData(
+                binaryTokens = listOf("01101001"),
+                binaryGroupTimeline =
+                    List(8) { index ->
+                        PayloadFollowBinaryGroupTimelineEntry(
+                            startSample = index * 10,
+                            sampleCount = 10,
+                            groupIndex = 0,
+                            bitOffset = index,
+                            bitCount = 1,
+                        )
+                    },
+                followAvailable = true,
+            )
 
-        val frame = flashBitReadoutFrame(segments = segments, sample = 35f)
+        val frame = flashBitReadoutFrame(followData = followData, sample = 35f)
 
         requireNotNull(frame)
         assertEquals(0, frame.currentGroupStartIndex)
@@ -203,22 +201,62 @@ class FlashSignalVisualizationAnalysisTest {
 
     @Test
     fun `flash bit readout shows previous and current groups after eight revealed bits`() {
-        val segments =
-            List(10) { index ->
-                FlashSignalToneSegment(
-                    startSample = index * 10,
-                    endSample = index * 10 + 10,
-                    tone = if (index % 2 == 0) FskDominantTone.Low else FskDominantTone.High,
-                )
-            }
+        val followData =
+            PayloadFollowViewData(
+                binaryTokens = listOf("01010101", "01"),
+                binaryGroupTimeline =
+                    List(10) { index ->
+                        PayloadFollowBinaryGroupTimelineEntry(
+                            startSample = index * 10,
+                            sampleCount = 10,
+                            groupIndex = index / 8,
+                            bitOffset = index,
+                            bitCount = 1,
+                        )
+                    },
+                followAvailable = true,
+            )
 
-        val frame = flashBitReadoutFrame(segments = segments, sample = 85f)
+        val frame = flashBitReadoutFrame(followData = followData, sample = 85f)
 
         requireNotNull(frame)
         assertEquals(8, frame.currentGroupStartIndex)
         assertEquals(listOf('0', '1', '0', '1', '0', '1', '0', '1'), frame.previousCells.map { it.bit })
         assertEquals(listOf('0', null, null, null, null, null, null, null), frame.currentCells.map { it.bit })
         assertEquals(listOf(true, false, false, false, false, false, false, false), frame.currentCells.map { it.isCurrent })
+    }
+
+    @Test
+    fun `flash bit readout uses global payload bits instead of local visual window index`() {
+        val followData =
+            PayloadFollowViewData(
+                binaryTokens =
+                    "flesh is weak".toByteArray(Charsets.UTF_8).map { byte ->
+                        byte.toUByte().toString(radix = 2).padStart(8, '0')
+                    },
+                binaryGroupTimeline =
+                    "flesh is weak".toByteArray(Charsets.UTF_8).flatMapIndexed { byteIndex, byte ->
+                        val byteBits = byte.toUByte().toString(radix = 2).padStart(8, '0')
+                        byteBits.mapIndexed { bitIndex, _ ->
+                            val bitOffset = byteIndex * 8 + bitIndex
+                            PayloadFollowBinaryGroupTimelineEntry(
+                                startSample = bitOffset * 10,
+                                sampleCount = 10,
+                                groupIndex = byteIndex,
+                                bitOffset = bitOffset,
+                                bitCount = 1,
+                            )
+                        }
+                    },
+                followAvailable = true,
+            )
+
+        val frame = flashBitReadoutFrame(followData = followData, sample = 1_035f)
+
+        requireNotNull(frame)
+        assertEquals(96, frame.currentGroupStartIndex)
+        assertEquals("01100001".toList(), frame.previousCells.map { it.bit })
+        assertEquals("01101011".toList(), frame.currentCells.map { it.bit })
     }
 
     @Test

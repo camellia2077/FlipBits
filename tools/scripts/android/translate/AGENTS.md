@@ -47,11 +47,11 @@ This directory contains the Android XML translation tooling. Keep this file as a
 
 ## Where To Look
 
-- Agent workflows live under [.agent/workflows/translations](/C:/code/WaveBits/.agent/workflows/translations).
-- Human web-chat workflow lives in [docs/sop.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/sop.md).
-- CLI behavior and JSON contracts live in [docs/cli_contract.md](/C:/code/WaveBits/tools/scripts/android/translate/docs/cli_contract.md).
-- Generated prompt/profile text lives under [prompts](/C:/code/WaveBits/tools/scripts/android/translate/prompts).
-- Locale-specific rules live under [prompts/locales](/C:/code/WaveBits/tools/scripts/android/translate/prompts/locales).
+- Agent workflows live under [.agent/workflows/translations](/C:/code/FlipBits/.agent/workflows/translations).
+- Human web-chat workflow lives in [docs/sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md).
+- CLI behavior and JSON contracts live in [docs/cli_contract.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/cli_contract.md).
+- Generated prompt/profile text lives under [prompts](/C:/code/FlipBits/tools/scripts/android/translate/prompts).
+- Locale-specific rules live under [prompts/locales](/C:/code/FlipBits/tools/scripts/android/translate/prompts/locales).
 
 ## Tool Boundaries
 

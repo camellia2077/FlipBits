@@ -20,50 +20,61 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](LICENSE)
 [![Platform Android](https://img.shields.io/badge/Platform-Android-3DDC84.svg)]()
-[![CI Android Assemble](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-assemble.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-assemble.yml)
-[![CI Android Quality](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-quality.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-android-quality.yml)
-[![CI Host Verify](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/WaveBits/actions/workflows/ci-host-verify.yml)
+[![CI Android Assemble](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-assemble.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-assemble.yml)
+[![CI Android Quality](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-quality.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-android-quality.yml)
+[![CI Host Verify](https://github.com/camellia2077/FlipBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-host-verify.yml)
 
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/5c2433f5-37b8-4524-a0a0-ce65f6fe4e4d" width="160" title="Chinese" />
   <img src="https://github.com/user-attachments/assets/a288707b-1186-4083-b134-c861dd2abf1a" width="160" title="English" />
   <img src="https://github.com/user-attachments/assets/6d578c41-3487-4c89-937e-a55a575ed58e" width="160" title="Deutsch" />
-  <img src="https://github.com/user-attachments/assets/21ab29a9-a81f-4f26-8770-91403984ef38" width="160" title="Latin" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/21ab29a9-a81f-4f26-8770-91403984ef38" width="160" title="dog Latin" />
   <img src="https://github.com/user-attachments/assets/9d517c89-4c80-4a37-ba9d-78b4b3177f26" width="160" title="French" />
   <img src="https://github.com/user-attachments/assets/e2bf65a3-e747-4f77-bfc9-f0717c0bcec1" width="160" title="Russian" />
 </p>
 
 
-## 🛠️ 项目定位 (Project Overview)
-本项目是一个文本与可听音频信号之间的编码/解析工具。它不只把文本转换成声音，也尝试通过逐 bit FSK 的持续时间、停顿间隔、频率组合和播放节奏，让生成音频呈现类似人类不同情绪和语气下说话的听感。
+## 快速概览
+- Android 原生应用，支持生成、播放、保存、导入与导出风格化编码音频。
+- 支持 Morse code (`mini`)、逐 bit BFSK / FSK (`flash`)、DTMF-like 双音映射 (`pro`) 和 `16-FSK` (`ultra`)。
+- 提供 Visual 与 Lyrics 两种跟随视图，用于观察信号层和文本编码层。
+- 支持多语言界面：英语、德语、西班牙语、法语、意大利语、日语、韩语、波兰语、巴西葡萄牙语、俄语、乌克兰语、简体中文、繁体中文，以及用于营造庄重、宗教感、科技感与太空歌剧氛围的 dog Latin。
 
-它提供多种文本声学编码方式，包括 Morse code (`mini`)、逐 bit BFSK / FSK (`flash`)、DTMF-like 双音映射 (`pro`) 和 `16-FSK` 频点映射 (`ultra`)。项目可以把文本内容映射为波形，也可以从项目内生成的波形中还原文本；项目本身不提供任何形式的密码学加密。
+## 下载 / 安装
+Android APK 将通过 GitHub Releases 发布。
+
+当前参考构建下，安装包约 `5.64 MB`，安装后占用约 `6.10 MB`。这些数字会随版本、ABI 与构建配置变化。
+
+## 模式总览
+| Mode | 技术类别 | 适合用途 |
+| --- | --- | --- |
+| `mini` | Morse code | 短促、清晰、节奏可读的点划信号 |
+| `flash` | 逐 bit BFSK / FSK | 更强情绪化听感、Visual/Lyrics 对照学习 |
+| `pro` | DTMF-like 双音映射 | 更紧凑的双音结构 |
+| `ultra` | `16-FSK` 频点映射 | 更短音频、更快生成与解析 |
+
+这些名字不是“强弱等级”，而是项目内部的产品化命名。它们分别强调不同的听感、表达气质和传输结构，而不是同一协议从基础版到高级版的线性升级关系。
+
+## 项目定位
+FlipBits 是一个文本与可听音频信号之间的编码/解析工具。它不只把文本转换成声音，也尝试通过逐 bit FSK 的持续时间、停顿间隔、频率组合和播放节奏，让生成音频呈现类似人类不同情绪和语气下说话的听感。
+
+项目可以把文本内容映射为波形，也可以从项目内生成的波形中还原文本；项目本身不提供任何形式的密码学加密。
 
 * **表达重点**：逐 bit BFSK / FSK (`flash`) 会刻意牺牲编码效率，用更长的 bit、停顿和频率变化换取更强的情绪化听感与仪式感。
 * **效率补充**：如果需要更短、更快、更正式的文本传输，Morse code (`mini`)、DTMF-like 双音映射 (`pro`) 和 `16-FSK` (`ultra`) 提供了更紧凑的编码路径。`16-FSK` (`ultra`) 不只是生成的音频更短，通常生成消耗和解析耗时也明显低于逐 bit BFSK / FSK (`flash`)；但“更快”不是项目唯一目标。
-* **可视化价值**：Android app 提供两种互补的跟随视图。Visual 偏向信号层，展示文本编码后如何变成 FSK low/high bit、频率片段和播放时间轴；Lyrics 偏向文本编码层，用 token 展示文本如何被编码为 UTF-8 bytes、hex/bin 和 bit，并随音频播放高亮。当前 token 展示设计是：CJK（中文/日文等）通常一个字/字符就是一个 token；英文/拉丁文本更适合按 word 或 word-like token 展示，而不是一定拆成单个字母；标点作为独立 token 处理。
-* **设计理念**：以现代处理器的性能余量，稳定生成低速、可辨识、风格明确的声学编码体验，在工程实现、编码展示与风格化表达之间取得平衡。
+* **可视化价值**：Android app 提供两种互补的跟随视图。Visual 偏向信号层，展示文本编码后如何变成 FSK low/high bit、频率片段和播放时间轴；Lyrics 偏向文本编码层，用 token 展示文本如何被编码为 UTF-8 bytes、hex/bin 和 bit，并随音频播放高亮。
 
-## 技术模式与命名映射
-README 下文优先使用通用技术名，括号中标注 app 内部模式名：
-
-- Morse code (`mini`)
-- 逐 bit BFSK / FSK (`flash`)
-- DTMF-like 双音映射 (`pro`)
-- `16-FSK` 频点映射 (`ultra`)
-
-这些名字不是“强弱等级”，而是项目内部的产品化命名。它们分别强调不同的听感、表达气质和传输结构，而不是同一协议从基础版到高级版的线性升级关系。
+## Android App 特性
+Android app 当前保持轻量原生取向：冷启动速度快，包体控制较小，适合直接生成、转换、分享与导出音频。
 
 ## 设计边界
 本项目当前重点是“文本 -> 风格化音频 -> 项目内解码”的受控闭环，尤其强调 Android app 内的音频生成、转换、分享与导出体验。
 
 它不以“外放后被另一设备直接实时解析”为主要交互目标，也不以真实环境下的抗噪、抗回声、远场接收或复杂同步鲁棒性为设计优先级。对本项目来说，氛围感、可辨识的风格表达和可控的模式体验，优先于现实声学环境中的通信稳健性。
-
-## Android App 特性
-Android app 当前保持轻量原生取向：冷启动速度快，包体控制较小，适合直接生成、转换、分享与导出音频。
-
-当前参考构建下，安装包约 `5.59 MB`，安装后占用约 `5.96 MB`。这些数字会随版本、ABI 与构建配置变化。
 
 ## 模式说明
 
@@ -231,7 +242,7 @@ FlipBits 图标资源（包括源文件与组件 SVG 文件）作为公共资源
 若你是 AI / agent，建议先阅读 [`.agent/AGENTS.md`](.agent/AGENTS.md) 以及对应子系统下的 `AGENTS.md`，用来快速理解仓库结构、工具入口与修改约定。
 
 ### Android
-- Android 官方工程入口在 `C:\code\WaveBits\apps\audio_android`。
+- Android 官方工程入口在 `C:\code\FlipBits\apps\audio_android`。
 - 从仓库根目录统一执行：
   - `python tools/run.py android assemble-debug`
   - `python tools/run.py android assemble-release`

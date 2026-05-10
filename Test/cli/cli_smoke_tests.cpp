@@ -182,7 +182,7 @@ void TestModeSpecificValidation(const std::filesystem::path& cli_path) {
     const auto dir = test::MakeTempDir("cli_smoke");
     const auto invalid_artifact_path = dir / "invalid.wav";
 
-    test::WriteTextFile(invalid_artifact_path, "not-a-wavebits-wav");
+    test::WriteTextFile(invalid_artifact_path, "not-a-flipbits-wav");
 
     const auto invalid_result = RunCli(
         cli_path,

@@ -24,8 +24,6 @@ Use this before changing Flash Visual, Lyrics follow, playback smoothing, or lon
   - Holds the current windowed Flash timeline and drawable segment budget.
 - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/screen/FlashVisualPerfTrace.kt`
   - Debug-only metrics for rendering, windowing, playback position, and visual motion quality.
-- `temp/format_flash_visual_perf.py`
-  - Converts `adb logcat` `FlashVisualPerf` lines from `temp/log.txt` into `temp/log.md`.
 
 ## Data Flow
 
@@ -129,6 +127,8 @@ Playback and motion:
 
 Use ADB data when the symptom is animation stutter, jumping, flicker, or long-audio performance. Do not rely only on subjective visual feedback.
 
+For the fixed Flash device scenario, supported styles/visual modes, instrumentation coverage, and stable UI tags, use `docs/architecture/android/android-flash-automation.md`.
+
 Recommended capture:
 
 ```powershell
@@ -136,13 +136,7 @@ adb logcat -c
 adb logcat FlashVisualPerf:D *:S > temp\log.txt
 ```
 
-Reproduce the issue for 10-15 seconds, then stop the command and format:
-
-```powershell
-python temp\format_flash_visual_perf.py
-```
-
-Read `temp/log.md` first. The top summary is usually enough to decide the next layer to inspect.
+Reproduce the issue for 10-15 seconds, then stop the command and inspect the captured `FlashVisualPerf` rows in `temp/log.txt`.
 
 ## Diagnostic Workflow
 

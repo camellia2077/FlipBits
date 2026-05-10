@@ -62,7 +62,7 @@
     <string name="audio_result_empty">Receptaculum vacuum est.</string>
     <string name="audio_decode_view_text">Textus</string>
     <string name="audio_decode_view_raw">Data Nuda</string>
-    <string name="audio_decode_raw_binary_label">Liturgia Binaria</string>
+    <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Chantus Hex</string>
     <string name="audio_decode_text_unavailable">Hoc payload ut textus solvi non potuit. Data nuda tamen adsunt.</string>
     <string name="audio_decode_raw_unavailable">Nulla data nuda payload adhuc adsunt.</string>
@@ -128,7 +128,7 @@
     <string name="audio_follow_display_lyrics">Carmina</string>
     <string name="audio_follow_display_data">Data</string>
     <string name="audio_follow_view_hex">Hex</string>
-    <string name="audio_follow_view_binary">Binarium</string>
+    <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
     <string name="audio_player_detail_saved_info_title">Singula</string>
     <string name="audio_player_detail_saved_mode">Modus</string>

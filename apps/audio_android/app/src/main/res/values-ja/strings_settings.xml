@@ -125,7 +125,7 @@
     <string name="config_custom_brand_theme_dialog_title">カスタム・デュアルトーン色</string>
     <string name="config_custom_brand_theme_dialog_description">#RRGGBB 形式の 16 進カラーを入力します。輪郭を空欄にすると accent 色を再利用します。</string>
     <string name="config_custom_brand_theme_background_label">主色</string>
-    <string name="config_custom_brand_theme_accent_label">accent 色</string>
+    <string name="config_custom_brand_theme_accent_label">secondary 色</string>
     <string name="config_custom_brand_theme_outline_label">輪郭色</string>
     <string name="config_custom_brand_theme_outline_optional">任意</string>
     <string name="config_custom_brand_theme_save">保存</string>
@@ -197,4 +197,21 @@
     <string name="config_sample_decoration_style_emoji">Emoji（勢力別）</string>
     <string name="config_demo_mode_title">デモモード</string>
     <string name="config_demo_mode_subtitle">録画向けにタップの視覚フィードバックと操作ヒントを表示します。</string>
+    <string name="config_custom_brand_theme_import_title">カスタム dual-tone をインポート</string>
+    <string name="config_custom_brand_theme_import">インポート</string>
+    <string name="config_custom_brand_theme_copy_config">設定をコピー</string>
+    <string name="config_custom_brand_theme_import_description">FlipBits カスタムテーマ設定を貼り付けます。</string>
+    <string name="config_custom_brand_theme_import_config_label">テーマ設定</string>
+    <string name="config_custom_brand_theme_import_invalid">有効な FlipBits カスタムテーマ設定を貼り付けてください。</string>
+    <string name="config_custom_brand_theme_import_duplicate_message">この設定は既存のカスタムテーマと一致します。上書きしますか、それとも別のコピーを追加しますか？</string>
+    <string name="config_custom_brand_theme_import_overwrite">上書き</string>
+    <string name="config_custom_brand_theme_import_duplicate_title">テーマは既に存在します</string>
+    <string name="config_custom_brand_theme_import_add_copy">コピーを追加</string>
+    <string name="config_custom_brand_theme_export_title">カスタム dual-tone をエクスポート</string>
+    <string name="config_custom_brand_theme_export_description">選択したカスタム dual-tone だけをコピーするか、すべてのカスタム dual-tone をコピーするかを選択します。</string>
+    <string name="config_custom_brand_theme_export_scope_selected">選択中</string>
+    <string name="config_custom_brand_theme_export_scope_all">すべて</string>
+    <string name="config_custom_brand_theme_batch_import_title">カスタム dual-tone をインポート</string>
+    <string name="config_custom_brand_theme_batch_import_summary">%1$d 件のテーマが見つかりました。新規 %2$d 件、完全な重複 %3$d 件。</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">完全な重複はスキップされます。</string>
 </resources>

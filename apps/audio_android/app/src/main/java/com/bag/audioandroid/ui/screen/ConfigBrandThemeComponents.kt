@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -50,6 +51,7 @@ internal fun BrandThemeSection(
     onEditBrandTheme: ((BrandThemeOption) -> Unit)? = null,
     actionLabel: String? = null,
     onActionClick: (() -> Unit)? = null,
+    iconActions: List<BrandThemeSectionIconAction> = emptyList(),
 ) {
     if (options.isEmpty()) {
         return
@@ -88,6 +90,18 @@ internal fun BrandThemeSection(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                iconActions.forEach { action ->
+                    IconButton(
+                        onClick = action.onClick,
+                        enabled = action.enabled,
+                        colors = utilityActionIconButtonColors(),
+                    ) {
+                        Icon(
+                            imageVector = action.icon,
+                            contentDescription = action.label,
+                        )
+                    }
+                }
                 if (actionLabel != null && onActionClick != null) {
                     TextButton(onClick = onActionClick) {
                         Text(text = actionLabel)
@@ -112,6 +126,13 @@ internal fun BrandThemeSection(
         }
     }
 }
+
+internal data class BrandThemeSectionIconAction(
+    val label: String,
+    val icon: ImageVector,
+    val enabled: Boolean = true,
+    val onClick: () -> Unit,
+)
 
 @Composable
 internal fun BrandThemeRow(

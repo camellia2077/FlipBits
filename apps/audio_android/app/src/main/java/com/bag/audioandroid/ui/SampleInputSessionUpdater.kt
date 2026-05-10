@@ -2,6 +2,7 @@ package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.SampleDecorationStyleOption
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -17,6 +18,8 @@ class SampleInputSessionUpdater(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
         language: AppLanguageOption,
         flavor: SampleFlavor,
+        isDecorationEnabled: Boolean = true,
+        decorationStyle: SampleDecorationStyleOption = SampleDecorationStyleOption.Emoji,
     ): Map<TransportModeOption, ModeAudioSessionState> =
         sessions.mapValues { (mode, session) ->
             randomizedInitialSession(
@@ -24,6 +27,8 @@ class SampleInputSessionUpdater(
                 mode = mode,
                 language = language,
                 flavor = flavor,
+                isDecorationEnabled = isDecorationEnabled,
+                decorationStyle = decorationStyle,
             )
         }
 
@@ -62,6 +67,8 @@ class SampleInputSessionUpdater(
                     mode = mode,
                     language = language,
                     flavor = newFlavor,
+                    isDecorationEnabled = false,
+                    decorationStyle = SampleDecorationStyleOption.None,
                 )
             }
         }
@@ -71,6 +78,8 @@ class SampleInputSessionUpdater(
         mode: TransportModeOption,
         language: AppLanguageOption,
         flavor: SampleFlavor,
+        isDecorationEnabled: Boolean,
+        decorationStyle: SampleDecorationStyleOption,
     ): ModeAudioSessionState {
         val length = SampleInputLengthOption.Short
         // The first sample does not need to be fixed. We can shuffle first, show
@@ -94,10 +103,21 @@ class SampleInputSessionUpdater(
                     lastPresentedSampleId = sample.id,
                 )
             }
+        val emojiPrefix =
+            nextSampleEmojiPrefix(
+                mode = mode,
+                flavor = flavor,
+                isDecorationEnabled = isDecorationEnabled,
+                decorationStyle = decorationStyle,
+                currentState = session.sampleEmojiShuffleState,
+                random = random,
+            )
         return session.copy(
-            inputText = sample.text,
+            inputText = withSampleEmojiPrefix(sample.text, emojiPrefix?.emoji),
             sampleInputId = sample.id,
             sampleShuffleState = shuffleState,
+            sampleEmojiShuffleState = emojiPrefix?.state ?: session.sampleEmojiShuffleState,
+            appliedSampleEmojiPrefix = emojiPrefix?.emoji,
         )
     }
 }

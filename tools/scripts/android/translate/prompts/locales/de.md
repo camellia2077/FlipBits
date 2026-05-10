@@ -13,7 +13,7 @@ German (`values-de`) is a standard German localization for Android UI, playback,
 Treat this locale as contemporary German UI localization.
 Use German capitalization rules for nouns and UI labels.
 Prefer natural German word order over English word order, especially in playback, input-rule, byte-count, and visualizer strings.
-Preserve WaveBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing German locale keeps them as technical terms.
+Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing German locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.
