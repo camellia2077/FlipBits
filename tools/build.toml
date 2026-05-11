@@ -1,6 +1,6 @@
 [ci]
 python = "3.12"
-java = "17"
+java = "21"
 
 [android.sdk]
 compile_sdk = 35

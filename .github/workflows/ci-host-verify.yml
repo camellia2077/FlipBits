@@ -3,14 +3,6 @@ name: ci-host-verify
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - ".github/workflows/ci-host-verify.yml"
-      - "CMakeLists.txt"
-      - "Test/**"
-      - "apps/audio_cli/**"
-      - "cmake/**"
-      - "libs/**"
-      - "tools/**"
   push:
     paths:
       - ".github/workflows/ci-host-verify.yml"

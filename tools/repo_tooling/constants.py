@@ -4,8 +4,8 @@ from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-TOOLING_DIR = ROOT_DIR / "tooling"
-BUILD_CONFIG_PATH = TOOLING_DIR / "build.toml"
+TOOLS_DIR = ROOT_DIR / "tools"
+BUILD_CONFIG_PATH = TOOLS_DIR / "build.toml"
 DEFAULT_BUILD_DIR = ROOT_DIR / "build" / "dev"
 DEFAULT_GENERATOR = "Ninja"
 DEFAULT_CXX_COMPILER = "clang++"

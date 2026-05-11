@@ -75,7 +75,7 @@ private val DefaultFollowData =
     )
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AudioSessionCodecActionsTest {
+class AudioSessionCodecProgressTest {
     @Test
     fun `same phase progress keeps status text stable while progress stays real time`() =
         runTest {
@@ -201,7 +201,10 @@ class AudioSessionCodecActionsTest {
             assertTrue(successSession.generatedFlashSignalInfo.available)
             assertEquals("300", successSession.generatedFlashSignalInfo.lowCarrierHz)
         }
+}
 
+@OptIn(ExperimentalCoroutinesApi::class)
+class AudioSessionCodecFailureStateTest {
     @Test
     fun `failed encode clears stale generated audio instead of exposing zero duration mini player`() =
         runTest {
@@ -427,7 +430,10 @@ class AudioSessionCodecActionsTest {
                 assertResId(session.statusText, R.string.status_mode_decode_completed)
             }
         }
+}
 
+@OptIn(ExperimentalCoroutinesApi::class)
+class AudioSessionCodecSegmentationTest {
     @Test
     fun `payload too large input auto segments and keeps aggregated playback`() =
         runTest {
@@ -755,7 +761,10 @@ class AudioSessionCodecActionsTest {
         assertEquals(longText, plan.segments.joinToString(separator = ""))
         assertTrue(plan.segments.all { it.toByteArray(UTF_8).size <= 512 })
     }
+}
 
+@OptIn(ExperimentalCoroutinesApi::class)
+class AudioSessionCodecFlashPresetTest {
     @Test
     fun `flash encode uses base preset when voicing effect is disabled`() =
         runTest {
@@ -826,45 +835,45 @@ class AudioSessionCodecActionsTest {
                 seenPresets.distinct(),
             )
         }
-
-    private fun createFixture(
-        gateway: AudioCodecGateway,
-        testScope: TestScope,
-        audioIoGateway: AudioIoGateway = CodecFakeAudioIoGateway(),
-    ): Fixture {
-        val dispatcher = StandardTestDispatcher(testScope.testScheduler)
-        val uiState = MutableStateFlow(AudioAppUiState())
-        val actions =
-            AudioSessionCodecActions(
-                uiState = uiState,
-                scope = CoroutineScope(dispatcher),
-                audioCodecGateway = gateway,
-                audioIoGateway = audioIoGateway,
-                sessionStateStore = AudioSessionStateStore(uiState),
-                uiTextMapper = BagUiTextMapper(),
-                playbackRuntimeGateway = FakePlaybackRuntimeGateway(),
-                sampleRateHz = 44_100,
-                frameSamples = 2_205,
-                stopPlayback = {},
-                workerDispatcher = dispatcher,
-                generatedAudioCacheGateway = CodecFakeGeneratedAudioCacheGateway(),
-            )
-        return Fixture(uiState, actions)
-    }
-
-    private fun assertResId(
-        text: UiText,
-        expectedResId: Int,
-    ) {
-        val resource = text as UiText.Resource
-        assertEquals(expectedResId, resource.resId)
-    }
-
-    private data class Fixture(
-        val uiState: MutableStateFlow<AudioAppUiState>,
-        val actions: AudioSessionCodecActions,
-    )
 }
+
+private fun createFixture(
+    gateway: AudioCodecGateway,
+    testScope: TestScope,
+    audioIoGateway: AudioIoGateway = CodecFakeAudioIoGateway(),
+): Fixture {
+    val dispatcher = StandardTestDispatcher(testScope.testScheduler)
+    val uiState = MutableStateFlow(AudioAppUiState())
+    val actions =
+        AudioSessionCodecActions(
+            uiState = uiState,
+            scope = CoroutineScope(dispatcher),
+            audioCodecGateway = gateway,
+            audioIoGateway = audioIoGateway,
+            sessionStateStore = AudioSessionStateStore(uiState),
+            uiTextMapper = BagUiTextMapper(),
+            playbackRuntimeGateway = FakePlaybackRuntimeGateway(),
+            sampleRateHz = 44_100,
+            frameSamples = 2_205,
+            stopPlayback = {},
+            workerDispatcher = dispatcher,
+            generatedAudioCacheGateway = CodecFakeGeneratedAudioCacheGateway(),
+        )
+    return Fixture(uiState, actions)
+}
+
+private fun assertResId(
+    text: UiText,
+    expectedResId: Int,
+) {
+    val resource = text as UiText.Resource
+    assertEquals(expectedResId, resource.resId)
+}
+
+private data class Fixture(
+    val uiState: MutableStateFlow<AudioAppUiState>,
+    val actions: AudioSessionCodecActions,
+)
 
 private class FakeAudioCodecGateway(
     private val encodeResult: EncodeAudioResult =

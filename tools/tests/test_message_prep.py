@@ -19,6 +19,7 @@ class MessagePrepTests(unittest.TestCase):
         self.assertEqual(component_name_for_history("docs/presentation/cli/v0.2/0.2.0.md"), "cli-presentation")
         self.assertEqual(component_name_for_history("docs/presentation/android/v0.3/0.3.0.md"), "android-presentation")
         self.assertEqual(component_name_for_history("docs/libs/v0.4/0.4.1.md"), "libs")
+        self.assertEqual(component_name_for_history("docs/tools/history/2026-05-11.md"), "tools")
 
     def test_parse_history_file_reads_heading_and_sections(self) -> None:
         entry = parse_history_file("docs/presentation/cli/v0.2/0.2.0.md")
@@ -45,6 +46,22 @@ class MessagePrepTests(unittest.TestCase):
         self.assertIn("[Fixed]", rendered)
         self.assertIn("[Verification]", rendered)
         self.assertIn("Release-Version: v0.3.0", rendered)
+
+    def test_tools_history_file_maps_tool_sections_to_commit_sections(self) -> None:
+        entry = parse_history_file("docs/tools/history/2026-05-11.md")
+        self.assertEqual(entry.release_date, "2026-05-11")
+        self.assertEqual(entry.release_version, "TODO(agent): set release version")
+        self.assertEqual(entry.component_name, "tools")
+        self.assertGreaterEqual(len(entry.added), 1)
+        self.assertGreaterEqual(len(entry.changed), 1)
+        self.assertGreaterEqual(len(entry.fixed), 1)
+
+        result = build_history_message_result(["docs/tools/history/2026-05-11.md"])
+        rendered = render_result(result)
+        self.assertIn("[Added]", rendered)
+        self.assertIn("[Changed & Refactored]", rendered)
+        self.assertIn("[Fixed]", rendered)
+        self.assertIn("- tools: TODO(agent): set release version", rendered)
 
 
 if __name__ == "__main__":

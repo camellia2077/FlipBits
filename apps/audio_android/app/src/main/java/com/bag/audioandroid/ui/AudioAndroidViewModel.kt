@@ -1,6 +1,5 @@
 package com.bag.audioandroid.ui
 
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import java.nio.charset.StandardCharsets.UTF_8
 
 class AudioAndroidViewModel(
     audioCodecGateway: AudioCodecGateway,
@@ -139,6 +137,17 @@ class AudioAndroidViewModel(
             sampleInputSessionUpdater = sampleInputSessionUpdater,
             appSettingsRepository = appSettingsRepository,
             scope = viewModelScope,
+        )
+    private val debugScenarioActions =
+        AudioDebugScenarioActions(
+            uiState = uiStateFlow,
+            sampleInputTextProvider = sampleInputTextProvider,
+            sessionStateStore = sessionStateStore,
+            onTransportModeSelected = ::onTransportModeSelected,
+            onFlashVoicingStyleSelected = ::onFlashVoicingStyleSelected,
+            onMorseSpeedSelected = ::onMorseSpeedSelected,
+            onInputTextChange = ::onInputTextChange,
+            onEncode = ::onEncode,
         )
 
     init {
@@ -265,74 +274,15 @@ class AudioAndroidViewModel(
     }
 
     fun startFlashDebugScenario(scenario: FlashDebugScenario) {
-        if (!BuildConfig.DEBUG) {
-            return
-        }
-        val input = resolveFlashDebugInput(scenario)
-        onTransportModeSelected(TransportModeOption.Flash)
-        onFlashVoicingStyleSelected(scenario.style)
-        onInputTextChange(input.text)
-        if (input.sampleId != null) {
-            sessionStateStore.updateSession(TransportModeOption.Flash) {
-                it.copy(
-                    sampleInputId = input.sampleId,
-                    sampleShuffleState = null,
-                    appliedSampleEmojiPrefix = null,
-                )
-            }
-        }
-        safeLogD(
-            FLASH_AUTOMATION_TAG,
-            "inputResolved requestId=${scenario.requestId} source=${input.source} " +
-                "sampleId=${input.sampleId.orEmpty()} chars=${input.text.length} " +
-                "payloadBytes=${input.text.toByteArray(UTF_8).size} style=${scenario.style.id}",
-        )
-        if (scenario.encode) {
-            onEncode()
-        }
+        debugScenarioActions.startFlashDebugScenario(scenario)
     }
 
     fun startMiniDebugScenario(scenario: MiniDebugScenario) {
-        if (!BuildConfig.DEBUG) {
-            return
-        }
-        onTransportModeSelected(TransportModeOption.Mini)
-        onMorseSpeedSelected(scenario.speed)
-        onInputTextChange(scenario.text)
-        if (scenario.encode) {
-            onEncode()
-        }
+        debugScenarioActions.startMiniDebugScenario(scenario)
     }
 
     fun startEncodeProgressDebugScenario(scenario: EncodeProgressDebugScenario) {
-        if (!BuildConfig.DEBUG) {
-            return
-        }
-        val input = resolveEncodeProgressDebugInput(scenario)
-        onTransportModeSelected(scenario.mode)
-        if (scenario.mode == TransportModeOption.Mini) {
-            onMorseSpeedSelected(scenario.speed)
-        }
-        onInputTextChange(input.text)
-        if (input.sampleId != null) {
-            sessionStateStore.updateSession(scenario.mode) {
-                it.copy(
-                    sampleInputId = input.sampleId,
-                    sampleShuffleState = null,
-                    appliedSampleEmojiPrefix = null,
-                )
-            }
-        }
-        safeLogD(
-            ENCODE_PROGRESS_AUTOMATION_TAG,
-            "inputResolved requestId=${scenario.requestId} mode=${scenario.mode.wireName} " +
-                "source=${input.source} sampleId=${input.sampleId.orEmpty()} " +
-                "chars=${input.text.length} payloadBytes=${input.text.toByteArray(UTF_8).size} " +
-                "repeat=${scenario.repeatCount} speed=${scenario.speed.id}",
-        )
-        if (scenario.encode) {
-            onEncode()
-        }
+        debugScenarioActions.startEncodeProgressDebugScenario(scenario)
     }
 
     fun onRandomizeSampleInput(length: SampleInputLengthOption) {
@@ -351,188 +301,6 @@ class AudioAndroidViewModel(
                 language = state.selectedLanguage,
                 flavor = state.currentSampleFlavor,
             ).text
-    }
-
-    private fun resolveFlashDebugInput(scenario: FlashDebugScenario): FlashDebugResolvedInput {
-        if (scenario.hasTextOverride) {
-            return FlashDebugResolvedInput(
-                text = scenario.text,
-                sampleId = null,
-                source = "text",
-            )
-        }
-
-        val state = uiStateFlow.value
-        val explicitSampleId = scenario.sampleId
-        if (explicitSampleId != null) {
-            val sample =
-                sampleInputTextProvider.sampleById(
-                    mode = TransportModeOption.Flash,
-                    language = state.selectedLanguage,
-                    flavor = state.currentSampleFlavor,
-                    sampleId = explicitSampleId,
-                )
-            if (sample != null) {
-                return FlashDebugResolvedInput(
-                    text = sample.text,
-                    sampleId = sample.id,
-                    source = "sample:id",
-                )
-            }
-            safeLogD(
-                FLASH_AUTOMATION_TAG,
-                "inputSampleMissing requestId=${scenario.requestId} sampleId=$explicitSampleId " +
-                    "flavor=${state.currentSampleFlavor}",
-            )
-        }
-
-        val sampleLength = scenario.sampleLength
-        if (sampleLength != null) {
-            val sampleId =
-                sampleInputTextProvider
-                    .sampleIds(
-                        mode = TransportModeOption.Flash,
-                        flavor = state.currentSampleFlavor,
-                        length = sampleLength,
-                    ).firstOrNull()
-            val sample =
-                sampleId?.let {
-                    sampleInputTextProvider.sampleById(
-                        mode = TransportModeOption.Flash,
-                        language = state.selectedLanguage,
-                        flavor = state.currentSampleFlavor,
-                        sampleId = it,
-                    )
-                }
-            if (sample != null) {
-                return FlashDebugResolvedInput(
-                    text = sample.text,
-                    sampleId = sample.id,
-                    source = "sample:${sampleLength.id}",
-                )
-            }
-            safeLogD(
-                FLASH_AUTOMATION_TAG,
-                "inputSampleMissing requestId=${scenario.requestId} sampleLength=${sampleLength.id} " +
-                    "flavor=${state.currentSampleFlavor}",
-            )
-        }
-
-        return FlashDebugResolvedInput(
-            text = scenario.text,
-            sampleId = null,
-            source = "text",
-        )
-    }
-
-    private fun resolveEncodeProgressDebugInput(scenario: EncodeProgressDebugScenario): FlashDebugResolvedInput {
-        val input =
-            resolveDebugInput(
-                mode = scenario.mode,
-                text = scenario.text,
-                hasTextOverride = scenario.hasTextOverride,
-                sampleLength = scenario.sampleLength,
-                sampleId = scenario.sampleId,
-                requestId = scenario.requestId,
-                logTag = ENCODE_PROGRESS_AUTOMATION_TAG,
-            )
-        val repeatedText =
-            if (scenario.repeatCount <= 1) {
-                input.text
-            } else {
-                buildString(input.text.length * scenario.repeatCount) {
-                    repeat(scenario.repeatCount) {
-                        append(input.text)
-                    }
-                }
-            }
-        return input.copy(
-            text = repeatedText,
-            source =
-                if (scenario.repeatCount <= 1) {
-                    input.source
-                } else {
-                    "${input.source}:repeat${scenario.repeatCount}"
-                },
-        )
-    }
-
-    private fun resolveDebugInput(
-        mode: TransportModeOption,
-        text: String,
-        hasTextOverride: Boolean,
-        sampleLength: SampleInputLengthOption?,
-        sampleId: String?,
-        requestId: Long,
-        logTag: String,
-    ): FlashDebugResolvedInput {
-        if (hasTextOverride) {
-            return FlashDebugResolvedInput(
-                text = text,
-                sampleId = null,
-                source = "text",
-            )
-        }
-
-        val state = uiStateFlow.value
-        if (sampleId != null) {
-            val sample =
-                sampleInputTextProvider.sampleById(
-                    mode = mode,
-                    language = state.selectedLanguage,
-                    flavor = state.currentSampleFlavor,
-                    sampleId = sampleId,
-                )
-            if (sample != null) {
-                return FlashDebugResolvedInput(
-                    text = sample.text,
-                    sampleId = sample.id,
-                    source = "sample:id",
-                )
-            }
-            safeLogD(
-                logTag,
-                "inputSampleMissing requestId=$requestId mode=${mode.wireName} sampleId=$sampleId " +
-                    "flavor=${state.currentSampleFlavor}",
-            )
-        }
-
-        if (sampleLength != null) {
-            val resolvedSampleId =
-                sampleInputTextProvider
-                    .sampleIds(
-                        mode = mode,
-                        flavor = state.currentSampleFlavor,
-                        length = sampleLength,
-                    ).firstOrNull()
-            val sample =
-                resolvedSampleId?.let {
-                    sampleInputTextProvider.sampleById(
-                        mode = mode,
-                        language = state.selectedLanguage,
-                        flavor = state.currentSampleFlavor,
-                        sampleId = it,
-                    )
-                }
-            if (sample != null) {
-                return FlashDebugResolvedInput(
-                    text = sample.text,
-                    sampleId = sample.id,
-                    source = "sample:${sampleLength.id}",
-                )
-            }
-            safeLogD(
-                logTag,
-                "inputSampleMissing requestId=$requestId mode=${mode.wireName} sampleLength=${sampleLength.id} " +
-                    "flavor=${state.currentSampleFlavor}",
-            )
-        }
-
-        return FlashDebugResolvedInput(
-            text = text,
-            sampleId = null,
-            source = "text",
-        )
     }
 
     fun onTransportModeSelected(mode: TransportModeOption) {
@@ -754,25 +522,5 @@ class AudioAndroidViewModel(
     private companion object {
         const val SAMPLE_RATE_HZ = 44100
         const val FRAME_SAMPLES = 2205
-    }
-}
-
-private const val FLASH_AUTOMATION_TAG = "FlashAutomation"
-private const val ENCODE_PROGRESS_AUTOMATION_TAG = "EncodeProgressAutomation"
-
-private data class FlashDebugResolvedInput(
-    val text: String,
-    val sampleId: String?,
-    val source: String,
-)
-
-private fun safeLogD(
-    tag: String,
-    message: String,
-) {
-    try {
-        Log.d(tag, message)
-    } catch (_: RuntimeException) {
-        // Plain JVM unit tests use the Android stub jar, where Log.d is not implemented.
     }
 }

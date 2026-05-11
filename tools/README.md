@@ -13,7 +13,7 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
 - 对外只保留一个入口：`python tools/run.py <command>`
 - 内部按职责拆分到 `tools/repo_tooling/`
 - 如需运行依赖第三方 Python 库的工具命令，先执行：`python -m pip install -r tools/requirements.txt`
-- 跨 CI / Python tooling 共用的最小工具链版本口径，优先收敛到 `tooling/build.toml`
+- 跨 CI / Python tooling 共用的最小工具链版本口径，优先收敛到 `tools/build.toml`
 - CLI 帮助保持分层：根命令只列主要子命令，详细参数通过 `python tools/run.py <command> --help` 或 `python tools/run.py <command> <subcommand> --help` 查看
 - 这份文档只保留工具入口地图与少量代表例子；更细流程统一下沉到 `docs/notes/`
 
@@ -69,7 +69,7 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
   - 具体 gate、build 目录和 Android 联动规则见 `docs/notes/build-commands.md`
 - `android`
   - 对应 Android Gradle 构建与 Kotlin 质量 gate
-  - `install-sdk` 会读取 `tooling/build.toml` 安装 Android SDK 组件
+  - `install-sdk` 会读取 `tools/build.toml` 安装 Android SDK 组件
   - 具体编译入口与 Android 专题见 `docs/notes/android/android-compile.md`
 - `windows`
   - 对应 Windows CLI 平台产物构建

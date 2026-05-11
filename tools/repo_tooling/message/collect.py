@@ -30,7 +30,11 @@ def is_history_markdown(path: str) -> bool:
     normalized = path.replace("\\", "/")
     if not normalized.endswith(".md"):
         return False
-    return normalized.startswith("docs/libs/") or normalized.startswith("docs/presentation/")
+    return (
+        normalized.startswith("docs/libs/")
+        or normalized.startswith("docs/presentation/")
+        or normalized.startswith("docs/tools/history/")
+    )
 
 
 def changed_history_paths() -> list[str]:
@@ -57,7 +61,10 @@ def normalize_history_paths(raw_paths: list[str]) -> list[str]:
         if not path.exists():
             raise ToolError(f"History file does not exist: {relative}")
         if not is_history_markdown(relative):
-            raise ToolError(f"History file is not under docs/libs or docs/presentation: {relative}")
+            raise ToolError(
+                "History file is not under docs/libs, docs/presentation, or docs/tools/history: "
+                f"{relative}"
+            )
         if relative not in seen:
             seen.add(relative)
             normalized.append(relative)
