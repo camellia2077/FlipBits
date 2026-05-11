@@ -8,6 +8,8 @@ from ..errors import ToolError
 from ..paths import ensure_root
 from .common import RAW_FORMATTER
 from .groups.android import register_android_group
+from .groups.android_debug import register_android_debug_group
+from .groups.android_translate import register_android_translate_group
 from .groups.artifact import register_artifact_group
 from .groups.build_host import register_build_host_commands
 from .groups.cli import register_cli_group
@@ -30,6 +32,8 @@ def build_parser() -> argparse.ArgumentParser:
             "- Windows delivery: `windows`\n"
             "- Native quality: `clang`\n"
             "- Android delivery: `android`\n"
+            "- Android debugging: `android-debug`\n"
+            "- Android translation: `android-translate`\n"
             "- Naming assistance: `file-name`\n"
             "- Release history: `history`\n"
             "- Git message drafts: `message`\n"
@@ -51,6 +55,8 @@ def build_parser() -> argparse.ArgumentParser:
     register_windows_group(subparsers)
     register_clang_group(subparsers)
     register_android_group(subparsers)
+    register_android_debug_group(subparsers)
+    register_android_translate_group(subparsers)
     register_artifact_group(subparsers)
     register_file_name_group(subparsers)
     register_history_group(subparsers)

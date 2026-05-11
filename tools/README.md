@@ -26,6 +26,11 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
   - 子命令：`format`、`tidy`
 - `android`
   - 用于 Android Gradle 构建与 Kotlin 质量 gate
+- `android-debug`
+  - 用于 adb/logcat 调试采集与摘要入口
+  - 子命令：`device-prep`、`capture-flash`、`capture-mini`、`capture-encode-progress`、`flash-summary`、`mini-summary`、`encode-progress-summary`、`crash-summary`
+- `android-translate`
+  - 用于 Android XML 翻译提示词生成、资源检查、lint/autofix、key alignment 与批量替换
 - `windows`
   - 用于 Windows CLI 平台产物构建
 - `artifact`
@@ -119,6 +124,8 @@ python tools/run.py --help
 ```powershell
 python tools/run.py clang --help
 python tools/run.py android --help
+python tools/run.py android-debug --help
+python tools/run.py android-translate --help
 python tools/run.py artifact --help
 python tools/run.py file-name --help
 python tools/run.py history --help
@@ -133,6 +140,9 @@ python tools/run.py verify --build-dir build/dev --skip-android
 python tools/run.py android native-debug
 python tools/run.py android assemble-debug
 python tools/run.py android assemble-release
+python tools/run.py android-translate key-alignment --quiet
+python tools/run.py android-debug capture-flash --scenario ui --style litany --sample-length long --wait-ms 90000
+python tools/run.py android-debug flash-summary temp\flash_alignment_raw.log --output temp\flash_alignment_summary.md
 python tools/run.py windows build
 python tools/run.py file-name prep
 python tools/run.py artifact export-apk

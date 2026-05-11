@@ -21,13 +21,13 @@ The script clears the output directory before writing fresh review files, so old
 The script resolves these paths from the repository root, so it can be run from the repository root with:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py"
+pwsh -NoLogo -Command "python tools/run.py android-translate"
 ```
 
 The unified outer entrypoint is:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py"
+pwsh -NoLogo -Command "python tools/run.py android-translate"
 ```
 
 `compare_translation_quality.py` itself now acts as a library-style module and no longer serves as the direct entrypoint.
@@ -35,13 +35,13 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py"
 If you want machine-readable output for agent callers:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py compare --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate compare --json-output"
 ```
 
 If you want a narrow agent job instead of a full refresh:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py compare --lang de --text-type sample_text --group ancient_dynasty --output-dir temp/agent_jobs/job_001/reviews --no-clean --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate compare --lang de --text-type sample_text --group ancient_dynasty --output-dir temp/agent_jobs/job_001/reviews --no-clean --json-output"
 ```
 
 ## Compare filters

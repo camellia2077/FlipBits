@@ -9,13 +9,13 @@ This command is intentionally **not** a translation review prompt. It is a low-m
 ## Command
 
 ```powershell
-python tools/scripts/android/translate/run.py dump-xml-md --lang ko --text-type sample_text --group exquisite_fall
+python tools/run.py android-translate dump-xml-md --lang ko --text-type sample_text --group exquisite_fall
 ```
 
 Include EN side-by-side:
 
 ```powershell
-python tools/scripts/android/translate/run.py dump-xml-md --lang ko --text-type sample_text --group exquisite_fall --with-en
+python tools/run.py android-translate dump-xml-md --lang ko --text-type sample_text --group exquisite_fall --with-en
 ```
 
 ## Output layout

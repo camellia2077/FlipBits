@@ -7,7 +7,7 @@
 
 - 这个项目的 Python CLI 采用“主命令 / 子命令”分层形式。
 - 先用 `python tools/run.py --help` 查看主命令组；需要具体参数时，再用 `python tools/run.py <command> --help` 或 `python tools/run.py <command> <subcommand> --help` 下钻。
-- 常用命令组优先记这几个：`build`、`test`、`test-lib`、`verify`、`cli`、`windows`、`android`、`artifact`、`history`、`message`
+- 常用命令组优先记这几个：`build`、`test`、`test-lib`、`verify`、`cli`、`windows`、`android`、`android-translate`、`artifact`、`history`、`message`
 - 修改代码后，如需开始编译，优先使用 `python tools/run.py build --build-dir build/dev`。
 - 修改代码后，如需完整验证，优先使用 `python tools/run.py verify --build-dir build/dev`。
 - 修复 review findings 或小批量跨层改动后，可先跑较短验证：`python tools/run.py verify review-fixes --build-dir build/dev`。

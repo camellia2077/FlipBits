@@ -1,4 +1,5 @@
 from .android import cmd_android
+from .android_translate import cmd_android_translate
 from .build import cmd_build
 from .clean import cmd_clean
 from .cli import cmd_cli
@@ -19,6 +20,7 @@ from .windows import cmd_windows
 
 __all__ = [
     "cmd_android",
+    "cmd_android_translate",
     "cmd_build",
     "cmd_clean",
     "cmd_cli",

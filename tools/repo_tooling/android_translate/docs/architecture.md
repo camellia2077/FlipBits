@@ -2,7 +2,7 @@
 
 ## 这套工具是干什么的
 
-这套 `tools/scripts/android/translate` 工具主要服务 Android 文本翻译和润色流程，目标是：
+这套 `tools/repo_tooling/android_translate` 工具主要服务 Android 文本翻译和润色流程，目标是：
 
 - 从英文基线和各语言资源生成可审校的 Markdown
 - 帮你发现缺翻译、混杂语言、key 不对齐之类的问题
@@ -41,28 +41,28 @@
 5. 保存到 `replacements.json`
 6. 运行 `replace`
 
-完整细节见 [sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md)。
+完整细节见 [sop.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/sop.md)。
 
 ## 文件职责
 
 ### 入口
 
-- [run.py](/C:/code/FlipBits/tools/scripts/android/translate/run.py)
+- [run.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/run.py)
   - 统一命令入口
   - 子命令分发：`compare` / `replace` / `mixed-language` / `key-alignment`
 
-- [run.cmd](/C:/code/FlipBits/tools/scripts/android/translate/run.cmd)
+- [run.cmd](/C:/code/WaveBits/tools/repo_tooling/android_translate/run.cmd)
   - Windows 下的通用入口包装
 
-- [replace.cmd](/C:/code/FlipBits/tools/scripts/android/translate/replace.cmd)
+- [replace.cmd](/C:/code/WaveBits/tools/repo_tooling/android_translate/replace.cmd)
   - Windows 下的普通 `replace` 快捷入口
 
-- [replace_auto_fix_json.cmd](/C:/code/FlipBits/tools/scripts/android/translate/replace_auto_fix_json.cmd)
+- [replace_auto_fix_json.cmd](/C:/code/WaveBits/tools/repo_tooling/android_translate/replace_auto_fix_json.cmd)
   - Windows 下的 `replace --auto-fix-json` 快捷入口
 
 ### Compare / Review
 
-- [compare_translation_quality.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/compare_translation_quality.py)
+- [compare_translation_quality.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/compare_translation_quality.py)
   - 生成英文 vs 本地化语言的 review markdown
   - 如果你要改：
     - review 输出字段
@@ -71,7 +71,7 @@
     - English-only review 的组织方式
     - 就来这里
 
-- [translation_review_prompts.py](/C:/code/FlipBits/tools/scripts/android/translate/prompts/translation_review_prompts.py)
+- [translation_review_prompts.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/prompts/translation_review_prompts.py)
   - 放给 LLM 的 prompt 文本
   - 如果你要改：
     - JSON 输出格式
@@ -79,7 +79,7 @@
     - 语气约束
     - 就来这里
 
-- [language_prompt_profiles.py](/C:/code/FlipBits/tools/scripts/android/translate/prompts/language_prompt_profiles.py)
+- [language_prompt_profiles.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/prompts/language_prompt_profiles.py)
   - locale 级 prompt profile
   - 如果你要改：
     - 某个语言的专属写作人格
@@ -89,7 +89,7 @@
 
 ### Replace
 
-- [apply_translation_replacements.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/apply_translation_replacements.py)
+- [apply_translation_replacements.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/apply_translation_replacements.py)
   - 核心 replace 逻辑
   - 负责：
     - 读取 JSON
@@ -105,33 +105,33 @@
     - 替换策略
     - 就来这里
 
-- [replacement_json_preflight.py](/C:/code/FlipBits/tools/scripts/android/translate/core/replacement_json_preflight.py)
+- [replacement_json_preflight.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/replacement_json_preflight.py)
   - replace 前的 JSON 预检和高置信度自动修复
   - 如果你要改：
     - JSON auto-fix 范围
     - JSON 语法错误提示
     - 就来这里
 
-- [android_string_text.py](/C:/code/FlipBits/tools/scripts/android/translate/core/android_string_text.py)
+- [android_string_text.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/android_string_text.py)
   - Android string 的转义 / 反转义 / 高风险字符串检查
   - 如果你要改：
     - `\'`、`\u`、`@`、`?`、反斜杠等资源文本处理
     - 就来这里
 
-- [android_resource_smoke_check.py](/C:/code/FlipBits/tools/scripts/android/translate/core/android_resource_smoke_check.py)
+- [android_resource_smoke_check.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/android_resource_smoke_check.py)
   - 跑 `:app:mergeDebugResources`
   - 如果你要改：
     - replace 后的资源级 smoke check 行为
     - 就来这里
 
-- [replacement_entries.py](/C:/code/FlipBits/tools/scripts/android/translate/core/replacement_entries.py)
+- [replacement_entries.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/replacement_entries.py)
   - replace JSON schema 解析
   - 负责：
     - 顶层 `dir + items` 解析
     - `name / find / replace` 字段校验
     - placeholder / manual escape 拦截
 
-- [xml_string_replacement.py](/C:/code/FlipBits/tools/scripts/android/translate/core/xml_string_replacement.py)
+- [xml_string_replacement.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/xml_string_replacement.py)
   - string 级 XML 定位与替换
   - 负责：
     - 按 `dir` 扫描翻译相关 XML
@@ -141,7 +141,7 @@
 
 ### 检查类工具
 
-- [check_mixed_language.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/check_mixed_language.py)
+- [check_mixed_language.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/check_mixed_language.py)
   - 检查目标语言中是否混入不该出现的别的语言
   - 如果你要改：
     - 白名单
@@ -149,7 +149,7 @@
     - ASCII / Pro 例外规则
     - 就来这里
 
-- [check_translation_key_alignment.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/check_translation_key_alignment.py)
+- [check_translation_key_alignment.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/check_translation_key_alignment.py)
   - 检查 localized keys 是否是 English keys 的子集
   - 如果你要改：
     - 缺 key / 多 key 判断逻辑
@@ -159,7 +159,7 @@
 
 ### 共用底层
 
-- [translation_paths.py](/C:/code/FlipBits/tools/scripts/android/translate/core/translation_paths.py)
+- [translation_paths.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/translation_paths.py)
   - 路径、语言标签、文件分类、sample 阵容归类
   - 如果你要改：
     - 资源根目录
@@ -167,7 +167,7 @@
     - faction 识别
     - 就来这里
 
-- [translation_resources.py](/C:/code/FlipBits/tools/scripts/android/translate/core/translation_resources.py)
+- [translation_resources.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/translation_resources.py)
   - 资源仓库和 XML 读取
   - 如果你要改：
     - XML 读取方式
@@ -175,14 +175,14 @@
     - sample length 推断
     - 就来这里
 
-- [translation_reporting.py](/C:/code/FlipBits/tools/scripts/android/translate/core/translation_reporting.py)
+- [translation_reporting.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/translation_reporting.py)
   - Markdown 报告块结构和写文件逻辑
   - 如果你要改：
     - report 输出格式
     - report block 组织形式
     - 就来这里
 
-- [translation_common.py](/C:/code/FlipBits/tools/scripts/android/translate/core/translation_common.py)
+- [translation_common.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/translation_common.py)
   - 兼容导出层
   - 新代码尽量不要继续往这里加职责
 
@@ -192,16 +192,16 @@
 
 去：
 
-- [compare_translation_quality.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/compare_translation_quality.py)
-- 如涉及通用格式，再看 [translation_reporting.py](/C:/code/FlipBits/tools/scripts/android/translate/core/translation_reporting.py)
+- [compare_translation_quality.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/compare_translation_quality.py)
+- 如涉及通用格式，再看 [translation_reporting.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/translation_reporting.py)
 
 ### 2. 想改 LLM 返回 JSON 的格式
 
 去：
 
-- [translation_review_prompts.py](/C:/code/FlipBits/tools/scripts/android/translate/prompts/translation_review_prompts.py)
-- [apply_translation_replacements.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/apply_translation_replacements.py)
-- [templates/replacements.template.json](/C:/code/FlipBits/tools/scripts/android/translate/templates/replacements.template.json)
+- [translation_review_prompts.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/prompts/translation_review_prompts.py)
+- [apply_translation_replacements.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/apply_translation_replacements.py)
+- [templates/replacements.template.json](/C:/code/WaveBits/tools/repo_tooling/android_translate/templates/replacements.template.json)
 
 这三个要一起看。
 
@@ -209,38 +209,38 @@
 
 去：
 
-- [apply_translation_replacements.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/apply_translation_replacements.py)
-- [android_string_text.py](/C:/code/FlipBits/tools/scripts/android/translate/core/android_string_text.py)
+- [apply_translation_replacements.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/apply_translation_replacements.py)
+- [android_string_text.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/android_string_text.py)
 
 ### 4. 想改 JSON 自动修复能力
 
 去：
 
-- [replacement_json_preflight.py](/C:/code/FlipBits/tools/scripts/android/translate/core/replacement_json_preflight.py)
+- [replacement_json_preflight.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/replacement_json_preflight.py)
 
 ### 5. 想改“哪些语言生成 review”
 
 去：
 
-- [compare_translation_quality.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/compare_translation_quality.py)
+- [compare_translation_quality.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/compare_translation_quality.py)
 
 ### 6. 想改 sample text 的 faction 分组
 
 去：
 
-- [translation_paths.py](/C:/code/FlipBits/tools/scripts/android/translate/core/translation_paths.py)
+- [translation_paths.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/core/translation_paths.py)
 
 ### 7. 想改 key alignment / mixed-language 检查规则
 
 去：
 
-- [check_translation_key_alignment.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/check_translation_key_alignment.py)
-- [check_mixed_language.py](/C:/code/FlipBits/tools/scripts/android/translate/commands/check_mixed_language.py)
+- [check_translation_key_alignment.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/check_translation_key_alignment.py)
+- [check_mixed_language.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/commands/check_mixed_language.py)
 
 ## 文档索引
 
-- [sop.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/sop.md)
-- [compare_translation_quality.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/compare_translation_quality.md)
-- [apply_translation_replacements.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/apply_translation_replacements.md)
-- [check_mixed_language.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_mixed_language.md)
-- [check_translation_key_alignment.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
+- [sop.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/sop.md)
+- [compare_translation_quality.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/compare_translation_quality.md)
+- [apply_translation_replacements.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/apply_translation_replacements.md)
+- [check_mixed_language.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/check_mixed_language.md)
+- [check_translation_key_alignment.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/check_translation_key_alignment.md)

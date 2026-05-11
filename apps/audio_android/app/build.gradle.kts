@@ -54,8 +54,8 @@ fun requiredGradleStringProperty(name: String): String =
         ?: error("Missing or blank Gradle string property: $name")
 
 val repoRootDir = rootProject.projectDir.parentFile.parentFile
-val translateRunScript = repoRootDir.resolve("tools/scripts/android/translate/run.py")
-val translateLintBaselineFile = repoRootDir.resolve("tools/scripts/android/translate/lint-baseline.json")
+val translateRunScript = repoRootDir.resolve("tools/repo_tooling/android_translate/run.py")
+val translateLintBaselineFile = repoRootDir.resolve("tools/repo_tooling/android_translate/lint-baseline.json")
 val pythonCommand =
     if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
         listOf("py", "-3")

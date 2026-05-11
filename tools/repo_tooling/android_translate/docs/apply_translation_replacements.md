@@ -19,12 +19,12 @@ It also avoids continuing on malformed XML. The script now performs a fail-fast 
 ## Default behavior
 
 - Input Android res root: `apps/audio_android/app/src/main/res`
-- JSON file: defaults to `tools/scripts/android/translate/replacements.json`
+- JSON file: defaults to `tools/repo_tooling/android_translate/replacements.json`
 - Target XML lookup: by `xml` selector plus `name`
 
 So if you run the script without `--json`, it will try to read:
 
-- `tools/scripts/android/translate/replacements.json`
+- `tools/repo_tooling/android_translate/replacements.json`
 
 ## JSON format
 
@@ -87,43 +87,43 @@ broken arrays, or heavily misaligned quotes.
 Run from the repository root:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/apply_translation_replacements.py"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace"
 ```
 
 That uses the default JSON path:
 
 ```text
-tools/scripts/android/translate/replacements.json
+tools/repo_tooling/android_translate/replacements.json
 ```
 
 Or pass an explicit JSON file:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/apply_translation_replacements.py --json apps/audio_android/app/src/main/res/values-zh-rTW/replacements.json"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --json apps/audio_android/app/src/main/res/values-zh-rTW/replacements.json"
 ```
 
 Optional custom res root:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/apply_translation_replacements.py --res-dir apps/audio_android/app/src/main/res --json apps/audio_android/app/src/main/res/values-zh-rTW/replacements.json"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --res-dir apps/audio_android/app/src/main/res --json apps/audio_android/app/src/main/res/values-zh-rTW/replacements.json"
 ```
 
 If preflight finds a high-confidence JSON syntax issue and you want the tool to repair it first:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py replace --auto-fix-json"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --auto-fix-json"
 ```
 
 If you want machine-readable output for agent callers:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py replace --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --json-output"
 ```
 
 If you also want to persist the structured result as a job artifact:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py replace --json temp/agent_jobs/job_001/replacements.json --summary-out temp/agent_jobs/job_001/replace_result.json --job-dir temp/agent_jobs/job_001 --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --json temp/agent_jobs/job_001/replacements.json --summary-out temp/agent_jobs/job_001/replace_result.json --job-dir temp/agent_jobs/job_001 --json-output"
 ```
 
 ## Validation rules
@@ -200,7 +200,7 @@ If `--job-dir` is also provided, `replace` updates `<job-dir>/job_manifest.json`
 By default, `run.py replace` now runs a lightweight Android resource compile step after replacements are written:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py replace"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace"
 ```
 
 The smoke check uses:
@@ -212,7 +212,7 @@ This is intended to catch Android resource parsing/escaping failures early, befo
 If you explicitly need to skip it:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py replace --skip-smoke-check"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --skip-smoke-check"
 ```
 
 Additional exit codes:

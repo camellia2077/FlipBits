@@ -61,13 +61,13 @@ This keeps the report shorter and makes it clearer that the real problem is “t
 From the repository root:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignment"
+pwsh -NoLogo -Command "python tools/run.py android-translate key-alignment"
 ```
 
 Or as part of the aggregated reporting flow:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py all"
+pwsh -NoLogo -Command "python tools/run.py android-translate all"
 ```
 
 ## Output

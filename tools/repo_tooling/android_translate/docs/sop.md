@@ -14,7 +14,7 @@ The replacement step is intentionally strict so it can update XML safely.
 
 Agent-specific workflow now lives in:
 
-- [AGENTS.md](/C:/code/FlipBits/tools/scripts/android/translate/AGENTS.md)
+- [AGENTS.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/AGENTS.md)
 
 ## Human Workflow
 
@@ -43,7 +43,7 @@ Each review block includes:
 
 4. Save the returned JSON into:
 
-- `tools/scripts/android/translate/replacements.json`
+- `tools/repo_tooling/android_translate/replacements.json`
 
 5. Run replace.
 

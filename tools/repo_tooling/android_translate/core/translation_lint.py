@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
 
-from commands.fix_android_resource_escapes import run_fix_android_resource_escapes
+from core.android_resource_escapes import run_fix_android_resource_escapes
 
 HEX_LITERAL_PATTERN = re.compile(r"#RRGGBB")
 PLACEHOLDER_PATTERN = re.compile(r"%\d+\$[sdf]")

@@ -53,6 +53,10 @@ def str_field(event: Event, key: str, default: str = "") -> str:
     return event.fields.get(key, default)
 
 
+def latest_with_field(events: list[Event], field: str) -> Event | None:
+    return next((event for event in reversed(events) if field in event.fields), None)
+
+
 def build_summary(events: list[Event], max_rows: int) -> str:
     automation = [event for event in events if event.tag == "MiniAutomation"]
     alignment = [event for event in events if event.tag == "MiniAlignmentPerf"]
@@ -63,14 +67,25 @@ def build_summary(events: list[Event], max_rows: int) -> str:
     lines.append(f"- MiniAutomation rows: {len(automation)}")
     lines.append(f"- MiniAlignmentPerf rows: {len(alignment)}")
     lines.append(f"- FlashLyricsPerf rows: {len(lyrics)}")
-    if automation:
-        latest = automation[-1]
+    received = latest_with_field(automation, "scenario")
+    if received:
         lines.append(
             "- Scenario: "
-            f"scenario={str_field(latest, 'scenario')} "
-            f"speed={str_field(latest, 'speed')} "
-            f"playMs={str_field(latest, 'playMs')} "
-            f"text={str_field(latest, 'text')}"
+            f"scenario={str_field(received, 'scenario')} "
+            f"speed={str_field(received, 'speed')} "
+            f"playMs={str_field(received, 'playMs')} "
+            f"input={str_field(received, 'input', '_')} "
+            f"text={str_field(received, 'text', '_')} "
+            f"sampleLength={str_field(received, 'sampleLength', '_')}"
+        )
+    input_resolved = latest_with_field(automation, "chars")
+    if input_resolved:
+        lines.append(
+            "- Input: "
+            f"source={str_field(input_resolved, 'source')} "
+            f"sampleId={str_field(input_resolved, 'sampleId', '_')} "
+            f"chars={str_field(input_resolved, 'chars')} "
+            f"payloadBytes={str_field(input_resolved, 'payloadBytes')}"
         )
     playing = [event for event in alignment if str_field(event, "playing") == "true"]
     token_rows = [event for event in playing if int_field(event, "token") >= 0]

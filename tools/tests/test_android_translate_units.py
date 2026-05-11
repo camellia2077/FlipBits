@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 
 
-TRANSLATE_DIR = Path(__file__).resolve().parents[1] / "scripts" / "android" / "translate"
+TRANSLATE_DIR = Path(__file__).resolve().parents[1] / "repo_tooling" / "android_translate"
 if str(TRANSLATE_DIR) not in sys.path:
     sys.path.insert(0, str(TRANSLATE_DIR))
 

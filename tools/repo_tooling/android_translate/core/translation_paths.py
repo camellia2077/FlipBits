@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[5]
+
+def _find_repo_root(start: Path) -> Path:
+    for candidate in (start, *start.parents):
+        if (candidate / "tools" / "run.py").exists() and (candidate / "apps").exists():
+            return candidate
+    raise RuntimeError(f"Unable to locate repository root from {start}")
+
+
+REPO_ROOT = _find_repo_root(Path(__file__).resolve())
 DEFAULT_RES_DIRECTORY = REPO_ROOT / "apps" / "audio_android" / "app" / "src" / "main" / "res"
 TEXT_TYPES = ("app_text", "sample_text")
 FACTIONS = (

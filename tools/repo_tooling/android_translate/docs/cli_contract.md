@@ -315,7 +315,7 @@ Example:
     "id": "sample_text.ko.labyrinth_of_mutability.v1",
     "locale": "ko",
     "group": "labyrinth_of_mutability",
-    "prompt_ref": "tools/scripts/android/translate/prompts/sample_text_profiles/ko_labyrinth_of_mutability.md",
+    "prompt_ref": "tools/repo_tooling/android_translate/prompts/sample_text_profiles/ko_labyrinth_of_mutability.md",
     "prompt_text": "..."
   }
 }

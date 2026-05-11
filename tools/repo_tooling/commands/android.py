@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import argparse
-import os
-import shutil
-import subprocess
-from pathlib import Path
 
-from ..build_config import load_build_config
+from ..android_install import install_debug_fresh
+from ..android_sdk import install_android_sdk_components
+from ..android_signing import (
+    ensure_release_signing_config_exists,
+    print_release_apk_path_if_present,
+    print_staging_apk_path_if_present,
+)
 from ..constants import ANDROID_GRADLE_ROOT
 from ..errors import ToolError
 from ..paths import gradle_wrapper
-from ..process import print_command, run, run_capture, run_capture_merged_streaming
+from ..process import run, run_capture, run_capture_merged_streaming
 from .android_kotlin_policy import cmd_android_kotlin_policy
 
 
@@ -60,106 +62,6 @@ ANDROID_ACTIONS = {
     },
 }
 
-RELEASE_SIGNING_PROPERTIES_PATH = ANDROID_GRADLE_ROOT / "app" / "release-signing.properties"
-RELEASE_SIGNING_DIRECTORY_PATH = ANDROID_GRADLE_ROOT / "app"
-RELEASE_APK_OUTPUT_PATH = (
-    ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "release" / "FlipBits-release.apk"
-)
-STAGING_APK_OUTPUT_PATH = (
-    ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "staging" / "FlipBits-staging.apk"
-)
-DEBUG_APK_OUTPUT_PATH = ANDROID_GRADLE_ROOT / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"
-ANDROID_APP_ID = "com.bag.audioandroid"
-MIN_DEBUG_APK_BYTES = 10 * 1024 * 1024
-
-
-def _resolve_sdkmanager() -> str:
-    sdkmanager = shutil.which("sdkmanager")
-    if sdkmanager is None:
-        raise ToolError("Could not find 'sdkmanager' on PATH.")
-    return sdkmanager
-
-
-def _accept_android_sdk_licenses(sdkmanager: str) -> None:
-    command = [sdkmanager, "--licenses"]
-    print_command(command)
-    completed = subprocess.run(
-        command,
-        input="y\n" * 128,
-        text=True,
-    )
-    if completed.returncode != 0:
-        raise SystemExit(completed.returncode)
-
-
-def _install_android_sdk_components(*, accept_licenses: bool) -> None:
-    config = load_build_config()
-    sdkmanager = _resolve_sdkmanager()
-    if accept_licenses:
-        _accept_android_sdk_licenses(sdkmanager)
-    run([sdkmanager, *config.android_sdk.components])
-
-
-def _read_release_signing_properties() -> dict[str, str]:
-    values: dict[str, str] = {}
-    for raw_line in RELEASE_SIGNING_PROPERTIES_PATH.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        values[key.strip()] = value.strip()
-    return values
-
-
-def _resolve_release_keystore_path(store_file_value: str) -> Path:
-    keystore_path = Path(store_file_value).expanduser()
-    if keystore_path.is_absolute():
-        return keystore_path
-    return (RELEASE_SIGNING_DIRECTORY_PATH / keystore_path).resolve()
-
-
-def _ensure_release_signing_config_exists() -> None:
-    if not RELEASE_SIGNING_PROPERTIES_PATH.exists():
-        raise ToolError(
-            "Missing Android release signing file.\n"
-            f"Directory: {RELEASE_SIGNING_DIRECTORY_PATH}\n"
-            "Please place the required file at:\n"
-            f"{RELEASE_SIGNING_PROPERTIES_PATH}"
-        )
-
-    signing_properties = _read_release_signing_properties()
-    store_file_value = signing_properties.get("storeFile")
-    if not store_file_value:
-        raise ToolError(
-            "Missing 'storeFile' in Android release signing config.\n"
-            f"Please update: {RELEASE_SIGNING_PROPERTIES_PATH}"
-        )
-
-    resolved_keystore_path = _resolve_release_keystore_path(store_file_value)
-    if resolved_keystore_path.exists():
-        return
-
-    raise ToolError(
-        "Missing Android release keystore file.\n"
-        f"Configured by: {RELEASE_SIGNING_PROPERTIES_PATH}\n"
-        f"Directory: {RELEASE_SIGNING_DIRECTORY_PATH}\n"
-        f"Configured storeFile: {store_file_value}\n"
-        f"Resolved keystore path: {resolved_keystore_path}"
-    )
-
-
-def _print_release_apk_path_if_present() -> None:
-    if RELEASE_APK_OUTPUT_PATH.exists():
-        print(f"Release APK: {RELEASE_APK_OUTPUT_PATH}")
-
-
-def _print_staging_apk_path_if_present() -> None:
-    if STAGING_APK_OUTPUT_PATH.exists():
-        print(f"Staging APK: {STAGING_APK_OUTPUT_PATH}")
-
-
 def _add_android_string_key(args: argparse.Namespace) -> None:
     missing_args = [
         option
@@ -177,7 +79,7 @@ def _add_android_string_key(args: argparse.Namespace) -> None:
         )
     command = [
         "python",
-        "tools/scripts/android/translate/run.py",
+        "tools/repo_tooling/android_translate/run.py",
         "add-key",
         "--file",
         args.file,
@@ -194,7 +96,7 @@ def _add_android_string_key(args: argparse.Namespace) -> None:
 
     alignment_command = [
         "python",
-        "tools/scripts/android/translate/run.py",
+        "tools/repo_tooling/android_translate/run.py",
         "key-alignment",
         "--json-output",
     ]
@@ -215,54 +117,22 @@ def _add_android_string_key(args: argparse.Namespace) -> None:
     raise SystemExit(completed.returncode)
 
 
-def _install_debug_fresh(args: argparse.Namespace) -> None:
-    command = gradle_wrapper()
-    if args.clean:
-        command.append("clean")
-    command.append(":app:assembleDebug")
-    run(command, cwd=ANDROID_GRADLE_ROOT)
-
-    if not DEBUG_APK_OUTPUT_PATH.exists():
-        raise ToolError(f"Debug APK was not produced: {DEBUG_APK_OUTPUT_PATH}")
-    apk_size = DEBUG_APK_OUTPUT_PATH.stat().st_size
-    if apk_size < MIN_DEBUG_APK_BYTES:
-        raise ToolError(
-            "Debug APK is unexpectedly small; refusing to install a likely incomplete artifact.\n"
-            f"APK: {DEBUG_APK_OUTPUT_PATH}\n"
-            f"Size: {apk_size} bytes"
-        )
-
-    adb = shutil.which("adb")
-    if adb is None:
-        raise ToolError("Could not find 'adb' on PATH.")
-
-    uninstall_command = [adb, "uninstall", ANDROID_APP_ID]
-    print_command(uninstall_command)
-    uninstall_result = subprocess.run(uninstall_command)
-    if uninstall_result.returncode != 0:
-        print(f"[android] adb uninstall returned {uninstall_result.returncode}; continuing with fresh install.")
-
-    install_command = [adb, "install", os.fspath(DEBUG_APK_OUTPUT_PATH)]
-    run(install_command)
-    print(f"[android] Installed fresh debug APK: {DEBUG_APK_OUTPUT_PATH}")
-
-
 def cmd_android(args: argparse.Namespace) -> None:
     if getattr(args, "action", None) == "strings-add":
         _add_android_string_key(args)
         return
     if args.action == "install-debug-fresh":
-        _install_debug_fresh(args)
+        install_debug_fresh(clean=args.clean)
         return
     if args.action == "install-sdk":
-        _install_android_sdk_components(accept_licenses=args.accept_licenses)
+        install_android_sdk_components(accept_licenses=args.accept_licenses)
         return
     if args.action == "kotlin-policy":
         cmd_android_kotlin_policy()
         return
 
     if args.action == "assemble-release":
-        _ensure_release_signing_config_exists()
+        ensure_release_signing_config_exists()
 
     command = gradle_wrapper()
     if args.clean:
@@ -285,6 +155,6 @@ def cmd_android(args: argparse.Namespace) -> None:
         run(command, cwd=ANDROID_GRADLE_ROOT)
 
     if args.action == "assemble-staging":
-        _print_staging_apk_path_if_present()
+        print_staging_apk_path_if_present()
     if args.action == "assemble-release":
-        _print_release_apk_path_if_present()
+        print_release_apk_path_if_present()

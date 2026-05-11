@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import difflib
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,7 +9,7 @@ from core.android_resource_smoke_check import run_android_resource_smoke_check_w
 from core.replacement_json_preflight import load_replacement_json_with_preflight
 from core.replacement_entries import ReplacementEntry, load_replacement_entries
 from core.translation_paths import DEFAULT_RES_DIRECTORY
-from commands.fix_android_resource_escapes import run_fix_android_resource_escapes
+from core.android_resource_escapes import run_fix_android_resource_escapes
 from core.ko_resource_guardrails import autofix_ko_xml_text, validate_ko_values_xml_files
 from core.xml_string_replacement import (
     AppliedReplacement,
@@ -51,34 +50,6 @@ class ReplaceCommandResult:
 
 
 SENTENCE_BREAK_CHARS = ".!?。！？;；\n"
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Read replacement rules from a JSON file and update localized Android string XML files.\n"
-            "The JSON must include a top-level dir plus items containing name, find, and replace."
-        )
-    )
-    parser.add_argument(
-        "--res-dir",
-        default=str(DEFAULT_RES_DIRECTORY),
-        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
-    )
-    parser.add_argument(
-        "--json",
-        default=str(DEFAULT_JSON_PATH),
-        help=(
-            "Path to the replacement JSON file. "
-            "Defaults to replacements.json in the same directory as this script."
-        ),
-    )
-    parser.add_argument(
-        "--auto-fix-json",
-        action="store_true",
-        help="Apply high-confidence JSON syntax repairs before running replace.",
-    )
-    return parser.parse_args()
 
 def build_colored_character_diff(original_text: str, updated_text: str) -> str:
     parts: list[str] = []
@@ -304,7 +275,7 @@ def apply_translation_replacements(
                     "1) Replace raw \\\" with &quot; inside string bodies.\n"
                     "2) Replace raw \\' with ' unless Android escaping explicitly requires otherwise.\n"
                     "3) Remove malformed \\u escapes; use plain Unicode characters directly.\n"
-                    "4) Re-run: python tools/scripts/android/translate/run.py fix-resource-escapes --res-dir apps/audio_android/app/src/main/res\n"
+                    "4) Re-run: python tools/run.py android-translate fix-resource-escapes --res-dir apps/audio_android/app/src/main/res\n"
                 )
                 details = "\n".join(
                     f"- {issue.file}\n  reason: {issue.reason}\n  sample: {issue.sample}"
@@ -555,16 +526,3 @@ def apply_translation_replacements(
         auto_fix_applied=preflight_result.changed,
         auto_fix_summary=preflight_result.fix_summary,
     )
-
-
-def run() -> int:
-    args = parse_args()
-    return apply_translation_replacements(
-        res_dir=args.res_dir,
-        json_path=args.json,
-        auto_fix_json=args.auto_fix_json,
-    ).exit_code
-
-
-if __name__ == "__main__":
-    raise SystemExit(run())

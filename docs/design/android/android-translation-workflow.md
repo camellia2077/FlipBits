@@ -15,9 +15,9 @@
 - 英文拆分资源的翻译说明：
   - [android-split-strings-translation-guide.md](/C:/code/FlipBits/docs/design/android/translation/android-split-strings-translation-guide.md)
 - translate 工具总览：
-  - [tools/scripts/android/translate/docs/architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
+  - [tools/repo_tooling/android_translate/docs/architecture.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/architecture.md)
 - key 对齐检查说明：
-  - [tools/scripts/android/translate/docs/check_translation_key_alignment.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/check_translation_key_alignment.md)
+  - [tools/repo_tooling/android_translate/docs/check_translation_key_alignment.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/check_translation_key_alignment.md)
 
 ## When To Read
 
@@ -27,7 +27,7 @@
 - 新增或修改 `audio_samples_*.xml`
 - 调整默认样例、随机样例、语言切换后的样例内容
 - 处理构建里和翻译对齐相关的失败
-- 想手动使用 `tools/scripts/android/translate/run.py`
+- 想手动使用 `tools/repo_tooling/android_translate/run.py`
 
 如果这次改动只是 Kotlin/JNI/播放逻辑，不碰文本资源，通常不用读这篇。
 
@@ -51,7 +51,7 @@
 1. 新增 key 时必须用 `python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`
 2. `strings-add` 默认只写英文 `values/` 基线，并自动生成 translation key alignment 报告
 3. 根据 `temp/translation_key_alignment_reports/` 里的语言任务补齐 `values-*`
-4. 补齐本地化时优先使用 `tools/scripts/android/translate/AGENTS.md` 的 agent job 流程，不要手工把英文复制成 localized fallback
+4. 补齐本地化时优先使用 `tools/repo_tooling/android_translate/AGENTS.md` 的 agent job 流程，不要手工把英文复制成 localized fallback
 5. 修改已有 key 时先改英文基线 XML，再用 translate 工具生成 review / task / replacement 产物修订对应语言
 6. 如果改动涉及样例文本，再检查：
    - `apps/audio_android/app/src/main/java/com/bag/audioandroid/data/AndroidSampleInputTextProvider.kt`
@@ -69,12 +69,12 @@
 
 统一入口：
 
-- [tools/scripts/android/translate/run.py](/C:/code/FlipBits/tools/scripts/android/translate/run.py)
+- [tools/repo_tooling/android_translate/run.py](/C:/code/WaveBits/tools/repo_tooling/android_translate/run.py)
 
 最常用命令：
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignment"
+pwsh -NoLogo -Command "python tools/run.py android-translate key-alignment"
 ```
 
 新增 key 脚手架：
@@ -92,7 +92,7 @@ pwsh -NoLogo -Command "python tools/run.py android strings-add --file strings_au
 静默模式：
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignment --quiet"
+pwsh -NoLogo -Command "python tools/run.py android-translate key-alignment --quiet"
 ```
 
 它会检查：
@@ -103,7 +103,7 @@ pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignme
 更多子命令见：
 
 - [android-translation-tooling-agent-index.md](/C:/code/FlipBits/docs/design/android/android-translation-tooling-agent-index.md)
-- [tools/scripts/android/translate/docs/architecture.md](/C:/code/FlipBits/tools/scripts/android/translate/docs/architecture.md)
+- [tools/repo_tooling/android_translate/docs/architecture.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/architecture.md)
 
 ## Gradle Integration
 
@@ -118,7 +118,7 @@ Android app 的 Gradle 已经把翻译结构检查接进默认构建链路。
 - `preBuild` 依赖 `checkTranslationKeyAlignment`
 - `check` 也依赖 `checkTranslationKeyAlignment`
 - `checkTranslationKeyAlignment` 会调用：
-  - `tools/scripts/android/translate/run.py key-alignment --quiet`
+  - `tools/repo_tooling/android_translate/run.py key-alignment --quiet`
 
 这意味着：
 
@@ -161,7 +161,7 @@ Android app 的 Gradle 已经把翻译结构检查接进默认构建链路。
 4. 再重新跑：
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py key-alignment --quiet"
+pwsh -NoLogo -Command "python tools/run.py android-translate key-alignment --quiet"
 ```
 
 如果这里只是结构缺失：

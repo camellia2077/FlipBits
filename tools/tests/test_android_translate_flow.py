@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 TOOLS_DIR = Path(__file__).resolve().parents[1]
-RUN_PY = TOOLS_DIR / "scripts" / "android" / "translate" / "run.py"
+RUN_PY = TOOLS_DIR / "repo_tooling" / "android_translate" / "run.py"
 
 
 class AndroidTranslateFlowTests(unittest.TestCase):

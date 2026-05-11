@@ -19,13 +19,13 @@ The current Android resource layout is split-aware:
 The script resolves these paths from the repository root, so it can be run from the repository root with:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py"
+pwsh -NoLogo -Command "python tools/run.py android-translate"
 ```
 
 The unified outer entrypoint is:
 
 ```powershell
-pwsh -NoLogo -Command "python tools/scripts/android/translate/run.py"
+pwsh -NoLogo -Command "python tools/run.py android-translate"
 ```
 
 `check_mixed_language.py` itself now acts as a library-style module and no longer serves as the direct entrypoint.

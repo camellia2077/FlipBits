@@ -183,7 +183,7 @@ def cmd_verify_review_fixes(args: argparse.Namespace) -> None:
     run(
         [
             "python",
-            "tools/scripts/android/translate/run.py",
+            "tools/repo_tooling/android_translate/run.py",
             "key-alignment",
             "--quiet",
         ],

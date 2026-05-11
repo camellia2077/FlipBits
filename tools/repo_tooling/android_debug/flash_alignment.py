@@ -64,6 +64,10 @@ def str_field(event: Event, key: str, default: str = "") -> str:
     return event.fields.get(key, default)
 
 
+def latest_with_field(events: list[Event], field: str) -> Event | None:
+    return next((event for event in reversed(events) if field in event.fields), None)
+
+
 def nearest_visual(visual_events: list[Event], sample: int) -> Event | None:
     if not visual_events:
         return None
@@ -82,15 +86,25 @@ def build_summary(events: list[Event], max_rows: int) -> str:
     lines.append(f"- FlashAlignmentPerf rows: {len(alignment)}")
     lines.append(f"- FlashVisualPerf rows: {len(visual)}")
     lines.append(f"- FlashLyricsPerf rows: {len(lyrics)}")
-    if automation:
-        latest = automation[-1]
+    received = latest_with_field(automation, "scenario")
+    if received:
         lines.append(
             "- Scenario: "
-            f"scenario={str_field(latest, 'scenario')} "
-            f"style={str_field(latest, 'style')} "
-            f"visual={str_field(latest, 'visual')} "
-            f"playMs={str_field(latest, 'playMs')} "
-            f"text={str_field(latest, 'text')}"
+            f"scenario={str_field(received, 'scenario')} "
+            f"style={str_field(received, 'style')} "
+            f"visual={str_field(received, 'visual')} "
+            f"playMs={str_field(received, 'playMs')} "
+            f"input={str_field(received, 'input')} "
+            f"sampleLength={str_field(received, 'sampleLength', '_')}"
+        )
+    input_resolved = latest_with_field(automation, "chars")
+    if input_resolved:
+        lines.append(
+            "- Input: "
+            f"source={str_field(input_resolved, 'source')} "
+            f"sampleId={str_field(input_resolved, 'sampleId', '_')} "
+            f"chars={str_field(input_resolved, 'chars')} "
+            f"payloadBytes={str_field(input_resolved, 'payloadBytes')}"
         )
     visual_playing = [event for event in visual if str_field(event, "playing") == "true"]
     lyrics_playing = [event for event in lyrics if str_field(event, "playing") == "true"]
