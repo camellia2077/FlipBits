@@ -458,9 +458,11 @@ private class EncodeRunner(
     private suspend fun encodeSegmented(request: EncodeRequest): EncodeResult {
         val maxPayloadBytes = segmentedPayloadByteLimit(request)
         val segmentation = splitInputIntoPayloadSegments(request.inputText, maxPayloadBytes)
+        val segmentByteCounts = segmentation.segments.map { it.toByteArray(UTF_8).size }
+        val segmentBytesSummary = segmentByteCounts.joinToString(prefix = "[", postfix = "]")
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "encodeSegmented:start mode=${request.mode.wireName} payloadBytes=${request.payloadByteCount} segments=${segmentation.segmentCount} maxPayloadBytes=$maxPayloadBytes style=${request.selectedFlashVoicingStyle.id}",
+            "encodeSegmented:start mode=${request.mode.wireName} payloadBytes=${request.payloadByteCount} segments=${segmentation.segmentCount} maxPayloadBytes=$maxPayloadBytes style=${request.selectedFlashVoicingStyle.id} segmentBytes=$segmentBytesSummary",
         )
         val totalSegments = segmentation.segmentCount.toFloat()
         val audioAssembler =
@@ -473,6 +475,11 @@ private class EncodeRunner(
 
         try {
             segmentation.segments.forEachIndexed { index, segmentText ->
+                val segmentBytes = segmentByteCounts[index]
+                safeLogE(
+                    LONG_AUDIO_LOG_TAG,
+                    "encodeSegmented:segmentStart mode=${request.mode.wireName} index=${index + 1}/${segmentation.segmentCount} chars=${segmentText.length} bytes=$segmentBytes maxPayloadBytes=$maxPayloadBytes",
+                )
                 val validationIssue =
                     audioCodecGateway.validateEncodeRequest(
                         segmentText,
@@ -496,11 +503,19 @@ private class EncodeRunner(
                             request.flashPreset.signalProfileValue,
                             request.flashPreset.voicingFlavorValue,
                             onProgress = { update ->
+                                val segmentProgress = update.progress0To1.coerceIn(0f, 1f)
                                 onProgress(
                                     request.mode,
                                     update.copy(
+                                        phase =
+                                            aggregateSegmentedEncodePhase(
+                                                segmentIndex = index,
+                                                segmentCount = segmentation.segmentCount,
+                                                segmentPhase = update.phase,
+                                                segmentProgress0To1 = segmentProgress,
+                                            ),
                                         progress0To1 =
-                                            ((index.toFloat() + update.progress0To1.coerceIn(0f, 1f)) / totalSegments)
+                                            ((index.toFloat() + segmentProgress) / totalSegments)
                                                 .coerceIn(0f, 1f),
                                     ),
                                 )
@@ -602,7 +617,7 @@ private class EncodeRunner(
 
     private companion object {
         const val MAX_SINGLE_FRAME_PAYLOAD_BYTES = 512
-        const val MAX_SEGMENT_PAYLOAD_BYTES_RITUAL = 256
+        const val MAX_SEGMENT_PAYLOAD_BYTES_RITUAL = 64
     }
 
     private fun shouldEncodeSegmented(
@@ -619,6 +634,29 @@ private class EncodeRunner(
             request.flashPreset.usesLongCadencePayload -> MAX_SEGMENT_PAYLOAD_BYTES_RITUAL
             else -> MAX_SINGLE_FRAME_PAYLOAD_BYTES
         }
+
+    private fun aggregateSegmentedEncodePhase(
+        segmentIndex: Int,
+        segmentCount: Int,
+        segmentPhase: AudioEncodePhase,
+        segmentProgress0To1: Float,
+    ): AudioEncodePhase {
+        val isFirstSegment = segmentIndex == 0
+        val isLastSegment = segmentIndex == segmentCount - 1
+        if (isFirstSegment && segmentPhase == AudioEncodePhase.PreparingInput && segmentProgress0To1 <= 0f) {
+            return AudioEncodePhase.PreparingInput
+        }
+        if (!isLastSegment) {
+            return AudioEncodePhase.RenderingPcm
+        }
+        return when (segmentPhase) {
+            AudioEncodePhase.PreparingInput -> AudioEncodePhase.RenderingPcm
+            AudioEncodePhase.RenderingPcm,
+            AudioEncodePhase.Postprocessing,
+            AudioEncodePhase.Finalizing,
+            -> segmentPhase
+        }
+    }
 }
 
 private class EncodeStateReducer(
@@ -740,6 +778,10 @@ private class EncodeStateReducer(
                 generatedFlashSignalInfo = FlashSignalInfo.Empty,
                 decodedPayload = DecodedPayloadViewData.Empty,
                 followData = PayloadFollowViewData.Empty,
+                followWindowSource = null,
+                followWindow = FollowDataWindowState(),
+                flashVisualWindowSource = null,
+                flashVisualWindow = FlashVisualWindowState(),
                 statusText = uiTextMapper.validationIssue(validationIssue),
                 isCodecBusy = false,
                 encodeProgress = null,
@@ -757,14 +799,29 @@ private class EncodeStateReducer(
         mode: TransportModeOption,
         errorCode: Int,
     ) {
+        val previousFilePath =
+            uiState.value.sessions
+                .getValue(mode)
+                .generatedPcmFilePath
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "applyFailure mode=${mode.wireName} error=$errorCode",
+            "applyFailure mode=${mode.wireName} error=$errorCode previousFilePath=$previousFilePath",
         )
         sessionStateStore.updateSession(mode) {
             it.copy(
+                generatedPcm = shortArrayOf(),
+                generatedWaveformPcm = shortArrayOf(),
+                generatedPcmFilePath = null,
+                generatedAudioMetadata = null,
+                generatedWavAudioInfo = WavAudioInfo.Empty,
+                generatedFlashVoicingStyle = null,
+                generatedFlashSignalInfo = FlashSignalInfo.Empty,
                 decodedPayload = DecodedPayloadViewData.Empty,
                 followData = PayloadFollowViewData.Empty,
+                followWindowSource = null,
+                followWindow = FollowDataWindowState(),
+                flashVisualWindowSource = null,
+                flashVisualWindow = FlashVisualWindowState(),
                 statusText = uiTextMapper.errorCode(errorCode),
                 isCodecBusy = false,
                 encodeProgress = null,
@@ -772,6 +829,9 @@ private class EncodeStateReducer(
                 isEncodeCancelling = false,
                 playback = playbackRuntimeGateway.cleared(),
             )
+        }
+        if (previousFilePath != null) {
+            generatedAudioCacheGateway.deleteCachedFile(previousFilePath)
         }
     }
 

@@ -12,6 +12,8 @@
   - `docs/architecture/android/android-ui-structure.md`
 - Android native 策略：
   - `docs/architecture/android/android-native-strategy.md`
+- Android 自动化覆盖总览：
+  - `docs/architecture/android/android-automation-coverage.md`
 - Android 双色主题规则：
   - `docs/design/android/android-dual-tone-theme.md`
 - Android 播放器 UI：
@@ -127,6 +129,7 @@
 
 - 编码进度、取消、结果落态：
   - `AudioSessionEncodeActions.kt` -> `data/NativeAudioCodecGateway.kt` -> `app/src/main/cpp/jni_bridge.cpp`
+  - adb 采集与进度条 phase 诊断看 `docs/architecture/android/android-encode-progress-automation.md`
 - 导出 WAV、文件元数据、媒体库识别：
   - `MediaStoreAudioExportGateway.kt` -> `MediaStoreSavedAudioLibraryGateway.kt` -> `NativeAudioIoGateway.kt` / `audio_io_jni.cpp` -> `libs/audio_io/`
 - 播放区 UI：

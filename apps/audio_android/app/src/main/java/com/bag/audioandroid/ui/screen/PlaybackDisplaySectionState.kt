@@ -18,7 +18,7 @@ internal data class PlaybackDisplaySectionState(
 internal fun rememberPlaybackDisplaySectionState(
     isFlashMode: Boolean,
     onLyricsRequested: () -> Unit,
-    initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
+    initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
     initialFlashVisualizationMode: FlashSignalVisualizationMode = FlashSignalVisualizationMode.ToneTracks,
     onDisplayModeSelected: (PlaybackDisplayMode) -> Unit = {},
 ): PlaybackDisplaySectionState {
@@ -28,7 +28,7 @@ internal fun rememberPlaybackDisplaySectionState(
     }
     val playbackDisplayMode =
         remember(playbackDisplayModeName) {
-            PlaybackDisplayMode.entries.firstOrNull { it.name == playbackDisplayModeName } ?: PlaybackDisplayMode.Visual
+            PlaybackDisplayMode.entries.firstOrNull { it.name == playbackDisplayModeName } ?: PlaybackDisplayMode.Lyrics
         }
 
     return remember(

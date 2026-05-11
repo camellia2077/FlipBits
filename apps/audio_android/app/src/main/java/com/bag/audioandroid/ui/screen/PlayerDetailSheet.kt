@@ -66,7 +66,7 @@ internal fun PlayerDetailSheetContent(
         onScrubChanged(targetSamples)
         onScrubFinished()
     },
-    initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
+    initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
     initialFlashVisualizationMode: FlashSignalVisualizationMode? = null,
     modifier: Modifier = Modifier,
 ) {

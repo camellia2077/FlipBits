@@ -304,7 +304,7 @@ class PlayerDetailSheetContentTest {
 
     @Test
     fun `preview waveform keeps flash visualizer and real follow timeline`() {
-        setPreviewPlayerDetailContent()
+        setPreviewPlayerDetailContent(initialDisplayMode = PlaybackDisplayMode.Visual)
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.audio_flash_visualizer_mode_tone_tracks)).assertIsDisplayed()
     }
 
@@ -314,7 +314,7 @@ class PlayerDetailSheetContentTest {
         composeRule.onAllNodesWithTag("follow-token-active", useUnmergedTree = true).assertCountEquals(1)
     }
 
-    private fun setPreviewPlayerDetailContent(initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual) {
+    private fun setPreviewPlayerDetailContent(initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics) {
         val flashVisualSegments =
             listOf(
                 FlashSignalToneSegment(0, 5_000, FskDominantTone.Low),

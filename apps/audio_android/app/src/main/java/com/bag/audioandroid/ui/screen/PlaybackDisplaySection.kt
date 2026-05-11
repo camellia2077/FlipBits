@@ -43,6 +43,11 @@ internal fun PlaybackDisplaySection(
     onSeekToSample: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val displayModeOptions =
+        listOf(
+            PlaybackDisplayMode.Lyrics,
+            PlaybackDisplayMode.Visual,
+        )
     val visualizationRoute =
         resolvePlaybackVisualizationRoute(
             transportMode = transportMode,
@@ -78,7 +83,7 @@ internal fun PlaybackDisplaySection(
                     .fillMaxWidth()
                     .testTag("playback-display-switcher"),
         ) {
-            PlaybackDisplayMode.entries.forEachIndexed { index, option ->
+            displayModeOptions.forEachIndexed { index, option ->
                 val optionLabel = stringResource(option.titleResId)
                 SegmentedButton(
                     selected = playbackDisplayMode == option,
@@ -90,7 +95,7 @@ internal fun PlaybackDisplaySection(
                     shape =
                         SegmentedButtonDefaults.itemShape(
                             index = index,
-                            count = PlaybackDisplayMode.entries.size,
+                            count = displayModeOptions.size,
                         ),
                     colors = playerSegmentedButtonColors(),
                     label = { Text(text = optionLabel) },

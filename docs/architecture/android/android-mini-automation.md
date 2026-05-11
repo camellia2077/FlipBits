@@ -4,6 +4,8 @@
 
 This document describes the debug-only Mini scenario used for real-device adb capture. The current goal is observability only: gather precise Visual/Lyrics timing data for Mini slow, standard, and fast generated playback before changing sync behavior.
 
+For the full Android automation matrix across JVM tests, instrumentation, and adb debug scenarios, see `docs/architecture/android/android-automation-coverage.md`.
+
 ## Current Coverage
 
 Covered:
@@ -72,19 +74,13 @@ Supported extras:
 Recommended device prep:
 
 ```powershell
-adb shell svc power stayon usb
-adb shell input keyevent KEYCODE_WAKEUP
-adb shell wm dismiss-keyguard
+python tools/run.py android-debug device-prep
 ```
 
 Recommended log capture:
 
 ```powershell
-adb logcat -c
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
-Start-Sleep -Seconds 14
-adb logcat -d -v time MiniAutomation:D MiniAlignmentPerf:D FlashLyricsPerf:D *:S > temp\mini_alignment_raw.log
-python tools/scripts/android/mini/filter_mini_alignment_log.py temp\mini_alignment_raw.log --output temp\mini_alignment_summary.md
+python tools/run.py android-debug capture-mini --speed standard --play-ms 6000 --wait-ms 20000
 ```
 
 `MiniAlignmentPerf` is the preferred Mini sync diagnostic. It records the UI samples used for the Mini Morse timeline visual and the Lyrics token tape in the same row, plus active Morse group and active token state.
@@ -102,11 +98,7 @@ All-speed fast sweep:
 ```powershell
 $speeds = @("slow", "standard", "fast")
 foreach ($speed in $speeds) {
-    adb logcat -c
-    adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed $speed --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
-    Start-Sleep -Seconds 14
-    adb logcat -d -v time MiniAutomation:D MiniAlignmentPerf:D FlashLyricsPerf:D *:S > "temp\mini_alignment_$speed.log"
-    python tools/scripts/android/mini/filter_mini_alignment_log.py "temp\mini_alignment_$speed.log" --output "temp\mini_alignment_$speed.md"
+    python tools/run.py android-debug capture-mini --speed $speed --play-ms 6000 --wait-ms 20000 --output-dir "temp\android-debug\mini_$speed"
 }
 ```
 

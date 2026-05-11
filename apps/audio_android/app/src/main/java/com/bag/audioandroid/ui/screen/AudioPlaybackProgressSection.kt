@@ -34,7 +34,7 @@ internal fun AudioPlaybackProgressSection(
     onScrubChanged: (Int) -> Unit,
     onScrubFinished: () -> Unit,
     onLyricsRequested: () -> Unit = {},
-    initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Visual,
+    initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
 ) {
     Column(
         modifier =

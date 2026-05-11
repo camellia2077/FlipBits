@@ -1,5 +1,7 @@
 package com.bag.audioandroid.ui
 
+import android.util.Log
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.audio.PlaybackResult
@@ -23,18 +25,33 @@ internal class AudioPlaybackCommandActions(
         val current = uiState.value
         val playbackTarget =
             playbackSourceCoordinator.resolveTarget(current) ?: run {
+                safeLogD(
+                    PLAYBACK_AUTOMATION_TAG,
+                    "toggle:noTarget source=${current.currentPlaybackSource.debugSourceId()} " +
+                        "currentMode=${current.transportMode.wireName} " +
+                        "currentSamples=${current.currentPlaybackSampleCount} " +
+                        "miniPlayer=${current.miniPlayerModel != null}",
+                )
                 playbackUiStateSync.setCurrentStatusText(UiText.Resource(R.string.status_no_audio_for_mode))
                 return
             }
         val sourceKey = playbackSourceCoordinator.sourceKey(playbackTarget.source)
 
         if (playbackCoordinator.hasActivePlaybackForOtherSource(sourceKey)) {
+            safeLogD(
+                PLAYBACK_AUTOMATION_TAG,
+                "toggle:stopOther target=$sourceKey",
+            )
             stopPlayback()
         }
         val playback = playbackTarget.playback
 
         when {
             playback.isPlaying -> {
+                safeLogD(
+                    PLAYBACK_AUTOMATION_TAG,
+                    "toggle:pause source=$sourceKey played=${playback.playedSamples} total=${playback.totalSamples}",
+                )
                 playbackCoordinator.pausePlayback(sourceKey)
                 playbackUiStateSync.updatePlaybackState(playbackTarget.source) {
                     playbackRuntimeGateway.paused(it)
@@ -43,6 +60,10 @@ internal class AudioPlaybackCommandActions(
             }
 
             playback.isPaused && playbackCoordinator.hasActivePlaybackForSource(sourceKey) -> {
+                safeLogD(
+                    PLAYBACK_AUTOMATION_TAG,
+                    "toggle:resume source=$sourceKey played=${playback.playedSamples} total=${playback.totalSamples}",
+                )
                 if (playbackCoordinator.resumePlayback(sourceKey)) {
                     playbackUiStateSync.updatePlaybackState(playbackTarget.source) {
                         playbackRuntimeGateway.resumed(it)
@@ -96,6 +117,12 @@ internal class AudioPlaybackCommandActions(
                 target.playback
             }
         val startedPlayback = playbackRuntimeGateway.playStarted(basePlayback)
+        safeLogD(
+            PLAYBACK_AUTOMATION_TAG,
+            "start source=$sourceKey total=${target.totalSamples} inMemory=${target.pcm.size} " +
+                "fileBacked=${!target.pcmFilePath.isNullOrBlank()} sampleRate=${target.sampleRateHz} " +
+                "start=${startedPlayback.playedSamples} restart=$restartFromBeginning",
+        )
         playbackCoordinator.startPlayback(
             scope = scope,
             sourceKey = sourceKey,
@@ -125,5 +152,27 @@ internal class AudioPlaybackCommandActions(
             },
             onFailed = playbackUiStateSync::applyPlaybackFailed,
         )
+    }
+}
+
+private const val PLAYBACK_AUTOMATION_TAG = "PlaybackAutomation"
+
+private fun AudioPlaybackSource.debugSourceId(): String =
+    when (this) {
+        is AudioPlaybackSource.Generated -> "generated:${mode.wireName}"
+        is AudioPlaybackSource.Saved -> "saved:$itemId"
+    }
+
+private fun safeLogD(
+    tag: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        Log.d(tag, message)
+    } catch (_: RuntimeException) {
+        // Plain JVM unit tests use the Android stub jar, where Log.d is not implemented.
     }
 }

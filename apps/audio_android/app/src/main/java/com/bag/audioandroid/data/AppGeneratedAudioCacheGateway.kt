@@ -1,6 +1,8 @@
 package com.bag.audioandroid.data
 
 import android.content.Context
+import android.util.Log
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
 import com.bag.audioandroid.domain.GeneratedAudioPcmCacheWriter
 import java.io.BufferedOutputStream
@@ -20,6 +22,7 @@ class AppGeneratedAudioCacheGateway(
                 CACHE_FILE_SUFFIX,
                 cacheDirectory,
             )
+        safeLogD(CACHE_AUTOMATION_TAG, "create mode=$modeWireName path=${file.absolutePath}")
         return FileGeneratedAudioPcmCacheWriter(file)
     }
 
@@ -28,6 +31,8 @@ class AppGeneratedAudioCacheGateway(
             return
         }
         runCatching { File(path).delete() }
+            .onSuccess { deleted -> safeLogD(CACHE_AUTOMATION_TAG, "delete path=$path deleted=$deleted") }
+            .onFailure { error -> safeLogD(CACHE_AUTOMATION_TAG, "deleteFailed path=$path error=${error.message}") }
     }
 
     private companion object {
@@ -41,6 +46,7 @@ private class FileGeneratedAudioPcmCacheWriter(
 ) : GeneratedAudioPcmCacheWriter {
     override val filePath: String = file.absolutePath
 
+    private var appendedSamples = 0L
     private var output =
         BufferedOutputStream(
             FileOutputStream(file),
@@ -52,6 +58,7 @@ private class FileGeneratedAudioPcmCacheWriter(
         if (closed || pcm.isEmpty()) {
             return
         }
+        appendedSamples += pcm.size.toLong()
         val bytes = ByteArray(pcm.size * SHORT_BYTES)
         var byteIndex = 0
         pcm.forEach { sample ->
@@ -65,11 +72,23 @@ private class FileGeneratedAudioPcmCacheWriter(
 
     override fun finish() {
         closeOutput()
+        safeLogD(
+            CACHE_AUTOMATION_TAG,
+            "finish path=${file.absolutePath} samples=$appendedSamples bytes=${file.length()}",
+        )
     }
 
     override fun abort() {
         closeOutput()
         runCatching { file.delete() }
+            .onSuccess { deleted ->
+                safeLogD(
+                    CACHE_AUTOMATION_TAG,
+                    "abort path=${file.absolutePath} samples=$appendedSamples deleted=$deleted",
+                )
+            }.onFailure { error ->
+                safeLogD(CACHE_AUTOMATION_TAG, "abortFailed path=${file.absolutePath} error=${error.message}")
+            }
     }
 
     private fun closeOutput() {
@@ -90,5 +109,21 @@ private class FileGeneratedAudioPcmCacheWriter(
         const val BYTE_MASK = 0xFF
         const val BUFFER_SIZE_BYTES = 32 * 1024
         const val SHORT_BYTES = 2
+    }
+}
+
+private const val CACHE_AUTOMATION_TAG = "GeneratedAudioCache"
+
+private fun safeLogD(
+    tag: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        Log.d(tag, message)
+    } catch (_: RuntimeException) {
+        // Plain JVM unit tests use the Android stub jar, where Log.d is not implemented.
     }
 }

@@ -27,12 +27,16 @@
   - `docs/design/android/android-translation-tooling-agent-index.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
   - `docs/architecture/android/android-ui-structure.md`
+- 如果改动涉及 Android 自动化覆盖面、测试分层、adb scenario 归属或补回归测试优先级，再按需读：
+  - `docs/architecture/android/android-automation-coverage.md`
 - 如果改动涉及 Flash Visual、Lyrics 跟随、长音频可视化、动画卡顿/跳动或 debug 指标，再按需读：
   - `docs/architecture/android/android-flash-visual.md`
 - 如果改动涉及 Flash 真机 UI 回归、agent/adb 驱动调试、自动化 scenario 或稳定 test tags，再按需读：
   - `docs/architecture/android/android-flash-automation.md`
 - 如果改动涉及 Mini 真机 UI 回归、agent/adb 驱动调试、slow/standard/fast Morse speed 采集或 Mini Visual/Lyrics 对齐数据，再按需读：
   - `docs/architecture/android/android-mini-automation.md`
+- 如果改动涉及 `mini / pro / ultra` 生成音频时的编码进度条、phase 文案或 adb 采集，再按需读：
+  - `docs/architecture/android/android-encode-progress-automation.md`
 
 ## Hard Rules
 

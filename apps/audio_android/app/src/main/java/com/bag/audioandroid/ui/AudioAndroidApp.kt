@@ -20,12 +20,15 @@ import com.bag.audioandroid.ui.screen.currentBitsText
 import com.bag.audioandroid.ui.screen.flashBitReadoutFrame
 import com.bag.audioandroid.ui.screen.previousBitsText
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.ModeAudioSessionState
 import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 
 @Composable
 fun AudioAndroidApp(
     debugScenario: FlashDebugScenario? = null,
     miniDebugScenario: MiniDebugScenario? = null,
+    encodeProgressDebugScenario: EncodeProgressDebugScenario? = null,
 ) {
     val appContext = LocalContext.current.applicationContext
     val factory = rememberAudioAndroidViewModelFactory(appContext)
@@ -95,6 +98,68 @@ fun AudioAndroidApp(
         }
     }
 
+    LaunchedEffect(encodeProgressDebugScenario?.requestId) {
+        if (BuildConfig.DEBUG && encodeProgressDebugScenario != null) {
+            viewModel.startEncodeProgressDebugScenario(encodeProgressDebugScenario)
+        }
+    }
+
+    val encodeProgressDebugSession = encodeProgressDebugScenario?.mode?.let { mode -> uiState.sessions[mode] }
+    LaunchedEffect(
+        encodeProgressDebugScenario?.requestId,
+        encodeProgressDebugSession?.isCodecBusy,
+        encodeProgressDebugSession?.encodeProgress,
+        encodeProgressDebugSession?.encodePhase,
+        encodeProgressDebugSession?.isEncodeCancelling,
+        encodeProgressDebugSession?.generatedContentRevision,
+        encodeProgressDebugSession?.generatedAudioMetadata?.pcmSampleCount,
+        encodeProgressDebugSession?.generatedPcm?.size,
+        encodeProgressDebugSession?.generatedPcmFilePath,
+    ) {
+        if (BuildConfig.DEBUG && encodeProgressDebugScenario != null && encodeProgressDebugSession != null) {
+            logEncodeProgressDebugSnapshot(
+                kind = "ui",
+                scenario = encodeProgressDebugScenario,
+                session = encodeProgressDebugSession,
+            )
+        }
+    }
+
+    LaunchedEffect(encodeProgressDebugScenario?.requestId) {
+        val scenario = encodeProgressDebugScenario
+        if (!BuildConfig.DEBUG || scenario == null) {
+            return@LaunchedEffect
+        }
+        var tick = 0
+        var sawBusy = false
+        val startedAtMs = System.currentTimeMillis()
+        while (System.currentTimeMillis() - startedAtMs <= scenario.captureDurationMs) {
+            val session = viewModel.uiState.value.sessions[scenario.mode] ?: break
+            logEncodeProgressDebugSnapshot(
+                kind = "uiTick",
+                scenario = scenario,
+                session = session,
+                tick = tick,
+            )
+            if (session.isCodecBusy || session.encodeProgress != null) {
+                sawBusy = true
+            }
+            if (!scenario.encode) {
+                break
+            }
+            if (sawBusy && !session.isCodecBusy && session.encodeProgress == null) {
+                break
+            }
+            tick += 1
+            delay(scenario.pollIntervalMs)
+        }
+        Log.d(
+            ENCODE_PROGRESS_AUTOMATION_TAG,
+            "captureEnd requestId=${scenario.requestId} mode=${scenario.mode.wireName} " +
+                "ticks=$tick sawBusy=$sawBusy elapsedMs=${System.currentTimeMillis() - startedAtMs}",
+        )
+    }
+
     LaunchedEffect(
         debugScenario,
         miniDebugScenario,
@@ -105,16 +170,42 @@ fun AudioAndroidApp(
         if (shouldStartUiDebugPlayback(debugScenario, debugScenarioStartRevision, handledDebugScenarioPlaybackRequestId, uiState)) {
             val scenario = debugScenario ?: return@LaunchedEffect
             handledDebugScenarioPlaybackRequestId = scenario.requestId
+            logUiDebugPlaybackStep(
+                label = "start",
+                requestId = scenario.requestId,
+                mode = TransportModeOption.Flash,
+                uiState = uiState,
+            )
             viewModel.onOpenPlayerDetailSheet()
+            Log.d(
+                "FlashAutomation",
+                "uiPlaybackOpenDetail requestId=${scenario.requestId} mode=flash " +
+                    "detailBefore=${uiState.showPlayerDetailSheet}",
+            )
             viewModel.onTogglePlayback()
+            Log.d(
+                "FlashAutomation",
+                "uiPlaybackToggle requestId=${scenario.requestId} mode=flash " +
+                    "playMs=${scenario.playDurationMs}",
+            )
             if (scenario.playDurationMs > 0L) {
                 delay(scenario.playDurationMs)
+                Log.d(
+                    "FlashAutomation",
+                    "uiPlaybackStop requestId=${scenario.requestId} mode=flash playMs=${scenario.playDurationMs}",
+                )
                 viewModel.stopPlayback()
             }
         }
         if (shouldStartUiDebugPlayback(miniDebugScenario, miniDebugScenarioStartRevision, handledDebugScenarioPlaybackRequestId, uiState)) {
             val scenario = miniDebugScenario ?: return@LaunchedEffect
             handledDebugScenarioPlaybackRequestId = scenario.requestId
+            logUiDebugPlaybackStep(
+                label = "start",
+                requestId = scenario.requestId,
+                mode = TransportModeOption.Mini,
+                uiState = uiState,
+            )
             viewModel.onOpenPlayerDetailSheet()
             viewModel.onTogglePlayback()
             if (scenario.playDurationMs > 0L) {
@@ -182,6 +273,41 @@ fun AudioAndroidApp(
         }
     }
 
+    val flashDebugSession = uiState.sessions[TransportModeOption.Flash]
+    LaunchedEffect(
+        debugScenario?.requestId,
+        flashDebugSession?.isCodecBusy,
+        flashDebugSession?.generatedContentRevision,
+        flashDebugSession?.generatedAudioMetadata?.pcmSampleCount,
+        flashDebugSession?.generatedPcm?.size,
+        flashDebugSession?.generatedPcmFilePath,
+        flashDebugSession?.followData?.followAvailable,
+        flashDebugSession?.followData?.textFollowAvailable,
+        uiState.currentPlaybackSource,
+        uiState.currentPlaybackSampleCount,
+        uiState.currentPlayback.isPlaying,
+        uiState.miniPlayerModel?.durationMs,
+        uiState.showPlayerDetailSheet,
+    ) {
+        if (BuildConfig.DEBUG && debugScenario != null && flashDebugSession != null) {
+            val followData = flashDebugSession.followData
+            Log.d(
+                "FlashAutomation",
+                "state requestId=${debugScenario.requestId} " +
+                    "busy=${flashDebugSession.isCodecBusy} revision=${flashDebugSession.generatedContentRevision} " +
+                    "source=${uiState.currentPlaybackSource.debugSourceId()} " +
+                    "metadataSamples=${flashDebugSession.generatedAudioMetadata?.pcmSampleCount ?: 0} " +
+                    "inMemorySamples=${flashDebugSession.generatedPcm.size} " +
+                    "fileBacked=${!flashDebugSession.generatedPcmFilePath.isNullOrBlank()} " +
+                    "playbackSamples=${uiState.currentPlaybackSampleCount} " +
+                    "miniPlayer=${uiState.miniPlayerModel != null} miniDurationMs=${uiState.miniPlayerModel?.durationMs ?: 0} " +
+                    "detailSheet=${uiState.showPlayerDetailSheet} " +
+                    "follow=${followData.followAvailable} textFollow=${followData.textFollowAvailable} " +
+                    "binaryGroups=${followData.binaryGroupTimeline.size} playing=${uiState.currentPlayback.isPlaying}",
+            )
+        }
+    }
+
     AudioAndroidAppShell(
         uiState = uiState,
         savedAudioFilter = savedAudioFilter,
@@ -193,6 +319,21 @@ fun AudioAndroidApp(
 }
 
 private const val FlashHeadlessTag = "FlashHeadless"
+
+private fun logUiDebugPlaybackStep(
+    label: String,
+    requestId: Long,
+    mode: TransportModeOption,
+    uiState: AudioAppUiState,
+) {
+    Log.d(
+        "FlashAutomation",
+        "uiPlaybackStep requestId=$requestId label=$label mode=${mode.wireName} " +
+            "source=${uiState.currentPlaybackSource.debugSourceId()} " +
+            "detailSheet=${uiState.showPlayerDetailSheet} miniPlayer=${uiState.miniPlayerModel != null} " +
+            "playbackSamples=${uiState.currentPlaybackSampleCount} playing=${uiState.currentPlayback.isPlaying}",
+    )
+}
 
 private fun shouldStartUiDebugPlayback(
     scenario: FlashDebugScenario?,
@@ -271,3 +412,37 @@ private fun defaultSavedAudioFilter(uiState: AudioAppUiState): SavedAudioModeFil
                 it.mode?.wireName == uiState.currentSavedAudioItem?.modeWireName
             } ?: SavedAudioModeFilter.All
     }
+
+private fun logEncodeProgressDebugSnapshot(
+    kind: String,
+    scenario: EncodeProgressDebugScenario,
+    session: ModeAudioSessionState,
+    tick: Int? = null,
+) {
+    val progress = session.encodeProgress
+    val isEncodingBusy = session.isCodecBusy && progress != null
+    val clampedProgress = (progress ?: 0f).coerceIn(0f, 1f)
+    val percent = (clampedProgress * 100f).roundToInt()
+    val tickPart = tick?.let { " tick=$it" }.orEmpty()
+    Log.d(
+        ENCODE_PROGRESS_AUTOMATION_TAG,
+        "$kind requestId=${scenario.requestId}$tickPart " +
+            "mode=${scenario.mode.wireName} busy=${session.isCodecBusy} " +
+            "barVisible=$isEncodingBusy labelVisible=${isEncodingBusy && session.encodePhase != null} " +
+            "phase=${session.encodePhase?.name ?: "none"} " +
+            "progress=${progress ?: -1f} percent=$percent " +
+            "cancelling=${session.isEncodeCancelling} " +
+            "revision=${session.generatedContentRevision} " +
+            "metadataSamples=${session.generatedAudioMetadata?.pcmSampleCount ?: 0} " +
+            "inMemorySamples=${session.generatedPcm.size} " +
+            "fileBacked=${!session.generatedPcmFilePath.isNullOrBlank()}",
+    )
+}
+
+private fun AudioPlaybackSource.debugSourceId(): String =
+    when (this) {
+        is AudioPlaybackSource.Generated -> "generated:${mode.wireName}"
+        is AudioPlaybackSource.Saved -> "saved:$itemId"
+    }
+
+private const val ENCODE_PROGRESS_AUTOMATION_TAG = "EncodeProgressAutomation"

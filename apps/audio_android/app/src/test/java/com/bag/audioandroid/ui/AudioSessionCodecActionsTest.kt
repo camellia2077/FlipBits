@@ -3,24 +3,34 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.AudioEncodePhase
+import com.bag.audioandroid.domain.AudioExportResult
 import com.bag.audioandroid.domain.AudioIoGateway
 import com.bag.audioandroid.domain.BagApiCodes
+import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.DecodedAudioData
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
 import com.bag.audioandroid.domain.EncodeProgressUpdate
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
+import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.GeneratedAudioPcmCacheWriter
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
+import com.bag.audioandroid.domain.SavedAudioContent
+import com.bag.audioandroid.domain.SavedAudioImportResult
+import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.domain.SavedAudioRenameResult
+import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
 import com.bag.audioandroid.domain.WavAudioInfo
+import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
@@ -30,10 +40,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -191,6 +203,232 @@ class AudioSessionCodecActionsTest {
         }
 
     @Test
+    fun `failed encode clears stale generated audio instead of exposing zero duration mini player`() =
+        runTest {
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeResult = EncodeAudioResult.Failed(BagApiCodes.ERROR_ENCODED_AUDIO_TOO_LARGE),
+                        ),
+                    testScope = this,
+                )
+            val staleMetadata =
+                GeneratedAudioMetadata(
+                    mode = TransportModeOption.Flash,
+                    flashVoicingStyle = FlashVoicingStyleOption.Steady,
+                    createdAtIsoUtc = "2026-05-11T00:00:00Z",
+                    durationMs = 1_000,
+                    sampleRateHz = 44_100,
+                    frameSamples = 2_205,
+                    pcmSampleCount = 44_100,
+                    payloadByteCount = 3,
+                    inputSourceKind = GeneratedAudioInputSourceKind.Manual,
+                    appVersion = "test",
+                    coreVersion = "test",
+                )
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (mode, session) ->
+                            if (mode == TransportModeOption.Flash) {
+                                session.copy(
+                                    inputText = "new text",
+                                    generatedPcm = shortArrayOf(1, 2, 3),
+                                    generatedWaveformPcm = shortArrayOf(1, 2, 3),
+                                    generatedAudioMetadata = staleMetadata,
+                                    generatedFlashVoicingStyle = FlashVoicingStyleOption.Steady,
+                                    generatedFlashSignalInfo =
+                                        FlashSignalInfo(
+                                            lowCarrierHz = "300",
+                                            highCarrierHz = "600",
+                                            bitDurationSamples = "2205",
+                                            payloadSilence = "none",
+                                            decodePath = "fixed low/high window",
+                                            available = true,
+                                        ),
+                                    followData = DefaultFollowData,
+                                    playback = PlaybackUiState(totalSamples = 44_100, sampleRateHz = 44_100),
+                                )
+                            } else {
+                                session
+                            }
+                        },
+                )
+            assertTrue(fixture.uiState.value.miniPlayerModel != null)
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.currentSession
+            assertFalse(session.isCodecBusy)
+            assertResId(session.statusText, R.string.error_encoded_audio_too_large)
+            assertEquals(0, session.generatedPcm.size)
+            assertEquals(0, session.generatedWaveformPcm.size)
+            assertEquals(null, session.generatedAudioMetadata)
+            assertEquals(null, session.generatedFlashVoicingStyle)
+            assertFalse(session.generatedFlashSignalInfo.available)
+            assertFalse(session.followData.followAvailable)
+            assertEquals(0, session.playback.totalSamples)
+            assertEquals(null, fixture.uiState.value.miniPlayerModel)
+        }
+
+    @Test
+    fun `saved playback source survives later generated encode failure`() =
+        runTest {
+            var encodeCount = 0
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeBlock = { _ ->
+                                if (encodeCount++ == 0) {
+                                    EncodeAudioResult.Success(shortArrayOf(1, 2, 3), followData = DefaultFollowData)
+                                } else {
+                                    EncodeAudioResult.Failed(BagApiCodes.ERROR_ENCODED_AUDIO_TOO_LARGE)
+                                }
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            assertTrue(fixture.uiState.value.currentPlaybackSource is AudioPlaybackSource.Generated)
+            assertTrue(fixture.uiState.value.miniPlayerModel != null)
+
+            val savedItem =
+                SavedAudioItem(
+                    itemId = "saved-pro",
+                    displayName = "saved-pro.wav",
+                    uriString = "content://saved/pro",
+                    modeWireName = TransportModeOption.Pro.wireName,
+                    durationMs = 2_000L,
+                    savedAtEpochSeconds = 1L,
+                )
+            val savedContent =
+                SavedAudioContent(
+                    item = savedItem,
+                    pcm = shortArrayOf(9, 8, 7, 6),
+                    sampleRateHz = 44_100,
+                    metadata =
+                        GeneratedAudioMetadata(
+                            mode = TransportModeOption.Pro,
+                            createdAtIsoUtc = "2026-05-11T00:00:00Z",
+                            durationMs = 2_000L,
+                            sampleRateHz = 44_100,
+                            frameSamples = 2_205,
+                            pcmSampleCount = 4,
+                            payloadByteCount = 4,
+                            inputSourceKind = GeneratedAudioInputSourceKind.Manual,
+                            appVersion = "test",
+                            coreVersion = "test",
+                        ),
+                )
+            val selectionActions =
+                AudioSavedAudioSelectionActions(
+                    uiState = fixture.uiState,
+                    audioCodecGateway = FakeAudioCodecGateway(),
+                    playbackRuntimeGateway = FakePlaybackRuntimeGateway(),
+                    savedAudioRepository = CodecFakeSavedAudioRepository(mapOf(savedItem.itemId to savedContent)),
+                    stopPlayback = {},
+                    setCurrentStatusText = {},
+                    generatedAudioCacheGateway = CodecFakeGeneratedAudioCacheGateway(),
+                )
+
+            selectionActions.onSavedAudioSelected(savedItem.itemId)
+
+            assertEquals(AudioPlaybackSource.Saved(savedItem.itemId), fixture.uiState.value.currentPlaybackSource)
+            assertEquals(
+                2_000L,
+                fixture.uiState.value.miniPlayerModel
+                    ?.durationMs,
+            )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val flashSession =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Flash)
+            assertEquals(AudioPlaybackSource.Saved(savedItem.itemId), fixture.uiState.value.currentPlaybackSource)
+            assertEquals(
+                2_000L,
+                fixture.uiState.value.miniPlayerModel
+                    ?.durationMs,
+            )
+            assertEquals(0, flashSession.generatedPcm.size)
+            assertEquals(null, flashSession.generatedAudioMetadata)
+            assertFalse(flashSession.followData.followAvailable)
+            assertEquals(0, flashSession.playback.totalSamples)
+        }
+
+    @Test
+    fun `generated encode decode roundtrip stores decoded text for all modes`() =
+        runTest {
+            TransportModeOption.entries.forEach { mode ->
+                val text = "roundtrip-${mode.wireName}"
+                val encodedPcm = shortArrayOf(mode.nativeValue.toShort(), 42)
+                val fixture =
+                    createFixture(
+                        gateway =
+                            FakeAudioCodecGateway(
+                                encodeResult =
+                                    EncodeAudioResult.Success(
+                                        pcm = encodedPcm,
+                                        followData = DefaultFollowData,
+                                    ),
+                                decodeBlock = { pcm, nativeMode ->
+                                    assertEquals(mode.nativeValue, nativeMode)
+                                    assertEquals(encodedPcm.toList(), pcm.toList())
+                                    DecodedAudioPayloadResult(
+                                        decodedPayload =
+                                            DecodedPayloadViewData(
+                                                text = text,
+                                                rawBytesHex = "72 6F 75 6E 64",
+                                                rawBitsBinary = "01110010",
+                                                textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                                                rawPayloadAvailable = true,
+                                            ),
+                                        followData = DefaultFollowData,
+                                    )
+                                },
+                            ),
+                        testScope = this,
+                    )
+                fixture.uiState.value =
+                    fixture.uiState.value.copy(
+                        transportMode = mode,
+                        currentPlaybackSource = AudioPlaybackSource.Generated(mode),
+                        sessions =
+                            fixture.uiState.value.sessions.mapValues { (sessionMode, session) ->
+                                if (sessionMode == mode) {
+                                    session.copy(inputText = text)
+                                } else {
+                                    session
+                                }
+                            },
+                    )
+
+                fixture.actions.onEncode()
+                advanceUntilIdle()
+                fixture.actions.onDecode()
+                advanceUntilIdle()
+
+                val session =
+                    fixture.uiState.value.sessions
+                        .getValue(mode)
+                assertEquals(text, session.decodedPayload.text)
+                assertEquals(BagDecodeContentCodes.STATUS_OK, session.decodedPayload.textDecodeStatusCode)
+                assertTrue(session.decodedPayload.rawPayloadAvailable)
+                assertTrue(session.followData.followAvailable)
+                assertFalse(session.isCodecBusy)
+                assertResId(session.statusText, R.string.status_mode_decode_completed)
+            }
+        }
+
+    @Test
     fun `payload too large input auto segments and keeps aggregated playback`() =
         runTest {
             val longText = "祭".repeat(200)
@@ -278,6 +516,95 @@ class AudioSessionCodecActionsTest {
             assertEquals(encodedTexts.size, session.generatedAudioMetadata?.segmentCount)
             assertEquals(session.generatedAudioMetadata?.pcmSampleCount, session.playback.totalSamples)
             assertTrue(fixture.uiState.value.miniPlayerModel != null)
+        }
+
+    @Test
+    fun `segmented progress phase does not jump back to preparing between segments`() =
+        runTest {
+            val longText = "A".repeat(1_025)
+            val observedPhases = mutableListOf<AudioEncodePhase>()
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeTextBlock = { text, onProgress ->
+                                onProgress(EncodeProgressUpdate(AudioEncodePhase.PreparingInput, 0f))
+                                yield()
+                                onProgress(EncodeProgressUpdate(AudioEncodePhase.Finalizing, 1f))
+                                yield()
+                                EncodeAudioResult.Success(ShortArray(text.length))
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    transportMode = TransportModeOption.Ultra,
+                    currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Ultra),
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = longText)
+                        },
+                )
+
+            val collectionJob =
+                launch {
+                    fixture.uiState.collect { state ->
+                        state.sessions.getValue(TransportModeOption.Ultra).encodePhase?.let { phase ->
+                            if (observedPhases.lastOrNull() != phase) {
+                                observedPhases += phase
+                            }
+                        }
+                    }
+                }
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+            collectionJob.cancel()
+
+            assertEquals(
+                listOf(
+                    AudioEncodePhase.PreparingInput,
+                    AudioEncodePhase.RenderingPcm,
+                    AudioEncodePhase.Finalizing,
+                ),
+                observedPhases,
+            )
+        }
+
+    @Test
+    fun `litany long cadence uses smaller payload segments`() =
+        runTest {
+            val longText = "A".repeat(129)
+            val encodedTexts = mutableListOf<String>()
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeTextBlock = { text, _ ->
+                                encodedTexts += text
+                                EncodeAudioResult.Success(ShortArray(text.length))
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Litany,
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (_, session) ->
+                            session.copy(inputText = longText)
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            assertTrue(encodedTexts.size > 2)
+            assertTrue(encodedTexts.all { it.toByteArray(UTF_8).size <= 64 })
+            assertEquals(longText, encodedTexts.joinToString(separator = ""))
         }
 
     @Test
@@ -547,6 +874,7 @@ private class FakeAudioCodecGateway(
         ),
     private val encodeBlock: (suspend ((EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
     private val encodeTextBlock: (suspend (String, (EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
+    private val decodeBlock: ((ShortArray, Int) -> DecodedAudioPayloadResult)? = null,
     private val flashSignalInfo: FlashSignalInfo = FlashSignalInfo.Empty,
     private val validateEncodeRequestBlock: (
         (
@@ -621,7 +949,7 @@ private class FakeAudioCodecGateway(
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): DecodedAudioPayloadResult = DecodedAudioPayloadResult()
+    ): DecodedAudioPayloadResult = decodeBlock?.invoke(pcm, mode) ?: DecodedAudioPayloadResult()
 
     override fun getCoreVersion(): String = "test"
 }
@@ -711,6 +1039,54 @@ private class CodecFakeAudioIoGateway(
             fileByteCount = wavBytes.size.toLong(),
             durationMs = 0L,
         )
+}
+
+private class CodecFakeSavedAudioRepository(
+    private val savedContentById: Map<String, SavedAudioContent> = emptyMap(),
+) : SavedAudioRepository {
+    override fun suggestGeneratedAudioDisplayName(
+        mode: TransportModeOption,
+        inputText: String,
+    ): String = "generated.wav"
+
+    override fun exportGeneratedAudio(
+        mode: TransportModeOption,
+        inputText: String,
+        pcm: ShortArray,
+        pcmFilePath: String?,
+        sampleRateHz: Int,
+        metadata: GeneratedAudioMetadata,
+    ): AudioExportResult = AudioExportResult.Failed
+
+    override fun exportGeneratedAudioToDocument(
+        mode: TransportModeOption,
+        inputText: String,
+        pcm: ShortArray,
+        pcmFilePath: String?,
+        sampleRateHz: Int,
+        metadata: GeneratedAudioMetadata,
+        destinationUriString: String,
+    ): Boolean = false
+
+    override fun listSavedAudio(): List<SavedAudioItem> = savedContentById.values.map { it.item }
+
+    override fun loadSavedAudio(itemId: String): SavedAudioContent? = savedContentById[itemId]
+
+    override fun deleteSavedAudio(itemId: String): Boolean = false
+
+    override fun renameSavedAudio(
+        itemId: String,
+        newBaseName: String,
+    ): SavedAudioRenameResult = SavedAudioRenameResult.Failed
+
+    override fun importAudio(uriString: String): SavedAudioImportResult = SavedAudioImportResult.Failed
+
+    override fun exportSavedAudioToDocument(
+        itemId: String,
+        destinationUriString: String,
+    ): Boolean = false
+
+    override fun shareSavedAudio(item: SavedAudioItem): Boolean = false
 }
 
 private class CodecFakeGeneratedAudioCacheGateway : GeneratedAudioCacheGateway {

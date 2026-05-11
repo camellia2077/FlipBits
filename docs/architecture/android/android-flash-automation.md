@@ -4,6 +4,8 @@
 
 This document explains the current Flash device automation surface for real-device UI regression checks and agent/adb-driven debugging. It is intentionally separate from the Flash Visual rendering architecture so agents can quickly find the automation contract and its current coverage.
 
+For the full Android automation matrix across JVM tests, instrumentation, and adb debug scenarios, see `docs/architecture/android/android-automation-coverage.md`.
+
 ## Current Coverage
 
 The automation path covers generated Flash playback only. It does not depend on sample catalog entries.
@@ -11,6 +13,7 @@ The automation path covers generated Flash playback only. It does not depend on 
 Covered:
 
 - Fast-regression input text: `flash sync test`
+- Built-in sample text selection through `wb.sample.length` / `wb.sample.id`
 - Scenario kinds:
   - `ui`: real foreground UI regression through player detail + Compose visual rendering.
   - `headless`: generated-audio diagnostics without opening player detail or depending on the visual Canvas.
@@ -25,6 +28,9 @@ Covered:
   - start playback
   - stop playback after the configured short capture window
 - Debug log confirmation through `FlashAutomation`
+- Encode/result/follow diagnostics through `FlipBitsLongAudio`
+- Generated PCM cache diagnostics through `GeneratedAudioCache`
+- Playback target diagnostics through `PlaybackAutomation`
 - Visual playback diagnostics through `FlashVisualPerf`
 - Unified Visual/readout/Lyrics timing diagnostics through `FlashAlignmentPerf`
 - Headless diagnostics through `FlashHeadless`
@@ -77,6 +83,16 @@ Supported extras:
 - `wb.input`
   - Optional text override.
   - Defaults to `flash sync test`.
+  - Takes priority over `wb.sample.length` and `wb.sample.id` when present.
+- `wb.sample.length`
+  - Optional built-in sample selector.
+  - Accepted values: `short`, `long`.
+  - Uses the current app language and current sample flavor, then picks the first matching Flash sample from the catalog.
+  - Useful for reproducing long-text behavior without passing long shell-escaped text through adb.
+- `wb.sample.id`
+  - Optional built-in sample id selector.
+  - Uses the current app language and current sample flavor.
+  - Takes priority over `wb.sample.length` when `wb.input` is absent.
 - `wb.flash.style`
   - `steady`, `hostile`, `litany`, `collapse`, `zeal`, `void`
 - `wb.visual`
@@ -93,9 +109,7 @@ Supported extras:
 Recommended device prep:
 
 ```powershell
-adb shell svc power stayon usb
-adb shell input keyevent KEYCODE_WAKEUP
-adb shell wm dismiss-keyguard
+python tools/run.py android-debug device-prep
 ```
 
 USB debugging alone is not enough for visual/perf validation. The device must be unlocked and able to draw the foreground app; otherwise the scenario can receive the intent and encode audio without producing visual draw logs.
@@ -104,7 +118,7 @@ Recommended UI log capture in a second shell:
 
 ```powershell
 adb logcat -c
-adb logcat -v time FlashAutomation:D FlashAlignmentPerf:D FlashVisualPerf:D FlashLyricsPerf:D *:S > temp\log.txt
+adb logcat -v time FlashAutomation:D FlipBitsLongAudio:D GeneratedAudioCache:D PlaybackAutomation:D FlashAlignmentPerf:D FlashVisualPerf:D FlashLyricsPerf:D AndroidRuntime:E libc:E *:S > temp\log.txt
 ```
 
 `FlashAutomation` confirms the scenario was received. `FlashVisualPerf` provides the playback and visual timing metrics used for diagnosis.
@@ -127,7 +141,7 @@ Filtered visual + Lyrics summary:
 
 ```powershell
 adb logcat -d -v time FlashAutomation:D FlashAlignmentPerf:D FlashVisualPerf:D FlashLyricsPerf:D *:S > temp\flash_alignment_raw.log
-python tools/scripts/android/flash/filter_flash_alignment_log.py temp\flash_alignment_raw.log --output temp\flash_alignment_summary.md
+python tools/run.py android-debug flash-summary temp\flash_alignment_raw.log --output temp\flash_alignment_summary.md
 ```
 
 Agents should read the generated summary first. It keeps the useful `FlashAutomation`, `FlashAlignmentPerf`, `FlashVisualPerf`, and `FlashLyricsPerf` rows. When `FlashAlignmentPerf` is present, the summary uses those unified samples first; otherwise it falls back to pairing each Lyrics sample with the nearest visual readout sample.
@@ -136,12 +150,15 @@ Recommended headless log capture:
 
 ```powershell
 adb logcat -c
-adb logcat -v time FlashAutomation:D FlashHeadless:D *:S > temp\log.txt
+adb logcat -v time FlashAutomation:D FlashHeadless:D FlipBitsLongAudio:D GeneratedAudioCache:D PlaybackAutomation:D AndroidRuntime:E libc:E *:S > temp\log.txt
 ```
 
 Headless success criteria:
 
 - `FlashAutomation` shows `scenario=headless`.
+- `FlashAutomation inputResolved` shows `source`, `sampleId`, `chars`, and `payloadBytes`.
+- `FlipBitsLongAudio applySuccess:begin` shows `pcmSamples > 0`.
+- `FlashAutomation state` shows `source=generated:flash`, `miniPlayer=true`, and a non-zero `miniDurationMs`.
 - `FlashHeadless start` shows `follow=true` and `binaryGroups > 0`.
 - `FlashHeadless tick` shows `playing=true`, advancing `sample`, and non-negative `bit` / `revealed` values after playback enters the bit timeline.
 - `FlashHeadless stop` appears after the configured `wb.play.ms`.
@@ -165,6 +182,20 @@ Pangram single-style example:
 ```powershell
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_FLASH_SCENARIO --es wb.input "The quick brown fox jumps over the lazy dog." --es wb.flash.style litany --es wb.visual lanes --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
 ```
+
+Built-in long-sample Litany diagnostic:
+
+```powershell
+python tools/run.py android-debug capture-flash --scenario headless --style litany --sample-length long --play-ms 6000 --wait-ms 90000
+```
+
+Use `ui` instead of `headless` when validating the mini player, player detail sheet, Visual, and Lyrics UI together:
+
+```powershell
+python tools/run.py android-debug capture-flash --scenario ui --style litany --sample-length long --visual lanes --wait-ms 90000
+```
+
+`capture-flash --scenario ui` defaults to `--play-ms 30000` so Litany's longer lead-in has time to enter Visual/Lyrics token activity. Headless captures keep the shorter `6000` ms default unless `--play-ms` is passed explicitly.
 
 ## Instrumentation Test
 

@@ -62,7 +62,7 @@ class AudioPlaybackProgressSectionTest {
     }
 
     @Test
-    fun `defaults to visual playback mode`() {
+    fun `defaults to lyrics playback mode`() {
         composeRule.setContent {
             AudioPlaybackProgressSection(
                 displayedSamples = 0,
@@ -83,10 +83,10 @@ class AudioPlaybackProgressSectionTest {
             )
         }
 
-        composeRule.onNodeWithTag("playback-display-visual").assertIsDisplayed()
+        composeRule.onNodeWithTag("playback-display-lyrics").assertIsDisplayed()
         composeRule.onNodeWithTag("playback-display-section").assertIsDisplayed()
         composeRule.onAllNodesWithTag("playback-token-context-tape-list").assertCountEquals(1)
-        composeRule.onAllNodesWithTag("playback-follow-section").assertCountEquals(0)
+        composeRule.onAllNodesWithTag("playback-follow-section").assertCountEquals(1)
     }
 
     @Test
@@ -197,6 +197,7 @@ class AudioPlaybackProgressSectionTest {
                 onScrubStarted = {},
                 onScrubChanged = {},
                 onScrubFinished = {},
+                initialDisplayMode = PlaybackDisplayMode.Visual,
             )
         }
 
@@ -222,6 +223,7 @@ class AudioPlaybackProgressSectionTest {
                 onScrubStarted = {},
                 onScrubChanged = {},
                 onScrubFinished = {},
+                initialDisplayMode = PlaybackDisplayMode.Visual,
             )
         }
 
@@ -248,6 +250,7 @@ class AudioPlaybackProgressSectionTest {
                 onScrubStarted = {},
                 onScrubChanged = {},
                 onScrubFinished = {},
+                initialDisplayMode = PlaybackDisplayMode.Visual,
             )
         }
 

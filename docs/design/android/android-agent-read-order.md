@@ -74,11 +74,32 @@
 再按需读：
 - [android-app-architecture.md](/C:/code/FlipBits/docs/architecture/android/android-app-architecture.md)
 
+### Encode Progress Automation
+
+适用场景：
+- 排查 `mini / pro / ultra` 生成音频时进度条 phase 文案、百分比或可见性
+- 需要用 adb 捕获 `Preparing input / Rendering PCM / Finalizing` 的 UI 显示切换
+
+先读：
+- [android-encode-progress-automation.md](/C:/code/WaveBits/docs/architecture/android/android-encode-progress-automation.md)
+
+### Automation Coverage
+
+适用场景：
+- 判断 Android 当前自动测试覆盖了哪些产品链路
+- 决定新增回归应该放在 JVM、instrumentation 还是 adb debug scenario
+- 更新自动化文档或梳理尚未覆盖的测试缺口
+
+先读：
+- [android-automation-coverage.md](/C:/code/WaveBits/docs/architecture/android/android-automation-coverage.md)
+
 ## Minimal Read Combos
 
 - 只改 Kotlin 业务逻辑：`README.md`
 - 改页面和交互：`README.md` -> `android-player-ui.md`
 - 改 Flash Visual / Lyrics 跟随 / 动画性能：`README.md` -> `android-flash-visual.md`
+- 改 `mini / pro / ultra` 编码进度条 adb 采集：`README.md` -> `android-encode-progress-automation.md`
+- 判断/更新自动化覆盖面：`README.md` -> `android-automation-coverage.md`
 - 改主题和配色：`README.md` -> `android-dual-tone-theme.md`
 - 改 XML 文案或翻译：`README.md` -> `android-translation-workflow.md`
 - 改 JNI / metadata / release-only native 问题：`README.md` -> `android-native-strategy.md`
