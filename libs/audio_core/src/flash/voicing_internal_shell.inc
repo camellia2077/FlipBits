@@ -132,7 +132,7 @@ double ComputePreamblePhraseMask(size_t local_index, size_t sample_count,
                                                       CadenceWindow{0.70, 0.88},
                                                   });
       break;
-    case FixedShellCadenceProfile::kSteadyProtocol:
+    case FixedShellCadenceProfile::kStandardProtocol:
       phrased_mask = ComputeCadenceMask(progress, std::array<CadenceWindow, 3>{
                                                       CadenceWindow{0.06, 0.17},
                                                       CadenceWindow{0.32, 0.42},
@@ -194,7 +194,7 @@ double ComputeEpiloguePhraseMask(size_t local_index, size_t sample_count,
                                                       CadenceWindow{0.56, 0.90},
                                                   });
       break;
-    case FixedShellCadenceProfile::kSteadyProtocol:
+    case FixedShellCadenceProfile::kStandardProtocol:
       phrased_mask = ComputeCadenceMask(progress, std::array<CadenceWindow, 2>{
                                                       CadenceWindow{0.12, 0.29},
                                                       CadenceWindow{0.52, 0.65},
@@ -242,7 +242,7 @@ double RenderFixedPreambleSample(size_t local_index, size_t sample_count,
   double carrier = 0.0;
   double shell = 0.0;
   switch (style_traits.preamble_timbre_profile) {
-    case FixedShellTimbreProfile::kSteadyBoundary:
+    case FixedShellTimbreProfile::kStandardBoundary:
       carrier = 0.28 * std::sin(2.0 * kPi * 420.0 * time) +
                 0.10 * std::sin(2.0 * kPi * 840.0 * time) +
                 0.04 * std::sin(2.0 * kPi * 1260.0 * time);
@@ -377,7 +377,7 @@ double RenderFixedEpilogueSample(size_t local_index, size_t sample_count,
   double carrier = 0.0;
   double shell = 0.0;
   switch (style_traits.epilogue_timbre_profile) {
-    case FixedShellTimbreProfile::kSteadyBoundary:
+    case FixedShellTimbreProfile::kStandardBoundary:
       carrier = 0.30 * std::sin(2.0 * kPi * 240.0 * time) +
                 0.11 * std::sin(2.0 * kPi * 480.0 * time + 0.18) +
                 0.04 * std::sin(2.0 * kPi * 720.0 * time + 0.10);

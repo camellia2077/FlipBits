@@ -236,7 +236,7 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
     const std::size_t frame_samples =
         config_case.frame_samples > 0 ? static_cast<std::size_t>(config_case.frame_samples) : static_cast<std::size_t>(0);
     std::size_t payload_samples_per_bit = frame_samples;
-    if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_STEADY) {
+    if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_STANDARD) {
         payload_samples_per_bit = std::max(static_cast<std::size_t>(1),
                                            frame_samples * static_cast<std::size_t>(15) /
                                                static_cast<std::size_t>(16));

@@ -79,7 +79,7 @@ std::size_t SamplesPerBitForSignalProfile(FlashSignalProfile signal_profile,
                       (static_cast<std::size_t>(config.frame_samples) *
                        static_cast<std::size_t>(5)) /
                           static_cast<std::size_t>(2));
-    case FlashSignalProfile::kSteady:
+    case FlashSignalProfile::kStandard:
       return std::max(static_cast<std::size_t>(1),
                       (static_cast<std::size_t>(config.frame_samples) *
                        static_cast<std::size_t>(15)) /
@@ -99,7 +99,7 @@ std::size_t SamplesPerSilenceSlotForSignalProfile(
     case FlashSignalProfile::kLitany:
     case FlashSignalProfile::kZeal:
       return static_cast<std::size_t>(config.frame_samples);
-    case FlashSignalProfile::kSteady:
+    case FlashSignalProfile::kStandard:
     case FlashSignalProfile::kHostile:
     case FlashSignalProfile::kCollapse:
     case FlashSignalProfile::kVoid:
@@ -204,10 +204,10 @@ FlashVoicingFlavor NormalizeSignalVoicingFlavor(FlashVoicingFlavor flavor) {
     case FlashVoicingFlavor::kCollapse:
     case FlashVoicingFlavor::kZeal:
     case FlashVoicingFlavor::kVoid:
-    case FlashVoicingFlavor::kSteady:
+    case FlashVoicingFlavor::kStandard:
       return flavor;
     default:
-      return FlashVoicingFlavor::kSteady;
+      return FlashVoicingFlavor::kStandard;
   }
 }
 
@@ -542,7 +542,7 @@ BfskConfig MakeBfskConfigForSignalProfile(const CoreConfig& config,
       bfsk.low_freq_hz = 220.0;
       bfsk.high_freq_hz = 440.0;
       break;
-    case FlashSignalProfile::kSteady:
+    case FlashSignalProfile::kStandard:
     default:
       bfsk.low_freq_hz = 300.0;
       bfsk.high_freq_hz = 600.0;
@@ -567,7 +567,7 @@ BfskConfig MakeBfskConfig(const CoreConfig& config) {
 FlashPayloadLayout BuildPayloadLayout(const std::vector<uint8_t>& bytes,
                                       const BfskConfig& config) {
   return BuildPayloadLayoutForVoicing(bytes, config,
-                                      FlashVoicingFlavor::kSteady);
+                                      FlashVoicingFlavor::kStandard);
 }
 
 FlashPayloadLayout BuildPayloadLayoutForVoicing(

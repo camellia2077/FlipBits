@@ -71,7 +71,7 @@ bool IsSupportedMode(FlipBitsAudioMetadataMode mode) {
 
 bool IsSupportedFlashVoicingStyle(
     FlipBitsAudioMetadataFlashVoicingStyle style) {
-  return style == FlipBitsAudioMetadataFlashVoicingStyle::kSteady ||
+  return style == FlipBitsAudioMetadataFlashVoicingStyle::kStandard ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kLitany ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kHostile ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kCollapse ||

@@ -493,8 +493,8 @@ void TestApiDecodeResultPublishesRawPayloadAcrossModes() {
     struct RawCase {
         bag_transport_mode mode;
         std::string text;
-        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY;
-        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY;
+        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD;
+        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD;
     };
     const std::array<RawCase, 9> cases = {{
         {BAG_TRANSPORT_FLASH, "FlashRaw"},
@@ -611,8 +611,8 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
     struct FollowCase {
         bag_transport_mode mode;
         std::string text;
-        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY;
-        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY;
+        bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD;
+        bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD;
     };
     const std::array<FollowCase, 9> cases = {{
         {BAG_TRANSPORT_FLASH, "Flash"},
@@ -923,7 +923,7 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
         double expected_payload_begin_seconds;
     };
     const std::array<StyleCase, 6> cases = {{
-        {BAG_FLASH_SIGNAL_PROFILE_STEADY, BAG_FLASH_VOICING_FLAVOR_STEADY, 15, 16, 3, 0.0},
+        {BAG_FLASH_SIGNAL_PROFILE_STANDARD, BAG_FLASH_VOICING_FLAVOR_STANDARD, 15, 16, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_LITANY, BAG_FLASH_VOICING_FLAVOR_LITANY, 6, 1, 0, 1.35},
         {BAG_FLASH_SIGNAL_PROFILE_HOSTILE, BAG_FLASH_VOICING_FLAVOR_HOSTILE, 7, 8, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_COLLAPSE, BAG_FLASH_VOICING_FLAVOR_COLLAPSE, 1, 1, 3, 0.0},

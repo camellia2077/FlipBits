@@ -622,7 +622,7 @@ void TestWavIoMetadataRejectsUnknownFlashStyleValues() {
 
 void TestWavIoMetadataFlashEmotionValuesRoundTrip() {
     const audio_io::FlipBitsAudioMetadataFlashVoicingStyle styles[] = {
-        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kSteady,
+        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kStandard,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCollapse,

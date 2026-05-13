@@ -110,26 +110,26 @@ void TestStyledVoicingOutputIsStable() {
     AssertPcm16Range(first.pcm, "Styled voicing output");
 }
 
-void TestDefaultVoicingMatchesExplicitSteady() {
+void TestDefaultVoicingMatchesExplicitStandard() {
     const auto layout = MakePayloadLayout("FlipBits");
     const auto clean_payload = MakeCleanPayload("FlipBits");
     const auto default_voiced =
         bag::flash::ApplyVoicingToPayload(clean_payload, layout, MakeStyledConfig());
-    const auto explicit_steady =
+    const auto explicit_standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kSteady,
+            bag::FlashVoicingFlavor::kStandard,
             MakeStyledConfig());
 
     test::AssertEq(
         default_voiced.pcm,
-        explicit_steady.pcm,
-        "Default flash voicing should remain identical to explicit steady style.");
+        explicit_standard.pcm,
+        "Default flash voicing should remain identical to explicit standard style.");
     test::AssertEq(
         default_voiced.descriptor.payload_sample_count,
-        explicit_steady.descriptor.payload_sample_count,
-        "Default flash voicing should preserve the steady descriptor.");
+        explicit_standard.descriptor.payload_sample_count,
+        "Default flash voicing should preserve the standard descriptor.");
 }
 
 void TestFlavorVoicingMatchesExplicitLitanyConfiguration() {
@@ -159,15 +159,15 @@ void TestFlavorVoicingMatchesExplicitLitanyConfiguration() {
         "Flavor-based voicing should preserve the same descriptor payload size across repeated calls.");
 }
 
-void TestLitanyDiffersButDecodesLikeSteady() {
+void TestLitanyDiffersButDecodesLikeStandard() {
     const auto config = MakeStyledShellConfig();
     const auto layout = MakePayloadLayout("Command");
     const auto clean_payload = MakeCleanPayload("Command");
-    const auto steady =
+    const auto standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kSteady,
+            bag::FlashVoicingFlavor::kStandard,
             config);
     const auto litany =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
@@ -177,20 +177,20 @@ void TestLitanyDiffersButDecodesLikeSteady() {
             config);
 
     test::AssertTrue(
-        steady.pcm != litany.pcm,
-        "Litany should sound different from steady for the same payload.");
+        standard.pcm != litany.pcm,
+        "Litany should sound different from standard for the same payload.");
 
-    const auto steady_trimmed = bag::flash::TrimToPayloadPcm(steady.pcm, steady.descriptor);
+    const auto standard_trimmed = bag::flash::TrimToPayloadPcm(standard.pcm, standard.descriptor);
     const auto litany_trimmed = bag::flash::TrimToPayloadPcm(litany.pcm, litany.descriptor);
 
     test::AssertEq(
-        bag::flash::DecodePcm16ToBytes(steady_trimmed, MakeSignalConfig()),
+        bag::flash::DecodePcm16ToBytes(standard_trimmed, MakeSignalConfig()),
         AsBytes("Command"),
-        "Steady should still decode to the original bytes.");
+        "Standard should still decode to the original bytes.");
     test::AssertEq(
         bag::flash::DecodePcm16ToBytes(litany_trimmed, MakeSignalConfig()),
         AsBytes("Command"),
-        "Litany should decode to the same bytes as steady.");
+        "Litany should decode to the same bytes as standard.");
 }
 
 void TestLitanyAddsContinuousChantDroneWithoutBreakingDecode() {
@@ -198,11 +198,11 @@ void TestLitanyAddsContinuousChantDroneWithoutBreakingDecode() {
     config.sample_rate_hz = 44100;
     const auto layout = MakePayloadLayout("Litany");
     const auto clean_payload = MakeCleanPayload("Litany");
-    const auto steady =
+    const auto standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kSteady,
+            bag::FlashVoicingFlavor::kStandard,
             config);
     const auto litany =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
@@ -219,8 +219,8 @@ void TestLitanyAddsContinuousChantDroneWithoutBreakingDecode() {
                                         static_cast<std::size_t>(10);
 
     test::AssertTrue(
-        AverageAbsoluteDelta(steady.pcm, clean_payload, begin, end) < 1.0,
-        "Steady with no explicit texture should leave the payload midpoint untouched.");
+        AverageAbsoluteDelta(standard.pcm, clean_payload, begin, end) < 1.0,
+        "Standard with no explicit texture should leave the payload midpoint untouched.");
     test::AssertTrue(
         AverageAbsoluteDelta(litany.pcm, clean_payload, begin, end) > 140.0,
         "Litany should add continuous low chant drone and mechanical throat texture across the payload body.");
@@ -318,24 +318,24 @@ void TestLitanyTextAwarePausesWithoutBreakingDecode() {
         "Litany text-aware pauses should keep the payload decodable.");
 }
 
-void TestFormalSteadyAddsLowVoiceWithoutBreakingDecode() {
+void TestFormalStandardAddsLowVoiceWithoutBreakingDecode() {
     auto core_config = MakeAndroidSizedCoreConfig();
-    core_config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    core_config.flash_signal_profile = bag::FlashSignalProfile::kStandard;
     const auto signal_config =
         bag::flash::MakeBfskConfigForSignalProfile(
             core_config,
-            bag::FlashSignalProfile::kSteady);
-    const auto bytes = AsBytes("Steady");
+            bag::FlashSignalProfile::kStandard);
+    const auto bytes = AsBytes("Standard");
     const auto layout = bag::flash::BuildPayloadLayout(bytes, signal_config);
     const auto clean_payload = bag::flash::EncodeBytesToPcm16(bytes, signal_config);
-    const auto steady =
+    const auto standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kSteady,
+            bag::FlashVoicingFlavor::kStandard,
             bag::flash::MakeFormalVoicingConfigForFlavor(
                 core_config,
-                bag::FlashVoicingFlavor::kSteady));
+                bag::FlashVoicingFlavor::kStandard));
     const auto hostile =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
@@ -344,7 +344,7 @@ void TestFormalSteadyAddsLowVoiceWithoutBreakingDecode() {
             bag::flash::MakeFormalVoicingConfigForFlavor(
                 core_config,
                 bag::FlashVoicingFlavor::kHostile));
-    const auto steady_trimmed = bag::flash::TrimToPayloadPcm(steady.pcm, steady.descriptor);
+    const auto standard_trimmed = bag::flash::TrimToPayloadPcm(standard.pcm, standard.descriptor);
     const auto hostile_trimmed = bag::flash::TrimToPayloadPcm(hostile.pcm, hostile.descriptor);
     const auto& first_chunk = layout.chunks.front();
     const std::size_t begin =
@@ -357,17 +357,17 @@ void TestFormalSteadyAddsLowVoiceWithoutBreakingDecode() {
             static_cast<std::size_t>(10);
 
     test::AssertTrue(
-        AverageAbsoluteDelta(steady_trimmed, clean_payload, begin, end) > 80.0,
-        "Formal steady should add a restrained low voice layer.");
+        AverageAbsoluteDelta(standard_trimmed, clean_payload, begin, end) > 80.0,
+        "Formal standard should add a restrained low voice layer.");
     test::AssertTrue(
-        AverageAbsoluteDelta(steady_trimmed, clean_payload, begin, end) <
+        AverageAbsoluteDelta(standard_trimmed, clean_payload, begin, end) <
             AverageAbsoluteDelta(hostile_trimmed, clean_payload, begin, end),
-        "Formal steady should stay more restrained than hostile.");
+        "Formal standard should stay more restrained than hostile.");
     test::AssertEq(
-        bag::flash::DecodePcm16ToBytes(steady_trimmed, signal_config),
+        bag::flash::DecodePcm16ToBytes(standard_trimmed, signal_config),
         bytes,
-        "Formal steady low voice should keep the payload decodable.");
-    AssertPcm16Range(steady.pcm, "Formal steady low voice output");
+        "Formal standard low voice should keep the payload decodable.");
+    AssertPcm16Range(standard.pcm, "Formal standard low voice output");
 }
 
 void TestHostileAddsAggressiveEdgeWithoutBreakingDecode() {
@@ -375,11 +375,11 @@ void TestHostileAddsAggressiveEdgeWithoutBreakingDecode() {
     config.sample_rate_hz = 44100;
     const auto layout = MakePayloadLayout("Hostile");
     const auto clean_payload = MakeCleanPayload("Hostile");
-    const auto steady =
+    const auto standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kSteady,
+            bag::FlashVoicingFlavor::kStandard,
             config);
     const auto hostile =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
@@ -396,15 +396,15 @@ void TestHostileAddsAggressiveEdgeWithoutBreakingDecode() {
                                         static_cast<std::size_t>(10);
 
     test::AssertEq(
-        steady.pcm,
+        standard.pcm,
         clean_payload,
-        "Steady with no explicit texture should preserve the clean payload.");
+        "Standard with no explicit texture should preserve the clean payload.");
     test::AssertTrue(
         AverageAbsoluteDelta(hostile.pcm, clean_payload, begin, end) > 300.0,
         "Hostile should add a sharp aggressive edge across the payload body.");
     test::AssertTrue(
-        hostile.pcm != steady.pcm,
-        "Hostile should produce a distinct aggressive payload from steady.");
+        hostile.pcm != standard.pcm,
+        "Hostile should produce a distinct aggressive payload from standard.");
     test::AssertEq(
         bag::flash::DecodePcm16ToBytes(hostile.pcm, MakeSignalConfig()),
         AsBytes("Hostile"),
@@ -417,11 +417,11 @@ void TestCollapseAddsTremorWithoutBreakingDecode() {
     config.sample_rate_hz = 44100;
     const auto layout = MakePayloadLayout("Collapse");
     const auto clean_payload = MakeCleanPayload("Collapse");
-    const auto steady =
+    const auto standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kSteady,
+            bag::FlashVoicingFlavor::kStandard,
             config);
     const auto collapse =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
@@ -438,12 +438,12 @@ void TestCollapseAddsTremorWithoutBreakingDecode() {
                                         static_cast<std::size_t>(10);
 
     test::AssertEq(
-        steady.pcm,
+        standard.pcm,
         clean_payload,
-        "Steady with no explicit texture should preserve the clean payload.");
+        "Standard with no explicit texture should preserve the clean payload.");
     test::AssertTrue(
-        collapse.pcm != steady.pcm,
-        "Collapse should produce a distinct trembling payload from steady.");
+        collapse.pcm != standard.pcm,
+        "Collapse should produce a distinct trembling payload from standard.");
     test::AssertTrue(
         AverageAbsoluteDelta(collapse.pcm, clean_payload, begin, end) > 180.0,
         "Collapse should add a tremor layer across the payload body.");
@@ -647,13 +647,13 @@ void TestLitanyPeriodicChantPausesWithoutPunctuation() {
 
 void TestCollapseVariableSilenceIsDeterministicAndRoundTripsText() {
     auto core_config = MakeAndroidSizedCoreConfig();
-    core_config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    core_config.flash_signal_profile = bag::FlashSignalProfile::kStandard;
     core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kCollapse;
     const std::string text = "Collapse hesitation makes the signal stop and stutter.";
     const auto signal_config =
         bag::flash::MakeBfskConfigForSignalProfile(
             core_config,
-            bag::FlashSignalProfile::kSteady);
+            bag::FlashSignalProfile::kStandard);
     const auto first_layout =
         bag::flash::BuildPayloadLayoutForVoicing(
             AsBytes(text),
@@ -720,7 +720,7 @@ void TestCollapseVariableSilenceIsDeterministicAndRoundTripsText() {
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             core_config,
             text,
-            bag::FlashSignalProfile::kSteady,
+            bag::FlashSignalProfile::kStandard,
             bag::FlashVoicingFlavor::kCollapse,
             &pcm),
         bag::ErrorCode::kOk,
@@ -729,7 +729,7 @@ void TestCollapseVariableSilenceIsDeterministicAndRoundTripsText() {
         bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
             core_config,
             pcm,
-            bag::FlashSignalProfile::kSteady,
+            bag::FlashSignalProfile::kStandard,
             bag::FlashVoicingFlavor::kCollapse,
             &decoded),
         bag::ErrorCode::kOk,
@@ -777,19 +777,19 @@ void RegisterFlashVoicingPayloadTests(test::Runner& runner) {
     runner.Add("FlashVoicing.HarmonicVoicingStaysWithinPcm16Range", TestHarmonicVoicingStaysWithinPcm16Range);
     runner.Add("FlashVoicing.BoundaryClickVoicingIsDeterministic", TestBoundaryClickVoicingIsDeterministic);
     runner.Add("FlashVoicing.StyledVoicingOutputIsStable", TestStyledVoicingOutputIsStable);
-    runner.Add("FlashVoicing.DefaultVoicingMatchesExplicitSteady", TestDefaultVoicingMatchesExplicitSteady);
+    runner.Add("FlashVoicing.DefaultVoicingMatchesExplicitStandard", TestDefaultVoicingMatchesExplicitStandard);
     runner.Add("FlashVoicing.FlavorVoicingMatchesExplicitLitanyConfiguration",
                TestFlavorVoicingMatchesExplicitLitanyConfiguration);
-    runner.Add("FlashVoicing.LitanyDiffersButDecodesLikeSteady",
-               TestLitanyDiffersButDecodesLikeSteady);
+    runner.Add("FlashVoicing.LitanyDiffersButDecodesLikeStandard",
+               TestLitanyDiffersButDecodesLikeStandard);
     runner.Add("FlashVoicing.LitanyAddsContinuousChantDroneWithoutBreakingDecode",
                TestLitanyAddsContinuousChantDroneWithoutBreakingDecode);
     runner.Add("FlashVoicing.LitanyPhraseTailDipsWithoutBreakingDecode",
                TestLitanyPhraseTailDipsWithoutBreakingDecode);
     runner.Add("FlashVoicing.LitanyTextAwarePausesWithoutBreakingDecode",
                TestLitanyTextAwarePausesWithoutBreakingDecode);
-    runner.Add("FlashVoicing.FormalSteadyAddsLowVoiceWithoutBreakingDecode",
-               TestFormalSteadyAddsLowVoiceWithoutBreakingDecode);
+    runner.Add("FlashVoicing.FormalStandardAddsLowVoiceWithoutBreakingDecode",
+               TestFormalStandardAddsLowVoiceWithoutBreakingDecode);
     runner.Add("FlashVoicing.HostileAddsAggressiveEdgeWithoutBreakingDecode",
                TestHostileAddsAggressiveEdgeWithoutBreakingDecode);
     runner.Add("FlashVoicing.CollapseAddsTremorWithoutBreakingDecode",

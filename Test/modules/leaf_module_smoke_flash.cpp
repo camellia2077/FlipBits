@@ -79,26 +79,26 @@ void TestFlashSignalEncodeLengthMatchesExpected() {
 }
 
 void TestFlashSignalStyleAwareChunkSizeMatchesConfig() {
-    const auto steady_config = MakeFlashCoreConfig();
-    const auto steady_signal = bag::flash::MakeBfskConfig(steady_config);
+    const auto standard_config = MakeFlashCoreConfig();
+    const auto standard_signal = bag::flash::MakeBfskConfig(standard_config);
     const auto litany_signal = bag::flash::MakeBfskConfig(MakeLitanyFlashCoreConfig());
     const auto hostile_signal = bag::flash::MakeBfskConfig(MakeHostileFlashCoreConfig());
     const auto collapse_signal = bag::flash::MakeBfskConfig(MakeCollapseFlashCoreConfig());
     const auto zeal_signal = bag::flash::MakeBfskConfig(MakeZealFlashCoreConfig());
-    const auto steady_frame_samples = static_cast<std::size_t>(steady_config.frame_samples);
+    const auto standard_frame_samples = static_cast<std::size_t>(standard_config.frame_samples);
 
     test::AssertEq(
-        steady_signal.samples_per_bit,
-        (steady_frame_samples * static_cast<std::size_t>(15)) / static_cast<std::size_t>(16),
-        "steady flash signal should use the conservative faster timing profile.");
+        standard_signal.samples_per_bit,
+        (standard_frame_samples * static_cast<std::size_t>(15)) / static_cast<std::size_t>(16),
+        "standard flash signal should use the conservative faster timing profile.");
     test::AssertEq(
-        steady_signal.low_freq_hz,
+        standard_signal.low_freq_hz,
         300.0,
-        "steady flash signal should use the lower everyday voice low carrier.");
+        "standard flash signal should use the lower everyday voice low carrier.");
     test::AssertEq(
-        steady_signal.high_freq_hz,
+        standard_signal.high_freq_hz,
         600.0,
-        "steady flash signal should use the lower everyday voice high carrier.");
+        "standard flash signal should use the lower everyday voice high carrier.");
     test::AssertEq(
         litany_signal.samples_per_bit,
         static_cast<std::size_t>(13230),
@@ -112,8 +112,8 @@ void TestFlashSignalStyleAwareChunkSizeMatchesConfig() {
         440.0,
         "litany flash signal should use the solemn high carrier.");
     test::AssertTrue(
-        litany_signal.samples_per_bit > steady_signal.samples_per_bit,
-        "litany flash signal should use more samples per bit than steady.");
+        litany_signal.samples_per_bit > standard_signal.samples_per_bit,
+        "litany flash signal should use more samples per bit than standard.");
     test::AssertEq(
         hostile_signal.samples_per_bit,
         static_cast<std::size_t>(1929),
@@ -158,10 +158,10 @@ void TestFlashSignalStyleAwareChunkSizeMatchesConfig() {
 
 void TestFlashSignalExplicitProfileSelectsEmotionTiming() {
     const auto litany_config = MakeLitanyFlashCoreConfig();
-    const auto explicit_steady_signal =
+    const auto explicit_standard_signal =
         bag::flash::MakeBfskConfigForSignalProfile(
             litany_config,
-            bag::FlashSignalProfile::kSteady);
+            bag::FlashSignalProfile::kStandard);
     const auto explicit_litany_signal =
         bag::flash::MakeBfskConfigForSignalProfile(
             litany_config,
@@ -180,14 +180,14 @@ void TestFlashSignalExplicitProfileSelectsEmotionTiming() {
             bag::FlashSignalProfile::kZeal);
 
     test::AssertEq(
-        explicit_steady_signal.samples_per_bit,
+        explicit_standard_signal.samples_per_bit,
         (static_cast<std::size_t>(litany_config.frame_samples) * static_cast<std::size_t>(15)) /
             static_cast<std::size_t>(16),
-        "Explicit steady signal profile should keep steady timing even when litany config is in scope.");
+        "Explicit standard signal profile should keep standard timing even when litany config is in scope.");
     test::AssertEq(
-        explicit_steady_signal.low_freq_hz,
+        explicit_standard_signal.low_freq_hz,
         300.0,
-        "Explicit steady signal profile should keep steady carrier tuning.");
+        "Explicit standard signal profile should keep standard carrier tuning.");
     test::AssertEq(
         explicit_litany_signal.samples_per_bit,
         static_cast<std::size_t>(13230),
@@ -322,23 +322,23 @@ void TestFlashPhyCleanFormalOutputIncludesPredictableNonpayloadSegments() {
 }
 
 void TestFlashPhyCleanLitanyUsesLongerTimingAndStillDecodes() {
-    const auto steady_config = MakeFlashCoreConfig();
+    const auto standard_config = MakeFlashCoreConfig();
     const auto litany_config = MakeLitanyFlashCoreConfig();
     const std::string text = "Litany";
 
-    std::vector<std::int16_t> steady_pcm;
+    std::vector<std::int16_t> standard_pcm;
     std::vector<std::int16_t> litany_pcm;
     test::AssertEq(
-        bag::flash::EncodeTextToPcm16(steady_config, text, &steady_pcm),
+        bag::flash::EncodeTextToPcm16(standard_config, text, &standard_pcm),
         bag::ErrorCode::kOk,
-        "steady flash encode should succeed for timing comparison.");
+        "standard flash encode should succeed for timing comparison.");
     test::AssertEq(
         bag::flash::EncodeTextToPcm16(litany_config, text, &litany_pcm),
         bag::ErrorCode::kOk,
         "litany flash encode should succeed for timing comparison.");
     test::AssertTrue(
-        litany_pcm.size() > steady_pcm.size(),
-        "litany flash encode should be longer than steady after signal timing expansion.");
+        litany_pcm.size() > standard_pcm.size(),
+        "litany flash encode should be longer than standard after signal timing expansion.");
 
     std::string decoded;
     test::AssertEq(
@@ -349,7 +349,7 @@ void TestFlashPhyCleanLitanyUsesLongerTimingAndStillDecodes() {
 }
 
 void TestFlashPhyCleanWrongStyleDoesNotRoundTrip() {
-    const auto steady_config = MakeFlashCoreConfig();
+    const auto standard_config = MakeFlashCoreConfig();
     const auto litany_config = MakeLitanyFlashCoreConfig();
     const std::string text = "Mismatch";
 
@@ -360,15 +360,15 @@ void TestFlashPhyCleanWrongStyleDoesNotRoundTrip() {
         "litany flash encode should succeed before wrong-style decode validation.");
 
     std::string decoded;
-    const auto decode_code = bag::flash::DecodePcm16ToText(steady_config, litany_pcm, &decoded);
+    const auto decode_code = bag::flash::DecodePcm16ToText(standard_config, litany_pcm, &decoded);
     test::AssertTrue(
         decode_code != bag::ErrorCode::kOk || decoded != text,
-        "Decoding litany flash PCM with steady style should not look like a valid roundtrip.");
+        "Decoding litany flash PCM with standard style should not look like a valid roundtrip.");
 }
 
 void TestFlashPhyCleanExplicitSignalProfileKeepsPayloadTimingWhenVoicingChanges() {
     const auto config = MakeFlashCoreConfig();
-    const auto signal_profile = bag::FlashSignalProfile::kSteady;
+    const auto signal_profile = bag::FlashSignalProfile::kStandard;
     const std::string text = "Decouple";
     const auto signal_config =
         bag::flash::MakeBfskConfigForSignalProfile(config, signal_profile);
@@ -391,11 +391,11 @@ void TestFlashPhyCleanExplicitSignalProfileKeepsPayloadTimingWhenVoicingChanges(
             bag::FlashVoicingFlavor::kLitany,
             &ritual_pcm),
         bag::ErrorCode::kOk,
-        "Explicit signal profile encode should succeed when litany voicing is layered over steady timing.");
+        "Explicit signal profile encode should succeed when litany voicing is layered over standard timing.");
     test::AssertEq(
         ritual_pcm.size(),
         expected_payload_sample_count + expected_ritual_shell,
-        "Explicit signal profile encode should use steady signal timing with litany payload pauses and shell.");
+        "Explicit signal profile encode should use standard signal timing with litany payload pauses and shell.");
 
     std::string decoded;
     test::AssertEq(
@@ -415,7 +415,7 @@ void TestFlashPhyCleanExplicitSignalProfileKeepsPayloadTimingWhenVoicingChanges(
 
 void TestFlashPhyCleanSignalProfileAndFlavorApiMatchesConfiguredDefaultPath() {
     auto config = MakeFlashCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    config.flash_signal_profile = bag::FlashSignalProfile::kStandard;
     config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
     std::vector<std::int16_t> flavor_pcm;
     std::vector<std::int16_t> default_pcm;
@@ -424,7 +424,7 @@ void TestFlashPhyCleanSignalProfileAndFlavorApiMatchesConfiguredDefaultPath() {
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             config,
             "FlavorApi",
-            bag::FlashSignalProfile::kSteady,
+            bag::FlashSignalProfile::kStandard,
             bag::FlashVoicingFlavor::kLitany,
             &flavor_pcm),
         bag::ErrorCode::kOk,
@@ -446,7 +446,7 @@ void TestFlashPhyCleanSignalProfileAndFlavorApiMatchesConfiguredDefaultPath() {
         bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
             config,
             flavor_pcm,
-            bag::FlashSignalProfile::kSteady,
+            bag::FlashSignalProfile::kStandard,
             bag::FlashVoicingFlavor::kLitany,
             &decoded),
         bag::ErrorCode::kOk,
@@ -463,7 +463,7 @@ void TestFlashPhyCleanDefaultPathUsesExplicitFlashComponentsWhenPresent() {
     const auto signal_config =
         bag::flash::MakeBfskConfigForSignalProfile(
             config,
-            bag::FlashSignalProfile::kSteady);
+            bag::FlashSignalProfile::kStandard);
     const auto ritual_payload_layout =
         bag::flash::BuildPayloadLayoutForVoicing(
             AsBytes(text),
@@ -483,7 +483,7 @@ void TestFlashPhyCleanDefaultPathUsesExplicitFlashComponentsWhenPresent() {
     test::AssertEq(
         pcm.size(),
         expected_total_size,
-        "Default flash encode should use explicit steady signal timing with litany payload pauses and shell.");
+        "Default flash encode should use explicit standard signal timing with litany payload pauses and shell.");
 
     std::string decoded;
     test::AssertEq(

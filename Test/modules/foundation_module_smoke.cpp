@@ -15,16 +15,16 @@ void TestConfigModuleDefaults() {
     test::AssertEq(config.mode, bag::TransportMode::kFlash, "Module import should preserve mode defaults.");
     test::AssertEq(
         config.flash_signal_profile,
-        bag::FlashSignalProfile::kSteady,
-        "Module import should default flash signal profile to steady.");
+        bag::FlashSignalProfile::kStandard,
+        "Module import should default flash signal profile to standard.");
     test::AssertEq(
         config.flash_voicing_flavor,
-        bag::FlashVoicingFlavor::kSteady,
-        "Module import should default flash voicing flavor to steady.");
+        bag::FlashVoicingFlavor::kStandard,
+        "Module import should default flash voicing flavor to standard.");
     test::AssertTrue(bag::IsValidTransportMode(bag::TransportMode::kUltra), "Imported helper should validate known modes.");
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kSteady),
-        "Imported helper should validate the steady signal profile.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kStandard),
+        "Imported helper should validate the standard signal profile.");
     test::AssertTrue(
         bag::IsValidFlashVoicingFlavor(bag::FlashVoicingFlavor::kLitany),
         "Imported helper should validate the litany voicing flavor.");
@@ -35,8 +35,8 @@ void TestConfigModuleDefaults() {
 
 void TestFlashSignalProfilesRemainDistinct() {
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kSteady),
-        "steady signal profile should remain valid.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kStandard),
+        "standard signal profile should remain valid.");
     test::AssertTrue(
         bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kLitany),
         "litany signal profile should remain valid.");
@@ -47,7 +47,7 @@ void TestFlashSignalProfilesRemainDistinct() {
         bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kCollapse),
         "collapse signal profile should remain valid.");
     test::AssertTrue(
-        static_cast<int>(bag::FlashSignalProfile::kSteady) !=
+        static_cast<int>(bag::FlashSignalProfile::kStandard) !=
             static_cast<int>(bag::FlashSignalProfile::kLitany),
         "flash signal profiles should remain distinct enum values.");
     test::AssertTrue(

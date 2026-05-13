@@ -25,8 +25,8 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz, int frame_samples,
       break;
   }
   switch (flash_signal_profile) {
-    case BAG_FLASH_SIGNAL_PROFILE_STEADY:
-      core_config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    case BAG_FLASH_SIGNAL_PROFILE_STANDARD:
+      core_config.flash_signal_profile = bag::FlashSignalProfile::kStandard;
       break;
     case BAG_FLASH_SIGNAL_PROFILE_LITANY:
       core_config.flash_signal_profile = bag::FlashSignalProfile::kLitany;
@@ -49,8 +49,8 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz, int frame_samples,
       break;
   }
   switch (flash_voicing_flavor) {
-    case BAG_FLASH_VOICING_FLAVOR_STEADY:
-      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kSteady;
+    case BAG_FLASH_VOICING_FLAVOR_STANDARD:
+      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kStandard;
       break;
     case BAG_FLASH_VOICING_FLAVOR_LITANY:
       core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;

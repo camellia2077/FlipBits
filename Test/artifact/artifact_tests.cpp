@@ -19,8 +19,8 @@ struct DecodeOutcome {
 
 bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
                                      bag_transport_mode mode = BAG_TRANSPORT_FLASH,
-                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD) {
     bag_encoder_config config{};
     config.sample_rate_hz = config_case.sample_rate_hz;
     config.frame_samples = config_case.frame_samples;
@@ -34,8 +34,8 @@ bag_encoder_config MakeEncoderConfig(const test::ConfigCase& config_case,
 
 bag_decoder_config MakeDecoderConfig(const test::ConfigCase& config_case,
                                      bag_transport_mode mode = BAG_TRANSPORT_FLASH,
-                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
+                                     bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                                     bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD) {
     bag_decoder_config config{};
     config.sample_rate_hz = config_case.sample_rate_hz;
     config.frame_samples = config_case.frame_samples;
@@ -166,13 +166,13 @@ size_t SecondsToSampleCount(int sample_rate_hz, double seconds) {
 size_t ExpectedPcmSampleCount(const std::string& text,
                               bag_transport_mode mode,
                               const test::ConfigCase& config_case,
-                              bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                              bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
+                              bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                              bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD) {
     if (mode == BAG_TRANSPORT_FLASH) {
         const auto frame_samples =
             config_case.frame_samples > 0 ? static_cast<size_t>(config_case.frame_samples) : static_cast<size_t>(0);
         size_t payload_samples_per_bit = frame_samples;
-        if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_STEADY) {
+        if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_STANDARD) {
             payload_samples_per_bit =
                 std::max(static_cast<size_t>(1),
                          frame_samples * static_cast<size_t>(15) / static_cast<size_t>(16));
@@ -219,8 +219,8 @@ void AssertPcmProperties(const std::vector<int16_t>& pcm,
                          const std::string& text,
                          bag_transport_mode mode,
                          const test::ConfigCase& config_case,
-                         bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                         bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STEADY) {
+                         bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                         bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD) {
     const auto expected_length =
         ExpectedPcmSampleCount(text, mode, config_case, flash_signal_profile, flash_voicing_flavor);
     test::AssertEq(pcm.size(), expected_length, "PCM length should match the selected mode's symbol layout.");

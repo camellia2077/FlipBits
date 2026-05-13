@@ -24,7 +24,7 @@ typedef enum bag_transport_mode {
 } bag_transport_mode;
 
 typedef enum bag_flash_signal_profile {
-  BAG_FLASH_SIGNAL_PROFILE_STEADY = 0,
+  BAG_FLASH_SIGNAL_PROFILE_STANDARD = 0,
   BAG_FLASH_SIGNAL_PROFILE_LITANY = 1,
   BAG_FLASH_SIGNAL_PROFILE_HOSTILE = 3,
   BAG_FLASH_SIGNAL_PROFILE_COLLAPSE = 4,
@@ -33,7 +33,7 @@ typedef enum bag_flash_signal_profile {
 } bag_flash_signal_profile;
 
 typedef enum bag_flash_voicing_flavor {
-  BAG_FLASH_VOICING_FLAVOR_STEADY = 0,
+  BAG_FLASH_VOICING_FLAVOR_STANDARD = 0,
   BAG_FLASH_VOICING_FLAVOR_LITANY = 1,
   BAG_FLASH_VOICING_FLAVOR_HOSTILE = 3,
   BAG_FLASH_VOICING_FLAVOR_COLLAPSE = 4,

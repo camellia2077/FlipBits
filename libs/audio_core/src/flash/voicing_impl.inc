@@ -104,7 +104,7 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
                     static_cast<std::size_t>(3)
               : static_cast<std::size_t>(0);
       break;
-    case FlashVoicingFlavor::kSteady:
+    case FlashVoicingFlavor::kStandard:
     default:
       voicing.attack_ratio = 0.045;
       voicing.release_ratio = 0.045;
@@ -173,7 +173,7 @@ FlashVoicingResult ApplyVoicingToPayload(
     const EncodeProgressSink* progress_sink, float progress_begin,
     float progress_end) {
   return ApplyVoicingToPayloadWithFlavor(
-      clean_payload_pcm, payload_layout, FlashVoicingFlavor::kSteady,
+      clean_payload_pcm, payload_layout, FlashVoicingFlavor::kStandard,
       config, progress_sink, progress_begin, progress_end);
 }
 
@@ -189,8 +189,8 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
   const bool use_chant_drone = style_traits.chant_drone_gain > 0.0;
   const bool use_mechanical_throat =
       style_traits.mechanical_throat_gain > 0.0;
-  const bool use_steady_low_voice =
-      use_layered_timbre && style_traits.steady_low_voice_gain > 0.0;
+  const bool use_standard_low_voice =
+      use_layered_timbre && style_traits.standard_low_voice_gain > 0.0;
   const bool use_hostile_edge = style_traits.hostile_edge_gain > 0.0;
   const FlashVoicingDescriptor descriptor = DescribeVoicingOutput(
       clean_payload_pcm.size() + LeadingNonpayloadSamples(config) +
@@ -341,10 +341,10 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
                         payload_sample_index, sanitized.sample_rate_hz,
                         style_traits.mechanical_throat_gain)
               : 0.0;
-      const double steady_low_voice =
-          use_steady_low_voice
+      const double standard_low_voice =
+          use_standard_low_voice
               ? envelope * payload_articulation *
-                    ComputeSteadyLowVoiceLayer(payload_sample_index,
+                    ComputeStandardLowVoiceLayer(payload_sample_index,
                                                sanitized.sample_rate_hz,
                                                style_traits)
               : 0.0;
@@ -372,7 +372,7 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
       const double mixed_sample =
           (clean_sample * envelope * payload_articulation + harmonic_mix +
            metallic_layer + chant_resonance + chant_drone +
-           mechanical_throat + steady_low_voice + hostile_edge) *
+           mechanical_throat + standard_low_voice + hostile_edge) *
               tremolo * collapse_tremor * chant_swell +
           boundary_click;
       const double voiced_sample = std::clamp(

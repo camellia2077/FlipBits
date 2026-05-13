@@ -11,7 +11,7 @@ namespace {
 
 using namespace flash_voicing_test;
 
-void TestFormalLitanyPayloadTailStaysCloseToSteady() {
+void TestFormalLitanyPayloadTailStaysCloseToStandard() {
     const auto config = MakeAndroidSizedCoreConfig();
     const auto signal_profile = bag::FlashSignalProfile::kLitany;
     const auto signal_config =
@@ -23,15 +23,15 @@ void TestFormalLitanyPayloadTailStaysCloseToSteady() {
             signal_config,
             bag::FlashVoicingFlavor::kLitany);
 
-    std::vector<std::int16_t> steady_pcm;
+    std::vector<std::int16_t> standard_pcm;
     std::vector<std::int16_t> litany_pcm;
-    const auto steady_encode_code =
+    const auto standard_encode_code =
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             config,
             "A",
             signal_profile,
-            bag::FlashVoicingFlavor::kSteady,
-            &steady_pcm);
+            bag::FlashVoicingFlavor::kStandard,
+            &standard_pcm);
     const auto litany_encode_code =
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             config,
@@ -40,16 +40,16 @@ void TestFormalLitanyPayloadTailStaysCloseToSteady() {
             bag::FlashVoicingFlavor::kLitany,
             &litany_pcm);
 
-    test::AssertEq(steady_encode_code, bag::ErrorCode::kOk, "steady formal encode should succeed.");
+    test::AssertEq(standard_encode_code, bag::ErrorCode::kOk, "standard formal encode should succeed.");
     test::AssertEq(litany_encode_code, bag::ErrorCode::kOk, "litany formal encode should succeed.");
 
     const auto coded_trimmed = bag::flash::TrimToPayloadPcm(
-        steady_pcm,
+        standard_pcm,
         bag::flash::DescribeVoicingOutput(
-            steady_pcm.size(),
+            standard_pcm.size(),
             bag::flash::MakeFormalVoicingConfigForFlavor(
                 config,
-                bag::FlashVoicingFlavor::kSteady)));
+                bag::FlashVoicingFlavor::kStandard)));
     const auto ritual_trimmed = bag::flash::TrimToPayloadPcm(
         litany_pcm,
         bag::flash::DescribeVoicingOutput(
@@ -61,14 +61,14 @@ void TestFormalLitanyPayloadTailStaysCloseToSteady() {
     test::AssertEq(
         coded_trimmed.size(),
         payload_layout.payload_sample_count,
-        "steady payload trimming should preserve the litany signal-profile payload length.");
+        "standard payload trimming should preserve the litany signal-profile payload length.");
     test::AssertEq(
         ritual_trimmed.size(),
         ritual_payload_layout.payload_sample_count,
         "litany payload trimming should preserve the litany signal-profile payload length plus chant pauses.");
     test::AssertTrue(
         ritual_trimmed != coded_trimmed,
-        "litany payload should remain distinct from steady under the same signal profile.");
+        "litany payload should remain distinct from standard under the same signal profile.");
 
     const auto& first_chunk = payload_layout.chunks.front();
     const auto [body_offset_begin, body_offset_end] =
@@ -99,37 +99,37 @@ void TestFormalLitanyPayloadTailStaysCloseToSteady() {
 
     test::AssertTrue(
         ritual_tail_ratio <= coded_tail_ratio * 1.25,
-        "litany payload tail should stay close to steady instead of blooming into a long sustain.");
+        "litany payload tail should stay close to standard instead of blooming into a long sustain.");
     test::AssertTrue(
         ritual_tail_brightness <= coded_tail_brightness * 1.15,
-        "litany payload tail should remain close to steady brightness after the aggressive convergence tuning.");
+        "litany payload tail should remain close to standard brightness after the aggressive convergence tuning.");
 }
 
-void TestFormalLitanyHasLongerShellThanSteady() {
-    auto steady_config = MakeAndroidSizedCoreConfig();
+void TestFormalLitanyHasLongerShellThanStandard() {
+    auto standard_config = MakeAndroidSizedCoreConfig();
     auto litany_config = MakeAndroidSizedCoreConfig();
     litany_config.flash_signal_profile = bag::FlashSignalProfile::kLitany;
     litany_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
-    std::vector<std::int16_t> steady_pcm;
+    std::vector<std::int16_t> standard_pcm;
     std::vector<std::int16_t> litany_pcm;
 
-    const auto steady_code = bag::flash::EncodeTextToPcm16(
-        steady_config,
+    const auto standard_code = bag::flash::EncodeTextToPcm16(
+        standard_config,
         "Length",
-        &steady_pcm);
+        &standard_pcm);
     const auto litany_code = bag::flash::EncodeTextToPcm16(
         litany_config,
         "Length",
         &litany_pcm);
 
-    test::AssertEq(steady_code, bag::ErrorCode::kOk, "steady formal encode should succeed.");
+    test::AssertEq(standard_code, bag::ErrorCode::kOk, "standard formal encode should succeed.");
     test::AssertEq(litany_code, bag::ErrorCode::kOk, "litany formal encode should succeed.");
     test::AssertTrue(
-        litany_pcm.size() > steady_pcm.size(),
-        "litany should use a longer preamble and epilogue than steady.");
+        litany_pcm.size() > standard_pcm.size(),
+        "litany should use a longer preamble and epilogue than standard.");
     test::AssertTrue(
-        (litany_pcm.size() - steady_pcm.size()) > static_cast<std::size_t>(steady_config.sample_rate_hz),
-        "litany should exceed steady by more than one second under the Android default frame size so coarse UI timers show a clear difference.");
+        (litany_pcm.size() - standard_pcm.size()) > static_cast<std::size_t>(standard_config.sample_rate_hz),
+        "litany should exceed standard by more than one second under the Android default frame size so coarse UI timers show a clear difference.");
 }
 
 void TestFormalLitanyDecodesWithConfiguredTrim() {
@@ -154,7 +154,7 @@ void TestFormalLitanyDecodesWithConfiguredTrim() {
 
 void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
     const auto config = MakeAndroidSizedCoreConfig();
-    const auto signal_profile = bag::FlashSignalProfile::kSteady;
+    const auto signal_profile = bag::FlashSignalProfile::kStandard;
     const std::string text = "Decouple";
     const auto signal_config =
         bag::flash::MakeBfskConfigForSignalProfile(config, signal_profile);
@@ -167,15 +167,15 @@ void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
     const std::size_t expected_ritual_payload_sample_count =
         ritual_payload_layout.payload_sample_count;
 
-    std::vector<std::int16_t> steady_pcm;
+    std::vector<std::int16_t> standard_pcm;
     std::vector<std::int16_t> litany_pcm;
-    const auto steady_encode_code =
+    const auto standard_encode_code =
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             config,
             text,
             signal_profile,
-            bag::FlashVoicingFlavor::kSteady,
-            &steady_pcm);
+            bag::FlashVoicingFlavor::kStandard,
+            &standard_pcm);
     const auto litany_encode_code =
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             config,
@@ -185,19 +185,19 @@ void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
             &litany_pcm);
 
     test::AssertEq(
-        steady_encode_code,
+        standard_encode_code,
         bag::ErrorCode::kOk,
-        "explicit steady encode should succeed with an explicit signal profile.");
+        "explicit standard encode should succeed with an explicit signal profile.");
     test::AssertEq(
         litany_encode_code,
         bag::ErrorCode::kOk,
         "explicit litany encode should succeed with an explicit signal profile.");
     test::AssertEq(
-        steady_pcm.size(),
+        standard_pcm.size(),
         expected_payload_sample_count +
-            FormalPreambleSampleCountForFlavor(config, bag::FlashVoicingFlavor::kSteady) +
-            FormalEpilogueSampleCountForFlavor(config, bag::FlashVoicingFlavor::kSteady),
-        "explicit steady encode should add only the steady shell on top of the shared payload timing.");
+            FormalPreambleSampleCountForFlavor(config, bag::FlashVoicingFlavor::kStandard) +
+            FormalEpilogueSampleCountForFlavor(config, bag::FlashVoicingFlavor::kStandard),
+        "explicit standard encode should add only the standard shell on top of the shared payload timing.");
     test::AssertEq(
         litany_pcm.size(),
         expected_ritual_payload_sample_count +
@@ -205,23 +205,23 @@ void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
             FormalEpilogueSampleCountForFlavor(config, bag::FlashVoicingFlavor::kLitany),
         "explicit litany encode should keep the explicit signal bit duration while adding litany payload pauses.");
     test::AssertEq(
-        litany_pcm.size() - steady_pcm.size(),
+        litany_pcm.size() - standard_pcm.size(),
         (expected_ritual_payload_sample_count - expected_payload_sample_count) +
         (FormalPreambleSampleCountForFlavor(config, bag::FlashVoicingFlavor::kLitany) +
          FormalEpilogueSampleCountForFlavor(config, bag::FlashVoicingFlavor::kLitany)) -
-            (FormalPreambleSampleCountForFlavor(config, bag::FlashVoicingFlavor::kSteady) +
-             FormalEpilogueSampleCountForFlavor(config, bag::FlashVoicingFlavor::kSteady)),
+            (FormalPreambleSampleCountForFlavor(config, bag::FlashVoicingFlavor::kStandard) +
+             FormalEpilogueSampleCountForFlavor(config, bag::FlashVoicingFlavor::kStandard)),
         "switching voicing flavor under one explicit signal profile should account for litany payload pauses and shell samples.");
 
-    std::string steady_decoded;
+    std::string standard_decoded;
     std::string litany_decoded;
-    const auto steady_decode_code =
+    const auto standard_decode_code =
         bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
             config,
-            steady_pcm,
+            standard_pcm,
             signal_profile,
-            bag::FlashVoicingFlavor::kSteady,
-            &steady_decoded);
+            bag::FlashVoicingFlavor::kStandard,
+            &standard_decoded);
     const auto litany_decode_code =
         bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
             config,
@@ -231,17 +231,17 @@ void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
             &litany_decoded);
 
     test::AssertEq(
-        steady_decode_code,
+        standard_decode_code,
         bag::ErrorCode::kOk,
-        "explicit steady decode should succeed with the shared signal profile.");
+        "explicit standard decode should succeed with the shared signal profile.");
     test::AssertEq(
         litany_decode_code,
         bag::ErrorCode::kOk,
         "explicit litany decode should succeed with the shared signal profile.");
     test::AssertEq(
-        steady_decoded,
+        standard_decoded,
         text,
-        "explicit steady decode should preserve the original text.");
+        "explicit standard decode should preserve the original text.");
     test::AssertEq(
         litany_decoded,
         text,
@@ -250,7 +250,7 @@ void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
 
 void TestExplicitSignalProfileAndFlavorMatchDefaultExplicitPath() {
     auto config = MakeAndroidSizedCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    config.flash_signal_profile = bag::FlashSignalProfile::kStandard;
     config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
     std::vector<std::int16_t> default_pcm;
     std::vector<std::int16_t> explicit_pcm;
@@ -261,7 +261,7 @@ void TestExplicitSignalProfileAndFlavorMatchDefaultExplicitPath() {
         bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
             config,
             "FlavorPath",
-            bag::FlashSignalProfile::kSteady,
+            bag::FlashSignalProfile::kStandard,
             bag::FlashVoicingFlavor::kLitany,
             &explicit_pcm);
 
@@ -277,7 +277,7 @@ void TestExplicitSignalProfileAndFlavorMatchDefaultExplicitPath() {
         bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
             config,
             explicit_pcm,
-            bag::FlashSignalProfile::kSteady,
+            bag::FlashSignalProfile::kStandard,
             bag::FlashVoicingFlavor::kLitany,
             &decoded_text);
     test::AssertEq(
@@ -290,28 +290,28 @@ void TestExplicitSignalProfileAndFlavorMatchDefaultExplicitPath() {
         "Explicit signal-profile-and-flavor decode should preserve the original text.");
 }
 
-void TestDefaultFormalFlashRemainsSteadyBaseline() {
+void TestDefaultFormalFlashRemainsStandardBaseline() {
     std::vector<std::int16_t> default_pcm;
-    std::vector<std::int16_t> steady_pcm;
+    std::vector<std::int16_t> standard_pcm;
 
     const auto default_encode_code = bag::flash::EncodeTextToPcm16(
         MakeCoreConfig(),
         "Baseline",
         &default_pcm);
-    const auto steady_encode_code = bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
+    const auto standard_encode_code = bag::flash::EncodeTextToPcm16WithSignalProfileAndFlavor(
         MakeCoreConfig(),
         "Baseline",
-        bag::FlashSignalProfile::kSteady,
-        bag::FlashVoicingFlavor::kSteady,
-        &steady_pcm);
+        bag::FlashSignalProfile::kStandard,
+        bag::FlashVoicingFlavor::kStandard,
+        &standard_pcm);
     test::AssertEq(default_encode_code, bag::ErrorCode::kOk, "default formal flash encode should succeed.");
-    test::AssertEq(steady_encode_code, bag::ErrorCode::kOk, "steady formal encode should succeed.");
-    test::AssertEq(default_pcm, steady_pcm, "default formal flash should remain aligned with steady.");
+    test::AssertEq(standard_encode_code, bag::ErrorCode::kOk, "standard formal encode should succeed.");
+    test::AssertEq(default_pcm, standard_pcm, "default formal flash should remain aligned with standard.");
 
     std::string decoded_text;
     const auto decode_code = bag::flash::DecodePcm16ToText(MakeCoreConfig(), default_pcm, &decoded_text);
     test::AssertEq(decode_code, bag::ErrorCode::kOk, "default formal flash decode should succeed.");
-    test::AssertEq(decoded_text, std::string("Baseline"), "default formal flash decode should remain steady-compatible.");
+    test::AssertEq(decoded_text, std::string("Baseline"), "default formal flash decode should remain standard-compatible.");
 }
 
 }  // namespace
@@ -319,18 +319,18 @@ void TestDefaultFormalFlashRemainsSteadyBaseline() {
 namespace flash_voicing_test {
 
 void RegisterFlashVoicingFormalTests(test::Runner& runner) {
-    runner.Add("FlashVoicing.FormalLitanyPayloadTailStaysCloseToSteady",
-               TestFormalLitanyPayloadTailStaysCloseToSteady);
-    runner.Add("FlashVoicing.FormalLitanyHasLongerShellThanSteady",
-               TestFormalLitanyHasLongerShellThanSteady);
+    runner.Add("FlashVoicing.FormalLitanyPayloadTailStaysCloseToStandard",
+               TestFormalLitanyPayloadTailStaysCloseToStandard);
+    runner.Add("FlashVoicing.FormalLitanyHasLongerShellThanStandard",
+               TestFormalLitanyHasLongerShellThanStandard);
     runner.Add("FlashVoicing.FormalLitanyDecodesWithConfiguredTrim",
                TestFormalLitanyDecodesWithConfiguredTrim);
     runner.Add("FlashVoicing.ExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor",
                TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor);
     runner.Add("FlashVoicing.ExplicitSignalProfileAndFlavorMatchDefaultExplicitPath",
                TestExplicitSignalProfileAndFlavorMatchDefaultExplicitPath);
-    runner.Add("FlashVoicing.DefaultFormalFlashRemainsSteadyBaseline",
-               TestDefaultFormalFlashRemainsSteadyBaseline);
+    runner.Add("FlashVoicing.DefaultFormalFlashRemainsStandardBaseline",
+               TestDefaultFormalFlashRemainsStandardBaseline);
 }
 
 }  // namespace flash_voicing_test

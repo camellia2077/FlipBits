@@ -77,7 +77,7 @@ bag::CoreConfig MakeZealFlashCoreConfig() {
 
 bag::CoreConfig MakeExplicitDecoupledFlashCoreConfig() {
     auto config = MakeFlashCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kSteady;
+    config.flash_signal_profile = bag::FlashSignalProfile::kStandard;
     config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
     return config;
 }

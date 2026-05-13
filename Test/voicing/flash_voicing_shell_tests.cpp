@@ -129,7 +129,7 @@ void TestLitanyEpilogueUsesLongThenShortBellStrikes() {
         "litany epilogue second bell should decay faster than the long closing bell.");
 }
 
-void TestSteadyPreambleUsesThreeHandshakeBursts() {
+void TestStandardPreambleUsesThreeHandshakeBursts() {
     constexpr std::size_t kPreambleSampleCount = 1600;
 
     const auto clean_payload = MakeCleanPayload("AB");
@@ -137,7 +137,7 @@ void TestSteadyPreambleUsesThreeHandshakeBursts() {
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kStandard,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
 
     const auto [burst1_begin, burst1_end] = FractionalRange(kPreambleSampleCount, 0.05, 0.18);
@@ -154,19 +154,19 @@ void TestSteadyPreambleUsesThreeHandshakeBursts() {
 
     test::AssertTrue(
         burst1_energy > gap1_energy * 3.0,
-        "steady preamble should open with a strong short handshake burst.");
+        "standard preamble should open with a strong short handshake burst.");
     test::AssertTrue(
         burst2_energy > gap1_energy * 3.0,
-        "steady preamble should re-enter with a short confirmation burst after the first gap.");
+        "standard preamble should re-enter with a short confirmation burst after the first gap.");
     test::AssertTrue(
         burst2_energy > gap2_energy * 3.0,
-        "steady preamble should leave a clear second gap before the sync burst.");
+        "standard preamble should leave a clear second gap before the sync burst.");
     test::AssertTrue(
         burst3_energy > gap2_energy * 3.0,
-        "steady preamble should finish with a third sync burst that pushes directly into payload onset.");
+        "standard preamble should finish with a third sync burst that pushes directly into payload onset.");
 }
 
-void TestSteadyPreambleContrastsPayloadOnset() {
+void TestStandardPreambleContrastsPayloadOnset() {
     constexpr std::size_t kPreambleSampleCount = 1600;
 
     const auto clean_payload = MakeCleanPayload("AB");
@@ -174,7 +174,7 @@ void TestSteadyPreambleContrastsPayloadOnset() {
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kStandard,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
 
     const auto [sync_begin, sync_end] = FractionalRange(kPreambleSampleCount, 0.58, 0.70);
@@ -197,16 +197,16 @@ void TestSteadyPreambleContrastsPayloadOnset() {
 
     test::AssertTrue(
         sync_delta > 5500.0,
-        "steady preamble sync burst should not sound like a continuation of payload onset.");
+        "standard preamble sync burst should not sound like a continuation of payload onset.");
     test::AssertTrue(
         sync_brightness > payload_brightness * 1.08,
-        "steady preamble sync burst should sound brighter than the payload start.");
+        "standard preamble sync burst should sound brighter than the payload start.");
     test::AssertTrue(
         seam_energy < sync_energy * 0.18,
-        "steady preamble should leave a low-energy seam before payload begins.");
+        "standard preamble should leave a low-energy seam before payload begins.");
 }
 
-void TestSteadyEpilogueUsesClosingBurstAndAckChirp() {
+void TestStandardEpilogueUsesClosingBurstAndAckChirp() {
     constexpr std::size_t kEpilogueSampleCount = 1200;
 
     const auto clean_payload = MakeCleanPayload("AB");
@@ -214,7 +214,7 @@ void TestSteadyEpilogueUsesClosingBurstAndAckChirp() {
     const auto voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kStandard,
         MakeTrimEnabledConfig(static_cast<std::size_t>(0), kEpilogueSampleCount));
 
     const std::size_t epilogue_begin = voiced.descriptor.leading_nonpayload_samples +
@@ -247,16 +247,16 @@ void TestSteadyEpilogueUsesClosingBurstAndAckChirp() {
 
     test::AssertTrue(
         burst_energy > gap_energy * 3.0,
-        "steady epilogue should begin with a short closing burst before the acknowledgement gap.");
+        "standard epilogue should begin with a short closing burst before the acknowledgement gap.");
     test::AssertTrue(
         ack_energy > gap_energy * 3.0,
-        "steady epilogue should emit a distinct ack chirp after the main closing burst.");
+        "standard epilogue should emit a distinct ack chirp after the main closing burst.");
     test::AssertTrue(
         tail_energy < ack_energy * 0.45,
-        "steady epilogue should decay quickly after the ack chirp instead of trailing like litany.");
+        "standard epilogue should decay quickly after the ack chirp instead of trailing like litany.");
 }
 
-void TestSteadyEpilogueContrastsPayloadTailAndStopsHard() {
+void TestStandardEpilogueContrastsPayloadTailAndStopsHard() {
     constexpr std::size_t kPreambleSampleCount = 1600;
     constexpr std::size_t kEpilogueSampleCount = 1200;
 
@@ -265,12 +265,12 @@ void TestSteadyEpilogueContrastsPayloadTailAndStopsHard() {
     const auto preamble_voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kStandard,
         MakeTrimEnabledConfig(kPreambleSampleCount, static_cast<std::size_t>(0)));
     const auto epilogue_voiced = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload,
         layout,
-        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kStandard,
         MakeTrimEnabledConfig(static_cast<std::size_t>(0), kEpilogueSampleCount));
 
     const auto [sync_begin, sync_end] = FractionalRange(kPreambleSampleCount, 0.58, 0.70);
@@ -311,13 +311,13 @@ void TestSteadyEpilogueContrastsPayloadTailAndStopsHard() {
 
     test::AssertTrue(
         closing_delta > 4200.0,
-        "steady closing burst should not sound like an extension of the payload tail.");
+        "standard closing burst should not sound like an extension of the payload tail.");
     test::AssertTrue(
         ack_brightness < preamble_sync_brightness * 0.92,
-        "steady ack chirp should sound lower and less bright than the preamble sync burst.");
+        "standard ack chirp should sound lower and less bright than the preamble sync burst.");
     test::AssertTrue(
         tail_energy < ack_energy * 0.12,
-        "steady epilogue should hard-stop after the ack chirp.");
+        "standard epilogue should hard-stop after the ack chirp.");
 }
 
 void TestEmotionShellProfilesAreDistinct() {
@@ -331,8 +331,8 @@ void TestEmotionShellProfilesAreDistinct() {
     const auto short_config = MakeTrimEnabledConfig(kShortPreambleSampleCount, kShortEpilogueSampleCount);
     const auto litany_config = MakeTrimEnabledConfig(kLitanyPreambleSampleCount, kLitanyEpilogueSampleCount);
 
-    const auto steady = bag::flash::ApplyVoicingToPayloadWithFlavor(
-        clean_payload, layout, bag::FlashVoicingFlavor::kSteady, short_config);
+    const auto standard = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload, layout, bag::FlashVoicingFlavor::kStandard, short_config);
     const auto hostile = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload, layout, bag::FlashVoicingFlavor::kHostile, short_config);
     const auto litany = bag::flash::ApplyVoicingToPayloadWithFlavor(
@@ -341,29 +341,29 @@ void TestEmotionShellProfilesAreDistinct() {
         clean_payload, layout, bag::FlashVoicingFlavor::kCollapse, short_config);
 
     const std::size_t epilogue_begin =
-        steady.descriptor.leading_nonpayload_samples + steady.descriptor.payload_sample_count;
+        standard.descriptor.leading_nonpayload_samples + standard.descriptor.payload_sample_count;
     const std::size_t epilogue_end = epilogue_begin + kShortEpilogueSampleCount;
     const auto [litany_attack_begin, litany_attack_end] = SecondsRange(44100, 0.20, 0.26);
     const std::size_t litany_epilogue_begin =
         litany.descriptor.leading_nonpayload_samples + litany.descriptor.payload_sample_count;
 
     test::AssertTrue(
-        AverageAbsoluteDelta(steady.pcm, hostile.pcm, 0, kShortPreambleSampleCount) > 500.0,
-        "hostile preamble should have a distinct aggressive shell instead of reusing steady.");
+        AverageAbsoluteDelta(standard.pcm, hostile.pcm, 0, kShortPreambleSampleCount) > 500.0,
+        "hostile preamble should have a distinct aggressive shell instead of reusing standard.");
     test::AssertTrue(
         AverageAbsoluteSample(litany.pcm, litany_attack_begin, litany_attack_end) > 500.0,
-        "litany preamble should have a distinct ceremonial shell instead of reusing steady.");
+        "litany preamble should have a distinct ceremonial shell instead of reusing standard.");
     test::AssertTrue(
-        AverageAbsoluteDelta(steady.pcm, hostile.pcm, epilogue_begin, epilogue_end) > 0.0,
-        "hostile epilogue should have a distinct aggressive shell instead of reusing steady.");
+        AverageAbsoluteDelta(standard.pcm, hostile.pcm, epilogue_begin, epilogue_end) > 0.0,
+        "hostile epilogue should have a distinct aggressive shell instead of reusing standard.");
     test::AssertTrue(
         AverageAbsoluteSample(
             litany.pcm,
             litany_epilogue_begin + SecondsToSampleCount(44100, 0.20),
             litany_epilogue_begin + SecondsToSampleCount(44100, 0.30)) > 500.0,
-        "litany epilogue should have a distinct ceremonial shell instead of reusing steady.");
+        "litany epilogue should have a distinct ceremonial shell instead of reusing standard.");
     test::AssertTrue(
-        AverageAbsoluteDelta(steady.pcm, collapse.pcm, epilogue_begin, epilogue_end) > 0.0,
+        AverageAbsoluteDelta(standard.pcm, collapse.pcm, epilogue_begin, epilogue_end) > 0.0,
         "collapse epilogue should have a distinct failure shell instead of reusing the old closure.");
 }
 
@@ -426,7 +426,7 @@ void TestEmotionShellsStayOutsidePayloadDecode() {
     const auto layout = MakePayloadLayout(text);
     const auto config = MakeTrimEnabledConfig(kPreambleSampleCount, kEpilogueSampleCount);
     const bag::FlashVoicingFlavor flavors[] = {
-        bag::FlashVoicingFlavor::kSteady,
+        bag::FlashVoicingFlavor::kStandard,
         bag::FlashVoicingFlavor::kHostile,
         bag::FlashVoicingFlavor::kLitany,
         bag::FlashVoicingFlavor::kCollapse,
@@ -542,14 +542,14 @@ void RegisterFlashVoicingShellTests(test::Runner& runner) {
                TestLitanyPreambleUsesThreeEvenBellStrikes);
     runner.Add("FlashVoicing.LitanyEpilogueUsesLongThenShortBellStrikes",
                TestLitanyEpilogueUsesLongThenShortBellStrikes);
-    runner.Add("FlashVoicing.SteadyPreambleUsesThreeHandshakeBursts",
-               TestSteadyPreambleUsesThreeHandshakeBursts);
-    runner.Add("FlashVoicing.SteadyPreambleContrastsPayloadOnset",
-               TestSteadyPreambleContrastsPayloadOnset);
-    runner.Add("FlashVoicing.SteadyEpilogueUsesClosingBurstAndAckChirp",
-               TestSteadyEpilogueUsesClosingBurstAndAckChirp);
-    runner.Add("FlashVoicing.SteadyEpilogueContrastsPayloadTailAndStopsHard",
-               TestSteadyEpilogueContrastsPayloadTailAndStopsHard);
+    runner.Add("FlashVoicing.StandardPreambleUsesThreeHandshakeBursts",
+               TestStandardPreambleUsesThreeHandshakeBursts);
+    runner.Add("FlashVoicing.StandardPreambleContrastsPayloadOnset",
+               TestStandardPreambleContrastsPayloadOnset);
+    runner.Add("FlashVoicing.StandardEpilogueUsesClosingBurstAndAckChirp",
+               TestStandardEpilogueUsesClosingBurstAndAckChirp);
+    runner.Add("FlashVoicing.StandardEpilogueContrastsPayloadTailAndStopsHard",
+               TestStandardEpilogueContrastsPayloadTailAndStopsHard);
     runner.Add("FlashVoicing.EmotionShellProfilesAreDistinct", TestEmotionShellProfilesAreDistinct);
     runner.Add("FlashVoicing.CollapseEpilogueUsesBrokenFailureCadence",
                TestCollapseEpilogueUsesBrokenFailureCadence);

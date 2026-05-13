@@ -10,18 +10,18 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
     const std::string text = "Length";
 
     for (const auto& config_case : test::ConfigCases()) {
-        const auto steady_encoder =
+        const auto standard_encoder =
             MakeEncoderConfig(
                 config_case,
                 BAG_TRANSPORT_FLASH,
-                BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                BAG_FLASH_VOICING_FLAVOR_STEADY);
-        const auto steady_decoder =
+                BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                BAG_FLASH_VOICING_FLAVOR_STANDARD);
+        const auto standard_decoder =
             MakeDecoderConfig(
                 config_case,
                 BAG_TRANSPORT_FLASH,
-                BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                BAG_FLASH_VOICING_FLAVOR_STEADY);
+                BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                BAG_FLASH_VOICING_FLAVOR_STANDARD);
         const auto litany_encoder =
             MakeEncoderConfig(
                 config_case,
@@ -71,15 +71,15 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_FLASH_SIGNAL_PROFILE_VOID,
                 BAG_FLASH_VOICING_FLAVOR_VOID);
 
-        bag_pcm16_result steady_pcm{};
+        bag_pcm16_result standard_pcm{};
         bag_pcm16_result litany_pcm{};
         bag_pcm16_result hostile_pcm{};
         bag_pcm16_result zeal_pcm{};
         bag_pcm16_result void_pcm{};
         test::AssertEq(
-            bag_encode_text(&steady_encoder, text.c_str(), &steady_pcm),
+            bag_encode_text(&standard_encoder, text.c_str(), &standard_pcm),
             BAG_OK,
-            "steady flash encode should succeed through the C API.");
+            "standard flash encode should succeed through the C API.");
         test::AssertEq(
             bag_encode_text(&litany_encoder, text.c_str(), &litany_pcm),
             BAG_OK,
@@ -97,13 +97,13 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
             BAG_OK,
             "void flash encode should succeed through the C API.");
         test::AssertEq(
-            steady_pcm.sample_count,
+            standard_pcm.sample_count,
             ExpectedFlashSampleCount(
                 text,
                 config_case,
-                BAG_FLASH_SIGNAL_PROFILE_STEADY,
-                BAG_FLASH_VOICING_FLAVOR_STEADY),
-            "steady C API flash length should stay on the baseline explicit configuration.");
+                BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+                BAG_FLASH_VOICING_FLAVOR_STANDARD),
+            "standard C API flash length should stay on the baseline explicit configuration.");
         test::AssertEq(
             litany_pcm.sample_count,
             ExpectedFlashSampleCount(
@@ -113,8 +113,8 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_FLASH_VOICING_FLAVOR_LITANY),
             "litany C API flash length should include the longer timing and shell configuration.");
         test::AssertTrue(
-            litany_pcm.sample_count > steady_pcm.sample_count,
-            "litany flash output should be longer than steady for the same text.");
+            litany_pcm.sample_count > standard_pcm.sample_count,
+            "litany flash output should be longer than standard for the same text.");
         test::AssertEq(
             hostile_pcm.sample_count,
             ExpectedFlashSampleCount(
@@ -124,8 +124,8 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_FLASH_VOICING_FLAVOR_HOSTILE),
             "hostile C API flash length should use the faster command timing with its own shell.");
         test::AssertTrue(
-            hostile_pcm.sample_count < steady_pcm.sample_count,
-            "hostile flash output should be shorter than steady for the same text.");
+            hostile_pcm.sample_count < standard_pcm.sample_count,
+            "hostile flash output should be shorter than standard for the same text.");
         test::AssertEq(
             zeal_pcm.sample_count,
             ExpectedFlashSampleCount(
@@ -135,8 +135,8 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_FLASH_VOICING_FLAVOR_ZEAL),
             "zeal C API flash length should use the conservative faster signal timing.");
         test::AssertTrue(
-            zeal_pcm.sample_count < steady_pcm.sample_count,
-            "zeal flash output should be shorter than steady for the same text.");
+            zeal_pcm.sample_count < standard_pcm.sample_count,
+            "zeal flash output should be shorter than standard for the same text.");
         test::AssertEq(
             void_pcm.sample_count,
             ExpectedFlashSampleCount(
@@ -146,26 +146,26 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_FLASH_VOICING_FLAVOR_VOID),
             "void C API flash length should use the slower signal timing.");
         test::AssertTrue(
-            void_pcm.sample_count > steady_pcm.sample_count,
-            "void flash output should be longer than steady for the same text.");
+            void_pcm.sample_count > standard_pcm.sample_count,
+            "void flash output should be longer than standard for the same text.");
 
-        const auto steady_decoded = DecodeViaApi(steady_decoder, steady_pcm);
+        const auto standard_decoded = DecodeViaApi(standard_decoder, standard_pcm);
         const auto litany_decoded = DecodeViaApi(litany_decoder, litany_pcm);
         const auto hostile_decoded = DecodeViaApi(hostile_decoder, hostile_pcm);
         const auto zeal_decoded = DecodeViaApi(zeal_decoder, zeal_pcm);
         const auto void_decoded = DecodeViaApi(void_decoder, void_pcm);
-        test::AssertEq(steady_decoded.code, BAG_OK, "steady flash decode should succeed.");
+        test::AssertEq(standard_decoded.code, BAG_OK, "standard flash decode should succeed.");
         test::AssertEq(litany_decoded.code, BAG_OK, "litany flash decode should succeed.");
         test::AssertEq(hostile_decoded.code, BAG_OK, "hostile flash decode should succeed.");
         test::AssertEq(zeal_decoded.code, BAG_OK, "zeal flash decode should succeed.");
         test::AssertEq(void_decoded.code, BAG_OK, "void flash decode should succeed.");
-        test::AssertEq(steady_decoded.text, text, "steady flash decode should preserve text.");
+        test::AssertEq(standard_decoded.text, text, "standard flash decode should preserve text.");
         test::AssertEq(litany_decoded.text, text, "litany flash decode should preserve text.");
         test::AssertEq(hostile_decoded.text, text, "hostile flash decode should preserve text.");
         test::AssertEq(zeal_decoded.text, text, "zeal flash decode should preserve text.");
         test::AssertEq(void_decoded.text, text, "void flash decode should preserve text.");
 
-        bag_free_pcm16_result(&steady_pcm);
+        bag_free_pcm16_result(&standard_pcm);
         bag_free_pcm16_result(&litany_pcm);
         bag_free_pcm16_result(&hostile_pcm);
         bag_free_pcm16_result(&zeal_pcm);
@@ -179,7 +179,7 @@ void TestApiFlashVoicingEmotionValuesRoundTrip() {
         const char* name;
     };
     const EmotionCase cases[] = {
-        {BAG_FLASH_VOICING_FLAVOR_STEADY, "steady"},
+        {BAG_FLASH_VOICING_FLAVOR_STANDARD, "standard"},
         {BAG_FLASH_VOICING_FLAVOR_LITANY, "litany"},
         {BAG_FLASH_VOICING_FLAVOR_HOSTILE, "hostile"},
         {BAG_FLASH_VOICING_FLAVOR_COLLAPSE, "collapse"},
@@ -194,13 +194,13 @@ void TestApiFlashVoicingEmotionValuesRoundTrip() {
             MakeEncoderConfig(
                 config_case,
                 BAG_TRANSPORT_FLASH,
-                BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                BAG_FLASH_SIGNAL_PROFILE_STANDARD,
                 item.flavor);
         const auto decoder =
             MakeDecoderConfig(
                 config_case,
                 BAG_TRANSPORT_FLASH,
-                BAG_FLASH_SIGNAL_PROFILE_STEADY,
+                BAG_FLASH_SIGNAL_PROFILE_STANDARD,
                 item.flavor);
         bag_pcm16_result pcm{};
         test::AssertEq(
@@ -224,54 +224,54 @@ void TestApiFlashVoicingEmotionValuesRoundTrip() {
     }
 }
 
-void TestApiFlashVoicingOnlyHostileKeepsSteadyLengthAndCollapseUsesVariableSilence() {
+void TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSilence() {
     const auto config_case = test::ConfigCases().front();
     const std::string text = "Shell collapse";
-    const auto steady_encoder =
+    const auto standard_encoder =
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
-            BAG_FLASH_VOICING_FLAVOR_STEADY);
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+            BAG_FLASH_VOICING_FLAVOR_STANDARD);
     const auto hostile_encoder =
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
             BAG_FLASH_VOICING_FLAVOR_HOSTILE);
     const auto collapse_encoder =
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
             BAG_FLASH_VOICING_FLAVOR_COLLAPSE);
     const auto collapse_decoder =
         MakeDecoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
             BAG_FLASH_VOICING_FLAVOR_COLLAPSE);
 
-    bag_pcm16_result steady_pcm{};
+    bag_pcm16_result standard_pcm{};
     bag_pcm16_result hostile_pcm{};
     bag_pcm16_result collapse_pcm{};
-    test::AssertEq(bag_encode_text(&steady_encoder, text.c_str(), &steady_pcm), BAG_OK,
-                   "steady flash encode should succeed.");
+    test::AssertEq(bag_encode_text(&standard_encoder, text.c_str(), &standard_pcm), BAG_OK,
+                   "standard flash encode should succeed.");
     test::AssertEq(bag_encode_text(&hostile_encoder, text.c_str(), &hostile_pcm), BAG_OK,
                    "hostile flash encode should succeed.");
     test::AssertEq(bag_encode_text(&collapse_encoder, text.c_str(), &collapse_pcm), BAG_OK,
                    "collapse flash encode should succeed.");
     test::AssertEq(
         hostile_pcm.sample_count,
-        steady_pcm.sample_count,
-        "hostile voicing alone should keep steady signal timing when the signal profile stays steady.");
+        standard_pcm.sample_count,
+        "hostile voicing alone should keep standard signal timing when the signal profile stays standard.");
     test::AssertTrue(
-        collapse_pcm.sample_count > steady_pcm.sample_count,
+        collapse_pcm.sample_count > standard_pcm.sample_count,
         "collapse should include variable hesitation silence in its payload length.");
     const auto collapse_decoded = DecodeViaApi(collapse_decoder, collapse_pcm);
     test::AssertEq(collapse_decoded.code, BAG_OK, "collapse flash decode should skip variable silence.");
     test::AssertEq(collapse_decoded.text, text, "collapse variable silence should preserve text.");
-    bag_free_pcm16_result(&steady_pcm);
+    bag_free_pcm16_result(&standard_pcm);
     bag_free_pcm16_result(&hostile_pcm);
     bag_free_pcm16_result(&collapse_pcm);
 }
@@ -288,8 +288,8 @@ void TestApiFlashDecodeRequiresMatchingConfig() {
         MakeDecoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
-            BAG_FLASH_VOICING_FLAVOR_STEADY);
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+            BAG_FLASH_VOICING_FLAVOR_STANDARD);
     const std::string text = "Mismatch";
 
     bag_pcm16_result ritual_pcm{};
@@ -301,7 +301,7 @@ void TestApiFlashDecodeRequiresMatchingConfig() {
     const auto decoded = DecodeViaApi(wrong_decoder, ritual_pcm);
     test::AssertTrue(
         decoded.code != BAG_OK || decoded.text != text,
-        "Decoding litany flash PCM with steady signal/flavor should not look like a valid roundtrip.");
+        "Decoding litany flash PCM with standard signal/flavor should not look like a valid roundtrip.");
     bag_free_pcm16_result(&ritual_pcm);
 
     const auto zeal_encoder =
@@ -320,7 +320,7 @@ void TestApiFlashDecodeRequiresMatchingConfig() {
     const auto zeal_decoded = DecodeViaApi(wrong_decoder, zeal_pcm);
     test::AssertTrue(
         zeal_decoded.code != BAG_OK || zeal_decoded.text != zeal_text,
-        "Decoding zeal flash PCM with steady signal/flavor should not look like a valid roundtrip.");
+        "Decoding zeal flash PCM with standard signal/flavor should not look like a valid roundtrip.");
     bag_free_pcm16_result(&zeal_pcm);
 
     const auto void_encoder =
@@ -339,7 +339,7 @@ void TestApiFlashDecodeRequiresMatchingConfig() {
     const auto void_decoded = DecodeViaApi(wrong_decoder, void_pcm);
     test::AssertTrue(
         void_decoded.code != BAG_OK || void_decoded.text != void_text,
-        "Decoding void flash PCM with steady signal/flavor should not look like a valid roundtrip.");
+        "Decoding void flash PCM with standard signal/flavor should not look like a valid roundtrip.");
     bag_free_pcm16_result(&void_pcm);
 }
 
@@ -381,47 +381,47 @@ void TestApiFlashZealVariableCadenceRoundTrip() {
 
 void TestApiFlashSignalInfoDerivedFromLayout() {
     const auto config_case = test::ConfigCases().front();
-    const auto steady_encoder =
+    const auto standard_encoder =
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
-            BAG_FLASH_VOICING_FLAVOR_STEADY);
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+            BAG_FLASH_VOICING_FLAVOR_STANDARD);
     std::array<char, 64> low_buffer{};
     std::array<char, 64> high_buffer{};
     std::array<char, 128> bit_buffer{};
     std::array<char, 128> silence_buffer{};
     std::array<char, 128> decode_buffer{};
-    bag_flash_signal_info steady_info{};
-    steady_info.low_carrier_hz_buffer = low_buffer.data();
-    steady_info.low_carrier_hz_buffer_size = low_buffer.size();
-    steady_info.high_carrier_hz_buffer = high_buffer.data();
-    steady_info.high_carrier_hz_buffer_size = high_buffer.size();
-    steady_info.bit_duration_samples_buffer = bit_buffer.data();
-    steady_info.bit_duration_samples_buffer_size = bit_buffer.size();
-    steady_info.payload_silence_buffer = silence_buffer.data();
-    steady_info.payload_silence_buffer_size = silence_buffer.size();
-    steady_info.decode_path_buffer = decode_buffer.data();
-    steady_info.decode_path_buffer_size = decode_buffer.size();
+    bag_flash_signal_info standard_info{};
+    standard_info.low_carrier_hz_buffer = low_buffer.data();
+    standard_info.low_carrier_hz_buffer_size = low_buffer.size();
+    standard_info.high_carrier_hz_buffer = high_buffer.data();
+    standard_info.high_carrier_hz_buffer_size = high_buffer.size();
+    standard_info.bit_duration_samples_buffer = bit_buffer.data();
+    standard_info.bit_duration_samples_buffer_size = bit_buffer.size();
+    standard_info.payload_silence_buffer = silence_buffer.data();
+    standard_info.payload_silence_buffer_size = silence_buffer.size();
+    standard_info.decode_path_buffer = decode_buffer.data();
+    standard_info.decode_path_buffer_size = decode_buffer.size();
 
     test::AssertEq(
-        bag_describe_flash_signal(&steady_encoder, "Info", &steady_info),
+        bag_describe_flash_signal(&standard_encoder, "Info", &standard_info),
         BAG_OK,
-        "steady flash signal info should be derived from the core layout.");
-    test::AssertTrue(steady_info.available != 0, "steady flash signal info should be available.");
-    test::AssertEq(std::string(low_buffer.data(), steady_info.low_carrier_hz_size), "300",
-                   "steady low carrier info should match the rendered layout.");
-    test::AssertEq(std::string(high_buffer.data(), steady_info.high_carrier_hz_size), "600",
-                   "steady high carrier info should match the rendered layout.");
-    test::AssertEq(std::string(bit_buffer.data(), steady_info.bit_duration_samples_size),
+        "standard flash signal info should be derived from the core layout.");
+    test::AssertTrue(standard_info.available != 0, "standard flash signal info should be available.");
+    test::AssertEq(std::string(low_buffer.data(), standard_info.low_carrier_hz_size), "300",
+                   "standard low carrier info should match the rendered layout.");
+    test::AssertEq(std::string(high_buffer.data(), standard_info.high_carrier_hz_size), "600",
+                   "standard high carrier info should match the rendered layout.");
+    test::AssertEq(std::string(bit_buffer.data(), standard_info.bit_duration_samples_size),
                    std::to_string((static_cast<std::size_t>(config_case.frame_samples) *
                                    static_cast<std::size_t>(15)) /
                                   static_cast<std::size_t>(16)),
-                   "steady bit duration info should match the conservative faster timing.");
-    test::AssertEq(std::string(silence_buffer.data(), steady_info.payload_silence_size), "none",
-                   "steady silence info should report no payload silence.");
-    test::AssertEq(std::string(decode_buffer.data(), steady_info.decode_path_size), "fixed low/high window",
-                   "steady decode path info should report fixed-window decode.");
+                   "standard bit duration info should match the conservative faster timing.");
+    test::AssertEq(std::string(silence_buffer.data(), standard_info.payload_silence_size), "none",
+                   "standard silence info should report no payload silence.");
+    test::AssertEq(std::string(decode_buffer.data(), standard_info.decode_path_size), "fixed low/high window",
+                   "standard decode path info should report fixed-window decode.");
 
     const auto zeal_encoder =
         MakeEncoderConfig(
@@ -519,8 +519,8 @@ namespace api_tests {
 void RegisterApiFlashTests(test::Runner& runner) {
     runner.Add("Api.FlashConfigAffectsLengthAndRoundTrip", TestApiFlashConfigAffectsLengthAndRoundTrip);
     runner.Add("Api.FlashVoicingEmotionValuesRoundTrip", TestApiFlashVoicingEmotionValuesRoundTrip);
-    runner.Add("Api.FlashVoicingOnlyHostileKeepsSteadyLengthAndCollapseUsesVariableSilence",
-               TestApiFlashVoicingOnlyHostileKeepsSteadyLengthAndCollapseUsesVariableSilence);
+    runner.Add("Api.FlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSilence",
+               TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSilence);
     runner.Add("Api.FlashDecodeRequiresMatchingConfig", TestApiFlashDecodeRequiresMatchingConfig);
     runner.Add("Api.FlashZealVariableCadenceRoundTrip", TestApiFlashZealVariableCadenceRoundTrip);
     runner.Add("Api.FlashSignalInfoDerivedFromLayout", TestApiFlashSignalInfoDerivedFromLayout);

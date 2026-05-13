@@ -42,7 +42,7 @@ std::size_t FormalPreambleSampleCountForFlavor(const bag::CoreConfig& config,
     switch (flavor) {
     case bag::FlashVoicingFlavor::kLitany:
         return SecondsToSampleCount(config.sample_rate_hz, 1.35);
-    case bag::FlashVoicingFlavor::kSteady:
+    case bag::FlashVoicingFlavor::kStandard:
     default:
         return config.frame_samples > 0
                    ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)
@@ -55,7 +55,7 @@ std::size_t FormalEpilogueSampleCountForFlavor(const bag::CoreConfig& config,
     switch (flavor) {
     case bag::FlashVoicingFlavor::kLitany:
         return SecondsToSampleCount(config.sample_rate_hz, 1.15);
-    case bag::FlashVoicingFlavor::kSteady:
+    case bag::FlashVoicingFlavor::kStandard:
     default:
         return config.frame_samples > 0
                    ? static_cast<std::size_t>(config.frame_samples) * static_cast<std::size_t>(3)

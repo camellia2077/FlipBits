@@ -33,8 +33,8 @@ audio_io_metadata_mode ToApiMode(audio_io::FlipBitsAudioMetadataMode mode) {
 audio_io::FlipBitsAudioMetadataFlashVoicingStyle ToLibraryFlashStyle(
     audio_io_metadata_flash_voicing_style style) {
   switch (style) {
-    case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY:
-      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kSteady;
+    case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD:
+      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kStandard;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY:
       return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE:
@@ -54,8 +54,8 @@ audio_io::FlipBitsAudioMetadataFlashVoicingStyle ToLibraryFlashStyle(
 audio_io_metadata_flash_voicing_style ToApiFlashStyle(
     audio_io::FlipBitsAudioMetadataFlashVoicingStyle style) {
   switch (style) {
-    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kSteady:
-      return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY;
+    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kStandard:
+      return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD;
     case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany:
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY;
     case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile:
