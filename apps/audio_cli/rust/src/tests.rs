@@ -203,7 +203,7 @@ fn encode_help_mentions_flash_style() {
     assert!(help.contains("The current CLI accepts UTF-8 text only:"));
     assert!(help.contains("--text is parsed as a Rust UTF-8 string."));
     assert!(help.contains("--text-file is read as a UTF-8 text file."));
-    assert!(help.contains("steady"));
+    assert!(help.contains("standard"));
     assert!(help.contains("hostile"));
     assert!(help.contains("litany"));
     assert!(help.contains("collapse"));

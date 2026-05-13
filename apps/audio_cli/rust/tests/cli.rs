@@ -236,7 +236,7 @@ fn encode_help_mentions_android_aligned_flash_styles() {
         .assert()
         .success()
         .stdout(predicate::str::contains("--flash-style"))
-        .stdout(predicate::str::contains("steady"))
+        .stdout(predicate::str::contains("standard"))
         .stdout(predicate::str::contains("hostile"))
         .stdout(predicate::str::contains("litany"))
         .stdout(predicate::str::contains("collapse"))

@@ -80,7 +80,7 @@ fn decode_command(args: DecodeArgs) -> Result<RunOutput, CliError> {
         sample_rate_hz: decoded.sample_rate_hz,
         frame_samples: metadata.frame_samples,
         mode: metadata.mode,
-        flash_style: metadata.flash_voicing_style.unwrap_or(FlashStyle::Steady),
+        flash_style: metadata.flash_voicing_style.unwrap_or(FlashStyle::Standard),
     };
     let text = bag_api::decode_pcm(&config, &decoded.pcm_samples).map_err(|error| {
         CliError::Api(format!(
@@ -124,6 +124,6 @@ fn flash_style_for_mode(mode: TransportMode, requested_style: FlashStyle) -> Fla
     if mode == TransportMode::Flash {
         requested_style
     } else {
-        FlashStyle::Steady
+        FlashStyle::Standard
     }
 }

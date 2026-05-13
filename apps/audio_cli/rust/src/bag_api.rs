@@ -21,13 +21,13 @@ const BAG_TRANSPORT_MINI: BagTransportMode = 0;
 const BAG_TRANSPORT_FLASH: BagTransportMode = 1;
 const BAG_TRANSPORT_PRO: BagTransportMode = 2;
 const BAG_TRANSPORT_ULTRA: BagTransportMode = 3;
-const BAG_FLASH_SIGNAL_PROFILE_STEADY: BagFlashSignalProfile = 0;
+const BAG_FLASH_SIGNAL_PROFILE_STANDARD: BagFlashSignalProfile = 0;
 const BAG_FLASH_SIGNAL_PROFILE_LITANY: BagFlashSignalProfile = 1;
 const BAG_FLASH_SIGNAL_PROFILE_HOSTILE: BagFlashSignalProfile = 3;
 const BAG_FLASH_SIGNAL_PROFILE_COLLAPSE: BagFlashSignalProfile = 4;
 const BAG_FLASH_SIGNAL_PROFILE_ZEAL: BagFlashSignalProfile = 5;
 const BAG_FLASH_SIGNAL_PROFILE_VOID: BagFlashSignalProfile = 6;
-const BAG_FLASH_VOICING_FLAVOR_STEADY: BagFlashVoicingFlavor = 0;
+const BAG_FLASH_VOICING_FLAVOR_STANDARD: BagFlashVoicingFlavor = 0;
 const BAG_FLASH_VOICING_FLAVOR_LITANY: BagFlashVoicingFlavor = 1;
 const BAG_FLASH_VOICING_FLAVOR_HOSTILE: BagFlashVoicingFlavor = 3;
 const BAG_FLASH_VOICING_FLAVOR_COLLAPSE: BagFlashVoicingFlavor = 4;
@@ -175,7 +175,7 @@ impl CodecConfig {
             sample_rate_hz: DEFAULT_SAMPLE_RATE_HZ,
             frame_samples: default_frame_samples(DEFAULT_SAMPLE_RATE_HZ),
             mode,
-            flash_style: FlashStyle::Steady,
+            flash_style: FlashStyle::Standard,
         }
     }
 }
@@ -337,9 +337,9 @@ fn make_decoder_config(config: &CodecConfig) -> BagDecoderConfig {
 
 fn flash_style_pair(style: FlashStyle) -> (BagFlashSignalProfile, BagFlashVoicingFlavor) {
     match style {
-        FlashStyle::Steady => (
-            BAG_FLASH_SIGNAL_PROFILE_STEADY,
-            BAG_FLASH_VOICING_FLAVOR_STEADY,
+        FlashStyle::Standard => (
+            BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+            BAG_FLASH_VOICING_FLAVOR_STANDARD,
         ),
         FlashStyle::Hostile => (
             BAG_FLASH_SIGNAL_PROFILE_HOSTILE,

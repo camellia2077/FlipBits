@@ -15,7 +15,7 @@ const AUDIO_IO_METADATA_MODE_MINI: AudioIoMetadataMode = 1;
 const AUDIO_IO_METADATA_MODE_FLASH: AudioIoMetadataMode = 2;
 const AUDIO_IO_METADATA_MODE_PRO: AudioIoMetadataMode = 3;
 const AUDIO_IO_METADATA_MODE_ULTRA: AudioIoMetadataMode = 4;
-const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY: AudioIoMetadataFlashVoicingStyle = 1;
+const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD: AudioIoMetadataFlashVoicingStyle = 1;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY: AudioIoMetadataFlashVoicingStyle = 2;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE: AudioIoMetadataFlashVoicingStyle = 4;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE: AudioIoMetadataFlashVoicingStyle = 5;
@@ -353,7 +353,7 @@ fn from_metadata_mode(mode: AudioIoMetadataMode) -> Result<TransportMode, CliErr
 
 fn to_flash_voicing_style(style: FlashStyle) -> AudioIoMetadataFlashVoicingStyle {
     match style {
-        FlashStyle::Steady => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY,
+        FlashStyle::Standard => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD,
         FlashStyle::Hostile => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE,
         FlashStyle::Litany => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY,
         FlashStyle::Collapse => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE,
@@ -366,7 +366,7 @@ fn from_flash_voicing_style(
     style: AudioIoMetadataFlashVoicingStyle,
 ) -> Result<FlashStyle, CliError> {
     match style {
-        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STEADY => Ok(FlashStyle::Steady),
+        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD => Ok(FlashStyle::Standard),
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE => Ok(FlashStyle::Hostile),
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY => Ok(FlashStyle::Litany),
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE => Ok(FlashStyle::Collapse),
