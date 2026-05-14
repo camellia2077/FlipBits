@@ -2,6 +2,7 @@ package com.bag.audioandroid.ui.screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +17,9 @@ import kotlin.math.abs
 
 internal data class FlashSignalVisualizerRenderState(
     val buckets: List<FskEnergyBucket>,
+    val toneSpectrumBuckets: List<ToneSpectrumBucket>,
+    val toneFrequencyScale: ToneFrequencyScale,
+    val toneCarrierLayout: ToneCarrierLayout,
     val bucketFrame: FlashSignalBucketFrame,
     val fixedTimelineFrame: FlashSignalFixedTimelineFrame?,
     val visualSegments: List<FlashSignalToneSegment>,
@@ -81,6 +85,14 @@ internal fun rememberFlashSignalVisualizerRenderState(
         remember(flashVoicingStyle) {
             flashSignalActiveWindowBucketCount(flashVoicingStyle)
         }
+    val toneFrequencyScale =
+        remember(flashVoicingStyle) {
+            toneFrequencyScaleForStyle(flashVoicingStyle)
+        }
+    val toneCarrierLayout =
+        remember(flashVoicingStyle) {
+            toneCarrierLayoutForStyle(flashVoicingStyle)
+        }
     val hasWindowedTimelineFrame = windowedTimelineFrame != null && !isScrubbing
     val shouldUseTimelineFallback =
         remember(mode, hasWindowedTimelineFrame, input.bucketSource.stableTimelineKey(), isScrubbing) {
@@ -89,6 +101,7 @@ internal fun rememberFlashSignalVisualizerRenderState(
                 FlashSignalVisualizationMode.Lanes,
                 FlashSignalVisualizationMode.Pitch,
                 -> true
+                FlashSignalVisualizationMode.Hz -> true
             }
         }
     val fallbackTimelineFrame =
@@ -100,15 +113,27 @@ internal fun rememberFlashSignalVisualizerRenderState(
                 ?.followData
                 ?.toFixedTimelineFrameOrNull()
         }
-    val fixedTimelineFrame = windowedTimelineFrame ?: fallbackTimelineFrame
-    val visualSegments = fixedTimelineFrame?.segments.orEmpty()
+    val fixedTimelineFrame =
+        if (isScrubbing) {
+            fallbackTimelineFrame ?: windowedTimelineFrame
+        } else {
+            windowedTimelineFrame ?: fallbackTimelineFrame
+        }
     val usesFallbackTimeline = fallbackTimelineFrame != null && fixedTimelineFrame === fallbackTimelineFrame
+    val visualSegments =
+        flashVisualSegmentsForMode(
+            fixedTimelineFrame = fixedTimelineFrame,
+            mode = mode,
+            usesFallbackTimeline = usesFallbackTimeline,
+            isScrubbing = isScrubbing,
+        )
     val visualTotalSamples = fixedTimelineFrame?.totalSamples ?: followTimelineTotalSamples
     val playbackSampleState =
         sharedPlaybackSampleState
             ?: rememberFlashVisualPlaybackSampleState(
                 rawSample = if (isScrubbing) displayedSamplePosition else followDisplayedSamplePosition,
                 isPlaying = isPlaying && !isScrubbing,
+                snapWhenNotPlaying = isScrubbing,
                 playbackSpeed = playbackSpeed,
                 sampleRateHz = sampleRateHz,
                 totalSamples = visualTotalSamples,
@@ -213,15 +238,47 @@ internal fun rememberFlashSignalVisualizerRenderState(
                     )
             }
         }
+    val toneSpectrumBuckets =
+        remember(
+            pcm,
+            sampleRateHz,
+            targetBucketCount,
+            windowSampleCount,
+            visualFollowAnalysisDisplayedSamplePosition,
+            toneFrequencyScale,
+            fixedTimelineFrame,
+            mode,
+        ) {
+            if (mode != FlashSignalVisualizationMode.Hz || fixedTimelineFrame != null) {
+                emptyList()
+            } else {
+                buildToneSpectrumBuckets(
+                    pcm = pcm,
+                    sampleRateHz = sampleRateHz,
+                    currentSample = visualFollowAnalysisDisplayedSamplePosition,
+                    windowSampleCount = windowSampleCount,
+                    targetBucketCount = targetBucketCount,
+                    frequencyScale = toneFrequencyScale,
+                )
+            }
+        }
     val primitiveEstimate =
         flashVisualPrimitiveEstimate(
             mode = mode,
             drawableSegments = visualSegments.size,
-            buckets = bucketFrame.buckets.size,
+            buckets =
+                if (mode == FlashSignalVisualizationMode.Hz && fixedTimelineFrame == null) {
+                    toneSpectrumBuckets.size
+                } else {
+                    bucketFrame.buckets.size
+                },
             hasFixedTimeline = fixedTimelineFrame != null,
         )
     return remember(
         bucketFrame,
+        toneSpectrumBuckets,
+        toneFrequencyScale,
+        toneCarrierLayout,
         fixedTimelineFrame,
         visualSegments,
         playbackSampleState,
@@ -238,6 +295,9 @@ internal fun rememberFlashSignalVisualizerRenderState(
     ) {
         FlashSignalVisualizerRenderState(
             buckets = bucketFrame.buckets,
+            toneSpectrumBuckets = toneSpectrumBuckets,
+            toneFrequencyScale = toneFrequencyScale,
+            toneCarrierLayout = toneCarrierLayout,
             bucketFrame = bucketFrame,
             fixedTimelineFrame = fixedTimelineFrame,
             visualSegments = visualSegments,
@@ -255,6 +315,30 @@ internal fun rememberFlashSignalVisualizerRenderState(
             traceWindowEndSample = flashVisualWindow.endSampleExclusive,
             totalSamples = visualTotalSamples,
         )
+    }
+}
+
+internal fun flashVisualSegmentsForMode(
+    fixedTimelineFrame: FlashSignalFixedTimelineFrame?,
+    mode: FlashSignalVisualizationMode,
+    usesFallbackTimeline: Boolean,
+    isScrubbing: Boolean,
+): List<FlashSignalToneSegment> {
+    if (fixedTimelineFrame == null) {
+        return emptyList()
+    }
+    val shouldPreserveExactBitGeometry =
+        mode == FlashSignalVisualizationMode.Lanes ||
+            mode == FlashSignalVisualizationMode.Hz ||
+            (
+                usesFallbackTimeline &&
+                    isScrubbing &&
+                    mode == FlashSignalVisualizationMode.Pitch
+            )
+    return if (shouldPreserveExactBitGeometry) {
+        fixedTimelineFrame.segments
+    } else {
+        fixedTimelineFrame.drawableSegments.takeIf { it.isNotEmpty() } ?: fixedTimelineFrame.segments
     }
 }
 
@@ -442,18 +526,35 @@ internal data class FlashVisualPlaybackSampleState(
 internal fun rememberFlashVisualPlaybackSampleState(
     rawSample: Float,
     isPlaying: Boolean,
+    snapWhenNotPlaying: Boolean = false,
     playbackSpeed: Float,
     sampleRateHz: Int,
     totalSamples: Int,
 ): FlashVisualPlaybackSampleState {
     var visualSample by remember { mutableFloatStateOf(rawSample) }
+    val clampedRawSample = rawSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
     val safeSpeed = playbackSpeed.coerceIn(0.1f, 4f)
     val latestAnchorSample by rememberUpdatedState(rawSample)
     val latestTotalSamples by rememberUpdatedState(totalSamples)
     if (!isPlaying || sampleRateHz <= 0 || totalSamples <= 0) {
+        val shouldSnapToRaw =
+            snapWhenNotPlaying ||
+                sampleRateHz <= 0 ||
+                abs(clampedRawSample - visualSample) > sampleRateHz * PauseSnapDriftThresholdSeconds
+        val displayedSample =
+            if (shouldSnapToRaw) {
+                clampedRawSample
+            } else {
+                visualSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
+            }
+        if (shouldSnapToRaw) {
+            SideEffect {
+                visualSample = clampedRawSample
+            }
+        }
         return FlashVisualPlaybackSampleState(
             rawSample = rawSample,
-            displayedSample = visualSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat()),
+            displayedSample = displayedSample,
         )
     }
     LaunchedEffect(safeSpeed, sampleRateHz, totalSamples) {
@@ -727,16 +828,19 @@ internal fun flashVisualPrimitiveEstimate(
         when (mode) {
             FlashSignalVisualizationMode.Lanes -> drawableSegments * 2
             FlashSignalVisualizationMode.Pitch -> drawableSegments
+            FlashSignalVisualizationMode.Hz -> drawableSegments
             FlashSignalVisualizationMode.Pulse -> FlashPulseVisibleCellCount
         }
     } else {
         when (mode) {
             FlashSignalVisualizationMode.Lanes -> buckets * 2
             FlashSignalVisualizationMode.Pitch -> buckets * 2
+            FlashSignalVisualizationMode.Hz -> buckets
             FlashSignalVisualizationMode.Pulse -> FlashPulseVisibleCellCount
         }
     }
 
 private const val FlashSignalAnalysisCacheMaxEntries = 12
 private const val FlashBitReadoutGroupSize = 8
+private const val PauseSnapDriftThresholdSeconds = 0.35f
 internal const val FlashPulseVisibleCellCount = 13

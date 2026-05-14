@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
+import android.graphics.Paint
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -10,7 +11,39 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+
+internal data class ToneSpectrumDrawStats(
+    val validBuckets: Int,
+    val lineSegments: Int,
+    val pointDraws: Int,
+    val minFrequencyHz: Float,
+    val maxFrequencyHz: Float,
+    val firstFrequencyHz: Float,
+    val lastFrequencyHz: Float,
+    val currentFrequencyHz: Float,
+    val minStrokeWidthPx: Float,
+    val maxStrokeWidthPx: Float,
+) {
+    companion object {
+        val Empty =
+            ToneSpectrumDrawStats(
+                validBuckets = 0,
+                lineSegments = 0,
+                pointDraws = 0,
+                minFrequencyHz = 0f,
+                maxFrequencyHz = 0f,
+                firstFrequencyHz = 0f,
+                lastFrequencyHz = 0f,
+                currentFrequencyHz = 0f,
+                minStrokeWidthPx = 0f,
+                maxStrokeWidthPx = 0f,
+            )
+    }
+}
 
 internal data class FlashSignalViewport(
     val startSample: Float,
@@ -111,9 +144,13 @@ internal fun DrawScope.drawBitCellSegments(
             }
             val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
             val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
-            val rectStartX = startX.coerceAtLeast(leftPadding)
-            val rectEndX = endX.coerceAtMost(leftPadding + innerWidth)
-            val rectWidth = (rectEndX - rectStartX).coerceAtLeast(1.2f)
+            val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.2f)
+            val rectStartX = drawBounds.startX.coerceAtLeast(leftPadding)
+            val rectEndX = drawBounds.endX.coerceAtMost(leftPadding + innerWidth)
+            val rectWidth = rectEndX - rectStartX
+            if (rectWidth <= 0f) {
+                return@forEach
+            }
             val isCurrentBit =
                 viewport.playheadSample >= segment.startSample.toFloat() &&
                     viewport.playheadSample < segment.endSample.toFloat()
@@ -124,16 +161,22 @@ internal fun DrawScope.drawBitCellSegments(
                     FskDominantTone.Low -> lowerTop
                     FskDominantTone.Unknown -> return@forEach
                 }
-            drawRect(
-                color =
-                    laneRectColor(
-                        isCurrent = isCurrentBit,
-                        isPast = isPastBit,
-                        activeToneColor = activeToneColor,
-                        inactiveToneColor = inactiveToneColor,
+            drawLaneSegmentProgress(
+                rectStartX = rectStartX,
+                rectEndX = rectEndX,
+                top = top,
+                height = contentHeight,
+                splitX =
+                    sampleToViewportX(
+                        viewport.playheadSample,
+                        viewport,
+                        leftPadding,
+                        innerWidth,
                     ),
-                topLeft = Offset(rectStartX, top),
-                size = Size(rectWidth, contentHeight),
+                isCurrent = isCurrentBit,
+                isPast = isPastBit,
+                activeToneColor = activeToneColor,
+                inactiveToneColor = inactiveToneColor,
             )
         }
     }
@@ -350,6 +393,66 @@ private fun laneRectColor(
         else -> inactiveToneColor.copy(alpha = 0.22f)
     }
 
+private fun DrawScope.drawLaneSegmentProgress(
+    rectStartX: Float,
+    rectEndX: Float,
+    top: Float,
+    height: Float,
+    splitX: Float,
+    isCurrent: Boolean,
+    isPast: Boolean,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+) {
+    val activeColor =
+        laneRectColor(
+            isCurrent = isCurrent,
+            isPast = isPast,
+            activeToneColor = activeToneColor,
+            inactiveToneColor = inactiveToneColor,
+        )
+    val inactiveColor =
+        laneRectColor(
+            isCurrent = false,
+            isPast = false,
+            activeToneColor = activeToneColor,
+            inactiveToneColor = inactiveToneColor,
+        )
+    when {
+        isPast -> {
+            drawRect(
+                color = activeColor,
+                topLeft = Offset(rectStartX, top),
+                size = Size(rectEndX - rectStartX, height),
+            )
+        }
+        isCurrent -> {
+            val activeEndX = splitX.coerceIn(rectStartX, rectEndX)
+            if (activeEndX > rectStartX) {
+                drawRect(
+                    color = activeColor,
+                    topLeft = Offset(rectStartX, top),
+                    size = Size(activeEndX - rectStartX, height),
+                )
+            }
+            if (activeEndX < rectEndX) {
+                drawRect(
+                    color = inactiveColor,
+                    topLeft = Offset(activeEndX, top),
+                    size = Size(rectEndX - activeEndX, height),
+                )
+            }
+        }
+        else -> {
+            drawRect(
+                color = inactiveColor,
+                topLeft = Offset(rectStartX, top),
+                size = Size(rectEndX - rectStartX, height),
+            )
+        }
+    }
+}
+
 internal fun DrawScope.drawPitch(
     buckets: List<FskEnergyBucket>,
     activeThresholdBucketIndex: Float,
@@ -458,6 +561,447 @@ internal fun DrawScope.drawPitch(
             center = Offset(centerX, y),
         )
     }
+}
+
+internal fun DrawScope.drawToneSpectrum(
+    buckets: List<ToneSpectrumBucket>,
+    frequencyScale: ToneFrequencyScale,
+    activeThresholdBucketIndex: Float,
+    bucketOffset: Float,
+    leftPadding: Float,
+    topPadding: Float,
+    innerWidth: Float,
+    innerHeight: Float,
+    bucketWidth: Float,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+    centerLineColor: Color,
+    glowPulse: Float,
+): ToneSpectrumDrawStats {
+    if (buckets.isEmpty()) {
+        return ToneSpectrumDrawStats.Empty
+    }
+    val minHz = frequencyScale.minHz
+    val maxHz = frequencyScale.maxHz
+    drawToneFrequencyReferences(
+        frequencyScale = frequencyScale,
+        leftPadding = leftPadding,
+        topPadding = topPadding,
+        innerWidth = innerWidth,
+        innerHeight = innerHeight,
+        activeToneColor = activeToneColor,
+        centerLineColor = centerLineColor,
+    )
+
+    var validBuckets = 0
+    var lineSegments = 0
+    var minFrequency = Float.POSITIVE_INFINITY
+    var maxFrequency = 0f
+    var firstFrequency = 0f
+    var lastFrequency = 0f
+    var minStrokeWidth = Float.POSITIVE_INFINITY
+    var maxStrokeWidth = 0f
+    var previousPoint: Offset? = null
+    buckets.forEachIndexed { index, bucket ->
+        val x = leftPadding + bucketWidth * (index.toFloat() - bucketOffset + 0.5f)
+        if (x < leftPadding - bucketWidth || x > leftPadding + innerWidth + bucketWidth) {
+            return@forEachIndexed
+        }
+        if (bucket.frequencyHz <= 0f || bucket.amplitude < FlashSignalSilenceThreshold) {
+            previousPoint = null
+            return@forEachIndexed
+        }
+        validBuckets += 1
+        minFrequency = minOf(minFrequency, bucket.frequencyHz)
+        maxFrequency = maxOf(maxFrequency, bucket.frequencyHz)
+        if (firstFrequency <= 0f) {
+            firstFrequency = bucket.frequencyHz
+        }
+        lastFrequency = bucket.frequencyHz
+        val y = toneSpectrumY(bucket.frequencyHz, minHz, maxHz, topPadding, innerHeight)
+        val isActive = index.toFloat() <= activeThresholdBucketIndex
+        val strength = bucket.strength.coerceIn(0f, 1f)
+        val color =
+            if (isActive) {
+                activeToneColor.copy(alpha = (0.66f + 0.22f * strength + 0.06f * glowPulse).coerceIn(0f, 1f))
+            } else {
+                inactiveToneColor.copy(alpha = (0.38f + 0.24f * strength).coerceIn(0f, 0.72f))
+            }
+        val point = Offset(x, y)
+        previousPoint?.let { previous ->
+            val strokeWidth = 1.35.dp.toPx()
+            lineSegments += 1
+            minStrokeWidth = minOf(minStrokeWidth, strokeWidth)
+            maxStrokeWidth = maxOf(maxStrokeWidth, strokeWidth)
+            drawLine(
+                color = color.copy(alpha = color.alpha * 0.72f),
+                start = previous,
+                end = point,
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Butt,
+            )
+        }
+        previousPoint = point
+    }
+    return ToneSpectrumDrawStats(
+        validBuckets = validBuckets,
+        lineSegments = lineSegments,
+        pointDraws = 0,
+        minFrequencyHz = if (validBuckets > 0) minFrequency else 0f,
+        maxFrequencyHz = if (validBuckets > 0) maxFrequency else 0f,
+        firstFrequencyHz = firstFrequency,
+        lastFrequencyHz = lastFrequency,
+        currentFrequencyHz = 0f,
+        minStrokeWidthPx = if (lineSegments > 0) minStrokeWidth else 0f,
+        maxStrokeWidthPx = if (lineSegments > 0) maxStrokeWidth else 0f,
+    )
+}
+
+internal fun DrawScope.drawToneTimelineSegments(
+    segments: List<FlashSignalToneSegment>,
+    viewport: FlashSignalViewport,
+    frequencyScale: ToneFrequencyScale,
+    carrierLayout: ToneCarrierLayout,
+    leftPadding: Float,
+    topPadding: Float,
+    innerWidth: Float,
+    innerHeight: Float,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+    centerLineColor: Color,
+    glowPulse: Float,
+): ToneSpectrumDrawStats {
+    if (segments.isEmpty()) {
+        return ToneSpectrumDrawStats.Empty
+    }
+    drawToneFrequencyReferences(
+        frequencyScale = frequencyScale,
+        leftPadding = leftPadding,
+        topPadding = topPadding,
+        innerWidth = innerWidth,
+        innerHeight = innerHeight,
+        activeToneColor = activeToneColor,
+        centerLineColor = centerLineColor,
+    )
+
+    var validSegments = 0
+    var minFrequency = Float.POSITIVE_INFINITY
+    var maxFrequency = 0f
+    var firstFrequency = 0f
+    var lastFrequency = 0f
+    val pulseStrokeWidth = 2.6.dp.toPx()
+    val railStrokeWidth = 1.dp.toPx()
+    val splitX = sampleToViewportX(viewport.playheadSample, viewport, leftPadding, innerWidth)
+    val fallbackLowY =
+        toneSpectrumY(
+            frequencyHz = carrierLayout.lowHz,
+            minHz = frequencyScale.minHz,
+            maxHz = frequencyScale.maxHz,
+            topPadding = topPadding,
+            innerHeight = innerHeight,
+        )
+    val fallbackHighY =
+        toneSpectrumY(
+            frequencyHz = carrierLayout.highHz,
+            minHz = frequencyScale.minHz,
+            maxHz = frequencyScale.maxHz,
+            topPadding = topPadding,
+            innerHeight = innerHeight,
+        )
+    var currentFrequency = 0f
+    clipFlashViewport(
+        leftPadding = leftPadding,
+        topPadding = topPadding,
+        innerWidth = innerWidth,
+        innerHeight = innerHeight,
+    ) {
+        segments.forEach { segment ->
+            if (!segment.overlaps(viewport)) {
+                return@forEach
+            }
+            val frequency =
+                segment.carrierFrequencyHz.takeIf { it > 0f }
+                    ?: when (segment.tone) {
+                        FskDominantTone.Low -> carrierLayout.lowHz
+                        FskDominantTone.High -> carrierLayout.highHz
+                        FskDominantTone.Unknown -> return@forEach
+                    }
+            val fallbackY =
+                when (segment.tone) {
+                    FskDominantTone.Low -> fallbackLowY
+                    FskDominantTone.High -> fallbackHighY
+                    FskDominantTone.Unknown -> return@forEach
+                }
+            val startX = sampleToViewportX(segment.startSample.toFloat(), viewport, leftPadding, innerWidth)
+            val endX = sampleToViewportX(segment.endSample.toFloat(), viewport, leftPadding, innerWidth)
+            val drawBounds = segmentVisualBounds(segment, viewport, startX, endX, minVisibleWidth = 1.2f)
+            val rectStartX = drawBounds.startX.coerceAtLeast(leftPadding)
+            val rectEndX = drawBounds.endX.coerceAtMost(leftPadding + innerWidth)
+            if (rectEndX <= rectStartX) {
+                return@forEach
+            }
+            val isCurrent =
+                viewport.playheadSample >= segment.startSample.toFloat() &&
+                    viewport.playheadSample < segment.endSample.toFloat()
+            if (isCurrent) {
+                currentFrequency = frequency
+            }
+            validSegments += 1
+            minFrequency = minOf(minFrequency, frequency)
+            maxFrequency = maxOf(maxFrequency, frequency)
+            if (firstFrequency <= 0f) {
+                firstFrequency = frequency
+            }
+            lastFrequency = frequency
+            val y =
+                if (segment.carrierFrequencyHz > 0f) {
+                    toneSpectrumY(
+                        frequencyHz = frequency,
+                        minHz = frequencyScale.minHz,
+                        maxHz = frequencyScale.maxHz,
+                        topPadding = topPadding,
+                        innerHeight = innerHeight,
+                    )
+                } else {
+                    fallbackY
+                }
+            drawToneTimelineProgressLine(
+                startX = rectStartX,
+                endX = rectEndX,
+                y = y,
+                splitX = splitX,
+                isPast = viewport.playheadSample >= segment.endSample.toFloat(),
+                isCurrent = isCurrent,
+                activeToneColor = activeToneColor.copy(alpha = (0.78f + 0.10f * glowPulse).coerceIn(0f, 1f)),
+                inactiveToneColor = inactiveToneColor.copy(alpha = 0.54f),
+                strokeWidth = pulseStrokeWidth,
+            )
+        }
+    }
+    drawToneCurrentFrequencyHud(
+        frequencyHz = currentFrequency,
+        leftPadding = leftPadding,
+        topPadding = topPadding,
+        innerWidth = innerWidth,
+        activeToneColor = activeToneColor,
+        inactiveToneColor = inactiveToneColor,
+    )
+    return ToneSpectrumDrawStats(
+        validBuckets = validSegments,
+        lineSegments = validSegments,
+        pointDraws = 0,
+        minFrequencyHz = if (validSegments > 0) minFrequency else 0f,
+        maxFrequencyHz = if (validSegments > 0) maxFrequency else 0f,
+        firstFrequencyHz = firstFrequency,
+        lastFrequencyHz = lastFrequency,
+        currentFrequencyHz = currentFrequency,
+        minStrokeWidthPx = if (validSegments > 0) pulseStrokeWidth else 0f,
+        maxStrokeWidthPx = if (validSegments > 0) pulseStrokeWidth else 0f,
+    )
+}
+
+private fun DrawScope.drawToneCurrentFrequencyHud(
+    frequencyHz: Float,
+    leftPadding: Float,
+    topPadding: Float,
+    innerWidth: Float,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+) {
+    val label = if (frequencyHz > 0f) "${frequencyHz.toInt()} Hz" else "-- Hz"
+    val textPaint =
+        Paint().apply {
+            isAntiAlias = true
+            textSize = 11.dp.toPx()
+            color = activeToneColor.copy(alpha = 0.94f).toArgb()
+        }
+    val horizontalPadding = 6.dp.toPx()
+    val verticalPadding = 4.dp.toPx()
+    val textWidth = textPaint.measureText(label)
+    val textHeight = textPaint.textSize
+    val boxWidth = textWidth + horizontalPadding * 2f
+    val boxHeight = textHeight + verticalPadding * 2f
+    val boxLeft = (leftPadding + innerWidth - boxWidth - 6.dp.toPx()).coerceAtLeast(leftPadding)
+    val boxTop = topPadding - 10.dp.toPx()
+    drawRoundRect(
+        color = activeToneColor.copy(alpha = 0.18f),
+        topLeft = Offset(boxLeft, boxTop),
+        size = Size(boxWidth, boxHeight),
+        cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx()),
+    )
+    drawRoundRect(
+        color = activeToneColor.copy(alpha = 0.10f),
+        topLeft = Offset(boxLeft, boxTop),
+        size = Size(boxWidth, boxHeight),
+        cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx()),
+    )
+    drawIntoCanvas { canvas ->
+        canvas.nativeCanvas.drawText(
+            label,
+            boxLeft + horizontalPadding,
+            boxTop + verticalPadding + textHeight * 0.82f,
+            textPaint,
+        )
+    }
+}
+
+private fun DrawScope.drawToneTimelineProgressLine(
+    startX: Float,
+    endX: Float,
+    y: Float,
+    splitX: Float,
+    isPast: Boolean,
+    isCurrent: Boolean,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+    strokeWidth: Float,
+) {
+    when {
+        isPast -> {
+            drawLine(
+                color = activeToneColor,
+                start = Offset(startX, y),
+                end = Offset(endX, y),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Butt,
+            )
+        }
+        isCurrent -> {
+            val activeEndX = splitX.coerceIn(startX, endX)
+            if (activeEndX > startX) {
+                drawLine(
+                    color = activeToneColor,
+                    start = Offset(startX, y),
+                    end = Offset(activeEndX, y),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Butt,
+                )
+            }
+            if (activeEndX < endX) {
+                drawLine(
+                    color = inactiveToneColor,
+                    start = Offset(activeEndX, y),
+                    end = Offset(endX, y),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Butt,
+                )
+            }
+        }
+        else -> {
+            drawLine(
+                color = inactiveToneColor,
+                start = Offset(startX, y),
+                end = Offset(endX, y),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Butt,
+            )
+        }
+    }
+}
+
+private fun DrawScope.drawToneFrequencyReferences(
+    frequencyScale: ToneFrequencyScale,
+    leftPadding: Float,
+    topPadding: Float,
+    innerWidth: Float,
+    innerHeight: Float,
+    activeToneColor: Color,
+    centerLineColor: Color,
+) {
+    val lineColor = centerLineColor.copy(alpha = 0.46f)
+    val bandColor = activeToneColor.copy(alpha = 0.10f)
+    frequencyScale.references.forEach { reference ->
+        if (reference.isBand) {
+            val topY =
+                toneSpectrumY(
+                    frequencyHz = reference.endHz,
+                    minHz = frequencyScale.minHz,
+                    maxHz = frequencyScale.maxHz,
+                    topPadding = topPadding,
+                    innerHeight = innerHeight,
+                )
+            val bottomY =
+                toneSpectrumY(
+                    frequencyHz = reference.startHz,
+                    minHz = frequencyScale.minHz,
+                    maxHz = frequencyScale.maxHz,
+                    topPadding = topPadding,
+                    innerHeight = innerHeight,
+                )
+            drawRect(
+                color = bandColor,
+                topLeft = Offset(leftPadding, topY),
+                size = Size(innerWidth, (bottomY - topY).coerceAtLeast(1f)),
+            )
+            val labelY =
+                if (topY < topPadding + innerHeight / 2f) {
+                    topY - 6.dp.toPx()
+                } else {
+                    topY + 32.dp.toPx()
+                }
+            drawToneReferenceLabel(
+                label = reference.label,
+                x = leftPadding + 6.dp.toPx(),
+                y = labelY,
+                color = lineColor,
+            )
+        } else {
+            val y =
+                toneSpectrumY(
+                    frequencyHz = reference.startHz,
+                    minHz = frequencyScale.minHz,
+                    maxHz = frequencyScale.maxHz,
+                    topPadding = topPadding,
+                    innerHeight = innerHeight,
+                )
+            val labelY =
+                if (y < topPadding + innerHeight / 2f) {
+                    y - 8.dp.toPx()
+                } else {
+                    y + 12.dp.toPx()
+                }
+            drawLine(
+                color = lineColor,
+                start = Offset(leftPadding, y),
+                end = Offset(leftPadding + innerWidth, y),
+                strokeWidth = 1.dp.toPx(),
+            )
+            drawToneReferenceLabel(
+                label = reference.label,
+                x = leftPadding + 6.dp.toPx(),
+                y = labelY,
+                color = lineColor,
+            )
+        }
+    }
+}
+
+private fun DrawScope.drawToneReferenceLabel(
+    label: String,
+    x: Float,
+    y: Float,
+    color: Color,
+) {
+    val textPaint =
+        Paint().apply {
+            isAntiAlias = true
+            textSize = 10.dp.toPx()
+            this.color = color.toArgb()
+        }
+    drawIntoCanvas { canvas ->
+        canvas.nativeCanvas.drawText(label, x, y, textPaint)
+    }
+}
+
+private fun toneSpectrumY(
+    frequencyHz: Float,
+    minHz: Float,
+    maxHz: Float,
+    topPadding: Float,
+    innerHeight: Float,
+): Float {
+    val normalized = ((frequencyHz - minHz) / (maxHz - minHz).coerceAtLeast(1f)).coerceIn(0f, 1f)
+    return topPadding + innerHeight * (1f - normalized)
 }
 
 private fun toneBucketColor(

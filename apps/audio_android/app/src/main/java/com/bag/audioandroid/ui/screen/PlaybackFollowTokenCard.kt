@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.ui.playbackLyricsAccentTextColor
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
@@ -36,6 +37,9 @@ internal fun PlaybackFollowTokenCard(
     activeByteIndexWithinToken: Int,
     activeBitIndexWithinByte: Int = -1,
     isActiveBitTone: Boolean = false,
+    tokenIndex: Int = -1,
+    displayedSamples: Int = -1,
+    followData: PayloadFollowViewData? = null,
     isPast: Boolean = false,
     onClick: (() -> Unit)? = null,
     onMeasuredHeightPxChanged: ((Int) -> Unit)? = null,
@@ -179,6 +183,9 @@ internal fun PlaybackFollowTokenCard(
                     activeByteIndexWithinToken = activeByteIndexWithinToken,
                     activeBitIndexWithinByte = activeBitIndexWithinByte,
                     isActiveBitTone = isActiveBitTone,
+                    tokenIndex = tokenIndex,
+                    displayedSamples = displayedSamples,
+                    followData = followData,
                     inactiveRawColor = inactiveRawColor,
                     focusColor = focusColor,
                     onFocusColor = onFocusColor,

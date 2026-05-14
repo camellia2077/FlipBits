@@ -66,6 +66,7 @@ internal fun PlaybackDisplaySection(
     playbackSpeed: Float = 1f,
     playbackDisplayMode: PlaybackDisplayMode,
     flashVisualizationModeName: String,
+    initialFollowViewMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
     lyricsExpanded: Boolean,
     extraLyricsRecoveryHeight: Dp = 0.dp,
     applyLyricsPreviewBonusLine: Boolean = false,
@@ -179,6 +180,7 @@ internal fun PlaybackDisplaySection(
                 followData = followData,
                 displayedSamples = followSectionDisplayedSamples,
                 transportMode = transportMode,
+                initialAnnotationMode = initialFollowViewMode,
                 contentSpacing = if (playbackDisplayMode == PlaybackDisplayMode.Mix) 6.dp else 10.dp,
                 onTokenStripHeightDpChanged = { heightDp ->
                     tokenStripHeightDp = heightDp
@@ -197,6 +199,7 @@ internal fun PlaybackDisplaySection(
                 followData = followData,
                 displayedSamples = displayedSamples,
                 isPlaying = isPlaying,
+                isScrubbing = isScrubbing,
                 transportMode = transportMode,
                 playbackDisplayMode = playbackDisplayMode,
                 lyricsExpanded = lyricsExpanded,
@@ -362,6 +365,7 @@ private fun ExpandablePlaybackLyricsSection(
     followData: PayloadFollowViewData,
     displayedSamples: Int,
     isPlaying: Boolean,
+    isScrubbing: Boolean,
     transportMode: TransportModeOption?,
     playbackDisplayMode: PlaybackDisplayMode,
     lyricsExpanded: Boolean,
@@ -407,6 +411,7 @@ private fun ExpandablePlaybackLyricsSection(
                     followData = followData,
                     displayedSamples = displayedSamples,
                     isPlaying = isPlaying,
+                    isScrubbing = isScrubbing,
                     visibleLineCount = lyricsLayoutModel.compactVisibleLineCount,
                     extraContainerHeight = lyricsLayoutModel.effectiveExtraLyricsRecoveryHeight,
                     layoutMeasurementSource =

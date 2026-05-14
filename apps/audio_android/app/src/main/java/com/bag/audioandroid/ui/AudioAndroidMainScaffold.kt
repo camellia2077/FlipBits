@@ -28,6 +28,7 @@ import com.bag.audioandroid.ui.screen.ConfigTabScreen
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
 import com.bag.audioandroid.ui.screen.MiniPlayerBar
+import com.bag.audioandroid.ui.screen.PlaybackFollowViewMode
 import com.bag.audioandroid.ui.screen.PlayerDetailSheetContent
 import com.bag.audioandroid.ui.screen.SavedAudioPickerSheet
 import com.bag.audioandroid.ui.screen.formatDurationMillis
@@ -211,6 +212,7 @@ internal fun AudioAndroidMainScaffold(
                     onDebugExpandLyricsHandled = onDebugExpandLyricsHandled,
                     debugPlaybackDisplayModeRequest = debugPlaybackDisplayModeRequest,
                     onDebugPlaybackDisplayModeHandled = onDebugPlaybackDisplayModeHandled,
+                    initialFollowViewMode = debugScenario?.followViewMode ?: PlaybackFollowViewMode.Binary,
                     initialFlashVisualizationMode = debugScenario?.visualMode,
                     modifier = Modifier.padding(sheetInnerPadding),
                 )

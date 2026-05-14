@@ -45,7 +45,7 @@ Offers "Visual" and "Lyrics" modes for inspecting audio signal and text encoding
 ## Download / Install
 Android APKs will be published through GitHub Releases.
 
-In the current reference build, the install package is about `5.64 MB`, and the installed size is about `6.10 MB`. These numbers may change across versions, ABIs, and build configurations.
+In the current reference build, the install package is about `5.90 MB`, these numbers may change across versions, ABIs, and build configurations.
 
 ## Mode Overview
 | Mode | Technical category | Best for |
@@ -104,7 +104,7 @@ Bit-by-bit BFSK / FSK (`flash`) currently provides six styles. Each style uses a
 | [Litany](docs/design/modes/flash/litany.md) | `220 / 440 Hz` | low, solemn, chant-like |
 | [Collapse](docs/design/modes/flash/collapse.md) | `280 / 560 Hz` | hushed, panicked, stuttering |
 | [Standard](docs/design/modes/flash/standard.md) | `300 / 600 Hz` | everyday, precise, stable |
-| [Hostile](docs/design/modes/flash/hostile.md) | `450 / 900 Hz` | sharp, urgent, aggressive |
+| [Hostility](docs/design/modes/flash/hostility.md) | `450 / 900 Hz` | sharp, urgent, aggressive |
 | [Zeal](docs/design/modes/flash/zeal.md) | variable `560-900 / 1120-1800 Hz` | bright, variable-speed, dense |
 | [Void](docs/design/modes/flash/void.md) | `240 / 480 Hz` | low, trailing, sparse |
 

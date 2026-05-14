@@ -112,6 +112,7 @@ internal fun PlaybackTokenContextTape(
     followData: PayloadFollowViewData,
     displayedSamples: Int,
     isPlaying: Boolean,
+    isScrubbing: Boolean = false,
     visibleLineCount: Int = 3,
     extraContainerHeight: Dp = 0.dp,
     layoutMeasurementSource: PlaybackLyricsLayoutMeasurementSource = PlaybackLyricsLayoutMeasurementSource.VisualPreview,
@@ -294,6 +295,8 @@ internal fun PlaybackTokenContextTape(
                 activeTokenIndex = activeTokenIndex,
                 activeTimelineEntry = if (isActiveLine) activeTimelineEntry else null,
                 displayedSamples = displayedSamples,
+                isScrubbing = isScrubbing,
+                layoutMeasurementSource = layoutMeasurementSource,
                 tokenStartSamples = tokenStartSamples,
                 onSeekToSample = onSeekToSample,
                 modifier = Modifier.alpha(alpha),
@@ -308,6 +311,8 @@ internal fun PlaybackTokenContextTapeLine(
     activeTokenIndex: Int,
     activeTimelineEntry: TextFollowTimelineEntry?,
     displayedSamples: Int,
+    isScrubbing: Boolean = false,
+    layoutMeasurementSource: PlaybackLyricsLayoutMeasurementSource = PlaybackLyricsLayoutMeasurementSource.VisualPreview,
     tokenStartSamples: Map<Int, Int?> = emptyMap(),
     onSeekToSample: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -370,6 +375,11 @@ internal fun PlaybackTokenContextTapeLine(
                     activeBounds = activeBounds,
                     visibleViewportWidthPx = visibleViewportWidthPx,
                 )
+        val shouldTrackScrubDirectly =
+            shouldTrackTokenPreviewScrubDirectly(
+                layoutMeasurementSource = layoutMeasurementSource,
+                isScrubbing = isScrubbing,
+            )
         val animatedTranslationPx by animateFloatAsState(
             targetValue = targetTranslationPx,
             animationSpec =
@@ -380,11 +390,21 @@ internal fun PlaybackTokenContextTapeLine(
             label = "playbackTokenContinuousTranslation",
         )
         val resolvedTranslationPx =
-            if (shouldSweepWithinActiveToken) {
+            if (shouldSweepWithinActiveToken || shouldTrackScrubDirectly) {
                 targetTranslationPx
             } else {
                 animatedTranslationPx
             }
+        if (layoutMeasurementSource == PlaybackLyricsLayoutMeasurementSource.VisualPreview) {
+            FlashLyricsPerfTrace.recordVisualPreviewMotion(
+                displayedSamples = displayedSamples,
+                activeTokenIndex = activeTokenIndex,
+                isScrubbing = isScrubbing,
+                resolvedTranslationPx = resolvedTranslationPx,
+                targetTranslationPx = targetTranslationPx,
+                directScrubTracking = shouldTrackScrubDirectly,
+            )
+        }
 
         Text(
             text =
@@ -534,6 +554,11 @@ private fun resolveTappedContinuousTokenIndex(
         characterOffset = layoutResult.getOffsetForPosition(Offset(localX, localY)),
     )
 }
+
+internal fun shouldTrackTokenPreviewScrubDirectly(
+    layoutMeasurementSource: PlaybackLyricsLayoutMeasurementSource,
+    isScrubbing: Boolean,
+): Boolean = layoutMeasurementSource == PlaybackLyricsLayoutMeasurementSource.VisualPreview && isScrubbing
 
 internal fun updateTokenPixelBounds(
     layoutResult: TextLayoutResult,

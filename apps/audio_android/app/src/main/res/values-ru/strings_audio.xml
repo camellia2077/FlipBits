@@ -244,5 +244,6 @@
     <string name="audio_saved_audio_decode_loading_title">Чтение сохраненного аудио…</string>
     <string name="audio_saved_audio_decode_loading_body">Этот клип читается один раз, чтобы создать его повторно используемое текстовое представление и режим с лирикой. Результат хранится только в этом приложении, чтобы повторное открытие было быстрее.</string>
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>
 

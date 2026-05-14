@@ -52,14 +52,14 @@ DATA_DICT = {
         ),
     },
 
-    # Flash BFSK 模式集 (物理极限 10)
+    # Flash BFSK 模式集 (建议限制在 10以内，为了和pro,mini,ultra区分开)
     "Steady": {
         "name_en": "Steady",
         "name_zh": "普通",
         "vals": build_metrics(
             transmission_speed=2, encoding_efficiency=3, transmission_stability=6,
-            compatibility=1, parsing_difficulty=4, electronic_feel=5,
-            emotional_richness=4, sense_of_ritual=5
+            compatibility=1, parsing_difficulty=2, electronic_feel=5,
+            emotional_richness=0, sense_of_ritual=0
         ),
     },
     "Hostile": {
@@ -68,7 +68,7 @@ DATA_DICT = {
         "vals": build_metrics(
             transmission_speed=3, encoding_efficiency=3, transmission_stability=6,
             compatibility=1, parsing_difficulty=8, electronic_feel=8,
-            emotional_richness=7, sense_of_ritual=2
+            emotional_richness=6, sense_of_ritual=0
         ),
     },
     "Litany": {
@@ -86,7 +86,7 @@ DATA_DICT = {
         "vals": build_metrics(
             transmission_speed=2, encoding_efficiency=3, transmission_stability=1,
             compatibility=1, parsing_difficulty=7, electronic_feel=8,
-            emotional_richness=6, sense_of_ritual=4
+            emotional_richness=7, sense_of_ritual=0
         ),
     },
     "Zeal": {
@@ -95,7 +95,7 @@ DATA_DICT = {
         "vals": build_metrics(
             transmission_speed=4, encoding_efficiency=3, transmission_stability=3,
             compatibility=1, parsing_difficulty=10, electronic_feel=10,
-            emotional_richness=8, sense_of_ritual=7
+            emotional_richness=10, sense_of_ritual=8
         ),
     },
     "Void": {
@@ -104,7 +104,7 @@ DATA_DICT = {
         "vals": build_metrics(
             transmission_speed=1, encoding_efficiency=3, transmission_stability=8,
             compatibility=1, parsing_difficulty=2, electronic_feel=9,
-            emotional_richness=5, sense_of_ritual=9
+            emotional_richness=2, sense_of_ritual=0
         ),
     },
 

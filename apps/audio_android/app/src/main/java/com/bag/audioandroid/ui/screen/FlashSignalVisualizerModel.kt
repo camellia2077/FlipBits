@@ -88,9 +88,52 @@ internal fun PayloadFollowViewData.toFixedTimelineFrameOrNull(): FlashSignalFixe
     if (segments.isEmpty()) {
         return null
     }
+    val drawableSegments = segments.downsampleToneSegmentsToBudget(FlashFallbackMaxDrawableSegments)
     return FlashSignalFixedTimelineFrame(
         segments = segments,
-        drawableSegments = segments,
+        drawableSegments = drawableSegments,
         totalSamples = totalPcmSampleCount.coerceAtLeast(1),
     )
 }
+
+private fun List<FlashSignalToneSegment>.downsampleToneSegmentsToBudget(maxSegments: Int): List<FlashSignalToneSegment> {
+    if (size <= maxSegments || maxSegments <= 0) {
+        return this
+    }
+
+    val stride =
+        kotlin.math
+            .ceil(size.toDouble() / maxSegments.toDouble())
+            .toInt()
+            .coerceAtLeast(1)
+    val compacted = ArrayList<FlashSignalToneSegment>((size + stride - 1) / stride)
+    var index = 0
+    while (index < size) {
+        val first = this[index]
+        var endSample = first.endSample
+        var highCount = 0
+        var lowCount = 0
+        var scan = index
+        while (scan < size && scan < index + stride) {
+            val segment = this[scan]
+            endSample = segment.endSample
+            when (segment.tone) {
+                FskDominantTone.High -> highCount += 1
+                FskDominantTone.Low -> lowCount += 1
+                FskDominantTone.Unknown -> Unit
+            }
+            scan += 1
+        }
+        val tone =
+            when {
+                highCount > lowCount -> FskDominantTone.High
+                lowCount > highCount -> FskDominantTone.Low
+                else -> first.tone
+            }
+        compacted += first.copy(endSample = endSample, tone = tone)
+        index += stride
+    }
+    return compacted
+}
+
+private const val FlashFallbackMaxDrawableSegments = 72

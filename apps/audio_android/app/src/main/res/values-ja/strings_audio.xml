@@ -265,5 +265,6 @@
     <string name="audio_saved_audio_decode_loading_title">保存済み音声を読み取り中…</string>
     <string name="audio_saved_audio_decode_loading_body">このクリップは、再利用できるテキスト表示と歌詞表示を作るために一度だけ読み取られます。結果は再度開くときに速くするため、このアプリ内にのみ保存されます。</string>
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>
 

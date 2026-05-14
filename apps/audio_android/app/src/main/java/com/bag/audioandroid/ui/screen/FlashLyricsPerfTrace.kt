@@ -12,6 +12,7 @@ internal object FlashLyricsPerfTrace {
     private var lastLogBucket = Int.MIN_VALUE
     private var lastTokenIndex = Int.MIN_VALUE
     private var lastPlaying = false
+    private var lastPreviewPreviewKey = ""
 
     fun record(
         followData: PayloadFollowViewData,
@@ -58,6 +59,42 @@ internal object FlashLyricsPerfTrace {
                 "byte=$activeByteIndexWithinToken bit=${activeBitPosition.bitIndexWithinByte} " +
                 "tone=${activeBitPosition.isToneActive} textTokens=${followData.textTokens.size} " +
                 "lineRanges=${sourceLineRanges.size}",
+        )
+    }
+
+    fun recordVisualPreviewMotion(
+        displayedSamples: Int,
+        activeTokenIndex: Int,
+        isScrubbing: Boolean,
+        resolvedTranslationPx: Float,
+        targetTranslationPx: Float,
+        directScrubTracking: Boolean,
+    ) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        val key =
+            buildString {
+                append(displayedSamples / 2_205)
+                append(':')
+                append(activeTokenIndex)
+                append(':')
+                append(isScrubbing)
+                append(':')
+                append(directScrubTracking)
+                append(':')
+                append(resolvedTranslationPx.toInt())
+                append(':')
+                append(targetTranslationPx.toInt())
+            }
+        if (key == lastPreviewPreviewKey) {
+            return
+        }
+        lastPreviewPreviewKey = key
+        logDebug(
+            "previewMotion sample=$displayedSamples token=$activeTokenIndex scrubbing=$isScrubbing " +
+                "direct=$directScrubTracking resolvedTx=${"%.1f".format(resolvedTranslationPx)} " +
+                "targetTx=${"%.1f".format(targetTranslationPx)} deltaTx=${"%.1f".format(resolvedTranslationPx - targetTranslationPx)}",
         )
     }
 

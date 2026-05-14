@@ -8,4 +8,5 @@ enum class FlashSignalVisualizationMode(
     Lanes(R.string.audio_flash_visualizer_mode_lanes),
     Pitch(R.string.audio_flash_visualizer_mode_pitch),
     Pulse(R.string.audio_flash_visualizer_mode_pulse),
+    Hz(R.string.audio_flash_visualizer_mode_hz),
 }

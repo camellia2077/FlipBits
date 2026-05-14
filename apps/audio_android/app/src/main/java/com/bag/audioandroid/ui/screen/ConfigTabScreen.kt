@@ -23,6 +23,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -74,6 +78,7 @@ fun ConfigTabScreen(
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = LocalLayoutDirection.current
+    var debugExpanded by rememberSaveable { mutableStateOf(true) }
     Column(
         modifier =
             modifier
@@ -122,58 +127,72 @@ fun ConfigTabScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Text("Debug", fontWeight = FontWeight.SemiBold)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                ExpandableCardHeader(
+                    accentTokens = accentTokens,
+                    title = "Debug",
+                    subtitle = "Demo playback aids and visual diagnostics.",
+                    expanded = debugExpanded,
+                    onToggleExpanded = { debugExpanded = !debugExpanded },
+                    contentDescription =
+                        if (debugExpanded) {
+                            "Collapse debug settings"
+                        } else {
+                            "Expand debug settings"
+                        },
+                )
+                if (debugExpanded) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Demo mode", fontWeight = FontWeight.SemiBold)
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                "Show tap feedback and key action hints for recording.",
-                                style = MaterialTheme.typography.bodySmall,
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text("Demo mode", fontWeight = FontWeight.SemiBold)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    "Show tap feedback and key action hints for recording.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = isDemoModeEnabled,
+                            onCheckedChange = onDemoModeEnabledChange,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text("Visual perf overlay", fontWeight = FontWeight.SemiBold)
+                        }
+                        IconButton(
+                            onClick = { onFlashVisualPerfOverlayEnabledChange(!isFlashVisualPerfOverlayEnabled) },
+                        ) {
+                            Icon(
+                                imageVector =
+                                    if (isFlashVisualPerfOverlayEnabled) {
+                                        Icons.Outlined.Visibility
+                                    } else {
+                                        Icons.Outlined.VisibilityOff
+                                    },
+                                contentDescription = null,
+                                tint =
+                                    if (isFlashVisualPerfOverlayEnabled) {
+                                        accentTokens.disclosureAccentTint
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
                             )
                         }
-                    }
-                    Switch(
-                        checked = isDemoModeEnabled,
-                        onCheckedChange = onDemoModeEnabledChange,
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                    ) {
-                        Text("Visual perf overlay", fontWeight = FontWeight.SemiBold)
-                    }
-                    IconButton(
-                        onClick = { onFlashVisualPerfOverlayEnabledChange(!isFlashVisualPerfOverlayEnabled) },
-                    ) {
-                        Icon(
-                            imageVector =
-                                if (isFlashVisualPerfOverlayEnabled) {
-                                    Icons.Outlined.Visibility
-                                } else {
-                                    Icons.Outlined.VisibilityOff
-                                },
-                            contentDescription = null,
-                            tint =
-                                if (isFlashVisualPerfOverlayEnabled) {
-                                    accentTokens.disclosureAccentTint
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                        )
                     }
                 }
             }

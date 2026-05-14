@@ -88,6 +88,7 @@ internal fun PlayerDetailSheetContent(
         onScrubFinished()
     },
     initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
+    initialFollowViewMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
     initialFlashVisualizationMode: FlashSignalVisualizationMode? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -183,6 +184,7 @@ internal fun PlayerDetailSheetContent(
             isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
             playbackSpeed = playbackSpeed,
             displaySectionState = displaySectionState,
+            initialFollowViewMode = initialFollowViewMode,
             savedAudioItem = savedAudioItem,
             showSavedAudioDecodeLoadingNotice = showSavedAudioDecodeLoadingNotice,
             extraLyricsRecoveryHeight = layoutPolicyState.extraLyricsRecoveryHeight,
@@ -250,6 +252,7 @@ private fun PlayerDetailScrollContent(
     isFlashVisualPerfOverlayEnabled: Boolean,
     playbackSpeed: Float,
     displaySectionState: PlaybackDisplaySectionState,
+    initialFollowViewMode: PlaybackFollowViewMode,
     savedAudioItem: SavedAudioItem?,
     showSavedAudioDecodeLoadingNotice: Boolean,
     extraLyricsRecoveryHeight: Dp,
@@ -283,9 +286,11 @@ private fun PlayerDetailScrollContent(
             followData = followData,
             flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
+            isScrubbing = isScrubbing,
             isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
             playbackSpeed = playbackSpeed,
             displaySectionState = displaySectionState,
+            initialFollowViewMode = initialFollowViewMode,
             extraLyricsRecoveryHeight = extraLyricsRecoveryHeight,
             applyLyricsPreviewBonusLine = applyLyricsPreviewBonusLine,
             modifier =

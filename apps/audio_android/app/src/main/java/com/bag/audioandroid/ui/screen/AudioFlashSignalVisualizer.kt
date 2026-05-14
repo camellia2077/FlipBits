@@ -59,6 +59,9 @@ import kotlin.math.roundToInt
 // Controls only the Flash Visual viewport density. Playback progress and audio
 // timeline semantics stay based on absolute samples.
 private const val FlashSignalViewportSeconds = 0.80f
+private const val FlashToneTraceTag = "FlashToneTrace"
+private const val FlashToneTraceIntervalNanos = 1_000_000_000L
+private var flashToneTraceLastLogNanos = 0L
 
 @Composable
 internal fun AudioFlashSignalVisualizer(
@@ -262,7 +265,7 @@ private fun FlashSignalCanvas(
                     .fillMaxWidth()
                     .height(112.dp),
         ) {
-            if (renderState.buckets.isEmpty() && renderState.fixedTimelineFrame == null) {
+            if (renderState.buckets.isEmpty() && renderState.fixedTimelineFrame == null && renderState.toneSpectrumBuckets.isEmpty()) {
                 return@Canvas
             }
 
@@ -273,15 +276,21 @@ private fun FlashSignalCanvas(
             val bottomPadding = 12.dp.toPx()
             val innerWidth = (size.width - leftPadding - rightPadding).coerceAtLeast(1f)
             val innerHeight = (size.height - topPadding - bottomPadding).coerceAtLeast(1f)
-            val bucketWidth = if (renderState.buckets.isNotEmpty()) innerWidth / renderState.buckets.size.toFloat() else 1f
+            val visualBucketCount =
+                if (mode == FlashSignalVisualizationMode.Hz) {
+                    renderState.toneSpectrumBuckets.size.takeIf { it > 0 } ?: renderState.buckets.size
+                } else {
+                    renderState.buckets.size
+                }
+            val bucketWidth = if (visualBucketCount > 0) innerWidth / visualBucketCount.toFloat() else 1f
             val analysisBucketSampleWidth =
-                if (renderState.buckets.isNotEmpty()) {
-                    windowSampleCount.toFloat() / renderState.buckets.size.toFloat()
+                if (visualBucketCount > 0) {
+                    windowSampleCount.toFloat() / visualBucketCount.toFloat()
                 } else {
                     1f
                 }
             val bucketOffset =
-                if (renderState.buckets.isNotEmpty()) {
+                if (renderState.buckets.isNotEmpty() && mode != FlashSignalVisualizationMode.Hz) {
                     (
                         (renderState.bucketFrame.displayedSamplePosition - renderState.bucketFrame.analysisDisplayedSamplePosition) /
                             analysisBucketSampleWidth
@@ -290,16 +299,16 @@ private fun FlashSignalCanvas(
                     0f
                 }
             val scanHeadBucketIndex =
-                if (renderState.buckets.isNotEmpty()) {
+                if (visualBucketCount > 0) {
                     (
-                        renderState.buckets.size * FlashSignalPlayheadAnchorRatio
-                    ).coerceIn(0f, renderState.buckets.lastIndex.toFloat())
+                        visualBucketCount * FlashSignalPlayheadAnchorRatio
+                    ).coerceIn(0f, (visualBucketCount - 1).toFloat())
                 } else {
                     0f
                 }
             val activeThresholdBucketIndex =
-                if (renderState.buckets.isNotEmpty()) {
-                    (scanHeadBucketIndex + bucketOffset).coerceIn(0f, renderState.buckets.lastIndex.toFloat())
+                if (visualBucketCount > 0) {
+                    (scanHeadBucketIndex + bucketOffset).coerceIn(0f, (visualBucketCount - 1).toFloat())
                 } else {
                     0f
                 }
@@ -443,6 +452,57 @@ private fun FlashSignalCanvas(
                         )
                     }
 
+                FlashSignalVisualizationMode.Hz -> {
+                    val toneDrawStats =
+                        if (renderState.fixedTimelineFrame != null && fixedViewport != null) {
+                            drawToneTimelineSegments(
+                                segments = renderState.visualSegments,
+                                viewport = fixedViewport,
+                                frequencyScale = renderState.toneFrequencyScale,
+                                carrierLayout = renderState.toneCarrierLayout,
+                                leftPadding = leftPadding,
+                                topPadding = topPadding,
+                                innerWidth = innerWidth,
+                                innerHeight = innerHeight,
+                                activeToneColor = activeToneColor,
+                                inactiveToneColor = inactiveToneColor,
+                                centerLineColor = centerLineColor,
+                                glowPulse = glowPulse,
+                            )
+                        } else {
+                            drawToneSpectrum(
+                                buckets = renderState.toneSpectrumBuckets,
+                                frequencyScale = renderState.toneFrequencyScale,
+                                activeThresholdBucketIndex = activeThresholdBucketIndex,
+                                bucketOffset = bucketOffset,
+                                leftPadding = leftPadding,
+                                topPadding = topPadding,
+                                innerWidth = innerWidth,
+                                innerHeight = innerHeight,
+                                bucketWidth = bucketWidth,
+                                activeToneColor = activeToneColor,
+                                inactiveToneColor = inactiveToneColor,
+                                centerLineColor = centerLineColor,
+                                glowPulse = glowPulse,
+                            )
+                        }
+                    if (showPerfOverlay) {
+                        recordToneTrace(
+                            isPlaying = isPlaying,
+                            displayedSample = followDisplayedSamplePosition,
+                            sampleRateHz = sampleRateHz,
+                            totalSamples = renderState.totalSamples,
+                            buckets = renderState.toneSpectrumBuckets,
+                            segments = renderState.visualSegments,
+                            frequencyScale = renderState.toneFrequencyScale,
+                            drawStats = toneDrawStats,
+                            activeThresholdBucketIndex = activeThresholdBucketIndex,
+                            bucketWidth = bucketWidth,
+                            source = if (renderState.fixedTimelineFrame != null) "layout" else "spectrum",
+                        )
+                    }
+                }
+
                 FlashSignalVisualizationMode.Pulse -> Unit
             }
             val drawDurationNanos = System.nanoTime() - drawStartNanos
@@ -454,9 +514,19 @@ private fun FlashSignalCanvas(
                 exactSegments = renderState.fixedTimelineFrame?.segments?.size ?: 0,
                 primitiveEstimate = renderState.primitiveEstimate,
                 visibleSegments = visibleSegmentCount,
-                visiblePrimitiveEstimate = visiblePrimitiveEstimate,
+                visiblePrimitiveEstimate =
+                    if (mode == FlashSignalVisualizationMode.Hz) {
+                        visibleSegmentCount.takeIf { renderState.fixedTimelineFrame != null } ?: renderState.toneSpectrumBuckets.size
+                    } else {
+                        visiblePrimitiveEstimate
+                    },
                 drawDurationNanos = drawDurationNanos,
-                buckets = renderState.buckets.size,
+                buckets =
+                    if (mode == FlashSignalVisualizationMode.Hz) {
+                        visibleSegmentCount.takeIf { renderState.fixedTimelineFrame != null } ?: renderState.toneSpectrumBuckets.size
+                    } else {
+                        renderState.buckets.size
+                    },
                 hasFixedTimeline = renderState.fixedTimelineFrame != null,
                 usesFallbackTimeline = renderState.usesFallbackTimeline,
                 hasBitReadout = renderState.bitReadoutFrame != null,
@@ -508,6 +578,76 @@ private fun FlashSignalCanvas(
                         .testTag("flash-visual-lanes-alignment-summary"),
             )
         }
+    }
+}
+
+private fun recordToneTrace(
+    isPlaying: Boolean,
+    displayedSample: Float,
+    sampleRateHz: Int,
+    totalSamples: Int,
+    buckets: List<ToneSpectrumBucket>,
+    segments: List<FlashSignalToneSegment>,
+    frequencyScale: ToneFrequencyScale,
+    drawStats: ToneSpectrumDrawStats,
+    activeThresholdBucketIndex: Float,
+    bucketWidth: Float,
+    source: String,
+) {
+    val now = System.nanoTime()
+    if (now - flashToneTraceLastLogNanos < FlashToneTraceIntervalNanos) {
+        return
+    }
+    flashToneTraceLastLogNanos = now
+    val activeBuckets = buckets.filter { it.frequencyHz > 0f && it.amplitude >= FlashSignalSilenceThreshold }
+    val zeroFrequencyBuckets = buckets.count { it.frequencyHz <= 0f }
+    val averageFrequency = activeBuckets.map { it.frequencyHz }.averageOrZero()
+    val averageStrength = activeBuckets.map { it.strength }.averageOrZero()
+    val segmentCarriers = segments.mapNotNull { it.carrierFrequencyHz.takeIf { carrier -> carrier > 0f } }
+    val uniqueSegmentCarrierCount = segmentCarriers.map { it.roundToInt() }.distinct().size
+    val segmentCarrierMin = segmentCarriers.minOrNull()?.roundToInt() ?: 0
+    val segmentCarrierMax = segmentCarriers.maxOrNull()?.roundToInt() ?: 0
+    safeLogD(
+        FlashToneTraceTag,
+        "tone source=$source isPlaying=$isPlaying " +
+            "displayMs=${displayedSample.samplesToMs(sampleRateHz)} " +
+            "totalMs=${totalSamples.toFloat().samplesToMs(sampleRateHz)} " +
+            "scale=${frequencyScale.minHz.roundToInt()}-${frequencyScale.maxHz.roundToInt()} " +
+            "refs=${frequencyScale.references.joinToString("|") { it.label }} " +
+            "buckets=${buckets.size} nonSilent=${activeBuckets.size} zeroHz=$zeroFrequencyBuckets " +
+            "avgHz=${averageFrequency.roundToInt()} " +
+            "drawValid=${drawStats.validBuckets} lineSegments=${drawStats.lineSegments} pointDraws=${drawStats.pointDraws} " +
+            "freqRange=${drawStats.minFrequencyHz.roundToInt()}-${drawStats.maxFrequencyHz.roundToInt()} " +
+            "firstLast=${drawStats.firstFrequencyHz.roundToInt()}-${drawStats.lastFrequencyHz.roundToInt()} " +
+            "currentHz=${drawStats.currentFrequencyHz.roundToInt()} " +
+            "segmentCarriers=$uniqueSegmentCarrierCount/$segmentCarrierMin-$segmentCarrierMax " +
+            "strokePx=${drawStats.minStrokeWidthPx.formatOneDecimal()}-${drawStats.maxStrokeWidthPx.formatOneDecimal()} " +
+            "avgStrength=${averageStrength.formatTwoDecimals()} " +
+            "activeThreshold=${activeThresholdBucketIndex.formatOneDecimal()} bucketWidth=${bucketWidth.formatOneDecimal()}",
+    )
+}
+
+private fun List<Float>.averageOrZero(): Double = if (isEmpty()) 0.0 else average()
+
+private fun Float.samplesToMs(sampleRateHz: Int): Int =
+    if (sampleRateHz > 0) {
+        (this * 1000f / sampleRateHz.toFloat()).roundToInt()
+    } else {
+        0
+    }
+
+private fun Float.formatOneDecimal(): String = "%.1f".format(java.util.Locale.US, this)
+
+private fun Double.formatTwoDecimals(): String = "%.2f".format(java.util.Locale.US, this)
+
+private fun safeLogD(
+    tag: String,
+    message: String,
+) {
+    try {
+        Log.d(tag, message)
+    } catch (_: RuntimeException) {
+        // Plain JVM unit tests use the Android stub jar, where Log.d is not implemented.
     }
 }
 

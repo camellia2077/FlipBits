@@ -6,6 +6,9 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.PI
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 class FlashSignalVisualizationAnalysisTest {
     @Test
@@ -173,6 +176,58 @@ class FlashSignalVisualizationAnalysisTest {
     }
 
     @Test
+    fun `lanes preserve exact timeline segments during normal playback`() {
+        val exactSegments =
+            List(4) { index ->
+                FlashSignalToneSegment(
+                    startSample = index * 10,
+                    endSample = index * 10 + 10,
+                    tone = if (index % 2 == 0) FskDominantTone.Low else FskDominantTone.High,
+                )
+            }
+        val drawableSegments =
+            listOf(
+                FlashSignalToneSegment(
+                    startSample = 0,
+                    endSample = 40,
+                    tone = FskDominantTone.Low,
+                ),
+            )
+        val frame =
+            FlashSignalFixedTimelineFrame(
+                segments = exactSegments,
+                drawableSegments = drawableSegments,
+                totalSamples = 40,
+            )
+
+        val lanesSegments =
+            flashVisualSegmentsForMode(
+                fixedTimelineFrame = frame,
+                mode = FlashSignalVisualizationMode.Lanes,
+                usesFallbackTimeline = false,
+                isScrubbing = false,
+            )
+        val toneSegments =
+            flashVisualSegmentsForMode(
+                fixedTimelineFrame = frame,
+                mode = FlashSignalVisualizationMode.Hz,
+                usesFallbackTimeline = false,
+                isScrubbing = false,
+            )
+        val pulseSegments =
+            flashVisualSegmentsForMode(
+                fixedTimelineFrame = frame,
+                mode = FlashSignalVisualizationMode.Pulse,
+                usesFallbackTimeline = false,
+                isScrubbing = false,
+            )
+
+        assertEquals(exactSegments, lanesSegments)
+        assertEquals(exactSegments, toneSegments)
+        assertEquals(drawableSegments, pulseSegments)
+    }
+
+    @Test
     fun `flash bit readout reveals current eight bit group by playback`() {
         val followData =
             PayloadFollowViewData(
@@ -273,4 +328,55 @@ class FlashSignalVisualizationAnalysisTest {
             ),
         )
     }
+
+    @Test
+    fun `tone spectrum buckets estimate dominant frequency from pcm`() {
+        val sampleRateHz = 44_100
+        val pcm = buildTonePcm(sampleRateHz = sampleRateHz, sampleCount = sampleRateHz, frequencyHz = 600.0)
+
+        val buckets =
+            buildToneSpectrumBuckets(
+                pcm = pcm,
+                sampleRateHz = sampleRateHz,
+                currentSample = sampleRateHz / 2f,
+                windowSampleCount = sampleRateHz / 2,
+                targetBucketCount = 24,
+            ).filter { it.frequencyHz > 0f }
+
+        assertTrue(buckets.isNotEmpty())
+        val averageFrequency = buckets.map { it.frequencyHz }.average()
+        assertTrue("averageFrequency=$averageFrequency", averageFrequency in 540.0..660.0)
+    }
+
+    @Test
+    fun `zeal tone spectrum scale includes high variable band`() {
+        val sampleRateHz = 44_100
+        val pcm = buildTonePcm(sampleRateHz = sampleRateHz, sampleCount = sampleRateHz, frequencyHz = 1_760.0)
+
+        val buckets =
+            buildToneSpectrumBuckets(
+                pcm = pcm,
+                sampleRateHz = sampleRateHz,
+                currentSample = sampleRateHz / 2f,
+                windowSampleCount = sampleRateHz / 2,
+                targetBucketCount = 24,
+                frequencyScale = toneFrequencyScaleForStyle(com.bag.audioandroid.ui.model.FlashVoicingStyleOption.Zeal),
+            ).filter { it.frequencyHz > 0f }
+
+        assertTrue(buckets.isNotEmpty())
+        val averageFrequency = buckets.map { it.frequencyHz }.average()
+        assertTrue("averageFrequency=$averageFrequency", averageFrequency in 1_650.0..1_870.0)
+    }
+
+    private fun buildTonePcm(
+        sampleRateHz: Int,
+        sampleCount: Int,
+        frequencyHz: Double,
+    ): ShortArray =
+        ShortArray(sampleCount) { index ->
+            (sin(2.0 * PI * frequencyHz * index.toDouble() / sampleRateHz.toDouble()) * Short.MAX_VALUE.toDouble() * 0.7)
+                .roundToInt()
+                .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
+                .toShort()
+        }
 }

@@ -8,6 +8,7 @@ internal object FlashAlignmentPerfTrace {
     private const val ReportIntervalNanos = 500_000_000L
 
     private var lastReportNanos = 0L
+    private var lastTokenBinaryReportNanos = 0L
     private var visualPlaying = false
     private var visualSample = 0
     private var rawSample = 0
@@ -43,6 +44,9 @@ internal object FlashAlignmentPerfTrace {
     private var cardCurrentBitValue = "_"
     private var displayGroupIndex = -1
     private var displayGroupBits = "_"
+    private var playbackBitFromTokenPage = -1
+    private var playbackBitValueFromTokenPage = "_"
+    private var tokenViewMode = "unknown"
     private var lastTokenUnitDumpKey = ""
 
     fun recordVisual(
@@ -103,10 +107,12 @@ internal object FlashAlignmentPerfTrace {
     fun recordTokenCard(
         followData: com.bag.audioandroid.domain.PayloadFollowViewData,
         presentationState: PlaybackFollowPresentationState,
+        displayedSamples: Int,
     ) {
         if (!BuildConfig.DEBUG) {
             return
         }
+        tokenViewMode = presentationState.followViewMode.name
         val activeTokenIndex = presentationState.activeTextIndex
         val activeByteIndexWithinToken = presentationState.activeByteIndexWithinToken
         val activeBitIndexWithinByte = presentationState.activeBitIndexWithinByte
@@ -190,6 +196,17 @@ internal object FlashAlignmentPerfTrace {
                 ?.logSafe()
                 .orEmpty()
                 .ifBlank { "_" }
+        val bitReadoutSource = followData.toFlashBitReadoutSource()
+        playbackBitFromTokenPage =
+            bitReadoutSource
+                ?.currentBitOffsetAtSample(displayedSamples.toFloat())
+                ?: -1
+        playbackBitValueFromTokenPage =
+            playbackBitFromTokenPage
+                .takeIf { it >= 0 }
+                ?.let { bitReadoutSource?.bitByOffset?.get(it) }
+                ?.toString()
+                ?: "_"
         val tokenUnitDumpKey =
             buildString {
                 append(activeTokenIndex)
@@ -209,9 +226,31 @@ internal object FlashAlignmentPerfTrace {
                     }}",
             )
         }
+        maybeReportTokenBinaryPlayback(displayedSamples)
     }
 
-    private fun maybeReport() {
+    private fun maybeReportTokenBinaryPlayback(displayedSamples: Int) {
+        if (!lyricsPlaying) {
+            return
+        }
+        val now = System.nanoTime()
+        if (lastTokenBinaryReportNanos != 0L && now - lastTokenBinaryReportNanos < ReportIntervalNanos) {
+            return
+        }
+        lastTokenBinaryReportNanos = now
+        logDebug(
+            "reason=token-card-binary-playback " +
+                "lyricsPlaying=$lyricsPlaying tokenViewMode=$tokenViewMode " +
+                "sample=$displayedSamples token=$token tokenText=$tokenText tokenProgress=$tokenProgress " +
+                "tokenByteIndex=$byte tokenBitIndexWithinByte=$lyricBit tokenBitOffsetWithinToken=$lyricBitOffset " +
+                "tokenToneActive=$tone cardByteHex=$displayUnitHex cardByteBinary=$displayUnitBinary " +
+                "cardBitIndexWithinByte=$displayBitInByte cardGlobalBitOffset=$displayGlobalBit cardCurrentBitValue=$cardCurrentBitValue " +
+                "playbackGlobalBit=$playbackBitFromTokenPage playbackCurrentBitValue=$playbackBitValueFromTokenPage " +
+                "playbackMinusCardBit=${playbackBitFromTokenPage - displayGlobalBit}",
+        )
+    }
+
+    private fun maybeReport(reason: String? = null) {
         val now = System.nanoTime()
         if (lastReportNanos == 0L) {
             lastReportNanos = now
@@ -222,7 +261,43 @@ internal object FlashAlignmentPerfTrace {
         }
         lastReportNanos = now
         logDebug(
-            "mode=$mode visualPlaying=$visualPlaying lyricsPlaying=$lyricsPlaying " +
+            buildString {
+                reason?.let {
+                    append("reason=")
+                    append(it)
+                    append(' ')
+                }
+            } +
+                "mode=$mode visualPlaying=$visualPlaying lyricsPlaying=$lyricsPlaying " +
+                "tokenViewMode=$tokenViewMode " +
+                "visualSample=$visualSample rawSample=$rawSample readoutSample=$readoutSample " +
+                "readoutGlobalBit=$readoutBit revealedGlobalBit=$revealedBit " +
+                "readoutCurrentBitValue=$readoutBitValue " +
+                "visualGlobalBit=$visualBit rawGlobalBit=$rawBit visualCurrentBitValue=$visualCurrentBitValue " +
+                "fallback=$fallback bitReadout=$bitReadout " +
+                "lyricsSample=$lyricsSample token=$token tokenText=$tokenText " +
+                "tokenStart=$tokenStart tokenEnd=$tokenEnd tokenProgress=$tokenProgress " +
+                "tokenByteIndex=$byte tokenBitIndexWithinByte=$lyricBit " +
+                "tokenBitOffsetWithinToken=$lyricBitOffset tokenToneActive=$tone " +
+                "cardByteOffsetGlobal=$displayUnitByteOffset cardByteCount=$displayUnitByteCount " +
+                "cardByteHex=$displayUnitHex cardByteBinary=$displayUnitBinary " +
+                "cardNibbleHex=$displayCardHex cardNibbleBinary=$displayCardBinary " +
+                "cardBitIndexWithinByte=$displayBitInByte cardGlobalBitOffset=$displayGlobalBit cardCurrentBitValue=$cardCurrentBitValue " +
+                "cardGlobalGroupIndex=$displayGroupIndex cardGlobalGroupBits=$displayGroupBits " +
+                "visualMinusLyricsSample=${visualSample - lyricsSample} " +
+                "globalBitMinusTokenBit=${readoutBit - lyricBitOffset} " +
+                "globalBitMinusCardBit=${readoutBit - displayGlobalBit}",
+        )
+    }
+
+    fun forceReport(reason: String) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        lastReportNanos = System.nanoTime()
+        logDebug(
+            "forced reason=$reason mode=$mode visualPlaying=$visualPlaying lyricsPlaying=$lyricsPlaying " +
+                "tokenViewMode=$tokenViewMode " +
                 "visualSample=$visualSample rawSample=$rawSample readoutSample=$readoutSample " +
                 "readoutGlobalBit=$readoutBit revealedGlobalBit=$revealedBit " +
                 "readoutCurrentBitValue=$readoutBitValue " +

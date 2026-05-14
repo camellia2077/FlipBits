@@ -244,5 +244,6 @@
     <string name="audio_saved_audio_decode_loading_title">Vox archivata legitur…</string>
     <string name="audio_saved_audio_decode_loading_body">Haec vox semel legitur ut prospectus textus et cantici reusabilis fiat. Eventus intra hanc appem tantum manet ut iterum celerius aperiatur.</string>
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>
 

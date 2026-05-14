@@ -33,11 +33,13 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @Composable
 internal fun PlaybackFollowTokenStrip(
     followData: PayloadFollowViewData,
     presentationState: PlaybackFollowPresentationState,
+    displayedSamples: Int,
     transportMode: TransportModeOption?,
     onMeasuredHeightDpChanged: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -49,6 +51,7 @@ internal fun PlaybackFollowTokenStrip(
     var resumeAutoFollowJob by remember { mutableStateOf<Job?>(null) }
     var measuredStripHeightPx by remember { mutableStateOf(0) }
     var measuredActiveCardHeightPx by remember { mutableStateOf(0) }
+    var hasAutoPositioned by remember(followData, presentationState.followViewMode) { mutableStateOf(false) }
 
     fun pauseAutoFollowBriefly() {
         autoFollowPaused = true
@@ -92,7 +95,18 @@ internal fun PlaybackFollowTokenStrip(
 
         LaunchedEffect(presentationState.activeTextIndex, maxWidthPx, autoFollowPaused) {
             if (!autoFollowPaused && presentationState.activeTextIndex >= 0 && maxWidthPx > 0) {
-                listState.animateScrollToItem(presentationState.activeTextIndex)
+                val currentIndex = listState.firstVisibleItemIndex
+                val tokenJump = abs(presentationState.activeTextIndex - currentIndex)
+                // When Mix opens from Visual, playback is already at the current
+                // sample position. Large token-strip jumps should land directly
+                // on the active token instead of replaying a full "from start"
+                // scroll animation that suggests the token context restarted.
+                if (!hasAutoPositioned || tokenJump > TokenStripAnimatedJumpLimit) {
+                    listState.scrollToItem(presentationState.activeTextIndex)
+                    hasAutoPositioned = true
+                } else {
+                    listState.animateScrollToItem(presentationState.activeTextIndex)
+                }
             }
         }
         val stripModifier =
@@ -135,6 +149,9 @@ internal fun PlaybackFollowTokenStrip(
                     rawDisplayUnits = presentationState.rawDisplayUnitsByToken[index].orEmpty(),
                     annotationMode = presentationState.followViewMode,
                     isActive = index == presentationState.activeTextIndex,
+                    tokenIndex = index,
+                    displayedSamples = displayedSamples,
+                    followData = followData,
                     activeByteIndexWithinToken =
                         if (index == presentationState.activeTextIndex) {
                             presentationState.activeByteIndexWithinToken
@@ -183,3 +200,4 @@ private val PlaybackFollowTokenMinimumWidth = 92.dp
 private val PlaybackFollowTokenMaximumWidth = 420.dp
 private val PlaybackFollowTokenMinimumEdgePadding = 0.dp
 private const val TokenStripAutoFollowResumeDelayMs = 650L
+private const val TokenStripAnimatedJumpLimit = 3

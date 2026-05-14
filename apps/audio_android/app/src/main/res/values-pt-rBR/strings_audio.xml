@@ -244,5 +244,6 @@
     <string name="audio_saved_audio_decode_loading_title">Lendo áudio salvo…</string>
     <string name="audio_saved_audio_decode_loading_body">Este clipe está sendo lido uma vez para criar sua visualização reutilizável de texto e letra. O resultado fica apenas neste app para reabrir mais rápido.</string>
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>
 

@@ -205,7 +205,7 @@ jobject NewPayloadFollowBinaryGroupEntry(
     if (entry_class == nullptr) {
         return nullptr;
     }
-    jmethodID ctor = env->GetMethodID(entry_class, "<init>", "(IIIII)V");
+    jmethodID ctor = env->GetMethodID(entry_class, "<init>", "(IIIIIF)V");
     if (ctor == nullptr) {
         return nullptr;
     }
@@ -216,7 +216,8 @@ jobject NewPayloadFollowBinaryGroupEntry(
         static_cast<jint>(entry.sample_count),
         static_cast<jint>(entry.group_index),
         static_cast<jint>(entry.bit_offset),
-        static_cast<jint>(entry.bit_count));
+        static_cast<jint>(entry.bit_count),
+        static_cast<jfloat>(entry.carrier_freq_hz));
 }
 
 jobject NewTextFollowTimelineEntry(JNIEnv* env, const bag_text_follow_token_entry& entry) {

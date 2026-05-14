@@ -320,6 +320,7 @@ private fun PayloadFollowBinaryGroupTimelineEntry.toJson() =
         .put("group_index", groupIndex)
         .put("bit_offset", bitOffset)
         .put("bit_count", bitCount)
+        .put("carrier_frequency_hz", carrierFrequencyHz.toDouble())
 
 private fun JSONObject.toPayloadFollowBinaryGroupTimelineEntry() =
     PayloadFollowBinaryGroupTimelineEntry(
@@ -328,6 +329,7 @@ private fun JSONObject.toPayloadFollowBinaryGroupTimelineEntry() =
         groupIndex = optInt("group_index"),
         bitOffset = optInt("bit_offset"),
         bitCount = optInt("bit_count"),
+        carrierFrequencyHz = optDouble("carrier_frequency_hz", 0.0).toFloat(),
     )
 
 private fun JSONArray?.toStringList(): List<String> =

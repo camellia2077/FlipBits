@@ -6,6 +6,8 @@ This document explains the current Flash device automation surface for real-devi
 
 For the full Android automation matrix across JVM tests, instrumentation, and adb debug scenarios, see `docs/architecture/android/android-automation-coverage.md`.
 
+For the accepted post-fix scrub regression baseline for `Lanes` / `Pitch`, also read `docs/architecture/android/android-flash-visual-scrub-regression-baseline.md`.
+
 ## Current Coverage
 
 The automation path covers generated Flash playback only. It does not depend on sample catalog entries.
@@ -77,6 +79,12 @@ UI scenario command:
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_FLASH_SCENARIO --es wb.scenario ui --es wb.flash.style litany --es wb.visual lanes --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
 ```
 
+Visual-page seek/scrub diagnostic scenario:
+
+```powershell
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_FLASH_SCENARIO --es wb.scenario ui --es wb.flash.style standard --es wb.display visual --es wb.visual lanes --ez wb.visual.perf_overlay true --es wb.sample.length long --ez wb.encode true --ez wb.play true --el wb.play.ms 12000 --es wb.seek.fractions 0.15,0.35,0.55,0.75 --el wb.seek.start.ms 1500 --el wb.seek.settle.ms 900
+```
+
 Visual-page lyrics-layout scenario:
 
 ```powershell
@@ -141,6 +149,16 @@ Supported extras:
   - Playback duration before the debug scenario stops playback.
   - Defaults to `6000`.
   - Use `0` to leave playback running.
+- `wb.seek.fractions`
+  - Optional comma-separated `0.0..1.0` seek targets.
+  - For `ui` captures, the debug scenario runs each seek through the normal scrub path after playback starts.
+  - Useful for proving whether `displayed/raw` moved immediately while `smooth/readout/visualBit` lagged behind.
+- `wb.seek.start.ms`
+  - Delay before the first automated seek.
+  - Defaults to `1500`.
+- `wb.seek.settle.ms`
+  - Delay between seek commit and the forced debug snapshot.
+  - Defaults to `700`.
 
 `python tools/run.py android-debug capture-flash` is a convenience wrapper around the same debug scenario, but it does not expose every adb extra yet.
 
@@ -312,6 +330,7 @@ Note the difference between the wrapper and fully custom logcat capture:
 - `capture-flash` uses a fixed filter set and then builds `summary.md` from the parsed Flash events
 - logs such as `PlaybackPulseLayout` or future one-off debug tags are not automatically included unless the tool filter list is updated
 - for geometry/layout investigations outside the default filter set, prefer a manual `adb logcat ... > temp/...` capture
+- seek/scrub diagnostics currently rely on raw adb extras and manual logcat capture; `capture-flash` does not expose the seek extras yet
 
 Useful `FlashAlignmentPerf` fields for current Flash alignment work:
 

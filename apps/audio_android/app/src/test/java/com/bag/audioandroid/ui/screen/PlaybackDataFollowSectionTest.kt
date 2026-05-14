@@ -9,6 +9,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -557,6 +558,28 @@ class PlaybackDataFollowSectionTest {
             )
 
         assertEquals(listOf(".--.", ".-.", ".-"), annotation)
+    }
+
+    @Test
+    fun `visual preview tracks scrub directly but lyrics preview keeps animated path`() {
+        assertTrue(
+            shouldTrackTokenPreviewScrubDirectly(
+                layoutMeasurementSource = PlaybackLyricsLayoutMeasurementSource.VisualPreview,
+                isScrubbing = true,
+            ),
+        )
+        assertFalse(
+            shouldTrackTokenPreviewScrubDirectly(
+                layoutMeasurementSource = PlaybackLyricsLayoutMeasurementSource.LyricsPreview,
+                isScrubbing = true,
+            ),
+        )
+        assertFalse(
+            shouldTrackTokenPreviewScrubDirectly(
+                layoutMeasurementSource = PlaybackLyricsLayoutMeasurementSource.VisualPreview,
+                isScrubbing = false,
+            ),
+        )
     }
 
     @Test

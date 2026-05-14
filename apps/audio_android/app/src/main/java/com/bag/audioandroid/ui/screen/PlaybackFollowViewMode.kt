@@ -9,3 +9,10 @@ internal enum class PlaybackFollowViewMode(
     Binary(R.string.audio_follow_view_binary),
     Morse(R.string.audio_follow_view_morse),
 }
+
+internal fun String?.toPlaybackFollowViewMode(): PlaybackFollowViewMode =
+    when (this?.trim()?.lowercase()) {
+        "hex" -> PlaybackFollowViewMode.Hex
+        "morse" -> PlaybackFollowViewMode.Morse
+        else -> PlaybackFollowViewMode.Binary
+    }

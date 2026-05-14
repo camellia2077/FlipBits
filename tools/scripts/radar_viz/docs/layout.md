@@ -67,4 +67,4 @@ def _label_value_positions(self, theta, r, half_gap, is_top=True)
 | `RADAR_LABEL_RADIUS_OFFSETS_*` | config_fonts.py | 各维度径向偏移（正=远离圆心）|
 | `RADAR_LABEL_ANGLE_OFFSETS_*` | config_fonts.py | 各维度角度偏移（正=逆时针）|
 | `HALF_GAP` | radar.py draw_labels() | label/value 间距（默认 0.6）|
-| `SIZE_RADAR_LABEL` | config_fonts.py | 标签字号 |
+| `SIZE_RADAR_LABEL_ZH` / `SIZE_RADAR_LABEL_EN` | config_fonts.py | 中英标签字号 |

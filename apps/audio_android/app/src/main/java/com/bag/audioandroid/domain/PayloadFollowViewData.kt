@@ -16,6 +16,7 @@ data class PayloadFollowBinaryGroupTimelineEntry(
     val groupIndex: Int,
     val bitOffset: Int,
     val bitCount: Int,
+    val carrierFrequencyHz: Float = 0f,
 )
 
 @Keep

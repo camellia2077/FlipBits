@@ -25,10 +25,36 @@ internal data class FskEnergyBucket(
     val confidence: Float,
 )
 
+internal data class ToneSpectrumBucket(
+    val frequencyHz: Float,
+    val strength: Float,
+    val amplitude: Float,
+)
+
+internal data class ToneFrequencyScale(
+    val minHz: Float,
+    val maxHz: Float,
+    val references: List<ToneFrequencyReference>,
+)
+
+internal data class ToneFrequencyReference(
+    val startHz: Float,
+    val endHz: Float,
+    val label: String,
+) {
+    val isBand: Boolean = endHz > startHz
+}
+
+internal data class ToneCarrierLayout(
+    val lowHz: Float,
+    val highHz: Float,
+)
+
 data class FlashSignalToneSegment(
     val startSample: Int,
     val endSample: Int,
     val tone: FskDominantTone,
+    val carrierFrequencyHz: Float = 0f,
 ) {
     val sampleCount: Int = (endSample - startSample).coerceAtLeast(0)
 }
@@ -64,6 +90,7 @@ internal fun buildFlashSignalToneSegments(followData: PayloadFollowViewData): Li
                     startSample = entry.startSample,
                     endSample = entry.startSample + entry.sampleCount,
                     tone = tone,
+                    carrierFrequencyHz = entry.carrierFrequencyHz,
                 )
         }
     return segments
@@ -159,6 +186,67 @@ internal fun buildFskEnergyBuckets(
             amplitude = bucket.amplitude,
             dominantTone = dominantTone,
             confidence = confidence.coerceIn(0f, 1f),
+        )
+    }
+}
+
+internal fun buildToneSpectrumBuckets(
+    pcm: ShortArray,
+    sampleRateHz: Int,
+    currentSample: Float,
+    windowSampleCount: Int,
+    targetBucketCount: Int,
+    frequencyScale: ToneFrequencyScale = toneFrequencyScaleForStyle(null),
+): List<ToneSpectrumBucket> {
+    if (pcm.isEmpty() || sampleRateHz <= 0) {
+        return emptyList()
+    }
+
+    val safeBucketCount = targetBucketCount.coerceAtLeast(1)
+    val safeWindowSampleCount = windowSampleCount.coerceAtLeast(1)
+    val pastWindowSamples = safeWindowSampleCount * FlashSignalPlayheadAnchorRatio
+    val windowStart = currentSample - pastWindowSamples
+    val bucketSampleWidth = safeWindowSampleCount.toFloat() / safeBucketCount.toFloat()
+    val rawBuckets = ArrayList<RawToneSpectrumBucket>(safeBucketCount)
+
+    repeat(safeBucketCount) { bucketIndex ->
+        val bucketCenter = windowStart + bucketSampleWidth * (bucketIndex.toFloat() + 0.5f)
+        val analysisSamples =
+            toneSpectrumAnalysisSampleCount(
+                sampleRateHz = sampleRateHz,
+                bucketSampleWidth = bucketSampleWidth,
+            )
+        val startIndex =
+            floor(bucketCenter.toDouble() - analysisSamples.toDouble() / 2.0)
+                .toInt()
+                .coerceAtLeast(0)
+        val endIndexExclusive = (startIndex + analysisSamples).coerceAtMost(pcm.size)
+
+        rawBuckets +=
+            if (endIndexExclusive - startIndex < FlashToneSpectrumMinimumAnalysisSamples) {
+                RawToneSpectrumBucket(0f, 0f, 0f)
+            } else {
+                dominantToneSpectrumBucket(
+                    pcm = pcm,
+                    startIndex = startIndex,
+                    endIndexExclusive = endIndexExclusive,
+                    sampleRateHz = sampleRateHz,
+                    minFrequencyHz = frequencyScale.minHz.toDouble(),
+                    maxFrequencyHz = frequencyScale.maxHz.toDouble(),
+                )
+            }
+    }
+
+    val maxPower = rawBuckets.maxOfOrNull { it.power }?.coerceAtLeast(1e-6f) ?: 1f
+    return rawBuckets.map { bucket ->
+        ToneSpectrumBucket(
+            frequencyHz = bucket.frequencyHz,
+            strength =
+                (
+                    sqrt((bucket.power / maxPower).coerceIn(0f, 1f).toDouble()).toFloat() *
+                        (0.32f + 0.68f * bucket.amplitude)
+                ).coerceIn(0f, 1f),
+            amplitude = bucket.amplitude,
         )
     }
 }
@@ -316,6 +404,77 @@ private data class RawFskEnergyBucket(
     val amplitude: Float,
 )
 
+private data class RawToneSpectrumBucket(
+    val frequencyHz: Float,
+    val power: Float,
+    val amplitude: Float,
+)
+
+private fun dominantToneSpectrumBucket(
+    pcm: ShortArray,
+    startIndex: Int,
+    endIndexExclusive: Int,
+    sampleRateHz: Int,
+    minFrequencyHz: Double,
+    maxFrequencyHz: Double,
+): RawToneSpectrumBucket {
+    val sampleCount = endIndexExclusive - startIndex
+    if (sampleCount < FlashToneSpectrumMinimumAnalysisSamples || sampleRateHz <= 0) {
+        return RawToneSpectrumBucket(0f, 0f, 0f)
+    }
+
+    val minBin =
+        ceil(minFrequencyHz * sampleCount.toDouble() / sampleRateHz.toDouble())
+            .toInt()
+            .coerceAtLeast(1)
+    val maxBin =
+        floor(maxFrequencyHz * sampleCount.toDouble() / sampleRateHz.toDouble())
+            .toInt()
+            .coerceAtLeast(minBin)
+    var bestBin = minBin
+    var bestPower = 0f
+    for (bin in minBin..maxBin) {
+        val targetFrequencyHz = bin.toDouble() * sampleRateHz.toDouble() / sampleCount.toDouble()
+        val power =
+            goertzelPower(
+                pcm = pcm,
+                startIndex = startIndex,
+                endIndexExclusive = endIndexExclusive,
+                sampleRateHz = sampleRateHz,
+                targetFrequencyHz = targetFrequencyHz,
+            )
+        if (power > bestPower) {
+            bestPower = power
+            bestBin = bin
+        }
+    }
+    val amplitude =
+        peakAmplitude(
+            pcm = pcm,
+            startIndex = startIndex,
+            endIndexExclusive = endIndexExclusive,
+        )
+    return RawToneSpectrumBucket(
+        frequencyHz =
+            if (amplitude >= FlashSignalSilenceThreshold) {
+                bestBin.toFloat() * sampleRateHz.toFloat() / sampleCount.toFloat()
+            } else {
+                0f
+            },
+        power = if (amplitude >= FlashSignalSilenceThreshold) bestPower else 0f,
+        amplitude = amplitude,
+    )
+}
+
+private fun toneSpectrumAnalysisSampleCount(
+    sampleRateHz: Int,
+    bucketSampleWidth: Float,
+): Int {
+    val minSamples = (sampleRateHz / FlashToneSpectrumAnalysisFramesPerSecond).coerceAtLeast(FlashToneSpectrumMinimumAnalysisSamples)
+    val bucketSamples = bucketSampleWidth.roundToInt().coerceAtLeast(FlashToneSpectrumMinimumAnalysisSamples)
+    return max(minSamples, bucketSamples).coerceAtMost(FlashToneSpectrumMaxAnalysisSamples)
+}
+
 private fun goertzelPower(
     pcm: ShortArray,
     startIndex: Int,
@@ -360,8 +519,87 @@ internal const val FlashSignalPlayheadAnchorRatio = 0.40f
 internal const val FlashSignalSilenceThreshold = 0.02f
 internal const val FlashSignalConfidenceThreshold = 0.12f
 internal const val FlashSignalMinimumAnalysisSamples = 96
+internal const val FlashToneSpectrumMinHz = 120.0
+internal const val FlashToneSpectrumMaxHz = 3_600.0
+internal const val FlashToneSpectrumMinimumAnalysisSamples = 192
+private const val FlashToneSpectrumAnalysisFramesPerSecond = 42
+private const val FlashToneSpectrumMaxAnalysisSamples = 2_048
 private const val FlashSignalTimelineSymbolCoreRatio = 0.62f
 private const val FlashSignalTimelineSymbolEdgeFloor = 0.12f
+
+internal fun toneFrequencyScaleForStyle(flashVoicingStyle: FlashVoicingStyleOption?): ToneFrequencyScale =
+    when (flashVoicingStyle ?: FlashVoicingStyleOption.Standard) {
+        FlashVoicingStyleOption.Litany ->
+            ToneFrequencyScale(
+                minHz = 160f,
+                maxHz = 560f,
+                references =
+                    listOf(
+                        ToneFrequencyReference(220f, 220f, "220 Hz"),
+                        ToneFrequencyReference(440f, 440f, "440 Hz"),
+                    ),
+            )
+        FlashVoicingStyleOption.Collapse ->
+            ToneFrequencyScale(
+                minHz = 180f,
+                maxHz = 700f,
+                references =
+                    listOf(
+                        ToneFrequencyReference(226f, 320f, "226-320 Hz"),
+                        ToneFrequencyReference(452f, 640f, "452-640 Hz"),
+                    ),
+            )
+        FlashVoicingStyleOption.Standard ->
+            ToneFrequencyScale(
+                minHz = 220f,
+                maxHz = 760f,
+                references =
+                    listOf(
+                        ToneFrequencyReference(300f, 300f, "300 Hz"),
+                        ToneFrequencyReference(600f, 600f, "600 Hz"),
+                    ),
+            )
+        FlashVoicingStyleOption.Hostile ->
+            ToneFrequencyScale(
+                minHz = 420f,
+                maxHz = 1_320f,
+                references =
+                    listOf(
+                        ToneFrequencyReference(500f, 618f, "500-618 Hz"),
+                        ToneFrequencyReference(1_000f, 1_236f, "1000-1236 Hz"),
+                    ),
+            )
+        FlashVoicingStyleOption.Zeal ->
+            ToneFrequencyScale(
+                minHz = 450f,
+                maxHz = 2_000f,
+                references =
+                    listOf(
+                        ToneFrequencyReference(560f, 900f, "560-900 Hz"),
+                        ToneFrequencyReference(1_120f, 1_800f, "1120-1800 Hz"),
+                    ),
+            )
+        FlashVoicingStyleOption.Void ->
+            ToneFrequencyScale(
+                minHz = 150f,
+                maxHz = 500f,
+                references =
+                    listOf(
+                        ToneFrequencyReference(180f, 230f, "180-230 Hz"),
+                        ToneFrequencyReference(360f, 460f, "360-460 Hz"),
+                    ),
+            )
+    }
+
+internal fun toneCarrierLayoutForStyle(flashVoicingStyle: FlashVoicingStyleOption?): ToneCarrierLayout =
+    when (flashVoicingStyle ?: FlashVoicingStyleOption.Standard) {
+        FlashVoicingStyleOption.Litany -> ToneCarrierLayout(lowHz = 220f, highHz = 440f)
+        FlashVoicingStyleOption.Collapse -> ToneCarrierLayout(lowHz = 273f, highHz = 546f)
+        FlashVoicingStyleOption.Standard -> ToneCarrierLayout(lowHz = 300f, highHz = 600f)
+        FlashVoicingStyleOption.Hostile -> ToneCarrierLayout(lowHz = 559f, highHz = 1_118f)
+        FlashVoicingStyleOption.Zeal -> ToneCarrierLayout(lowHz = 730f, highHz = 1_460f)
+        FlashVoicingStyleOption.Void -> ToneCarrierLayout(lowHz = 205f, highHz = 410f)
+    }
 
 internal fun flashSignalActiveWindowBucketCount(flashVoicingStyle: FlashVoicingStyleOption?): Int =
     flashVoicingStyle?.flashVisualActiveWindowBucketCount ?: 3

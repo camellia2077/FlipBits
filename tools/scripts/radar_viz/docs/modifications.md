@@ -17,7 +17,7 @@
 
 | 调整项 | 位置 |
 |--------|------|
-| 字号 | `config_fonts.py` 的 `SIZE_RADAR_LABEL`、`SIZE_RADAR_TITLE_*` |
+| 字号 | `config_fonts.py` 的 `SIZE_RADAR_LABEL_ZH`、`SIZE_RADAR_LABEL_EN`、`SIZE_RADAR_TITLE_*` |
 | 径向偏移 | `config_fonts.py` 的 `RADAR_LABEL_RADIUS_OFFSETS_*`（正=远离圆心）|
 | 角度偏移 | `config_fonts.py` 的 `RADAR_LABEL_ANGLE_OFFSETS_*`（正=逆时针）|
 | label/value 间距 | `radar.py` 的 `draw_labels()` 中 `HALF_GAP` |

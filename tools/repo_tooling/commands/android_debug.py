@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 from ..constants import ROOT_DIR
-from ..android_debug import capture, crash_summary, encode_progress, flash_alignment, mini_alignment
+from ..android_debug import capture, crash_summary, encode_progress, flash_alignment, flash_visual_sweep, mini_alignment
 
 
 def _write_or_print(summary: str, output: Path | None) -> None:
@@ -57,6 +57,7 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
         capture.string_extra(extras, "wb.scenario", args.scenario)
         capture.string_extra(extras, "wb.flash.style", args.style)
         capture.string_extra(extras, "wb.display", args.display)
+        capture.string_extra(extras, "wb.follow.view", args.follow_view)
         capture.string_extra(extras, "wb.visual", args.visual)
         capture.string_extra(extras, "wb.input", args.input_text)
         capture.string_extra(extras, "wb.sample.length", args.sample_length)
@@ -73,6 +74,48 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
             summary_builder=lambda events: flash_alignment.build_summary(events, max_rows=args.max_rows),
             start=lambda: capture.start_activity(capture.FLASH_ACTION, extras),
         )
+        return
+    if args.action == "capture-flash-visual-sweep":
+        output_dir = _output_dir(args, f"flash-visual-sweep-{args.style}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        captures: list[flash_visual_sweep.ModeCapture] = []
+        for mode in ("lanes", "pitch", "pulse"):
+            mode_dir = output_dir / mode
+            extras = []
+            capture.string_extra(extras, "wb.scenario", "ui")
+            capture.string_extra(extras, "wb.flash.style", args.style)
+            capture.string_extra(extras, "wb.display", args.display)
+            capture.string_extra(extras, "wb.visual", mode)
+            capture.string_extra(extras, "wb.sample.length", args.sample_length)
+            capture.string_extra(extras, "wb.sample.id", args.sample_id)
+            capture.float_extra(extras, "wb.playback.speed", args.playback_speed)
+            capture.bool_extra(extras, "wb.visual.perf_overlay", True)
+            capture.bool_extra(extras, "wb.encode", True)
+            capture.bool_extra(extras, "wb.play", True)
+            capture.long_extra(extras, "wb.play.ms", args.play_ms)
+            capture.string_extra(extras, "wb.seek.fractions", args.seek_fractions)
+            capture.long_extra(extras, "wb.seek.start.ms", args.seek_start_ms)
+            capture.long_extra(extras, "wb.seek.drag.ms", args.seek_drag_ms)
+            capture.long_extra(extras, "wb.seek.step.ms", args.seek_step_ms)
+            capture.long_extra(extras, "wb.seek.settle.ms", args.seek_settle_ms)
+            result = capture.capture_common(
+                output_dir=mode_dir,
+                wait_ms=args.wait_ms,
+                filters=capture.FLASH_LOGCAT_FILTERS,
+                event_parser=flash_alignment.parse_event,
+                summary_builder=lambda events, max_rows=args.max_rows: flash_alignment.build_summary(events, max_rows=max_rows),
+                start=lambda extras=extras: capture.start_activity(capture.FLASH_ACTION, extras),
+            )
+            captures.append(
+                flash_visual_sweep.ModeCapture(
+                    mode=mode,
+                    raw_log=result.raw_log,
+                    summary=result.summary,
+                    crash_summary=result.crash_summary,
+                )
+            )
+        summary_path = output_dir / "summary.md"
+        _write_or_print(flash_visual_sweep.build_sweep_summary(captures), summary_path)
         return
     if args.action == "capture-mini":
         extras = []

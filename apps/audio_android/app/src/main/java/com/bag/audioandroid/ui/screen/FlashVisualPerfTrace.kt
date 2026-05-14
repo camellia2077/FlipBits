@@ -512,6 +512,26 @@ internal object FlashVisualPerfTrace {
         } else {
             FlashVisualPerfSnapshot()
         }
+
+    fun forceReport(reason: String) {
+        if (!enabled) {
+            return
+        }
+        logDebug(
+            "forced reason=$reason mode=$lastMode playing=$lastIsPlaying " +
+                "displayed=${lastDisplayedSample.toInt()} raw=${lastRawSample.toInt()} smooth=${lastSmoothSample.toInt()} " +
+                "drawable=$lastDrawableSegments exact=$lastExactSegments primitives=$lastPrimitiveEstimate " +
+                "visible=$lastVisibleSegments visiblePrimitives=$lastVisiblePrimitiveEstimate " +
+                "visualErrorMs=${ms(lastVisualErrorMs.toDouble())} " +
+                "readoutSample=${lastReadoutSample.toInt()} readoutBit=${lastReadoutCurrentBitOffset ?: -1} " +
+                "revealedBit=$lastReadoutRevealedBitOffset readoutGroup=$lastReadoutGroupStart " +
+                "readoutPrev=$lastReadoutPreviousBits readoutCurrent=$lastReadoutCurrentBits " +
+                "visualBit=${lastVisualBitOffset ?: -1} rawBit=${lastRawBitOffset ?: -1} " +
+                "window=[$lastWindowStart,$lastWindowEnd) distStart=${lastDistanceToWindowStart.toInt()} " +
+                "distEnd=${lastDistanceToWindowEnd.toInt()} inside=$lastComfortablyInside " +
+                "windowSamples=$lastWindowSamples totalSamples=$lastTotalSamples",
+        )
+    }
 }
 
 internal data class FlashVisualPerfSnapshot(

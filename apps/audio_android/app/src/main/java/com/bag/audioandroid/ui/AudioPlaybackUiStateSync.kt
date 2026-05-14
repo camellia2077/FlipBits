@@ -69,6 +69,9 @@ internal class AudioPlaybackUiStateSync(
         playedSamples: Int,
         totalSamples: Int,
     ) {
+        if (isPlaybackPaused(source)) {
+            return
+        }
         if (!shouldPublishProgressToUi(source, playedSamples, totalSamples)) {
             return
         }
@@ -135,6 +138,18 @@ internal class AudioPlaybackUiStateSync(
     private fun resetProgressThrottle(source: AudioPlaybackSource) {
         lastProgressUiUpdateNanosBySource.remove(progressThrottleKey(source))
     }
+
+    private fun isPlaybackPaused(source: AudioPlaybackSource): Boolean =
+        when (source) {
+            is AudioPlaybackSource.Generated ->
+                uiState.value.sessions[source.mode]
+                    ?.playback
+                    ?.isPaused == true
+            is AudioPlaybackSource.Saved ->
+                uiState.value.selectedSavedAudio
+                    ?.playback
+                    ?.isPaused == true
+        }
 
     private fun progressThrottleKey(source: AudioPlaybackSource): String =
         when (source) {

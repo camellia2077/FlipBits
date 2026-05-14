@@ -113,10 +113,10 @@ class RadarChart:
         # ---------------------------------------------------------------
         if lang == 'zh':
             label_font = FontProperties(fname=config_fonts.FONT_ZH_PATH,
-                                        weight='bold', size=config_fonts.SIZE_RADAR_LABEL)
+                                        weight='bold', size=config_fonts.SIZE_RADAR_LABEL_ZH)
         else:
             label_font = self._get_font_props(mode_key, weight='bold',
-                                              size=config_fonts.SIZE_RADAR_LABEL)
+                                              size=config_fonts.SIZE_RADAR_LABEL_EN)
 
         # ---------------------------------------------------------------
         # 逐维度渲染
@@ -180,7 +180,7 @@ class RadarChart:
     def _get_font_props(mode_key, weight='regular', size=None):
         """根据 mode 动态选择英文字体（Flash → JetBrains Mono，其余 → IBM Plex Mono）。"""
         if size is None:
-            size = config_fonts.SIZE_RADAR_LABEL
+            size = config_fonts.SIZE_RADAR_LABEL_EN
 
         if mode_key in _FLASH_MODES:
             path = (config_fonts.FONT_JETBRAINS_BOLD if weight == 'bold'

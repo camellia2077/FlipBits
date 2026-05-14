@@ -62,6 +62,7 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     flash_capture.add_argument("--scenario", choices=["ui", "headless"], default="ui")
     flash_capture.add_argument("--style", default="litany", help="Flash voicing style.")
     flash_capture.add_argument("--display", choices=["lyrics", "visual", "mix"], default="lyrics")
+    flash_capture.add_argument("--follow-view", choices=["binary", "hex", "morse"], default="binary")
     flash_capture.add_argument("--visual", default="lanes", help="Flash visual mode.")
     flash_capture.add_argument("--input", dest="input_text", help="Optional text override.")
     flash_capture.add_argument("--sample-length", choices=["short", "long"], help="Built-in sample length.")
@@ -77,6 +78,26 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     flash_capture.add_argument("--no-play", action="store_true", help="Pass wb.play=false.")
     flash_capture.add_argument("--max-rows", type=int, default=24, help="Maximum summary rows.")
     flash_capture.set_defaults(func=cmd_android_debug)
+
+    flash_sweep = action_parsers.add_parser(
+        "capture-flash-visual-sweep",
+        help="Run Flash UI visual sweep across lanes/pitch/pulse and write per-mode logs plus a comparison summary.",
+    )
+    flash_sweep.add_argument("--output-dir", type=_path_arg, help="Directory for sweep artifacts.")
+    flash_sweep.add_argument("--wait-ms", type=int, default=90000, help="Delay before dumping logcat for each mode.")
+    flash_sweep.add_argument("--style", default="standard", help="Flash voicing style.")
+    flash_sweep.add_argument("--display", choices=["visual"], default="visual")
+    flash_sweep.add_argument("--sample-length", choices=["short", "long"], default="long")
+    flash_sweep.add_argument("--sample-id", help="Built-in sample id.")
+    flash_sweep.add_argument("--playback-speed", type=float, default=1.0, help="Player playback speed to apply before playback.")
+    flash_sweep.add_argument("--play-ms", type=int, default=14000, help="Playback duration before stop.")
+    flash_sweep.add_argument("--seek-fractions", default="0.15,0.35,0.55,0.75", help="Comma-separated seek targets.")
+    flash_sweep.add_argument("--seek-start-ms", type=int, default=1500, help="Delay before first automated seek.")
+    flash_sweep.add_argument("--seek-drag-ms", type=int, default=480, help="Continuous scrub duration per seek.")
+    flash_sweep.add_argument("--seek-step-ms", type=int, default=16, help="Continuous scrub step interval.")
+    flash_sweep.add_argument("--seek-settle-ms", type=int, default=700, help="Delay between seek commit and settled snapshot.")
+    flash_sweep.add_argument("--max-rows", type=int, default=24, help="Maximum per-mode summary rows.")
+    flash_sweep.set_defaults(func=cmd_android_debug)
 
     mini_capture = action_parsers.add_parser("capture-mini", help="Run Mini debug scenario and write logs.")
     mini_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")

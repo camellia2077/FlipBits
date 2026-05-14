@@ -265,5 +265,6 @@
     <string name="audio_saved_audio_decode_loading_title">저장된 오디오 읽는 중…</string>
     <string name="audio_saved_audio_decode_loading_body">이 클립은 재사용 가능한 텍스트 및 가사 보기를 만들기 위해 한 번만 읽습니다. 결과는 더 빠르게 다시 열 수 있도록 이 앱 안에만 저장됩니다.</string>
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>
 

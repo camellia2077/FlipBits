@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 
 @Composable
@@ -40,6 +41,9 @@ internal fun PlaybackFollowAnnotationRows(
     activeByteIndexWithinToken: Int,
     activeBitIndexWithinByte: Int,
     isActiveBitTone: Boolean,
+    tokenIndex: Int,
+    displayedSamples: Int,
+    followData: PayloadFollowViewData?,
     inactiveRawColor: Color,
     focusColor: Color,
     onFocusColor: Color,
@@ -116,6 +120,12 @@ internal fun PlaybackFollowAnnotationRows(
                                             -1
                                         },
                                     isActiveBitTone = isActiveBitTone,
+                                    tokenIndex = tokenIndex,
+                                    tokenText = token,
+                                    byteIndexWithinToken = byteIndex,
+                                    globalByteOffset = rawDisplayUnits.getOrNull(byteIndex)?.byteOffset ?: -1,
+                                    displayedSamples = displayedSamples,
+                                    followData = followData,
                                     focusColor = focusColor,
                                     onFocusColor = onFocusColor,
                                     inactiveColor = inactiveRawColor,

@@ -1,10 +1,12 @@
 package com.bag.audioandroid.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -14,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 
 @Composable
 internal fun MorseLetterBlock(
@@ -208,10 +211,31 @@ internal fun PlaybackByteBlock(
     isPast: Boolean,
     activeBitIndex: Int,
     isActiveBitTone: Boolean,
+    tokenIndex: Int = -1,
+    tokenText: String = "_",
+    byteIndexWithinToken: Int = -1,
+    globalByteOffset: Int = -1,
+    displayedSamples: Int = -1,
+    followData: com.bag.audioandroid.domain.PayloadFollowViewData? = null,
     focusColor: Color,
     onFocusColor: Color,
     inactiveColor: Color,
 ) {
+    SideEffect {
+        PlaybackFollowBinaryRenderTrace.record(
+            mode = mode,
+            group = group,
+            isActive = isActive,
+            activeBitIndex = activeBitIndex,
+            isActiveBitTone = isActiveBitTone,
+            tokenIndex = tokenIndex,
+            tokenText = tokenText,
+            byteIndexWithinToken = byteIndexWithinToken,
+            globalByteOffset = globalByteOffset,
+            displayedSamples = displayedSamples,
+            followData = followData,
+        )
+    }
     val text =
         buildAnnotatedString {
             if (isActive) {
@@ -306,4 +330,60 @@ internal fun PlaybackByteBlock(
         maxLines = 1,
         softWrap = false,
     )
+}
+
+private object PlaybackFollowBinaryRenderTrace {
+    private const val Tag = "FlashAlignmentPerf"
+    private const val ReportIntervalNanos = 500_000_000L
+    private var lastReportNanos = 0L
+
+    fun record(
+        mode: PlaybackFollowViewMode,
+        group: String,
+        isActive: Boolean,
+        activeBitIndex: Int,
+        isActiveBitTone: Boolean,
+        tokenIndex: Int,
+        tokenText: String,
+        byteIndexWithinToken: Int,
+        globalByteOffset: Int,
+        displayedSamples: Int,
+        followData: com.bag.audioandroid.domain.PayloadFollowViewData?,
+    ) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        if (mode != PlaybackFollowViewMode.Binary || !isActive || activeBitIndex < 0 || displayedSamples < 0) {
+            return
+        }
+        val playbackSource = followData?.toFlashBitReadoutSource() ?: return
+        val playbackGlobalBit = playbackSource.currentBitOffsetAtSample(displayedSamples.toFloat()) ?: return
+        val renderedGlobalBit = (globalByteOffset * 8 + activeBitIndex).takeIf { globalByteOffset >= 0 } ?: return
+        val renderedBitValue = group.filter { it == '0' || it == '1' }.getOrNull(activeBitIndex)?.toString() ?: "_"
+        val playbackBitValue = playbackSource.bitByOffset[playbackGlobalBit]?.toString() ?: "_"
+        val now = System.nanoTime()
+        if (lastReportNanos != 0L && now - lastReportNanos < ReportIntervalNanos) {
+            return
+        }
+        lastReportNanos = now
+        try {
+            Log.d(
+                Tag,
+                "reason=token-binary-render-playback " +
+                    "sample=$displayedSamples token=$tokenIndex tokenText=${tokenText.logSafe()} " +
+                    "tokenViewMode=binary byteIndexWithinToken=$byteIndexWithinToken globalByteOffset=$globalByteOffset " +
+                    "renderedBitIndexWithinByte=$activeBitIndex renderedGlobalBitOffset=$renderedGlobalBit " +
+                    "renderedBitValue=$renderedBitValue toneActive=$isActiveBitTone " +
+                    "playbackGlobalBit=$playbackGlobalBit playbackCurrentBitValue=$playbackBitValue " +
+                    "playbackMinusRenderedBit=${playbackGlobalBit - renderedGlobalBit}",
+            )
+        } catch (_: Throwable) {
+        }
+    }
+
+    private fun String.logSafe(): String =
+        replace('\n', ' ')
+            .replace('\r', ' ')
+            .take(64)
+            .ifBlank { "_" }
 }

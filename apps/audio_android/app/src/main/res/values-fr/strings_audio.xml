@@ -244,5 +244,6 @@
     <string name="audio_saved_audio_decode_loading_title">Lecture de l’audio enregistré…</string>
     <string name="audio_saved_audio_decode_loading_body">Ce clip est lu une seule fois pour créer sa vue réutilisable de texte et de paroles. Le résultat reste uniquement dans cette app pour une réouverture plus rapide.</string>
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>
 

@@ -206,7 +206,7 @@ private fun FlashVisualWindowSource.firstSegmentEndingAfter(sample: Int): Int {
     return low
 }
 
-private fun List<FlashSignalToneSegment>.downsampleToBudget(maxSegments: Int): List<FlashSignalToneSegment> {
+internal fun List<FlashSignalToneSegment>.downsampleToBudget(maxSegments: Int): List<FlashSignalToneSegment> {
     if (size <= maxSegments || maxSegments <= 0) {
         return this
     }

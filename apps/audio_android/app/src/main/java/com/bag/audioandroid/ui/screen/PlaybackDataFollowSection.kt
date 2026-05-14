@@ -50,7 +50,7 @@ internal fun PlaybackDataFollowSection(
     contentSpacing: Dp = 10.dp,
     onSeekToSample: (Int) -> Unit = {},
 ) {
-    var selectedAnnotationMode by rememberSaveable { mutableStateOf(initialAnnotationMode.name) }
+    var selectedAnnotationMode by rememberSaveable(initialAnnotationMode, transportMode) { mutableStateOf(initialAnnotationMode.name) }
     var isTokenizerOpen by rememberSaveable { mutableStateOf(false) }
     val isMorseMode = transportMode == TransportModeOption.Mini
     val normalizedAnnotationModeName =
@@ -70,6 +70,7 @@ internal fun PlaybackDataFollowSection(
         FlashAlignmentPerfTrace.recordTokenCard(
             followData = followData,
             presentationState = presentationState,
+            displayedSamples = displayedSamples,
         )
     }
 
@@ -125,6 +126,7 @@ internal fun PlaybackDataFollowSection(
         PlaybackFollowTokenStrip(
             followData = followData,
             presentationState = presentationState,
+            displayedSamples = displayedSamples,
             transportMode = transportMode,
             onMeasuredHeightDpChanged = onTokenStripHeightDpChanged,
         )
@@ -132,6 +134,7 @@ internal fun PlaybackDataFollowSection(
             PlaybackFollowTokenizerSheet(
                 followData = followData,
                 presentationState = presentationState,
+                displayedSamples = displayedSamples,
                 onSeekToSample = onSeekToSample,
                 onDismiss = { isTokenizerOpen = false },
             )
@@ -144,6 +147,7 @@ internal fun PlaybackDataFollowSection(
 private fun PlaybackFollowTokenizerSheet(
     followData: PayloadFollowViewData,
     presentationState: PlaybackFollowPresentationState,
+    displayedSamples: Int,
     onSeekToSample: (Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -201,6 +205,9 @@ private fun PlaybackFollowTokenizerSheet(
                             rawDisplayUnits = presentationState.rawDisplayUnitsByToken[index].orEmpty(),
                             annotationMode = presentationState.followViewMode,
                             isActive = index == presentationState.activeTextIndex,
+                            tokenIndex = index,
+                            displayedSamples = displayedSamples,
+                            followData = followData,
                             activeByteIndexWithinToken =
                                 if (index == presentationState.activeTextIndex) {
                                     presentationState.activeByteIndexWithinToken

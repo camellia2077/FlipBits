@@ -18,6 +18,7 @@ internal fun PlaybackFollowLineStrip(
     followData: PayloadFollowViewData,
     lineTokenRange: TextFollowLineTokenRangeViewData,
     presentationState: PlaybackFollowPresentationState,
+    displayedSamples: Int,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -59,6 +60,9 @@ internal fun PlaybackFollowLineStrip(
                 rawDisplayUnits = presentationState.rawDisplayUnitsByToken[absoluteTokenIndex].orEmpty(),
                 annotationMode = presentationState.followViewMode,
                 isActive = absoluteTokenIndex == presentationState.activeTextIndex,
+                tokenIndex = absoluteTokenIndex,
+                displayedSamples = displayedSamples,
+                followData = followData,
                 activeByteIndexWithinToken =
                     if (absoluteTokenIndex == presentationState.activeTextIndex) {
                         presentationState.activeByteIndexWithinToken

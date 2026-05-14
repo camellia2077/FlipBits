@@ -11,6 +11,7 @@ if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
 from repo_tooling.android_debug import capture, flash_alignment
+from repo_tooling.android_debug import flash_visual_sweep
 from repo_tooling.commands import android_debug
 
 
@@ -65,6 +66,7 @@ def test_capture_flash_defaults_ui_play_ms_to_longer_duration(monkeypatch, tmp_p
             scenario="ui",
             style="litany",
             display="mix",
+            follow_view="binary",
             visual="lanes",
             input_text=None,
             sample_length="long",
@@ -80,6 +82,7 @@ def test_capture_flash_defaults_ui_play_ms_to_longer_duration(monkeypatch, tmp_p
     assert captured[0]["wait_ms"] == 90000
     assert started[0][0] == capture.FLASH_ACTION
     assert started[0][1][started[0][1].index("wb.display") + 1] == "mix"
+    assert started[0][1][started[0][1].index("wb.follow.view") + 1] == "binary"
     assert started[0][1][started[0][1].index("wb.playback.speed") + 1] == "0.1"
     assert "--el" in started[0][1]
     assert started[0][1][started[0][1].index("wb.play.ms") + 1] == "30000"
@@ -110,6 +113,7 @@ def test_capture_flash_defaults_headless_play_ms_to_short_duration(monkeypatch, 
             scenario="headless",
             style="litany",
             display="lyrics",
+            follow_view="binary",
             visual="lanes",
             input_text="flash smoke",
             sample_length=None,
@@ -167,3 +171,85 @@ def test_capture_common_writes_summary_and_crash_files_without_device(monkeypatc
     crash_summary = result.crash_summary.read_text(encoding="utf-8")
     assert "total_lines: 3" in crash_summary
     assert "pattern_hits:" in crash_summary
+
+
+def test_capture_flash_visual_sweep_runs_all_modes(monkeypatch, tmp_path) -> None:
+    started: list[tuple[str, str]] = []
+
+    def fake_start_activity(action: str, extras: list[str]) -> None:
+        mode = extras[extras.index("wb.visual") + 1]
+        started.append((action, mode))
+
+    def fake_capture_common(**kwargs):
+        kwargs["output_dir"].mkdir(parents=True, exist_ok=True)
+        raw_log = kwargs["output_dir"] / "raw.log"
+        raw_log.write_text(
+            "05-14 06:28:58.462 D/FlashAutomation(24394): received scenario=ui style=standard visual=lanes playMs=14000 input=sample sampleLength=long\n",
+            encoding="utf-8",
+        )
+        summary = kwargs["output_dir"] / "summary.md"
+        summary.write_text("mode summary", encoding="utf-8")
+        crash_summary = kwargs["output_dir"] / "crash-summary.txt"
+        crash_summary.write_text("", encoding="utf-8")
+        kwargs["start"]()
+        return capture.CaptureResult(raw_log=raw_log, summary=summary, crash_summary=crash_summary)
+
+    monkeypatch.setattr(capture, "start_activity", fake_start_activity)
+    monkeypatch.setattr(capture, "capture_common", fake_capture_common)
+
+    android_debug.cmd_android_debug(
+        argparse.Namespace(
+            action="capture-flash-visual-sweep",
+            output_dir=tmp_path,
+            wait_ms=1000,
+            style="standard",
+            display="visual",
+            sample_length="long",
+            sample_id=None,
+            playback_speed=1.0,
+            play_ms=14000,
+            seek_fractions="0.15,0.35,0.55,0.75",
+            seek_start_ms=1500,
+            seek_drag_ms=480,
+            seek_step_ms=16,
+            seek_settle_ms=700,
+            max_rows=24,
+        )
+    )
+
+    assert started == [
+        (capture.FLASH_ACTION, "lanes"),
+        (capture.FLASH_ACTION, "pitch"),
+        (capture.FLASH_ACTION, "pulse"),
+    ]
+    assert (tmp_path / "summary.md").exists()
+
+
+def test_flash_visual_sweep_summary_extracts_basic_metrics(tmp_path) -> None:
+    raw_log = tmp_path / "raw.log"
+    raw_log.write_text(
+        "\n".join(
+            [
+                "05-14 06:28:58.462 D/FlashVisualPerf(24394): mode=Lanes playing=true drawAvgMs=1.25 drawMaxMs=3.50 primitives=216 visiblePrimitives=36 visualErrorMs=-4.25",
+                "05-14 06:28:59.552 D/FlashLyricsPerf(24394): previewMotion sample=1135527 token=9 scrubbing=true direct=true resolvedTx=0.0 targetTx=0.0 deltaTx=0.0",
+                "05-14 06:28:59.640 D/FlashVisualPerf(24394): forced reason=seek-immediate requestId=1 index=0 fraction=0.150 target=1135527 displayed=1135527 raw=1135527 smooth=1135527 readoutSample=1135527",
+                "05-14 06:29:00.351 D/FlashVisualPerf(24394): forced reason=seek-settled requestId=1 index=0 fraction=0.150 target=1135527 displayed=1165906 raw=1165137 smooth=1165906 readoutSample=1165906",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    summary = flash_visual_sweep.build_sweep_summary(
+        [
+            flash_visual_sweep.ModeCapture(
+                mode="lanes",
+                raw_log=raw_log,
+                summary=tmp_path / "summary.md",
+                crash_summary=tmp_path / "crash-summary.txt",
+            )
+        ]
+    )
+
+    assert "| lanes |" in summary
+    assert "216" in summary
+    assert "0.00" in summary
+    assert "30379" in summary

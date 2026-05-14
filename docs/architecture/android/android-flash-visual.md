@@ -6,6 +6,11 @@ This document explains the Android Flash Visual playback path, the data it consu
 
 Use this before changing Flash Visual, Lyrics follow, playback smoothing, or long-audio visual performance. The goal is to identify the real bottleneck with code and debug data before widening the change to windowing, follow data, or native libraries.
 
+For the long-audio performance investigation history and accepted scrub regression baseline, also read:
+
+- `docs/architecture/android/android-flash-visual-performance.md`
+- `docs/architecture/android/android-flash-visual-scrub-regression-baseline.md`
+
 ## Primary Files
 
 - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/screen/PlaybackDisplaySection.kt`

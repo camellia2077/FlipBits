@@ -451,4 +451,5 @@
     <string name="audio_saved_audio_decode_loading_body">This clip is being read once to build its reusable text and lyrics view. The result stays only inside this app for faster reopening.</string>
     <!-- CONTEXT: Tab label for the playback screen's mixed mode that combines the visualizer and token view. Keep it short and preserve the English product term Mix in all locales. -->
     <string name="audio_playback_view_mix">Mix</string>
+    <string name="audio_flash_visualizer_mode_hz">Hz</string>
 </resources>

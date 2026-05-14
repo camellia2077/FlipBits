@@ -12,6 +12,7 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.screen.FlashSignalVisualizationMode
 import com.bag.audioandroid.ui.screen.PlaybackDisplayMode
 import com.bag.audioandroid.ui.screen.toPlaybackDisplayMode
+import com.bag.audioandroid.ui.screen.toPlaybackFollowViewMode
 
 data class FlashDebugScenario(
     val text: String = DefaultText,
@@ -22,12 +23,19 @@ data class FlashDebugScenario(
     val scenario: FlashDebugScenarioKind = FlashDebugScenarioKind.Ui,
     val style: FlashVoicingStyleOption = FlashVoicingStyleOption.Standard,
     val displayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
+    val followViewModeName: String = "binary",
     val visualMode: FlashSignalVisualizationMode = FlashSignalVisualizationMode.Lanes,
     val visualPerfOverlayEnabled: Boolean? = null,
     val playbackSpeed: Float = PlaybackSpeedOption.default.speed,
     val encode: Boolean = true,
     val play: Boolean = true,
     val playDurationMs: Long = DefaultPlayDurationMs,
+    val playEndAction: FlashDebugPlayEndAction = FlashDebugPlayEndAction.Stop,
+    val seekFractions: List<Float> = emptyList(),
+    val seekStartDelayMs: Long = DefaultSeekStartDelayMs,
+    val seekDragDurationMs: Long = DefaultSeekDragDurationMs,
+    val seekStepIntervalMs: Long = DefaultSeekStepIntervalMs,
+    val seekSettleDelayMs: Long = DefaultSeekSettleDelayMs,
     val requestId: Long = System.nanoTime(),
 ) {
     companion object {
@@ -39,14 +47,25 @@ data class FlashDebugScenario(
         const val ExtraScenario = "wb.scenario"
         const val ExtraStyle = "wb.flash.style"
         const val ExtraDisplay = "wb.display"
+        const val ExtraFollowView = "wb.follow.view"
         const val ExtraVisual = "wb.visual"
         const val ExtraVisualPerfOverlay = "wb.visual.perf_overlay"
         const val ExtraPlaybackSpeed = "wb.playback.speed"
         const val ExtraEncode = "wb.encode"
         const val ExtraPlay = "wb.play"
         const val ExtraPlayDurationMs = "wb.play.ms"
+        const val ExtraPlayEndAction = "wb.play.end"
+        const val ExtraSeekFractions = "wb.seek.fractions"
+        const val ExtraSeekStartDelayMs = "wb.seek.start.ms"
+        const val ExtraSeekDragDurationMs = "wb.seek.drag.ms"
+        const val ExtraSeekStepIntervalMs = "wb.seek.step.ms"
+        const val ExtraSeekSettleDelayMs = "wb.seek.settle.ms"
         const val DefaultText = "flash sync test"
         const val DefaultPlayDurationMs = 6_000L
+        const val DefaultSeekStartDelayMs = 1_500L
+        const val DefaultSeekDragDurationMs = 400L
+        const val DefaultSeekStepIntervalMs = 16L
+        const val DefaultSeekSettleDelayMs = 700L
         private const val Tag = "FlashAutomation"
 
         fun fromIntent(intent: Intent?): FlashDebugScenario? {
@@ -64,6 +83,13 @@ data class FlashDebugScenario(
                     scenario = FlashDebugScenarioKind.fromId(intent.getStringExtra(ExtraScenario)),
                     style = FlashVoicingStyleOption.fromId(intent.getStringExtra(ExtraStyle)),
                     displayMode = intent.getStringExtra(ExtraDisplay).toPlaybackDisplayMode(),
+                    followViewModeName =
+                        intent
+                            .getStringExtra(ExtraFollowView)
+                            ?.trim()
+                            ?.lowercase()
+                            .orEmpty()
+                            .ifBlank { "binary" },
                     visualMode = intent.getStringExtra(ExtraVisual).toFlashVisualizationMode(),
                     visualPerfOverlayEnabled =
                         intent
@@ -76,21 +102,37 @@ data class FlashDebugScenario(
                     encode = intent.getBooleanExtra(ExtraEncode, true),
                     play = intent.getBooleanExtra(ExtraPlay, true),
                     playDurationMs = intent.getLongExtra(ExtraPlayDurationMs, DefaultPlayDurationMs).coerceAtLeast(0L),
+                    playEndAction = FlashDebugPlayEndAction.fromId(intent.getStringExtra(ExtraPlayEndAction)),
+                    seekFractions = intent.getStringExtra(ExtraSeekFractions).toSeekFractions(),
+                    seekStartDelayMs = intent.getLongExtra(ExtraSeekStartDelayMs, DefaultSeekStartDelayMs).coerceAtLeast(0L),
+                    seekDragDurationMs =
+                        intent.getLongExtra(ExtraSeekDragDurationMs, DefaultSeekDragDurationMs).coerceAtLeast(0L),
+                    seekStepIntervalMs =
+                        intent.getLongExtra(ExtraSeekStepIntervalMs, DefaultSeekStepIntervalMs).coerceAtLeast(1L),
+                    seekSettleDelayMs = intent.getLongExtra(ExtraSeekSettleDelayMs, DefaultSeekSettleDelayMs).coerceAtLeast(0L),
                 )
             Log.d(
                 Tag,
                 "received scenario=${scenario.scenario.id} style=${scenario.style.id} display=${scenario.displayMode.name.lowercase()} " +
+                    "followView=${scenario.followViewMode.name.lowercase()} " +
                     "visual=${scenario.visualMode.name} " +
                     "visualPerfOverlay=${scenario.visualPerfOverlayEnabled?.toString() ?: "default"} " +
                     "playbackSpeed=${scenario.playbackSpeed} " +
+                    "seekFractions=${scenario.seekFractions.joinToString(prefix = "[", postfix = "]") { "%.3f".format(it) }} " +
+                    "seekStartMs=${scenario.seekStartDelayMs} seekDragMs=${scenario.seekDragDurationMs} " +
+                    "seekStepMs=${scenario.seekStepIntervalMs} seekSettleMs=${scenario.seekSettleDelayMs} " +
                     "lang=${scenario.languageOverride?.languageTag ?: "current"} " +
                     "encode=${scenario.encode} play=${scenario.play} playMs=${scenario.playDurationMs} " +
+                    "playEnd=${scenario.playEndAction.id} " +
                     "requestId=${scenario.requestId} input=${scenario.inputDebugSummary()}",
             )
             return scenario
         }
     }
 }
+
+internal val FlashDebugScenario.followViewMode
+    get() = followViewModeName.toPlaybackFollowViewMode()
 
 private fun FlashDebugScenario.inputDebugSummary(): String {
     if (hasTextOverride) {
@@ -312,10 +354,23 @@ enum class FlashDebugScenarioKind(
     }
 }
 
+enum class FlashDebugPlayEndAction(
+    val id: String,
+) {
+    Stop("stop"),
+    Pause("pause"),
+    ;
+
+    companion object {
+        fun fromId(id: String?): FlashDebugPlayEndAction = entries.firstOrNull { it.id == id?.trim()?.lowercase() } ?: Stop
+    }
+}
+
 private fun String?.toFlashVisualizationMode(): FlashSignalVisualizationMode =
     when (this?.lowercase()) {
         "lanes" -> FlashSignalVisualizationMode.Lanes
         "pitch" -> FlashSignalVisualizationMode.Pitch
+        "hz" -> FlashSignalVisualizationMode.Hz
         "pulse" -> FlashSignalVisualizationMode.Pulse
         else -> FlashSignalVisualizationMode.Lanes
     }
@@ -329,6 +384,18 @@ private fun String?.toDebugAppLanguageOption(): AppLanguageOption? {
         .fromLanguageTags(raw)
         .takeUnless { it == AppLanguageOption.FollowSystem }
 }
+
+private fun String?.toSeekFractions(): List<Float> =
+    this
+        ?.split(',')
+        ?.mapNotNull { token ->
+            token
+                .trim()
+                .takeIf { it.isNotEmpty() }
+                ?.toFloatOrNull()
+                ?.coerceIn(0f, 1f)
+        }?.distinct()
+        .orEmpty()
 
 internal val MorseSpeedOption.id: String
     get() =

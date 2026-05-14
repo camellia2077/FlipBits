@@ -17,8 +17,7 @@ FONT_ZH_PATH = r"C:\Users\17596\Downloads\Noto_Sans_SC\static\NotoSansSC-Bold.tt
 # [ 字体大小配置 - Font Size Configuration ]
 # ==========================================
 
-# 1. 雷达图本体 (Radar Chart)
-SIZE_RADAR_LABEL = 24       # 各维度标签大小
+
 
 # 数值变大：标题向上移（远离图表中心）
 # 数值变小：标题向下移（靠近图表中心）
@@ -53,20 +52,26 @@ from config import (
 # [ 雷达图布局微调 - Radar Layout Fine-tuning ]
 # ==========================================
 
+
+
+# 1. 雷达图本体 (Radar Chart)
+SIZE_RADAR_LABEL_ZH = 38    # 中文维度标签大小
+
 # --- 中文版微调 (Chinese Offsets) ---
 # 值增大：远离圆心；值减小：靠近圆心
 RADAR_LABEL_RADIUS_OFFSETS_ZH = {
     # --- 侧翼维度 (Side) ---
-    ENCODING_EFFICIENCY:    -0.20, # 编码效率
-    TRANSMISSION_STABILITY: -0.20, # 传输稳定
-    EMOTIONAL_RICHNESS:     -0.20, # 情感丰富度
-    ELECTRONIC_FEEL:        -0.20, # 电子感
+    ENCODING_EFFICIENCY:    1.40, # 编码效率
+    TRANSMISSION_STABILITY: 1.40, # 传输稳定
+    EMOTIONAL_RICHNESS:     1.40, # 情感丰富度
+    ELECTRONIC_FEEL:        1.40, # 电子感
 
     # --- 垂直维度 (Vertical) ---
-    TRANSMISSION_SPEED:      -0.20,  # 传输速度
-    SENSE_OF_RITUAL:         -0.20,  # 仪式感
-    COMPATIBILITY:           -0.20, # 兼容性
-    PARSING_DIFFICULTY:      -0.20, # 解析难度
+    TRANSMISSION_SPEED:      0.30,  # 传输速度
+    SENSE_OF_RITUAL:         0.30,  # 仪式感
+
+    COMPATIBILITY:           0.50, # 兼容性
+    PARSING_DIFFICULTY:      0.50, # 解析难度
 }
 
 RADAR_LABEL_ANGLE_OFFSETS_ZH = {
@@ -75,9 +80,25 @@ RADAR_LABEL_ANGLE_OFFSETS_ZH = {
     EMOTIONAL_RICHNESS: 0.0, SENSE_OF_RITUAL: 0.0
 }
 
+
+
+SIZE_RADAR_LABEL_EN = 24    # 英文维度标签大小
 # --- 英文版微调 (English Offsets) ---
-# 目前直接复制中文配置，后续可独立调整
-RADAR_LABEL_RADIUS_OFFSETS_EN = RADAR_LABEL_RADIUS_OFFSETS_ZH.copy()
-RADAR_LABEL_ANGLE_OFFSETS_EN  = RADAR_LABEL_ANGLE_OFFSETS_ZH.copy()
+RADAR_LABEL_RADIUS_OFFSETS_EN = {
+    TRANSMISSION_SPEED:      -0.10,
+    ENCODING_EFFICIENCY:      0.40,
+    TRANSMISSION_STABILITY:   0.40,
+    COMPATIBILITY:           -0.10,
+    PARSING_DIFFICULTY:      -0.10,
+    ELECTRONIC_FEEL:          0.40,
+    EMOTIONAL_RICHNESS:       0.40,
+    SENSE_OF_RITUAL:         -0.10,
+}
+
+RADAR_LABEL_ANGLE_OFFSETS_EN = {
+    TRANSMISSION_SPEED: 0.0, ENCODING_EFFICIENCY: 0.0, TRANSMISSION_STABILITY: 0.0,
+    COMPATIBILITY: 0.0, PARSING_DIFFICULTY: 0.0, ELECTRONIC_FEEL: 0.0,
+    EMOTIONAL_RICHNESS: 0.0, SENSE_OF_RITUAL: 0.0
+}
 
 

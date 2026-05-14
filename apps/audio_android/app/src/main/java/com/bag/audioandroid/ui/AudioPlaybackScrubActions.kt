@@ -45,11 +45,6 @@ internal class AudioPlaybackScrubActions(
         playbackUiStateSync.updatePlaybackState(playbackTarget.source) {
             playbackRuntimeGateway.scrubChanged(it, clampedTarget)
         }
-        val generatedSource = playbackTarget.source as? com.bag.audioandroid.ui.model.AudioPlaybackSource.Generated
-        if (generatedSource != null) {
-            followDataWindowActions?.ensureCurrentWindow(generatedSource.mode, clampedTarget)
-            flashVisualWindowActions?.ensureCurrentWindow(generatedSource.mode, clampedTarget)
-        }
     }
 
     fun onScrubFinished() {
@@ -71,6 +66,11 @@ internal class AudioPlaybackScrubActions(
             return
         }
         playbackUiStateSync.updatePlaybackState(playbackTarget.source) { committed }
+        val generatedSource = playbackTarget.source as? com.bag.audioandroid.ui.model.AudioPlaybackSource.Generated
+        if (generatedSource != null) {
+            followDataWindowActions?.ensureCurrentWindow(generatedSource.mode, committed.playedSamples)
+            flashVisualWindowActions?.ensureCurrentWindow(generatedSource.mode, committed.playedSamples)
+        }
         playbackUiStateSync.setCurrentStatusText(
             UiText.Resource(R.string.status_playback_paused),
         )

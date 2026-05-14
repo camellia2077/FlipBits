@@ -16,6 +16,8 @@ import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.screen.FlashAlignmentPerfTrace
+import com.bag.audioandroid.ui.screen.FlashVisualPerfTrace
 import com.bag.audioandroid.ui.screen.currentBitsText
 import com.bag.audioandroid.ui.screen.flashBitReadoutFrame
 import com.bag.audioandroid.ui.screen.previousBitsText
@@ -202,13 +204,41 @@ fun AudioAndroidApp(
                 "uiPlaybackToggle requestId=${scenario.requestId} mode=flash " +
                     "playMs=${scenario.playDurationMs} speed=${scenario.playbackSpeed}",
             )
+            runFlashDebugSeeks(
+                scenario = scenario,
+                totalSamples = uiState.currentPlaybackSampleCount,
+                onScrubStarted = viewModel::onScrubStarted,
+                onScrubChanged = viewModel::onScrubChanged,
+                onScrubFinished = viewModel::onScrubFinished,
+            )
             if (scenario.playDurationMs > 0L) {
                 delay(scenario.playDurationMs)
-                Log.d(
-                    "FlashAutomation",
-                    "uiPlaybackStop requestId=${scenario.requestId} mode=flash playMs=${scenario.playDurationMs}",
+                val settledReason =
+                    when (scenario.playEndAction) {
+                        FlashDebugPlayEndAction.Pause -> {
+                            Log.d(
+                                "FlashAutomation",
+                                "uiPlaybackPause requestId=${scenario.requestId} mode=flash playMs=${scenario.playDurationMs}",
+                            )
+                            viewModel.onTogglePlayback()
+                            "playback-pause-settled"
+                        }
+                        FlashDebugPlayEndAction.Stop -> {
+                            Log.d(
+                                "FlashAutomation",
+                                "uiPlaybackStop requestId=${scenario.requestId} mode=flash playMs=${scenario.playDurationMs}",
+                            )
+                            viewModel.stopPlayback()
+                            "playback-stop-settled"
+                        }
+                    }
+                delay(FlashDebugStopSettleDelayMs)
+                FlashAlignmentPerfTrace.forceReport(
+                    "$settledReason requestId=${scenario.requestId} playMs=${scenario.playDurationMs}",
                 )
-                viewModel.stopPlayback()
+                FlashVisualPerfTrace.forceReport(
+                    "$settledReason requestId=${scenario.requestId} playMs=${scenario.playDurationMs}",
+                )
             }
         }
         if (shouldStartUiDebugPlayback(miniDebugScenario, miniDebugScenarioStartRevision, handledDebugScenarioPlaybackRequestId, uiState)) {
@@ -337,6 +367,82 @@ fun AudioAndroidApp(
 }
 
 private const val FlashHeadlessTag = "FlashHeadless"
+private const val FlashDebugScrubFrameDelayMs = 32L
+private const val FlashDebugStopSettleDelayMs = 120L
+
+private suspend fun runFlashDebugSeeks(
+    scenario: FlashDebugScenario,
+    totalSamples: Int,
+    onScrubStarted: () -> Unit,
+    onScrubChanged: (Int) -> Unit,
+    onScrubFinished: () -> Unit,
+) {
+    if (scenario.seekFractions.isEmpty() || totalSamples <= 0) {
+        return
+    }
+    if (scenario.seekStartDelayMs > 0L) {
+        delay(scenario.seekStartDelayMs)
+    }
+    var previousTargetSamples = 0
+    scenario.seekFractions.forEachIndexed { index, fraction ->
+        val targetSamples =
+            (fraction * totalSamples.toFloat())
+                .roundToInt()
+                .coerceIn(0, totalSamples)
+        val dragSteps =
+            if (scenario.seekDragDurationMs <= 0L) {
+                1
+            } else {
+                (scenario.seekDragDurationMs / scenario.seekStepIntervalMs)
+                    .toInt()
+                    .coerceAtLeast(1)
+            }
+        Log.d(
+            "FlashAutomation",
+            "uiPlaybackSeek requestId=${scenario.requestId} index=$index fraction=${"%.3f".format(fraction)} " +
+                "fromSamples=$previousTargetSamples targetSamples=$targetSamples totalSamples=$totalSamples " +
+                "dragMs=${scenario.seekDragDurationMs} stepMs=${scenario.seekStepIntervalMs} steps=$dragSteps",
+        )
+        onScrubStarted()
+        delay(FlashDebugScrubFrameDelayMs)
+        repeat(dragSteps) { stepIndex ->
+            val progress = (stepIndex + 1).toFloat() / dragSteps.toFloat()
+            val stepTarget =
+                lerpInt(
+                    start = previousTargetSamples,
+                    end = targetSamples,
+                    progress = progress,
+                ).coerceIn(0, totalSamples)
+            onScrubChanged(stepTarget)
+            delay(scenario.seekStepIntervalMs.coerceAtLeast(FlashDebugScrubFrameDelayMs))
+        }
+        delay(FlashDebugScrubFrameDelayMs)
+        onScrubFinished()
+        delay(FlashDebugScrubFrameDelayMs)
+        FlashAlignmentPerfTrace.forceReport(
+            "seek-immediate requestId=${scenario.requestId} index=$index fraction=${"%.3f".format(fraction)} target=$targetSamples",
+        )
+        FlashVisualPerfTrace.forceReport(
+            "seek-immediate requestId=${scenario.requestId} index=$index fraction=${"%.3f".format(fraction)} target=$targetSamples",
+        )
+        if (scenario.seekSettleDelayMs > 0L) {
+            delay(scenario.seekSettleDelayMs)
+        }
+        FlashAlignmentPerfTrace.forceReport(
+            "seek-settled requestId=${scenario.requestId} index=$index fraction=${"%.3f".format(fraction)} target=$targetSamples",
+        )
+        FlashVisualPerfTrace.forceReport(
+            "seek-settled requestId=${scenario.requestId} index=$index fraction=${"%.3f".format(fraction)} target=$targetSamples",
+        )
+        previousTargetSamples = targetSamples
+    }
+}
+
+private fun lerpInt(
+    start: Int,
+    end: Int,
+    progress: Float,
+): Int = (start + (end - start) * progress).roundToInt()
 
 private fun logUiDebugPlaybackStep(
     label: String,
