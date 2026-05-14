@@ -72,6 +72,7 @@ struct PayloadFollowBinaryGroupEntry {
   std::size_t group_index = 0;
   std::size_t bit_offset = 0;
   std::size_t bit_count = 0;
+  double carrier_freq_hz = 0.0;
 };
 
 struct TextFollowTokenTimelineEntry {

@@ -691,7 +691,8 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
                     binary_entries.begin() + result.follow_data.binary_group_timeline_count),
                 (item.mode == BAG_TRANSPORT_FLASH &&
                         (item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY ||
-                         item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_COLLAPSE)) ||
+                         item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_COLLAPSE ||
+                         item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_VOID)) ||
                     item.mode == BAG_TRANSPORT_MINI);
 
             bag_free_encode_result(&result);
@@ -922,13 +923,12 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
         std::size_t expected_payload_begin_frame_multiplier;
         double expected_payload_begin_seconds;
     };
-    const std::array<StyleCase, 6> cases = {{
+    const std::array<StyleCase, 5> cases = {{
         {BAG_FLASH_SIGNAL_PROFILE_STANDARD, BAG_FLASH_VOICING_FLAVOR_STANDARD, 15, 16, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_LITANY, BAG_FLASH_VOICING_FLAVOR_LITANY, 6, 1, 0, 1.35},
         {BAG_FLASH_SIGNAL_PROFILE_HOSTILE, BAG_FLASH_VOICING_FLAVOR_HOSTILE, 7, 8, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_COLLAPSE, BAG_FLASH_VOICING_FLAVOR_COLLAPSE, 1, 1, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_ZEAL, BAG_FLASH_VOICING_FLAVOR_ZEAL, 1, 2, 3, 0.0},
-        {BAG_FLASH_SIGNAL_PROFILE_VOID, BAG_FLASH_VOICING_FLAVOR_VOID, 5, 2, 3, 0.0},
     }};
     const auto config_case = test::ConfigCases().front();
 
@@ -1007,10 +1007,18 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
             static_cast<std::size_t>(config_case.frame_samples) / static_cast<std::size_t>(2),
             "Zeal first bit should use burst timing.");
         test::AssertEq(
+            binary_entries[0].carrier_freq_hz,
+            900.0,
+            "Zeal first low bit should publish the rendered burst carrier.");
+        test::AssertEq(
             binary_entries[2].sample_count,
             static_cast<std::size_t>(config_case.frame_samples) * static_cast<std::size_t>(5) /
                 static_cast<std::size_t>(8),
             "Zeal should vary bit duration inside the deterministic burst pattern.");
+        test::AssertEq(
+            binary_entries[2].carrier_freq_hz,
+            760.0,
+            "Zeal fast low bit should publish the rendered per-bit carrier.");
         const std::size_t gap_after_exclamation =
             binary_entries[16].start_sample -
             (binary_entries[15].start_sample + binary_entries[15].sample_count);
@@ -1022,12 +1030,150 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
             binary_entries[16].sample_count,
             static_cast<std::size_t>(config_case.frame_samples) / static_cast<std::size_t>(2),
             "Zeal should restart with a burst bit immediately after a punctuation pause.");
+        test::AssertEq(
+            binary_entries[16].carrier_freq_hz,
+            900.0,
+            "Zeal should publish burst carrier frequency after punctuation pause.");
         AssertFollowTimelineIsContinuous(
             result.follow_data,
             std::vector<bag_payload_follow_binary_group_entry>(
                 binary_entries.begin(),
                 binary_entries.begin() + result.follow_data.binary_group_timeline_count),
             true);
+
+        bag_free_encode_result(&result);
+    }
+
+    {
+        const auto encoder_config =
+            MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH, BAG_FLASH_SIGNAL_PROFILE_VOID,
+                              BAG_FLASH_VOICING_FLAVOR_VOID);
+        std::array<char, 1024> raw_hex_buffer{};
+        std::array<char, 8192> raw_bits_buffer{};
+        std::array<bag_payload_follow_byte_entry, 512> byte_entries{};
+        std::array<bag_payload_follow_binary_group_entry, 4096> binary_entries{};
+        bag_encode_result result{};
+        result.raw_bytes_hex_buffer = raw_hex_buffer.data();
+        result.raw_bytes_hex_buffer_size = raw_hex_buffer.size();
+        result.raw_bits_binary_buffer = raw_bits_buffer.data();
+        result.raw_bits_binary_buffer_size = raw_bits_buffer.size();
+        result.follow_data.byte_timeline_buffer = byte_entries.data();
+        result.follow_data.byte_timeline_buffer_count = byte_entries.size();
+        result.follow_data.binary_group_timeline_buffer = binary_entries.data();
+        result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
+
+        test::AssertEq(
+            bag_encode_text_with_follow(&encoder_config, "AB", &result),
+            BAG_OK,
+            "Void follow encode should support variable sag timing and sparse gaps.");
+        test::AssertTrue(
+            result.follow_data.binary_group_timeline_count >= static_cast<std::size_t>(8),
+            "Void follow data should publish one binary group per payload bit.");
+        test::AssertEq(
+            binary_entries[0].sample_count,
+            static_cast<std::size_t>(config_case.frame_samples) * static_cast<std::size_t>(5) /
+                static_cast<std::size_t>(2),
+            "Void first bit should use the baseline slow duration.");
+        test::AssertEq(
+            binary_entries[7].sample_count,
+            static_cast<std::size_t>(config_case.frame_samples) * static_cast<std::size_t>(11) /
+                static_cast<std::size_t>(4),
+            "Void byte-tail bit should stretch slightly longer.");
+        test::AssertEq(
+            binary_entries[0].carrier_freq_hz,
+            230.0,
+            "Void first low bit should publish the start of the downward carrier phrase.");
+        test::AssertEq(
+            binary_entries[1].carrier_freq_hz,
+            444.0,
+            "Void second high bit should publish the doubled sag carrier.");
+        const std::size_t gap_after_first_byte =
+            binary_entries[8].start_sample -
+            (binary_entries[7].start_sample + binary_entries[7].sample_count);
+        test::AssertEq(
+            gap_after_first_byte,
+            static_cast<std::size_t>(config_case.frame_samples),
+            "Void should expose sparse payload silence after the first byte.");
+        AssertFollowTimelineIsContinuous(
+            result.follow_data,
+            std::vector<bag_payload_follow_binary_group_entry>(
+                binary_entries.begin(),
+                binary_entries.begin() + result.follow_data.binary_group_timeline_count),
+            true);
+
+        bag_free_encode_result(&result);
+    }
+
+    {
+        const auto encoder_config =
+            MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH, BAG_FLASH_SIGNAL_PROFILE_HOSTILE,
+                              BAG_FLASH_VOICING_FLAVOR_HOSTILE);
+        std::array<char, 1024> raw_hex_buffer{};
+        std::array<char, 8192> raw_bits_buffer{};
+        std::array<bag_payload_follow_byte_entry, 512> byte_entries{};
+        std::array<bag_payload_follow_binary_group_entry, 4096> binary_entries{};
+        bag_encode_result result{};
+        result.raw_bytes_hex_buffer = raw_hex_buffer.data();
+        result.raw_bytes_hex_buffer_size = raw_hex_buffer.size();
+        result.raw_bits_binary_buffer = raw_bits_buffer.data();
+        result.raw_bits_binary_buffer_size = raw_bits_buffer.size();
+        result.follow_data.byte_timeline_buffer = byte_entries.data();
+        result.follow_data.byte_timeline_buffer_count = byte_entries.size();
+        result.follow_data.binary_group_timeline_buffer = binary_entries.data();
+        result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
+
+        test::AssertEq(
+            bag_encode_text_with_follow(&encoder_config, "A", &result),
+            BAG_OK,
+            "Hostile follow encode should support deterministic per-bit carrier jitter.");
+        test::AssertTrue(
+            result.follow_data.binary_group_timeline_count >= static_cast<std::size_t>(2),
+            "Hostile follow data should publish the first two binary bits.");
+        test::AssertEq(
+            binary_entries[0].carrier_freq_hz,
+            500.0,
+            "Hostile first low bit should publish its upward jittered carrier.");
+        test::AssertEq(
+            binary_entries[1].carrier_freq_hz,
+            1140.0,
+            "Hostile second high bit should publish the doubled upward jittered carrier.");
+
+        bag_free_encode_result(&result);
+    }
+
+    {
+        const auto encoder_config =
+            MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH, BAG_FLASH_SIGNAL_PROFILE_COLLAPSE,
+                              BAG_FLASH_VOICING_FLAVOR_COLLAPSE);
+        std::array<char, 1024> raw_hex_buffer{};
+        std::array<char, 8192> raw_bits_buffer{};
+        std::array<bag_payload_follow_byte_entry, 512> byte_entries{};
+        std::array<bag_payload_follow_binary_group_entry, 4096> binary_entries{};
+        bag_encode_result result{};
+        result.raw_bytes_hex_buffer = raw_hex_buffer.data();
+        result.raw_bytes_hex_buffer_size = raw_hex_buffer.size();
+        result.raw_bits_binary_buffer = raw_bits_buffer.data();
+        result.raw_bits_binary_buffer_size = raw_bits_buffer.size();
+        result.follow_data.byte_timeline_buffer = byte_entries.data();
+        result.follow_data.byte_timeline_buffer_count = byte_entries.size();
+        result.follow_data.binary_group_timeline_buffer = binary_entries.data();
+        result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
+
+        test::AssertEq(
+            bag_encode_text_with_follow(&encoder_config, "A", &result),
+            BAG_OK,
+            "Collapse follow encode should support deterministic per-bit carrier sag.");
+        test::AssertTrue(
+            result.follow_data.binary_group_timeline_count >= static_cast<std::size_t>(2),
+            "Collapse follow data should publish the first two binary bits.");
+        test::AssertEq(
+            binary_entries[0].carrier_freq_hz,
+            320.0,
+            "Collapse first low bit should publish the sag carrier.");
+        test::AssertEq(
+            binary_entries[1].carrier_freq_hz,
+            610.0,
+            "Collapse second high bit should publish the doubled sag carrier.");
 
         bag_free_encode_result(&result);
     }

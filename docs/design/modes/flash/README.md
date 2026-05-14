@@ -1,6 +1,6 @@
 # `flash` Mode Design
 
-更新时间：2026-05-04
+更新时间：2026-05-14
 
 ## 定位
 - `flash` 是娱乐化、仪式感优先的原始直通模式。
@@ -34,7 +34,7 @@
 ## Emotion / Style 结构
 - formal `flash` 当前对外暴露六个用户可见 emotion preset：
   - `Standard`
-  - `Hostile`
+  - `Hostility`
   - `Litany`
   - `Collapse`
   - `Zeal`
@@ -48,17 +48,17 @@
 
 ## 当前 Signal Profile 速记
 - `Standard`: `0.9375x frame_samples`
-- `Hostile`: `0.875x frame_samples`
+- `Hostility`: `0.875x frame_samples`
 - `Litany`: `6x frame_samples`，可跳过 silence slot 为 `1x frame_samples`
 - `Collapse`: `1x frame_samples`
 - `Zeal`: variable `0.5x` / `0.625x` / `0.75x` / `1x frame_samples` bit windows, with `1x frame_samples` silence slots for punctuation pauses
-- `Void`: `2.5x frame_samples`
+- `Void`: variable `2.5x` / `2.75x` / `3x frame_samples` bit windows, with sparse `1x frame_samples` silence slots
 
 ## Decode 边界
 - decode 入口会先按 voicing trim descriptor 去掉非 payload 区域，再进入 `bag.flash.signal` 解调。
 - `Litany` / `Collapse` 的变长 silence payload 使用 gap-aware decode 跳过静音。
 - `Zeal` 使用自己的确定性变速 / 变频 gap-aware decode。
-- `Void` 继续使用普通 low/high window 判定。
+- `Void` 使用确定性变长 / 变频 layout-aware decode，跳过稀疏真实 silence。
 - 所有 emotion voicing 都必须服从这个边界：
   - 不把 payload 语义藏进 texture / drone / shell
   - 不让 preamble / epilogue 参与 payload decode

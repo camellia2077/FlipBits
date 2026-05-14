@@ -56,6 +56,7 @@ void CopyFollowDataToApi(const bag::PayloadFollowData& follow_data,
         destination->group_index = source.group_index;
         destination->bit_offset = source.bit_offset;
         destination->bit_count = source.bit_count;
+        destination->carrier_freq_hz = source.carrier_freq_hz;
       });
 }
 

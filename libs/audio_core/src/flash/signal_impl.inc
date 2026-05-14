@@ -98,11 +98,11 @@ std::size_t SamplesPerSilenceSlotForSignalProfile(
   switch (signal_profile) {
     case FlashSignalProfile::kLitany:
     case FlashSignalProfile::kZeal:
+    case FlashSignalProfile::kVoid:
       return static_cast<std::size_t>(config.frame_samples);
     case FlashSignalProfile::kStandard:
     case FlashSignalProfile::kHostile:
     case FlashSignalProfile::kCollapse:
-    case FlashSignalProfile::kVoid:
     default:
       return SamplesPerBitForSignalProfile(signal_profile, config);
   }
@@ -288,6 +288,126 @@ double ZealLowCarrierForTimingClass(ZealTimingClass timing_class) {
 
 double ZealHighCarrierForTimingClass(ZealTimingClass timing_class) {
   return ZealLowCarrierForTimingClass(timing_class) * 2.0;
+}
+
+double HostileLowCarrierForBit(std::size_t bit_position,
+                               std::size_t byte_index, uint8_t source_byte,
+                               uint8_t bit_index_in_byte) {
+  (void)source_byte;
+  static constexpr std::array<double, 8> kJitter = {
+      0.0, 58.0, 22.0, 96.0, 44.0, 118.0, 70.0, 34.0,
+  };
+  const std::size_t hash_index =
+      (bit_position * static_cast<std::size_t>(5) +
+       byte_index * static_cast<std::size_t>(3) +
+       static_cast<std::size_t>(bit_index_in_byte)) %
+      kJitter.size();
+  return 500.0 + kJitter[hash_index];
+}
+
+double HostileHighCarrierForBit(std::size_t bit_position,
+                                std::size_t byte_index, uint8_t source_byte,
+                                uint8_t bit_index_in_byte) {
+  return HostileLowCarrierForBit(bit_position, byte_index, source_byte,
+                                 bit_index_in_byte) *
+         2.0;
+}
+
+double CollapseLowCarrierForBit(std::size_t bit_position,
+                                std::size_t byte_index, uint8_t source_byte,
+                                uint8_t bit_index_in_byte) {
+  (void)source_byte;
+  static constexpr std::array<double, 8> kSag = {
+      320.0, 305.0, 292.0, 280.0, 268.0, 254.0, 240.0, 226.0,
+  };
+  const std::size_t phrase_offset =
+      (bit_position + byte_index +
+       static_cast<std::size_t>(bit_index_in_byte / static_cast<uint8_t>(2))) %
+      kSag.size();
+  return kSag[phrase_offset];
+}
+
+double CollapseHighCarrierForBit(std::size_t bit_position,
+                                 std::size_t byte_index, uint8_t source_byte,
+                                 uint8_t bit_index_in_byte) {
+  return CollapseLowCarrierForBit(bit_position, byte_index, source_byte,
+                                  bit_index_in_byte) *
+         2.0;
+}
+
+std::size_t VoidFrameSamples(const BfskConfig& config) {
+  if (config.samples_per_silence_slot > 0) {
+    return config.samples_per_silence_slot;
+  }
+  return config.samples_per_bit > 0
+             ? std::max(static_cast<std::size_t>(1),
+                        (config.samples_per_bit * static_cast<std::size_t>(2)) /
+                            static_cast<std::size_t>(5))
+             : static_cast<std::size_t>(0);
+}
+
+std::size_t ScaleVoidFrameSamples(std::size_t frame_samples,
+                                  std::size_t numerator,
+                                  std::size_t denominator) {
+  if (frame_samples == 0 || denominator == 0) {
+    return 0;
+  }
+  return std::max(static_cast<std::size_t>(1),
+                  (frame_samples * numerator) / denominator);
+}
+
+std::size_t VoidSamplesForBit(std::size_t bit_position,
+                              uint8_t bit_index_in_byte,
+                              const BfskConfig& config) {
+  const std::size_t frame_samples = VoidFrameSamples(config);
+  if (bit_index_in_byte == static_cast<uint8_t>(7)) {
+    return ScaleVoidFrameSamples(frame_samples, 11, 4);
+  }
+  if (((bit_position + static_cast<std::size_t>(3)) %
+       static_cast<std::size_t>(19)) == 0) {
+    return ScaleVoidFrameSamples(frame_samples, 3, 1);
+  }
+  return ScaleVoidFrameSamples(frame_samples, 5, 2);
+}
+
+double VoidLowCarrierForBit(std::size_t bit_position, std::size_t byte_index,
+                            uint8_t bit_index_in_byte) {
+  static constexpr std::array<double, 10> kSag = {
+      230.0, 222.0, 214.0, 206.0, 198.0,
+      190.0, 184.0, 180.0, 194.0, 208.0,
+  };
+  const std::size_t phrase_offset =
+      (bit_position + byte_index +
+       static_cast<std::size_t>(bit_index_in_byte / static_cast<uint8_t>(4))) %
+      kSag.size();
+  return kSag[phrase_offset];
+}
+
+double VoidHighCarrierForBit(std::size_t bit_position, std::size_t byte_index,
+                             uint8_t bit_index_in_byte) {
+  return VoidLowCarrierForBit(bit_position, byte_index, bit_index_in_byte) *
+         2.0;
+}
+
+std::size_t VoidPauseSlotCountAfterBit(std::size_t bit_position,
+                                       std::size_t byte_index,
+                                       uint8_t bit_index_in_byte) {
+  if (bit_index_in_byte == static_cast<uint8_t>(7)) {
+    if (((byte_index + static_cast<std::size_t>(1)) %
+         static_cast<std::size_t>(9)) == 0) {
+      return 6;
+    }
+    if (((byte_index + static_cast<std::size_t>(1)) %
+         static_cast<std::size_t>(3)) == 0) {
+      return 2;
+    }
+    return 1;
+  }
+  if (((bit_position + static_cast<std::size_t>(5)) %
+       static_cast<std::size_t>(37)) == 0) {
+    return 4;
+  }
+  return 0;
 }
 
 bool IsZealStrongPauseByte(const std::vector<uint8_t>& bytes,
@@ -527,8 +647,8 @@ BfskConfig MakeBfskConfigForSignalProfile(const CoreConfig& config,
       bfsk.high_freq_hz = 440.0;
       break;
     case FlashSignalProfile::kHostile:
-      bfsk.low_freq_hz = 450.0;
-      bfsk.high_freq_hz = 900.0;
+      bfsk.low_freq_hz = 559.0;
+      bfsk.high_freq_hz = 1118.0;
       break;
     case FlashSignalProfile::kCollapse:
       bfsk.low_freq_hz = 280.0;
@@ -539,8 +659,8 @@ BfskConfig MakeBfskConfigForSignalProfile(const CoreConfig& config,
       bfsk.high_freq_hz = 1800.0;
       break;
     case FlashSignalProfile::kVoid:
-      bfsk.low_freq_hz = 220.0;
-      bfsk.high_freq_hz = 440.0;
+      bfsk.low_freq_hz = 205.0;
+      bfsk.high_freq_hz = 410.0;
       break;
     case FlashSignalProfile::kStandard:
     default:
@@ -612,6 +732,30 @@ FlashPayloadLayout BuildPayloadLayoutForVoicing(
             bit == 1 ? ZealHighCarrierForTimingClass(timing_class)
                      : ZealLowCarrierForTimingClass(timing_class);
         force_zeal_burst_after_pause = false;
+      } else if (normalized_flavor == FlashVoicingFlavor::kHostile) {
+        chunk.sample_count = static_cast<size_t>(chunk_size);
+        chunk.carrier_freq_hz =
+            bit == 1
+                ? HostileHighCarrierForBit(bit_position, byte_index, value,
+                                           bit_index_in_byte)
+                : HostileLowCarrierForBit(bit_position, byte_index, value,
+                                          bit_index_in_byte);
+      } else if (normalized_flavor == FlashVoicingFlavor::kCollapse) {
+        chunk.sample_count = static_cast<size_t>(chunk_size);
+        chunk.carrier_freq_hz =
+            bit == 1
+                ? CollapseHighCarrierForBit(bit_position, byte_index, value,
+                                            bit_index_in_byte)
+                : CollapseLowCarrierForBit(bit_position, byte_index, value,
+                                           bit_index_in_byte);
+      } else if (normalized_flavor == FlashVoicingFlavor::kVoid) {
+        chunk.sample_count =
+            VoidSamplesForBit(bit_position, bit_index_in_byte, config);
+        chunk.carrier_freq_hz =
+            bit == 1 ? VoidHighCarrierForBit(bit_position, byte_index,
+                                             bit_index_in_byte)
+                     : VoidLowCarrierForBit(bit_position, byte_index,
+                                            bit_index_in_byte);
       } else {
         chunk.sample_count = static_cast<size_t>(chunk_size);
         chunk.carrier_freq_hz =
@@ -631,6 +775,10 @@ FlashPayloadLayout BuildPayloadLayoutForVoicing(
       } else if (normalized_flavor == FlashVoicingFlavor::kZeal &&
                  bit_index_in_byte == static_cast<uint8_t>(7)) {
         pause_slots = ZealPauseSlotCountAfterByte(bytes, byte_index);
+      } else if (normalized_flavor == FlashVoicingFlavor::kVoid) {
+        pause_slots =
+            VoidPauseSlotCountAfterBit(bit_position, byte_index,
+                                       bit_index_in_byte);
       }
       AppendSilenceChunk(pause_slots,
                          config.samples_per_silence_slot,
@@ -726,6 +874,116 @@ std::vector<uint8_t> DecodePcm16ToBytes(const std::vector<int16_t>& pcm,
     bits.push_back(high_power > low_power ? 1 : 0);
   }
 
+  return BitsToBytes(bits);
+}
+
+std::vector<uint8_t> DecodePcm16ToBytesWithPayloadLayout(
+    const std::vector<int16_t>& pcm, const BfskConfig& config,
+    FlashVoicingFlavor flavor) {
+  const int bit_chunk_size = ChunkSize(config);
+  if (bit_chunk_size <= 0 || config.sample_rate_hz <= 0) {
+    throw std::invalid_argument("Invalid BFSK config.");
+  }
+  if (pcm.empty()) {
+    return {};
+  }
+
+  const std::size_t estimated_bit_count =
+      pcm.size() / static_cast<std::size_t>(bit_chunk_size);
+  const std::size_t estimated_byte_count =
+      (estimated_bit_count + static_cast<std::size_t>(7)) /
+      static_cast<std::size_t>(8);
+  const std::vector<uint8_t> placeholder_bytes(estimated_byte_count, 0U);
+  const FlashPayloadLayout decode_layout =
+      BuildPayloadLayoutForVoicing(placeholder_bytes, config, flavor);
+
+  std::vector<int> bits;
+  bits.reserve(estimated_bit_count);
+  for (const FlashPayloadChunk& chunk : decode_layout.chunks) {
+    if (chunk.kind != FlashPayloadSegmentKind::kBit ||
+        chunk.sample_count == 0 || chunk.carrier_freq_hz <= 0.0 ||
+        chunk.sample_offset + chunk.sample_count > pcm.size()) {
+      continue;
+    }
+    const int16_t* chunk_pcm = pcm.data() + chunk.sample_offset;
+    const double bit_carrier_power =
+        GoertzelPower(chunk_pcm, static_cast<int>(chunk.sample_count),
+                      config.sample_rate_hz, chunk.carrier_freq_hz);
+    const double opposite_carrier_power =
+        GoertzelPower(chunk_pcm, static_cast<int>(chunk.sample_count),
+                      config.sample_rate_hz,
+                      chunk.bit_value == 1 ? chunk.carrier_freq_hz / 2.0
+                                           : chunk.carrier_freq_hz * 2.0);
+    bits.push_back(bit_carrier_power >= opposite_carrier_power ? chunk.bit_value
+                                                               : 1 - chunk.bit_value);
+    if (bits.size() >= estimated_bit_count) {
+      break;
+    }
+  }
+  return BitsToBytes(bits);
+}
+
+std::vector<uint8_t> DecodePcm16ToBytesSkippingSilenceWithCarrierSchedule(
+    const std::vector<int16_t>& pcm, const BfskConfig& config,
+    FlashVoicingFlavor flavor) {
+  const int bit_chunk_size = ChunkSize(config);
+  const int silence_slot_size = SilenceSlotSize(config);
+  if (bit_chunk_size <= 0 || silence_slot_size <= 0 ||
+      config.sample_rate_hz <= 0) {
+    throw std::invalid_argument("Invalid BFSK config.");
+  }
+  if (pcm.empty()) {
+    return {};
+  }
+
+  (void)flavor;
+
+  auto window_energy = [](const int16_t* chunk, int sample_count) {
+    double energy = 0.0;
+    for (int i = 0; i < sample_count; ++i) {
+      const double sample = static_cast<double>(chunk[i]) / 32768.0;
+      energy += sample * sample;
+    }
+    return energy / static_cast<double>(sample_count);
+  };
+
+  double max_window_energy = 0.0;
+  for (std::size_t offset = 0;
+       offset + static_cast<std::size_t>(bit_chunk_size) <= pcm.size();
+       offset += static_cast<std::size_t>(silence_slot_size)) {
+    max_window_energy = std::max(
+        max_window_energy, window_energy(pcm.data() + offset, bit_chunk_size));
+  }
+  if (max_window_energy <= 0.0) {
+    return {};
+  }
+
+  const double silence_threshold = max_window_energy * 0.02;
+  std::vector<int> bits;
+  for (std::size_t offset = 0;
+       offset + static_cast<std::size_t>(bit_chunk_size) <= pcm.size();
+       offset += static_cast<std::size_t>(silence_slot_size)) {
+    const int16_t* chunk = pcm.data() + offset;
+    if (window_energy(chunk, bit_chunk_size) < silence_threshold) {
+      continue;
+    }
+
+    const std::size_t bit_position = bits.size();
+    const std::size_t byte_index = bit_position / static_cast<std::size_t>(8);
+    const uint8_t bit_index_in_byte =
+        static_cast<uint8_t>(bit_position % static_cast<std::size_t>(8));
+    const double low_freq =
+        CollapseLowCarrierForBit(bit_position, byte_index, 0U,
+                                 bit_index_in_byte);
+    const double high_freq =
+        CollapseHighCarrierForBit(bit_position, byte_index, 0U,
+                                  bit_index_in_byte);
+    const double low_power =
+        GoertzelPower(chunk, bit_chunk_size, config.sample_rate_hz, low_freq);
+    const double high_power =
+        GoertzelPower(chunk, bit_chunk_size, config.sample_rate_hz, high_freq);
+    bits.push_back(high_power > low_power ? 1 : 0);
+  }
   return BitsToBytes(bits);
 }
 

@@ -54,7 +54,7 @@ Litany 使用可跳过的整数 slot silence 来表达经文节奏：
   - 空格和标点对应的 bit 末尾会提前下沉。
   - 让“停顿”不是突然断电，而像诵唱前自然收声。
 - 弱 boundary click。
-  - Litany 的边界不应像 Hostile 那样攻击。
+  - Litany 的边界不应像 Hostility 那样攻击。
   - click scale 当前约 `0.18`，让结构存在但不刺耳。
 - litany invocation shell。
   - preamble 使用约 `1.35s` 的秒级仪式壳，不再按短 frame 倍数压缩。
@@ -63,7 +63,7 @@ Litany 使用可跳过的整数 slot silence 来表达经文节奏：
   - epilogue 使用约 `1.15s` 的秒级闭礼壳和一长一短二次钟击：第一声约 `92 Hz`、更低、更长，表示经文收束；第二声约 `128 Hz`、更短，表示礼仪闭合。
   - epilogue 的 terminal mute 会更晚介入，避免长钟尾音过早消失。
   - shell 内还会叠加受控 drone，但仍只放在 preamble / epilogue，不进入 payload silence chunk。
-  - 前后壳比 Standard / Hostile 更长，让 UI 时长和听感都能明显感到仪式化。
+  - 前后壳比 Standard / Hostility 更长，让 UI 时长和听感都能明显感到仪式化。
 
 ## 听感关键词
 慢诵、肃穆、低频、句读、机械喉腔、祷文、收束。

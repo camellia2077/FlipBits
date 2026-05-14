@@ -10,7 +10,7 @@
 - 每个 low/high bit 使用 `0.9375x frame_samples`。
 - low/high carrier 为 `300 / 600 Hz`。
 - 不插入额外可跳过 silence。
-- payload timeline 连续，适合作为其他 emotion 的基线；v2 只做保守加速，让日常输出更利落但不靠近 Hostile 的短促命令感。
+- payload timeline 连续，适合作为其他 emotion 的基线；v2 只做保守加速，让日常输出更利落但不靠近 Hostility 的短促命令感。
 
 ## Voicing 方法
 - 加入很弱的 `120 Hz` low voice layer。
@@ -22,7 +22,7 @@
   - 深度很低，频率约 `6.2 Hz`。
   - 只提供微弱设备感，不形成颤抖。
 - byte / nibble 边界 accent 保守。
-  - byte 边界 click 比 Hostile 弱。
+  - byte 边界 click 比 Hostility 弱。
   - 让二进制结构仍清楚，但不攻击。
 - preamble / epilogue 使用克制的 standard protocol shell。
   - 开头和结尾仍像通信协议边界，但音高和 shell 混合比旧 protocol boundary 更低、更轻。

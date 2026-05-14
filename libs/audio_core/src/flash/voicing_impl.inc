@@ -29,11 +29,11 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
           SecondsToSampleCount(config.sample_rate_hz, kLitanyEpilogueSeconds);
       break;
     case FlashVoicingFlavor::kHostile:
-      voicing.attack_ratio = 0.022;
-      voicing.release_ratio = 0.030;
-      voicing.second_harmonic_gain = 0.105;
-      voicing.third_harmonic_gain = 0.052;
-      voicing.boundary_click_gain = 0.028;
+      voicing.attack_ratio = 0.020;
+      voicing.release_ratio = 0.026;
+      voicing.second_harmonic_gain = 0.112;
+      voicing.third_harmonic_gain = 0.058;
+      voicing.boundary_click_gain = 0.032;
       voicing.enable_preamble = true;
       voicing.enable_epilogue = true;
       voicing.preamble_sample_count =
@@ -86,11 +86,11 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
               : static_cast<std::size_t>(0);
       break;
     case FlashVoicingFlavor::kVoid:
-      voicing.attack_ratio = 0.085;
-      voicing.release_ratio = 0.170;
-      voicing.second_harmonic_gain = 0.014;
-      voicing.third_harmonic_gain = 0.002;
-      voicing.boundary_click_gain = 0.002;
+      voicing.attack_ratio = 0.115;
+      voicing.release_ratio = 0.215;
+      voicing.second_harmonic_gain = 0.010;
+      voicing.third_harmonic_gain = 0.001;
+      voicing.boundary_click_gain = 0.001;
       voicing.enable_preamble = true;
       voicing.enable_epilogue = true;
       voicing.preamble_sample_count =

@@ -34,10 +34,10 @@ std::string DecodePathForFlashVoicing(bag::FlashVoicingFlavor flavor) {
     case bag::FlashVoicingFlavor::kCollapse:
       return "gap-aware silence skip";
     case bag::FlashVoicingFlavor::kZeal:
+    case bag::FlashVoicingFlavor::kVoid:
       return "variable-window gap-aware";
     case bag::FlashVoicingFlavor::kStandard:
     case bag::FlashVoicingFlavor::kHostile:
-    case bag::FlashVoicingFlavor::kVoid:
     default:
       return "fixed low/high window";
   }

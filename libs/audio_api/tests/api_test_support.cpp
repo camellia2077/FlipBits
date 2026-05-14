@@ -229,6 +229,54 @@ std::size_t ZealPayloadSampleCount(const std::string& text, std::size_t frame_sa
     return sample_count;
 }
 
+std::size_t VoidBitSampleCount(std::size_t frame_samples,
+                               std::size_t bit_position,
+                               int bit_index) {
+    if (frame_samples == 0) {
+        return 0;
+    }
+    if (bit_index == 7) {
+        return std::max(static_cast<std::size_t>(1),
+                        frame_samples * static_cast<std::size_t>(11) / static_cast<std::size_t>(4));
+    }
+    if (((bit_position + static_cast<std::size_t>(3)) % static_cast<std::size_t>(19)) == 0) {
+        return std::max(static_cast<std::size_t>(1), frame_samples * static_cast<std::size_t>(3));
+    }
+    return std::max(static_cast<std::size_t>(1),
+                    frame_samples * static_cast<std::size_t>(5) / static_cast<std::size_t>(2));
+}
+
+std::size_t VoidPauseSlotCountAfterBit(std::size_t bit_position,
+                                       std::size_t byte_index,
+                                       int bit_index) {
+    if (bit_index == 7) {
+        if (((byte_index + static_cast<std::size_t>(1)) % static_cast<std::size_t>(9)) == 0) {
+            return 6;
+        }
+        if (((byte_index + static_cast<std::size_t>(1)) % static_cast<std::size_t>(3)) == 0) {
+            return 2;
+        }
+        return 1;
+    }
+    if (((bit_position + static_cast<std::size_t>(5)) % static_cast<std::size_t>(37)) == 0) {
+        return 4;
+    }
+    return 0;
+}
+
+std::size_t VoidPayloadSampleCount(const std::string& text, std::size_t frame_samples) {
+    std::size_t sample_count = 0;
+    for (std::size_t byte_index = 0; byte_index < text.size(); ++byte_index) {
+        for (int bit_index = 0; bit_index < 8; ++bit_index) {
+            const std::size_t bit_position =
+                byte_index * static_cast<std::size_t>(8) + static_cast<std::size_t>(bit_index);
+            sample_count += VoidBitSampleCount(frame_samples, bit_position, bit_index);
+            sample_count += VoidPauseSlotCountAfterBit(bit_position, byte_index, bit_index) * frame_samples;
+        }
+    }
+    return sample_count;
+}
+
 std::size_t ExpectedFlashSampleCount(const std::string& text,
                                      const test::ConfigCase& config_case,
                                      bag_flash_signal_profile flash_signal_profile,
@@ -268,9 +316,12 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
             : frame_samples * static_cast<std::size_t>(3);
     const bool uses_litany_pauses = flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY;
     const bool uses_zeal_layout = flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_ZEAL;
+    const bool uses_void_layout = flash_voicing_flavor == BAG_FLASH_VOICING_FLAVOR_VOID;
     return (uses_zeal_layout
                 ? ZealPayloadSampleCount(text, frame_samples)
-                : text.size() * static_cast<std::size_t>(8) * payload_samples_per_bit) +
+                : uses_void_layout
+                      ? VoidPayloadSampleCount(text, frame_samples)
+                      : text.size() * static_cast<std::size_t>(8) * payload_samples_per_bit) +
            (uses_litany_pauses
                 ? LitanyPauseSampleCount(text, payload_samples_per_litany_silence_slot)
                 : static_cast<std::size_t>(0)) +

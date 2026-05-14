@@ -490,26 +490,24 @@ void TestApiFlashSignalInfoDerivedFromLayout() {
     void_info.decode_path_buffer_size = decode_buffer.size();
 
     test::AssertEq(
-        bag_describe_flash_signal(&void_encoder, "Info", &void_info),
+        bag_describe_flash_signal(&void_encoder, "InfoLoss", &void_info),
         BAG_OK,
         "void flash signal info should be derived from the core layout.");
     test::AssertEq(std::string(low_buffer.data(), void_info.low_carrier_hz_size),
-                   "220",
-                   "void low carrier info should match the slower low register.");
+                   "180 / 184 / 190 / 194 / 198 / 206 / 208 / 214 / 222 / 230",
+                   "void low carrier info should expose the downward carrier phrase.");
     test::AssertEq(std::string(high_buffer.data(), void_info.high_carrier_hz_size),
-                   "440",
-                   "void high carrier info should match the slower low register.");
+                   "360 / 368 / 380 / 388 / 396 / 412 / 416 / 428 / 444 / 460",
+                   "void high carrier info should expose the doubled downward carrier phrase.");
     test::AssertEq(std::string(bit_buffer.data(), void_info.bit_duration_samples_size),
-                   std::to_string((static_cast<std::size_t>(config_case.frame_samples) *
-                                   static_cast<std::size_t>(5)) /
-                                  static_cast<std::size_t>(2)),
-                   "void bit duration info should match the 2.5x signal timing.");
+                   "5512 / 6063 / 6615",
+                   "void bit duration info should expose baseline, tail, and loss-bit timing.");
     test::AssertEq(std::string(silence_buffer.data(), void_info.payload_silence_size),
-                   "none",
-                   "void silence info should report a continuous payload.");
+                   "1 / 2 / 4 slot gap",
+                   "void silence info should expose sparse payload gaps.");
     test::AssertEq(std::string(decode_buffer.data(), void_info.decode_path_size),
-                   "fixed low/high window",
-                   "void decode path should remain fixed-window for stability.");
+                   "variable-window gap-aware",
+                   "void decode path should report layout-aware decode.");
 }
 
 }  // namespace

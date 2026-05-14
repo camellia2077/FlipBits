@@ -71,6 +71,7 @@ PayloadFollowData BuildFlashPayloadFollowData(
         .group_index = bit_group_index,
         .bit_offset = bit_offset,
         .bit_count = 1,
+        .carrier_freq_hz = chunk.carrier_freq_hz,
     });
     ++bit_group_index;
   }

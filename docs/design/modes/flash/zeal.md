@@ -3,7 +3,7 @@
 更新时间：2026-05-03
 
 ## 情绪目标
-`Zeal` 表达高唤醒、兴奋、确信和快速宣告。它的重点是明亮、变速、密集和突然强调，但不是 Hostile 那种威胁和过载。v2 以稳定 decode 为前提，通过确定性 timing / carrier schedule 制造急促与突变。
+`Zeal` 表达高唤醒、兴奋、确信和快速宣告。它的重点是明亮、变速、密集和突然强调，但不是 Hostility 那种威胁和过载。v2 以稳定 decode 为前提，通过确定性 timing / carrier schedule 制造急促与突变。
 
 ## Signal / Timing
 - 使用 `Zeal` signal profile。
@@ -18,7 +18,7 @@
 - 更短 attack / release。
   - 每个 tone 更短促、更接近快速发声，但 signal 层仍保留足够 carrier 周期供判定。
 - 更亮 harmonic 与适中边界 accent。
-  - 二、三次谐波和 byte / nibble accent 高于 Standard，但低于 Hostile 的攻击性口径。
+  - 二、三次谐波和 byte / nibble accent 高于 Standard，但低于 Hostility 的攻击性口径。
 - 轻度 softclip 与快速 tremolo。
   - 让整体更紧、更兴奋，但不制造 Collapse 式不稳定。
 - zeal rising shell。

@@ -108,6 +108,7 @@ typedef struct bag_payload_follow_binary_group_entry {
   size_t group_index;
   size_t bit_offset;
   size_t bit_count;
+  double carrier_freq_hz;
 } bag_payload_follow_binary_group_entry;
 
 typedef struct bag_payload_follow_data {

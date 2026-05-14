@@ -1,6 +1,6 @@
 # Flash Voicing: Collapse
 
-更新时间：2026-05-03
+更新时间：2026-05-14
 
 ## 情绪目标
 `Collapse` 表达恐惧、慌张、崩溃和结巴。它不是“随机坏掉”，而是内在恐惧导致外在语音控制失败：多数时候仍能输出，但会突然卡住、重复、颤抖或短暂断开。
@@ -8,7 +8,10 @@
 ## Signal / Timing
 - 使用 `Collapse` signal profile。
 - 每个 low/high bit 基础时长仍为 `1x frame_samples`。
-- low/high carrier 为 `280 / 560 Hz`。
+- low/high carrier 不再固定为单点，而是使用 deterministic per-bit sag：
+  - low carrier 按短 phrase 下坠，范围为 `226-320 Hz`。
+  - high carrier 始终为对应 low carrier 的 `2x`，范围为 `452-640 Hz`。
+  - sag 只由 bit position、byte index 和 bit index 推导，不依赖 payload 解码结果；因此解码端可以在不知道明文的前提下复现同一 carrier schedule。
 - 不像 Litany 那样整体变慢；Collapse 的不稳定来自局部停顿和 tremor。
 
 ## Silence / Stutter
@@ -28,13 +31,16 @@ Collapse 使用 deterministic hash 触发局部结巴 cluster：
 - tremor layer。
   - `collapse_tremor_depth` 让 voiced payload 带颤抖。
   - 目标是胆怯和维持不了稳定输出。
+- per-bit carrier sag。
+  - 让 Collapse 在 Hz visual 中呈现向下泄气、恢复、再下坠的频率变化。
+  - high 仍严格跟随 low 的 `2x`，避免破坏 BFSK 的 low/high 判定关系。
 - hesitation articulation。
   - bit 尾部会有 near-silent hesitation 处理。
   - 和真实 silence cluster 配合，让音频有“说到一半泄气”的感觉。
 - release 更长、envelope floor 较高。
   - 让声音不是硬切，而像失控拖尾。
 - 金属层很弱。
-  - 避免听起来像 Hostile 的攻击。
+  - 避免听起来像 Hostility 的攻击。
 - 轻微软削波。
   - 只给崩溃边缘一点不稳定，不做强烈敌意压缩。
 - preamble / epilogue 分工。

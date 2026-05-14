@@ -125,14 +125,18 @@ std::vector<uint8_t> DecodeFormalPayloadBytes(
       MakeBfskConfigForSignalProfile(config, signal_profile);
   switch (NormalizeFormalVoicingFlavor(flavor)) {
     case FlashVoicingFlavor::kLitany:
-    case FlashVoicingFlavor::kCollapse:
       return DecodePcm16ToBytesSkippingSilence(trimmed_payload_pcm,
                                                signal_config);
+    case FlashVoicingFlavor::kCollapse:
+      return DecodePcm16ToBytesSkippingSilenceWithCarrierSchedule(
+          trimmed_payload_pcm, signal_config, flavor);
     case FlashVoicingFlavor::kZeal:
       return DecodeZealPcm16ToBytes(trimmed_payload_pcm, signal_config);
-    case FlashVoicingFlavor::kStandard:
     case FlashVoicingFlavor::kHostile:
     case FlashVoicingFlavor::kVoid:
+      return DecodePcm16ToBytesWithPayloadLayout(trimmed_payload_pcm,
+                                                 signal_config, flavor);
+    case FlashVoicingFlavor::kStandard:
     default:
       return DecodePcm16ToBytes(trimmed_payload_pcm, signal_config);
   }
