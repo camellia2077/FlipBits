@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlipBits TTS Audio Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292f;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #f6f8fa;
+        }
+        h1 { border-bottom: 1px solid #d0d7de; padding-bottom: .3em; }
+        .description { color: #57606a; margin-bottom: 20px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #d0d7de;
+        }
+        th { background-color: #f6f8fa; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        code {
+            background-color: rgba(175,184,193,0.2);
+            padding: 0.2em 0.4em;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 85%;
+        }
+        audio {
+            height: 35px;
+            vertical-align: middle;
+            width: 220px;
+        }
+        .tag {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: #e1e4e8;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>FlipBits TTS Audio Demos</h1>
+    <p class="description">逐 bit BFSK / FSK (flash) 模式不同 Style 的听感展示。</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Style</th>
+                <th>频率配置 (Hz)</th>
+                <th>输入内容</th>
+                <th>在线试听</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Litany</strong></td>
+                <td><code>220 / 440</code></td>
+                <td><span class="tag">rs</span></td>
+                <td><audio controls src="https://github.com/user-attachments/files/27785770/flash-litany-rs.wav"></audio></td>
+            </tr>
+            <tr>
+                <td><strong>Collapse</strong></td>
+                <td><code>226-320 / 452-640</code></td>
+                <td><span class="tag">github</span></td>
+                <td><audio controls src="https://github.com/user-attachments/files/27785767/flash-collapse-github.wav"></audio></td>
+            </tr>
+            <tr>
+                <td><strong>Standard</strong></td>
+                <td><code>300 / 600</code></td>
+                <td><span class="tag">github</span></td>
+                <td><audio controls src="https://github.com/user-attachments/files/27785771/flash-standard-github.wav"></audio></td>
+            </tr>
+            <tr>
+                <td><strong>Hostility</strong></td>
+                <td><code>438-536 / 876-1072</code></td>
+                <td><span class="tag">github</span></td>
+                <td><audio controls src="https://github.com/user-attachments/files/27785769/flash-hostility-github.wav"></audio></td>
+            </tr>
+            <tr>
+                <td><strong>Zeal</strong></td>
+                <td><code>560-900 / 1120-1800</code></td>
+                <td><span class="tag">github</span></td>
+                <td><audio controls src="https://github.com/user-attachments/files/27785764/flash-zeal-github.wav"></audio></td>
+            </tr>
+            <tr>
+                <td><strong>Void</strong></td>
+                <td><code>240 / 480</code></td>
+                <td><span class="tag">github</span></td>
+                <td><audio controls src="https://github.com/user-attachments/files/27785772/flash-void-github.wav"></audio></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p style="margin-top: 30px; font-size: 14px; color: #57606a;">
+        <a href="https://github.com/camellia2077/FlipBits">← 返回 GitHub 仓库</a>
+    </p>
+
+</body>
+</html>

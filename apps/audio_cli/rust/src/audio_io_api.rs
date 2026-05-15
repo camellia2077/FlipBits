@@ -136,6 +136,109 @@ unsafe extern "C" {
     fn audio_io_free_decoded_wav(decoded: *mut AudioIoDecodedWav);
 }
 
+struct ByteBufferGuard(AudioIoByteBuffer);
+
+impl ByteBufferGuard {
+    fn new() -> Self {
+        Self(AudioIoByteBuffer {
+            data: ptr::null_mut(),
+            size: 0,
+        })
+    }
+
+    fn as_mut_ptr(&mut self) -> *mut AudioIoByteBuffer {
+        &mut self.0
+    }
+
+    fn to_vec(&self) -> Vec<u8> {
+        raw_bytes_to_vec(self.0.data.cast_const(), self.0.size)
+    }
+}
+
+impl Drop for ByteBufferGuard {
+    fn drop(&mut self) {
+        unsafe {
+            // SAFETY: The native API documents that output buffers returned through
+            // `audio_io_encode_mono_pcm16_wav_with_metadata` are released with
+            // `audio_io_free_byte_buffer`. Null/empty buffers are accepted.
+            audio_io_free_byte_buffer(&mut self.0);
+        }
+    }
+}
+
+struct DecodedWavGuard(AudioIoDecodedWav);
+
+impl DecodedWavGuard {
+    fn new() -> Self {
+        Self(AudioIoDecodedWav {
+            sample_rate_hz: 0,
+            channels: 1,
+            samples: ptr::null_mut(),
+            sample_count: 0,
+            metadata_status: 1,
+            metadata: AudioIoMetadata {
+                version: 0,
+                mode: 0,
+                has_flash_voicing_style: 0,
+                flash_voicing_style: 0,
+                created_at_iso_utc: AudioIoOwnedString {
+                    data: ptr::null_mut(),
+                    size: 0,
+                },
+                duration_ms: 0,
+                sample_rate_hz: 0,
+                frame_samples: 0,
+                pcm_sample_count: 0,
+                payload_byte_count: 0,
+                input_source_kind: 0,
+                segment_count: 1,
+                segment_sample_counts: ptr::null_mut(),
+                segment_sample_count_count: 0,
+                app_version: AudioIoOwnedString {
+                    data: ptr::null_mut(),
+                    size: 0,
+                },
+                core_version: AudioIoOwnedString {
+                    data: ptr::null_mut(),
+                    size: 0,
+                },
+            },
+        })
+    }
+
+    fn as_mut_ptr(&mut self) -> *mut AudioIoDecodedWav {
+        &mut self.0
+    }
+
+    fn sample_rate_hz(&self) -> i32 {
+        self.0.sample_rate_hz
+    }
+
+    fn pcm_samples(&self) -> Vec<i16> {
+        raw_slice_to_vec(self.0.samples.cast_const(), self.0.sample_count)
+    }
+
+    fn metadata(&self) -> Result<FlipBitsMetadata, CliError> {
+        convert_metadata(&self.0.metadata)
+    }
+
+    fn metadata_status(&self) -> AudioIoMetadataStatus {
+        self.0.metadata_status
+    }
+}
+
+impl Drop for DecodedWavGuard {
+    fn drop(&mut self) {
+        unsafe {
+            // SAFETY: The native API initializes `AudioIoDecodedWav` outputs for
+            // `audio_io_decode_mono_pcm16_wav` and requires cleanup with
+            // `audio_io_free_decoded_wav`. The free function tolerates the zeroed
+            // / null state used for initialization.
+            audio_io_free_decoded_wav(&mut self.0);
+        }
+    }
+}
+
 pub fn encode_mono_pcm16_wav_with_metadata(
     sample_rate_hz: i32,
     pcm_samples: &[i16],
@@ -174,96 +277,49 @@ pub fn encode_mono_pcm16_wav_with_metadata(
             size: core_version_bytes.len(),
         },
     };
-    let mut out = AudioIoByteBuffer {
-        data: ptr::null_mut(),
-        size: 0,
-    };
+    let mut out = ByteBufferGuard::new();
     let status = unsafe {
+        // SAFETY: `pcm_samples` and the metadata string slices stay alive for the
+        // duration of the FFI call, and `out` points to writable storage for the
+        // native output buffer descriptor.
         audio_io_encode_mono_pcm16_wav_with_metadata(
             sample_rate_hz,
             pcm_samples.as_ptr(),
             pcm_samples.len(),
             &raw_metadata,
-            &mut out,
+            out.as_mut_ptr(),
         )
     };
     if status != AUDIO_IO_WAV_OK {
-        return Err(CliError::Api(c_str_to_string(unsafe {
-            audio_io_wav_status_message(status)
-        })));
+        return Err(CliError::Api(wav_status_message(status)));
     }
 
-    let bytes = unsafe { std::slice::from_raw_parts(out.data as *const u8, out.size).to_vec() };
-    unsafe {
-        audio_io_free_byte_buffer(&mut out);
-    }
-    Ok(bytes)
+    Ok(out.to_vec())
 }
 
 pub fn decode_mono_pcm16_wav(wav_bytes: &[u8]) -> Result<DecodedWav, CliError> {
-    let mut out = AudioIoDecodedWav {
-        sample_rate_hz: 0,
-        channels: 1,
-        samples: ptr::null_mut(),
-        sample_count: 0,
-        metadata_status: 1,
-        metadata: AudioIoMetadata {
-            version: 0,
-            mode: 0,
-            has_flash_voicing_style: 0,
-            flash_voicing_style: 0,
-            created_at_iso_utc: AudioIoOwnedString {
-                data: ptr::null_mut(),
-                size: 0,
-            },
-            duration_ms: 0,
-            sample_rate_hz: 0,
-            frame_samples: 0,
-            pcm_sample_count: 0,
-            payload_byte_count: 0,
-            input_source_kind: 0,
-            segment_count: 1,
-            segment_sample_counts: ptr::null_mut(),
-            segment_sample_count_count: 0,
-            app_version: AudioIoOwnedString {
-                data: ptr::null_mut(),
-                size: 0,
-            },
-            core_version: AudioIoOwnedString {
-                data: ptr::null_mut(),
-                size: 0,
-            },
-        },
+    let mut out = DecodedWavGuard::new();
+    let wav_status = unsafe {
+        // SAFETY: `wav_bytes` is a valid immutable byte slice for the duration of
+        // the call, and `out` points to writable storage for the native decoded
+        // result descriptor.
+        audio_io_decode_mono_pcm16_wav(wav_bytes.as_ptr(), wav_bytes.len(), out.as_mut_ptr())
     };
-    let wav_status =
-        unsafe { audio_io_decode_mono_pcm16_wav(wav_bytes.as_ptr(), wav_bytes.len(), &mut out) };
     if wav_status != AUDIO_IO_WAV_OK {
-        unsafe {
-            audio_io_free_decoded_wav(&mut out);
-        }
-        return Err(CliError::Api(c_str_to_string(unsafe {
-            audio_io_wav_status_message(wav_status)
-        })));
+        return Err(CliError::Api(wav_status_message(wav_status)));
     }
 
-    let pcm_samples =
-        unsafe { std::slice::from_raw_parts(out.samples as *const i16, out.sample_count).to_vec() };
-    let metadata = if out.metadata_status == AUDIO_IO_METADATA_OK {
-        let converted = convert_metadata(&out.metadata)?;
-        Ok(converted)
+    let pcm_samples = out.pcm_samples();
+    let metadata = if out.metadata_status() == AUDIO_IO_METADATA_OK {
+        Ok(out.metadata()?)
     } else {
-        Err(c_str_to_string(unsafe {
-            audio_io_metadata_status_message(out.metadata_status)
-        }))
+        Err(metadata_status_message(out.metadata_status()))
     };
     let decoded = DecodedWav {
-        sample_rate_hz: out.sample_rate_hz,
+        sample_rate_hz: out.sample_rate_hz(),
         pcm_samples,
         metadata,
     };
-    unsafe {
-        audio_io_free_decoded_wav(&mut out);
-    }
     Ok(decoded)
 }
 
@@ -325,8 +381,47 @@ fn owned_string_to_string(raw: &AudioIoOwnedString) -> String {
     if raw.data.is_null() || raw.size == 0 {
         String::new()
     } else {
-        let bytes = unsafe { std::slice::from_raw_parts(raw.data as *const u8, raw.size) };
+        let bytes = raw_slice(raw.data.cast_const().cast::<u8>(), raw.size);
         String::from_utf8_lossy(bytes).into_owned()
+    }
+}
+
+fn wav_status_message(status: AudioIoWavStatus) -> String {
+    let raw = unsafe {
+        // SAFETY: The native function returns a process-lifetime message pointer
+        // for any status code value.
+        audio_io_wav_status_message(status)
+    };
+    c_str_to_string(raw)
+}
+
+fn metadata_status_message(status: AudioIoMetadataStatus) -> String {
+    let raw = unsafe {
+        // SAFETY: The native function returns a process-lifetime message pointer
+        // for any metadata status code value.
+        audio_io_metadata_status_message(status)
+    };
+    c_str_to_string(raw)
+}
+
+fn raw_bytes_to_vec(data: *const u8, size: usize) -> Vec<u8> {
+    raw_slice(data, size).to_vec()
+}
+
+fn raw_slice_to_vec<T: Copy>(data: *const T, size: usize) -> Vec<T> {
+    raw_slice(data, size).to_vec()
+}
+
+fn raw_slice<'a, T>(data: *const T, size: usize) -> &'a [T] {
+    if data.is_null() || size == 0 {
+        &[]
+    } else {
+        unsafe {
+            // SAFETY: Callers only pass pointers/lengths obtained from the native
+            // `audio_io` API, which guarantees readable contiguous storage for the
+            // reported element count until the matching free function runs.
+            std::slice::from_raw_parts(data, size)
+        }
     }
 }
 
