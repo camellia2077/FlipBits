@@ -22,7 +22,7 @@ def register_cli_group(
             "- Always uses the repository-supported target triple x86_64-pc-windows-gnu.\n"
             "- On Windows, uses the GNU-host Rust toolchain stable-x86_64-pc-windows-gnu.\n"
             "- `build` maps to `cargo build`.\n"
-            "- `test` maps to `cargo test`.\n\n"
+            "- `test` runs `cargo clippy -- -W clippy::undocumented_unsafe_blocks` and then `cargo test`.\n\n"
             "Version workflow:\n"
             "- `bump-version <version>` updates apps/audio_cli/rust/Cargo.toml.\n"
             "- Cargo.lock is refreshed by Cargo; do not edit Cargo.lock by hand.\n\n"

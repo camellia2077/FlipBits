@@ -39,6 +39,7 @@ jobs:
         with:
           toolchain: stable-x86_64-pc-windows-gnu
           targets: x86_64-pc-windows-gnu
+          components: clippy
 
       - name: Install Python tooling dependencies
         shell: pwsh
@@ -88,3 +89,11 @@ jobs:
         run: |
           $env:PATH = "${{ steps.msys2.outputs.msys2-location }}\ucrt64\bin;${{ steps.msys2.outputs.msys2-location }}\usr\bin;$env:PATH"
           python tools/run.py verify --build-dir build/dev --skip-android
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs
+          path: build/test-artifacts/reports/
+          if-no-files-found: warn

@@ -63,6 +63,16 @@ def _print_verify_banner(message: str) -> None:
     print(f"\n[verify] {message}", flush=True)
 
 
+def _rust_cli_cargo_command(action: str) -> list[str]:
+    command = ["cargo"]
+    if os.name == "nt":
+        command.append(f"+{RUST_CLI_WINDOWS_TOOLCHAIN}")
+    command.extend([action, "--target", RUST_TARGET_TRIPLE])
+    if action == "clippy":
+        command.extend(["--", "-W", "clippy::undocumented_unsafe_blocks"])
+    return command
+
+
 def format_verify_check_groups() -> str:
     lines = ["Current static check groups run before configure/build/test:"]
     for name, description, subchecks in VERIFY_CHECK_GROUPS:
@@ -125,20 +135,13 @@ def run_verify_steps(
         )
     )
 
-    _print_verify_banner(f"{test_step}: running cargo test for Rust CLI and ctest in {build_dir}")
+    _print_verify_banner(
+        f"{test_step}: running cargo clippy, cargo test for Rust CLI, and ctest in {build_dir}"
+    )
     cargo_env = os.environ.copy()
     cargo_env["FLIPBITS_CMAKE_BUILD_DIR"] = str(build_dir)
-    cargo_command = ["cargo"]
-    if os.name == "nt":
-        cargo_command.append(f"+{RUST_CLI_WINDOWS_TOOLCHAIN}")
-    cargo_command.extend(
-        [
-            "test",
-            "--target",
-            RUST_TARGET_TRIPLE,
-        ]
-    )
-    run(cargo_command, cwd=RUST_CLI_DIR, env=cargo_env)
+    run(_rust_cli_cargo_command("clippy"), cwd=RUST_CLI_DIR, env=cargo_env)
+    run(_rust_cli_cargo_command("test"), cwd=RUST_CLI_DIR, env=cargo_env)
     cmd_test(
         argparse.Namespace(
             build_dir=str(build_dir),

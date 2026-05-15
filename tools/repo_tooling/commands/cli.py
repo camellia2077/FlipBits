@@ -39,12 +39,10 @@ def cmd_cli(args: argparse.Namespace) -> None:
     cargo_env["FLIPBITS_CMAKE_BUILD_DIR"] = str(build_dir)
     cargo_env["CARGO_TARGET_DIR"] = str(_cargo_target_dir(build_dir))
 
-    command = ["cargo"]
-    if os.name == "nt":
-        command.append(f"+{RUST_CLI_WINDOWS_TOOLCHAIN}")
-    command.extend([args.action, "--target", RUST_CLI_TARGET_TRIPLE])
-    if args.release:
-        command.append("--release")
+    if args.action == "test":
+        run(_cargo_command("clippy", release=args.release), cwd=CLI_RUST_DIR, env=cargo_env)
+
+    command = _cargo_command(args.action, release=args.release)
 
     run(command, cwd=CLI_RUST_DIR, env=cargo_env)
 
@@ -77,6 +75,18 @@ def bump_cli_version(version: str) -> None:
 
 def _cargo_target_dir(build_dir: Path) -> Path:
     return build_dir / "rust-cli" / "target"
+
+
+def _cargo_command(action: str, *, release: bool) -> list[str]:
+    command = ["cargo"]
+    if os.name == "nt":
+        command.append(f"+{RUST_CLI_WINDOWS_TOOLCHAIN}")
+    command.extend([action, "--target", RUST_CLI_TARGET_TRIPLE])
+    if release:
+        command.append("--release")
+    if action == "clippy":
+        command.extend(["--", "-W", "clippy::undocumented_unsafe_blocks"])
+    return command
 
 
 def _cargo_artifact_path(*, build_dir: Path, release: bool) -> Path:

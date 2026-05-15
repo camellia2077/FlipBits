@@ -79,3 +79,14 @@ jobs:
       - name: Assemble Android debug build
         shell: bash
         run: python tools/run.py android assemble-debug
+
+      - name: Upload Android assemble artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-assemble-artifacts
+          path: |
+            apps/audio_android/app/build/outputs/apk/debug/
+            apps/audio_android/app/build/reports/
+            temp/translation_key_alignment_reports/
+          if-no-files-found: warn

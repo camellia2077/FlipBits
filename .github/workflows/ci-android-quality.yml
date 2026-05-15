@@ -70,3 +70,13 @@ jobs:
       - name: Run Android quality gate
         shell: bash
         run: python tools/run.py android quality
+
+      - name: Upload Android quality artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-quality-artifacts
+          path: |
+            apps/audio_android/app/build/reports/
+            temp/translation_key_alignment_reports/
+          if-no-files-found: warn

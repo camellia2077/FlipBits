@@ -120,12 +120,12 @@ void TestFlashSignalStyleAwareChunkSizeMatchesConfig() {
         "hostile flash signal should use the faster 7/8 bit timing profile.");
     test::AssertEq(
         hostile_signal.low_freq_hz,
-        450.0,
-        "hostile flash signal should use the aggressive high-tension low carrier.");
+        559.0,
+        "hostile flash signal should expose the nominal aggressive low carrier for the jittered hostile band.");
     test::AssertEq(
         hostile_signal.high_freq_hz,
-        900.0,
-        "hostile flash signal should use the aggressive high-tension high carrier.");
+        1118.0,
+        "hostile flash signal should expose the nominal aggressive high carrier for the jittered hostile band.");
     test::AssertEq(
         collapse_signal.samples_per_bit,
         static_cast<std::size_t>(2205),
@@ -202,8 +202,8 @@ void TestFlashSignalExplicitProfileSelectsEmotionTiming() {
         "Explicit hostile signal profile should keep the faster hostile timing when requested.");
     test::AssertEq(
         explicit_hostile_signal.low_freq_hz,
-        450.0,
-        "Explicit hostile signal profile should keep hostile carrier tuning.");
+        559.0,
+        "Explicit hostile signal profile should keep the nominal hostile carrier tuning.");
     test::AssertEq(
         explicit_collapse_signal.samples_per_bit,
         static_cast<std::size_t>(2205),
