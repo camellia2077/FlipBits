@@ -70,6 +70,20 @@ std::string JoinTextTokens(const std::vector<std::string>& tokens) {
   return out;
 }
 
+std::string JoinCharacterTexts(
+    const std::vector<bag::TextFollowCharacterEntry>& characters) {
+  if (characters.empty()) {
+    return {};
+  }
+
+  std::string out;
+  out.reserve(JoinedCharacterTextsSize(characters));
+  for (const auto& character : characters) {
+    out.append(character.text);
+  }
+  return out;
+}
+
 std::size_t JoinedTextTokensSize(const std::vector<std::string>& tokens) {
   if (tokens.empty()) {
     return 0;
@@ -80,6 +94,15 @@ std::size_t JoinedTextTokensSize(const std::vector<std::string>& tokens) {
     total_size += token.size();
   }
   return total_size + tokens.size() - static_cast<std::size_t>(1);
+}
+
+std::size_t JoinedCharacterTextsSize(
+    const std::vector<bag::TextFollowCharacterEntry>& characters) {
+  std::size_t total_size = 0;
+  for (const auto& character : characters) {
+    total_size += character.text.size();
+  }
+  return total_size;
 }
 
 bag_decode_content_status CopyStringToApiBuffer(std::string_view input,
@@ -146,4 +169,20 @@ bag_decode_content_status CopyJoinedTextTokensToApi(
     return BAG_DECODE_CONTENT_STATUS_BUFFER_TOO_SMALL;
   }
   return CopyStringToApiBuffer(JoinTextTokens(tokens), buffer, buffer_size);
+}
+
+bag_decode_content_status CopyJoinedCharacterTextsToApi(
+    const std::vector<bag::TextFollowCharacterEntry>& characters, char* buffer,
+    std::size_t buffer_size) {
+  if (characters.empty()) {
+    return CopyStringToApiBuffer({}, buffer, buffer_size);
+  }
+  if (buffer == nullptr) {
+    return BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+  }
+  if (buffer_size == 0) {
+    return BAG_DECODE_CONTENT_STATUS_BUFFER_TOO_SMALL;
+  }
+  return CopyStringToApiBuffer(JoinCharacterTexts(characters), buffer,
+                               buffer_size);
 }

@@ -134,6 +134,28 @@ typedef struct bag_text_follow_token_entry {
   size_t text_size;
 } bag_text_follow_token_entry;
 
+// Character-level follow semantics inside a token. Consumers should use this
+// together with text_offset/text_size to decide whether a character is visible
+// text or a separator that only needs timing/layout ownership.
+typedef enum bag_text_follow_character_kind {
+  BAG_TEXT_FOLLOW_CHARACTER_KIND_VISIBLE = 0,         // Visible glyphs.
+  BAG_TEXT_FOLLOW_CHARACTER_KIND_SPACE = 1,           // Space-like separators.
+  BAG_TEXT_FOLLOW_CHARACTER_KIND_NEWLINE = 2,         // Attached newline separators.
+  BAG_TEXT_FOLLOW_CHARACTER_KIND_SEPARATOR_OTHER = 3  // Other non-visible separators.
+} bag_text_follow_character_kind;
+
+typedef struct bag_text_follow_character_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t token_index;
+  size_t character_index_within_token;
+  size_t byte_index_within_token;
+  size_t byte_count;
+  bag_text_follow_character_kind kind;
+  size_t text_offset;
+  size_t text_size;
+} bag_text_follow_character_entry;
+
 typedef struct bag_text_follow_raw_segment_entry {
   size_t start_sample;
   size_t sample_count;
@@ -149,6 +171,11 @@ typedef struct bag_text_follow_raw_display_unit_entry {
   size_t byte_index_within_token;
   size_t byte_offset;
   size_t byte_count;
+  size_t character_index_within_token;
+  size_t byte_index_within_character;
+  size_t character_byte_count;
+  int is_character_start;
+  int is_character_end;
 } bag_text_follow_raw_display_unit_entry;
 
 typedef struct bag_text_follow_lyric_line_entry {
@@ -180,6 +207,14 @@ typedef struct bag_text_follow_data {
   size_t text_token_timeline_buffer_count;
   size_t text_token_timeline_count;
   bag_decode_content_status text_token_timeline_status;
+  char* text_character_text_buffer;
+  size_t text_character_text_buffer_size;
+  size_t text_character_text_size;
+  bag_decode_content_status text_character_text_status;
+  bag_text_follow_character_entry* text_characters_buffer;
+  size_t text_characters_buffer_count;
+  size_t text_characters_count;
+  bag_decode_content_status text_characters_status;
   bag_text_follow_raw_segment_entry* token_raw_segments_buffer;
   size_t token_raw_segments_buffer_count;
   size_t token_raw_segments_count;
@@ -281,7 +316,9 @@ typedef struct bag_encode_result_layout {
   size_t byte_timeline_count;
   size_t binary_group_timeline_count;
   size_t text_tokens_size;
+  size_t text_character_text_size;
   size_t text_token_timeline_count;
+  size_t text_characters_count;
   size_t token_raw_segments_count;
   size_t token_raw_display_units_count;
   size_t lyric_lines_size;

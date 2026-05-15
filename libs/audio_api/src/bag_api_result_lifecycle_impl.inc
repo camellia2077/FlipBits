@@ -23,10 +23,20 @@ void ClearApiTextFollowData(bag_text_follow_data* out_text_follow) {
       out_text_follow->text_tokens_buffer_size > 0) {
     out_text_follow->text_tokens_buffer[0] = '\0';
   }
+  if (out_text_follow->text_character_text_buffer != nullptr &&
+      out_text_follow->text_character_text_buffer_size > 0) {
+    out_text_follow->text_character_text_buffer[0] = '\0';
+  }
   out_text_follow->text_tokens_size = 0;
   out_text_follow->text_tokens_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_text_follow->text_token_timeline_count = 0;
   out_text_follow->text_token_timeline_status =
+      BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+  out_text_follow->text_character_text_size = 0;
+  out_text_follow->text_character_text_status =
+      BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+  out_text_follow->text_characters_count = 0;
+  out_text_follow->text_characters_status =
       BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_text_follow->token_raw_segments_count = 0;
   out_text_follow->token_raw_segments_status =

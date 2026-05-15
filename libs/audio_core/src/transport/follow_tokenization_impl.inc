@@ -9,6 +9,7 @@ struct TextTokenSpec {
   std::size_t display_unit_count = 0;
   std::uint32_t tail_code_point = 0;
   std::string joiner_after;
+  std::string trailing_separator_text;
   bool force_line_break_after = false;
 };
 
@@ -213,6 +214,11 @@ std::vector<TextTokenSpec> TokenizeTextForFollow(std::string_view text) {
     if (segment_begin >= segment_end) {
       return;
     }
+    // Tokenization is the first layer of the contract:
+    // - Latin/Cyrillic-like runs stay word-grouped until punctuation/whitespace.
+    // - CJK-containing runs split visible non-punctuation code points per character.
+    // The later character/byte layer must preserve this tokenization instead of
+    // re-deciding it in Android.
     bool contains_cjk = false;
     for (std::size_t index = segment_begin; index < segment_end; ++index) {
       contains_cjk = contains_cjk || IsCjkCodePoint(slices[index].code_point);
@@ -222,7 +228,13 @@ std::vector<TextTokenSpec> TokenizeTextForFollow(std::string_view text) {
         slices.data() + segment_begin, segment_end - segment_begin,
         contains_cjk);
     if (pending_whitespace_bytes > 0 && !tokens.empty()) {
+      // Whitespace is not emitted as its own text token, but it still owns raw
+      // payload bytes. Attach those bytes to the preceding token so the
+      // token/byte timeline remains contiguous, and preserve the literal
+      // separator text for lyric-line reconstruction plus character/byte
+      // mapping of trailing separators.
       tokens.back().covered_byte_count += pending_whitespace_bytes;
+      tokens.back().trailing_separator_text = pending_separator;
       tokens.back().joiner_after =
           pending_contains_newline ? "" : pending_separator;
       tokens.back().force_line_break_after = pending_contains_newline;
@@ -249,6 +261,7 @@ std::vector<TextTokenSpec> TokenizeTextForFollow(std::string_view text) {
 
   if (pending_whitespace_bytes > 0 && !tokens.empty()) {
     tokens.back().covered_byte_count += pending_whitespace_bytes;
+    tokens.back().trailing_separator_text = pending_separator;
     tokens.back().joiner_after =
         pending_contains_newline ? "" : pending_separator;
     tokens.back().force_line_break_after = pending_contains_newline;

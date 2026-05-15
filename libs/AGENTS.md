@@ -18,6 +18,9 @@
 - 改 `bag_api`、稳定 ABI、Android/CLI 边界或兼容层：
   - `docs/architecture/compatibility-layer-inventory.md`
   - `docs/architecture/repo-map.md`
+- 改 `text follow` / `token-character-byte` 解析或显示契约：
+  - `docs/architecture/text-follow-contract.md`
+  - `docs/architecture/repo-map.md`
 - 改 WAV / I/O：
   - `docs/architecture/repo-map.md`
   - `docs/testing.md`

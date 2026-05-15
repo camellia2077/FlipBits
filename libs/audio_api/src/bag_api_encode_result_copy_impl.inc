@@ -38,8 +38,12 @@ void FillEncodeResultLayout(const bag::EncodedPcmFollowResult& result,
       result.follow_data.binary_group_timeline.size();
   out_layout->text_tokens_size =
       JoinedTextTokensSize(result.text_follow_data.text_tokens);
+  out_layout->text_character_text_size =
+      JoinedCharacterTextsSize(result.text_follow_data.text_characters);
   out_layout->text_token_timeline_count =
       result.text_follow_data.text_token_timeline.size();
+  out_layout->text_characters_count =
+      result.text_follow_data.text_characters.size();
   out_layout->token_raw_segments_count =
       result.text_follow_data.token_raw_segments.size();
   out_layout->token_raw_display_units_count =

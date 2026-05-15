@@ -904,6 +904,10 @@ void TestApiBuildEncodeFollowDataMatchesStructuredEncode() {
                 follow_only_result.text_follow_data.text_token_timeline_count,
                 "Follow-only metadata build should preserve text token timeline count.");
             test::AssertEq(
+                structured_result.text_follow_data.text_characters_count,
+                follow_only_result.text_follow_data.text_characters_count,
+                "Follow-only metadata build should preserve character timeline count.");
+            test::AssertEq(
                 structured_result.text_follow_data.token_raw_display_units_count,
                 follow_only_result.text_follow_data.token_raw_display_units_count,
                 "Follow-only metadata build should preserve raw display units.");
@@ -1341,8 +1345,10 @@ void TestApiStructuredEncodePublishesCjkTextFollow() {
     const auto config_case = test::ConfigCases().front();
     const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_ULTRA);
     std::array<char, 256> text_tokens_buffer{};
+    std::array<char, 256> text_character_text_buffer{};
     std::array<char, 256> lyric_lines_buffer{};
     std::array<bag_text_follow_token_entry, 32> text_entries{};
+    std::array<bag_text_follow_character_entry, 32> text_characters{};
     std::array<bag_text_follow_raw_segment_entry, 32> text_raw_segments{};
     std::array<bag_text_follow_raw_display_unit_entry, 32> text_raw_display_units{};
     std::array<bag_text_follow_lyric_line_entry, 32> lyric_line_entries{};
@@ -1355,10 +1361,16 @@ void TestApiStructuredEncodePublishesCjkTextFollow() {
     bag_encode_result result{};
     result.text_follow_data.text_tokens_buffer = text_tokens_buffer.data();
     result.text_follow_data.text_tokens_buffer_size = text_tokens_buffer.size();
+    result.text_follow_data.text_character_text_buffer =
+        text_character_text_buffer.data();
+    result.text_follow_data.text_character_text_buffer_size =
+        text_character_text_buffer.size();
     result.text_follow_data.lyric_lines_buffer = lyric_lines_buffer.data();
     result.text_follow_data.lyric_lines_buffer_size = lyric_lines_buffer.size();
     result.text_follow_data.text_token_timeline_buffer = text_entries.data();
     result.text_follow_data.text_token_timeline_buffer_count = text_entries.size();
+    result.text_follow_data.text_characters_buffer = text_characters.data();
+    result.text_follow_data.text_characters_buffer_count = text_characters.size();
     result.text_follow_data.token_raw_segments_buffer = text_raw_segments.data();
     result.text_follow_data.token_raw_segments_buffer_count = text_raw_segments.size();
     result.text_follow_data.token_raw_display_units_buffer = text_raw_display_units.data();
@@ -1394,6 +1406,14 @@ void TestApiStructuredEncodePublishesCjkTextFollow() {
         tokens.size(),
         "CJK text follow should align one timeline entry per character token.");
     test::AssertEq(
+        result.text_follow_data.text_characters_count,
+        static_cast<std::size_t>(2),
+        "CJK text follow should publish one character entry per visible token.");
+    test::AssertEq(
+        result.text_follow_data.text_character_text_status,
+        BAG_DECODE_CONTENT_STATUS_OK,
+        "Character text buffer should be populated for offset/size decoding.");
+    test::AssertEq(
         result.text_follow_data.token_raw_segments_count,
         tokens.size(),
         "CJK text follow should publish one raw segment per character token.");
@@ -1417,6 +1437,12 @@ void TestApiStructuredEncodePublishesCjkTextFollow() {
                    "Each UTF-8 CJK token should map to its three-byte payload span.");
     test::AssertEq(text_raw_segments[1].byte_offset, static_cast<std::size_t>(3),
                    "Second UTF-8 CJK token should start after the first byte span.");
+    test::AssertEq(
+        std::string(text_character_text_buffer.data() +
+                        text_characters[0].text_offset,
+                    text_characters[0].text_size),
+        test::Utf8Literal(u8"神"),
+        "Character text offsets should resolve the first UTF-8 CJK glyph.");
     test::AssertEq(text_raw_display_units[2].token_index, static_cast<std::size_t>(0),
                    "First CJK token should own its third byte-sized display unit.");
     test::AssertEq(text_raw_display_units[3].token_index, static_cast<std::size_t>(1),
@@ -1425,6 +1451,264 @@ void TestApiStructuredEncodePublishesCjkTextFollow() {
                    "New token display units should reset their local byte index.");
 
     bag_free_encode_result(&result);
+}
+
+void TestApiStructuredEncodePublishesCharacterAndByteBoundariesAcrossScripts() {
+    const auto config_case = test::ConfigCases().front();
+
+    const auto run_case =
+        [&](bag_transport_mode mode,
+            const std::string& input,
+            const std::vector<std::string>& expected_tokens,
+            std::size_t expected_character_count,
+            std::size_t expected_raw_display_unit_count,
+            auto&& verify_units) {
+            const auto encoder_config = MakeEncoderConfig(config_case, mode);
+            std::vector<char> text_tokens_buffer(input.size() * 4 + 32, '\0');
+            std::vector<char> text_character_text_buffer(input.size() * 4 + 32, '\0');
+            std::vector<char> lyric_lines_buffer(input.size() * 4 + 32, '\0');
+            std::vector<bag_text_follow_token_entry> text_entries(input.size() + 8);
+            std::vector<bag_text_follow_character_entry> text_characters(
+                input.size() + 8);
+            std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(
+                input.size() + 8);
+            std::vector<bag_text_follow_raw_display_unit_entry>
+                text_raw_display_units(input.size() * 4 + 16);
+            std::vector<bag_text_follow_lyric_line_entry> lyric_line_entries(
+                input.size() + 8);
+            std::vector<bag_text_follow_line_token_range_entry> line_token_ranges(
+                input.size() + 8);
+            std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments(
+                input.size() + 8);
+            std::vector<char> raw_hex_buffer(input.size() * 8 + 64, '\0');
+            std::vector<char> raw_bits_buffer(input.size() * 48 + 64, '\0');
+            std::vector<bag_payload_follow_byte_entry> byte_entries(
+                input.size() * 4 + 16);
+            std::vector<bag_payload_follow_binary_group_entry> binary_entries(
+                input.size() * 16 + 32);
+            bag_encode_result result{};
+            result.text_follow_data.text_tokens_buffer = text_tokens_buffer.data();
+            result.text_follow_data.text_tokens_buffer_size =
+                text_tokens_buffer.size();
+            result.text_follow_data.text_character_text_buffer =
+                text_character_text_buffer.data();
+            result.text_follow_data.text_character_text_buffer_size =
+                text_character_text_buffer.size();
+            result.text_follow_data.lyric_lines_buffer =
+                lyric_lines_buffer.data();
+            result.text_follow_data.lyric_lines_buffer_size =
+                lyric_lines_buffer.size();
+            result.text_follow_data.text_token_timeline_buffer =
+                text_entries.data();
+            result.text_follow_data.text_token_timeline_buffer_count =
+                text_entries.size();
+            result.text_follow_data.text_characters_buffer =
+                text_characters.data();
+            result.text_follow_data.text_characters_buffer_count =
+                text_characters.size();
+            result.text_follow_data.token_raw_segments_buffer =
+                text_raw_segments.data();
+            result.text_follow_data.token_raw_segments_buffer_count =
+                text_raw_segments.size();
+            result.text_follow_data.token_raw_display_units_buffer =
+                text_raw_display_units.data();
+            result.text_follow_data.token_raw_display_units_buffer_count =
+                text_raw_display_units.size();
+            result.text_follow_data.lyric_line_timeline_buffer =
+                lyric_line_entries.data();
+            result.text_follow_data.lyric_line_timeline_buffer_count =
+                lyric_line_entries.size();
+            result.text_follow_data.line_token_ranges_buffer =
+                line_token_ranges.data();
+            result.text_follow_data.line_token_ranges_buffer_count =
+                line_token_ranges.size();
+            result.text_follow_data.line_raw_segments_buffer =
+                line_raw_segments.data();
+            result.text_follow_data.line_raw_segments_buffer_count =
+                line_raw_segments.size();
+            result.raw_bytes_hex_buffer = raw_hex_buffer.data();
+            result.raw_bytes_hex_buffer_size = raw_hex_buffer.size();
+            result.raw_bits_binary_buffer = raw_bits_buffer.data();
+            result.raw_bits_binary_buffer_size = raw_bits_buffer.size();
+            result.follow_data.byte_timeline_buffer = byte_entries.data();
+            result.follow_data.byte_timeline_buffer_count = byte_entries.size();
+            result.follow_data.binary_group_timeline_buffer =
+                binary_entries.data();
+            result.follow_data.binary_group_timeline_buffer_count =
+                binary_entries.size();
+
+            test::AssertEq(
+                bag_encode_text_with_follow(&encoder_config, input.c_str(), &result),
+                BAG_OK,
+                "Structured encode should succeed for character-boundary validation.");
+            test::AssertEq(
+                result.text_follow_data.text_characters_status,
+                BAG_DECODE_CONTENT_STATUS_OK,
+                "Character-level text follow should be published.");
+            test::AssertEq(
+                result.text_follow_data.text_character_text_status,
+                BAG_DECODE_CONTENT_STATUS_OK,
+                "Joined character text should be available for offset/size decoding.");
+            test::AssertEq(
+                result.text_follow_data.text_characters_count,
+                expected_character_count,
+                "Character-level text follow should publish the expected number of characters.");
+            test::AssertEq(
+                result.text_follow_data.token_raw_display_units_count,
+                expected_raw_display_unit_count,
+                "Byte-level display units should still align one entry per payload byte.");
+
+            const auto tokens = SplitLineSeparatedTokens(
+                std::string(text_tokens_buffer.data(),
+                            result.text_follow_data.text_tokens_size));
+            test::AssertEq(
+                tokens.size(),
+                expected_tokens.size(),
+                "Tokenization should remain stable while publishing character metadata.");
+            for (std::size_t index = 0; index < expected_tokens.size(); ++index) {
+                test::AssertEq(tokens[index], expected_tokens[index],
+                               "Token text should preserve the tokenizer contract.");
+            }
+
+            verify_units(text_characters, text_raw_display_units, result,
+                         text_character_text_buffer);
+            bag_free_encode_result(&result);
+        };
+
+    run_case(
+        BAG_TRANSPORT_PRO,
+        "hello world",
+        {"hello", "world"},
+        static_cast<std::size_t>(11),
+        static_cast<std::size_t>(11),
+        [&](const auto& text_characters,
+            const auto& text_raw_display_units,
+            const bag_encode_result& result,
+            const auto& text_character_text_buffer) {
+            test::AssertEq(
+                result.text_follow_data.text_characters_count,
+                static_cast<std::size_t>(11),
+                "Latin word tokens should publish visible letters plus the attached separator.");
+            test::AssertEq(
+                text_characters[0].text_size,
+                static_cast<std::size_t>(1),
+                "Latin characters should keep single-byte text spans.");
+            test::AssertEq(
+                text_characters[5].kind,
+                BAG_TEXT_FOLLOW_CHARACTER_KIND_SPACE,
+                "Trailing spaces should publish their own separator character kind.");
+            test::AssertEq(
+                std::string(text_character_text_buffer.data() +
+                                text_characters[5].text_offset,
+                            text_characters[5].text_size),
+                std::string(" "),
+                "Separator characters should roundtrip through the joined character text buffer.");
+            test::AssertEq(
+                text_raw_display_units[0].character_byte_count,
+                static_cast<std::size_t>(1),
+                "ASCII bytes should report single-byte characters.");
+            test::AssertEq(
+                text_raw_display_units[0].byte_index_within_character,
+                static_cast<std::size_t>(0),
+                "ASCII characters should start at the first byte within their character.");
+            test::AssertEq(
+                text_raw_display_units[0].is_character_start,
+                1,
+                "ASCII bytes should mark character starts.");
+            test::AssertEq(
+                text_raw_display_units[0].is_character_end,
+                1,
+                "ASCII bytes should also mark character ends.");
+            test::AssertEq(
+                text_raw_display_units[5].token_index,
+                static_cast<std::size_t>(0),
+                "The separator byte should remain attached to the first token payload span.");
+            test::AssertEq(
+                text_raw_display_units[5].character_byte_count,
+                static_cast<std::size_t>(1),
+                "The separator byte should still publish a stable single-byte boundary.");
+        });
+
+    run_case(
+        BAG_TRANSPORT_ULTRA,
+        test::Utf8Literal(u8"中文测试"),
+        {
+            test::Utf8Literal(u8"中"),
+            test::Utf8Literal(u8"文"),
+            test::Utf8Literal(u8"测"),
+            test::Utf8Literal(u8"试"),
+        },
+        static_cast<std::size_t>(4),
+        static_cast<std::size_t>(12),
+        [&](const auto& text_characters,
+            const auto& text_raw_display_units,
+            const bag_encode_result&,
+            const auto&) {
+            test::AssertEq(
+                text_characters[0].byte_count,
+                static_cast<std::size_t>(3),
+                "Each UTF-8 CJK character entry should span three bytes.");
+            test::AssertEq(
+                text_raw_display_units[0].character_byte_count,
+                static_cast<std::size_t>(3),
+                "CJK byte units should publish the full character byte width.");
+            test::AssertEq(
+                text_raw_display_units[0].byte_index_within_character,
+                static_cast<std::size_t>(0),
+                "The first UTF-8 byte should start the character.");
+            test::AssertEq(
+                text_raw_display_units[1].byte_index_within_character,
+                static_cast<std::size_t>(1),
+                "The second UTF-8 byte should advance within the character.");
+            test::AssertEq(
+                text_raw_display_units[2].byte_index_within_character,
+                static_cast<std::size_t>(2),
+                "The third UTF-8 byte should complete the character.");
+            test::AssertEq(
+                text_raw_display_units[0].is_character_start,
+                1,
+                "The first CJK byte should mark character start.");
+            test::AssertEq(
+                text_raw_display_units[2].is_character_end,
+                1,
+                "The third CJK byte should mark character end.");
+        });
+
+    run_case(
+        BAG_TRANSPORT_ULTRA,
+        test::Utf8Literal(u8"A中B"),
+        {"A", test::Utf8Literal(u8"中"), "B"},
+        static_cast<std::size_t>(3),
+        static_cast<std::size_t>(5),
+        [&](const auto& text_characters,
+            const auto& text_raw_display_units,
+            const bag_encode_result&,
+            const auto&) {
+            test::AssertEq(
+                text_characters[0].byte_count,
+                static_cast<std::size_t>(1),
+                "Mixed text should preserve single-byte ASCII character spans.");
+            test::AssertEq(
+                text_characters[1].byte_count,
+                static_cast<std::size_t>(3),
+                "Mixed text should preserve three-byte UTF-8 CJK spans.");
+            test::AssertEq(
+                text_characters[2].byte_count,
+                static_cast<std::size_t>(1),
+                "Mixed text should preserve the trailing ASCII span.");
+            test::AssertEq(
+                text_raw_display_units[1].character_byte_count,
+                static_cast<std::size_t>(3),
+                "The CJK byte range in mixed text should still publish a three-byte span.");
+            test::AssertEq(
+                text_raw_display_units[3].byte_index_within_character,
+                static_cast<std::size_t>(2),
+                "The final UTF-8 byte should stay aligned inside the mixed-script character.");
+            test::AssertEq(
+                text_raw_display_units[4].token_index,
+                static_cast<std::size_t>(2),
+                "The final ASCII byte should switch back to the trailing token.");
+        });
 }
 
 void TestApiStructuredEncodeDetachesPunctuationAcrossScripts() {
@@ -2148,6 +2432,8 @@ void RegisterApiSyncTests(test::Runner& runner) {
     runner.Add("Api.FlashFollowTimingRespectsStyleRules", TestApiFlashFollowTimingRespectsStyleRules);
     runner.Add("Api.StructuredEncodePublishesWordLevelTextFollow", TestApiStructuredEncodePublishesWordLevelTextFollow);
     runner.Add("Api.StructuredEncodePublishesCjkTextFollow", TestApiStructuredEncodePublishesCjkTextFollow);
+    runner.Add("Api.StructuredEncodePublishesCharacterAndByteBoundariesAcrossScripts",
+               TestApiStructuredEncodePublishesCharacterAndByteBoundariesAcrossScripts);
     runner.Add("Api.StructuredEncodeDetachesPunctuationAcrossScripts",
                TestApiStructuredEncodeDetachesPunctuationAcrossScripts);
     runner.Add("Api.StructuredEncodePublishesShortPhraseLyricLines",

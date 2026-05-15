@@ -69,6 +69,9 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
   out_text_follow->available = text_follow_data.available ? 1 : 0;
   out_text_follow->text_token_timeline_count =
       text_follow_data.text_token_timeline.size();
+  out_text_follow->text_character_text_size =
+      JoinedCharacterTextsSize(text_follow_data.text_characters);
+  out_text_follow->text_characters_count = text_follow_data.text_characters.size();
   out_text_follow->token_raw_segments_count =
       text_follow_data.token_raw_segments.size();
   out_text_follow->token_raw_display_units_count =
@@ -80,10 +83,15 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
   out_text_follow->line_raw_segments_count =
       text_follow_data.line_raw_segments.size();
   out_text_follow->text_tokens_size = 0;
+  out_text_follow->text_character_text_size = 0;
   out_text_follow->lyric_lines_size = 0;
   if (!text_follow_data.available) {
     out_text_follow->text_tokens_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
     out_text_follow->text_token_timeline_status =
+        BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+    out_text_follow->text_character_text_status =
+        BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+    out_text_follow->text_characters_status =
         BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
     out_text_follow->token_raw_segments_status =
         BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
@@ -101,6 +109,8 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
 
   std::vector<std::size_t> token_offsets(text_follow_data.text_tokens.size(), 0);
   std::vector<std::size_t> token_sizes(text_follow_data.text_tokens.size(), 0);
+  std::vector<std::size_t> character_text_offsets(
+      text_follow_data.text_characters.size(), 0);
   std::size_t joined_size = 0;
   for (std::size_t index = 0; index < text_follow_data.text_tokens.size();
        ++index) {
@@ -111,10 +121,21 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
       ++joined_size;
     }
   }
+  std::size_t joined_character_text_size = 0;
+  for (std::size_t index = 0; index < text_follow_data.text_characters.size();
+       ++index) {
+    character_text_offsets[index] = joined_character_text_size;
+    joined_character_text_size += text_follow_data.text_characters[index].text.size();
+  }
   out_text_follow->text_tokens_size = joined_size;
   out_text_follow->text_tokens_status = CopyJoinedTextTokensToApi(
       text_follow_data.text_tokens, out_text_follow->text_tokens_buffer,
       out_text_follow->text_tokens_buffer_size);
+  out_text_follow->text_character_text_size = joined_character_text_size;
+  out_text_follow->text_character_text_status = CopyJoinedCharacterTextsToApi(
+      text_follow_data.text_characters,
+      out_text_follow->text_character_text_buffer,
+      out_text_follow->text_character_text_buffer_size);
   out_text_follow->lyric_lines_size =
       JoinedTextTokensSize(text_follow_data.lyric_lines);
   out_text_follow->lyric_lines_status = CopyJoinedTextTokensToApi(
@@ -137,6 +158,28 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
             source.token_index < token_sizes.size()
                 ? token_sizes[source.token_index]
                 : static_cast<std::size_t>(0);
+      });
+  std::size_t character_copy_index = 0;
+  out_text_follow->text_characters_status = CopyTimelineEntries(
+      text_follow_data.text_characters,
+      out_text_follow->text_characters_buffer,
+      out_text_follow->text_characters_buffer_count,
+      [&](const bag::TextFollowCharacterEntry& source,
+          bag_text_follow_character_entry* destination) {
+        destination->start_sample = source.start_sample;
+        destination->sample_count = source.sample_count;
+        destination->token_index = source.token_index;
+        destination->character_index_within_token =
+            source.character_index_within_token;
+        destination->byte_index_within_token = source.byte_index_within_token;
+        destination->byte_count = source.byte_count;
+        destination->kind = static_cast<bag_text_follow_character_kind>(source.kind);
+        destination->text_offset =
+            character_copy_index < character_text_offsets.size()
+                ? character_text_offsets[character_copy_index]
+                : static_cast<std::size_t>(0);
+        destination->text_size = source.text.size();
+        ++character_copy_index;
       });
   out_text_follow->token_raw_segments_status = CopyTimelineEntries(
       text_follow_data.token_raw_segments,
@@ -162,6 +205,13 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
         destination->byte_index_within_token = source.byte_index_within_token;
         destination->byte_offset = source.byte_offset;
         destination->byte_count = source.byte_count;
+        destination->character_index_within_token =
+            source.character_index_within_token;
+        destination->byte_index_within_character =
+            source.byte_index_within_character;
+        destination->character_byte_count = source.character_byte_count;
+        destination->is_character_start = source.is_character_start ? 1 : 0;
+        destination->is_character_end = source.is_character_end ? 1 : 0;
       });
   out_text_follow->lyric_line_timeline_status = CopyTimelineEntries(
       text_follow_data.lyric_line_timeline,
