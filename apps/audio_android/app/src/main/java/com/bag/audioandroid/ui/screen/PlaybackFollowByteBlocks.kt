@@ -2,12 +2,15 @@ package com.bag.audioandroid.ui.screen
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -220,6 +223,7 @@ internal fun PlaybackByteBlock(
     focusColor: Color,
     onFocusColor: Color,
     inactiveColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     SideEffect {
         PlaybackFollowBinaryRenderTrace.record(
@@ -320,16 +324,22 @@ internal fun PlaybackByteBlock(
             }
         }
 
-    Text(
-        text = text,
-        style =
-            MaterialTheme.typography.labelLarge.copy(
-                fontFamily = FontFamily.Monospace,
-            ),
-        textAlign = TextAlign.Center,
-        maxLines = 1,
-        softWrap = false,
-    )
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = text,
+            style =
+                MaterialTheme.typography.labelLarge.copy(
+                    fontFamily = FontFamily.Monospace,
+                ),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            softWrap = false,
+        )
+    }
 }
 
 private object PlaybackFollowBinaryRenderTrace {

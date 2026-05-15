@@ -8,13 +8,14 @@
 
 <h1 align="center">FlipBits</h1>
 
+
 <p align="center">
   <a href="README.md">中文</a> | English
 </p>
 
 <p align="center">
-  <strong>A stylized text/audio signaling and decoding toolkit that uses FSK rhythm, tone, and pause to make encoded audio feel spoken</strong><br />
-  <em>Text-to-audio signaling with emotional FSK pacing, visual follow, and readable encoding structure</em>
+  <strong>A stylized encoding/decoding tool between text and audio signals, generating audible "tone-based" encoded audio using FSK rhythms, Hz variations, and different pause intervals</strong><br />
+  <em>A tool covering rhythmic BFSK signals, Dual-tone mapping, and efficient 16-FSK transmission</em>
 </p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](LICENSE)
@@ -24,220 +25,308 @@
 [![CI Host Verify](https://github.com/camellia2077/FlipBits/actions/workflows/ci-host-verify.yml/badge.svg)](https://github.com/camellia2077/FlipBits/actions/workflows/ci-host-verify.yml)
 
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/5c2433f5-37b8-4524-a0a0-ce65f6fe4e4d" width="160" title="Chinese" />
-  <img src="https://github.com/user-attachments/assets/a288707b-1186-4083-b134-c861dd2abf1a" width="160" title="English" />
-  <img src="https://github.com/user-attachments/assets/6d578c41-3487-4c89-937e-a55a575ed58e" width="160" title="Deutsch" />
-</p>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/21ab29a9-a81f-4f26-8770-91403984ef38" width="160" title="dog Latin" />
-  <img src="https://github.com/user-attachments/assets/9d517c89-4c80-4a37-ba9d-78b4b3177f26" width="160" title="French" />
-  <img src="https://github.com/user-attachments/assets/e2bf65a3-e747-4f77-bfc9-f0717c0bcec1" width="160" title="Russian" />
-</p>
+<table>
+  <tr>
+    <td width="25%"><img src="https://github.com/user-attachments/assets/3790efee-6fcb-4584-a5c7-5b3a3140cad7" alt="1-zh"></td>
+    <td width="25%"><img src="https://github.com/user-attachments/assets/1d515f54-abee-4422-8d9b-094165d11b85" alt="2-en"></td>
+    <td width="25%"><img src="https://github.com/user-attachments/assets/e8ee3c5d-a438-4fab-a9ec-d15dee0370be" alt="3-de"></td>
+    <td width="25%"><img src="https://github.com/user-attachments/assets/6641c520-1c35-45c4-8235-6e5a4b78f4a7" alt="4-jp"></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/2b53391f-a415-4765-92f9-b04276792dc5" alt="5-la"></td>
+    <td><img src="https://github.com/user-attachments/assets/04d6ad29-4bed-4554-b4c2-182ad60c094c" alt="6-la"></td>
+    <td><img src="https://github.com/user-attachments/assets/970438f7-2ebe-4efd-9aa7-2afb6d75865c" alt="7-la"></td>
+    <td><img src="https://github.com/user-attachments/assets/a8786e2b-c65e-445d-9d8c-dd9ec05be31a" alt="8-la"></td>
+  </tr>
+</table>
 
 ## Quick Overview
-- Native Android app for the visualization and sonification of text encoding.
+- Native Android application for the visualization and sonification of computer text encoding.
 - Supports Morse code (`mini`), bit-by-bit BFSK / FSK (`flash`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`).
-Offers "Visual" and "Lyrics" modes for inspecting audio signal and text encoding layers.
-- Localized UI: English, German, Spanish, French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Ukrainian, Simplified Chinese, Traditional Chinese, and dog Latin for a solemn, liturgical, techno-futurist space-opera atmosphere.
+- Visualization provides two modes: Visual and Lyrics, used to observe the audio signal layer and the text encoding layer respectively.
+- Supports multilingual interfaces: English, German, Spanish, French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Ukrainian, Simplified Chinese, Traditional Chinese, as well as dog Latin to create solemn, religious, sci-fi, and space opera atmospheres.
+- Localization work is continuously being optimized. If you find translation errors or have better suggestions, corrections are warmly welcomed.
 
 ## Download / Install
-Android APKs will be published through GitHub Releases.
+The Android APK will be published via GitHub Releases.
 
-In the current reference build, the install package is about `5.90 MB`, these numbers may change across versions, ABIs, and build configurations.
+Under the current reference build, the installation package is approximately `5.93 MB`. These numbers will vary depending on the version, ABI, and build configurations.
 
-## Mode Overview
-| Mode | Technical category | Best for |
+## Modes Overview
+| Mode | Technology Category | Suitable Uses |
 | --- | --- | --- |
-| `mini` | Morse code | short, clear, readable dot/dash rhythm |
-| `flash` | bit-by-bit BFSK / FSK | expressive audio and Visual/Lyrics learning |
-| `pro` | DTMF-like dual-tone mapping | compact dual-tone structure |
-| `ultra` | `16-FSK` frequency mapping | shorter audio, faster generation and decoding |
+| `mini` | Morse code | Short, clear, rhythmically readable dot-dash signals |
+| `flash` | Bit-by-bit BFSK / FSK | Stronger emotional listening experience, Visual/Lyrics comparison learning |
+| `pro` | DTMF-like dual-tone mapping | More compact dual-tone structure |
+| `ultra` | `16-FSK` frequency mapping | Shorter audio, faster generation and parsing |
 
-These names are product-facing labels, not a simple ladder of "basic to advanced" versions of the same protocol. Each mode emphasizes a different listening character, expressive goal, and transport structure.
+These names are not "power levels", but rather productized naming within the project. They emphasize different listening experiences, expressive temperaments, and transmission structures, rather than representing a linear upgrade from a basic to an advanced version of the same protocol.
 
-## Project Overview
-FlipBits is a toolkit for encoding text into audible signal patterns and decoding those generated patterns back into text. It does more than convert text into sound: in its bit-by-bit FSK path, it shapes bit duration, pause spacing, frequency choices, and playback rhythm so generated audio can resemble different emotional tones or speaking styles.
+## Project Positioning
+FlipBits is an encoding/decoding tool between text and audible audio signals. It doesn't just convert text into sound; it also attempts to give the generated audio a listening experience similar to human speech under different emotions and tones by adjusting the duration, pause intervals, frequency combinations, and playback rhythm of bit-by-bit FSK.
 
-It maps text into waveform structures and can recover text from project-generated waveforms. It does not provide cryptographic encryption.
+The project can map text content into waveforms and can also restore text from the waveforms generated within the project. The project itself does not provide any form of cryptographic encryption.
 
-- **Expressive focus**: bit-by-bit BFSK / FSK (`flash`) intentionally sacrifices encoding efficiency, using longer bits, pauses, and frequency changes to create stronger emotional tone and ritual-like listening character.
-- **Efficient alternatives**: if shorter audio or more formal transport is needed, Morse code (`mini`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`) provide more compact paths. `16-FSK` (`ultra`) is not only shorter than bit-by-bit BFSK / FSK (`flash`) for the same input; generation cost and decode time are usually much lower as well. Speed is available, but it is not the only goal.
-- **Visual learning value**: Android provides two complementary follow views. Visual focuses on the signal layer, showing how encoded text becomes FSK low/high bits, tone segments, and playback timing. Lyrics focuses on the text-encoding layer, using tokens to show how text becomes UTF-8 bytes, hex/bin, and bits, then highlighting them during playback.
+* **Expressive Focus**: Bit-by-bit BFSK / FSK (`flash`) deliberately sacrifices encoding efficiency, trading longer bits, pauses, and frequency changes for a stronger emotional listening experience and a sense of ritual.
+* **Efficiency Supplement**: If shorter, faster, and more formal text transmission is needed, Morse code (`mini`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`) provide more compact encoding paths. `16-FSK` (`ultra`) not only generates shorter audio, but its generation and parsing time is also usually significantly lower than bit-by-bit BFSK / FSK (`flash`); however, being "faster" is not the sole goal of the project.
+* **Visualization Value**: The Android app provides two complementary tracking views. "Visual" leans toward the signal layer, showing how text encoding turns into FSK low/high bits, frequency segments, and the playback timeline; "Lyrics" leans toward the text encoding layer, using tokens to show how text is encoded into UTF-8 bytes, hex/bin, and bits, highlighting them as the audio plays.
 
-## Android App Footprint
-The Android app is intentionally lightweight and native-leaning, with fast cold start behavior and a small package footprint for audio generation, conversion, sharing, and export.
+## Android App Features
+The Android app currently maintains a lightweight, native approach: fast cold start speed and small package size, making it suitable for directly generating, converting, sharing, and exporting audio.
 
-## Design Boundary
-The current project focus is the controlled loop of "text -> stylized audio -> in-project decoding", with particular emphasis on Android app workflows for audio generation, conversion, sharing, and export.
+## Design Boundaries
+The current focus of this project is a controlled closed loop of "text -> stylized audio -> in-project decoding", with a particular emphasis on the audio generation, conversion, sharing, and export experience within the Android app.
 
-It is not primarily designed around real-time over-speaker playback decoding by another device, nor around noise robustness, echo resistance, far-field reception, or complex real-world synchronization. In this project, atmosphere, recognizable stylistic expression, and controlled mode behavior take priority over real-world acoustic communication robustness.
+It does not take "direct real-time parsing by another device after external playback" as its main interactive goal, nor does it prioritize anti-noise, anti-echo, far-field reception, or complex synchronization robustness in real-world environments as design priorities. For this project, atmosphere, recognizable style expression, and a controlled mode experience take precedence over communication robustness in real-world acoustic environments.
 
-## Modes
+## Mode Instructions
 
 ### Bit-by-bit BFSK / FSK (`flash`)
-Bit-by-bit BFSK / FSK (`flash`) is intentionally the most stylized mode. It uses two high / low Hz states to represent bits, then shapes bit duration, frequency choices, and pause spacing to simulate a more human-like emotional tone and stylized delivery. The same input text may produce audio close to a minute long in bit-by-bit BFSK / FSK (`flash`), while `16-FSK` (`ultra`) may finish in only a few seconds. That gap is intentional: the project values the feeling of "being played like a ritual signal" more than raw throughput.
 
-The feel of bit-by-bit BFSK / FSK (`flash`) comes from the binary nature of the signal itself: each bit switches between only two frequency states, low and high, similar to 0 and 1 in binary. Instead of sounding like continuous natural speech, it turns text into an audible chain of low/high pulses, giving the audio a mechanical, ritual-like communication character.
+Bit-by-bit BFSK / FSK (`flash`) is the most highly stylized mode. Its listening experience comes from the acoustic expression of binary encoding: it uses high/low Hz as bit states, with each bit only switching between low and high frequency states, corresponding to 0 / 1 in binary. Then, by adjusting bit duration, frequency configuration, and pause intervals, it simulates listening experiences closer to 6 common human speaking emotions.
 
-The low efficiency of bit-by-bit BFSK / FSK (`flash`) is intentional. It does not encode multiple bits into one simultaneous symbol; low and high tones appear one after another in bit order. Style-specific bit duration, pauses, and frequency changes make the audio much longer. The goal is not throughput, but audibility and explainability: a listener can use the sound, Visual, and Lyrics views together to understand or even write down the corresponding low/high bit sequence.
+In the Litany style, low speed is an intentional feature. The same text might generate nearly a minute of audio under `flash`, while it takes only a few seconds under `16-FSK` (`ultra`). The longer bit lengths and intervals allow users to easily manually transcribe binary from the audio. The **220 / 440 Hz** (standard A3/A4 pitch) configuration makes it easy for humans to sing along with the digital signals.
 
-Bit-by-bit BFSK / FSK (`flash`) currently provides six styles. Each style uses a low / high Hz pair to define bit states, then combines bit duration, frequency shaping, and pause spacing to create a distinct emotional "speaking tone":
+### Interface Preview and Style Definition
+
+<div align="center">
+  <table style="width: 100%; table-layout: fixed;">
+    <tr>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/cbf5af39-7069-42b3-aeca-07d219542f83" width="100%"></td>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/2bd1b34b-962e-473e-b105-1964305a58d8" width="100%"></td>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/29db01d6-8164-47f0-af1a-2edb661060ed" width="100%"></td>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/02dcddce-ed31-4c9a-8156-fd629bc21c1b" width="100%"></td>
+    </tr>
+    <tr align="center">
+      <td><small>Visualization 1</small></td>
+      <td><small>Visualization 2</small></td>
+      <td><small>Visualization 3</small></td>
+      <td><small>Visualization 4</small></td>
+    </tr>
+  </table>
+</div>
+
+Currently, six styles are provided. Through combinations of bit duration, frequency organization, and pause intervals, they shape different emotional "speaking tones":
+
+| Style | Low / High Hz | Listening Goal |
+| :--- | :--- | :--- |
+| [Litany](docs/design/modes/flash/litany.md) | `220 / 440` | Deep, solemn, chanting |
+| [Collapse](docs/design/modes/flash/collapse.md) | `226-320 / 452-640` | Whispering, panicked, stuttering |
+| [Standard](docs/design/modes/flash/standard.md) | `300 / 600` | Daily, precise, steady |
+| [Hostility](docs/design/modes/flash/hostility.md) | `438-536 / 876-1072` | Sharp, rapid, aggressive |
+| [Zeal](docs/design/modes/flash/zeal.md) | `560-900 / 1120-1800` | Bright, variable speed, dense |
+| [Void](docs/design/modes/flash/void.md) | `240 / 480` | Deep, trailing, sparse |
 
 
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/e9f2c2bb-0e1c-4a81-a5d2-9f8872324b2d" width="400" controls muted autoplay loop style="border-radius: 8px;"></video>
-</p>
+### Demo Audio Download
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/5b1f1b40-a4e2-4891-9800-8052f304baba" width="180" title="1" />
-  <img src="https://github.com/user-attachments/assets/1eee2bb5-d696-48a9-94b5-dbf72c2442f9" width="180" title="2" />
-  <img src="https://github.com/user-attachments/assets/c9d593f5-a330-4f7a-9f56-eb823abdf1c5" width="180" title="3" />
-  <img src="https://github.com/user-attachments/assets/7bd93db0-b2b5-4c85-83eb-299dde7bd4b1" width="180" title="4" />
-</p>
+#### 1. Text Content: `rs`
 
+* **[ 8.8s ]** **Litany**: [flash[litany]-rs.wav](https://github.com/user-attachments/files/27787615/flash.litany.-rs.wav)
 
-| Style | Low / High | Listening target |
-| --- | --- | --- |
-| [Litany](docs/design/modes/flash/litany.md) | `220 / 440 Hz` | low, solemn, chant-like |
-| [Collapse](docs/design/modes/flash/collapse.md) | `280 / 560 Hz` | hushed, panicked, stuttering |
-| [Standard](docs/design/modes/flash/standard.md) | `300 / 600 Hz` | everyday, precise, stable |
-| [Hostility](docs/design/modes/flash/hostility.md) | `450 / 900 Hz` | sharp, urgent, aggressive |
-| [Zeal](docs/design/modes/flash/zeal.md) | variable `560-900 / 1120-1800 Hz` | bright, variable-speed, dense |
-| [Void](docs/design/modes/flash/void.md) | `240 / 480 Hz` | low, trailing, sparse |
+#### 2. Text Content: `github`
 
-For deeper `flash` voicing-style semantics, emotional intent, and preset design notes, see:
+The following shows the auditory performance of the same input under different voicing styles:
+
+* **[ 7.0s ]** **Void**: [flash[void]-github.wav](https://github.com/user-attachments/files/27787632/flash.void.-github.wav)
+* **[ 3.6s ]** **Collapse**: [flash[collapse]github.wav](https://github.com/user-attachments/files/27787621/flash.collapse.github.wav)
+* **[ 2.5s ]** **Standard**: [flash[standard]-github.wav](https://github.com/user-attachments/files/27787627/flash.standard.-github.wav)
+* **[ 2.4s ]** **Hostility**: [flash[hostility]-github.wav](https://github.com/user-attachments/files/27787626/flash.hostility.-github.wav)
+* **[ 1.8s ]** **Zeal**: [flash[zeal]-github.wav](https://github.com/user-attachments/files/27787637/flash.zeal.-github.wav)
+
+### Design Details
+
+For more details on the emotional positioning, naming semantics, and preset designs of the `flash` voicing style, see:
 - [`docs/design/modes/flash/README.md`](docs/design/modes/flash/README.md)
 - [`docs/design/modes/flash/voicing-emotions.md`](docs/design/modes/flash/voicing-emotions.md)
 - [`docs/design/modes/flash/`](docs/design/modes/flash/)
 
+
 ### Morse code (`mini`)
-Morse code (`mini`) normalizes input through Morse-compatible text rules, emphasizing clear rhythm, visual readability, and follow-along playback. The current speed presets are:
 
-| Speed | Role |
-| --- | --- |
-| Slow | slower and easier to inspect in dot/dash visuals and lyrics follow |
-| Standard | default Morse rhythm |
-| Fast | shorter, more compact Morse output |
+Morse code (`mini`) standardizes input according to Morse rules, emphasizing clear visual effects and dot-dash rhythms. The core of its design lies in the **"visibility of rhythm"**: through real-time UI feedback, abstract codes are transformed into intuitive visual progress.
 
+#### Speed Presets and Visual Follow
+Three Speed Presets are currently provided, aiming to balance "feasibility of manual recognition" and "transmission efficiency":
 
+<div align="center">
+  <table style="width: 100%; table-layout: fixed;">
+    <tr>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/d79e0302-b13f-4ec7-9136-66dbdc7bb00c" style="width: 100%;"></td>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/f50e4b9c-e6b3-4193-b957-bd9bf4a12d64" style="width: 100%;"></td>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/726dd727-bc20-4f1f-9564-f49095f9eddd" style="width: 100%;"></td>
+      <td width="25%"><img src="https://github.com/user-attachments/assets/716cdb9b-0f37-4692-9942-1b1a4d48cc32" style="width: 100%;"></td>
+    </tr>
+    <tr align="center">
+      <td><small>Page</small></td>
+      <td><small>Visualization 1</small></td>
+      <td><small>Visualization 2</small></td>
+      <td><small>Word Selection</small></td>
+    </tr>
+  </table>
+</div>
 
+| Speed | Positioning | Design Goal |
+| :--- | :--- | :--- |
+| **Slow** | Extremely slow | Teaching-level speed, best for observing dot / dash and word-by-word comparison (Lyrics Follow) |
+| **Standard** | Standard rhythm | Simulates the classic rhythmic feel and recognizability of traditional Morse code |
+| **Fast** | Compact | Compresses dot-dash intervals, providing a more efficient, shorter audio output |
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/7d4b6ba9-8102-4122-9518-854ee63a1bc8" width="400" controls muted autoplay loop style="border-radius: 8px;"></video>
-</p>
+#### Demo Audio Download
+**Text Content**: `github`
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/61618706-dacb-44cc-ba31-149d5d68f971" width="180" title="1" />
-  <img src="https://github.com/user-attachments/assets/b68d1c27-34ef-450c-ae75-77c1be9708c3" width="180" title="2" />
-  <img src="https://github.com/user-attachments/assets/72bcba95-cb29-4d39-a271-11c7cdc33602" width="180" title="3" />
-</p>
+*   **[ 4.0s ]** **Slow**: [mini_slow_github.wav](https://github.com/user-attachments/files/27787705/mini_slow_github.wav)
+*   **[ 2.7s ]** **Standard**: [mini_standard_github.wav](https://github.com/user-attachments/files/27787714/mini_standard_github.wav)
+*   **[ 1.3s ]** **Fast**: [mini_fast_github.wav](https://github.com/user-attachments/files/27787703/mini_fast_github.wav)
 
-
-
-For deeper `mini` rules, follow/visual behavior, and implementation notes, see:
+### Design Details
+For `mini`'s input specifications, Visual real-time follow logic, and specific preset parameter descriptions, see:
 - [`docs/design/modes/mini.md`](docs/design/modes/mini.md)
 
-### DTMF-like dual-tone mapping (`pro`)
-DTMF-like dual-tone mapping (`pro`) is the more formal ASCII-only mode: input text is first converted into ASCII bytes, then each byte is split into a high nibble and a low nibble, each of which maps to a dual-tone symbol, so `1 byte = 2 symbol`. It favors a cleaner and more regular acoustic signaling structure.
+
+### DTMF-like Dual-tone Mapping (`pro`)
+
+Auditorily, this is a **pure telephone dial tone**. It is a standard ASCII-only mode: by splitting bytes into high and low bits and mapping them to dual-tone signals (DTMF), it achieves a precise transmission of `1 byte = 2 symbols`. It discards redundant embellishments, pursuing the ultimate clarity and pure acoustic link feedback.
+
+#### Interface Preview
+
+<div align="center">
+  <table style="width: 100%; table-layout: fixed;">
+    <tr>
+      <td><img src="https://github.com/user-attachments/assets/d991b7a2-4e88-4e4c-88e7-e897d6b0bd78" width="100%"></td>
+      <td><img src="https://github.com/user-attachments/assets/0f88277d-42f2-4618-a745-8648d795f15d" width="100%"></td>
+      <td><img src="https://github.com/user-attachments/assets/ac6b33f1-8ece-4644-ba9a-9483690e751e" width="100%"></td>
+    </tr>
+    <tr align="center">
+      <td><small>Visualization 1</small></td>
+      <td><small>Visualization 2</small></td>
+      <td><small>Word Selection</small></td>
+    </tr>
+  </table>
+</div>
+
+### Demo Audio Download
+* **[ 3.7s ]** **Text Content**: `RED STEEL RECEIVES NEW SERIAL NUMBERS`
+* **Download Link**: [RED STEEL RECE_pro_20260515_105734.wav](https://github.com/user-attachments/files/27786956/RED.STEEL.RECE_pro_20260515_105734.wav)
 
 
-
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/e64a710d-12fe-44c0-bb6f-79dceed10d68" width="400" controls muted autoplay loop style="border-radius: 8px;"></video>
-</p>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/ebfc6f96-ccf4-4d17-ace9-794704151515" width="180" title="1" />
-  <img src="https://github.com/user-attachments/assets/1f436a22-cbff-4681-bd62-343875c3bce4" width="180" title="2" />
-  <img src="https://github.com/user-attachments/assets/dc1144a3-fcd6-4e81-a258-a4f7a7380bf5" width="180" title="3" />
-  <img src="https://github.com/user-attachments/assets/fb63021c-c32f-4d10-8a5e-a2e44ecbc6e8" width="180" title="4" />
-</p>
-
-
-For deeper `pro` mode positioning and implementation notes, see:
+### Design Details
+For more descriptions of `pro`'s mode positioning and implementation, see:
 - [`docs/design/modes/pro.md`](docs/design/modes/pro.md)
 - [`docs/design/transports.md`](docs/design/transports.md)
 - [`docs/architecture/repo-map.md`](docs/architecture/repo-map.md)
 
-### `16-FSK` frequency mapping (`ultra`)
-`16-FSK` frequency mapping (`ultra`) is the denser UTF-8-oriented mode: input text is processed directly as UTF-8 bytes, each byte is split into two nibbles, and each nibble maps to a fixed frequency in clean `16-FSK`, so `1 byte = 2 symbol`, with each symbol emitting only one frequency. It favors higher information density and a more formal UTF-8 text transport path.
 
-Compared with bit-by-bit BFSK / FSK (`flash`), `16-FSK` (`ultra`) is not only shorter for the same input; its generation and decoding paths are also lighter. In one reference test with 7000 chars / 7000 bytes of text, bit-by-bit BFSK / FSK (`flash`) took about 1 min 56 sec to generate about 43 min of audio, while `16-FSK` (`ultra`) generated in about 2 sec and produced about 11 min 40 sec of audio. Exact numbers vary by device, style, and parameters, but the scale difference reflects the mode split: `flash` prioritizes audibility, explainability, and emotional delivery, while `ultra` prioritizes higher throughput and faster processing.
+### `16-FSK` Frequency Point Mapping (`ultra`)
+
+`16-FSK` (`ultra`) is a high-density mode aimed at UTF-8 text. It uses a more lightweight generation and parsing path, splitting input text bytes into two Nibbles and mapping them to 16 fixed frequency points.
+
+**1 byte = 2 symbols**. Compared to the dual-tone multi-frequency of the `pro` mode, `ultra` only sends a single frequency point in each Symbol, pursuing purer information density and processing speed. It is the preferred solution for formal, long-text transmission.
+
+#### Interface Preview
+<div align="center">
+  <table style="width: 100%; table-layout: fixed;">
+    <tr>
+      <td><img src="https://github.com/user-attachments/assets/96b3862f-771e-4c98-984e-30ea5411fd0b" width="100%"></td>
+      <td><img src="https://github.com/user-attachments/assets/6f5c8cad-babe-4157-ba59-e4f7838d1fb8" width="100%"></td>
+      <td><img src="https://github.com/user-attachments/assets/8dc9bf72-d0d9-4c53-85eb-435e60062cc1" width="100%"></td>
+    </tr>
+    <tr align="center">
+      <td><small>Visualization 1</small></td>
+      <td><small>Visualization 2</small></td>
+      <td><small>Word Selection</small></td>
+    </tr>
+  </table>
+</div>
 
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/444a37c7-af57-46a0-b34a-4a8e26a34db9" width="400" controls muted autoplay loop style="border-radius: 8px;"></video>
-</p>
+#### Performance Benchmark Comparison (7000 Characters/Bytes Text)
+| Dimension | `flash` (Bit-by-bit BFSK) | `ultra` (16-FSK) | Difference |
+| :--- | :--- | :--- | :--- |
+| **Generation Time** | ~ 116.0 seconds | **~ 2.0 seconds** | 58x speedup |
+| **Audio Length** | ~ 43.0 minutes | **~ 11.7 minutes** | 3.7x compression |
+| **Core Positioning** | Ritualistic, audibility, emotional | **High throughput, fast processing, industrial feel** | - |
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/2cf006b1-a4fe-4af1-bfce-2c738ed26129" width="180" title="1" />
-  <img src="https://github.com/user-attachments/assets/cf5d6e62-d4d6-44f4-92ce-fd22335686c8" width="180" title="2" />
-  <img src="https://github.com/user-attachments/assets/79d8854a-14d2-40d2-9672-e958b0a174fd" width="180" title="3" />
-</p>
+---
 
+### Demo Audio: Comparison of Efficiency and Texture
+**Text Content**: `完好的源端矩阵`
 
-For deeper `ultra` mode positioning and implementation notes, see:
+| Mode | Style | Time Cost | Download |
+| :--- | :--- | :--- | :--- |
+| **`ultra`** | **Default** | **5.4s** | [Download audio](https://github.com/user-attachments/files/27787427/ultra-.wav) |
+| `flash` | Zeal (Extreme speed) | 13.8s | [Download audio](https://github.com/user-attachments/files/27787423/flash.zeal.-.wav) |
+| `flash` | Standard | 20.5s | [Download audio](https://github.com/user-attachments/files/27787417/flash.standard.-.wav) |
+| `flash` | Litany (Solemn) | 173.4s | [Download audio](https://github.com/user-attachments/files/27787454/flash.litany.-.wav) |
+
+> **Note**: The `litany` style audio is up to 2.9 minutes long. This is deliberate redundancy designed for "stylization", aiming to achieve frequency intervals that humans can clearly identify, record, or even read aloud.
+
+---
+
+### Design Details
+For the mode positioning, transport layer protocol, and system architecture design of `ultra`, see:
 - [`docs/design/modes/ultra.md`](docs/design/modes/ultra.md)
 - [`docs/design/transports.md`](docs/design/transports.md)
 - [`docs/architecture/repo-map.md`](docs/architecture/repo-map.md)
 
-The implementation direction of the `ultra` mode was informed by the public engineering ideas and acoustic transport practice in [ggerganov/ggwave](https://github.com/ggerganov/ggwave), and we gratefully acknowledge that reference.  
-This repository remains an independent implementation; except for third-party components explicitly marked in-tree, no affiliation, endorsement, or official relationship is claimed.
+---
+
+#### Acknowledgements
+The implementation approach of the `ultra` mode referenced the public engineering design and acoustic transmission practices of [ggerganov/ggwave](https://github.com/ggerganov/ggwave). We hereby express our gratitude.
+*This project is an independent implementation; except for the explicitly marked third-party components in the repository, we claim no affiliation, endorsement, or official relationship with that project.*
 
 ---
 
 ## Usage & Liability
 
-### Icon Usage (Public Resource)
-FlipBits icon assets (including source and component SVG files) are provided to the community as a public resource.
+### Icon Usage Instructions (Public Resource)
+FlipBits icon resources (including source files and component SVG files) are open to the community as public resources.
 
-Subject to this repository's license and applicable law, you may use these icons for badges, derivative creations, videos, and commercial distribution (including sales) without requesting additional one-off permission from the project.
+Under the premise of complying with this repository's license and applicable laws, you can use these icons for badges, fan creations, video displays, and commercial releases (including sales), without needing to apply for separate authorization from the project.
 
-For public distribution, attribution is recommended:
+If used for public dissemination, it is recommended to attribute:
 `Icon designed by FlipBits Project`
 
-Limits and boundaries (legally conservative):
-- This permission covers the icon assets only and does not grant trademark rights, patent rights, personality/publicity rights, or any rights not explicitly granted.
-- The assets are provided "as is" without express or implied warranties; users are responsible for their own compliance and risk assessment.
-- Do not privatize, exclusively claim, or re-license these icon assets as proprietary/exclusive resources.
-- Do not imply official representation, endorsement, or exclusive authorization from the FlipBits project or its author.
+Limitations and Boundaries (Legally Conservative Version):
+- This authorization only covers the icon resources themselves and does not grant trademark rights, patent rights, moral rights, or any rights not explicitly granted.
+- Icons are provided "as is", without any express or implied warranties; users shall bear their own compliance and risk responsibilities.
+- You may not privatize, claim exclusivity, or sublicense these icon resources as proprietary/exclusive resources.
+- You may not imply in any way that you have official representation, endorsement, or a sole authorization relationship with the FlipBits project or authors.
 
 ### 1. Principles & Limitations
-- **Transparent signaling methods**: the project uses open and conventional acoustic signaling methods, including high/low frequency switching, dual-tone mapping, and multi-frequency mapping. These are structured encoding schemes, not encryption or steganography.
-- **Clear scope**: this project is intended for DSP experimentation, acoustic signaling studies, and encode/decode performance exploration. It is not designed for covert communication.
-- **Entertainment over efficiency**: some modes intentionally preserve long duration, low speed, and heavy stylistic coloration as part of the intended experience.
-- **No real-world robustness guarantee**: the current focus is the controlled loop of "generate audio -> decode generated audio". The project does not guarantee reliable decoding under real playback, recording, noise, echo, clipping, frequency-response shifts, or distance propagation conditions.
-- **Use at your own responsibility**: users are responsible for ensuring that any use, modification, or deployment complies with local law, platform rules, and network-security requirements.
-- **As-Is distribution**: this software is provided as-is. To the maximum extent permitted by law, the authors disclaim liability for suitability, stability, or losses resulting from its use.
+* **Open and transparent protocols**: The transmission methods used by this tool belong to **open, general acoustic encoding methods**, including high/low frequency switching, dual-tone mapping, and multi-frequency point mapping. Its essence is the orderly encoding of text bytes or symbols, and it does not provide encryption or steganography capabilities to bypass security reviews.
+* **Clear usage positioning**: This project is for **audio signal processing (DSP) research, acoustic communication principle verification, and related codec performance experiments**, and is not designed for covert communication scenarios.
+* **Entertainment expression priority**: Some modes will deliberately retain lengthy, low-speed, and heavily stylized audio appearances to serve the overall atmosphere expression; efficiency is not the primary goal for all modes.
+* **No promise of real-world robustness**: The current focus is the main link closed-loop of "generating audio -> parsing generated audio", without promising stable reception performance under real-world playback, recording, noise, echo, clipping, device frequency response deviation, or long-distance propagation conditions.
+* **User responsibility**: The developer provides the source code and implementation methods. When running, modifying, or deploying this project, users should independently ensure that their usage complies with local laws, regulations, platform rules, and network security requirements.
+* **Distributed As-Is**: This software is provided as-is. To the extent permitted by applicable law, the author assumes no liability for damages resulting from its suitability, stability, or use.
 
 ### 2. Style & IP
-- **Independent open-source project**: this is an independent, unofficial open-source project and is not affiliated with any film, game, or commercial brand.
-- **No affiliation statement**: this project is an original independent work and is not affiliated with, endorsed by, sponsored by, licensed by, or otherwise associated with Games Workshop or Warhammer 40,000.
-- **Aesthetic references only**: the project's visual and writing style draws from retro-futurism, industrial aesthetics, and ritualized presentation as broad creative influences, without relying on protected setting-specific terminology as its foundation.
-- **Content correction policy**: if any asset, naming, or wording in the repository feels misleading, inappropriate, or legally risky, please report it through [GitHub Issues](../../issues).
+* **Independent open-source project**: This project is an independently developed unofficial open-source project. It is not affiliated with any film, television, game, or commercial brand, nor does it represent the stance of any third party.
+* **Disclaimer of Affiliation**: This project is an independent original work and has no affiliation, authorization, sponsorship, endorsement, or other connection with Games Workshop and Warhammer 40,000.
+* **Style source explanation**: The project references general creative directions such as retro-futurism, industrial aesthetics, and religious ritualistic expressions in its visual and copywriting temperament, but it does not use any proprietary settings from protected worldviews as the foundation of the project.
+* **Content processing principles**: If materials, namings, or expressions that may cause confusion, infringement, or inappropriate associations appear in the repository, you are welcome to raise them via [GitHub Issues](../../issues), and we will promptly evaluate and correct them.
 
 ---
 
 ## Quick Start
 
-> If you notice wording, assets, or stylistic material in this repository that feels inaccurate or potentially misleading, please report it through [GitHub Issues](../../issues).
+> If you find inaccurate, or potentially misleading content in the repository, you are welcome to provide feedback via [GitHub Issues](../../issues).
 
-If you are an AI / agent, start with [`.agent/AGENTS.md`](.agent/AGENTS.md) and then read the relevant subsystem `AGENTS.md` files for a faster overview of repository structure, tooling entry points, and editing conventions.
+If you are an AI / agent, it is recommended to first read [`.agent/AGENTS.md`](.agent/AGENTS.md) and the `AGENTS.md` under the corresponding subsystems to quickly understand the repository structure, tool entry points, and modification conventions.
 
 ### Android
-- The official Android project root is `C:\code\FlipBits\apps\audio_android`.
-- Run these commands from the repository root:
+- The official Android project entry is at `C:\code\FlipBits\apps\audio_android`.
+- Execute uniformly from the repository root directory:
   - `python tools/run.py android assemble-debug`
   - `python tools/run.py android assemble-release`
   - `python tools/run.py android native-debug`
-- `apps/audio_android` is the Android Gradle root, and `apps/audio_android/app` is the actual app module.
-- In Android Studio, open `apps/audio_android` directly.
+- `apps/audio_android` is the Android Gradle root, and `apps/audio_android/app` is the actual application module.
+- It is recommended to open `apps/audio_android` directly in Android Studio.
 
-### Local Tooling
-- Prefer using `python tools/run.py <command>` as the unified entry point.
+### Local Orchestration Tools
+- It is recommended to uniformly use `python tools/run.py <command>`.
 - Common commands:
   - `python tools/run.py build --build-dir build/dev`
   - `python tools/run.py clean`
@@ -245,22 +334,22 @@ If you are an AI / agent, start with [`.agent/AGENTS.md`](.agent/AGENTS.md) and 
   - `python tools/run.py android native-debug`
   - `python tools/run.py android assemble-debug`
   - `python tools/run.py artifact export-apk`
-- Notes:
-  - Use `python tools/run.py --help` for the top-level overview; use `python tools/run.py <command> --help` for detailed arguments.
-  - The host-side default path is currently the mainline `clang++ + Ninja + build/dev`.
-  - `python tools/run.py verify --build-dir build/dev --skip-android` validates the default host module path only.
-  - The Android native side is assembled through `apps/audio_android/native_package -> bag_android_native`; the remaining `C++17` exceptions are restricted to the package-private wrapper layer and `android_bag/**`.
-  - `build/` remains the home for native CMake / Gradle build outputs and test artifacts.
-  - Root-level `dist/` is reserved for Python-exported deliverables; Android APKs are currently exported to `dist/android/`.
+- Conventions:
+  - `python tools/run.py --help` only views the main command overview; for detailed parameters use `python tools/run.py <command> --help`.
+  - The host root directory currently directly fixes one official main line: `clang++ + Ninja + build/dev`.
+  - `python tools/run.py verify --build-dir build/dev --skip-android` only verifies the host default modules main path.
+  - The Android native side is assembled independently via `apps/audio_android/native_package -> bag_android_native`; the remaining `C++17` exceptions are restricted to the package-private wrapper and `android_bag/**` private declaration layer.
+  - `build/` continues to be reserved for native build outputs and test artifacts of CMake / Gradle.
+  - The root directory `dist/` only stores the final deliverables exported by Python; currently, the Android APK is exported to `dist/android/` by default.
 
 ### Development Navigation
-When reading or modifying the codebase by area, these are good starting points:
+When reading or modifying by modules, you can prioritize entering from the following entries:
 
-- Agent / AI entry point: [`.agent/AGENTS.md`](.agent/AGENTS.md)
-- Core libraries and shared logic: [`libs/AGENTS.md`](libs/AGENTS.md)
+- agent / AI main entry: [`.agent/AGENTS.md`](.agent/AGENTS.md)
+- Core libraries and shared business logic: [`libs/AGENTS.md`](libs/AGENTS.md)
 - CLI presentation layer: [`apps/audio_cli/AGENTS.md`](apps/audio_cli/AGENTS.md)
 - Android application: [`apps/audio_android/AGENTS.md`](apps/audio_android/AGENTS.md)
 
-For broader repository structure and tooling details, see:
+For more repository structure and tool instructions, see:
 - [`docs/architecture/repo-map.md`](docs/architecture/repo-map.md)
 - [`tools/README.md`](tools/README.md)

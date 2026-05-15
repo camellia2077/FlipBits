@@ -238,6 +238,41 @@ jobject NewTextFollowTimelineEntry(JNIEnv* env, const bag_text_follow_token_entr
         static_cast<jint>(entry.token_index));
 }
 
+jobject NewTextFollowCharacterViewData(JNIEnv* env,
+                                       const bag_text_follow_character_entry& entry,
+                                       const std::string& text_character_text) {
+    jclass entry_class =
+        FindClassOrNull(env, "com/bag/audioandroid/domain/TextFollowCharacterViewData");
+    if (entry_class == nullptr) {
+        return nullptr;
+    }
+    jmethodID ctor =
+        env->GetMethodID(entry_class, "<init>", "(IIIIIIILjava/lang/String;)V");
+    if (ctor == nullptr) {
+        return nullptr;
+    }
+
+    std::string character_text;
+    if (entry.text_size > 0 && entry.text_offset < text_character_text.size()) {
+        const std::size_t clamped_text_size =
+            std::min(entry.text_size, text_character_text.size() - entry.text_offset);
+        character_text =
+            text_character_text.substr(entry.text_offset, clamped_text_size);
+    }
+    jstring text_value = env->NewStringUTF(character_text.c_str());
+    return env->NewObject(
+        entry_class,
+        ctor,
+        static_cast<jint>(entry.token_index),
+        static_cast<jint>(entry.character_index_within_token),
+        static_cast<jint>(entry.byte_index_within_token),
+        static_cast<jint>(entry.byte_count),
+        static_cast<jint>(entry.start_sample),
+        static_cast<jint>(entry.sample_count),
+        static_cast<jint>(entry.kind),
+        text_value);
+}
+
 jobject NewTextFollowRawSegmentViewData(JNIEnv* env,
                                         const bag_text_follow_raw_segment_entry& entry,
                                         const std::vector<std::string>& hex_tokens,
@@ -303,7 +338,10 @@ jobject NewTextFollowRawDisplayUnitViewData(
         return nullptr;
     }
     jmethodID ctor =
-        env->GetMethodID(entry_class, "<init>", "(IIIIIILjava/lang/String;Ljava/lang/String;)V");
+        env->GetMethodID(
+            entry_class,
+            "<init>",
+            "(IIIIIIIIIZZLjava/lang/String;Ljava/lang/String;)V");
     if (ctor == nullptr) {
         return nullptr;
     }
@@ -345,6 +383,11 @@ jobject NewTextFollowRawDisplayUnitViewData(
         static_cast<jint>(entry.byte_index_within_token),
         static_cast<jint>(entry.byte_offset),
         static_cast<jint>(entry.byte_count),
+        static_cast<jint>(entry.character_index_within_token),
+        static_cast<jint>(entry.byte_index_within_character),
+        static_cast<jint>(entry.character_byte_count),
+        entry.is_character_start != 0 ? JNI_TRUE : JNI_FALSE,
+        entry.is_character_end != 0 ? JNI_TRUE : JNI_FALSE,
         hex_value,
         binary_value);
 }
@@ -492,6 +535,24 @@ jobject NewTextTimelineList(JNIEnv* env,
     return list;
 }
 
+jobject NewTextCharacterList(JNIEnv* env,
+                             const std::vector<bag_text_follow_character_entry>& entries,
+                             const std::string& text_character_text) {
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    if (list == nullptr) {
+        return nullptr;
+    }
+    for (const auto& entry : entries) {
+        jobject item =
+            NewTextFollowCharacterViewData(env, entry, text_character_text);
+        if (item == nullptr || !AddToList(env, list, item)) {
+            return nullptr;
+        }
+        env->DeleteLocalRef(item);
+    }
+    return list;
+}
+
 jobject NewTextRawSegmentList(JNIEnv* env,
                               const std::vector<bag_text_follow_raw_segment_entry>& entries,
                               const std::vector<std::string>& hex_tokens,
@@ -582,10 +643,12 @@ jobject NewLineRawSegmentList(JNIEnv* env,
 
 jobject NewPayloadFollowViewData(JNIEnv* env,
                                  const std::string& text_tokens,
+                                 const std::string& text_character_text,
                                  const std::string& lyric_lines,
                                  const std::string& raw_bytes_hex,
                                  const std::string& raw_bits_binary,
                                  const std::vector<bag_text_follow_token_entry>& text_entries,
+                                 const std::vector<bag_text_follow_character_entry>& text_characters,
                                  const std::vector<bag_text_follow_raw_segment_entry>& text_raw_segments,
                                  const std::vector<bag_text_follow_raw_display_unit_entry>& text_raw_display_units,
                                  const std::vector<bag_text_follow_lyric_line_entry>& line_entries,
@@ -607,7 +670,7 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         env->GetMethodID(
             result_class,
             "<init>",
-            "(Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;IIIZ)V");
+            "(Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;IIIZ)V");
     if (ctor == nullptr) {
         return nullptr;
     }
@@ -632,6 +695,8 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
 
     jobject text_list = NewStringList(env, text_follow_tokens);
     jobject text_timeline_list = NewTextTimelineList(env, text_entries);
+    jobject text_character_list =
+        NewTextCharacterList(env, text_characters, text_character_text);
     jobject text_raw_segment_list =
         NewTextRawSegmentList(env, text_raw_segments, hex_tokens, compact_bits);
     jobject text_raw_display_unit_list =
@@ -646,6 +711,7 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
     jobject byte_timeline_list = NewByteTimelineList(env, byte_entries);
     jobject binary_timeline_list = NewBinaryTimelineList(env, binary_entries);
     if (text_list == nullptr || text_timeline_list == nullptr ||
+        text_character_list == nullptr ||
         text_raw_segment_list == nullptr || text_raw_display_unit_list == nullptr ||
         lyric_line_list == nullptr ||
         lyric_line_timeline_list == nullptr || line_token_range_list == nullptr ||
@@ -659,6 +725,7 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         ctor,
         text_list,
         text_timeline_list,
+        text_character_list,
         text_raw_segment_list,
         text_raw_display_unit_list,
         text_follow_available,
@@ -800,7 +867,7 @@ jshortArray NewShortArrayFromPcmResult(JNIEnv* env, const bag_pcm16_result& resu
 
 jobject NewEmptyPayloadFollowViewData(JNIEnv* env) {
     return NewPayloadFollowViewData(
-        env, "", "", "", "", {}, {}, {}, {}, {}, {}, {}, {}, JNI_FALSE, JNI_FALSE, 0, 0, 0, JNI_FALSE);
+        env, "", "", "", "", "", {}, {}, {}, {}, {}, {}, {}, {}, {}, JNI_FALSE, JNI_FALSE, 0, 0, 0, JNI_FALSE);
 }
 
 jobject NewEmptyDecodedAudioPayloadResult(JNIEnv* env,
@@ -830,6 +897,9 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
     const std::string text_tokens = CopyApiString(
         result.text_follow_data.text_tokens_buffer,
         result.text_follow_data.text_tokens_size);
+    const std::string text_character_text = CopyApiString(
+        result.text_follow_data.text_character_text_buffer,
+        result.text_follow_data.text_character_text_size);
     const std::string lyric_lines = CopyApiString(
         result.text_follow_data.lyric_lines_buffer,
         result.text_follow_data.lyric_lines_size);
@@ -839,6 +909,8 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
         result.raw_bits_binary_buffer, result.raw_bits_binary_size);
     std::vector<bag_text_follow_token_entry> text_entries(
         result.text_follow_data.text_token_timeline_count);
+    std::vector<bag_text_follow_character_entry> text_characters(
+        result.text_follow_data.text_characters_count);
     std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(
         result.text_follow_data.token_raw_segments_count);
     std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(
@@ -860,6 +932,10 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
     if (!text_raw_segments.empty()) {
         std::copy_n(result.text_follow_data.token_raw_segments_buffer,
                     text_raw_segments.size(), text_raw_segments.begin());
+    }
+    if (!text_characters.empty()) {
+        std::copy_n(result.text_follow_data.text_characters_buffer,
+                    text_characters.size(), text_characters.begin());
     }
     if (!text_raw_display_units.empty()) {
         std::copy_n(result.text_follow_data.token_raw_display_units_buffer,
@@ -893,10 +969,12 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
     jobject follow_data = NewPayloadFollowViewData(
         env,
         text_tokens,
+        text_character_text,
         lyric_lines,
         raw_bytes_hex,
         raw_bits_binary,
         text_entries,
+        text_characters,
         text_raw_segments,
         text_raw_display_units,
         line_entries,

@@ -319,8 +319,8 @@ class PlaybackDataFollowSectionTest {
 
     @Test
     fun `annotation rows fit more byte groups when lyrics card is wide`() {
-        assertEquals(8, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 320f))
-        assertEquals(6, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 288f))
+        assertEquals(4, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 320f))
+        assertEquals(4, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 288f))
         assertEquals(4, annotationByteGroupsPerRow(PlaybackFollowViewMode.Hex, availableWidthDp = 220f))
         assertEquals(4, annotationByteGroupsPerRow(PlaybackFollowViewMode.Binary, availableWidthDp = 320f))
         assertEquals(3, annotationByteGroupsPerRow(PlaybackFollowViewMode.Binary, availableWidthDp = 300f))
@@ -501,21 +501,45 @@ class PlaybackDataFollowSectionTest {
     }
 
     @Test
-    fun `annotation character boundaries split non cjk token bytes`() {
+    fun `annotation divider styles split token bytes by character boundaries`() {
         assertEquals(
-            setOf(2, 4),
-            annotationCharacterBoundaryByteIndexes("під"),
+            mapOf(
+                2 to AnnotationDividerStyle.Strong,
+                4 to AnnotationDividerStyle.Strong,
+            ),
+            annotationDividerStylesByBoundary(
+                rawDisplayUnits = emptyList(),
+                fallbackCharacterDisplayUnits = characterDisplayUnits("під"),
+            ),
         )
         assertEquals(
-            setOf(1, 2),
-            annotationCharacterBoundaryByteIndexes("ABC"),
+            mapOf(
+                1 to AnnotationDividerStyle.Strong,
+                2 to AnnotationDividerStyle.Strong,
+            ),
+            annotationDividerStylesByBoundary(
+                rawDisplayUnits = emptyList(),
+                fallbackCharacterDisplayUnits = characterDisplayUnits("ABC"),
+            ),
         )
     }
 
     @Test
-    fun `annotation character boundaries are hidden for cjk token`() {
-        assertEquals(emptySet<Int>(), annotationCharacterBoundaryByteIndexes("漢字"))
-        assertEquals(emptySet<Int>(), annotationCharacterBoundaryByteIndexes("日"))
+    fun `annotation divider styles include cjk character boundaries`() {
+        assertEquals(
+            mapOf(3 to AnnotationDividerStyle.Strong),
+            annotationDividerStylesByBoundary(
+                rawDisplayUnits = emptyList(),
+                fallbackCharacterDisplayUnits = characterDisplayUnits("漢字"),
+            ),
+        )
+        assertEquals(
+            emptyMap<Int, AnnotationDividerStyle>(),
+            annotationDividerStylesByBoundary(
+                rawDisplayUnits = emptyList(),
+                fallbackCharacterDisplayUnits = characterDisplayUnits("日"),
+            ),
+        )
     }
 
     @Test
@@ -589,9 +613,36 @@ class PlaybackDataFollowSectionTest {
                 token = "ASH",
                 rawDisplayUnits =
                     listOf(
-                        TextFollowRawDisplayUnitViewData(0, 0, 1, 0, 0, 1, "41", "01000001"),
-                        TextFollowRawDisplayUnitViewData(0, 1, 1, 1, 1, 1, "53", "01010011"),
-                        TextFollowRawDisplayUnitViewData(0, 2, 2, 2, 2, 1, "48", "01001000"),
+                        TextFollowRawDisplayUnitViewData(
+                            tokenIndex = 0,
+                            startSample = 0,
+                            sampleCount = 1,
+                            byteIndexWithinToken = 0,
+                            byteOffset = 0,
+                            byteCount = 1,
+                            hexText = "41",
+                            binaryText = "01000001",
+                        ),
+                        TextFollowRawDisplayUnitViewData(
+                            tokenIndex = 0,
+                            startSample = 1,
+                            sampleCount = 1,
+                            byteIndexWithinToken = 1,
+                            byteOffset = 1,
+                            byteCount = 1,
+                            hexText = "53",
+                            binaryText = "01010011",
+                        ),
+                        TextFollowRawDisplayUnitViewData(
+                            tokenIndex = 0,
+                            startSample = 2,
+                            sampleCount = 2,
+                            byteIndexWithinToken = 2,
+                            byteOffset = 2,
+                            byteCount = 1,
+                            hexText = "48",
+                            binaryText = "01001000",
+                        ),
                     ),
             )
 
@@ -601,7 +652,17 @@ class PlaybackDataFollowSectionTest {
 
     @Test
     fun `active bit index uses follow timeline bit offset from libs`() {
-        val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
+        val rawDisplayUnit =
+            TextFollowRawDisplayUnitViewData(
+                tokenIndex = 0,
+                startSample = 0,
+                sampleCount = 80,
+                byteIndexWithinToken = 0,
+                byteOffset = 0,
+                byteCount = 1,
+                hexText = "41",
+                binaryText = "01000001",
+            )
         val activeBitIndex =
             activeBitIndexWithinByte(
                 activeTextIndex = 0,
@@ -628,7 +689,17 @@ class PlaybackDataFollowSectionTest {
 
     @Test
     fun `active bit position keeps completed bit during silence gap`() {
-        val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
+        val rawDisplayUnit =
+            TextFollowRawDisplayUnitViewData(
+                tokenIndex = 0,
+                startSample = 0,
+                sampleCount = 80,
+                byteIndexWithinToken = 0,
+                byteOffset = 0,
+                byteCount = 1,
+                hexText = "41",
+                binaryText = "01000001",
+            )
         val position =
             activeBitPositionWithinByte(
                 activeTextIndex = 0,
@@ -663,7 +734,17 @@ class PlaybackDataFollowSectionTest {
 
     @Test
     fun `active bit position reports tone active during current bit`() {
-        val rawDisplayUnit = TextFollowRawDisplayUnitViewData(0, 0, 80, 0, 0, 1, "41", "01000001")
+        val rawDisplayUnit =
+            TextFollowRawDisplayUnitViewData(
+                tokenIndex = 0,
+                startSample = 0,
+                sampleCount = 80,
+                byteIndexWithinToken = 0,
+                byteOffset = 0,
+                byteCount = 1,
+                hexText = "41",
+                binaryText = "01000001",
+            )
         val position =
             activeBitPositionWithinByte(
                 activeTextIndex = 0,
@@ -707,17 +788,116 @@ class PlaybackDataFollowSectionTest {
                 ),
             textRawDisplayUnits =
                 listOf(
-                    TextFollowRawDisplayUnitViewData(0, 0, 1, 0, 0, 1, "41", "01000001"),
-                    TextFollowRawDisplayUnitViewData(0, 1, 1, 1, 1, 1, "53", "01010011"),
-                    TextFollowRawDisplayUnitViewData(0, 2, 2, 2, 2, 1, "48", "01001000"),
-                    TextFollowRawDisplayUnitViewData(1, 4, 1, 0, 3, 1, "42", "01000010"),
-                    TextFollowRawDisplayUnitViewData(1, 5, 1, 1, 4, 1, "45", "01000101"),
-                    TextFollowRawDisplayUnitViewData(1, 6, 1, 2, 5, 1, "4C", "01001100"),
-                    TextFollowRawDisplayUnitViewData(1, 7, 1, 3, 6, 1, "4C", "01001100"),
-                    TextFollowRawDisplayUnitViewData(2, 8, 1, 0, 7, 1, "52", "01010010"),
-                    TextFollowRawDisplayUnitViewData(2, 9, 1, 1, 8, 1, "49", "01001001"),
-                    TextFollowRawDisplayUnitViewData(2, 10, 1, 2, 9, 1, "54", "01010100"),
-                    TextFollowRawDisplayUnitViewData(2, 11, 1, 3, 10, 1, "45", "01000101"),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 0,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 0,
+                        byteOffset = 0,
+                        byteCount = 1,
+                        hexText = "41",
+                        binaryText = "01000001",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 1,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 1,
+                        byteOffset = 1,
+                        byteCount = 1,
+                        hexText = "53",
+                        binaryText = "01010011",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 2,
+                        sampleCount = 2,
+                        byteIndexWithinToken = 2,
+                        byteOffset = 2,
+                        byteCount = 1,
+                        hexText = "48",
+                        binaryText = "01001000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 1,
+                        startSample = 4,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 0,
+                        byteOffset = 3,
+                        byteCount = 1,
+                        hexText = "42",
+                        binaryText = "01000010",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 1,
+                        startSample = 5,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 1,
+                        byteOffset = 4,
+                        byteCount = 1,
+                        hexText = "45",
+                        binaryText = "01000101",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 1,
+                        startSample = 6,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 2,
+                        byteOffset = 5,
+                        byteCount = 1,
+                        hexText = "4C",
+                        binaryText = "01001100",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 1,
+                        startSample = 7,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 3,
+                        byteOffset = 6,
+                        byteCount = 1,
+                        hexText = "4C",
+                        binaryText = "01001100",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 2,
+                        startSample = 8,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 0,
+                        byteOffset = 7,
+                        byteCount = 1,
+                        hexText = "52",
+                        binaryText = "01010010",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 2,
+                        startSample = 9,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 1,
+                        byteOffset = 8,
+                        byteCount = 1,
+                        hexText = "49",
+                        binaryText = "01001001",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 2,
+                        startSample = 10,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 2,
+                        byteOffset = 9,
+                        byteCount = 1,
+                        hexText = "54",
+                        binaryText = "01010100",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 2,
+                        startSample = 11,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 3,
+                        byteOffset = 10,
+                        byteCount = 1,
+                        hexText = "45",
+                        binaryText = "01000101",
+                    ),
                 ),
             textFollowAvailable = true,
             followAvailable = true,
@@ -732,30 +912,246 @@ class PlaybackDataFollowSectionTest {
                 ),
             textRawDisplayUnits =
                 listOf(
-                    TextFollowRawDisplayUnitViewData(0, 0, 1, 0, 0, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 1, 1, 1, 1, 1, "BF", "10111111"),
-                    TextFollowRawDisplayUnitViewData(0, 2, 1, 2, 2, 1, "D1", "11010001"),
-                    TextFollowRawDisplayUnitViewData(0, 3, 1, 3, 3, 1, "96", "10010110"),
-                    TextFollowRawDisplayUnitViewData(0, 4, 1, 4, 4, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 5, 1, 5, 5, 1, "B4", "10110100"),
-                    TextFollowRawDisplayUnitViewData(0, 6, 1, 6, 6, 1, "D1", "11010001"),
-                    TextFollowRawDisplayUnitViewData(0, 7, 1, 7, 7, 1, "82", "10000010"),
-                    TextFollowRawDisplayUnitViewData(0, 8, 1, 8, 8, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 9, 1, 9, 9, 1, "B2", "10110010"),
-                    TextFollowRawDisplayUnitViewData(0, 10, 1, 10, 10, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 11, 1, 11, 11, 1, "B5", "10110101"),
-                    TextFollowRawDisplayUnitViewData(0, 12, 1, 12, 12, 1, "D1", "11010001"),
-                    TextFollowRawDisplayUnitViewData(0, 13, 1, 13, 13, 1, "80", "10000000"),
-                    TextFollowRawDisplayUnitViewData(0, 14, 1, 14, 14, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 15, 1, 15, 15, 1, "B4", "10110100"),
-                    TextFollowRawDisplayUnitViewData(0, 16, 1, 16, 16, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 17, 1, 17, 17, 1, "B6", "10110110"),
-                    TextFollowRawDisplayUnitViewData(0, 18, 1, 18, 18, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 19, 1, 19, 19, 1, "B5", "10110101"),
-                    TextFollowRawDisplayUnitViewData(0, 20, 1, 20, 20, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 21, 1, 21, 21, 1, "BD", "10111101"),
-                    TextFollowRawDisplayUnitViewData(0, 22, 1, 22, 22, 1, "D0", "11010000"),
-                    TextFollowRawDisplayUnitViewData(0, 23, 1, 23, 23, 1, "BE", "10111110"),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 0,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 0,
+                        byteOffset = 0,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 1,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 1,
+                        byteOffset = 1,
+                        byteCount = 1,
+                        hexText = "BF",
+                        binaryText = "10111111",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 2,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 2,
+                        byteOffset = 2,
+                        byteCount = 1,
+                        hexText = "D1",
+                        binaryText = "11010001",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 3,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 3,
+                        byteOffset = 3,
+                        byteCount = 1,
+                        hexText = "96",
+                        binaryText = "10010110",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 4,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 4,
+                        byteOffset = 4,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 5,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 5,
+                        byteOffset = 5,
+                        byteCount = 1,
+                        hexText = "B4",
+                        binaryText = "10110100",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 6,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 6,
+                        byteOffset = 6,
+                        byteCount = 1,
+                        hexText = "D1",
+                        binaryText = "11010001",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 7,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 7,
+                        byteOffset = 7,
+                        byteCount = 1,
+                        hexText = "82",
+                        binaryText = "10000010",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 8,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 8,
+                        byteOffset = 8,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 9,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 9,
+                        byteOffset = 9,
+                        byteCount = 1,
+                        hexText = "B2",
+                        binaryText = "10110010",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 10,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 10,
+                        byteOffset = 10,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 11,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 11,
+                        byteOffset = 11,
+                        byteCount = 1,
+                        hexText = "B5",
+                        binaryText = "10110101",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 12,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 12,
+                        byteOffset = 12,
+                        byteCount = 1,
+                        hexText = "D1",
+                        binaryText = "11010001",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 13,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 13,
+                        byteOffset = 13,
+                        byteCount = 1,
+                        hexText = "80",
+                        binaryText = "10000000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 14,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 14,
+                        byteOffset = 14,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 15,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 15,
+                        byteOffset = 15,
+                        byteCount = 1,
+                        hexText = "B4",
+                        binaryText = "10110100",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 16,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 16,
+                        byteOffset = 16,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 17,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 17,
+                        byteOffset = 17,
+                        byteCount = 1,
+                        hexText = "B6",
+                        binaryText = "10110110",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 18,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 18,
+                        byteOffset = 18,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 19,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 19,
+                        byteOffset = 19,
+                        byteCount = 1,
+                        hexText = "B5",
+                        binaryText = "10110101",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 20,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 20,
+                        byteOffset = 20,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 21,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 21,
+                        byteOffset = 21,
+                        byteCount = 1,
+                        hexText = "BD",
+                        binaryText = "10111101",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 22,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 22,
+                        byteOffset = 22,
+                        byteCount = 1,
+                        hexText = "D0",
+                        binaryText = "11010000",
+                    ),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 23,
+                        sampleCount = 1,
+                        byteIndexWithinToken = 23,
+                        byteOffset = 23,
+                        byteCount = 1,
+                        hexText = "BE",
+                        binaryText = "10111110",
+                    ),
                 ),
             textFollowAvailable = true,
             followAvailable = true,

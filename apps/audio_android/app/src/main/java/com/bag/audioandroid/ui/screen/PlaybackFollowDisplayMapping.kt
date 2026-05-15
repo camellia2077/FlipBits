@@ -1,5 +1,7 @@
 package com.bag.audioandroid.ui.screen
 
+import com.bag.audioandroid.domain.TextFollowCharacterKind
+import com.bag.audioandroid.domain.TextFollowCharacterViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import java.nio.charset.StandardCharsets
 
@@ -73,6 +75,28 @@ internal data class CharacterDisplayUnit(
     val byteCount: Int,
 )
 
+internal fun characterDisplayUnits(
+    token: String,
+    textCharacters: List<TextFollowCharacterViewData>,
+): List<CharacterDisplayUnit> =
+    if (textCharacters.isNotEmpty()) {
+        textCharacters
+            .sortedWith(
+                compareBy(
+                    TextFollowCharacterViewData::characterIndexWithinToken,
+                    TextFollowCharacterViewData::byteIndexWithinToken,
+                ),
+            ).map { entry ->
+                CharacterDisplayUnit(
+                    text = entry.layoutText,
+                    byteStartIndexWithinToken = entry.byteIndexWithinToken,
+                    byteCount = entry.byteCount,
+                )
+            }
+    } else {
+        characterDisplayUnits(token)
+    }
+
 internal fun characterDisplayUnits(token: String): List<CharacterDisplayUnit> {
     if (token.isEmpty()) {
         return emptyList()
@@ -96,18 +120,64 @@ internal fun characterDisplayUnits(token: String): List<CharacterDisplayUnit> {
     return units
 }
 
-internal fun annotationCharacterBoundaryByteIndexes(
-    token: String,
-    characterDisplayUnits: List<CharacterDisplayUnit> = characterDisplayUnits(token),
-): Set<Int> {
-    if (characterDisplayUnits.size <= 1 || token.containsCjkCodePoint()) {
-        return emptySet()
-    }
-    return characterDisplayUnits
-        .dropLast(1)
-        .mapTo(LinkedHashSet()) { unit ->
-            unit.byteStartIndexWithinToken + unit.byteCount
+private val TextFollowCharacterViewData.layoutText: String
+    get() =
+        when (kind) {
+            TextFollowCharacterKind.Visible -> text
+            // Separator characters still need layout width so token highlighting
+            // can stay aligned with the byte timeline while remaining visually blank.
+            TextFollowCharacterKind.Space,
+            TextFollowCharacterKind.Newline,
+            TextFollowCharacterKind.SeparatorOther,
+            -> "\u00A0".repeat(text.codePointCount(0, text.length).coerceAtLeast(1))
         }
+
+internal enum class AnnotationDividerStyle {
+    Thin,
+    Strong,
+}
+
+internal fun annotationDividerStylesByBoundary(
+    rawDisplayUnits: List<TextFollowRawDisplayUnitViewData>,
+    fallbackCharacterDisplayUnits: List<CharacterDisplayUnit> = emptyList(),
+): Map<Int, AnnotationDividerStyle> {
+    if (rawDisplayUnits.isNotEmpty()) {
+        val sortedUnits = rawDisplayUnits.sortedBy(TextFollowRawDisplayUnitViewData::byteIndexWithinToken)
+        if (sortedUnits.any { it.characterByteCount > 0 || it.isCharacterStart || it.isCharacterEnd }) {
+            return buildMap(sortedUnits.size) {
+                for (index in 0 until sortedUnits.lastIndex) {
+                    val unit = sortedUnits[index]
+                    put(
+                        unit.byteIndexWithinToken + unit.byteCount,
+                        if (unit.isCharacterEnd) {
+                            AnnotationDividerStyle.Strong
+                        } else {
+                            AnnotationDividerStyle.Thin
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    if (fallbackCharacterDisplayUnits.isEmpty()) {
+        return emptyMap()
+    }
+    return buildMap {
+        fallbackCharacterDisplayUnits
+            .dropLast(1)
+            .forEach { unit ->
+                put(unit.byteStartIndexWithinToken + unit.byteCount, AnnotationDividerStyle.Strong)
+            }
+        if (rawDisplayUnits.isNotEmpty()) {
+            val sortedUnits = rawDisplayUnits.sortedBy(TextFollowRawDisplayUnitViewData::byteIndexWithinToken)
+            for (index in 0 until sortedUnits.lastIndex) {
+                val boundaryIndex =
+                    sortedUnits[index].byteIndexWithinToken + sortedUnits[index].byteCount
+                putIfAbsent(boundaryIndex, AnnotationDividerStyle.Thin)
+            }
+        }
+    }
 }
 
 internal data class HexNibbleGroup(

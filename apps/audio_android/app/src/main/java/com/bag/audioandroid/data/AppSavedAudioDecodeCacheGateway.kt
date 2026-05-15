@@ -10,6 +10,7 @@ import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
 import com.bag.audioandroid.domain.SavedAudioDecodedCacheEntry
 import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.domain.TextFollowCharacterViewData
 import com.bag.audioandroid.domain.TextFollowLineRawSegmentViewData
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
@@ -157,6 +158,7 @@ private fun PayloadFollowViewData.toJson() =
     JSONObject()
         .put("text_tokens", JSONArray(textTokens))
         .put("text_token_timeline", JSONArray().apply { textTokenTimeline.forEach { put(it.toJson()) } })
+        .put("text_characters", JSONArray().apply { textCharacters.forEach { put(it.toJson()) } })
         .put("text_raw_segments", JSONArray().apply { textRawSegments.forEach { put(it.toJson()) } })
         .put("text_raw_display_units", JSONArray().apply { textRawDisplayUnits.forEach { put(it.toJson()) } })
         .put("text_follow_available", textFollowAvailable)
@@ -178,6 +180,7 @@ private fun JSONObject.toFollowData() =
     PayloadFollowViewData(
         textTokens = optJSONArray("text_tokens").toStringList(),
         textTokenTimeline = optJSONArray("text_token_timeline").toObjectList { it.toTextFollowTimelineEntry() },
+        textCharacters = optJSONArray("text_characters").toObjectList { it.toTextFollowCharacterViewData() },
         textRawSegments = optJSONArray("text_raw_segments").toObjectList { it.toTextFollowRawSegmentViewData() },
         textRawDisplayUnits = optJSONArray("text_raw_display_units").toObjectList { it.toTextFollowRawDisplayUnitViewData() },
         textFollowAvailable = optBoolean("text_follow_available"),
@@ -230,6 +233,29 @@ private fun JSONObject.toTextFollowRawSegmentViewData() =
         binaryText = optString("binary_text"),
     )
 
+private fun TextFollowCharacterViewData.toJson() =
+    JSONObject()
+        .put("token_index", tokenIndex)
+        .put("character_index_within_token", characterIndexWithinToken)
+        .put("byte_index_within_token", byteIndexWithinToken)
+        .put("byte_count", byteCount)
+        .put("start_sample", startSample)
+        .put("sample_count", sampleCount)
+        .put("kind_code", kindCode)
+        .put("text", text)
+
+private fun JSONObject.toTextFollowCharacterViewData() =
+    TextFollowCharacterViewData(
+        tokenIndex = optInt("token_index"),
+        characterIndexWithinToken = optInt("character_index_within_token"),
+        byteIndexWithinToken = optInt("byte_index_within_token"),
+        byteCount = optInt("byte_count"),
+        startSample = optInt("start_sample"),
+        sampleCount = optInt("sample_count"),
+        kindCode = optInt("kind_code"),
+        text = optString("text"),
+    )
+
 private fun TextFollowRawDisplayUnitViewData.toJson() =
     JSONObject()
         .put("token_index", tokenIndex)
@@ -238,6 +264,11 @@ private fun TextFollowRawDisplayUnitViewData.toJson() =
         .put("byte_index_within_token", byteIndexWithinToken)
         .put("byte_offset", byteOffset)
         .put("byte_count", byteCount)
+        .put("character_index_within_token", characterIndexWithinToken)
+        .put("byte_index_within_character", byteIndexWithinCharacter)
+        .put("character_byte_count", characterByteCount)
+        .put("is_character_start", isCharacterStart)
+        .put("is_character_end", isCharacterEnd)
         .put("hex_text", hexText)
         .put("binary_text", binaryText)
 
@@ -249,6 +280,11 @@ private fun JSONObject.toTextFollowRawDisplayUnitViewData() =
         byteIndexWithinToken = optInt("byte_index_within_token"),
         byteOffset = optInt("byte_offset"),
         byteCount = optInt("byte_count"),
+        characterIndexWithinToken = optInt("character_index_within_token"),
+        byteIndexWithinCharacter = optInt("byte_index_within_character"),
+        characterByteCount = optInt("character_byte_count"),
+        isCharacterStart = optBoolean("is_character_start"),
+        isCharacterEnd = optBoolean("is_character_end"),
         hexText = optString("hex_text"),
         binaryText = optString("binary_text"),
     )

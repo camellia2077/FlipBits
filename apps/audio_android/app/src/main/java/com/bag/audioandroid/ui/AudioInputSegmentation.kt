@@ -6,6 +6,7 @@ import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
+import com.bag.audioandroid.domain.TextFollowCharacterViewData
 import com.bag.audioandroid.domain.TextFollowLineRawSegmentViewData
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
@@ -86,6 +87,7 @@ private fun mergeSegmentedFollowData(
 
     val textTokens = ArrayList<String>()
     val textTokenTimeline = ArrayList<TextFollowTimelineEntry>()
+    val textCharacters = ArrayList<TextFollowCharacterViewData>()
     val textRawSegments = ArrayList<TextFollowRawSegmentViewData>()
     val textRawDisplayUnits = ArrayList<TextFollowRawDisplayUnitViewData>()
     val lyricLines = ArrayList<String>()
@@ -122,6 +124,13 @@ private fun mergeSegmentedFollowData(
                 entry.copy(
                     startSample = sampleOffset + entry.startSample,
                     tokenIndex = tokenOffset + entry.tokenIndex,
+                )
+            }
+        textCharacters +=
+            segment.textCharacters.map { entry ->
+                entry.copy(
+                    tokenIndex = tokenOffset + entry.tokenIndex,
+                    startSample = sampleOffset + entry.startSample,
                 )
             }
         textRawSegments +=
@@ -190,6 +199,7 @@ private fun mergeSegmentedFollowData(
     return PayloadFollowViewData(
         textTokens = textTokens,
         textTokenTimeline = textTokenTimeline,
+        textCharacters = textCharacters,
         textRawSegments = textRawSegments,
         textRawDisplayUnits = textRawDisplayUnits,
         textFollowAvailable = segments.all(PayloadFollowViewData::textFollowAvailable),

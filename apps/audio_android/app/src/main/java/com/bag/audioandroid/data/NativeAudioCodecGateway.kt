@@ -92,20 +92,15 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): EncodedAudioPayloadResult {
-        val result =
-            NativeBagBridge.nativeBuildEncodeFollowData(
-                text,
-                sampleRateHz,
-                frameSamples,
-                mode,
-                flashSignalProfile,
-                flashVoicingFlavor,
-            )
-        return result.copy(
-            followData = result.followData.normalizeDesignTokens(),
+    ): EncodedAudioPayloadResult =
+        NativeBagBridge.nativeBuildEncodeFollowData(
+            text,
+            sampleRateHz,
+            frameSamples,
+            mode,
+            flashSignalProfile,
+            flashVoicingFlavor,
         )
-    }
 
     override fun describeFlashSignal(
         text: String,
@@ -144,20 +139,15 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): DecodedAudioPayloadResult {
-        val result =
-            NativeBagBridge.nativeDecodeGeneratedPcm(
-                pcm,
-                sampleRateHz,
-                frameSamples,
-                mode,
-                flashSignalProfile,
-                flashVoicingFlavor,
-            )
-        return result.copy(
-            followData = result.followData.normalizeDesignTokens(),
+    ): DecodedAudioPayloadResult =
+        NativeBagBridge.nativeDecodeGeneratedPcm(
+            pcm,
+            sampleRateHz,
+            frameSamples,
+            mode,
+            flashSignalProfile,
+            flashVoicingFlavor,
         )
-    }
 
     override fun getCoreVersion(): String = NativeBagBridge.nativeGetCoreVersion()
 

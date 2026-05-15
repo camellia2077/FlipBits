@@ -82,6 +82,26 @@ struct TextFollowTokenTimelineEntry {
     std::size_t token_index = 0;
 };
 
+// Character-level follow semantics inside a token. Android uses this to keep
+// separator timing aligned with payload bytes without inventing extra glyphs.
+enum class TextFollowCharacterKind {
+    kVisible = 0,         // Visible text glyphs such as letters, digits, CJK.
+    kSpace = 1,           // Space-like separators that should keep layout width.
+    kNewline = 2,         // Newline separators attached to the preceding token.
+    kSeparatorOther = 3,  // Other non-visible separators not covered above.
+};
+
+struct TextFollowCharacterEntry {
+    std::size_t start_sample = 0;
+    std::size_t sample_count = 0;
+    std::size_t token_index = 0;
+    std::size_t character_index_within_token = 0;
+    std::size_t byte_index_within_token = 0;
+    std::size_t byte_count = 0;
+    TextFollowCharacterKind kind = TextFollowCharacterKind::kVisible;
+    std::string text;
+};
+
 struct TextFollowRawSegmentEntry {
     std::size_t start_sample = 0;
     std::size_t sample_count = 0;
@@ -97,6 +117,11 @@ struct TextFollowRawDisplayUnitEntry {
     std::size_t byte_index_within_token = 0;
     std::size_t byte_offset = 0;
     std::size_t byte_count = 0;
+    std::size_t character_index_within_token = 0;
+    std::size_t byte_index_within_character = 0;
+    std::size_t character_byte_count = 0;
+    bool is_character_start = false;
+    bool is_character_end = false;
 };
 
 struct TextFollowLyricLineTimelineEntry {
@@ -122,6 +147,7 @@ struct TextFollowLineRawSegmentEntry {
 struct TextFollowData {
     std::vector<std::string> text_tokens;
     std::vector<TextFollowTokenTimelineEntry> text_token_timeline;
+    std::vector<TextFollowCharacterEntry> text_characters;
     std::vector<TextFollowRawSegmentEntry> token_raw_segments;
     std::vector<TextFollowRawDisplayUnitEntry> token_raw_display_units;
     std::vector<std::string> lyric_lines;

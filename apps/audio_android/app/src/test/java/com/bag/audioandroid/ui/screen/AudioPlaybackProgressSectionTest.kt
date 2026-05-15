@@ -303,7 +303,16 @@ class AudioPlaybackProgressSectionTest {
                 ),
             textRawDisplayUnits =
                 listOf(
-                    TextFollowRawDisplayUnitViewData(0, 0, 4, 0, 0, 1, "41", "01000001"),
+                    TextFollowRawDisplayUnitViewData(
+                        tokenIndex = 0,
+                        startSample = 0,
+                        sampleCount = 4,
+                        byteIndexWithinToken = 0,
+                        byteOffset = 0,
+                        byteCount = 1,
+                        hexText = "41",
+                        binaryText = "01000001",
+                    ),
                 ),
             byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 8, 0)),
             textFollowAvailable = true,

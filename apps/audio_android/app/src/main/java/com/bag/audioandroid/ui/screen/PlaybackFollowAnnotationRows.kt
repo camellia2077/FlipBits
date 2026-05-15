@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
@@ -84,8 +85,11 @@ internal fun PlaybackFollowAnnotationRows(
             }
         }
         val boundaryByteIndexes =
-            remember(token, characterDisplayUnits) {
-                annotationCharacterBoundaryByteIndexes(token, characterDisplayUnits)
+            remember(rawDisplayUnits, characterDisplayUnits) {
+                annotationDividerStylesByBoundary(
+                    rawDisplayUnits = rawDisplayUnits,
+                    fallbackCharacterDisplayUnits = characterDisplayUnits,
+                )
             }
         when (annotationMode) {
             PlaybackFollowViewMode.Binary -> {
@@ -93,12 +97,14 @@ internal fun PlaybackFollowAnnotationRows(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                            .padding(horizontal = BinaryAnnotationHorizontalPadding, vertical = 6.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     visibleWindow.groups.chunked(byteGroupsPerRow).forEachIndexed { rowIndex, rowGroups ->
-                        PlaybackByteGroupRow {
+                        PlaybackByteGroupRow(
+                            horizontalSpacing = BinaryAnnotationGroupSpacing,
+                        ) {
                             val isFirstRow = rowIndex == 0
                             val isLastRow = rowIndex == visibleWindow.groups.chunked(byteGroupsPerRow).lastIndex
                             if (isFirstRow && visibleWindow.hasLeadingOverflow) {
@@ -129,9 +135,10 @@ internal fun PlaybackFollowAnnotationRows(
                                     focusColor = focusColor,
                                     onFocusColor = onFocusColor,
                                     inactiveColor = inactiveRawColor,
+                                    modifier = Modifier.width(BinaryByteBlockWidth),
                                 )
-                                PlaybackCharacterBoundaryDivider(
-                                    visible = byteIndex + 1 in boundaryByteIndexes,
+                                PlaybackByteBoundaryDivider(
+                                    style = boundaryByteIndexes[byteIndex + 1],
                                     color = inactiveRawColor,
                                 )
                             }
@@ -172,8 +179,8 @@ internal fun PlaybackFollowAnnotationRows(
                                     onFocusColor = onFocusColor,
                                     inactiveColor = inactiveRawColor,
                                 )
-                                PlaybackCharacterBoundaryDivider(
-                                    visible = byteIndex + 1 in boundaryByteIndexes,
+                                PlaybackByteBoundaryDivider(
+                                    style = boundaryByteIndexes[byteIndex + 1],
                                     color = inactiveRawColor,
                                 )
                             }
@@ -247,9 +254,14 @@ internal fun PlaybackFollowAnnotationRows(
 }
 
 @Composable
-private fun PlaybackByteGroupRow(content: @Composable () -> Unit) {
+private fun PlaybackByteGroupRow(
+    horizontalSpacing: Dp = 6.dp,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(horizontalSpacing, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         content()
@@ -257,17 +269,27 @@ private fun PlaybackByteGroupRow(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun PlaybackCharacterBoundaryDivider(
-    visible: Boolean,
+private fun PlaybackByteBoundaryDivider(
+    style: AnnotationDividerStyle?,
     color: Color,
 ) {
-    if (visible) {
+    if (style != null) {
+        val alpha =
+            when (style) {
+                AnnotationDividerStyle.Thin -> ByteBoundaryDividerThinAlpha
+                AnnotationDividerStyle.Strong -> ByteBoundaryDividerStrongAlpha
+            }
+        val height =
+            when (style) {
+                AnnotationDividerStyle.Thin -> ByteBoundaryDividerThinHeight
+                AnnotationDividerStyle.Strong -> ByteBoundaryDividerStrongHeight
+            }
         Box(
             modifier =
                 Modifier
-                    .height(CharacterBoundaryDividerHeight)
+                    .height(height)
                     .width(1.dp)
-                    .background(color.copy(alpha = CharacterBoundaryDividerAlpha)),
+                    .background(color.copy(alpha = alpha)),
         )
     }
 }
@@ -288,20 +310,17 @@ private fun AnnotationOverflowIndicator(color: Color) {
 }
 
 private val MorseLetterDividerHeight = 34.dp
-private val CharacterBoundaryDividerHeight = 28.dp
-private const val CharacterBoundaryDividerAlpha = 0.44f
+private val ByteBoundaryDividerThinHeight = 20.dp
+private val ByteBoundaryDividerStrongHeight = 28.dp
+private const val ByteBoundaryDividerThinAlpha = 0.22f
+private const val ByteBoundaryDividerStrongAlpha = 0.44f
 
 internal fun annotationByteGroupsPerRow(
     mode: PlaybackFollowViewMode,
     availableWidthDp: Float,
 ): Int =
     when (mode) {
-        PlaybackFollowViewMode.Hex ->
-            when {
-                availableWidthDp >= HexWideRowMinWidthDp -> 8
-                availableWidthDp >= HexMediumRowMinWidthDp -> 6
-                else -> 4
-            }
+        PlaybackFollowViewMode.Hex -> 4
 
         PlaybackFollowViewMode.Binary ->
             if (availableWidthDp >= BinaryWideRowMinWidthDp) {
@@ -313,9 +332,10 @@ internal fun annotationByteGroupsPerRow(
         PlaybackFollowViewMode.Morse -> 1
     }
 
-private const val HexMediumRowMinWidthDp = 288f
-private const val HexWideRowMinWidthDp = 320f
 private const val BinaryWideRowMinWidthDp = 320f
+private val BinaryAnnotationHorizontalPadding = 4.dp
+private val BinaryAnnotationGroupSpacing = 4.dp
+private val BinaryByteBlockWidth = 68.dp
 
 internal fun annotationMaxVisibleRows(mode: PlaybackFollowViewMode): Int =
     when (mode) {

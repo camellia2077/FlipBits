@@ -53,6 +53,7 @@
   - 只需要定位英文基线 `apps/audio_android/app/src/main/res/values/strings_*.xml` 和对应 `values-*` 文件；通常不用展开 core/native 文档。
 - 只改 core follow / lyrics / visual timeline 对齐
   - 先看 `docs/design/transports.md`
+  - 再看 `docs/architecture/text-follow-contract.md`
   - 再看 `docs/architecture/repo-map.md` 的 `mini / flash / pro / ultra`、`播放会话 runtime / seek 语义`、测试地图相关入口
   - 重点入口通常是 `libs/audio_core/src/transport/follow.cpp`、`libs/audio_api/tests/api_sync_tests.cpp` 和 Android follow/visual 组件。
 - 改 `mini / flash / pro / ultra` 模式实现

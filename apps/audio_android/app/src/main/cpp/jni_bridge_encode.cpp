@@ -74,8 +74,10 @@ jobject NativeBuildEncodeFollowData(
     std::array<char, 4096> raw_bytes_hex_buffer{};
     std::array<char, 32768> raw_bits_binary_buffer{};
     std::vector<char> text_tokens_buffer(input.size() * 4 + 1, '\0');
+    std::vector<char> text_character_text_buffer(input.size() * 4 + 1, '\0');
     std::vector<char> lyric_lines_buffer(input.size() * 4 + 1, '\0');
     std::vector<bag_text_follow_token_entry> text_entries(input.size());
+    std::vector<bag_text_follow_character_entry> text_characters(input.size());
     std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(input.size());
     std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(input.size() * 4);
     std::vector<bag_text_follow_lyric_line_entry> line_entries(input.size());
@@ -90,10 +92,16 @@ jobject NativeBuildEncodeFollowData(
     result.raw_bits_binary_buffer_size = raw_bits_binary_buffer.size();
     result.text_follow_data.text_tokens_buffer = text_tokens_buffer.data();
     result.text_follow_data.text_tokens_buffer_size = text_tokens_buffer.size();
+    result.text_follow_data.text_character_text_buffer =
+        text_character_text_buffer.data();
+    result.text_follow_data.text_character_text_buffer_size =
+        text_character_text_buffer.size();
     result.text_follow_data.lyric_lines_buffer = lyric_lines_buffer.data();
     result.text_follow_data.lyric_lines_buffer_size = lyric_lines_buffer.size();
     result.text_follow_data.text_token_timeline_buffer = text_entries.data();
     result.text_follow_data.text_token_timeline_buffer_count = text_entries.size();
+    result.text_follow_data.text_characters_buffer = text_characters.data();
+    result.text_follow_data.text_characters_buffer_count = text_characters.size();
     result.text_follow_data.token_raw_segments_buffer = text_raw_segments.data();
     result.text_follow_data.token_raw_segments_buffer_count = text_raw_segments.size();
     result.text_follow_data.token_raw_display_units_buffer = text_raw_display_units.data();
@@ -204,9 +212,13 @@ jobject NativeDecodeGeneratedPcm(
     std::vector<char> raw_bytes_hex_buffer(probe.raw_bytes_hex_size + 1, '\0');
     std::vector<char> raw_bits_binary_buffer(probe.raw_bits_binary_size + 1, '\0');
     std::vector<char> text_tokens_buffer(probe.text_follow_data.text_tokens_size + 1, '\0');
+    std::vector<char> text_character_text_buffer(
+        probe.text_follow_data.text_character_text_size + 1, '\0');
     std::vector<char> lyric_lines_buffer(probe.text_follow_data.lyric_lines_size + 1, '\0');
     std::vector<bag_text_follow_token_entry> text_entries(
         probe.text_follow_data.text_token_timeline_count);
+    std::vector<bag_text_follow_character_entry> text_characters(
+        probe.text_follow_data.text_characters_count);
     std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(
         probe.text_follow_data.token_raw_segments_count);
     std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(
@@ -230,10 +242,16 @@ jobject NativeDecodeGeneratedPcm(
     result.raw_bits_binary_buffer_size = raw_bits_binary_buffer.size();
     result.text_follow_data.text_tokens_buffer = text_tokens_buffer.data();
     result.text_follow_data.text_tokens_buffer_size = text_tokens_buffer.size();
+    result.text_follow_data.text_character_text_buffer =
+        text_character_text_buffer.data();
+    result.text_follow_data.text_character_text_buffer_size =
+        text_character_text_buffer.size();
     result.text_follow_data.lyric_lines_buffer = lyric_lines_buffer.data();
     result.text_follow_data.lyric_lines_buffer_size = lyric_lines_buffer.size();
     result.text_follow_data.text_token_timeline_buffer = text_entries.data();
     result.text_follow_data.text_token_timeline_buffer_count = text_entries.size();
+    result.text_follow_data.text_characters_buffer = text_characters.data();
+    result.text_follow_data.text_characters_buffer_count = text_characters.size();
     result.text_follow_data.token_raw_segments_buffer = text_raw_segments.data();
     result.text_follow_data.token_raw_segments_buffer_count = text_raw_segments.size();
     result.text_follow_data.token_raw_display_units_buffer = text_raw_display_units.data();
@@ -255,6 +273,7 @@ jobject NativeDecodeGeneratedPcm(
     }
     bag_destroy_decoder(decoder);
     text_entries.resize(result.text_follow_data.text_token_timeline_count);
+    text_characters.resize(result.text_follow_data.text_characters_count);
     text_raw_segments.resize(result.text_follow_data.token_raw_segments_count);
     text_raw_display_units.resize(result.text_follow_data.token_raw_display_units_count);
     line_entries.resize(result.text_follow_data.lyric_line_timeline_count);
@@ -264,6 +283,9 @@ jobject NativeDecodeGeneratedPcm(
     binary_entries.resize(result.follow_data.binary_group_timeline_count);
     const std::string text(text_buffer.data(), result.text_size);
     const std::string text_tokens(text_tokens_buffer.data(), result.text_follow_data.text_tokens_size);
+    const std::string text_character_text(
+        text_character_text_buffer.data(),
+        result.text_follow_data.text_character_text_size);
     const std::string lyric_lines(lyric_lines_buffer.data(), result.text_follow_data.lyric_lines_size);
     const std::string raw_bytes_hex(raw_bytes_hex_buffer.data(), result.raw_bytes_hex_size);
     const std::string raw_bits_binary(raw_bits_binary_buffer.data(), result.raw_bits_binary_size);
@@ -277,10 +299,12 @@ jobject NativeDecodeGeneratedPcm(
     jobject follow_data = NewPayloadFollowViewData(
         env,
         text_tokens,
+        text_character_text,
         lyric_lines,
         raw_bytes_hex,
         raw_bits_binary,
         text_entries,
+        text_characters,
         text_raw_segments,
         text_raw_display_units,
         line_entries,

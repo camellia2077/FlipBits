@@ -20,11 +20,41 @@ data class PayloadFollowBinaryGroupTimelineEntry(
 )
 
 @Keep
+enum class TextFollowCharacterKind(
+    val wireValue: Int,
+) {
+    Visible(0),
+    Space(1),
+    Newline(2),
+    SeparatorOther(3),
+    ;
+
+    companion object {
+        fun fromWireValue(value: Int): TextFollowCharacterKind = entries.firstOrNull { it.wireValue == value } ?: SeparatorOther
+    }
+}
+
+@Keep
 data class TextFollowTimelineEntry(
     val startSample: Int,
     val sampleCount: Int,
     val tokenIndex: Int,
 )
+
+@Keep
+data class TextFollowCharacterViewData(
+    val tokenIndex: Int,
+    val characterIndexWithinToken: Int,
+    val byteIndexWithinToken: Int,
+    val byteCount: Int,
+    val startSample: Int,
+    val sampleCount: Int,
+    val kindCode: Int = TextFollowCharacterKind.Visible.wireValue,
+    val text: String = "",
+) {
+    val kind: TextFollowCharacterKind
+        get() = TextFollowCharacterKind.fromWireValue(kindCode)
+}
 
 @Keep
 data class TextFollowRawSegmentViewData(
@@ -45,6 +75,11 @@ data class TextFollowRawDisplayUnitViewData(
     val byteIndexWithinToken: Int,
     val byteOffset: Int,
     val byteCount: Int,
+    val characterIndexWithinToken: Int = 0,
+    val byteIndexWithinCharacter: Int = 0,
+    val characterByteCount: Int = 0,
+    val isCharacterStart: Boolean = false,
+    val isCharacterEnd: Boolean = false,
     val hexText: String,
     val binaryText: String,
 )
@@ -78,6 +113,7 @@ data class TextFollowLineRawSegmentViewData(
 data class PayloadFollowViewData(
     val textTokens: List<String> = emptyList(),
     val textTokenTimeline: List<TextFollowTimelineEntry> = emptyList(),
+    val textCharacters: List<TextFollowCharacterViewData> = emptyList(),
     val textRawSegments: List<TextFollowRawSegmentViewData> = emptyList(),
     val textRawDisplayUnits: List<TextFollowRawDisplayUnitViewData> = emptyList(),
     val textFollowAvailable: Boolean = false,

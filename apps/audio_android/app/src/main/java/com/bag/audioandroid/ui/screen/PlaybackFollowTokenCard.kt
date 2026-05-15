@@ -75,7 +75,18 @@ internal fun PlaybackFollowTokenCard(
     val inactiveRawColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isPast) 0.5f else 1.0f)
     val inactiveCharacterColor = tokenColor
     val annotationByteGroups = annotationByteGroupsForMode(annotationMode, rawDisplayUnits)
-    val characterDisplayUnits = remember(token) { characterDisplayUnits(token) }
+    val textCharacters =
+        remember(followData?.textCharacters, tokenIndex) {
+            if (followData == null || tokenIndex < 0) {
+                emptyList()
+            } else {
+                followData.textCharacters.filter { it.tokenIndex == tokenIndex }
+            }
+        }
+    val characterDisplayUnits =
+        remember(token, textCharacters) {
+            characterDisplayUnits(token, textCharacters)
+        }
     val tokenDisplayText =
         remember(
             token,
