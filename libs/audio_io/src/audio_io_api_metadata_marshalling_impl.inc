@@ -37,8 +37,8 @@ audio_io::FlipBitsAudioMetadataFlashVoicingStyle ToLibraryFlashStyle(
       return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kStandard;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY:
       return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany;
-    case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE:
-      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile;
+    case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY:
+      return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostility;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE:
       return audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCollapse;
     case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_ZEAL:
@@ -58,8 +58,8 @@ audio_io_metadata_flash_voicing_style ToApiFlashStyle(
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD;
     case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany:
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY;
-    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile:
-      return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE;
+    case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostility:
+      return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY;
     case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCollapse:
       return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE;
     case audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kZeal:

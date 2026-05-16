@@ -16,7 +16,7 @@ enum class TransportMode : std::uint8_t {
 enum class FlashSignalProfile : std::uint8_t {
   kStandard = 0,
   kLitany = 1,
-  kHostile = 3,
+  kHostility = 3,
   kCollapse = 4,
   kZeal = 5,
   kVoid = 6,
@@ -25,7 +25,7 @@ enum class FlashSignalProfile : std::uint8_t {
 enum class FlashVoicingFlavor : std::uint8_t {
   kStandard = 0,
   kLitany = 1,
-  kHostile = 3,
+  kHostility = 3,
   kCollapse = 4,
   kZeal = 5,
   kVoid = 6,
@@ -52,7 +52,7 @@ inline constexpr bool IsValidFlashSignalProfile(FlashSignalProfile profile) {
   switch (profile) {
     case FlashSignalProfile::kStandard:
     case FlashSignalProfile::kLitany:
-    case FlashSignalProfile::kHostile:
+    case FlashSignalProfile::kHostility:
     case FlashSignalProfile::kCollapse:
     case FlashSignalProfile::kZeal:
     case FlashSignalProfile::kVoid:
@@ -66,7 +66,7 @@ inline constexpr bool IsValidFlashVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
     case FlashVoicingFlavor::kStandard:
     case FlashVoicingFlavor::kLitany:
-    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kHostility:
     case FlashVoicingFlavor::kCollapse:
     case FlashVoicingFlavor::kZeal:
     case FlashVoicingFlavor::kVoid:

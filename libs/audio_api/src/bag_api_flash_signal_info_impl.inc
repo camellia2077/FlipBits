@@ -37,7 +37,7 @@ std::string DecodePathForFlashVoicing(bag::FlashVoicingFlavor flavor) {
     case bag::FlashVoicingFlavor::kVoid:
       return "variable-window gap-aware";
     case bag::FlashVoicingFlavor::kStandard:
-    case bag::FlashVoicingFlavor::kHostile:
+    case bag::FlashVoicingFlavor::kHostility:
     default:
       return "fixed low/high window";
   }

@@ -25,10 +25,10 @@ const char* bag_validation_issue_message(bag_validation_issue issue) {
     case BAG_VALIDATION_PAYLOAD_TOO_LARGE:
       return "Payload exceeds the 512-byte single-frame limit.";
     case BAG_VALIDATION_INVALID_FLASH_SIGNAL_PROFILE:
-      return "Unsupported flash signal profile. Use standard, hostile, litany, "
+      return "Unsupported flash signal profile. Use standard, hostility, litany, "
              "collapse, zeal, or void.";
     case BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR:
-      return "Unsupported flash voicing flavor. Use standard, hostile, litany, "
+      return "Unsupported flash voicing flavor. Use standard, hostility, litany, "
              "collapse, zeal, or void.";
     case BAG_VALIDATION_MINI_MORSE_ONLY:
       return "`mini` Morse mode supports A-Z, 0-9, common Morse punctuation, "

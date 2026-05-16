@@ -333,8 +333,8 @@ void TestEmotionShellProfilesAreDistinct() {
 
     const auto standard = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload, layout, bag::FlashVoicingFlavor::kStandard, short_config);
-    const auto hostile = bag::flash::ApplyVoicingToPayloadWithFlavor(
-        clean_payload, layout, bag::FlashVoicingFlavor::kHostile, short_config);
+    const auto hostility = bag::flash::ApplyVoicingToPayloadWithFlavor(
+        clean_payload, layout, bag::FlashVoicingFlavor::kHostility, short_config);
     const auto litany = bag::flash::ApplyVoicingToPayloadWithFlavor(
         clean_payload, layout, bag::FlashVoicingFlavor::kLitany, litany_config);
     const auto collapse = bag::flash::ApplyVoicingToPayloadWithFlavor(
@@ -348,14 +348,14 @@ void TestEmotionShellProfilesAreDistinct() {
         litany.descriptor.leading_nonpayload_samples + litany.descriptor.payload_sample_count;
 
     test::AssertTrue(
-        AverageAbsoluteDelta(standard.pcm, hostile.pcm, 0, kShortPreambleSampleCount) > 500.0,
-        "hostile preamble should have a distinct aggressive shell instead of reusing standard.");
+        AverageAbsoluteDelta(standard.pcm, hostility.pcm, 0, kShortPreambleSampleCount) > 500.0,
+        "hostility preamble should have a distinct aggressive shell instead of reusing standard.");
     test::AssertTrue(
         AverageAbsoluteSample(litany.pcm, litany_attack_begin, litany_attack_end) > 500.0,
         "litany preamble should have a distinct ceremonial shell instead of reusing standard.");
     test::AssertTrue(
-        AverageAbsoluteDelta(standard.pcm, hostile.pcm, epilogue_begin, epilogue_end) > 0.0,
-        "hostile epilogue should have a distinct aggressive shell instead of reusing standard.");
+        AverageAbsoluteDelta(standard.pcm, hostility.pcm, epilogue_begin, epilogue_end) > 0.0,
+        "hostility epilogue should have a distinct aggressive shell instead of reusing standard.");
     test::AssertTrue(
         AverageAbsoluteSample(
             litany.pcm,
@@ -427,7 +427,7 @@ void TestEmotionShellsStayOutsidePayloadDecode() {
     const auto config = MakeTrimEnabledConfig(kPreambleSampleCount, kEpilogueSampleCount);
     const bag::FlashVoicingFlavor flavors[] = {
         bag::FlashVoicingFlavor::kStandard,
-        bag::FlashVoicingFlavor::kHostile,
+        bag::FlashVoicingFlavor::kHostility,
         bag::FlashVoicingFlavor::kLitany,
         bag::FlashVoicingFlavor::kCollapse,
     };

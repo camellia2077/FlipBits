@@ -83,7 +83,7 @@ struct SanitizedVoicingConfig {
 enum class FixedShellCadenceProfile {
   kProtocolHandshake = 0,
   kStandardProtocol = 3,
-  kHostileChallenge = 4,
+  kHostilityChallenge = 4,
   kCollapseFailure = 5,
   kLitanyInvocation = 6,
   kZealRising = 7,
@@ -94,7 +94,7 @@ enum class FixedShellTimbreProfile {
   kInvocationClosure = 0,
   kProtocolBoundary = 1,
   kStandardBoundary = 2,
-  kHostileEdge = 3,
+  kHostilityEdge = 3,
   kCollapseFailure = 4,
   kLitanyInvocation = 5,
   kZealRising = 6,
@@ -131,7 +131,7 @@ struct VoicingStyleTraits {
   double litany_text_pause_tail_begin = 1.0;
   double standard_low_voice_gain = 0.0;
   double standard_low_voice_freq_hz = 120.0;
-  double hostile_edge_gain = 0.0;
+  double hostility_edge_gain = 0.0;
   double collapse_tremor_depth = 0.0;
   double collapse_hesitation_depth = 0.0;
   double collapse_hesitation_density = 0.0;
@@ -162,7 +162,7 @@ FlashVoicingFlavor NormalizeVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
     case FlashVoicingFlavor::kStandard:
     case FlashVoicingFlavor::kLitany:
-    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kHostility:
     case FlashVoicingFlavor::kCollapse:
     case FlashVoicingFlavor::kZeal:
     case FlashVoicingFlavor::kVoid:
@@ -640,7 +640,7 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .epilogue_terminal_mute_begin = 0.93,
           .epilogue_terminal_mute_end = 1.0,
       };
-    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kHostility:
       return VoicingStyleTraits{
           .nibble_boundary_accent_factor = 0.38,
           .byte_boundary_click_scale = 1.48,
@@ -656,7 +656,7 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .payload_release_scale = 0.56,
           .payload_envelope_floor = 0.03,
           .metallic_layer_gain_scale = 0.58,
-          .hostile_edge_gain = 0.062,
+          .hostility_edge_gain = 0.062,
           .payload_softclip_drive = 1.58,
           .payload_softclip_mix = 0.36,
           .tremolo_depth_scale = 0.20,
@@ -664,11 +664,11 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .spectral_band_mix_scale = 0.68,
           .spectral_softclip_mix_scale = 0.60,
           .preamble_cadence_profile =
-              FixedShellCadenceProfile::kHostileChallenge,
+              FixedShellCadenceProfile::kHostilityChallenge,
           .epilogue_cadence_profile =
-              FixedShellCadenceProfile::kHostileChallenge,
-          .preamble_timbre_profile = FixedShellTimbreProfile::kHostileEdge,
-          .epilogue_timbre_profile = FixedShellTimbreProfile::kHostileEdge,
+              FixedShellCadenceProfile::kHostilityChallenge,
+          .preamble_timbre_profile = FixedShellTimbreProfile::kHostilityEdge,
+          .epilogue_timbre_profile = FixedShellTimbreProfile::kHostilityEdge,
           .preamble_phrase_mask_mix = 1.0,
           .epilogue_phrase_mask_mix = 1.0,
           .preamble_terminal_mute_begin = 0.68,
@@ -731,7 +731,7 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .payload_release_scale = 0.70,
           .payload_envelope_floor = 0.02,
           .metallic_layer_gain_scale = 0.34,
-          .hostile_edge_gain = 0.018,
+          .hostility_edge_gain = 0.018,
           .payload_softclip_drive = 1.20,
           .payload_softclip_mix = 0.16,
           .tremolo_depth_scale = 0.16,
@@ -978,7 +978,7 @@ double ComputeStandardLowVoiceLayer(std::size_t sample_index, int sample_rate_hz
   return style_traits.standard_low_voice_gain * square_like;
 }
 
-double ComputeHostileEdgeLayer(double carrier_freq_hz, std::size_t local_index,
+double ComputeHostilityEdgeLayer(double carrier_freq_hz, std::size_t local_index,
                                int sample_rate_hz, double gain) {
   if (gain <= 0.0 || carrier_freq_hz <= 0.0 || sample_rate_hz <= 0) {
     return 0.0;

@@ -69,7 +69,7 @@ std::size_t SamplesPerBitForSignalProfile(FlashSignalProfile signal_profile,
       return std::max(static_cast<std::size_t>(1),
                       static_cast<std::size_t>(config.frame_samples) /
                           static_cast<std::size_t>(2));
-    case FlashSignalProfile::kHostile:
+    case FlashSignalProfile::kHostility:
       return std::max(static_cast<std::size_t>(1),
                       (static_cast<std::size_t>(config.frame_samples) *
                        static_cast<std::size_t>(7)) /
@@ -101,7 +101,7 @@ std::size_t SamplesPerSilenceSlotForSignalProfile(
     case FlashSignalProfile::kVoid:
       return static_cast<std::size_t>(config.frame_samples);
     case FlashSignalProfile::kStandard:
-    case FlashSignalProfile::kHostile:
+    case FlashSignalProfile::kHostility:
     case FlashSignalProfile::kCollapse:
     default:
       return SamplesPerBitForSignalProfile(signal_profile, config);
@@ -200,7 +200,7 @@ double GoertzelPower(const int16_t* chunk, int chunk_size, int sample_rate_hz,
 FlashVoicingFlavor NormalizeSignalVoicingFlavor(FlashVoicingFlavor flavor) {
   switch (flavor) {
     case FlashVoicingFlavor::kLitany:
-    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kHostility:
     case FlashVoicingFlavor::kCollapse:
     case FlashVoicingFlavor::kZeal:
     case FlashVoicingFlavor::kVoid:
@@ -290,7 +290,7 @@ double ZealHighCarrierForTimingClass(ZealTimingClass timing_class) {
   return ZealLowCarrierForTimingClass(timing_class) * 2.0;
 }
 
-double HostileLowCarrierForBit(std::size_t bit_position,
+double HostilityLowCarrierForBit(std::size_t bit_position,
                                std::size_t byte_index, uint8_t source_byte,
                                uint8_t bit_index_in_byte) {
   (void)source_byte;
@@ -305,10 +305,10 @@ double HostileLowCarrierForBit(std::size_t bit_position,
   return 500.0 + kJitter[hash_index];
 }
 
-double HostileHighCarrierForBit(std::size_t bit_position,
+double HostilityHighCarrierForBit(std::size_t bit_position,
                                 std::size_t byte_index, uint8_t source_byte,
                                 uint8_t bit_index_in_byte) {
-  return HostileLowCarrierForBit(bit_position, byte_index, source_byte,
+  return HostilityLowCarrierForBit(bit_position, byte_index, source_byte,
                                  bit_index_in_byte) *
          2.0;
 }
@@ -646,7 +646,7 @@ BfskConfig MakeBfskConfigForSignalProfile(const CoreConfig& config,
       bfsk.low_freq_hz = 220.0;
       bfsk.high_freq_hz = 440.0;
       break;
-    case FlashSignalProfile::kHostile:
+    case FlashSignalProfile::kHostility:
       bfsk.low_freq_hz = 559.0;
       bfsk.high_freq_hz = 1118.0;
       break;
@@ -732,13 +732,13 @@ FlashPayloadLayout BuildPayloadLayoutForVoicing(
             bit == 1 ? ZealHighCarrierForTimingClass(timing_class)
                      : ZealLowCarrierForTimingClass(timing_class);
         force_zeal_burst_after_pause = false;
-      } else if (normalized_flavor == FlashVoicingFlavor::kHostile) {
+      } else if (normalized_flavor == FlashVoicingFlavor::kHostility) {
         chunk.sample_count = static_cast<size_t>(chunk_size);
         chunk.carrier_freq_hz =
             bit == 1
-                ? HostileHighCarrierForBit(bit_position, byte_index, value,
+                ? HostilityHighCarrierForBit(bit_position, byte_index, value,
                                            bit_index_in_byte)
-                : HostileLowCarrierForBit(bit_position, byte_index, value,
+                : HostilityLowCarrierForBit(bit_position, byte_index, value,
                                           bit_index_in_byte);
       } else if (normalized_flavor == FlashVoicingFlavor::kCollapse) {
         chunk.sample_count = static_cast<size_t>(chunk_size);

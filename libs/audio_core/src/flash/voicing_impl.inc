@@ -28,7 +28,7 @@ FlashVoicingConfig MakeFormalVoicingConfigForFlavor(const CoreConfig& config,
       voicing.epilogue_sample_count =
           SecondsToSampleCount(config.sample_rate_hz, kLitanyEpilogueSeconds);
       break;
-    case FlashVoicingFlavor::kHostile:
+    case FlashVoicingFlavor::kHostility:
       voicing.attack_ratio = 0.020;
       voicing.release_ratio = 0.026;
       voicing.second_harmonic_gain = 0.112;
@@ -191,7 +191,7 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
       style_traits.mechanical_throat_gain > 0.0;
   const bool use_standard_low_voice =
       use_layered_timbre && style_traits.standard_low_voice_gain > 0.0;
-  const bool use_hostile_edge = style_traits.hostile_edge_gain > 0.0;
+  const bool use_hostility_edge = style_traits.hostility_edge_gain > 0.0;
   const FlashVoicingDescriptor descriptor = DescribeVoicingOutput(
       clean_payload_pcm.size() + LeadingNonpayloadSamples(config) +
           TrailingNonpayloadSamples(config),
@@ -348,12 +348,12 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
                                                sanitized.sample_rate_hz,
                                                style_traits)
               : 0.0;
-      const double hostile_edge =
-          use_hostile_edge
+      const double hostility_edge =
+          use_hostility_edge
               ? envelope * payload_articulation *
-                    ComputeHostileEdgeLayer(chunk.carrier_freq_hz, local_index,
+                    ComputeHostilityEdgeLayer(chunk.carrier_freq_hz, local_index,
                                             sanitized.sample_rate_hz,
-                                            style_traits.hostile_edge_gain)
+                                            style_traits.hostility_edge_gain)
               : 0.0;
       const double boundary_click =
           ComputeBoundaryClick(sanitized.boundary_click_gain, style_traits,
@@ -372,7 +372,7 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
       const double mixed_sample =
           (clean_sample * envelope * payload_articulation + harmonic_mix +
            metallic_layer + chant_resonance + chant_drone +
-           mechanical_throat + standard_low_voice + hostile_edge) *
+           mechanical_throat + standard_low_voice + hostility_edge) *
               tremolo * collapse_tremor * chant_swell +
           boundary_click;
       const double voiced_sample = std::clamp(

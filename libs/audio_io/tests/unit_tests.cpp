@@ -58,7 +58,7 @@ audio_io::FlipBitsAudioMetadata MakeValidFlashMetadata(std::uint32_t pcm_sample_
     auto metadata = MakeValidMetadata(pcm_sample_count);
     metadata.mode = audio_io::FlipBitsAudioMetadataMode::kFlash;
     metadata.has_flash_voicing_style = true;
-    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile;
+    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostility;
     metadata.has_mini_speed_style = false;
     metadata.mini_speed_style = audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
     return metadata;
@@ -521,7 +521,7 @@ void TestWavIoMetadataModeValuesRoundTrip() {
         metadata.has_flash_voicing_style = mode == audio_io::FlipBitsAudioMetadataMode::kFlash;
         metadata.flash_voicing_style =
             metadata.has_flash_voicing_style
-                ? audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile
+                ? audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostility
                 : audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
         metadata.has_mini_speed_style = mode == audio_io::FlipBitsAudioMetadataMode::kMini;
         metadata.mini_speed_style =
@@ -668,7 +668,7 @@ void TestWavIoMetadataFlashEmotionValuesRoundTrip() {
     const audio_io::FlipBitsAudioMetadataFlashVoicingStyle styles[] = {
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kStandard,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kLitany,
-        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile,
+        audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostility,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kCollapse,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kZeal,
         audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kVoid,

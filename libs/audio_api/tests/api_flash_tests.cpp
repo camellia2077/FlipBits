@@ -34,18 +34,18 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
                 BAG_TRANSPORT_FLASH,
                 BAG_FLASH_SIGNAL_PROFILE_LITANY,
                 BAG_FLASH_VOICING_FLAVOR_LITANY);
-        const auto hostile_encoder =
+        const auto hostility_encoder =
             MakeEncoderConfig(
                 config_case,
                 BAG_TRANSPORT_FLASH,
-                BAG_FLASH_SIGNAL_PROFILE_HOSTILE,
-                BAG_FLASH_VOICING_FLAVOR_HOSTILE);
-        const auto hostile_decoder =
+                BAG_FLASH_SIGNAL_PROFILE_HOSTILITY,
+                BAG_FLASH_VOICING_FLAVOR_HOSTILITY);
+        const auto hostility_decoder =
             MakeDecoderConfig(
                 config_case,
                 BAG_TRANSPORT_FLASH,
-                BAG_FLASH_SIGNAL_PROFILE_HOSTILE,
-                BAG_FLASH_VOICING_FLAVOR_HOSTILE);
+                BAG_FLASH_SIGNAL_PROFILE_HOSTILITY,
+                BAG_FLASH_VOICING_FLAVOR_HOSTILITY);
         const auto zeal_encoder =
             MakeEncoderConfig(
                 config_case,
@@ -73,7 +73,7 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
 
         bag_pcm16_result standard_pcm{};
         bag_pcm16_result litany_pcm{};
-        bag_pcm16_result hostile_pcm{};
+        bag_pcm16_result hostility_pcm{};
         bag_pcm16_result zeal_pcm{};
         bag_pcm16_result void_pcm{};
         test::AssertEq(
@@ -85,9 +85,9 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
             BAG_OK,
             "litany flash encode should succeed through the C API.");
         test::AssertEq(
-            bag_encode_text(&hostile_encoder, text.c_str(), &hostile_pcm),
+            bag_encode_text(&hostility_encoder, text.c_str(), &hostility_pcm),
             BAG_OK,
-            "hostile flash encode should succeed through the C API.");
+            "hostility flash encode should succeed through the C API.");
         test::AssertEq(
             bag_encode_text(&zeal_encoder, text.c_str(), &zeal_pcm),
             BAG_OK,
@@ -116,16 +116,16 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
             litany_pcm.sample_count > standard_pcm.sample_count,
             "litany flash output should be longer than standard for the same text.");
         test::AssertEq(
-            hostile_pcm.sample_count,
+            hostility_pcm.sample_count,
             ExpectedFlashSampleCount(
                 text,
                 config_case,
-                BAG_FLASH_SIGNAL_PROFILE_HOSTILE,
-                BAG_FLASH_VOICING_FLAVOR_HOSTILE),
-            "hostile C API flash length should use the faster command timing with its own shell.");
+                BAG_FLASH_SIGNAL_PROFILE_HOSTILITY,
+                BAG_FLASH_VOICING_FLAVOR_HOSTILITY),
+            "hostility C API flash length should use the faster command timing with its own shell.");
         test::AssertTrue(
-            hostile_pcm.sample_count < standard_pcm.sample_count,
-            "hostile flash output should be shorter than standard for the same text.");
+            hostility_pcm.sample_count < standard_pcm.sample_count,
+            "hostility flash output should be shorter than standard for the same text.");
         test::AssertEq(
             zeal_pcm.sample_count,
             ExpectedFlashSampleCount(
@@ -151,23 +151,23 @@ void TestApiFlashConfigAffectsLengthAndRoundTrip() {
 
         const auto standard_decoded = DecodeViaApi(standard_decoder, standard_pcm);
         const auto litany_decoded = DecodeViaApi(litany_decoder, litany_pcm);
-        const auto hostile_decoded = DecodeViaApi(hostile_decoder, hostile_pcm);
+        const auto hostility_decoded = DecodeViaApi(hostility_decoder, hostility_pcm);
         const auto zeal_decoded = DecodeViaApi(zeal_decoder, zeal_pcm);
         const auto void_decoded = DecodeViaApi(void_decoder, void_pcm);
         test::AssertEq(standard_decoded.code, BAG_OK, "standard flash decode should succeed.");
         test::AssertEq(litany_decoded.code, BAG_OK, "litany flash decode should succeed.");
-        test::AssertEq(hostile_decoded.code, BAG_OK, "hostile flash decode should succeed.");
+        test::AssertEq(hostility_decoded.code, BAG_OK, "hostility flash decode should succeed.");
         test::AssertEq(zeal_decoded.code, BAG_OK, "zeal flash decode should succeed.");
         test::AssertEq(void_decoded.code, BAG_OK, "void flash decode should succeed.");
         test::AssertEq(standard_decoded.text, text, "standard flash decode should preserve text.");
         test::AssertEq(litany_decoded.text, text, "litany flash decode should preserve text.");
-        test::AssertEq(hostile_decoded.text, text, "hostile flash decode should preserve text.");
+        test::AssertEq(hostility_decoded.text, text, "hostility flash decode should preserve text.");
         test::AssertEq(zeal_decoded.text, text, "zeal flash decode should preserve text.");
         test::AssertEq(void_decoded.text, text, "void flash decode should preserve text.");
 
         bag_free_pcm16_result(&standard_pcm);
         bag_free_pcm16_result(&litany_pcm);
-        bag_free_pcm16_result(&hostile_pcm);
+        bag_free_pcm16_result(&hostility_pcm);
         bag_free_pcm16_result(&zeal_pcm);
         bag_free_pcm16_result(&void_pcm);
     }
@@ -181,7 +181,7 @@ void TestApiFlashVoicingEmotionValuesRoundTrip() {
     const EmotionCase cases[] = {
         {BAG_FLASH_VOICING_FLAVOR_STANDARD, "standard"},
         {BAG_FLASH_VOICING_FLAVOR_LITANY, "litany"},
-        {BAG_FLASH_VOICING_FLAVOR_HOSTILE, "hostile"},
+        {BAG_FLASH_VOICING_FLAVOR_HOSTILITY, "hostility"},
         {BAG_FLASH_VOICING_FLAVOR_COLLAPSE, "collapse"},
         {BAG_FLASH_VOICING_FLAVOR_ZEAL, "zeal"},
         {BAG_FLASH_VOICING_FLAVOR_VOID, "void"},
@@ -224,7 +224,7 @@ void TestApiFlashVoicingEmotionValuesRoundTrip() {
     }
 }
 
-void TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSilence() {
+void TestApiFlashVoicingOnlyHostilityKeepsStandardLengthAndCollapseUsesVariableSilence() {
     const auto config_case = test::ConfigCases().front();
     const std::string text = "Shell collapse";
     const auto standard_encoder =
@@ -233,12 +233,12 @@ void TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSil
             BAG_TRANSPORT_FLASH,
             BAG_FLASH_SIGNAL_PROFILE_STANDARD,
             BAG_FLASH_VOICING_FLAVOR_STANDARD);
-    const auto hostile_encoder =
+    const auto hostility_encoder =
         MakeEncoderConfig(
             config_case,
             BAG_TRANSPORT_FLASH,
             BAG_FLASH_SIGNAL_PROFILE_STANDARD,
-            BAG_FLASH_VOICING_FLAVOR_HOSTILE);
+            BAG_FLASH_VOICING_FLAVOR_HOSTILITY);
     const auto collapse_encoder =
         MakeEncoderConfig(
             config_case,
@@ -253,18 +253,18 @@ void TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSil
             BAG_FLASH_VOICING_FLAVOR_COLLAPSE);
 
     bag_pcm16_result standard_pcm{};
-    bag_pcm16_result hostile_pcm{};
+    bag_pcm16_result hostility_pcm{};
     bag_pcm16_result collapse_pcm{};
     test::AssertEq(bag_encode_text(&standard_encoder, text.c_str(), &standard_pcm), BAG_OK,
                    "standard flash encode should succeed.");
-    test::AssertEq(bag_encode_text(&hostile_encoder, text.c_str(), &hostile_pcm), BAG_OK,
-                   "hostile flash encode should succeed.");
+    test::AssertEq(bag_encode_text(&hostility_encoder, text.c_str(), &hostility_pcm), BAG_OK,
+                   "hostility flash encode should succeed.");
     test::AssertEq(bag_encode_text(&collapse_encoder, text.c_str(), &collapse_pcm), BAG_OK,
                    "collapse flash encode should succeed.");
     test::AssertEq(
-        hostile_pcm.sample_count,
+        hostility_pcm.sample_count,
         standard_pcm.sample_count,
-        "hostile voicing alone should keep standard signal timing when the signal profile stays standard.");
+        "hostility voicing alone should keep standard signal timing when the signal profile stays standard.");
     test::AssertTrue(
         collapse_pcm.sample_count > standard_pcm.sample_count,
         "collapse should include variable hesitation silence in its payload length.");
@@ -272,7 +272,7 @@ void TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSil
     test::AssertEq(collapse_decoded.code, BAG_OK, "collapse flash decode should skip variable silence.");
     test::AssertEq(collapse_decoded.text, text, "collapse variable silence should preserve text.");
     bag_free_pcm16_result(&standard_pcm);
-    bag_free_pcm16_result(&hostile_pcm);
+    bag_free_pcm16_result(&hostility_pcm);
     bag_free_pcm16_result(&collapse_pcm);
 }
 
@@ -517,8 +517,8 @@ namespace api_tests {
 void RegisterApiFlashTests(test::Runner& runner) {
     runner.Add("Api.FlashConfigAffectsLengthAndRoundTrip", TestApiFlashConfigAffectsLengthAndRoundTrip);
     runner.Add("Api.FlashVoicingEmotionValuesRoundTrip", TestApiFlashVoicingEmotionValuesRoundTrip);
-    runner.Add("Api.FlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSilence",
-               TestApiFlashVoicingOnlyHostileKeepsStandardLengthAndCollapseUsesVariableSilence);
+    runner.Add("Api.FlashVoicingOnlyHostilityKeepsStandardLengthAndCollapseUsesVariableSilence",
+               TestApiFlashVoicingOnlyHostilityKeepsStandardLengthAndCollapseUsesVariableSilence);
     runner.Add("Api.FlashDecodeRequiresMatchingConfig", TestApiFlashDecodeRequiresMatchingConfig);
     runner.Add("Api.FlashZealVariableCadenceRoundTrip", TestApiFlashZealVariableCadenceRoundTrip);
     runner.Add("Api.FlashSignalInfoDerivedFromLayout", TestApiFlashSignalInfoDerivedFromLayout);

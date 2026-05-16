@@ -82,7 +82,7 @@ void TestFlashSignalStyleAwareChunkSizeMatchesConfig() {
     const auto standard_config = MakeFlashCoreConfig();
     const auto standard_signal = bag::flash::MakeBfskConfig(standard_config);
     const auto litany_signal = bag::flash::MakeBfskConfig(MakeLitanyFlashCoreConfig());
-    const auto hostile_signal = bag::flash::MakeBfskConfig(MakeHostileFlashCoreConfig());
+    const auto hostility_signal = bag::flash::MakeBfskConfig(MakeHostilityFlashCoreConfig());
     const auto collapse_signal = bag::flash::MakeBfskConfig(MakeCollapseFlashCoreConfig());
     const auto zeal_signal = bag::flash::MakeBfskConfig(MakeZealFlashCoreConfig());
     const auto standard_frame_samples = static_cast<std::size_t>(standard_config.frame_samples);
@@ -115,17 +115,17 @@ void TestFlashSignalStyleAwareChunkSizeMatchesConfig() {
         litany_signal.samples_per_bit > standard_signal.samples_per_bit,
         "litany flash signal should use more samples per bit than standard.");
     test::AssertEq(
-        hostile_signal.samples_per_bit,
+        hostility_signal.samples_per_bit,
         static_cast<std::size_t>(1929),
-        "hostile flash signal should use the faster 7/8 bit timing profile.");
+        "hostility flash signal should use the faster 7/8 bit timing profile.");
     test::AssertEq(
-        hostile_signal.low_freq_hz,
+        hostility_signal.low_freq_hz,
         559.0,
-        "hostile flash signal should expose the nominal aggressive low carrier for the jittered hostile band.");
+        "hostility flash signal should expose the nominal aggressive low carrier for the jittered hostility band.");
     test::AssertEq(
-        hostile_signal.high_freq_hz,
+        hostility_signal.high_freq_hz,
         1118.0,
-        "hostile flash signal should expose the nominal aggressive high carrier for the jittered hostile band.");
+        "hostility flash signal should expose the nominal aggressive high carrier for the jittered hostility band.");
     test::AssertEq(
         collapse_signal.samples_per_bit,
         static_cast<std::size_t>(2205),
@@ -166,10 +166,10 @@ void TestFlashSignalExplicitProfileSelectsEmotionTiming() {
         bag::flash::MakeBfskConfigForSignalProfile(
             litany_config,
             bag::FlashSignalProfile::kLitany);
-    const auto explicit_hostile_signal =
+    const auto explicit_hostility_signal =
         bag::flash::MakeBfskConfigForSignalProfile(
             litany_config,
-            bag::FlashSignalProfile::kHostile);
+            bag::FlashSignalProfile::kHostility);
     const auto explicit_collapse_signal =
         bag::flash::MakeBfskConfigForSignalProfile(
             litany_config,
@@ -197,13 +197,13 @@ void TestFlashSignalExplicitProfileSelectsEmotionTiming() {
         220.0,
         "Explicit litany signal profile should keep litany carrier tuning.");
     test::AssertEq(
-        explicit_hostile_signal.samples_per_bit,
+        explicit_hostility_signal.samples_per_bit,
         static_cast<std::size_t>(1929),
-        "Explicit hostile signal profile should keep the faster hostile timing when requested.");
+        "Explicit hostility signal profile should keep the faster hostility timing when requested.");
     test::AssertEq(
-        explicit_hostile_signal.low_freq_hz,
+        explicit_hostility_signal.low_freq_hz,
         559.0,
-        "Explicit hostile signal profile should keep the nominal hostile carrier tuning.");
+        "Explicit hostility signal profile should keep the nominal hostility carrier tuning.");
     test::AssertEq(
         explicit_collapse_signal.samples_per_bit,
         static_cast<std::size_t>(2205),

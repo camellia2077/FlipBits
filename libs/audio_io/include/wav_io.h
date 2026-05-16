@@ -28,7 +28,7 @@ enum class FlipBitsAudioMetadataFlashVoicingStyle : std::uint8_t {
   kUnknown = 0,
   kStandard = 1,
   kLitany = 2,
-  kHostile = 4,
+  kHostility = 4,
   kCollapse = 5,
   kZeal = 6,
   kVoid = 7,

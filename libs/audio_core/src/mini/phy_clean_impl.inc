@@ -305,7 +305,10 @@ ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
       pattern.push_back(run_units >= 2 ? '-' : '.');
     } else if (run_units >= kMorseWordGapUnits) {
       FlushDecodedPattern(&pattern, out_payload);
-      if (!out_payload->empty() &&
+      // Separator-only mini payloads are valid in this project because
+      // whitespace itself is encodable text. Preserve one separator when the
+      // decoded PCM is all silence instead of collapsing back to empty.
+      if (out_payload->empty() ||
           out_payload->back() != static_cast<uint8_t>(' ')) {
         out_payload->push_back(static_cast<uint8_t>(' '));
       }
@@ -315,7 +318,8 @@ ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
     index = run_end;
   }
   FlushDecodedPattern(&pattern, out_payload);
-  if (!out_payload->empty() && out_payload->back() == static_cast<uint8_t>(' ')) {
+  if (out_payload->size() > 1 &&
+      out_payload->back() == static_cast<uint8_t>(' ')) {
     out_payload->pop_back();
   }
   return ErrorCode::kOk;

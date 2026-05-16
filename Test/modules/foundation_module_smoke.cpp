@@ -41,8 +41,8 @@ void TestFlashSignalProfilesRemainDistinct() {
         bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kLitany),
         "litany signal profile should remain valid.");
     test::AssertTrue(
-        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kHostile),
-        "hostile signal profile should remain valid.");
+        bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kHostility),
+        "hostility signal profile should remain valid.");
     test::AssertTrue(
         bag::IsValidFlashSignalProfile(bag::FlashSignalProfile::kCollapse),
         "collapse signal profile should remain valid.");
@@ -51,9 +51,9 @@ void TestFlashSignalProfilesRemainDistinct() {
             static_cast<int>(bag::FlashSignalProfile::kLitany),
         "flash signal profiles should remain distinct enum values.");
     test::AssertTrue(
-        static_cast<int>(bag::FlashSignalProfile::kHostile) !=
+        static_cast<int>(bag::FlashSignalProfile::kHostility) !=
             static_cast<int>(bag::FlashSignalProfile::kCollapse),
-        "hostile and collapse signal profiles should remain distinct enum values.");
+        "hostility and collapse signal profiles should remain distinct enum values.");
 }
 
 void TestFlashVoicingFlavorsRemainDistinct() {
@@ -72,16 +72,16 @@ void TestFlashVoicingFlavorsRemainDistinct() {
         config.flash_voicing_flavor,
         bag::FlashVoicingFlavor::kLitany,
         "CoreConfig should store explicit litany voicing flavor directly.");
-    config.flash_signal_profile = bag::FlashSignalProfile::kHostile;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostile;
+    config.flash_signal_profile = bag::FlashSignalProfile::kHostility;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostility;
     test::AssertEq(
         config.flash_signal_profile,
-        bag::FlashSignalProfile::kHostile,
-        "CoreConfig should store explicit hostile signal timing directly.");
+        bag::FlashSignalProfile::kHostility,
+        "CoreConfig should store explicit hostility signal timing directly.");
     test::AssertEq(
         config.flash_voicing_flavor,
-        bag::FlashVoicingFlavor::kHostile,
-        "CoreConfig should store explicit hostile voicing flavor directly.");
+        bag::FlashVoicingFlavor::kHostility,
+        "CoreConfig should store explicit hostility voicing flavor directly.");
 }
 
 void TestTypesAndAudioIoModules() {

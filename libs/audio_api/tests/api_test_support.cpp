@@ -290,7 +290,7 @@ std::size_t ExpectedFlashSampleCount(const std::string& text,
                                                static_cast<std::size_t>(16));
     } else if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_LITANY) {
         payload_samples_per_bit = RoundHalfUpFrameScale(config_case.frame_samples, 6, 1);
-    } else if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_HOSTILE) {
+    } else if (flash_signal_profile == BAG_FLASH_SIGNAL_PROFILE_HOSTILITY) {
         payload_samples_per_bit = std::max(static_cast<std::size_t>(1),
                                            frame_samples * static_cast<std::size_t>(7) /
                                                static_cast<std::size_t>(8));

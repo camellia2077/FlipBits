@@ -31,8 +31,8 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz, int frame_samples,
     case BAG_FLASH_SIGNAL_PROFILE_LITANY:
       core_config.flash_signal_profile = bag::FlashSignalProfile::kLitany;
       break;
-    case BAG_FLASH_SIGNAL_PROFILE_HOSTILE:
-      core_config.flash_signal_profile = bag::FlashSignalProfile::kHostile;
+    case BAG_FLASH_SIGNAL_PROFILE_HOSTILITY:
+      core_config.flash_signal_profile = bag::FlashSignalProfile::kHostility;
       break;
     case BAG_FLASH_SIGNAL_PROFILE_COLLAPSE:
       core_config.flash_signal_profile = bag::FlashSignalProfile::kCollapse;
@@ -55,8 +55,8 @@ bag::CoreConfig ToCoreConfig(int sample_rate_hz, int frame_samples,
     case BAG_FLASH_VOICING_FLAVOR_LITANY:
       core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kLitany;
       break;
-    case BAG_FLASH_VOICING_FLAVOR_HOSTILE:
-      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostile;
+    case BAG_FLASH_VOICING_FLAVOR_HOSTILITY:
+      core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostility;
       break;
     case BAG_FLASH_VOICING_FLAVOR_COLLAPSE:
       core_config.flash_voicing_flavor = bag::FlashVoicingFlavor::kCollapse;

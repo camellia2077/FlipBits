@@ -109,7 +109,7 @@ double ComputePreamblePhraseMask(size_t local_index, size_t sample_count,
       phrased_mask =
           ComputePhraseMask(progress, 0.11, 0.32, 0.36, 0.57, 0.61, 0.94);
       break;
-    case FixedShellCadenceProfile::kHostileChallenge:
+    case FixedShellCadenceProfile::kHostilityChallenge:
       phrased_mask = ComputeCadenceMask(progress, std::array<CadenceWindow, 4>{
                                                       CadenceWindow{0.02, 0.10},
                                                       CadenceWindow{0.14, 0.22},
@@ -174,7 +174,7 @@ double ComputeEpiloguePhraseMask(size_t local_index, size_t sample_count,
       phrased_mask = std::max(ComputeBurstWindow(progress, 0.10, 0.58),
                               ComputeBurstWindow(progress, 0.58, 0.98));
       break;
-    case FixedShellCadenceProfile::kHostileChallenge:
+    case FixedShellCadenceProfile::kHostilityChallenge:
       phrased_mask = ComputeCadenceMask(progress, std::array<CadenceWindow, 3>{
                                                       CadenceWindow{0.04, 0.15},
                                                       CadenceWindow{0.20, 0.30},
@@ -252,7 +252,7 @@ double RenderFixedPreambleSample(size_t local_index, size_t sample_count,
            0.72 * ComputeProtocolLeadLockPulse(local_index, sample_count,
                                                sample_rate_hz));
       break;
-    case FixedShellTimbreProfile::kHostileEdge: {
+    case FixedShellTimbreProfile::kHostilityEdge: {
       const double hard_gate =
           0.72 + 0.28 * std::copysign(
                        1.0, std::sin(2.0 * kPi * 54.0 * time + 0.30));
@@ -388,7 +388,7 @@ double RenderFixedEpilogueSample(size_t local_index, size_t sample_count,
            0.70 * ComputeProtocolAckChirp(local_index, sample_count,
                                           sample_rate_hz));
       break;
-    case FixedShellTimbreProfile::kHostileEdge: {
+    case FixedShellTimbreProfile::kHostilityEdge: {
       const double hard_gate =
           0.68 + 0.32 * std::copysign(
                        1.0, std::sin(2.0 * kPi * 46.0 * time + 0.18));

@@ -54,10 +54,10 @@ bag::CoreConfig MakeLitanyFlashCoreConfig() {
     return config;
 }
 
-bag::CoreConfig MakeHostileFlashCoreConfig() {
+bag::CoreConfig MakeHostilityFlashCoreConfig() {
     auto config = MakeFlashCoreConfig();
-    config.flash_signal_profile = bag::FlashSignalProfile::kHostile;
-    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostile;
+    config.flash_signal_profile = bag::FlashSignalProfile::kHostility;
+    config.flash_voicing_flavor = bag::FlashVoicingFlavor::kHostility;
     return config;
 }
 

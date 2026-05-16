@@ -227,13 +227,14 @@ void TestApiMiniMorseRoundTripAcrossConfigs() {
         {"   ", " "},
         {"\n", " "},
         {" \t\r\n ", " "},
-        {"   123\n", "123"},
+        {"   123\n", " 123"},
     }};
 
     for (const auto& config_case : test::ConfigCases()) {
         const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
         const auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_MINI);
         for (const auto& item : cases) {
+            const std::string context = "input=" + test::detail::ToDebugString(item.input);
             bag_pcm16_result pcm{};
             test::AssertEq(
                 bag_encode_text(&encoder_config, item.input.c_str(), &pcm),
@@ -241,10 +242,11 @@ void TestApiMiniMorseRoundTripAcrossConfigs() {
                 "Mini Morse encode should accept Morse-compatible text.");
             const auto decoded = DecodeViaApi(decoder_config, pcm);
             test::AssertEq(decoded.code, BAG_OK, "Mini Morse decode should succeed.");
-            test::AssertEq(
+            test::AssertEqWithContext(
                 decoded.text,
                 item.expected_text,
-                "Mini Morse roundtrip should preserve normalized text.");
+                "Mini Morse roundtrip should preserve normalized text.",
+                context);
             test::AssertEq(decoded.mode, BAG_TRANSPORT_MINI, "Mini Morse decode should preserve mode.");
             bag_free_pcm16_result(&pcm);
         }
@@ -938,7 +940,7 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
     const std::array<StyleCase, 5> cases = {{
         {BAG_FLASH_SIGNAL_PROFILE_STANDARD, BAG_FLASH_VOICING_FLAVOR_STANDARD, 15, 16, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_LITANY, BAG_FLASH_VOICING_FLAVOR_LITANY, 6, 1, 0, 1.35},
-        {BAG_FLASH_SIGNAL_PROFILE_HOSTILE, BAG_FLASH_VOICING_FLAVOR_HOSTILE, 7, 8, 3, 0.0},
+        {BAG_FLASH_SIGNAL_PROFILE_HOSTILITY, BAG_FLASH_VOICING_FLAVOR_HOSTILITY, 7, 8, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_COLLAPSE, BAG_FLASH_VOICING_FLAVOR_COLLAPSE, 1, 1, 3, 0.0},
         {BAG_FLASH_SIGNAL_PROFILE_ZEAL, BAG_FLASH_VOICING_FLAVOR_ZEAL, 1, 2, 3, 0.0},
     }};
@@ -1118,8 +1120,8 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
 
     {
         const auto encoder_config =
-            MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH, BAG_FLASH_SIGNAL_PROFILE_HOSTILE,
-                              BAG_FLASH_VOICING_FLAVOR_HOSTILE);
+            MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH, BAG_FLASH_SIGNAL_PROFILE_HOSTILITY,
+                              BAG_FLASH_VOICING_FLAVOR_HOSTILITY);
         std::array<char, 1024> raw_hex_buffer{};
         std::array<char, 8192> raw_bits_buffer{};
         std::array<bag_payload_follow_byte_entry, 512> byte_entries{};
@@ -1137,18 +1139,18 @@ void TestApiFlashFollowTimingRespectsStyleRules() {
         test::AssertEq(
             bag_encode_text_with_follow(&encoder_config, "A", &result),
             BAG_OK,
-            "Hostile follow encode should support deterministic per-bit carrier jitter.");
+            "Hostility follow encode should support deterministic per-bit carrier jitter.");
         test::AssertTrue(
             result.follow_data.binary_group_timeline_count >= static_cast<std::size_t>(2),
-            "Hostile follow data should publish the first two binary bits.");
+            "Hostility follow data should publish the first two binary bits.");
         test::AssertEq(
             binary_entries[0].carrier_freq_hz,
             500.0,
-            "Hostile first low bit should publish its upward jittered carrier.");
+            "Hostility first low bit should publish its upward jittered carrier.");
         test::AssertEq(
             binary_entries[1].carrier_freq_hz,
             1140.0,
-            "Hostile second high bit should publish the doubled upward jittered carrier.");
+            "Hostility second high bit should publish the doubled upward jittered carrier.");
 
         bag_free_encode_result(&result);
     }

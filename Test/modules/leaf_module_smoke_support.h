@@ -10,7 +10,7 @@ bag::flash::BfskConfig MakeBfskConfig();
 bag::flash::FlashVoicingConfig MakeStyledVoicingConfig();
 bag::CoreConfig MakeFlashCoreConfig();
 bag::CoreConfig MakeLitanyFlashCoreConfig();
-bag::CoreConfig MakeHostileFlashCoreConfig();
+bag::CoreConfig MakeHostilityFlashCoreConfig();
 bag::CoreConfig MakeCollapseFlashCoreConfig();
 bag::CoreConfig MakeZealFlashCoreConfig();
 bag::CoreConfig MakeExplicitDecoupledFlashCoreConfig();

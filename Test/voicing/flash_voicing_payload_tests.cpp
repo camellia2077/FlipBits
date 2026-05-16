@@ -336,16 +336,16 @@ void TestFormalStandardAddsLowVoiceWithoutBreakingDecode() {
             bag::flash::MakeFormalVoicingConfigForFlavor(
                 core_config,
                 bag::FlashVoicingFlavor::kStandard));
-    const auto hostile =
+    const auto hostility =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kHostile,
+            bag::FlashVoicingFlavor::kHostility,
             bag::flash::MakeFormalVoicingConfigForFlavor(
                 core_config,
-                bag::FlashVoicingFlavor::kHostile));
+                bag::FlashVoicingFlavor::kHostility));
     const auto standard_trimmed = bag::flash::TrimToPayloadPcm(standard.pcm, standard.descriptor);
-    const auto hostile_trimmed = bag::flash::TrimToPayloadPcm(hostile.pcm, hostile.descriptor);
+    const auto hostility_trimmed = bag::flash::TrimToPayloadPcm(hostility.pcm, hostility.descriptor);
     const auto& first_chunk = layout.chunks.front();
     const std::size_t begin =
         first_chunk.sample_offset +
@@ -361,8 +361,8 @@ void TestFormalStandardAddsLowVoiceWithoutBreakingDecode() {
         "Formal standard should add a restrained low voice layer.");
     test::AssertTrue(
         AverageAbsoluteDelta(standard_trimmed, clean_payload, begin, end) <
-            AverageAbsoluteDelta(hostile_trimmed, clean_payload, begin, end),
-        "Formal standard should stay more restrained than hostile.");
+            AverageAbsoluteDelta(hostility_trimmed, clean_payload, begin, end),
+        "Formal standard should stay more restrained than hostility.");
     test::AssertEq(
         bag::flash::DecodePcm16ToBytes(standard_trimmed, signal_config),
         bytes,
@@ -370,22 +370,22 @@ void TestFormalStandardAddsLowVoiceWithoutBreakingDecode() {
     AssertPcm16Range(standard.pcm, "Formal standard low voice output");
 }
 
-void TestHostileAddsAggressiveEdgeWithoutBreakingDecode() {
+void TestHostilityAddsAggressiveEdgeWithoutBreakingDecode() {
     bag::flash::FlashVoicingConfig config{};
     config.sample_rate_hz = 44100;
-    const auto layout = MakePayloadLayout("Hostile");
-    const auto clean_payload = MakeCleanPayload("Hostile");
+    const auto layout = MakePayloadLayout("Hostility");
+    const auto clean_payload = MakeCleanPayload("Hostility");
     const auto standard =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
             bag::FlashVoicingFlavor::kStandard,
             config);
-    const auto hostile =
+    const auto hostility =
         bag::flash::ApplyVoicingToPayloadWithFlavor(
             clean_payload,
             layout,
-            bag::FlashVoicingFlavor::kHostile,
+            bag::FlashVoicingFlavor::kHostility,
             config);
     const auto& first_chunk = layout.chunks.front();
     const std::size_t begin =
@@ -400,16 +400,16 @@ void TestHostileAddsAggressiveEdgeWithoutBreakingDecode() {
         clean_payload,
         "Standard with no explicit texture should preserve the clean payload.");
     test::AssertTrue(
-        AverageAbsoluteDelta(hostile.pcm, clean_payload, begin, end) > 300.0,
-        "Hostile should add a sharp aggressive edge across the payload body.");
+        AverageAbsoluteDelta(hostility.pcm, clean_payload, begin, end) > 300.0,
+        "Hostility should add a sharp aggressive edge across the payload body.");
     test::AssertTrue(
-        hostile.pcm != standard.pcm,
-        "Hostile should produce a distinct aggressive payload from standard.");
+        hostility.pcm != standard.pcm,
+        "Hostility should produce a distinct aggressive payload from standard.");
     test::AssertEq(
-        bag::flash::DecodePcm16ToBytes(hostile.pcm, MakeSignalConfig()),
-        AsBytes("Hostile"),
-        "Hostile edge should keep the payload decodable.");
-    AssertPcm16Range(hostile.pcm, "Hostile edge output");
+        bag::flash::DecodePcm16ToBytes(hostility.pcm, MakeSignalConfig()),
+        AsBytes("Hostility"),
+        "Hostility edge should keep the payload decodable.");
+    AssertPcm16Range(hostility.pcm, "Hostility edge output");
 }
 
 void TestCollapseAddsTremorWithoutBreakingDecode() {
@@ -790,8 +790,8 @@ void RegisterFlashVoicingPayloadTests(test::Runner& runner) {
                TestLitanyTextAwarePausesWithoutBreakingDecode);
     runner.Add("FlashVoicing.FormalStandardAddsLowVoiceWithoutBreakingDecode",
                TestFormalStandardAddsLowVoiceWithoutBreakingDecode);
-    runner.Add("FlashVoicing.HostileAddsAggressiveEdgeWithoutBreakingDecode",
-               TestHostileAddsAggressiveEdgeWithoutBreakingDecode);
+    runner.Add("FlashVoicing.HostilityAddsAggressiveEdgeWithoutBreakingDecode",
+               TestHostilityAddsAggressiveEdgeWithoutBreakingDecode);
     runner.Add("FlashVoicing.CollapseAddsTremorWithoutBreakingDecode",
                TestCollapseAddsTremorWithoutBreakingDecode);
     runner.Add("FlashVoicing.CollapseAddsIrregularHesitationWithoutBreakingDecode",

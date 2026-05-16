@@ -56,7 +56,7 @@ bool IsSupportedFlashVoicingStyle(
     FlipBitsAudioMetadataFlashVoicingStyle style) {
   return style == FlipBitsAudioMetadataFlashVoicingStyle::kStandard ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kLitany ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kHostile ||
+         style == FlipBitsAudioMetadataFlashVoicingStyle::kHostility ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kCollapse ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kZeal ||
          style == FlipBitsAudioMetadataFlashVoicingStyle::kVoid;
