@@ -6,6 +6,8 @@ const char* bag_validation_issue_message(bag_validation_issue issue) {
       return "Missing configuration.";
     case BAG_VALIDATION_NULL_TEXT:
       return "Missing input text.";
+    case BAG_VALIDATION_EMPTY_TEXT:
+      return "Input text is empty. Whitespace-only mini input is encodable, but a truly empty string is not.";
     case BAG_VALIDATION_NULL_DECODER_OUTPUT:
       return "Missing decoder output target.";
     case BAG_VALIDATION_INVALID_SAMPLE_RATE:
@@ -29,8 +31,8 @@ const char* bag_validation_issue_message(bag_validation_issue issue) {
       return "Unsupported flash voicing flavor. Use standard, hostile, litany, "
              "collapse, zeal, or void.";
     case BAG_VALIDATION_MINI_MORSE_ONLY:
-      return "`mini` Morse mode supports A-Z, 0-9, spaces, and common Morse "
-             "punctuation.";
+      return "`mini` Morse mode supports A-Z, 0-9, common Morse punctuation, "
+             "and encodable whitespace separators such as space, tab, CR, and LF.";
     default:
       return "Unknown validation issue.";
   }

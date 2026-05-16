@@ -7,55 +7,38 @@ constexpr std::size_t kFmtChunkSize = 16;
 constexpr std::size_t kCanonicalWavHeaderSize = 44;
 constexpr std::size_t kFlipBitsMetadataIsoUtcByteCount = 20;
 constexpr std::size_t kFlipBitsMetadataVersionTextByteCount = 32;
-constexpr std::size_t kFlipBitsMetadataV6InputSourceKindOffset = 4;
-constexpr std::size_t kFlipBitsMetadataV6DurationOffset = 8;
-constexpr std::size_t kFlipBitsMetadataV6CreatedAtOffset = 12;
-constexpr std::size_t kFlipBitsMetadataV6SampleRateHzOffset =
-    kFlipBitsMetadataV6CreatedAtOffset + kFlipBitsMetadataIsoUtcByteCount;
-constexpr std::size_t kFlipBitsMetadataV6FrameSamplesOffset =
-    kFlipBitsMetadataV6SampleRateHzOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV6PcmSampleCountOffset =
-    kFlipBitsMetadataV6FrameSamplesOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV6PayloadByteCountOffset =
-    kFlipBitsMetadataV6PcmSampleCountOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV6AppVersionOffset =
-    kFlipBitsMetadataV6PayloadByteCountOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV6CoreVersionOffset =
-    kFlipBitsMetadataV6AppVersionOffset + kFlipBitsMetadataVersionTextByteCount;
-constexpr std::size_t kFlipBitsMetadataV6SegmentCountOffset =
-    kFlipBitsMetadataV6CoreVersionOffset + kFlipBitsMetadataVersionTextByteCount;
-constexpr std::size_t kFlipBitsMetadataV6SegmentSampleCountCountOffset =
-    kFlipBitsMetadataV6SegmentCountOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV6HeaderSize =
-    kFlipBitsMetadataV6SegmentSampleCountCountOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV6FixedPayloadSize =
-    kFlipBitsMetadataV6HeaderSize +
-    (2 * kFlipBitsMetadataVersionTextByteCount);
 constexpr std::size_t kFlipBitsMetadataVersionOffset = 0;
 constexpr std::size_t kFlipBitsMetadataModeOffset = 1;
 constexpr std::size_t kFlipBitsMetadataHasFlashStyleOffset = 2;
 constexpr std::size_t kFlipBitsMetadataFlashStyleOffset = 3;
-constexpr std::size_t kFlipBitsMetadataDurationOffset = 4;
-constexpr std::size_t kFlipBitsMetadataCreatedAtOffset = 8;
-constexpr std::size_t kFlipBitsMetadataFrameSamplesOffset =
+constexpr std::size_t kFlipBitsMetadataInputSourceKindOffset = 4;
+constexpr std::size_t kFlipBitsMetadataHasMiniSpeedStyleOffset = 5;
+constexpr std::size_t kFlipBitsMetadataMiniSpeedStyleOffset = 6;
+constexpr std::size_t kFlipBitsMetadataReservedOffset = 7;
+constexpr std::size_t kFlipBitsMetadataDurationOffset = 8;
+constexpr std::size_t kFlipBitsMetadataCreatedAtOffset = 12;
+constexpr std::size_t kFlipBitsMetadataSampleRateHzOffset =
     kFlipBitsMetadataCreatedAtOffset + kFlipBitsMetadataIsoUtcByteCount;
+constexpr std::size_t kFlipBitsMetadataFrameSamplesOffset =
+    kFlipBitsMetadataSampleRateHzOffset + 4;
 constexpr std::size_t kFlipBitsMetadataPcmSampleCountOffset =
     kFlipBitsMetadataFrameSamplesOffset + 4;
-constexpr std::size_t kFlipBitsMetadataAppVersionOffset =
+constexpr std::size_t kFlipBitsMetadataPayloadByteCountOffset =
     kFlipBitsMetadataPcmSampleCountOffset + 4;
+constexpr std::size_t kFlipBitsMetadataAppVersionOffset =
+    kFlipBitsMetadataPayloadByteCountOffset + 4;
 constexpr std::size_t kFlipBitsMetadataCoreVersionOffset =
     kFlipBitsMetadataAppVersionOffset + kFlipBitsMetadataVersionTextByteCount;
 constexpr std::size_t kFlipBitsMetadataSegmentCountOffset =
     kFlipBitsMetadataCoreVersionOffset + kFlipBitsMetadataVersionTextByteCount;
 constexpr std::size_t kFlipBitsMetadataSegmentSampleCountCountOffset =
     kFlipBitsMetadataSegmentCountOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV5HeaderSize =
+constexpr std::size_t kFlipBitsMetadataHeaderSize =
     kFlipBitsMetadataSegmentSampleCountCountOffset + 4;
-constexpr std::size_t kFlipBitsMetadataV5FixedPayloadSize =
-    kFlipBitsMetadataV5HeaderSize +
+constexpr std::size_t kFlipBitsMetadataFixedPayloadSize =
+    kFlipBitsMetadataHeaderSize +
     (2 * kFlipBitsMetadataVersionTextByteCount);
-constexpr std::uint8_t kFlipBitsMetadataVersionV5 = 5;
-constexpr std::uint8_t kFlipBitsMetadataVersionV6 = 6;
+constexpr std::uint8_t kFlipBitsMetadataVersionV7 = 7;
 constexpr std::uint16_t kPcmFormatCode = 1;
 constexpr std::uint16_t kMonoChannelCount = 1;
 constexpr std::uint16_t kBitsPerSample = 16;
@@ -79,6 +62,12 @@ bool IsSupportedFlashVoicingStyle(
          style == FlipBitsAudioMetadataFlashVoicingStyle::kVoid;
 }
 
+bool IsSupportedMiniSpeedStyle(FlipBitsAudioMetadataMiniSpeedStyle style) {
+  return style == FlipBitsAudioMetadataMiniSpeedStyle::kSlow ||
+         style == FlipBitsAudioMetadataMiniSpeedStyle::kStandard ||
+         style == FlipBitsAudioMetadataMiniSpeedStyle::kFast;
+}
+
 bool IsIsoUtcTimestampChar(char value, std::size_t index) {
   switch (index) {
     case 4:
@@ -97,8 +86,7 @@ bool IsIsoUtcTimestampChar(char value, std::size_t index) {
 }
 
 bool IsSupportedMetadataVersion(std::uint8_t version) {
-  return version == kFlipBitsMetadataVersionV5 ||
-         version == kFlipBitsMetadataVersionV6;
+  return version == kFlipBitsMetadataVersionV7;
 }
 
 bool IsValidCreatedAtIsoUtc(const std::string& created_at_iso_utc) {
@@ -154,9 +142,7 @@ bool IsValidSegmentSampleCounts(const FlipBitsAudioMetadata& metadata) {
 
 std::size_t ComputeFlipBitsMetadataPayloadSize(
     const FlipBitsAudioMetadata& metadata) {
-  return (metadata.version == kFlipBitsMetadataVersionV6
-              ? kFlipBitsMetadataV6FixedPayloadSize
-              : kFlipBitsMetadataV5FixedPayloadSize) +
+  return kFlipBitsMetadataFixedPayloadSize +
          (metadata.segment_sample_counts.size() * 4u);
 }
 
@@ -218,14 +204,18 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
       return {};
     }
   }
+  if (metadata.has_mini_speed_style) {
+    if (metadata.mode != FlipBitsAudioMetadataMode::kMini ||
+        !IsSupportedMiniSpeedStyle(metadata.mini_speed_style)) {
+      return {};
+    }
+  }
   if (!IsValidCreatedAtIsoUtc(metadata.created_at_iso_utc)) {
     return {};
   }
-  if (metadata.version == kFlipBitsMetadataVersionV6) {
-    if (metadata.sample_rate_hz == 0u ||
-        !IsSupportedInputSourceKind(metadata.input_source_kind)) {
-      return {};
-    }
+  if (metadata.sample_rate_hz == 0u ||
+      !IsSupportedInputSourceKind(metadata.input_source_kind)) {
+    return {};
   }
   if (!IsValidVersionText(metadata.app_version) ||
       !IsValidVersionText(metadata.core_version)) {
@@ -252,75 +242,52 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
       metadata.has_flash_voicing_style
                   ? static_cast<std::uint8_t>(metadata.flash_voicing_style)
                   : static_cast<std::uint8_t>(0u);
-  std::size_t app_version_offset = kFlipBitsMetadataAppVersionOffset;
-  std::size_t core_version_offset = kFlipBitsMetadataCoreVersionOffset;
-  std::size_t segment_count_offset = kFlipBitsMetadataSegmentCountOffset;
-  std::size_t segment_count_count_offset =
-      kFlipBitsMetadataSegmentSampleCountCountOffset;
-  std::size_t header_size = kFlipBitsMetadataV5HeaderSize;
-  if (metadata.version == kFlipBitsMetadataVersionV6) {
-    chunk[kChunkHeaderSize + kFlipBitsMetadataV6InputSourceKindOffset] =
-        static_cast<std::uint8_t>(metadata.input_source_kind);
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize + kFlipBitsMetadataV6DurationOffset,
-        metadata.duration_ms);
-    for (std::size_t index = 0; index < kFlipBitsMetadataIsoUtcByteCount;
-         ++index) {
-      chunk[kChunkHeaderSize + kFlipBitsMetadataV6CreatedAtOffset + index] =
-          static_cast<std::uint8_t>(metadata.created_at_iso_utc[index]);
-    }
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize + kFlipBitsMetadataV6SampleRateHzOffset,
-        metadata.sample_rate_hz);
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize + kFlipBitsMetadataV6FrameSamplesOffset,
-        metadata.frame_samples);
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize +
-            kFlipBitsMetadataV6PcmSampleCountOffset,
-        metadata.pcm_sample_count);
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize +
-            kFlipBitsMetadataV6PayloadByteCountOffset,
-        metadata.payload_byte_count);
-    app_version_offset = kFlipBitsMetadataV6AppVersionOffset;
-    core_version_offset = kFlipBitsMetadataV6CoreVersionOffset;
-    segment_count_offset = kFlipBitsMetadataV6SegmentCountOffset;
-    segment_count_count_offset =
-        kFlipBitsMetadataV6SegmentSampleCountCountOffset;
-    header_size = kFlipBitsMetadataV6HeaderSize;
-  } else {
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize + kFlipBitsMetadataDurationOffset,
-        metadata.duration_ms);
-    for (std::size_t index = 0; index < kFlipBitsMetadataIsoUtcByteCount;
-         ++index) {
-      chunk[kChunkHeaderSize + kFlipBitsMetadataCreatedAtOffset + index] =
-          static_cast<std::uint8_t>(metadata.created_at_iso_utc[index]);
-    }
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize + kFlipBitsMetadataFrameSamplesOffset,
-        metadata.frame_samples);
-    WriteU32Le(
-        chunk.data() + kChunkHeaderSize +
-            kFlipBitsMetadataPcmSampleCountOffset,
-        metadata.pcm_sample_count);
+  chunk[kChunkHeaderSize + kFlipBitsMetadataInputSourceKindOffset] =
+      static_cast<std::uint8_t>(metadata.input_source_kind);
+  chunk[kChunkHeaderSize + kFlipBitsMetadataHasMiniSpeedStyleOffset] =
+      metadata.has_mini_speed_style ? 1u : 0u;
+  chunk[kChunkHeaderSize + kFlipBitsMetadataMiniSpeedStyleOffset] =
+      metadata.has_mini_speed_style
+          ? static_cast<std::uint8_t>(metadata.mini_speed_style)
+          : static_cast<std::uint8_t>(0u);
+  chunk[kChunkHeaderSize + kFlipBitsMetadataReservedOffset] = 0u;
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataDurationOffset,
+      metadata.duration_ms);
+  for (std::size_t index = 0; index < kFlipBitsMetadataIsoUtcByteCount;
+       ++index) {
+    chunk[kChunkHeaderSize + kFlipBitsMetadataCreatedAtOffset + index] =
+        static_cast<std::uint8_t>(metadata.created_at_iso_utc[index]);
   }
-  WriteU32Le(chunk.data() + kChunkHeaderSize + segment_count_offset,
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataSampleRateHzOffset,
+      metadata.sample_rate_hz);
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataFrameSamplesOffset,
+      metadata.frame_samples);
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize +
+          kFlipBitsMetadataPcmSampleCountOffset,
+      metadata.pcm_sample_count);
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize +
+          kFlipBitsMetadataPayloadByteCountOffset,
+      metadata.payload_byte_count);
+  WriteU32Le(chunk.data() + kChunkHeaderSize + kFlipBitsMetadataSegmentCountOffset,
              metadata.segment_count);
-  WriteU32Le(chunk.data() + kChunkHeaderSize + segment_count_count_offset,
+  WriteU32Le(chunk.data() + kChunkHeaderSize + kFlipBitsMetadataSegmentSampleCountCountOffset,
              static_cast<std::uint32_t>(metadata.segment_sample_counts.size()));
-  std::size_t write_offset = kChunkHeaderSize + header_size;
+  std::size_t write_offset = kChunkHeaderSize + kFlipBitsMetadataHeaderSize;
   for (std::uint32_t sample_count : metadata.segment_sample_counts) {
     WriteU32Le(chunk.data() + write_offset, sample_count);
     write_offset += 4;
   }
   for (std::size_t index = 0; index < metadata.app_version.size(); ++index) {
-    chunk[kChunkHeaderSize + app_version_offset + index] =
+    chunk[kChunkHeaderSize + kFlipBitsMetadataAppVersionOffset + index] =
         static_cast<std::uint8_t>(metadata.app_version[index]);
   }
   for (std::size_t index = 0; index < metadata.core_version.size(); ++index) {
-    chunk[kChunkHeaderSize + core_version_offset + index] =
+    chunk[kChunkHeaderSize + kFlipBitsMetadataCoreVersionOffset + index] =
         static_cast<std::uint8_t>(metadata.core_version[index]);
   }
   return chunk;
@@ -331,7 +298,7 @@ FlipBitsAudioMetadataParseResult ParseFlipBitsMetadataChunk(
   if (chunk_data == nullptr && chunk_size > 0) {
     return {FlipBitsAudioMetadataStatus::kInvalidArgument, {}};
   }
-  if (chunk_size < kFlipBitsMetadataV5FixedPayloadSize) {
+  if (chunk_size < kFlipBitsMetadataFixedPayloadSize) {
     return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
 
@@ -348,80 +315,52 @@ FlipBitsAudioMetadataParseResult ParseFlipBitsMetadataChunk(
   if (!IsSupportedMetadataVersion(metadata.version)) {
     return {FlipBitsAudioMetadataStatus::kUnsupportedVersion, {}};
   }
-  std::size_t app_version_offset = kFlipBitsMetadataAppVersionOffset;
-  std::size_t core_version_offset = kFlipBitsMetadataCoreVersionOffset;
-  std::size_t segment_count_offset = kFlipBitsMetadataSegmentCountOffset;
-  std::size_t segment_count_count_offset =
-      kFlipBitsMetadataSegmentSampleCountCountOffset;
-  std::size_t fixed_payload_size = kFlipBitsMetadataV5FixedPayloadSize;
-  std::size_t header_size = kFlipBitsMetadataV5HeaderSize;
-  if (metadata.version == kFlipBitsMetadataVersionV6) {
-    if (chunk_size < kFlipBitsMetadataV6FixedPayloadSize) {
-      return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-    }
-    metadata.input_source_kind =
-        static_cast<FlipBitsAudioMetadataInputSourceKind>(
-            chunk_data[kFlipBitsMetadataV6InputSourceKindOffset]);
-    metadata.duration_ms =
-        ReadU32Le(chunk_data + kFlipBitsMetadataV6DurationOffset);
-    metadata.created_at_iso_utc.assign(
-        reinterpret_cast<const char*>(chunk_data +
-                                      kFlipBitsMetadataV6CreatedAtOffset),
-        kFlipBitsMetadataIsoUtcByteCount);
-    metadata.sample_rate_hz =
-        ReadU32Le(chunk_data + kFlipBitsMetadataV6SampleRateHzOffset);
-    metadata.frame_samples =
-        ReadU32Le(chunk_data + kFlipBitsMetadataV6FrameSamplesOffset);
-    metadata.pcm_sample_count =
-        ReadU32Le(chunk_data + kFlipBitsMetadataV6PcmSampleCountOffset);
-    metadata.payload_byte_count =
-        ReadU32Le(chunk_data + kFlipBitsMetadataV6PayloadByteCountOffset);
-    app_version_offset = kFlipBitsMetadataV6AppVersionOffset;
-    core_version_offset = kFlipBitsMetadataV6CoreVersionOffset;
-    segment_count_offset = kFlipBitsMetadataV6SegmentCountOffset;
-    segment_count_count_offset =
-        kFlipBitsMetadataV6SegmentSampleCountCountOffset;
-    fixed_payload_size = kFlipBitsMetadataV6FixedPayloadSize;
-    header_size = kFlipBitsMetadataV6HeaderSize;
-  } else {
-    metadata.duration_ms =
-        ReadU32Le(chunk_data + kFlipBitsMetadataDurationOffset);
-    metadata.created_at_iso_utc.assign(
-        reinterpret_cast<const char*>(chunk_data +
-                                      kFlipBitsMetadataCreatedAtOffset),
-        kFlipBitsMetadataIsoUtcByteCount);
-    metadata.frame_samples =
-        ReadU32Le(chunk_data + kFlipBitsMetadataFrameSamplesOffset);
-    metadata.pcm_sample_count =
-        ReadU32Le(chunk_data + kFlipBitsMetadataPcmSampleCountOffset);
-    metadata.sample_rate_hz = 0u;
-    metadata.payload_byte_count = 0u;
-    metadata.input_source_kind = FlipBitsAudioMetadataInputSourceKind::kUnknown;
-  }
+  metadata.input_source_kind =
+      static_cast<FlipBitsAudioMetadataInputSourceKind>(
+          chunk_data[kFlipBitsMetadataInputSourceKindOffset]);
+  metadata.has_mini_speed_style =
+      chunk_data[kFlipBitsMetadataHasMiniSpeedStyleOffset] != 0u;
+  metadata.mini_speed_style =
+      static_cast<FlipBitsAudioMetadataMiniSpeedStyle>(
+          chunk_data[kFlipBitsMetadataMiniSpeedStyleOffset]);
+  metadata.duration_ms =
+      ReadU32Le(chunk_data + kFlipBitsMetadataDurationOffset);
+  metadata.created_at_iso_utc.assign(
+      reinterpret_cast<const char*>(chunk_data +
+                                    kFlipBitsMetadataCreatedAtOffset),
+      kFlipBitsMetadataIsoUtcByteCount);
+  metadata.sample_rate_hz =
+      ReadU32Le(chunk_data + kFlipBitsMetadataSampleRateHzOffset);
+  metadata.frame_samples =
+      ReadU32Le(chunk_data + kFlipBitsMetadataFrameSamplesOffset);
+  metadata.pcm_sample_count =
+      ReadU32Le(chunk_data + kFlipBitsMetadataPcmSampleCountOffset);
+  metadata.payload_byte_count =
+      ReadU32Le(chunk_data + kFlipBitsMetadataPayloadByteCountOffset);
   if (!IsValidCreatedAtIsoUtc(metadata.created_at_iso_utc)) {
     return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
-  metadata.segment_count = ReadU32Le(chunk_data + segment_count_offset);
+  metadata.segment_count = ReadU32Le(chunk_data + kFlipBitsMetadataSegmentCountOffset);
   const std::uint32_t segment_sample_count_count =
-      ReadU32Le(chunk_data + segment_count_count_offset);
+      ReadU32Le(chunk_data + kFlipBitsMetadataSegmentSampleCountCountOffset);
   const std::size_t expected_size =
-      fixed_payload_size +
+      kFlipBitsMetadataFixedPayloadSize +
       (static_cast<std::size_t>(segment_sample_count_count) * 4u);
   if (chunk_size != expected_size) {
     return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
   metadata.segment_sample_counts.reserve(segment_sample_count_count);
-  std::size_t read_offset = header_size;
+  std::size_t read_offset = kFlipBitsMetadataHeaderSize;
   for (std::uint32_t index = 0; index < segment_sample_count_count; ++index) {
     metadata.segment_sample_counts.push_back(
         ReadU32Le(chunk_data + read_offset));
     read_offset += 4;
   }
   metadata.app_version = ReadPaddedAsciiString(
-      chunk_data + app_version_offset,
+      chunk_data + kFlipBitsMetadataAppVersionOffset,
       kFlipBitsMetadataVersionTextByteCount);
   metadata.core_version = ReadPaddedAsciiString(
-      chunk_data + core_version_offset,
+      chunk_data + kFlipBitsMetadataCoreVersionOffset,
       kFlipBitsMetadataVersionTextByteCount);
   if (!IsValidVersionText(metadata.app_version) ||
       !IsValidVersionText(metadata.core_version)) {
@@ -445,11 +384,17 @@ FlipBitsAudioMetadataParseResult ParseFlipBitsMetadataChunk(
     metadata.flash_voicing_style =
         FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
   }
-  if (metadata.version == kFlipBitsMetadataVersionV6) {
-    if (metadata.sample_rate_hz == 0u ||
-        !IsSupportedInputSourceKind(metadata.input_source_kind)) {
+  if (metadata.has_mini_speed_style) {
+    if (metadata.mode != FlipBitsAudioMetadataMode::kMini ||
+        !IsSupportedMiniSpeedStyle(metadata.mini_speed_style)) {
       return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
     }
+  } else {
+    metadata.mini_speed_style = FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
+  }
+  if (metadata.sample_rate_hz == 0u ||
+      !IsSupportedInputSourceKind(metadata.input_source_kind)) {
+    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
   }
 
   return {FlipBitsAudioMetadataStatus::kOk, metadata};

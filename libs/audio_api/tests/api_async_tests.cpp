@@ -163,6 +163,46 @@ void TestApiEncodeJobSuccessAndProgressAcrossModes() {
     }
 }
 
+void TestApiMiniWhitespaceEncodeJobSuccess() {
+    const auto config_case = test::ConfigCases().front();
+    const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
+    const std::array<std::string, 3> cases = {
+        "   ",
+        "\n",
+        " \t\r\n ",
+    };
+
+    for (const auto& text : cases) {
+        bag_encode_job* job = nullptr;
+        test::AssertEq(
+            bag_start_encode_text_job(&encoder_config, text.c_str(), &job),
+            BAG_OK,
+            "Mini async encode jobs should accept whitespace-only text because separators are encodable.");
+
+        const EncodeJobCompletion completion = WaitForEncodeJobTerminal(job);
+        test::AssertEq(
+            completion.final_progress.state,
+            BAG_ENCODE_JOB_SUCCEEDED,
+            "Whitespace-only mini jobs should reach the succeeded terminal state.");
+        test::AssertEq(
+            completion.final_progress.terminal_code,
+            BAG_OK,
+            "Whitespace-only mini jobs should publish an OK terminal code.");
+
+        bag_pcm16_result pcm{};
+        test::AssertEq(
+            bag_take_encode_text_job_result(job, &pcm),
+            BAG_OK,
+            "Whitespace-only mini jobs should expose a PCM result.");
+        test::AssertTrue(
+            pcm.sample_count > 0,
+            "Whitespace-only mini jobs should render non-empty silence PCM.");
+
+        bag_free_pcm16_result(&pcm);
+        bag_destroy_encode_text_job(job);
+    }
+}
+
 void TestApiEncodeJobImmediateCancel() {
     const auto config_case = test::ConfigCases().front();
     const auto encoder_config =
@@ -297,6 +337,7 @@ namespace api_tests {
 void RegisterApiAsyncTests(test::Runner& runner) {
     runner.Add("Api.EncodeJobRejectsInvalidArguments", TestApiEncodeJobRejectsInvalidArguments);
     runner.Add("Api.EncodeJobSuccessAndProgressAcrossModes", TestApiEncodeJobSuccessAndProgressAcrossModes);
+    runner.Add("Api.MiniWhitespaceEncodeJobSuccess", TestApiMiniWhitespaceEncodeJobSuccess);
     runner.Add("Api.EncodeJobImmediateCancel", TestApiEncodeJobImmediateCancel);
     runner.Add("Api.EncodeJobCancelWhileRunning", TestApiEncodeJobCancelWhileRunning);
     runner.Add("Api.EncodeJobDestroyWhileRunningIsSafe", TestApiEncodeJobDestroyWhileRunningIsSafe);

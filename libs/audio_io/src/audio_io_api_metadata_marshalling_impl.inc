@@ -72,6 +72,36 @@ audio_io_metadata_flash_voicing_style ToApiFlashStyle(
   }
 }
 
+audio_io::FlipBitsAudioMetadataMiniSpeedStyle ToLibraryMiniSpeedStyle(
+    audio_io_metadata_mini_speed_style style) {
+  switch (style) {
+    case AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW:
+      return audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kSlow;
+    case AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD:
+      return audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kStandard;
+    case AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST:
+      return audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kFast;
+    case AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN:
+    default:
+      return audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
+  }
+}
+
+audio_io_metadata_mini_speed_style ToApiMiniSpeedStyle(
+    audio_io::FlipBitsAudioMetadataMiniSpeedStyle style) {
+  switch (style) {
+    case audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kSlow:
+      return AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW;
+    case audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kStandard:
+      return AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD;
+    case audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kFast:
+      return AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST;
+    case audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kUnknown:
+    default:
+      return AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;
+  }
+}
+
 audio_io::FlipBitsAudioMetadataInputSourceKind ToLibraryInputSourceKind(
     audio_io_metadata_input_source_kind kind) {
   switch (kind) {
@@ -124,6 +154,12 @@ bool FillApiMetadata(const audio_io::FlipBitsAudioMetadata& native_metadata,
       native_metadata.has_flash_voicing_style
           ? ToApiFlashStyle(native_metadata.flash_voicing_style)
           : AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
+  out_metadata->has_mini_speed_style =
+      native_metadata.has_mini_speed_style ? 1u : 0u;
+  out_metadata->mini_speed_style =
+      native_metadata.has_mini_speed_style
+          ? ToApiMiniSpeedStyle(native_metadata.mini_speed_style)
+          : AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;
   out_metadata->duration_ms = native_metadata.duration_ms;
   out_metadata->sample_rate_hz = native_metadata.sample_rate_hz;
   out_metadata->frame_samples = native_metadata.frame_samples;
@@ -174,6 +210,12 @@ bool ToNativeMetadata(const audio_io_metadata_view* metadata,
       out_metadata->has_flash_voicing_style
           ? ToLibraryFlashStyle(metadata->flash_voicing_style)
           : audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
+  out_metadata->has_mini_speed_style =
+      metadata->has_mini_speed_style != 0u;
+  out_metadata->mini_speed_style =
+      out_metadata->has_mini_speed_style
+          ? ToLibraryMiniSpeedStyle(metadata->mini_speed_style)
+          : audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
   out_metadata->created_at_iso_utc = ToStdString(metadata->created_at_iso_utc);
   out_metadata->duration_ms = metadata->duration_ms;
   out_metadata->sample_rate_hz = metadata->sample_rate_hz;

@@ -218,12 +218,16 @@ void TestApiMiniMorseRoundTripAcrossConfigs() {
         std::string input;
         std::string expected_text;
     };
-    const std::array<MaxCase, 5> cases = {{
+    const std::array<MaxCase, 9> cases = {{
         {"PRAISE THE OMNISSIAH", "PRAISE THE OMNISSIAH"},
         {"SOS", "SOS"},
         {"MINI-ASCII 123", "MINI-ASCII 123"},
         {"HELLO, WORLD?", "HELLO, WORLD?"},
         {"praise   the omnissiah", "PRAISE THE OMNISSIAH"},
+        {"   ", " "},
+        {"\n", " "},
+        {" \t\r\n ", " "},
+        {"   123\n", "123"},
     }};
 
     for (const auto& config_case : test::ConfigCases()) {
@@ -397,6 +401,10 @@ void TestApiModeSpecificValidation() {
         bag_encode_text(&mini_config, "PRAISE THE OMNISSIAH", &pcm),
         BAG_OK,
         "Mini Morse mode should accept the pro-style ASCII example text.");
+    test::AssertEq(
+        bag_encode_text(&mini_config, "", &pcm),
+        BAG_INVALID_ARGUMENT,
+        "Mini Morse mode should reject a truly empty string while still allowing encodable whitespace.");
     bag_free_pcm16_result(&pcm);
 }
 
@@ -2371,10 +2379,18 @@ void TestApiValidationHelpers() {
         bag_validate_encode_request(&mini_config, mini_non_morse.c_str()),
         BAG_VALIDATION_MINI_MORSE_ONLY,
         "Validation helper should expose the mini Morse-compatible text rule.");
+    test::AssertEq(
+        bag_validate_encode_request(&mini_config, ""),
+        BAG_VALIDATION_EMPTY_TEXT,
+        "Validation helper should distinguish truly empty text from encodable whitespace.");
     test::AssertContains(
         bag_validation_issue_message(BAG_VALIDATION_MINI_MORSE_ONLY),
         "Morse",
         "Validation helper message should explain the mini Morse-only rule.");
+    test::AssertContains(
+        bag_validation_issue_message(BAG_VALIDATION_EMPTY_TEXT),
+        "empty",
+        "Validation helper message should explain the empty-text rule.");
 
     auto invalid_decoder = MakeDecoderConfig(config_case, static_cast<bag_transport_mode>(99));
     test::AssertEq(

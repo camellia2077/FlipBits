@@ -12,18 +12,22 @@
   - `A-Z`
   - `0-9`
   - space
+  - `\t / \r / \n`，会规范化成 space separator
   - 常见 International Morse punctuation：`.,?'!/()&:;=+-_"$@`
 - 小写输入会自动转成大写。
-- 多个连续空格会折叠为一个空格。
-- 开头和结尾的空格不会进入 payload。
+- `space / \t / \r / \n` 会统一规范化成一个 ASCII space。
+- 多个连续 whitespace 会折叠为一个 space separator。
+- truly empty string 会在校验阶段失败；whitespace-only text 仍是合法可编码输入。
 - 非支持字符应在校验阶段失败，公共 API 通过 `BAG_VALIDATION_MINI_MORSE_ONLY` 暴露失败语义。
 - Android 输入区会显示 normalization 预览、Morse 点划预览与 unsupported character 提示；这些 UI 提示是编辑辅助，不改变 core 的最终校验权威。
+- whitespace 详细契约见 [`mini-whitespace-contract.md`](mini-whitespace-contract.md)。
 
 ## 信息层
 - 输入文本先规范化为 Morse-compatible text。
 - 规范化后的每个字符仍以 byte 形式保存到 payload 中：
   - 字母 / 数字 / 标点保存其 ASCII byte
   - space 保存为 `0x20`
+- 纯 whitespace 输入会保留一个 separator byte，因此会生成 silence PCM，而不是被视为 absent input。
 - `mini` 不是原始 byte 透明传输；它只接受 Morse 表中存在的字符。
 - `mini` 也不是 nibble / 多频映射模式；每个字符最终会通过 International Morse 表映射到 dot / dash pattern。
 - decode 后返回的是规范化文本：
@@ -70,3 +74,4 @@
 ## 相关入口
 - 总览 / 对比见 [`../transports.md`](../transports.md)
 - 文件地图见 [`../../architecture/repo-map.md`](../../architecture/repo-map.md)
+- Android 跨层契约见 [`../../architecture/android/android-mini-cross-layer-contract.md`](../../architecture/android/android-mini-cross-layer-contract.md)

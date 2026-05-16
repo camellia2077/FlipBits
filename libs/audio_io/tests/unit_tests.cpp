@@ -18,6 +18,8 @@ constexpr std::size_t kMetadataVersionOffset = kWavChunkPayloadOffset + 0;
 constexpr std::size_t kMetadataModeOffset = kWavChunkPayloadOffset + 1;
 constexpr std::size_t kMetadataFlashStyleOffset = kWavChunkPayloadOffset + 3;
 constexpr std::size_t kMetadataInputSourceKindOffset = kWavChunkPayloadOffset + 4;
+constexpr std::size_t kMetadataHasMiniSpeedStyleOffset = kWavChunkPayloadOffset + 5;
+constexpr std::size_t kMetadataMiniSpeedStyleOffset = kWavChunkPayloadOffset + 6;
 constexpr std::size_t kMetadataCreatedAtOffset = kWavChunkPayloadOffset + 12;
 constexpr std::size_t kMetadataAppVersionOffset = kWavChunkPayloadOffset + 48;
 
@@ -32,10 +34,12 @@ std::vector<std::uint32_t> MakeValidSegmentSampleCounts(
 
 audio_io::FlipBitsAudioMetadata MakeValidMetadata(std::uint32_t pcm_sample_count) {
     audio_io::FlipBitsAudioMetadata metadata{};
-    metadata.version = 6;
-    metadata.mode = audio_io::FlipBitsAudioMetadataMode::kFlash;
-    metadata.has_flash_voicing_style = true;
-    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile;
+    metadata.version = 7;
+    metadata.mode = audio_io::FlipBitsAudioMetadataMode::kMini;
+    metadata.has_flash_voicing_style = false;
+    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
+    metadata.has_mini_speed_style = true;
+    metadata.mini_speed_style = audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kFast;
     metadata.created_at_iso_utc = "2026-03-17T09:45:00Z";
     metadata.duration_ms = 4321u;
     metadata.sample_rate_hz = 44100u;
@@ -47,6 +51,16 @@ audio_io::FlipBitsAudioMetadata MakeValidMetadata(std::uint32_t pcm_sample_count
     metadata.segment_sample_counts = MakeValidSegmentSampleCounts(pcm_sample_count);
     metadata.app_version = kTestAppVersion;
     metadata.core_version = kTestCoreVersion;
+    return metadata;
+}
+
+audio_io::FlipBitsAudioMetadata MakeValidFlashMetadata(std::uint32_t pcm_sample_count) {
+    auto metadata = MakeValidMetadata(pcm_sample_count);
+    metadata.mode = audio_io::FlipBitsAudioMetadataMode::kFlash;
+    metadata.has_flash_voicing_style = true;
+    metadata.flash_voicing_style = audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile;
+    metadata.has_mini_speed_style = false;
+    metadata.mini_speed_style = audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
     return metadata;
 }
 
@@ -62,6 +76,14 @@ std::vector<std::uint8_t> MakeMetadataWavBytes() {
         MakeValidMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size())));
 }
 
+std::vector<std::uint8_t> MakeFlashMetadataWavBytes() {
+    const auto& test_case = MetadataRoundTripCase();
+    return audio_io::SerializeMonoPcm16WavWithMetadata(
+        test_case.sample_rate_hz,
+        test_case.mono_pcm,
+        MakeValidFlashMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size())));
+}
+
 audio_io_string_view MakeStringView(std::string_view value) {
     return audio_io_string_view{value.data(), value.size()};
 }
@@ -75,10 +97,12 @@ ApiMetadataFixture MakeApiMetadataView(std::uint32_t pcm_sample_count) {
     ApiMetadataFixture fixture{};
     fixture.segment_sample_counts = MakeValidSegmentSampleCounts(pcm_sample_count);
     fixture.view = audio_io_metadata_view{
-        6u,
-        AUDIO_IO_METADATA_MODE_FLASH,
+        7u,
+        AUDIO_IO_METADATA_MODE_MINI,
+        0u,
+        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN,
         1u,
-        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID,
+        AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST,
         MakeStringView("2026-03-17T09:45:00Z"),
         4321u,
         44100u,
@@ -310,14 +334,20 @@ void TestWavIoCApiMetadataRoundTripContract() {
     test::AssertEq(decoded.metadata_status,
                    AUDIO_IO_METADATA_OK,
                    "C ABI unified decode should report metadata success.");
-    test::AssertEq(decoded.metadata.version, static_cast<std::uint8_t>(6u), "C ABI metadata version should round-trip.");
-    test::AssertEq(decoded.metadata.mode, AUDIO_IO_METADATA_MODE_FLASH, "C ABI metadata mode should round-trip.");
+    test::AssertEq(decoded.metadata.version, static_cast<std::uint8_t>(7u), "C ABI metadata version should round-trip.");
+    test::AssertEq(decoded.metadata.mode, AUDIO_IO_METADATA_MODE_MINI, "C ABI metadata mode should round-trip.");
     test::AssertEq(decoded.metadata.has_flash_voicing_style,
-                   static_cast<std::uint8_t>(1u),
+                   static_cast<std::uint8_t>(0u),
                    "C ABI metadata flash-style presence should round-trip.");
     test::AssertEq(decoded.metadata.flash_voicing_style,
-                   AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID,
+                   AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN,
                    "C ABI metadata flash-style value should round-trip.");
+    test::AssertEq(decoded.metadata.has_mini_speed_style,
+                   static_cast<std::uint8_t>(1u),
+                   "C ABI metadata mini-speed-style presence should round-trip.");
+    test::AssertEq(decoded.metadata.mini_speed_style,
+                   AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST,
+                   "C ABI metadata mini-speed-style value should round-trip.");
     test::AssertEq(std::string(decoded.metadata.created_at_iso_utc.data, decoded.metadata.created_at_iso_utc.size),
                    std::string("2026-03-17T09:45:00Z"),
                    "C ABI metadata timestamp should round-trip.");
@@ -396,7 +426,7 @@ void TestWavIoCApiTruncatedWavPreservesMetadataStatus() {
                    AUDIO_IO_METADATA_OK,
                    "C ABI unified decode should preserve metadata success when WBAG is intact.");
     test::AssertEq(decoded.metadata.mode,
-                   AUDIO_IO_METADATA_MODE_FLASH,
+                   AUDIO_IO_METADATA_MODE_MINI,
                    "C ABI truncated decode should still expose parsed metadata.");
     audio_io_free_decoded_wav(&decoded);
 }
@@ -426,15 +456,20 @@ void TestWavIoMetadataRoundTripContract() {
 
     const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status, audio_io::FlipBitsAudioMetadataStatus::kOk, "Metadata parse should succeed.");
-    test::AssertEq(parsed_metadata.metadata.version, 6u, "Metadata version should round-trip.");
+    test::AssertEq(parsed_metadata.metadata.version, 7u, "Metadata version should round-trip.");
     test::AssertEq(parsed_metadata.metadata.mode,
-                   audio_io::FlipBitsAudioMetadataMode::kFlash,
+                   audio_io::FlipBitsAudioMetadataMode::kMini,
                    "Metadata mode should round-trip.");
-    test::AssertTrue(parsed_metadata.metadata.has_flash_voicing_style,
-                     "Metadata should preserve the flash voicing style flag.");
+    test::AssertTrue(!parsed_metadata.metadata.has_flash_voicing_style,
+                     "Metadata should preserve the absent flash voicing style flag.");
     test::AssertEq(parsed_metadata.metadata.flash_voicing_style,
-                   audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile,
+                   audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown,
                    "Metadata flash voicing style should round-trip.");
+    test::AssertTrue(parsed_metadata.metadata.has_mini_speed_style,
+                     "Metadata should preserve the mini speed style flag.");
+    test::AssertEq(parsed_metadata.metadata.mini_speed_style,
+                   audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kFast,
+                   "Metadata mini speed style should round-trip.");
     test::AssertEq(parsed_metadata.metadata.created_at_iso_utc,
                    std::string("2026-03-17T09:45:00Z"),
                    "Metadata creation time should round-trip.");
@@ -484,6 +519,15 @@ void TestWavIoMetadataModeValuesRoundTrip() {
         auto metadata = MakeValidMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size()));
         metadata.mode = mode;
         metadata.has_flash_voicing_style = mode == audio_io::FlipBitsAudioMetadataMode::kFlash;
+        metadata.flash_voicing_style =
+            metadata.has_flash_voicing_style
+                ? audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kHostile
+                : audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
+        metadata.has_mini_speed_style = mode == audio_io::FlipBitsAudioMetadataMode::kMini;
+        metadata.mini_speed_style =
+            metadata.has_mini_speed_style
+                ? audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kFast
+                : audio_io::FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
         const auto wav_bytes = audio_io::SerializeMonoPcm16WavWithMetadata(
             test_case.sample_rate_hz,
             test_case.mono_pcm,
@@ -553,7 +597,7 @@ void TestWavIoMetadataRejectsOlderVersions() {
         metadata_v2);
     test::AssertTrue(
         wav_bytes_v2.empty(),
-        "Serialization should reject older metadata versions now that only v6 is writable.");
+        "Serialization should reject older metadata versions now that only v7 is writable.");
 }
 
 void TestWavIoMetadataParseRejectsUnsupportedVersion() {
@@ -612,7 +656,7 @@ void TestWavIoMetadataRejectsUnknownModeValues() {
 }
 
 void TestWavIoMetadataRejectsUnknownFlashStyleValues() {
-    auto wav_bytes = MakeMetadataWavBytes();
+    auto wav_bytes = MakeFlashMetadataWavBytes();
     wav_bytes[kMetadataFlashStyleOffset] = 99u;
     const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
     test::AssertEq(parsed_metadata.status,
@@ -632,7 +676,7 @@ void TestWavIoMetadataFlashEmotionValuesRoundTrip() {
     const auto& test_case = MetadataRoundTripCase();
 
     for (const auto style : styles) {
-        auto metadata = MakeValidMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size()));
+        auto metadata = MakeValidFlashMetadata(static_cast<std::uint32_t>(test_case.mono_pcm.size()));
         metadata.flash_voicing_style = style;
         const auto wav_bytes = audio_io::SerializeMonoPcm16WavWithMetadata(
             test_case.sample_rate_hz,
@@ -668,6 +712,15 @@ void TestWavIoMetadataRejectsCorruptedFields() {
         test::AssertEq(parsed_metadata.status,
                        audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
                        "Metadata parsing should reject empty app-version fields inside WBAG chunks.");
+    }
+
+    {
+        auto wav_bytes = MakeMetadataWavBytes();
+        wav_bytes[kMetadataMiniSpeedStyleOffset] = 99u;
+        const auto parsed_metadata = audio_io::ParseFlipBitsAudioMetadata(wav_bytes);
+        test::AssertEq(parsed_metadata.status,
+                       audio_io::FlipBitsAudioMetadataStatus::kInvalidMetadata,
+                       "Metadata parsing should reject unknown mini speed styles.");
     }
 }
 

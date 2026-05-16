@@ -58,6 +58,9 @@ TransportValidationIssue ValidateEncodeRequest(const CoreConfig& config,
   if (config_issue != TransportValidationIssue::kOk) {
     return config_issue;
   }
+  if (text.empty()) {
+    return TransportValidationIssue::kEmptyText;
+  }
 
   if (config.mode == TransportMode::kFlash) {
     return TransportValidationIssue::kOk;

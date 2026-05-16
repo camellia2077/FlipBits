@@ -14,6 +14,8 @@ void ResetMetadata(audio_io_metadata* metadata) {
   metadata->mode = AUDIO_IO_METADATA_MODE_UNKNOWN;
   metadata->has_flash_voicing_style = 0;
   metadata->flash_voicing_style = AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
+  metadata->has_mini_speed_style = 0;
+  metadata->mini_speed_style = AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;
   ResetOwnedString(&metadata->created_at_iso_utc);
   metadata->duration_ms = 0;
   metadata->sample_rate_hz = 0;

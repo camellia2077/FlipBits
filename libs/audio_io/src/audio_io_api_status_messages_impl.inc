@@ -28,7 +28,7 @@ const char* audio_io_metadata_status_message(audio_io_metadata_status status) {
     case AUDIO_IO_METADATA_INVALID_HEADER:
       return "Invalid FlipBits metadata header.";
     case AUDIO_IO_METADATA_UNSUPPORTED_VERSION:
-      return "Unsupported FlipBits metadata version.";
+      return "Unsupported FlipBits metadata version; only WBAG metadata v7 is supported.";
     case AUDIO_IO_METADATA_INVALID_METADATA:
       return "Invalid FlipBits metadata payload.";
     case AUDIO_IO_METADATA_TRUNCATED_DATA:

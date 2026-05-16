@@ -67,6 +67,8 @@ bag_validation_issue ToApiValidationIssue(bag::TransportValidationIssue issue) {
       return BAG_VALIDATION_INVALID_FLASH_VOICING_FLAVOR;
     case bag::TransportValidationIssue::kMiniMorseOnly:
       return BAG_VALIDATION_MINI_MORSE_ONLY;
+    case bag::TransportValidationIssue::kEmptyText:
+      return BAG_VALIDATION_EMPTY_TEXT;
     default:
       return BAG_VALIDATION_INVALID_MODE;
   }

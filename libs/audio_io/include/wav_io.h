@@ -34,6 +34,13 @@ enum class FlipBitsAudioMetadataFlashVoicingStyle : std::uint8_t {
   kVoid = 7,
 };
 
+enum class FlipBitsAudioMetadataMiniSpeedStyle : std::uint8_t {
+  kUnknown = 0,
+  kSlow = 1,
+  kStandard = 2,
+  kFast = 3,
+};
+
 enum class FlipBitsAudioMetadataInputSourceKind : std::uint8_t {
   kUnknown = 0,
   kManual = 1,
@@ -62,6 +69,9 @@ struct FlipBitsAudioMetadata {
   bool has_flash_voicing_style = false;
   FlipBitsAudioMetadataFlashVoicingStyle flash_voicing_style =
       FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
+  bool has_mini_speed_style = false;
+  FlipBitsAudioMetadataMiniSpeedStyle mini_speed_style =
+      FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
   // ISO-8601 UTC generation timestamp for the PCM payload.
   std::string created_at_iso_utc;
   std::uint32_t duration_ms = 0;

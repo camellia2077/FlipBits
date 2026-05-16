@@ -6,6 +6,13 @@ namespace {
 
 char NormalizeMorseChar(char ch) {
   const unsigned char value = static_cast<unsigned char>(ch);
+  // In this project, visible glyphs and separator whitespace are both part of
+  // the text-to-audio contract. Mini therefore normalizes common ASCII
+  // whitespace into a single encodable separator instead of treating it as
+  // absent input.
+  if (value == ' ' || value == '\t' || value == '\r' || value == '\n') {
+    return ' ';
+  }
   if (value >= 'a' && value <= 'z') {
     return static_cast<char>('A' + (value - 'a'));
   }
@@ -190,7 +197,7 @@ ErrorCode EncodeTextToPayload(const std::string& text,
   for (char ch : text) {
     const char normalized = NormalizeMorseChar(ch);
     if (normalized == ' ') {
-      if (!previous_was_space && !out_payload->empty()) {
+      if (!previous_was_space) {
         out_payload->push_back(static_cast<uint8_t>(' '));
       }
       previous_was_space = true;
@@ -199,7 +206,11 @@ ErrorCode EncodeTextToPayload(const std::string& text,
     previous_was_space = false;
     out_payload->push_back(static_cast<uint8_t>(normalized));
   }
-  if (!out_payload->empty() && out_payload->back() == static_cast<uint8_t>(' ')) {
+  // Preserve a pure-whitespace payload as one separator byte so the transport
+  // still renders audible timing/silence. Only trim trailing separators when
+  // the payload also carries visible Morse characters.
+  if (out_payload->size() > 1 &&
+      out_payload->back() == static_cast<uint8_t>(' ')) {
     out_payload->pop_back();
   }
   return ErrorCode::kOk;

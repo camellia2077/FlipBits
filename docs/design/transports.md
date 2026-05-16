@@ -46,6 +46,7 @@
 - 核心：文本先规范化为 Morse-compatible text，再按 dot / dash / silence unit 渲染。
 - 详细设计：
   - [`docs/design/modes/mini.md`](modes/mini.md)
+  - [`docs/design/modes/mini-whitespace-contract.md`](modes/mini-whitespace-contract.md)
 
 ### `pro`
 - 定位：ASCII-only 的正式模式。

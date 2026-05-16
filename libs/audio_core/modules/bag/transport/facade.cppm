@@ -22,6 +22,7 @@ enum class TransportValidationIssue {
   kInvalidFlashSignalProfile = 6,
   kInvalidFlashVoicingFlavor = 7,
   kMiniMorseOnly = 8,
+  kEmptyText = 9,
 };
 
 TransportValidationIssue ValidateEncodeRequest(const CoreConfig& config,

@@ -16,6 +16,8 @@
   - `Standard / Hostility / Litany / Collapse / Zeal / Void` 的逐 preset 详细设计。
 - [`mini.md`](mini.md)
   - Morse code 模式的输入规范、节奏单位、follow / visual 口径与主链路文件。
+- [`mini-whitespace-contract.md`](mini-whitespace-contract.md)
+  - `mini` 对 empty text、separator whitespace、canonical normalization 和 silence PCM 的权威语义。
 - [`pro.md`](pro.md)
   - ASCII-only + `DTMF-like` 双音映射模式的定位、字节结构与 clean PHY 口径。
 - [`ultra.md`](ultra.md)

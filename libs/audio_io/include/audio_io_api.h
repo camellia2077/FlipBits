@@ -45,6 +45,13 @@ typedef enum audio_io_metadata_flash_voicing_style {
   AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID = 7
 } audio_io_metadata_flash_voicing_style;
 
+typedef enum audio_io_metadata_mini_speed_style {
+  AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN = 0,
+  AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW = 1,
+  AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD = 2,
+  AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST = 3
+} audio_io_metadata_mini_speed_style;
+
 typedef enum audio_io_metadata_input_source_kind {
   AUDIO_IO_METADATA_INPUT_SOURCE_KIND_UNKNOWN = 0,
   AUDIO_IO_METADATA_INPUT_SOURCE_KIND_MANUAL = 1,
@@ -66,6 +73,8 @@ typedef struct audio_io_metadata_view {
   audio_io_metadata_mode mode;
   uint8_t has_flash_voicing_style;
   audio_io_metadata_flash_voicing_style flash_voicing_style;
+  uint8_t has_mini_speed_style;
+  audio_io_metadata_mini_speed_style mini_speed_style;
   audio_io_string_view created_at_iso_utc;
   uint32_t duration_ms;
   uint32_t sample_rate_hz;
@@ -85,6 +94,8 @@ typedef struct audio_io_metadata {
   audio_io_metadata_mode mode;
   uint8_t has_flash_voicing_style;
   audio_io_metadata_flash_voicing_style flash_voicing_style;
+  uint8_t has_mini_speed_style;
+  audio_io_metadata_mini_speed_style mini_speed_style;
   audio_io_owned_string created_at_iso_utc;
   uint32_t duration_ms;
   uint32_t sample_rate_hz;
