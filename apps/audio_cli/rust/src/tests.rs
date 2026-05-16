@@ -236,7 +236,7 @@ fn encode_help_mentions_flash_style() {
     assert!(help.contains("--text is parsed as a Rust UTF-8 string."));
     assert!(help.contains("--text-file is read as a UTF-8 text file."));
     assert!(help.contains("standard"));
-    assert!(help.contains("hostile"));
+    assert!(help.contains("hostility"));
     assert!(help.contains("litany"));
     assert!(help.contains("collapse"));
     assert!(help.contains("zeal"));

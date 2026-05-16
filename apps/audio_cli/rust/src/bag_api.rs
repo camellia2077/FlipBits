@@ -23,13 +23,13 @@ const BAG_TRANSPORT_PRO: BagTransportMode = 2;
 const BAG_TRANSPORT_ULTRA: BagTransportMode = 3;
 const BAG_FLASH_SIGNAL_PROFILE_STANDARD: BagFlashSignalProfile = 0;
 const BAG_FLASH_SIGNAL_PROFILE_LITANY: BagFlashSignalProfile = 1;
-const BAG_FLASH_SIGNAL_PROFILE_HOSTILE: BagFlashSignalProfile = 3;
+const BAG_FLASH_SIGNAL_PROFILE_HOSTILITY: BagFlashSignalProfile = 3;
 const BAG_FLASH_SIGNAL_PROFILE_COLLAPSE: BagFlashSignalProfile = 4;
 const BAG_FLASH_SIGNAL_PROFILE_ZEAL: BagFlashSignalProfile = 5;
 const BAG_FLASH_SIGNAL_PROFILE_VOID: BagFlashSignalProfile = 6;
 const BAG_FLASH_VOICING_FLAVOR_STANDARD: BagFlashVoicingFlavor = 0;
 const BAG_FLASH_VOICING_FLAVOR_LITANY: BagFlashVoicingFlavor = 1;
-const BAG_FLASH_VOICING_FLAVOR_HOSTILE: BagFlashVoicingFlavor = 3;
+const BAG_FLASH_VOICING_FLAVOR_HOSTILITY: BagFlashVoicingFlavor = 3;
 const BAG_FLASH_VOICING_FLAVOR_COLLAPSE: BagFlashVoicingFlavor = 4;
 const BAG_FLASH_VOICING_FLAVOR_ZEAL: BagFlashVoicingFlavor = 5;
 const BAG_FLASH_VOICING_FLAVOR_VOID: BagFlashVoicingFlavor = 6;
@@ -407,9 +407,9 @@ fn flash_style_pair(style: FlashStyle) -> (BagFlashSignalProfile, BagFlashVoicin
             BAG_FLASH_SIGNAL_PROFILE_STANDARD,
             BAG_FLASH_VOICING_FLAVOR_STANDARD,
         ),
-        FlashStyle::Hostile => (
-            BAG_FLASH_SIGNAL_PROFILE_HOSTILE,
-            BAG_FLASH_VOICING_FLAVOR_HOSTILE,
+        FlashStyle::Hostility => (
+            BAG_FLASH_SIGNAL_PROFILE_HOSTILITY,
+            BAG_FLASH_VOICING_FLAVOR_HOSTILITY,
         ),
         FlashStyle::Litany => (
             BAG_FLASH_SIGNAL_PROFILE_LITANY,

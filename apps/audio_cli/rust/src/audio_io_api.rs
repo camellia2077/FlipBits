@@ -18,7 +18,7 @@ const AUDIO_IO_METADATA_MODE_PRO: AudioIoMetadataMode = 3;
 const AUDIO_IO_METADATA_MODE_ULTRA: AudioIoMetadataMode = 4;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD: AudioIoMetadataFlashVoicingStyle = 1;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY: AudioIoMetadataFlashVoicingStyle = 2;
-const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE: AudioIoMetadataFlashVoicingStyle = 4;
+const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY: AudioIoMetadataFlashVoicingStyle = 4;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE: AudioIoMetadataFlashVoicingStyle = 5;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_ZEAL: AudioIoMetadataFlashVoicingStyle = 6;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID: AudioIoMetadataFlashVoicingStyle = 7;
@@ -472,7 +472,7 @@ fn from_metadata_mode(mode: AudioIoMetadataMode) -> Result<TransportMode, CliErr
 fn to_flash_voicing_style(style: FlashStyle) -> AudioIoMetadataFlashVoicingStyle {
     match style {
         FlashStyle::Standard => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD,
-        FlashStyle::Hostile => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE,
+        FlashStyle::Hostility => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY,
         FlashStyle::Litany => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY,
         FlashStyle::Collapse => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE,
         FlashStyle::Zeal => AUDIO_IO_METADATA_FLASH_VOICING_STYLE_ZEAL,
@@ -485,7 +485,7 @@ fn from_flash_voicing_style(
 ) -> Result<FlashStyle, CliError> {
     match style {
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_STANDARD => Ok(FlashStyle::Standard),
-        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE => Ok(FlashStyle::Hostile),
+        AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY => Ok(FlashStyle::Hostility),
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY => Ok(FlashStyle::Litany),
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE => Ok(FlashStyle::Collapse),
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_ZEAL => Ok(FlashStyle::Zeal),
