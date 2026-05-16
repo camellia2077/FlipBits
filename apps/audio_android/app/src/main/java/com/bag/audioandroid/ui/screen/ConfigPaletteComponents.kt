@@ -15,10 +15,13 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +37,9 @@ import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 internal data class PaletteGroupUi(
     val family: PaletteFamily,
     val options: List<PaletteOption>,
+    val onAddOption: (() -> Unit)? = null,
+    val onEditOption: (() -> Unit)? = null,
+    val editActionLabel: String? = null,
 )
 
 @Composable
@@ -109,13 +115,37 @@ internal fun PaletteGroupSection(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(
-                text =
-                    androidx.compose.ui.res
-                        .stringResource(group.family.titleResId),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text =
+                        androidx.compose.ui.res
+                            .stringResource(group.family.titleResId),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (group.onEditOption != null && group.editActionLabel != null) {
+                        TextButton(onClick = group.onEditOption) {
+                            Text(text = group.editActionLabel)
+                        }
+                    }
+                    if (group.onAddOption != null) {
+                        IconButton(onClick = group.onAddOption) {
+                            Icon(
+                                imageVector = Icons.Rounded.Add,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                }
+            }
             Row(
                 modifier =
                     Modifier

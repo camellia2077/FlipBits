@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.OpenInFull
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -152,12 +154,20 @@ private fun PlaybackFollowTokenizerSheet(
     onDismiss: () -> Unit,
 ) {
     val visualTokens = appThemeVisualTokens()
+    val listState = rememberLazyListState()
     val tokenStartSamples =
         remember(followData.textTokenTimeline) {
             followData.textTokenTimeline
                 .groupBy { it.tokenIndex }
                 .mapValues { (_, entries) -> entries.minOfOrNull { it.startSample } }
         }
+    val activeTokenIndex = presentationState.activeTextIndex
+
+    LaunchedEffect(activeTokenIndex) {
+        if (activeTokenIndex >= 0) {
+            listState.scrollToItem(activeTokenIndex)
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -177,6 +187,7 @@ private fun PlaybackFollowTokenizerSheet(
                 style = MaterialTheme.typography.titleMedium,
             )
             LazyColumn(
+                state = listState,
                 modifier =
                     Modifier
                         .fillMaxWidth()

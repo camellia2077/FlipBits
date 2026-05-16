@@ -23,6 +23,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                isSampleAutoFillEnabled = true,
             )
 
         TransportModeOption.entries.forEach { mode ->
@@ -43,6 +44,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                isSampleAutoFillEnabled = true,
                 isDecorationEnabled = true,
             )
 
@@ -69,6 +71,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                isSampleAutoFillEnabled = true,
                 isDecorationEnabled = false,
             )
 
@@ -104,6 +107,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = sessions,
                 newLanguage = AppLanguageOption.Japanese,
                 flavor = SampleFlavor.SacredMachine,
+                isSampleAutoFillEnabled = true,
             )
 
         assertEquals("sacred-ja-b", updated.getValue(TransportModeOption.Flash).inputText)
@@ -140,6 +144,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = sessions,
                 language = AppLanguageOption.English,
                 newFlavor = SampleFlavor.AncientDynasty,
+                isSampleAutoFillEnabled = true,
             )
 
         assertTrue(updated.getValue(TransportModeOption.Flash).sampleInputId in setOf("a", "b"))
@@ -180,6 +185,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = sessions,
                 language = AppLanguageOption.English,
                 newFlavor = SampleFlavor.LabyrinthOfMutability,
+                isSampleAutoFillEnabled = true,
             )
 
         assertTrue(updated.getValue(TransportModeOption.Flash).sampleInputId in setOf("a", "b"))
@@ -190,6 +196,84 @@ class SampleInputSessionUpdaterTest {
         assertEquals(SampleFlavor.LabyrinthOfMutability, updated.getValue(TransportModeOption.Pro).sampleShuffleState?.flavor)
         assertEquals("CUSTOM INPUT", updated.getValue(TransportModeOption.Ultra).inputText)
         assertNull(updated.getValue(TransportModeOption.Ultra).sampleInputId)
+    }
+
+    @Test
+    fun `auto-fill disabled leaves initialization and refresh inputs untouched`() {
+        val initialSessions =
+            mapOf(
+                TransportModeOption.Flash to ModeAudioSessionState(inputText = "", sampleInputId = null),
+                TransportModeOption.Mini to ModeAudioSessionState(inputText = "CUSTOM", sampleInputId = null),
+            )
+
+        val initialized =
+            updater.initialize(
+                sessions = initialSessions,
+                language = AppLanguageOption.English,
+                flavor = SampleFlavor.SacredMachine,
+                isSampleAutoFillEnabled = false,
+            )
+        assertEquals(initialSessions, initialized)
+
+        val languageRefreshed =
+            updater.refreshForLanguageChange(
+                sessions = initialSessions,
+                newLanguage = AppLanguageOption.Japanese,
+                flavor = SampleFlavor.SacredMachine,
+                isSampleAutoFillEnabled = false,
+            )
+        assertEquals(initialSessions, languageRefreshed)
+
+        val flavorRefreshed =
+            updater.refreshForFlavorChange(
+                sessions = initialSessions,
+                language = AppLanguageOption.English,
+                newFlavor = SampleFlavor.AncientDynasty,
+                isSampleAutoFillEnabled = false,
+        )
+        assertEquals(initialSessions, flavorRefreshed)
+    }
+
+    @Test
+    fun `clear auto-filled sessions removes sample-backed text but preserves custom text`() {
+        val sessions =
+            mapOf(
+                TransportModeOption.Flash to
+                    ModeAudioSessionState(
+                        inputText = "sacred-en-a",
+                        sampleInputId = "a",
+                        sampleShuffleState =
+                            com.bag.audioandroid.ui.state.SampleInputShuffleState(
+                                flavor = SampleFlavor.SacredMachine,
+                                length = SampleInputLengthOption.Short,
+                                shuffledSampleIds = listOf("a", "b"),
+                                nextSampleIndex = 1,
+                                lastPresentedSampleId = "a",
+                            ),
+                        sampleEmojiShuffleState =
+                            com.bag.audioandroid.ui.state.SampleEmojiShuffleState(
+                                shuffledEmojis = listOf("x"),
+                                nextEmojiIndex = 0,
+                                lastPresentedEmoji = "x",
+                            ),
+                        appliedSampleEmojiPrefix = "x",
+                    ),
+                TransportModeOption.Mini to
+                    ModeAudioSessionState(
+                        inputText = "CUSTOM",
+                        sampleInputId = null,
+                    ),
+            )
+
+        val cleared = updater.clearAutoFilledSessions(sessions)
+
+        assertEquals("", cleared.getValue(TransportModeOption.Flash).inputText)
+        assertNull(cleared.getValue(TransportModeOption.Flash).sampleInputId)
+        assertNull(cleared.getValue(TransportModeOption.Flash).sampleShuffleState)
+        assertNull(cleared.getValue(TransportModeOption.Flash).sampleEmojiShuffleState)
+        assertNull(cleared.getValue(TransportModeOption.Flash).appliedSampleEmojiPrefix)
+        assertEquals("CUSTOM", cleared.getValue(TransportModeOption.Mini).inputText)
+        assertNull(cleared.getValue(TransportModeOption.Mini).sampleInputId)
     }
 }
 

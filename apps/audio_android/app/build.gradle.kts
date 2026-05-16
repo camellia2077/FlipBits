@@ -55,6 +55,7 @@ fun requiredGradleStringProperty(name: String): String =
 val repoRootDir = rootProject.projectDir.parentFile.parentFile
 val translateRunScript = repoRootDir.resolve("tools/repo_tooling/android_translate/run.py")
 val translateLintBaselineFile = repoRootDir.resolve("temp/translations/lint-baseline.json")
+val androidJniKeepCheckScript = repoRootDir.resolve("tools/repo_tooling/android_jni_keep_check.py")
 val pythonCommand =
     if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
         listOf("py", "-3")
@@ -301,6 +302,13 @@ val translationLintStrict by tasks.registering(Exec::class) {
     )
 }
 
+val androidJniKeepCheck by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Fails when JNI-referenced Android app classes lack @Keep or proguard backstop for release-like builds."
+    workingDir = repoRootDir
+    commandLine(*(pythonCommand + listOf(androidJniKeepCheckScript.absolutePath)).toTypedArray())
+}
+
 val detektCliClasspath by configurations.creating
 
 val detekt by tasks.registering(JavaExec::class) {
@@ -333,6 +341,11 @@ tasks.named("check").configure {
 
 tasks.matching { it.name == "assembleRelease" }.configureEach {
     dependsOn(translationLintStrict)
+    dependsOn(androidJniKeepCheck)
+}
+
+tasks.matching { it.name == "assembleStaging" }.configureEach {
+    dependsOn(androidJniKeepCheck)
 }
 
 dependencies {

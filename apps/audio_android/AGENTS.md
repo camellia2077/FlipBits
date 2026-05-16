@@ -85,6 +85,7 @@
 - 涉及 JNI / `proguard-rules.pro` / `@Keep` / 反射 / `FindClass` / `GetMethodID` /
   `NewObject` / 资源收缩 / release-only 崩溃时，不要只验证 debug；默认还要运行：
   - `python tools/run.py android assemble-staging`
+- `assemble-staging` / `assemble-release` 现在会额外执行 Android JNI keep 校验；凡是被 native 通过 `FindClass` 或 JNI 签名直接引用到的 app 类，必须有 `@Keep` 或 `proguard-rules.pro` backstop。
 - 新增会被 native 通过类名、字段名或构造器签名直接访问的 Kotlin/Java DTO 时：
   - 优先补 `@Keep`
   - 同步检查 `app/proguard-rules.pro`

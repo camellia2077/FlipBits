@@ -7,8 +7,8 @@ import org.json.JSONObject
 internal object CustomBrandThemeSettingsStore {
     private const val KeyPresetId = "preset_id"
     private const val KeyDisplayName = "display_name"
-    private const val KeyBackgroundHex = "background_hex"
-    private const val KeyAccentHex = "accent_hex"
+    private const val KeyPrimaryHex = "primary_hex"
+    private const val KeySecondaryHex = "secondary_hex"
     private const val KeyOutlineHex = "outline_hex"
 
     fun encode(settings: List<CustomBrandThemeSettings>): String =
@@ -19,8 +19,8 @@ internal object CustomBrandThemeSettingsStore {
                         JSONObject()
                             .put(KeyPresetId, item.presetId)
                             .put(KeyDisplayName, item.displayName)
-                            .put(KeyBackgroundHex, item.backgroundHex)
-                            .put(KeyAccentHex, item.accentHex)
+                            .put(KeyPrimaryHex, item.primaryHex)
+                            .put(KeySecondaryHex, item.secondaryHex)
                             .put(KeyOutlineHex, item.outlineHexOrNull),
                     )
                 }
@@ -37,22 +37,22 @@ internal object CustomBrandThemeSettingsStore {
                     val item = array.optJSONObject(index) ?: continue
                     val presetId = item.optString(KeyPresetId).trim()
                     val displayName = item.optString(KeyDisplayName).trim()
-                    val backgroundHex = item.optString(KeyBackgroundHex).trim()
-                    val accentHex = item.optString(KeyAccentHex).trim()
+                    val primaryHex = item.optString(KeyPrimaryHex).trim()
+                    val secondaryHex = item.optString(KeySecondaryHex).trim()
                     val outlineHex =
                         item
                             .optString(KeyOutlineHex)
                             .trim()
                             .ifBlank { null }
-                    if (presetId.isEmpty() || displayName.isEmpty() || backgroundHex.isEmpty() || accentHex.isEmpty()) {
+                    if (presetId.isEmpty() || displayName.isEmpty() || primaryHex.isEmpty() || secondaryHex.isEmpty()) {
                         continue
                     }
                     add(
                         CustomBrandThemeSettings(
                             presetId = presetId,
                             displayName = displayName,
-                            backgroundHex = backgroundHex,
-                            accentHex = accentHex,
+                            primaryHex = primaryHex,
+                            secondaryHex = secondaryHex,
                             outlineHexOrNull = outlineHex,
                         ),
                     )

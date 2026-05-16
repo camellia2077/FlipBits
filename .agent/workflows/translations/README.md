@@ -15,14 +15,14 @@ If the task only changes Kotlin, JNI, playback, or layout code and does not touc
 
 ## What This Workflow Does
 
-This workflow chooses the right translation task type and tool command. It does not duplicate the full translation prompt.
+This workflow chooses the right translation task type and `android-translate` command. It does not duplicate the full translation prompt.
 
-The translate tool already generates the detailed prompt contract:
+The `android-translate` workflow already generates the detailed prompt contract:
 
 - review markdown contains `PROMPT_REF`
 - shared prompt docs live under generated `_prompts/` folders
 - `*.task.json` includes `locale_profile`, `text_type`, `context`, and `sample_length`
-- key-alignment also writes per-locale `*_key_alignment.task.json` files with missing keys, English source text, context, nearby localized terms, and suggested insertion points
+- `key-alignment` also writes per-locale `*_key_alignment.task.json` files with missing keys, English source text, context, nearby localized terms, and suggested insertion points
 
 When generated task artifacts exist, read those artifacts first and follow their prompt/profile fields.
 
@@ -31,14 +31,14 @@ When generated task artifacts exist, read those artifacts first and follow their
 Find missing or extra localized keys:
 
 ```powershell
-python tools/scripts/android/translate/run.py key-alignment
+python tools/run.py android-translate key-alignment
 ```
 
 Generate scoped translation review/task artifacts:
 
 ```powershell
-python tools/scripts/android/translate/run.py compare --text-type app_text
-python tools/scripts/android/translate/run.py compare --text-type sample_text
+python tools/run.py android-translate compare --text-type app_text
+python tools/run.py android-translate compare --text-type sample_text
 ```
 
 For generated agent jobs, prefer `*.task.json` over parsing markdown.

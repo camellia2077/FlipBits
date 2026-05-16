@@ -2,8 +2,10 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
     jclass metadata_class = env->FindClass("com/bag/audioandroid/domain/GeneratedAudioMetadata");
     jclass transport_mode_class = env->FindClass("com/bag/audioandroid/ui/model/TransportModeOption");
     jclass flash_style_class = env->FindClass("com/bag/audioandroid/ui/model/FlashVoicingStyleOption");
+    jclass morse_speed_class = env->FindClass("com/bag/audioandroid/ui/model/MorseSpeedOption");
     jclass input_source_kind_class = env->FindClass("com/bag/audioandroid/domain/GeneratedAudioInputSourceKind");
     if (metadata_class == nullptr || transport_mode_class == nullptr || flash_style_class == nullptr ||
+        morse_speed_class == nullptr ||
         input_source_kind_class == nullptr) {
         return nullptr;
     }
@@ -16,11 +18,15 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
         flash_style_class,
         "values",
         "()[Lcom/bag/audioandroid/ui/model/FlashVoicingStyleOption;");
+    jmethodID morse_speed_values = env->GetStaticMethodID(
+        morse_speed_class,
+        "values",
+        "()[Lcom/bag/audioandroid/ui/model/MorseSpeedOption;");
     jmethodID input_source_values = env->GetStaticMethodID(
         input_source_kind_class,
         "values",
         "()[Lcom/bag/audioandroid/domain/GeneratedAudioInputSourceKind;");
-    if (transport_values == nullptr || flash_values == nullptr || input_source_values == nullptr) {
+    if (transport_values == nullptr || flash_values == nullptr || morse_speed_values == nullptr || input_source_values == nullptr) {
         return nullptr;
     }
 
@@ -28,9 +34,11 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
         env->CallStaticObjectMethod(transport_mode_class, transport_values));
     jobjectArray flash_entries = static_cast<jobjectArray>(
         env->CallStaticObjectMethod(flash_style_class, flash_values));
+    jobjectArray morse_speed_entries = static_cast<jobjectArray>(
+        env->CallStaticObjectMethod(morse_speed_class, morse_speed_values));
     jobjectArray input_source_entries = static_cast<jobjectArray>(
         env->CallStaticObjectMethod(input_source_kind_class, input_source_values));
-    if (transport_entries == nullptr || flash_entries == nullptr || input_source_entries == nullptr) {
+    if (transport_entries == nullptr || flash_entries == nullptr || morse_speed_entries == nullptr || input_source_entries == nullptr) {
         return nullptr;
     }
 
@@ -84,6 +92,26 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
         }
     }
 
+    jobject mini_speed_style_object = nullptr;
+    if (metadata.has_mini_speed_style != 0u) {
+        switch (metadata.mini_speed_style) {
+            case AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW:
+                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "slow");
+                break;
+            case AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD:
+                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "standard");
+                break;
+            case AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST:
+                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "fast");
+                break;
+            default:
+                return nullptr;
+        }
+        if (mini_speed_style_object == nullptr) {
+            return nullptr;
+        }
+    }
+
     jobject input_source_object = nullptr;
     switch (metadata.input_source_kind) {
         case AUDIO_IO_METADATA_INPUT_SOURCE_KIND_MANUAL:
@@ -100,7 +128,7 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
     jmethodID ctor = env->GetMethodID(
         metadata_class,
         "<init>",
-        "(ILcom/bag/audioandroid/ui/model/TransportModeOption;Lcom/bag/audioandroid/ui/model/FlashVoicingStyleOption;Ljava/lang/String;JIIIILcom/bag/audioandroid/domain/GeneratedAudioInputSourceKind;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;)V");
+        "(ILcom/bag/audioandroid/ui/model/TransportModeOption;Lcom/bag/audioandroid/ui/model/FlashVoicingStyleOption;Lcom/bag/audioandroid/ui/model/MorseSpeedOption;Ljava/lang/String;JIIIILcom/bag/audioandroid/domain/GeneratedAudioInputSourceKind;ILjava/lang/String;Ljava/lang/String;Ljava/util/List;)V");
     if (ctor == nullptr) {
         return nullptr;
     }
@@ -117,6 +145,7 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
         static_cast<jint>(metadata.version),
         mode_object,
         flash_style_object,
+        mini_speed_style_object,
         created_at_string,
         static_cast<jlong>(metadata.duration_ms),
         static_cast<jint>(metadata.sample_rate_hz != 0u ? metadata.sample_rate_hz : fallback_sample_rate_hz),

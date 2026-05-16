@@ -12,7 +12,6 @@ import com.bag.audioandroid.domain.SavedAudioLibraryGateway
 import com.bag.audioandroid.domain.SavedAudioLibraryMetadata
 import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
-import com.bag.audioandroid.ui.model.TransportModeOption
 
 class DefaultSavedAudioRepository(
     private val audioExportGateway: AudioExportGateway,
@@ -21,21 +20,19 @@ class DefaultSavedAudioRepository(
     private val libraryMetadataStore: SavedAudioLibraryMetadataStore,
 ) : SavedAudioRepository {
     override fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
-    ): String = audioExportGateway.suggestGeneratedAudioDisplayName(mode, inputText)
+        metadata: GeneratedAudioMetadata,
+    ): String = audioExportGateway.suggestGeneratedAudioDisplayName(inputText, metadata)
 
     override fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
         sampleRateHz: Int,
         metadata: GeneratedAudioMetadata,
-    ): AudioExportResult = audioExportGateway.exportGeneratedAudio(mode, inputText, pcm, pcmFilePath, sampleRateHz, metadata)
+    ): AudioExportResult = audioExportGateway.exportGeneratedAudio(inputText, pcm, pcmFilePath, sampleRateHz, metadata)
 
     override fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -44,7 +41,6 @@ class DefaultSavedAudioRepository(
         destinationUriString: String,
     ): Boolean =
         audioExportGateway.exportGeneratedAudioToDocument(
-            mode = mode,
             inputText = inputText,
             pcm = pcm,
             pcmFilePath = pcmFilePath,

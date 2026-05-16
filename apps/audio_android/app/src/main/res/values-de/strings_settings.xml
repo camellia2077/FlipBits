@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Systemeinstellung verwenden</string>
     <string name="config_theme_mode_light">Hell</string>
     <string name="config_theme_mode_dark">Dunkel</string>
+    <string name="config_theme_mode_custom">Benutzerdefiniert</string>
     <string name="config_theme_appearance_title">Designoptik</string>
     <string name="config_theme_style_title">Designstil</string>
     <string name="config_theme_style_subtitle">Material oder Dual-tone wählen.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">Erlesener Fall</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">Das Labyrinth der Wandelbarkeit</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Benutzerdefiniert</string>
     <string name="palette_family_reds_pinks">Rot &amp; Pink</string>
     <string name="palette_family_oranges">Orange</string>
     <string name="palette_family_yellows">Gelb</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Sample-Dekoration</string>
     <string name="config_sample_decoration_subtitle">Fügt dem zufälligen Sample-Text optionale Präfixmarker hinzu.</string>
+    <string name="config_sample_text_title">Beispieltext</string>
+    <string name="config_sample_text_subtitle">Steuert, wie Beispieltext im Eingabefeld erscheint.</string>
+    <string name="config_sample_auto_fill_subtitle">Füllt das Eingabefeld mit einem zufälligen Beispiel, wenn Beispieltext verfügbar ist.</string>
+    <string name="config_sample_text_collapse">Beispieltext-Einstellungen einklappen</string>
+    <string name="config_sample_text_expand">Beispieltext-Einstellungen ausklappen</string>
+    <string name="config_sample_auto_fill_title">Beispieltext automatisch einfügen</string>
     <string name="config_demo_mode_title">Demo-Modus</string>
     <string name="config_demo_mode_subtitle">Zeigt Tipp-Feedback und Aktionshinweise für Aufnahmen.</string>
     <string name="config_custom_brand_theme_import_title">Benutzerdefinierten dual-tone importieren</string>

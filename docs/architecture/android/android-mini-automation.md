@@ -13,16 +13,21 @@ Covered:
 - Fast-regression input text: `mini sync test`
 - Scenario kind: `ui`
 - Mini Morse speeds: `slow`, `standard`, `fast`
+- Player detail display pages: `lyrics`, `visual`
+- Visual perf overlay toggle through adb scenario extras
 - UI scenario actions driven through the normal ViewModel path:
   - select Mini mode
   - select the requested Morse speed
   - replace input text
   - encode generated Mini audio
   - open the player detail sheet
+  - switch player detail to the requested display page
+  - optionally enable Visual perf overlay before capture
   - start playback
   - stop playback after the configured short capture window
 - Debug log confirmation through `MiniAutomation`
 - Unified Mini visual/Lyrics timing diagnostics through `MiniAlignmentPerf`
+- Mini Morse visual performance diagnostics through `MiniVisualPerf`
 - Token-tape diagnostics through `FlashLyricsPerf`
 - Lyrics layout diagnostics through `PlaybackLyricsLayout`
 
@@ -66,6 +71,12 @@ Visual-page lyrics layout scenario:
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
 ```
 
+Visual-page perf-overlay scenario:
+
+```powershell
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
+```
+
 Supported extras:
 
 - `wb.scenario`
@@ -86,6 +97,10 @@ Supported extras:
   - `lyrics` by default.
   - Supports `lyrics` and `visual`.
   - When `visual`, the debug scenario switches player detail to the Visual page before capture.
+- `wb.visual.perf_overlay`
+  - `false` by default.
+  - When `true`, the debug scenario leaves `Settings > Visual perf overlay` enabled for the capture instead of forcing it off.
+  - Useful for on-device Morse visual diagnostics and adb `MiniVisualPerf` capture.
 - `wb.encode`
   - `true` by default.
 - `wb.play`
@@ -109,6 +124,7 @@ Current `capture-mini` CLI surface:
   - `wb.lang`
   - `wb.display`
   - `wb.lyrics.expand`
+  - `wb.visual.perf_overlay`
 
 So:
 
@@ -127,6 +143,7 @@ All Mini UI adb scenarios reuse the same core flow:
 - Open player detail.
 - Optionally switch player detail to the requested `wb.display` page.
 - Optionally force expanded full-lyrics mode through `wb.lyrics.expand=true`.
+- Optionally keep Visual perf overlay enabled through `wb.visual.perf_overlay=true`.
 - Start playback.
 - Stop playback after the configured short capture window unless `wb.play.ms=0`.
 
@@ -137,7 +154,7 @@ For lyrics layout measurement, the UI scenario now forces a clean debug baseline
 - `Demo mode = off`
 - `Visual perf overlay = off`
 
-This reset is intentional. Demo mode only adds tap-feedback animation, but measurement captures still disable it to avoid inheriting any debug-only visual noise from device-local settings state.
+This reset is intentional. Demo mode only adds tap-feedback animation, but measurement captures still disable it by default to avoid inheriting any debug-only visual noise from device-local settings state. The only exception is an explicit `wb.visual.perf_overlay=true` request.
 
 ## Mode-specific Observability
 
@@ -145,6 +162,7 @@ Visual mode:
 
 - `MiniAutomation displayModeApplied ... mode=visual` confirms the sheet switched to Visual.
 - `MiniAlignmentPerf` remains the preferred sync stream for Mini visual and lyrics together.
+- `MiniVisualPerf` records the Morse visual perf overlay metrics when `wb.visual.perf_overlay=true`.
 - `PlaybackLyricsLayout mode=visual surface=preview` measures the compact lyrics preview shown below the Visual page.
 
 Lyrics mode:
@@ -213,10 +231,27 @@ If `--output-dir` is omitted, the tool creates:
 
 `MiniAlignmentPerf` is the preferred Mini sync diagnostic. It records the UI samples used for the Mini Morse timeline visual and the Lyrics token tape in the same row, plus active Morse group and active token state.
 
+`MiniVisualPerf` is the preferred Mini rendering and smoothing diagnostic when the Visual page is under investigation. Current key fields:
+
+- `drawAvgMs`
+- `rawUpdate/s`
+- `rawStepMaxMs`
+- `smoothStepMaxMs`
+- `visualErrorMs`
+- `windowStepMaxMs`
+
+Recommended manual perf capture:
+
+```powershell
+adb logcat -c
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
+adb logcat -d MiniVisualPerf:D MiniAlignmentPerf:D MiniAutomation:D *:S
+```
+
 Wrapper limitation to remember:
 
 - `capture-mini` summary is built from the parsed `MiniAutomation` / `MiniAlignmentPerf` / `FlashLyricsPerf` rows only
-- if you are investigating `PlaybackLyricsLayout` or other extra debug tags, use manual `adb logcat` capture instead of assuming the wrapper collected them
+- if you are investigating `PlaybackLyricsLayout`, `MiniVisualPerf`, or other extra debug tags, use manual `adb logcat` capture instead of assuming the wrapper collected them
 
 ## Success Criteria
 
@@ -237,6 +272,12 @@ Timing and follow success:
 - `sampleDelta` is visible for comparing Mini visual input sample and Lyrics input sample.
 - `visualGroup` / `visualBitOffset` change as the Morse visual advances.
 - `token`, `tokenText`, `tokenProgress`, and `lyricBitOffset` advance as Lyrics follows playback.
+
+Visual-perf success:
+
+- `MiniAutomation measurementBaselineReset ... visualPerfOverlay=true` confirms the scenario kept the overlay enabled.
+- `MiniVisualPerf` rows appear once per second during playback when `wb.visual.perf_overlay=true`.
+- `drawAvgMs`, `rawUpdate/s`, `rawStepMaxMs`, `smoothStepMaxMs`, `visualErrorMs`, and `windowStepMaxMs` can be compared across speed presets or code changes.
 
 Layout-measurement success:
 

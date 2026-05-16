@@ -33,6 +33,10 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeEncodeMonoPcm16ToWavBytes(
             metadata_class,
             "flashVoicingStyle",
             "Lcom/bag/audioandroid/ui/model/FlashVoicingStyleOption;");
+        jfieldID mini_speed_style_field = env->GetFieldID(
+            metadata_class,
+            "miniSpeedStyle",
+            "Lcom/bag/audioandroid/ui/model/MorseSpeedOption;");
         jfieldID created_at_field = env->GetFieldID(
             metadata_class,
             "createdAtIsoUtc",
@@ -80,6 +84,7 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeEncodeMonoPcm16ToWavBytes(
         if (version_field == nullptr ||
             mode_field == nullptr ||
             flash_style_field == nullptr ||
+            mini_speed_style_field == nullptr ||
             created_at_field == nullptr ||
             duration_field == nullptr ||
             sample_rate_hz_field == nullptr ||
@@ -96,6 +101,7 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeEncodeMonoPcm16ToWavBytes(
 
         jobject mode_object = env->GetObjectField(metadata_object, mode_field);
         jobject flash_style_object = env->GetObjectField(metadata_object, flash_style_field);
+        jobject mini_speed_style_object = env->GetObjectField(metadata_object, mini_speed_style_field);
         jobject input_source_kind_object = env->GetObjectField(metadata_object, input_source_kind_field);
         created_at_iso_utc = JStringToStdString(
             env,
@@ -117,6 +123,8 @@ Java_com_bag_audioandroid_NativeAudioIoBridge_nativeEncodeMonoPcm16ToWavBytes(
         metadata.mode = MapTransportMode(env, mode_object);
         metadata.has_flash_voicing_style = flash_style_object != nullptr ? 1u : 0u;
         metadata.flash_voicing_style = MapFlashVoicingStyle(env, flash_style_object);
+        metadata.has_mini_speed_style = mini_speed_style_object != nullptr ? 1u : 0u;
+        metadata.mini_speed_style = MapMiniSpeedStyle(env, mini_speed_style_object);
         metadata.created_at_iso_utc = ToStringView(created_at_iso_utc);
         metadata.duration_ms =
             static_cast<std::uint32_t>(std::max<jlong>(0, env->GetLongField(metadata_object, duration_field)));

@@ -841,6 +841,50 @@ class AudioSessionCodecFlashPresetTest {
         }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
+class AudioSessionCodecMiniNormalizationTest {
+    @Test
+    fun `mini encode normalizes whitespace before gateway validation and encode`() =
+        runTest {
+            val validatedTexts = mutableListOf<String>()
+            val encodedTexts = mutableListOf<String>()
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            validateEncodeRequestBlock = { text, _, _, _, _, _ ->
+                                validatedTexts += text
+                                BagApiCodes.VALIDATION_OK
+                            },
+                            encodeTextBlock = { text, _ ->
+                                encodedTexts += text
+                                EncodeAudioResult.Success(shortArrayOf(1, 2, 3), followData = DefaultFollowData)
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    transportMode = TransportModeOption.Mini,
+                    sessions =
+                        fixture.uiState.value.sessions.mapValues { (mode, session) ->
+                            if (mode == TransportModeOption.Mini) {
+                                session.copy(inputText = "   123\n")
+                            } else {
+                                session
+                            }
+                        },
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            assertEquals(listOf("123"), validatedTexts)
+            assertEquals(listOf("123"), encodedTexts)
+        }
+}
+
 private fun createFixture(
     gateway: AudioCodecGateway,
     testScope: TestScope,
@@ -1059,12 +1103,11 @@ private class CodecFakeSavedAudioRepository(
     private val savedContentById: Map<String, SavedAudioContent> = emptyMap(),
 ) : SavedAudioRepository {
     override fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String = "generated.wav"
 
     override fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -1073,7 +1116,6 @@ private class CodecFakeSavedAudioRepository(
     ): AudioExportResult = AudioExportResult.Failed
 
     override fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,

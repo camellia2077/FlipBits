@@ -14,7 +14,6 @@ import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.SavedAudioLibraryMetadata
 import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
-import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -180,12 +179,11 @@ private class FakeSavedAudioRepository(
     private val assignToFolderResult: Boolean = false,
 ) : SavedAudioRepository {
     override fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String = "test.wav"
 
     override fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -194,7 +192,6 @@ private class FakeSavedAudioRepository(
     ): AudioExportResult = AudioExportResult.Failed
 
     override fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,

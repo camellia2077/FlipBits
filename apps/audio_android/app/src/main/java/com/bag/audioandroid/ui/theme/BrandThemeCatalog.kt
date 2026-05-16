@@ -28,8 +28,8 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_mars_relic_description,
             accessibilityLabelResId = R.string.brand_theme_mars_relic_accessibility,
             sampleFlavor = SampleFlavor.SacredMachine,
-            backgroundColor = Color(0xFFE8E2D0),
-            accentColor = Color(0xFF9E1B1B),
+            primaryColor = Color(0xFFE8E2D0),
+            secondaryColor = Color(0xFF9E1B1B),
             outlineColor = Color(0xFFC5A059),
         ),
         buildBrandThemeOption(
@@ -39,9 +39,9 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_scarlet_guard_description,
             accessibilityLabelResId = R.string.brand_theme_scarlet_guard_accessibility,
             sampleFlavor = SampleFlavor.SacredMachine,
-            backgroundColor = Color(0xFFE0E0E0),
-            accentColor = Color(0xFF8B0000),
-            outlineColor = Color(0xFFB8860B),
+            primaryColor = Color(0xFFE0E0E0),
+            secondaryColor = Color(0xFFD64011),
+            outlineColor = Color(0xFF3B444B),
         ),
         buildBrandThemeOption(
             id = "black_crimson_rite",
@@ -50,8 +50,8 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_black_crimson_rite_description,
             accessibilityLabelResId = R.string.brand_theme_black_crimson_rite_accessibility,
             sampleFlavor = SampleFlavor.SacredMachine,
-            backgroundColor = Color(0xFF4A2B2F),
-            accentColor = Color(0xFFDC143C),
+            primaryColor = Color(0xFF4A2B2F),
+            secondaryColor = Color(0xFFDC143C),
             outlineColor = Color(0xFFB2C9AB),
         ),
         buildBrandThemeOption(
@@ -61,9 +61,9 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_scarlet_carnage_description,
             accessibilityLabelResId = R.string.brand_theme_scarlet_carnage_accessibility,
             sampleFlavor = SampleFlavor.ScarletCarnage,
-            backgroundColor = Color(0xFF8B0000),
-            accentColor = Color(0xFFB8860B),
-            outlineColor = Color(0xFF000000),
+            primaryColor = Color(0xFF8B0000),
+            secondaryColor = Color(0xFFB8860B),
+            outlineColor = Color(0xFFD4C4A8),
         ),
         buildBrandThemeOption(
             id = "labyrinth_of_mutability",
@@ -72,9 +72,9 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_labyrinth_of_mutability_description,
             accessibilityLabelResId = R.string.brand_theme_labyrinth_of_mutability_accessibility,
             sampleFlavor = SampleFlavor.LabyrinthOfMutability,
-            backgroundColor = Color(0xFF005D7C),
-            accentColor = Color(0xFFB066FF),
-            outlineColor = Color(0xFFFFD700),
+            primaryColor = Color(0xFF005D7C),
+            secondaryColor = Color(0xFFB066FF),
+            outlineColor = Color(0xFF00E5FF),
         ),
         buildBrandThemeOption(
             id = "exquisite_fall",
@@ -83,9 +83,9 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_exquisite_fall_description,
             accessibilityLabelResId = R.string.brand_theme_exquisite_fall_accessibility,
             sampleFlavor = SampleFlavor.ExquisiteFall,
-            backgroundColor = Color(0xFF5C0273),
-            accentColor = Color(0xFFAB0040),
-            outlineColor = Color(0xFFFFD700),
+            primaryColor = Color(0xFF26053A),
+            secondaryColor = Color(0xFFFF3399),
+            outlineColor = Color(0xFFECB1AC),
         ),
         buildBrandThemeOption(
             id = "immortal_rot",
@@ -94,24 +94,13 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_immortal_rot_description,
             accessibilityLabelResId = R.string.brand_theme_immortal_rot_accessibility,
             sampleFlavor = SampleFlavor.ImmortalRot,
-            backgroundColor = Color(0xFF4F7942),
-            accentColor = Color(0xFFE4D00A),
-            outlineColor = Color(0xFF2D3B2D),
+            primaryColor = Color(0xFF4F7942),
+            secondaryColor = Color(0xFFE4D00A),
+            outlineColor = Color(0xFF8CFF1A),
         ),
         // The dark dual-tone dynasty set is separated by material character instead of
         // tiny near-black shifts: alloy leans warm metallic, revival leans jade-cold,
         // sepulcher leans graphite-cyan, and tomb sigil leans earthen tomb black.
-        buildBrandThemeOption(
-            id = "ancient_alloy",
-            groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
-            titleResId = R.string.brand_theme_ancient_alloy_title,
-            descriptionResId = R.string.brand_theme_ancient_alloy_description,
-            accessibilityLabelResId = R.string.brand_theme_ancient_alloy_accessibility,
-            sampleFlavor = SampleFlavor.AncientDynasty,
-            backgroundColor = Color(0xFF423B33),
-            accentColor = Color(0xFF00FFCC),
-            outlineColor = Color(0xFF1A1815),
-        ),
         buildBrandThemeOption(
             id = "dynasty_revival",
             groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
@@ -121,9 +110,9 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.AncientDynasty,
             // Separate the two green dynasty themes on purpose: dynasty revival stays in
             // a colder jade/bronze lane, while tomb sigil keeps the harsher tomb glow.
-            backgroundColor = Color(0xFF31443E),
-            accentColor = Color(0xFF00D68F),
-            outlineColor = Color(0xFF5E736C),
+            primaryColor = Color(0xFF31443E),
+            secondaryColor = Color(0xFF00D68F),
+            outlineColor = Color(0xFFA0B3AC),
         ),
         buildBrandThemeOption(
             id = "sepulcher_cyan",
@@ -132,9 +121,20 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_sepulcher_cyan_description,
             accessibilityLabelResId = R.string.brand_theme_sepulcher_cyan_accessibility,
             sampleFlavor = SampleFlavor.AncientDynasty,
-            backgroundColor = Color(0xFF2B404A),
-            accentColor = Color(0xFF00E5B8),
+            primaryColor = Color(0xFF2B404A),
+            secondaryColor = Color(0xFF00E5B8),
             outlineColor = Color(0xFF81A1B1),
+        ),
+        buildBrandThemeOption(
+            id = "ancient_alloy",
+            groupTitleResId = R.string.config_dual_tone_group_ancient_dynasty,
+            titleResId = R.string.brand_theme_ancient_alloy_title,
+            descriptionResId = R.string.brand_theme_ancient_alloy_description,
+            accessibilityLabelResId = R.string.brand_theme_ancient_alloy_accessibility,
+            sampleFlavor = SampleFlavor.AncientDynasty,
+            primaryColor = Color(0xFF423B33),
+            secondaryColor = Color(0xFF00FFCC),
+            outlineColor = Color(0xFFB59367),
         ),
         buildBrandThemeOption(
             id = "tomb_sigil",
@@ -143,9 +143,9 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_tomb_sigil_description,
             accessibilityLabelResId = R.string.brand_theme_tomb_sigil_accessibility,
             sampleFlavor = SampleFlavor.AncientDynasty,
-            backgroundColor = Color(0xFF4D3C2B),
-            accentColor = Color(0xFFA6FF00),
-            outlineColor = Color(0xFF7D5F41),
+            primaryColor = Color(0xFF4D3C2B),
+            secondaryColor = Color(0xFFA6FF00),
+            outlineColor = Color(0xFFC7B39B),
         ),
     )
 
@@ -153,11 +153,11 @@ val DefaultBrandTheme: BrandThemeOption
     get() = BrandDualToneThemes.first()
 
 fun customBrandTheme(settings: CustomBrandThemeSettings): BrandThemeOption {
-    val normalizedBackground = normalizeBrandThemeHex(settings.backgroundHex) ?: DefaultCustomBackgroundHex
-    val normalizedAccent = normalizeBrandThemeHex(settings.accentHex) ?: DefaultCustomAccentHex
+    val normalizedPrimary = normalizeBrandThemeHex(settings.primaryHex) ?: DefaultCustomPrimaryHex
+    val normalizedSecondary = normalizeBrandThemeHex(settings.secondaryHex) ?: DefaultCustomSecondaryHex
     val normalizedOutline = normalizeBrandThemeHexOrNull(settings.outlineHexOrNull)
-    val backgroundColor = parseBrandThemeColor(normalizedBackground)
-    val accentColor = parseBrandThemeColor(normalizedAccent)
+    val primaryColor = parseBrandThemeColor(normalizedPrimary)
+    val secondaryColor = parseBrandThemeColor(normalizedSecondary)
     return buildBrandThemeOption(
         id = customBrandThemeOptionId(settings.presetId),
         groupTitleResId = R.string.config_dual_tone_group_custom,
@@ -166,9 +166,9 @@ fun customBrandTheme(settings: CustomBrandThemeSettings): BrandThemeOption {
         accessibilityLabelResId = R.string.brand_theme_custom_accessibility,
         titleOverride = settings.displayName,
         sampleFlavor = SampleFlavor.SacredMachine,
-        backgroundColor = backgroundColor,
-        accentColor = accentColor,
-        outlineColor = normalizedOutline?.let(::parseBrandThemeColor) ?: accentColor,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
+        outlineColor = normalizedOutline?.let(::parseBrandThemeColor) ?: secondaryColor,
     )
 }
 
@@ -222,25 +222,25 @@ fun buildBrandThemeOption(
     descriptionOverride: String? = null,
     accessibilityLabelOverride: String? = null,
     sampleFlavor: SampleFlavor,
-    backgroundColor: Color,
-    accentColor: Color,
-    outlineColor: Color = accentColor,
+    primaryColor: Color,
+    secondaryColor: Color,
+    outlineColor: Color = secondaryColor,
 ): BrandThemeOption {
-    val isDarkTheme = backgroundColor.luminance() < DarkThemeLuminanceThreshold
+    val isDarkTheme = primaryColor.luminance() < DarkThemeLuminanceThreshold
     // Call sites pass colors by visual responsibility, not by Material slot name:
-    // backgroundColor is the dominant page/surface color, and accentColor is the
+    // primaryColor is the dominant page/surface color, and secondaryColor is the
     // strong action/selection color. Do not swap them based on light/dark mode.
-    val background = backgroundColor
+    val background = primaryColor
     // Keep surface fully opaque. Floating UI such as the mini-player relies on
     // MaterialTheme.colorScheme.surface for readable text; adding alpha here makes
     // docked cards look translucent even when the component requests a solid color.
-    val surface = backgroundColor
+    val surface = primaryColor
     val onBackground = if (isDarkTheme) BrandInkDark else BrandInkLight
-    val primary = accentColor
-    val onPrimary = backgroundColor
-    val primaryContainer = blend(background, accentColor, if (isDarkTheme) 0.22f else 0.14f)
+    val primary = secondaryColor
+    val onPrimary = primaryColor
+    val primaryContainer = blend(background, secondaryColor, if (isDarkTheme) 0.22f else 0.14f)
     val secondaryContainer = blend(background, primary, if (isDarkTheme) 0.30f else 0.18f)
-    val surfaceVariant = blend(background, accentColor, if (isDarkTheme) 0.16f else 0.10f)
+    val surfaceVariant = blend(background, secondaryColor, if (isDarkTheme) 0.16f else 0.10f)
     val outline = blend(primary, onBackground, if (isDarkTheme) 0.48f else 0.58f)
     val outlineVariant = blend(surfaceVariant, onBackground, if (isDarkTheme) 0.22f else 0.18f)
 
@@ -251,12 +251,12 @@ fun buildBrandThemeOption(
                 onPrimary = onPrimary,
                 primaryContainer = primaryContainer,
                 onPrimaryContainer = BrandInkDark,
-                secondary = accentColor,
-                onSecondary = backgroundColor,
+                secondary = secondaryColor,
+                onSecondary = primaryColor,
                 secondaryContainer = secondaryContainer,
                 onSecondaryContainer = BrandInkDark,
-                tertiary = accentColor,
-                onTertiary = backgroundColor,
+                tertiary = secondaryColor,
+                onTertiary = primaryColor,
                 tertiaryContainer = secondaryContainer,
                 onTertiaryContainer = BrandInkDark,
                 background = background,
@@ -264,7 +264,7 @@ fun buildBrandThemeOption(
                 surface = surface,
                 onSurface = onBackground,
                 surfaceVariant = surfaceVariant,
-                onSurfaceVariant = blend(onBackground, accentColor, 0.22f),
+                onSurfaceVariant = blend(onBackground, secondaryColor, 0.22f),
                 outline = outline,
                 outlineVariant = outlineVariant,
             )
@@ -275,19 +275,19 @@ fun buildBrandThemeOption(
                 primaryContainer = primaryContainer,
                 onPrimaryContainer = BrandInkLight,
                 secondary = blend(primary, background, 0.20f),
-                onSecondary = backgroundColor,
+                onSecondary = primaryColor,
                 secondaryContainer = secondaryContainer,
                 onSecondaryContainer = BrandInkLight,
                 tertiary = blend(primary, background, 0.34f),
-                onTertiary = backgroundColor,
-                tertiaryContainer = blend(backgroundColor, accentColor, 0.08f),
+                onTertiary = primaryColor,
+                tertiaryContainer = blend(primaryColor, secondaryColor, 0.08f),
                 onTertiaryContainer = BrandInkLight,
                 background = background,
                 onBackground = onBackground,
                 surface = surface,
                 onSurface = onBackground,
                 surfaceVariant = surfaceVariant,
-                onSurfaceVariant = blend(onBackground, accentColor, 0.36f),
+                onSurfaceVariant = blend(onBackground, secondaryColor, 0.36f),
                 outline = outline,
                 outlineVariant = outlineVariant,
             )
@@ -303,8 +303,8 @@ fun buildBrandThemeOption(
         descriptionOverride = descriptionOverride,
         accessibilityLabelOverride = accessibilityLabelOverride,
         sampleFlavor = sampleFlavor,
-        backgroundColor = backgroundColor,
-        accentColor = accentColor,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
         outlineColor = outlineColor,
         colorScheme = colorScheme,
     )
@@ -318,6 +318,6 @@ private fun blend(
 
 private val BrandThemeHexRegex = Regex("^#[0-9A-F]{6}$")
 
-private const val DefaultCustomBackgroundHex = "#E8E2D0"
-private const val DefaultCustomAccentHex = "#9E1B1B"
+private const val DefaultCustomPrimaryHex = "#E8E2D0"
+private const val DefaultCustomSecondaryHex = "#9E1B1B"
 private const val DarkThemeLuminanceThreshold = 0.5f

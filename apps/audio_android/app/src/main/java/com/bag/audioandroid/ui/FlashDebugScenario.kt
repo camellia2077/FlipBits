@@ -72,7 +72,7 @@ data class FlashDebugScenario(
             if (!BuildConfig.DEBUG || intent?.action != Action) {
                 return null
             }
-            val textOverride = intent.getStringExtra(ExtraText)?.takeIf { it.isNotBlank() }
+            val textOverride = intent.debugTextExtraOrNull(ExtraText)
             val scenario =
                 FlashDebugScenario(
                     text = textOverride ?: DefaultText,
@@ -157,6 +157,7 @@ data class MiniDebugScenario(
     val speed: MorseSpeedOption = MorseSpeedOption.default,
     val expandLyrics: Boolean = false,
     val displayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
+    val visualPerfOverlayEnabled: Boolean? = null,
     val encode: Boolean = true,
     val play: Boolean = true,
     val playDurationMs: Long = DefaultPlayDurationMs,
@@ -171,6 +172,7 @@ data class MiniDebugScenario(
         const val ExtraSpeed = "wb.mini.speed"
         const val ExtraExpandLyrics = "wb.lyrics.expand"
         const val ExtraDisplay = "wb.display"
+        const val ExtraVisualPerfOverlay = FlashDebugScenario.ExtraVisualPerfOverlay
         const val ExtraEncode = FlashDebugScenario.ExtraEncode
         const val ExtraPlay = FlashDebugScenario.ExtraPlay
         const val ExtraPlayDurationMs = FlashDebugScenario.ExtraPlayDurationMs
@@ -182,7 +184,7 @@ data class MiniDebugScenario(
             if (!BuildConfig.DEBUG || intent?.action != Action) {
                 return null
             }
-            val textOverride = intent.getStringExtra(ExtraText)?.takeIf { it.isNotBlank() }
+            val textOverride = intent.debugTextExtraOrNull(ExtraText)
             val scenario =
                 MiniDebugScenario(
                     text = textOverride ?: DefaultText,
@@ -194,6 +196,10 @@ data class MiniDebugScenario(
                     speed = intent.getStringExtra(ExtraSpeed).toMorseSpeedOption(),
                     expandLyrics = intent.getBooleanExtra(ExtraExpandLyrics, false),
                     displayMode = intent.getStringExtra(ExtraDisplay).toPlaybackDisplayMode(),
+                    visualPerfOverlayEnabled =
+                        intent
+                            .takeIf { it.hasExtra(ExtraVisualPerfOverlay) }
+                            ?.getBooleanExtra(ExtraVisualPerfOverlay, false),
                     encode = intent.getBooleanExtra(ExtraEncode, true),
                     play = intent.getBooleanExtra(ExtraPlay, true),
                     playDurationMs = intent.getLongExtra(ExtraPlayDurationMs, DefaultPlayDurationMs).coerceAtLeast(0L),
@@ -202,6 +208,7 @@ data class MiniDebugScenario(
                 Tag,
                 "received scenario=${scenario.scenario.id} speed=${scenario.speed.id} expandLyrics=${scenario.expandLyrics} " +
                     "display=${scenario.displayMode.name.lowercase()} " +
+                    "visualPerfOverlay=${scenario.visualPerfOverlayEnabled?.toString() ?: "default"} " +
                     "lang=${scenario.languageOverride?.languageTag ?: "current"} " +
                     "encode=${scenario.encode} play=${scenario.play} playMs=${scenario.playDurationMs} " +
                     "requestId=${scenario.requestId} input=${scenario.inputDebugSummary()}",
@@ -258,7 +265,7 @@ data class EncodeProgressDebugScenario(
             if (!BuildConfig.DEBUG || intent?.action != Action) {
                 return null
             }
-            val textOverride = intent.getStringExtra(ExtraText)?.takeIf { it.isNotBlank() }
+            val textOverride = intent.debugTextExtraOrNull(ExtraText)
             val scenario =
                 EncodeProgressDebugScenario(
                     mode = intent.getStringExtra(ExtraMode).toProgressScenarioMode(),
@@ -418,4 +425,11 @@ private fun String?.toProgressScenarioMode(): TransportModeOption =
         "ultra" -> TransportModeOption.Ultra
         "mini" -> TransportModeOption.Mini
         else -> TransportModeOption.Mini
+    }
+
+internal fun Intent.debugTextExtraOrNull(key: String): String? =
+    if (hasExtra(key)) {
+        getStringExtra(key) ?: ""
+    } else {
+        null
     }

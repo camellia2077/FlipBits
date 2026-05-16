@@ -1,7 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
+import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 @Composable
 internal fun PlaybackFollowAnnotationRows(
@@ -50,6 +49,7 @@ internal fun PlaybackFollowAnnotationRows(
     onFocusColor: Color,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val dividerColor = appThemeVisualTokens().subtleOutlineColor.copy(alpha = 0.7f)
         val byteGroupsPerRow = annotationByteGroupsPerRow(annotationMode, maxWidth.value)
         val maxVisibleRows = annotationMaxVisibleRows(annotationMode)
         var previousWindowStartIndex by
@@ -139,7 +139,7 @@ internal fun PlaybackFollowAnnotationRows(
                                 )
                                 PlaybackByteBoundaryDivider(
                                     style = boundaryByteIndexes[byteIndex + 1],
-                                    color = inactiveRawColor,
+                                    color = dividerColor,
                                 )
                             }
                             if (isLastRow && visibleWindow.hasTrailingOverflow) {
@@ -181,7 +181,7 @@ internal fun PlaybackFollowAnnotationRows(
                                 )
                                 PlaybackByteBoundaryDivider(
                                     style = boundaryByteIndexes[byteIndex + 1],
-                                    color = inactiveRawColor,
+                                    color = dividerColor,
                                 )
                             }
                             if (isLastRow && visibleWindow.hasTrailingOverflow) {
@@ -202,49 +202,59 @@ internal fun PlaybackFollowAnnotationRows(
                             annotationByteGroups = annotationByteGroups,
                         )
                     }
-                val dividerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.24f)
+                val availableMorseRowWidth = (maxWidth - MorseAnnotationHorizontalPadding * 2).coerceAtLeast(0.dp)
+                val morseLetterGroupRows =
+                    remember(morseLetterGroups, availableMorseRowWidth) {
+                        packMorseLetterRows(
+                            groups = morseLetterGroups,
+                            availableWidth = availableMorseRowWidth,
+                        )
+                    }
                 Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                            .padding(horizontal = MorseAnnotationHorizontalPadding, vertical = 6.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                        verticalAlignment = Alignment.Top,
-                    ) {
-                        morseLetterGroups.forEachIndexed { index, group ->
-                            if (index > 0) {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .height(MorseLetterDividerHeight)
-                                            .width(1.dp)
-                                            .background(dividerColor),
+                    morseLetterGroupRows.forEach { rowGroups ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            rowGroups.forEachIndexed { index, group ->
+                                if (index > 0) {
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .padding(horizontal = MorseLetterDividerHorizontalPadding)
+                                                .height(MorseLetterDividerHeight)
+                                                .width(1.dp)
+                                                .background(dividerColor),
+                                    )
+                                }
+                                val isActiveByte =
+                                    isActive &&
+                                        activeByteIndexWithinToken >= group.byteStartIndexWithinToken &&
+                                        activeByteIndexWithinToken <
+                                        group.byteStartIndexWithinToken + group.byteCount
+                                MorseLetterBlock(
+                                    letter = group.text,
+                                    morse = group.morse,
+                                    isActive = isActiveByte,
+                                    isPast =
+                                        isActive &&
+                                            group.byteStartIndexWithinToken + group.byteCount - 1 <
+                                            activeByteIndexWithinToken,
+                                    activeBitIndex = if (isActiveByte) activeBitIndexWithinByte else -1,
+                                    isActiveBitTone = isActiveBitTone,
+                                    focusColor = focusColor,
+                                    onFocusColor = onFocusColor,
+                                    inactiveColor = inactiveRawColor,
                                 )
                             }
-                            val isActiveByte =
-                                isActive &&
-                                    activeByteIndexWithinToken >= group.byteStartIndexWithinToken &&
-                                    activeByteIndexWithinToken <
-                                    group.byteStartIndexWithinToken + group.byteCount
-                            MorseLetterBlock(
-                                letter = group.text,
-                                morse = group.morse,
-                                isActive = isActiveByte,
-                                isPast =
-                                    isActive &&
-                                        group.byteStartIndexWithinToken + group.byteCount - 1 <
-                                        activeByteIndexWithinToken,
-                                activeBitIndex = if (isActiveByte) activeBitIndexWithinByte else -1,
-                                isActiveBitTone = isActiveBitTone,
-                                focusColor = focusColor,
-                                onFocusColor = onFocusColor,
-                                inactiveColor = inactiveRawColor,
-                            )
                         }
                     }
                 }
@@ -274,11 +284,6 @@ private fun PlaybackByteBoundaryDivider(
     color: Color,
 ) {
     if (style != null) {
-        val alpha =
-            when (style) {
-                AnnotationDividerStyle.Thin -> ByteBoundaryDividerThinAlpha
-                AnnotationDividerStyle.Strong -> ByteBoundaryDividerStrongAlpha
-            }
         val height =
             when (style) {
                 AnnotationDividerStyle.Thin -> ByteBoundaryDividerThinHeight
@@ -289,7 +294,7 @@ private fun PlaybackByteBoundaryDivider(
                 Modifier
                     .height(height)
                     .width(1.dp)
-                    .background(color.copy(alpha = alpha)),
+                    .background(color),
         )
     }
 }
@@ -310,10 +315,48 @@ private fun AnnotationOverflowIndicator(color: Color) {
 }
 
 private val MorseLetterDividerHeight = 34.dp
+private const val MorseLettersPerRow = 6
+private val MorseAnnotationHorizontalPadding = 8.dp
+private val MorseLetterDividerHorizontalPadding = 5.dp
 private val ByteBoundaryDividerThinHeight = 20.dp
 private val ByteBoundaryDividerStrongHeight = 28.dp
-private const val ByteBoundaryDividerThinAlpha = 0.22f
-private const val ByteBoundaryDividerStrongAlpha = 0.44f
+
+private fun packMorseLetterRows(
+    groups: List<MorseLetterDisplayGroup>,
+    availableWidth: Dp,
+): List<List<MorseLetterDisplayGroup>> {
+    if (groups.isEmpty()) {
+        return emptyList()
+    }
+    val rows = ArrayList<List<MorseLetterDisplayGroup>>()
+    var currentRow = ArrayList<MorseLetterDisplayGroup>()
+    var currentRowWidth = 0.dp
+    groups.forEach { group ->
+        val itemWidth = morseLetterVisualWidthDp(letter = group.text, morse = group.morse)
+        val separatorWidth =
+            if (currentRow.isEmpty()) {
+                0.dp
+            } else {
+                MorseLetterDividerHorizontalPadding * 2 + 1.dp
+            }
+        val wouldOverflowWidth =
+            currentRow.isNotEmpty() && currentRowWidth + separatorWidth + itemWidth > availableWidth
+        if (currentRow.isNotEmpty() && (currentRow.size >= MorseLettersPerRow || wouldOverflowWidth)) {
+            rows += currentRow
+            currentRow = ArrayList()
+            currentRowWidth = 0.dp
+        }
+        if (currentRow.isNotEmpty()) {
+            currentRowWidth += MorseLetterDividerHorizontalPadding * 2 + 1.dp
+        }
+        currentRow += group
+        currentRowWidth += itemWidth
+    }
+    if (currentRow.isNotEmpty()) {
+        rows += currentRow
+    }
+    return rows
+}
 
 internal fun annotationByteGroupsPerRow(
     mode: PlaybackFollowViewMode,

@@ -3,8 +3,8 @@ package com.bag.audioandroid.ui.model
 data class CustomBrandThemeSettings(
     val presetId: String = DefaultCustomBrandThemePresetId,
     val displayName: String = DefaultCustomBrandThemeDisplayName,
-    val backgroundHex: String = "#E8E2D0",
-    val accentHex: String = "#9E1B1B",
+    val primaryHex: String = "#E8E2D0",
+    val secondaryHex: String = "#9E1B1B",
     val outlineHexOrNull: String? = "#C5A059",
 )
 

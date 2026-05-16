@@ -720,12 +720,11 @@ private class LocalFakeSampleInputTextProvider : SampleInputTextProvider {
 
 private class LocalFakeSavedAudioRepository : SavedAudioRepository {
     override fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String = "test.wav"
 
     override fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -734,7 +733,6 @@ private class LocalFakeSavedAudioRepository : SavedAudioRepository {
     ): AudioExportResult = AudioExportResult.Failed
 
     override fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,

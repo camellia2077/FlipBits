@@ -23,10 +23,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -58,12 +54,36 @@ fun ConfigTabScreen(
     onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
     onCustomBrandThemeDeleted: (String) -> Unit,
     onCustomBrandThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
+    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    customMaterialThemeSettings: CustomBrandThemeSettings,
+    onCustomMaterialThemeSaved: (CustomBrandThemeSettings) -> Unit,
+    onCreateCustomMaterialTheme: () -> Unit,
     selectedThemeMode: ThemeModeOption,
     onThemeModeSelected: (ThemeModeOption) -> Unit,
     isThemeAppearanceExpanded: Boolean,
     onThemeAppearanceExpandedChanged: (Boolean) -> Unit,
+    isCustomBrandThemeExpanded: Boolean,
+    onCustomBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isSampleTextExpanded: Boolean,
+    onSampleTextExpandedChanged: (Boolean) -> Unit,
+    isSacredMachineBrandThemeExpanded: Boolean,
+    onSacredMachineBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isAncientDynastyBrandThemeExpanded: Boolean,
+    onAncientDynastyBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isImmortalRotBrandThemeExpanded: Boolean,
+    onImmortalRotBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isScarletCarnageBrandThemeExpanded: Boolean,
+    onScarletCarnageBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isExquisiteFallBrandThemeExpanded: Boolean,
+    onExquisiteFallBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isLabyrinthOfMutabilityBrandThemeExpanded: Boolean,
+    onLabyrinthOfMutabilityBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isDebugExpanded: Boolean,
+    onDebugExpandedChanged: (Boolean) -> Unit,
     isDemoModeEnabled: Boolean,
     onDemoModeEnabledChange: (Boolean) -> Unit,
+    isSampleAutoFillEnabled: Boolean,
+    onSampleAutoFillEnabledChange: (Boolean) -> Unit,
     isSampleDecorationEnabled: Boolean,
     onSampleDecorationEnabledChange: (Boolean) -> Unit,
     isFlashVisualPerfOverlayEnabled: Boolean,
@@ -78,7 +98,6 @@ fun ConfigTabScreen(
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    var debugExpanded by rememberSaveable { mutableStateOf(true) }
     Column(
         modifier =
             modifier
@@ -107,10 +126,28 @@ fun ConfigTabScreen(
             onCustomBrandThemeSaved = onCustomBrandThemeSaved,
             onCustomBrandThemeDeleted = onCustomBrandThemeDeleted,
             onCustomBrandThemesImported = onCustomBrandThemesImported,
+            customMaterialThemePresets = customMaterialThemePresets,
+            customMaterialThemeSettings = customMaterialThemeSettings,
+            onCustomMaterialThemeSaved = onCustomMaterialThemeSaved,
+            onCreateCustomMaterialTheme = onCreateCustomMaterialTheme,
             selectedThemeMode = selectedThemeMode,
             onThemeModeSelected = onThemeModeSelected,
             isExpanded = isThemeAppearanceExpanded,
             onExpandedChanged = onThemeAppearanceExpandedChanged,
+            isCustomBrandThemeExpanded = isCustomBrandThemeExpanded,
+            onCustomBrandThemeExpandedChanged = onCustomBrandThemeExpandedChanged,
+            isSacredMachineBrandThemeExpanded = isSacredMachineBrandThemeExpanded,
+            onSacredMachineBrandThemeExpandedChanged = onSacredMachineBrandThemeExpandedChanged,
+            isAncientDynastyBrandThemeExpanded = isAncientDynastyBrandThemeExpanded,
+            onAncientDynastyBrandThemeExpandedChanged = onAncientDynastyBrandThemeExpandedChanged,
+            isImmortalRotBrandThemeExpanded = isImmortalRotBrandThemeExpanded,
+            onImmortalRotBrandThemeExpandedChanged = onImmortalRotBrandThemeExpandedChanged,
+            isScarletCarnageBrandThemeExpanded = isScarletCarnageBrandThemeExpanded,
+            onScarletCarnageBrandThemeExpandedChanged = onScarletCarnageBrandThemeExpandedChanged,
+            isExquisiteFallBrandThemeExpanded = isExquisiteFallBrandThemeExpanded,
+            onExquisiteFallBrandThemeExpandedChanged = onExquisiteFallBrandThemeExpandedChanged,
+            isLabyrinthOfMutabilityBrandThemeExpanded = isLabyrinthOfMutabilityBrandThemeExpanded,
+            onLabyrinthOfMutabilityBrandThemeExpandedChanged = onLabyrinthOfMutabilityBrandThemeExpandedChanged,
             selectedPalette = selectedPalette,
             onPaletteSelected = onPaletteSelected,
             materialPalettes = materialPalettes,
@@ -131,16 +168,16 @@ fun ConfigTabScreen(
                     accentTokens = accentTokens,
                     title = "Debug",
                     subtitle = "Demo playback aids and visual diagnostics.",
-                    expanded = debugExpanded,
-                    onToggleExpanded = { debugExpanded = !debugExpanded },
+                    expanded = isDebugExpanded,
+                    onToggleExpanded = { onDebugExpandedChanged(!isDebugExpanded) },
                     contentDescription =
-                        if (debugExpanded) {
+                        if (isDebugExpanded) {
                             "Collapse debug settings"
                         } else {
                             "Expand debug settings"
                         },
                 )
-                if (debugExpanded) {
+                if (isDebugExpanded) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -207,25 +244,60 @@ fun ConfigTabScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                ExpandableCardHeader(
+                    accentTokens = accentTokens,
+                    title = stringResource(R.string.config_sample_text_title),
+                    subtitle = stringResource(R.string.config_sample_text_subtitle),
+                    expanded = isSampleTextExpanded,
+                    onToggleExpanded = { onSampleTextExpandedChanged(!isSampleTextExpanded) },
+                    contentDescription =
+                        if (isSampleTextExpanded) {
+                            stringResource(R.string.config_sample_text_collapse)
+                        } else {
+                            stringResource(R.string.config_sample_text_expand)
+                        },
+                )
+                if (isSampleTextExpanded) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(stringResource(R.string.config_sample_decoration_title), fontWeight = FontWeight.SemiBold)
-                        Text(
-                            stringResource(R.string.config_sample_decoration_subtitle),
-                            style = MaterialTheme.typography.bodySmall,
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text(stringResource(R.string.config_sample_auto_fill_title), fontWeight = FontWeight.SemiBold)
+                            Text(
+                                stringResource(R.string.config_sample_auto_fill_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                        Switch(
+                            checked = isSampleAutoFillEnabled,
+                            onCheckedChange = onSampleAutoFillEnabledChange,
                         )
                     }
-                    Switch(
-                        checked = isSampleDecorationEnabled,
-                        onCheckedChange = onSampleDecorationEnabledChange,
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text(stringResource(R.string.config_sample_decoration_title), fontWeight = FontWeight.SemiBold)
+                            Text(
+                                stringResource(R.string.config_sample_decoration_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                        Switch(
+                            checked = isSampleDecorationEnabled,
+                            onCheckedChange = onSampleDecorationEnabledChange,
+                        )
+                    }
                 }
             }
         }

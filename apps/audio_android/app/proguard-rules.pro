@@ -28,3 +28,4 @@
 # Native metadata encoding/decoding reads enum accessors and names directly.
 -keep class com.bag.audioandroid.ui.model.TransportModeOption { *; }
 -keep class com.bag.audioandroid.ui.model.FlashVoicingStyleOption { *; }
+-keep class com.bag.audioandroid.ui.model.MorseSpeedOption { *; }

@@ -125,10 +125,10 @@ fun brandThemeVisualTokens(
     theme: BrandThemeOption,
     accentTokens: AppThemeAccentTokens,
 ): AppThemeVisualTokens {
-    val base = theme.backgroundColor
-    val accent = theme.accentColor
+    val base = theme.primaryColor
+    val accent = theme.secondaryColor
     val onSurface = theme.colorScheme.onSurface
-    val isDarkTheme = theme.backgroundColor.luminance() < 0.5f
+    val isDarkTheme = theme.primaryColor.luminance() < 0.5f
 
     // "Ancient Alloy" philosophy: Use a recessed shadow derived from the background
     // for structural elements instead of a decorative third color.
@@ -153,7 +153,7 @@ fun brandThemeVisualTokens(
         inputContainerColor = blend(base, accent, 0.08f),
         inputContentColor = onSurface,
         inputFocusedBorderColor = accentTokens.selectionBorderAccentTint,
-        inputUnfocusedBorderColor = accentTokens.selectionBorderAccentTint.copy(alpha = 0.42f),
+        inputUnfocusedBorderColor = theme.outlineColor,
         actionContainerColor = blend(base, accent, 0.12f),
         actionDisabledContainerColor = blend(base, onSurface, 0.08f),
         actionContentColor = accentTokens.disclosureAccentTint,
@@ -163,7 +163,7 @@ fun brandThemeVisualTokens(
         annotationChipContainerColor = blend(base, accent, 0.10f),
         annotationChipContentColor = onSurface,
         followTokenContainerColor = blend(base, accent, 0.06f),
-        subtleOutlineColor = depthShadow.copy(alpha = 0.52f),
+        subtleOutlineColor = theme.outlineColor.copy(),
         timelineInactiveTrackColor = blend(base, accent, 0.10f),
         visualizationBaseBackgroundColor = blend(base, accent, 0.10f),
         // Inactive waveform/tone rails now always use the recessed shadow

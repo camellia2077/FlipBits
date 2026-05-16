@@ -21,11 +21,12 @@
     <string name="config_language_expand">Expand language settings</string>
     <string name="config_language_collapse">Collapse language settings</string>
     <string name="config_theme_mode_title">Theme mode</string>
-    <string name="config_theme_mode_subtitle">Choose system, light, or dark mode.</string>
+    <string name="config_theme_mode_subtitle">Choose system, light, or dark.</string>
     <string name="config_theme_mode_brand_fixed">Dual-tone themes use a fixed look.</string>
     <string name="config_theme_mode_follow_system">Follow system</string>
     <string name="config_theme_mode_light">Light</string>
     <string name="config_theme_mode_dark">Dark</string>
+    <string name="config_theme_mode_custom">Custom</string>
     <string name="config_theme_appearance_title">Theme appearance</string>
     <string name="config_theme_style_title">Theme style</string>
     <string name="config_theme_style_subtitle">Choose Material or dual-tone.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">The Exquisite Fall</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">The Labyrinth of Mutability</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Custom</string>
     <string name="palette_family_reds_pinks">Reds &amp; Pinks</string>
     <string name="palette_family_oranges">Oranges</string>
     <string name="palette_family_yellows">Yellows</string>
@@ -229,4 +231,10 @@
     <string name="config_custom_brand_theme_batch_import_summary">%1$d themes found. %2$d new, %3$d exact duplicates.</string>
     <!-- CONTEXT: Helper text shown when confirming batch custom dual-tone import. -->
     <string name="config_custom_brand_theme_batch_import_duplicate_note">Exact duplicates will be skipped.</string>
+    <string name="config_sample_text_title">Sample text</string>
+    <string name="config_sample_text_subtitle">Control how example text appears in the input field.</string>
+    <string name="config_sample_auto_fill_subtitle">Fill the input field with a randomized example when sample text is available.</string>
+    <string name="config_sample_text_collapse">Collapse sample text settings</string>
+    <string name="config_sample_text_expand">Expand sample text settings</string>
+    <string name="config_sample_auto_fill_title">Auto-fill sample text</string>
 </resources>

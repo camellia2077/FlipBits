@@ -32,8 +32,8 @@ fun audioEncodeGlyphColorsForBrandTheme(theme: BrandThemeOption): AudioEncodeGly
         // The encode glyph is part of the dual-tone surface language: the right split uses the
         // action/accent color, while the left split uses the dominant background color. Keep this
         // generic so newly added dual-tone themes update the gear fill automatically.
-        primarySplit = theme.accentColor,
-        secondarySplit = theme.backgroundColor,
+        primarySplit = theme.secondaryColor,
+        secondarySplit = theme.primaryColor,
         outline = theme.outlineColor,
     )
 

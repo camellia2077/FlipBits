@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Segui il sistema</string>
     <string name="config_theme_mode_light">Chiaro</string>
     <string name="config_theme_mode_dark">Scuro</string>
+    <string name="config_theme_mode_custom">Personalizzato</string>
     <string name="config_theme_appearance_title">Aspetto del tema</string>
     <string name="config_theme_style_title">Stile del tema</string>
     <string name="config_theme_style_subtitle">Scegli Material o Dual-tone.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">La Caduta Squisita</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">Il Labirinto della Mutabilità</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Personalizzato</string>
     <string name="palette_family_reds_pinks">Rossi e rosa</string>
     <string name="palette_family_oranges">Arancioni</string>
     <string name="palette_family_yellows">Gialli</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Decorazione esempio</string>
     <string name="config_sample_decoration_subtitle">Aggiungi marcatori di prefisso opzionali all\'esempio casuale.</string>
+    <string name="config_sample_text_title">Testo di esempio</string>
+    <string name="config_sample_text_subtitle">Controlla come appare il testo di esempio nel campo di input.</string>
+    <string name="config_sample_auto_fill_subtitle">Riempie il campo di input con un esempio casuale quando è disponibile testo di esempio.</string>
+    <string name="config_sample_text_collapse">Comprimi le impostazioni del testo di esempio</string>
+    <string name="config_sample_text_expand">Espandi le impostazioni del testo di esempio</string>
+    <string name="config_sample_auto_fill_title">Compila automaticamente il testo di esempio</string>
     <string name="config_demo_mode_title">Modalità demo</string>
     <string name="config_demo_mode_subtitle">Mostra feedback tocco e suggerimenti per registrazione.</string>
     <string name="config_custom_brand_theme_import_title">Importa dual-tone personalizzato</string>

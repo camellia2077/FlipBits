@@ -99,6 +99,7 @@ class AppSavedAudioDecodeCacheGateway(
             (item.sampleRateHz ?: -1).toString(),
             (item.payloadByteCount ?: -1).toString(),
             item.flashVoicingStyle?.id.orEmpty(),
+            item.miniSpeedStyle?.id.orEmpty(),
             (metadata?.version ?: -1).toString(),
             metadata?.createdAtIsoUtc.orEmpty(),
             (metadata?.sampleRateHz ?: -1).toString(),
@@ -106,6 +107,7 @@ class AppSavedAudioDecodeCacheGateway(
             (metadata?.pcmSampleCount ?: -1).toString(),
             (metadata?.payloadByteCount ?: -1).toString(),
             metadata?.flashVoicingStyle?.id.orEmpty(),
+            metadata?.miniSpeedStyle?.id.orEmpty(),
         ).joinToString(separator = "|")
 
     private companion object {

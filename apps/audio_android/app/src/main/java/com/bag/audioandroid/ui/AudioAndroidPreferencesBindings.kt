@@ -4,18 +4,23 @@ import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
+import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHexOrNull
+import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -34,14 +39,26 @@ internal class AudioAndroidPreferencesBindings(
         observeSelectedPalette()
         observeSelectedThemeMode()
         observeSelectedThemeStyle()
+        observeCustomMaterialThemeSettings()
         observeCustomBrandThemeSettings()
         observeSelectedBrandTheme()
         observeSelectedFlashVoicingStyle()
+        observeSelectedMorseSpeedStyle()
         observeFlashVoicingEnabled()
         observeSelectedPlaybackSequenceMode()
         observeConfigLanguageExpanded()
         observeConfigThemeAppearanceExpanded()
+        observeConfigCustomBrandThemeExpanded()
+        observeConfigSampleTextExpanded()
+        observeConfigSacredMachineBrandThemeExpanded()
+        observeConfigAncientDynastyBrandThemeExpanded()
+        observeConfigImmortalRotBrandThemeExpanded()
+        observeConfigScarletCarnageBrandThemeExpanded()
+        observeConfigExquisiteFallBrandThemeExpanded()
+        observeConfigLabyrinthOfMutabilityBrandThemeExpanded()
+        observeConfigDebugExpanded()
         observeDemoModeEnabled()
+        observeSampleAutoFillEnabled()
         observeSampleDecorationEnabled()
         observeFlashVisualPerfOverlayEnabled()
     }
@@ -51,13 +68,55 @@ internal class AudioAndroidPreferencesBindings(
             appSettingsRepository.selectedPaletteId
                 .distinctUntilChanged()
                 .collect { paletteId ->
-                    val palette = MaterialPalettes.firstOrNull { it.id == paletteId } ?: DefaultMaterialPalette
                     uiState.update { state ->
-                        if (state.selectedPalette.id == palette.id) {
+                        val resolvedPalette =
+                            if (paletteId != null && isCustomMaterialPaletteId(paletteId)) {
+                                state.customMaterialThemePresets
+                                    .map(::customMaterialPalette)
+                                    .firstOrNull { it.id == paletteId }
+                                    ?: customMaterialPalette(state.customMaterialThemeSettings)
+                            } else {
+                                MaterialPalettes.firstOrNull { it.id == paletteId } ?: DefaultMaterialPalette
+                            }
+                        if (state.selectedPalette.id == resolvedPalette.id &&
+                            state.selectedPalette.lightScheme == resolvedPalette.lightScheme &&
+                            state.selectedPalette.darkScheme == resolvedPalette.darkScheme
+                        ) {
                             state
                         } else {
-                            state.copy(selectedPalette = palette)
+                            state.copy(selectedPalette = resolvedPalette)
                         }
+                    }
+                }
+        }
+    }
+
+    private fun observeCustomMaterialThemeSettings() {
+        scope.launch {
+            appSettingsRepository.customMaterialThemePresets
+                .map { presets ->
+                    val normalizedPresets = presets.map(::normalizeCustomMaterialThemeSettings)
+                    if (normalizedPresets.isEmpty()) {
+                        listOf(DefaultCustomMaterialPaletteSettings)
+                    } else {
+                        normalizedPresets
+                    }
+                }.distinctUntilChanged()
+                .collect { presets ->
+                    uiState.update { state ->
+                        val selectedCustomPalette =
+                            if (isCustomMaterialPaletteId(state.selectedPalette.id)) {
+                                presets
+                                    .map(::customMaterialPalette)
+                                    .firstOrNull { it.id == state.selectedPalette.id }
+                                    ?: customMaterialPalette(presets.first())
+                            } else {
+                                state.selectedPalette
+                            }
+                        state.copy(
+                            customMaterialThemePresets = presets,
+                            selectedPalette = selectedCustomPalette,
+                        )
                     }
                 }
         }
@@ -120,12 +179,12 @@ internal class AudioAndroidPreferencesBindings(
                             CustomBrandThemeSettings(
                                 presetId = settings.presetId,
                                 displayName = settings.displayName.trim().ifBlank { DefaultCustomBrandThemeSettings.displayName },
-                                backgroundHex =
-                                    normalizeBrandThemeHex(settings.backgroundHex)
-                                        ?: DefaultCustomBrandThemeSettings.backgroundHex,
-                                accentHex =
-                                    normalizeBrandThemeHex(settings.accentHex)
-                                        ?: DefaultCustomBrandThemeSettings.accentHex,
+                                primaryHex =
+                                    normalizeBrandThemeHex(settings.primaryHex)
+                                        ?: DefaultCustomBrandThemeSettings.primaryHex,
+                                secondaryHex =
+                                    normalizeBrandThemeHex(settings.secondaryHex)
+                                        ?: DefaultCustomBrandThemeSettings.secondaryHex,
                                 outlineHexOrNull =
                                     settings.outlineHexOrNull?.let { outlineHex ->
                                         normalizeBrandThemeHexOrNull(outlineHex) ?: DefaultCustomBrandThemeSettings.outlineHexOrNull
@@ -234,6 +293,175 @@ internal class AudioAndroidPreferencesBindings(
         }
     }
 
+    private fun observeSelectedMorseSpeedStyle() {
+        scope.launch {
+            appSettingsRepository.selectedMorseSpeedStyleId
+                .distinctUntilChanged()
+                .collect { styleId ->
+                    val style = MorseSpeedOption.fromId(styleId)
+                    uiState.update { state ->
+                        if (state.selectedMorseSpeed == style) {
+                            state
+                        } else {
+                            state.copy(selectedMorseSpeed = style)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigCustomBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigCustomBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigCustomBrandThemeExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigCustomBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigSampleTextExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigSampleTextExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigSampleTextExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigSampleTextExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigSacredMachineBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigSacredMachineBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigSacredMachineBrandThemeExpanded ==
+                            expanded
+                        ) {
+                            state
+                        } else {
+                            state.copy(isConfigSacredMachineBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigAncientDynastyBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigAncientDynastyBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigAncientDynastyBrandThemeExpanded ==
+                            expanded
+                        ) {
+                            state
+                        } else {
+                            state.copy(isConfigAncientDynastyBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigImmortalRotBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigImmortalRotBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigImmortalRotBrandThemeExpanded ==
+                            expanded
+                        ) {
+                            state
+                        } else {
+                            state.copy(isConfigImmortalRotBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigScarletCarnageBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigScarletCarnageBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigScarletCarnageBrandThemeExpanded ==
+                            expanded
+                        ) {
+                            state
+                        } else {
+                            state.copy(isConfigScarletCarnageBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigExquisiteFallBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigExquisiteFallBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigExquisiteFallBrandThemeExpanded ==
+                            expanded
+                        ) {
+                            state
+                        } else {
+                            state.copy(isConfigExquisiteFallBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigLabyrinthOfMutabilityBrandThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigLabyrinthOfMutabilityBrandThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigLabyrinthOfMutabilityBrandThemeExpanded ==
+                            expanded
+                        ) {
+                            state
+                        } else {
+                            state.copy(isConfigLabyrinthOfMutabilityBrandThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigDebugExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigDebugExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigDebugExpanded == expanded) state else state.copy(isConfigDebugExpanded = expanded)
+                    }
+                }
+        }
+    }
+
     private fun observeDemoModeEnabled() {
         scope.launch {
             appSettingsRepository.isDemoModeEnabled
@@ -260,6 +488,22 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(isSampleDecorationEnabled = enabled)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSampleAutoFillEnabled() {
+        scope.launch {
+            appSettingsRepository.isSampleAutoFillEnabled
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    uiState.update { state ->
+                        if (state.isSampleAutoFillEnabled == enabled) {
+                            state
+                        } else {
+                            state.copy(isSampleAutoFillEnabled = enabled)
                         }
                     }
                 }

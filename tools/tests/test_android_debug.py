@@ -39,6 +39,12 @@ def test_start_activity_quotes_shell_extras_with_spaces(monkeypatch) -> None:
     ]
 
 
+def test_string_extra_keeps_whitespace_value() -> None:
+    extras: list[str] = []
+    capture.string_extra(extras, "wb.input", " \n ")
+    assert extras == ["--es", "wb.input", " \n "]
+
+
 def test_capture_flash_defaults_ui_play_ms_to_longer_duration(monkeypatch, tmp_path) -> None:
     started: list[tuple[str, list[str]]] = []
     captured: list[dict] = []

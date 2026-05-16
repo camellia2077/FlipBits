@@ -27,11 +27,12 @@
     <string name="config_language_expand">言語設定を展開</string>
     <string name="config_language_collapse">言語設定を折りたたむ</string>
     <string name="config_theme_mode_title">テーマモード</string>
-    <string name="config_theme_mode_subtitle">システム設定、ライト、またはダークモードを選択します。</string>
+    <string name="config_theme_mode_subtitle">システム、ライト、またはダークを選択します。</string>
     <string name="config_theme_mode_brand_fixed">デュアルトーンテーマは固定のデザインを使用します。</string>
     <string name="config_theme_mode_follow_system">システムの設定に従う</string>
     <string name="config_theme_mode_light">ライト</string>
     <string name="config_theme_mode_dark">ダーク</string>
+    <string name="config_theme_mode_custom">カスタム</string>
     <string name="config_theme_appearance_title">テーマのデザイン</string>
     <string name="config_theme_style_title">テーマスタイル</string>
     <string name="config_theme_style_subtitle">Material またはデュアルトーンを選択します。</string>
@@ -54,6 +55,7 @@
     <string name="config_dual_tone_group_exquisite_fall">精緻なる没落</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">変転の迷宮</string>
     <string name="palette_family_brand">デュアルトーン</string>
+    <string name="palette_family_custom">カスタム</string>
     <string name="palette_family_reds_pinks">レッド＆ピンク</string>
     <string name="palette_family_oranges">オレンジ</string>
     <string name="palette_family_yellows">イエロー</string>
@@ -192,6 +194,12 @@
 
     <string name="config_sample_decoration_title">サンプル装飾</string>
     <string name="config_sample_decoration_subtitle">ランダム化されたサンプルテキストに任意の接頭マーカーを追加します。</string>
+    <string name="config_sample_text_title">サンプルテキスト</string>
+    <string name="config_sample_text_subtitle">入力欄にサンプルテキストをどう表示するかを設定します。</string>
+    <string name="config_sample_auto_fill_subtitle">サンプルテキストが利用できるとき、入力欄をランダムな例文で埋めます。</string>
+    <string name="config_sample_text_collapse">サンプルテキスト設定を折りたたむ</string>
+    <string name="config_sample_text_expand">サンプルテキスト設定を展開する</string>
+    <string name="config_sample_auto_fill_title">サンプルテキストを自動入力</string>
     <string name="config_demo_mode_title">デモモード</string>
     <string name="config_demo_mode_subtitle">録画向けにタップの視覚フィードバックと操作ヒントを表示します。</string>
     <string name="config_custom_brand_theme_import_title">カスタム dual-tone をインポート</string>

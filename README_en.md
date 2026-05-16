@@ -14,8 +14,8 @@
 </p>
 
 <p align="center">
-  <strong>A stylized encoding/decoding tool between text and audio signals, generating audible "tone-based" encoded audio using FSK rhythms, Hz variations, and different pause intervals</strong><br />
-  <em>A tool covering rhythmic BFSK signals, Dual-tone mapping, and efficient 16-FSK transmission</em>
+  <strong>Turn text encoding into sound, and turn the bits, bytes, tokens, and rhythm behind that sound into something you can watch.</strong><br />
+  <em>FlipBits combines encoding conversion, audio visualization, and encoding visualization in one project. It supports Morse, bit-by-bit BFSK / FSK, dual-tone mapping, and multi-frequency mapping; its `flash` mode further stylizes transmission through bit duration, pauses, and Hz variation to imitate different speaking tones, making the result feel part protocol, part human speech under shifting emotions.</em>
 </p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](LICENSE)
@@ -41,16 +41,21 @@
 </table>
 
 ## Quick Overview
-- Native Android application for the visualization and sonification of computer text encoding.
+- A native Android app that turns computer text encoding into audible audio while visualizing both the encoding layer and the signal layer in sync.
 - Supports Morse code (`mini`), bit-by-bit BFSK / FSK (`flash`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`).
-- Visualization provides two modes: Visual and Lyrics, used to observe the audio signal layer and the text encoding layer respectively.
+- Visualization provides two modes, Visual and Lyrics, for observing the audio signal layer, the text encoding layer, and the playback follow relationship across tokens, bytes, and bits.
+- Helps reveal how CJK, Latin, Cyrillic, and other writing systems occupy different numbers of bytes under UTF-8, and how those bytes expand into hex, binary, and bits.
+- `mini` mode is useful not only for Morse generation and decoding, but also for learning Morse timing and practicing text-to-Morse / Morse-to-text conversion.
 - Supports multilingual interfaces: English, German, Spanish, French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Ukrainian, Simplified Chinese, Traditional Chinese, as well as dog Latin to create solemn, religious, sci-fi, and space opera atmospheres.
 - Localization work is continuously being optimized. If you find translation errors or have better suggestions, corrections are warmly welcomed.
 
 ## Download / Install
 The Android APK will be published via GitHub Releases.
 
-Under the current reference build, the installation package is approximately `5.93 MB`. These numbers will vary depending on the version, ABI, and build configurations.
+Under the current reference build, the installation package is approximately `6.02 MB`. These numbers will vary depending on the version, ABI, and build configurations.
+
+For user-facing Android release notes, see:
+- [`docs/presentation/android/CHANGELOG.md`](docs/presentation/android/CHANGELOG.md)
 
 ## Modes Overview
 | Mode | Technology Category | Suitable Uses |
@@ -63,16 +68,24 @@ Under the current reference build, the installation package is approximately `5.
 These names are not "power levels", but rather productized naming within the project. They emphasize different listening experiences, expressive temperaments, and transmission structures, rather than representing a linear upgrade from a basic to an advanced version of the same protocol.
 
 ## Project Positioning
-FlipBits is an encoding/decoding tool between text and audible audio signals. It doesn't just convert text into sound; it also attempts to give the generated audio a listening experience similar to human speech under different emotions and tones by adjusting the duration, pause intervals, frequency combinations, and playback rhythm of bit-by-bit FSK.
+FlipBits is a project that ties text encoding, audible audio signals, and visualization into one experience. It does not just convert text into sound; it also tries to expose what text looks like inside the machine, including how tokens, characters, bytes, hex, binary, and bits enter a playback timeline.
 
-The project can map text content into waveforms and can also restore text from the waveforms generated within the project. The project itself does not provide any form of cryptographic encryption.
+The project can map text into waveforms and restore text from waveforms generated within the project. It does not provide cryptographic encryption, and covert communication is not its design goal.
 
-* **Expressive Focus**: Bit-by-bit BFSK / FSK (`flash`) deliberately sacrifices encoding efficiency, trading longer bits, pauses, and frequency changes for a stronger emotional listening experience and a sense of ritual.
-* **Efficiency Supplement**: If shorter, faster, and more formal text transmission is needed, Morse code (`mini`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`) provide more compact encoding paths. `16-FSK` (`ultra`) not only generates shorter audio, but its generation and parsing time is also usually significantly lower than bit-by-bit BFSK / FSK (`flash`); however, being "faster" is not the sole goal of the project.
-* **Visualization Value**: The Android app provides two complementary tracking views. "Visual" leans toward the signal layer, showing how text encoding turns into FSK low/high bits, frequency segments, and the playback timeline; "Lyrics" leans toward the text encoding layer, using tokens to show how text is encoded into UTF-8 bytes, hex/bin, and bits, highlighting them as the audio plays.
+* **Encoding literacy**: The project can help explain how CJK, Latin, Cyrillic, and other writing systems occupy different byte counts under UTF-8, and how those bytes expand into hex, binary, and bits. For anyone trying to understand what text looks like after it enters the machine, this is often easier to grasp than reading encoding tables alone.
+* **Morse learning**: `mini` mode is not only a Morse transport; it also works as a text/Morse conversion aid, a timing trainer, and a visual companion for manual recognition.
+* **Expressive focus**: Bit-by-bit BFSK / FSK (`flash`) deliberately sacrifices encoding efficiency, trading longer bits, pauses, and frequency changes for a stronger emotional listening experience and a more human-like speaking tone. It behaves less like a purely efficient protocol and more like signal structure performing emotion.
+* **Efficiency supplement**: If shorter, faster, and more formal transmission is needed, Morse code (`mini`), DTMF-like dual-tone mapping (`pro`), and `16-FSK` (`ultra`) provide more compact encoding paths. `16-FSK` (`ultra`) not only generates shorter audio, but also usually reduces generation and parsing cost compared with bit-by-bit BFSK / FSK (`flash`); however, being faster is not the project's only goal.
+* **Visualization value**: The Android app provides two complementary tracking views. Visual leans toward the signal layer, showing how text encoding turns into FSK low/high bits, frequency segments, and the playback timeline; Lyrics leans toward the text encoding layer, using tokens to show how text is encoded into UTF-8 bytes, hex/bin, and bits, highlighting them as the audio plays.
 
 ## Android App Features
 The Android app currently maintains a lightweight, native approach: fast cold start speed and small package size, making it suitable for directly generating, converting, sharing, and exporting audio.
+
+It is not just a shell for generating WAV files. It also carries much of the project's visual character:
+
+* **Dual follow views**: Visual is for watching signal, frequency, rhythm, and timeline motion; Lyrics is for watching how tokens, UTF-8 bytes, hex / binary / bits progress during playback.
+* **Theme expression**: Alongside `Material`, the app includes more atmospheric dual-tone themes designed for spectacle and mood, so different modes and styles can carry a stronger visual identity.
+* **Learning and presentation together**: The app is meant to help people understand encoding structure while also looking and sounding compelling, so UI, themes, animation, and visualization are part of the product rather than decoration.
 
 ## Design Boundaries
 The current focus of this project is a controlled closed loop of "text -> stylized audio -> in-project decoding", with a particular emphasis on the audio generation, conversion, sharing, and export experience within the Android app.
@@ -123,17 +136,17 @@ Currently, six styles are provided. Through combinations of bit duration, freque
 
 #### 1. Text Content: `rs`
 
-* **[ 8.8s ]** **Litany**: [flash[litany]-rs.wav](https://github.com/user-attachments/files/27787615/flash.litany.-rs.wav)
+* **[ 8.80s ]** **Litany**: [flash[litany]_rs.wav](https://github.com/user-attachments/files/27856597/flash.litany._rs.wav)
 
 #### 2. Text Content: `github`
 
 The following shows the auditory performance of the same input under different voicing styles:
 
-* **[ 7.0s ]** **Void**: [flash[void]-github.wav](https://github.com/user-attachments/files/27787632/flash.void.-github.wav)
-* **[ 3.6s ]** **Collapse**: [flash[collapse]github.wav](https://github.com/user-attachments/files/27787621/flash.collapse.github.wav)
-* **[ 2.5s ]** **Standard**: [flash[standard]-github.wav](https://github.com/user-attachments/files/27787627/flash.standard.-github.wav)
-* **[ 2.4s ]** **Hostility**: [flash[hostility]-github.wav](https://github.com/user-attachments/files/27787626/flash.hostility.-github.wav)
-* **[ 1.8s ]** **Zeal**: [flash[zeal]-github.wav](https://github.com/user-attachments/files/27787637/flash.zeal.-github.wav)
+* **[ 7.02s ]** **Void**: [flash[void]-github.wav](https://github.com/user-attachments/files/27787632/flash.void.-github.wav)
+* **[ 3.60s ]** **Collapse**: [flash[collapse]_github.wav](https://github.com/user-attachments/files/27856341/flash.collapse._github.wav)
+* **[ 2.55s ]** **Standard**: [flash[standard]_github.wav](https://github.com/user-attachments/files/27856350/flash.standard._github.wav)
+* **[ 2.40s ]** **Hostility**: [flash[hostility]_github.wav](https://github.com/user-attachments/files/27856406/flash.hostility._github.wav)
+* **[ 1.80s ]** **Zeal**: [flash[zeal]_github.wav](https://github.com/user-attachments/files/27856411/flash.zeal._github.wav)
 
 ### Design Details
 
@@ -176,9 +189,9 @@ Three Speed Presets are currently provided, aiming to balance "feasibility of ma
 #### Demo Audio Download
 **Text Content**: `github`
 
-*   **[ 4.0s ]** **Slow**: [mini_slow_github.wav](https://github.com/user-attachments/files/27787705/mini_slow_github.wav)
-*   **[ 2.7s ]** **Standard**: [mini_standard_github.wav](https://github.com/user-attachments/files/27787714/mini_standard_github.wav)
-*   **[ 1.3s ]** **Fast**: [mini_fast_github.wav](https://github.com/user-attachments/files/27787703/mini_fast_github.wav)
+*   **[ 3.97s ]** **Slow**: [mini[slow]_GITHUB.wav](https://github.com/user-attachments/files/27856417/mini.slow._GITHUB.wav)
+*   **[ 2.65s ]** **Standard**: [mini[standard]_GITHUB.wav](https://github.com/user-attachments/files/27856419/mini.standard._GITHUB.wav)
+*   **[ 1.32s ]** **Fast**: [mini[fast]_GITHUB.wav](https://github.com/user-attachments/files/27856415/mini.fast._GITHUB.wav)
 
 ### Design Details
 For `mini`'s input specifications, Visual real-time follow logic, and specific preset parameter descriptions, see:
@@ -251,16 +264,19 @@ For more descriptions of `pro`'s mode positioning and implementation, see:
 ---
 
 ### Demo Audio: Comparison of Efficiency and Texture
-**Text Content**: `完好的源端矩阵`
+**Text Content**: `Behind the quarantine wall, the unpowered terminal writes`
+[flash[zeal]_Behind the qua.wav]
+[flash[litany]_Behind the qua.wav]
+[flash[standard]_Behind the qua.wav]
 
 | Mode | Style | Time Cost | Download |
 | :--- | :--- | :--- | :--- |
-| **`ultra`** | **Default** | **5.4s** | [Download audio](https://github.com/user-attachments/files/27787427/ultra-.wav) |
-| `flash` | Zeal (Extreme speed) | 13.8s | [Download audio](https://github.com/user-attachments/files/27787423/flash.zeal.-.wav) |
-| `flash` | Standard | 20.5s | [Download audio](https://github.com/user-attachments/files/27787417/flash.standard.-.wav) |
-| `flash` | Litany (Solemn) | 173.4s | [Download audio](https://github.com/user-attachments/files/27787454/flash.litany.-.wav) |
+| **`ultra`** | **Default** | **5.80s** | [Download audio](https://github.com/user-attachments/files/27856631/ultra_Behind.the.qua.wav) |
+| `flash` | Zeal (Extreme speed) | 15.05s | [Download audio](https://github.com/user-attachments/files/27856644/flash.zeal._Behind.the.qua.wav)|
+| `flash` | Standard | 22.05s | [Download audio](https://github.com/user-attachments/files/27856649/flash.standard._Behind.the.qua.wav) |
+| `flash` | Litany (Solemn) | 187.20s | [Download audio](https://github.com/user-attachments/files/27856650/flash.litany._Behind.the.qua.wav) |
 
-> **Note**: The `litany` style audio is up to 2.9 minutes long. This is deliberate redundancy designed for "stylization", aiming to achieve frequency intervals that humans can clearly identify, record, or even read aloud.
+> **Note**: The `litany` style audio is 3 minutes and 7.2 seconds long. This is deliberate redundancy designed for "stylization", aiming to achieve frequency intervals that humans can clearly identify, record, or even read aloud.
 
 ---
 

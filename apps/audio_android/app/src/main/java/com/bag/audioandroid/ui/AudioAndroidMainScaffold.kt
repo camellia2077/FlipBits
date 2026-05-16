@@ -76,17 +76,17 @@ internal fun AudioAndroidMainScaffold(
     val navigationBarColors = navigationBarItemColors(uiState)
     val demoTouchStrokeColor =
         if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.BrandDualTone) {
-            uiState.activeBrandTheme.accentColor
+            uiState.activeBrandTheme.secondaryColor
         } else {
             androidx.compose.material3.MaterialTheme.colorScheme.primary
         }
     val demoTouchFillColor =
         if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.BrandDualTone) {
-            val bg = uiState.activeBrandTheme.backgroundColor
-            if (bg.luminance() < 0.5f) {
-                lerp(Color.White, bg, 0.15f)
+            val primary = uiState.activeBrandTheme.primaryColor
+            if (primary.luminance() < 0.5f) {
+                lerp(Color.White, primary, 0.15f)
             } else {
-                lerp(Color.Black, bg, 0.15f)
+                lerp(Color.Black, primary, 0.15f)
             }
         } else {
             val materialBg = androidx.compose.material3.MaterialTheme.colorScheme.background
@@ -268,13 +268,37 @@ internal fun AudioAndroidMainScaffold(
                     onCustomBrandThemeSaved = viewModel::onCustomBrandThemeSaved,
                     onCustomBrandThemeDeleted = viewModel::onCustomBrandThemeDeleted,
                     onCustomBrandThemesImported = viewModel::onCustomBrandThemesImported,
+                    customMaterialThemePresets = uiState.customMaterialThemePresets,
+                    customMaterialThemeSettings = uiState.customMaterialThemeSettings,
+                    onCustomMaterialThemeSaved = viewModel::onCustomMaterialThemeSaved,
+                    onCreateCustomMaterialTheme = viewModel::onCreateCustomMaterialTheme,
                     customBrandThemePresets = uiState.customBrandThemePresets,
                     selectedThemeMode = uiState.selectedThemeMode,
                     onThemeModeSelected = viewModel::onThemeModeSelected,
                     isThemeAppearanceExpanded = uiState.isConfigThemeAppearanceExpanded,
                     onThemeAppearanceExpandedChanged = viewModel::onConfigThemeAppearanceExpandedChanged,
+                    isCustomBrandThemeExpanded = uiState.isConfigCustomBrandThemeExpanded,
+                    onCustomBrandThemeExpandedChanged = viewModel::onConfigCustomBrandThemeExpandedChanged,
+                    isSampleTextExpanded = uiState.isConfigSampleTextExpanded,
+                    onSampleTextExpandedChanged = viewModel::onConfigSampleTextExpandedChanged,
+                    isSacredMachineBrandThemeExpanded = uiState.isConfigSacredMachineBrandThemeExpanded,
+                    onSacredMachineBrandThemeExpandedChanged = viewModel::onConfigSacredMachineBrandThemeExpandedChanged,
+                    isAncientDynastyBrandThemeExpanded = uiState.isConfigAncientDynastyBrandThemeExpanded,
+                    onAncientDynastyBrandThemeExpandedChanged = viewModel::onConfigAncientDynastyBrandThemeExpandedChanged,
+                    isImmortalRotBrandThemeExpanded = uiState.isConfigImmortalRotBrandThemeExpanded,
+                    onImmortalRotBrandThemeExpandedChanged = viewModel::onConfigImmortalRotBrandThemeExpandedChanged,
+                    isScarletCarnageBrandThemeExpanded = uiState.isConfigScarletCarnageBrandThemeExpanded,
+                    onScarletCarnageBrandThemeExpandedChanged = viewModel::onConfigScarletCarnageBrandThemeExpandedChanged,
+                    isExquisiteFallBrandThemeExpanded = uiState.isConfigExquisiteFallBrandThemeExpanded,
+                    onExquisiteFallBrandThemeExpandedChanged = viewModel::onConfigExquisiteFallBrandThemeExpandedChanged,
+                    isLabyrinthOfMutabilityBrandThemeExpanded = uiState.isConfigLabyrinthOfMutabilityBrandThemeExpanded,
+                    onLabyrinthOfMutabilityBrandThemeExpandedChanged = viewModel::onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged,
+                    isDebugExpanded = uiState.isConfigDebugExpanded,
+                    onDebugExpandedChanged = viewModel::onConfigDebugExpandedChanged,
                     isDemoModeEnabled = uiState.isDemoModeEnabled,
                     onDemoModeEnabledChange = viewModel::onDemoModeEnabledChanged,
+                    isSampleAutoFillEnabled = uiState.isSampleAutoFillEnabled,
+                    onSampleAutoFillEnabledChange = viewModel::onSampleAutoFillEnabledChanged,
                     isSampleDecorationEnabled = uiState.isSampleDecorationEnabled,
                     onSampleDecorationEnabledChange = viewModel::onSampleDecorationEnabledChanged,
                     isFlashVisualPerfOverlayEnabled = uiState.isFlashVisualPerfOverlayEnabled,

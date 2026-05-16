@@ -90,6 +90,24 @@ class LocScanService:
             return "P2", "中度超阈值，可结合后续需求一起拆分"
         return "P3", "轻度超阈值，先观察再拆分"
 
+    def classify_small_file_priority(self, line_count: int, threshold: int) -> tuple[str, str]:
+        if line_count <= max(20, int(threshold * 0.25)):
+            return "P0", "极小文件，优先检查是否过度碎片化"
+        if line_count <= max(40, int(threshold * 0.40)):
+            return "P1", "明显偏小，建议检查是否拆分过度"
+        if line_count <= max(60, int(threshold * 0.60)):
+            return "P2", "中度偏小，可结合目录结构一起评估"
+        return "P3", "轻度偏小，先观察再调整"
+
+    def classify_dir_priority(self, file_count: int, threshold: int) -> tuple[str, str]:
+        if file_count >= max(threshold * 2, threshold + 20):
+            return "P0", "目录文件数严重超阈值，建议优先按职责或层次拆目录"
+        if file_count >= max(int(threshold * 1.6), threshold + 12):
+            return "P1", "目录文件数明显超阈值，建议近期拆目录"
+        if file_count >= max(int(threshold * 1.3), threshold + 6):
+            return "P2", "目录文件数中度超阈值，可结合后续需求整理"
+        return "P3", "目录文件数轻度超阈值，先观察再拆分"
+
     def analyze_directory_file_counts(
         self,
         target_dir: Path,

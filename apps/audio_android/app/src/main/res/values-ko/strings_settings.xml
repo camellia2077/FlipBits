@@ -27,11 +27,12 @@
     <string name="config_language_expand">언어 설정 확장</string>
     <string name="config_language_collapse">언어 설정 축소</string>
     <string name="config_theme_mode_title">테마 모드</string>
-    <string name="config_theme_mode_subtitle">시스템 설정, 라이트 모드 또는 다크 모드 중 선택하세요.</string>
+    <string name="config_theme_mode_subtitle">시스템, 라이트 또는 다크를 선택하세요.</string>
     <string name="config_theme_mode_brand_fixed">듀얼 톤 테마는 고정된 디자인을 사용합니다.</string>
     <string name="config_theme_mode_follow_system">시스템 설정 따름</string>
     <string name="config_theme_mode_light">라이트</string>
     <string name="config_theme_mode_dark">다크</string>
+    <string name="config_theme_mode_custom">사용자 지정</string>
     <string name="config_theme_appearance_title">테마 외관</string>
     <string name="config_theme_style_title">테마 스타일</string>
     <string name="config_theme_style_subtitle">Material 또는 듀얼 톤 중 선택하세요.</string>
@@ -55,6 +56,7 @@
     <string name="config_dual_tone_group_exquisite_fall">정교한 몰락</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">변이의 미궁</string>
     <string name="palette_family_brand">듀얼 톤</string>
+    <string name="palette_family_custom">사용자 지정</string>
     <string name="palette_family_reds_pinks">레드 &amp; 핑크</string>
     <string name="palette_family_oranges">오렌지</string>
     <string name="palette_family_yellows">옐로우</string>
@@ -205,6 +207,12 @@
 
     <string name="config_sample_decoration_title">Sample decoration</string>
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_text_title">Sample text</string>
+    <string name="config_sample_text_subtitle">Control how example text appears in the input field.</string>
+    <string name="config_sample_auto_fill_subtitle">Fill the input field with a randomized example when sample text is available.</string>
+    <string name="config_sample_text_collapse">Collapse sample text settings</string>
+    <string name="config_sample_text_expand">Expand sample text settings</string>
+    <string name="config_sample_auto_fill_title">Auto-fill sample text</string>
     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
     <string name="config_custom_brand_theme_import_title">사용자 지정 dual-tone 가져오기</string>

@@ -228,6 +228,8 @@
 
 ### 改 `mini` / Morse 编解码
 - 先看：
+  - `docs/design/modes/mini-whitespace-contract.md`
+  - `docs/architecture/android/android-mini-cross-layer-contract.md`
   - `libs/audio_core/src/mini/codec.cpp`
   - `libs/audio_core/src/mini/phy_clean.cpp`
   - `libs/audio_core/src/transport/transport.cpp`

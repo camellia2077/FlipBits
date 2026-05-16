@@ -10,8 +10,8 @@ class CustomBrandThemeConfigCodecTest {
         val text =
             CustomBrandThemeSettings(
                 displayName = "Test Theme",
-                backgroundHex = "#101014",
-                accentHex = "#78D6FF",
+                primaryHex = "#101014",
+                secondaryHex = "#78D6FF",
                 outlineHexOrNull = "#303846",
             ).toConfigText()
 
@@ -42,8 +42,8 @@ class CustomBrandThemeConfigCodecTest {
         require(result is CustomBrandThemeImportParseResult.Valid)
         assertEquals(1, result.settings.size)
         assertEquals("Imported", result.settings.single().displayName)
-        assertEquals("#101014", result.settings.single().backgroundHex)
-        assertEquals("#78D6FF", result.settings.single().accentHex)
+        assertEquals("#101014", result.settings.single().primaryHex)
+        assertEquals("#78D6FF", result.settings.single().secondaryHex)
         assertEquals(null, result.settings.single().outlineHexOrNull)
     }
 
@@ -67,14 +67,14 @@ class CustomBrandThemeConfigCodecTest {
             listOf(
                 CustomBrandThemeSettings(
                     displayName = "First",
-                    backgroundHex = "#101014",
-                    accentHex = "#78D6FF",
+                    primaryHex = "#101014",
+                    secondaryHex = "#78D6FF",
                     outlineHexOrNull = null,
                 ),
                 CustomBrandThemeSettings(
                     displayName = "Second",
-                    backgroundHex = "#1A100C",
-                    accentHex = "#FFAA55",
+                    primaryHex = "#1A100C",
+                    secondaryHex = "#FFAA55",
                     outlineHexOrNull = "#553011",
                 ),
             ).toBatchConfigText()
@@ -116,8 +116,8 @@ class CustomBrandThemeConfigCodecTest {
         assertEquals(2, result.settings.size)
         assertEquals("First", result.settings[0].displayName)
         assertEquals(null, result.settings[0].outlineHexOrNull)
-        assertEquals("#1A100C", result.settings[1].backgroundHex)
-        assertEquals("#FFAA55", result.settings[1].accentHex)
+        assertEquals("#1A100C", result.settings[1].primaryHex)
+        assertEquals("#FFAA55", result.settings[1].secondaryHex)
         assertEquals("#553011", result.settings[1].outlineHexOrNull)
     }
 
@@ -154,16 +154,16 @@ class CustomBrandThemeConfigCodecTest {
             CustomBrandThemeSettings(
                 presetId = "a",
                 displayName = "Same",
-                backgroundHex = "#101014",
-                accentHex = "#78D6FF",
+                primaryHex = "#101014",
+                secondaryHex = "#78D6FF",
                 outlineHexOrNull = null,
             )
         val second =
             CustomBrandThemeSettings(
                 presetId = "b",
                 displayName = "Same",
-                backgroundHex = "#101014",
-                accentHex = "#78d6ff",
+                primaryHex = "#101014",
+                secondaryHex = "#78d6ff",
                 outlineHexOrNull = "",
             )
 

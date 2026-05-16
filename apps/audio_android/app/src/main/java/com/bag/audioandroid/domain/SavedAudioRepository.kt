@@ -1,15 +1,12 @@
 package com.bag.audioandroid.domain
 
-import com.bag.audioandroid.ui.model.TransportModeOption
-
 interface SavedAudioRepository {
     fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String
 
     fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -18,7 +15,6 @@ interface SavedAudioRepository {
     ): AudioExportResult
 
     fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,

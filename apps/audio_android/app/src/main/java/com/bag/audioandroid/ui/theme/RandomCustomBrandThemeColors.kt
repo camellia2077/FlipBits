@@ -10,8 +10,8 @@ import kotlin.random.Random
 import android.graphics.Color as AndroidColor
 
 data class RandomCustomBrandThemeColors(
-    val backgroundHex: String,
-    val accentHex: String,
+    val primaryHex: String,
+    val secondaryHex: String,
     val outlineHex: String,
 )
 
@@ -20,81 +20,81 @@ fun randomCustomBrandThemeColors(random: Random = Random.Default): RandomCustomB
     // vivid enough to read, force primary/accent apart, and derive outline from
     // their mix so the gear edge feels related instead of like a third random actor.
     repeat(16) {
-        val backgroundHue = random.nextInt(360).toFloat()
+        val primaryHue = random.nextInt(360).toFloat()
         val isLightMode = random.nextBoolean()
 
-        val background: Color
-        val accent: Color
+        val primary: Color
+        val secondary: Color
 
         if (isLightMode) {
-            // Light Profile: Low saturation, very high brightness for background
-            // High saturation, medium brightness for accent (to ensure contrast)
-            background =
+            // Light Profile: Low saturation, very high brightness for primary
+            // High saturation, medium brightness for secondary (to ensure contrast)
+            primary =
                 hsvColor(
-                    hue = backgroundHue,
+                    hue = primaryHue,
                     saturation = random.nextFloat().lerp(0.04f, 0.16f),
                     value = random.nextFloat().lerp(0.88f, 0.98f),
                 )
-            val accentHueOffset = random.nextFloat().lerp(60f, 180f)
-            val accentHue = (backgroundHue + accentHueOffset) % 360f
-            accent =
+            val secondaryHueOffset = random.nextFloat().lerp(60f, 180f)
+            val secondaryHue = (primaryHue + secondaryHueOffset) % 360f
+            secondary =
                 hsvColor(
-                    hue = accentHue,
+                    hue = secondaryHue,
                     saturation = random.nextFloat().lerp(0.65f, 0.95f),
                     value = random.nextFloat().lerp(0.35f, 0.60f),
                 )
         } else {
-            // Dark Profile: Medium saturation, low brightness for background
-            // Medium-high saturation, high brightness for accent
-            background =
+            // Dark Profile: Medium saturation, low brightness for primary
+            // Medium-high saturation, high brightness for secondary
+            primary =
                 hsvColor(
-                    hue = backgroundHue,
+                    hue = primaryHue,
                     saturation = random.nextFloat().lerp(0.20f, 0.50f),
                     value = random.nextFloat().lerp(0.12f, 0.28f),
                 )
-            val accentHueOffset = random.nextFloat().lerp(60f, 180f)
-            val accentHue = (backgroundHue + accentHueOffset) % 360f
-            accent =
+            val secondaryHueOffset = random.nextFloat().lerp(60f, 180f)
+            val secondaryHue = (primaryHue + secondaryHueOffset) % 360f
+            secondary =
                 hsvColor(
-                    hue = accentHue,
+                    hue = secondaryHue,
                     saturation = random.nextFloat().lerp(0.55f, 0.95f),
                     value = random.nextFloat().lerp(0.75f, 0.98f),
                 )
         }
 
-        if (!colorsLookSeparated(background, accent)) {
+        if (!colorsLookSeparated(primary, secondary)) {
             return@repeat
         }
 
-        val outline = chooseOutlineColor(background = background, accent = accent)
+        val outline = chooseOutlineColor(primary = primary, secondary = secondary)
 
         return RandomCustomBrandThemeColors(
-            backgroundHex = background.toHexString(),
-            accentHex = accent.toHexString(),
+            primaryHex = primary.toHexString(),
+            secondaryHex = secondary.toHexString(),
             outlineHex = outline.toHexString(),
         )
     }
 
-    val fallbackBackground = Color(0xFF3A4B57)
-    val fallbackAccent = Color(0xFFD9912B)
+    val fallbackPrimary = Color(0xFF3A4B57)
+    val fallbackSecondary = Color(0xFFD9912B)
     val fallbackOutline = Color(0xFF9FB4C4)
     return RandomCustomBrandThemeColors(
-        backgroundHex = fallbackBackground.toHexString(),
-        accentHex = fallbackAccent.toHexString(),
+        primaryHex = fallbackPrimary.toHexString(),
+        secondaryHex = fallbackSecondary.toHexString(),
         outlineHex = fallbackOutline.toHexString(),
     )
 }
 
 private fun chooseOutlineColor(
-    background: Color,
-    accent: Color,
+    primary: Color,
+    secondary: Color,
 ): Color {
-    val mixed = lerp(background, accent, 0.5f)
+    val mixed = lerp(primary, secondary, 0.5f)
     val darkCandidate = lerp(mixed, Color.Black, 0.38f)
     val lightCandidate = lerp(mixed, Color.White, 0.26f)
 
     val bestCandidate =
-        if (outlineMinContrast(darkCandidate, background, accent) >= outlineMinContrast(lightCandidate, background, accent)) {
+        if (outlineMinContrast(darkCandidate, primary, secondary) >= outlineMinContrast(lightCandidate, primary, secondary)) {
             darkCandidate
         } else {
             lightCandidate
@@ -102,12 +102,12 @@ private fun chooseOutlineColor(
 
     val desaturated = desaturateColor(bestCandidate, amount = 0.18f)
     val targetMinContrast = 1.55f
-    val adjusted = nudgeOutlineContrast(desaturated, background, accent, targetMinContrast)
+    val adjusted = nudgeOutlineContrast(desaturated, primary, secondary, targetMinContrast)
     val finalCandidate =
-        if (outlineMinContrast(adjusted, background, accent) >= targetMinContrast) {
+        if (outlineMinContrast(adjusted, primary, secondary) >= targetMinContrast) {
             adjusted
         } else {
-            fallbackOutlineColor(background, accent)
+            fallbackOutlineColor(primary, secondary)
         }
 
     return finalCandidate
@@ -115,9 +115,9 @@ private fun chooseOutlineColor(
 
 private fun outlineMinContrast(
     outline: Color,
-    background: Color,
-    accent: Color,
-): Float = minOf(contrastRatio(outline, background), contrastRatio(outline, accent))
+    primary: Color,
+    secondary: Color,
+): Float = minOf(contrastRatio(outline, primary), contrastRatio(outline, secondary))
 
 private fun contrastRatio(
     first: Color,
@@ -142,20 +142,20 @@ private fun desaturateColor(
 
 private fun nudgeOutlineContrast(
     outline: Color,
-    background: Color,
-    accent: Color,
+    primary: Color,
+    secondary: Color,
     targetMinContrast: Float,
 ): Color {
     var current = outline
     repeat(8) {
-        val minContrast = outlineMinContrast(current, background, accent)
+        val minContrast = outlineMinContrast(current, primary, secondary)
         if (minContrast >= targetMinContrast) {
             return current
         }
         val towardBlack = lerp(current, Color.Black, 0.14f)
         val towardWhite = lerp(current, Color.White, 0.14f)
         current =
-            if (outlineMinContrast(towardBlack, background, accent) >= outlineMinContrast(towardWhite, background, accent)) {
+            if (outlineMinContrast(towardBlack, primary, secondary) >= outlineMinContrast(towardWhite, primary, secondary)) {
                 towardBlack
             } else {
                 towardWhite
@@ -165,12 +165,12 @@ private fun nudgeOutlineContrast(
 }
 
 private fun fallbackOutlineColor(
-    background: Color,
-    accent: Color,
+    primary: Color,
+    secondary: Color,
 ): Color {
     val darkFallback = Color(0xFF2A2F35)
     val lightFallback = Color(0xFFC7D0DA)
-    return if (outlineMinContrast(darkFallback, background, accent) >= outlineMinContrast(lightFallback, background, accent)) {
+    return if (outlineMinContrast(darkFallback, primary, secondary) >= outlineMinContrast(lightFallback, primary, secondary)) {
         darkFallback
     } else {
         lightFallback
@@ -178,14 +178,14 @@ private fun fallbackOutlineColor(
 }
 
 private fun colorsLookSeparated(
-    background: Color,
-    accent: Color,
+    primary: Color,
+    secondary: Color,
 ): Boolean {
-    val luminanceDelta = abs(background.luminance() - accent.luminance())
+    val luminanceDelta = abs(primary.luminance() - secondary.luminance())
     val channelDistance =
-        abs(background.red - accent.red) +
-            abs(background.green - accent.green) +
-            abs(background.blue - accent.blue)
+        abs(primary.red - secondary.red) +
+            abs(primary.green - secondary.green) +
+            abs(primary.blue - secondary.blue)
     return channelDistance >= 0.40f && luminanceDelta >= 0.08f
 }
 

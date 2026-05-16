@@ -1,13 +1,32 @@
 package com.bag.audioandroid.ui.screen
 
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import com.bag.audioandroid.ui.appSegmentedButtonColors
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.MorseSpeedOption
+import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 
 @Composable
 internal fun MorseSpeedSelectorSection(
@@ -15,20 +34,77 @@ internal fun MorseSpeedSelectorSection(
     selectedMorseSpeed: MorseSpeedOption,
     onMorseSpeedSelected: (MorseSpeedOption) -> Unit,
 ) {
-    SingleChoiceSegmentedButtonRow {
-        MorseSpeedOption.entries.forEachIndexed { index, option ->
-            SegmentedButton(
-                selected = selectedMorseSpeed == option,
-                onClick = { onMorseSpeedSelected(option) },
-                enabled = enabled,
-                shape =
-                    SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = MorseSpeedOption.entries.size,
-                    ),
-                colors = appSegmentedButtonColors(),
-                label = { Text(text = stringResource(option.labelResId)) },
-            )
-        }
+    var isSpeedStyleSheetOpen by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        MorseSpeedEntryRow(
+            title = stringResource(R.string.audio_mini_speed_style_title),
+            value = stringResource(selectedMorseSpeed.labelResId),
+            contentDescription = stringResource(R.string.audio_action_select_mini_speed_style),
+            testTag = "mini-speed-style-selector",
+            enabled = enabled,
+            onClick = { isSpeedStyleSheetOpen = true },
+        )
+        Text(
+            text = stringResource(R.string.audio_mini_speed_style_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+
+    if (isSpeedStyleSheetOpen) {
+        MorseSpeedPickerSheet(
+            selectedStyle = selectedMorseSpeed,
+            onStyleSelected = { option ->
+                onMorseSpeedSelected(option)
+                isSpeedStyleSheetOpen = false
+            },
+            onDismiss = { isSpeedStyleSheetOpen = false },
+        )
+    }
+}
+
+@Composable
+private fun MorseSpeedEntryRow(
+    title: String,
+    value: String,
+    contentDescription: String,
+    testTag: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    val accentTokens = appThemeAccentTokens()
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(enabled = enabled, onClick = onClick)
+                .testTag(testTag)
+                .semantics { this.contentDescription = contentDescription }
+                .padding(horizontal = 2.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = accentTokens.selectionLabelAccentTint,
+        )
+        Icon(
+            imageVector = Icons.Rounded.ExpandMore,
+            contentDescription = null,
+            tint = accentTokens.disclosureAccentTint,
+        )
     }
 }

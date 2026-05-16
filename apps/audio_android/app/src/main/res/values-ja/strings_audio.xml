@@ -49,6 +49,7 @@
     <string name="audio_decode_busy_reason_generated">現在のオーディオを読み取り中</string>
     <string name="audio_decode_busy_reason_saved">保存されたオーディオを読み取り中</string>
     <string name="audio_action_randomize_sample_input">ランダムサンプル</string>
+    <string name="audio_input_required_or_randomize">テキストを入力するか、ランダムサンプルを使用してください。</string>
     <string name="audio_action_open_input_editor">エディタを開く</string>
     <string name="audio_sample_length_short">短い</string>
     <string name="audio_sample_length_long">長い</string>
@@ -83,6 +84,10 @@
     <string name="audio_flash_voicing_style_title">音声スタイル</string>
     <string name="audio_action_select_flash_voicing_style">音声スタイルを選択</string>
     <string name="audio_flash_voicing_style_sheet_title">音声スタイル</string>
+    <string name="audio_mini_speed_style_title">速度スタイル</string>
+    <string name="audio_action_select_mini_speed_style">速度スタイルを選択</string>
+    <string name="audio_mini_speed_style_hint">次に生成されるオーディオに適用されます。既存の生成済みオーディオは、作成時のスタイルを維持します。</string>
+    <string name="audio_mini_speed_style_sheet_title">速度スタイル</string>
     <string name="audio_saved_audio_sheet_title">保存されたオーディオ</string>
     <string name="audio_saved_audio_empty">保存されたオーディオはまだありません。</string>
     <string name="audio_mini_player_generated_title">%1$s 生成オーディオ</string>

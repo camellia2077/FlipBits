@@ -2,9 +2,9 @@
 
 这是一页给 agent / 开发者的短索引。
 
-它不解释 translate 工具内部实现，只回答三类问题：
+它不解释 `android-translate` 内部实现，只回答三类问题：
 
-1. 现在该不该看翻译工具文档
+1. 现在该不该看 `android-translate` 文档
 2. 现在该跑哪个命令
 3. 现在该去看哪篇更详细的文档
 
@@ -18,12 +18,12 @@
 
 ## Start Here
 
-只有在下面这些场景里，才建议展开 translate 工具文档：
+只有在下面这些场景里，才建议展开 `android-translate` 文档：
 
 - 你改了 `res/values*` 下的可见 XML 文案
 - 你改了 `audio_samples_*.xml`
 - 你改了样例文本、默认文案、语言切换后的样例内容
-- Android 构建因为 translation / localization / key alignment 失败
+- Android 构建因为 translation / localization / `key-alignment` 失败
 - 你想生成翻译 review markdown
 - 你想把 LLM 或人工给出的翻译修订安全写回 XML
 
@@ -41,7 +41,7 @@
 
 - 新增 key 必须走 `python tools/run.py android strings-add ...`
 - `strings-add` 默认只写英文基线，并生成缺译任务报告
-- Android 构建会自动触发 key alignment
+- Android 构建会自动触发 `key-alignment`
 
 ### 2. 我想先检查本地化结构有没有漂移
 
@@ -55,7 +55,7 @@ pwsh -NoLogo -Command "python tools/run.py android-translate key-alignment"
 
 - [check_translation_key_alignment.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/check_translation_key_alignment.md)
 
-### 3. 构建失败了，提示 translation key alignment
+### 3. 构建失败了，提示 `key-alignment`
 
 先看：
 

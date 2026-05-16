@@ -4,7 +4,13 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from .config import LanguageConfig
-from .responsibility_metrics import ResponsibilityMetrics
+from .responsibility_metrics import (
+    ResponsibilityAnchor,
+    ResponsibilityAssessment,
+    ResponsibilityDetails,
+    ResponsibilityFunctionHotspot,
+    ResponsibilityMetrics,
+)
 from .responsibility_scoring import (
     BaseResponsibilityScorer,
     CppResponsibilityScorer,
@@ -24,6 +30,17 @@ class ResponsibilityLanguagePlugin(ABC):
     @abstractmethod
     def collect_metrics(self, *, file_path: Path, text: str) -> ResponsibilityMetrics:
         raise NotImplementedError
+
+    def collect_details(
+        self,
+        *,
+        file_path: Path,
+        text: str,
+        metrics: ResponsibilityMetrics,
+        assessment: ResponsibilityAssessment,
+    ) -> ResponsibilityDetails:
+        del file_path, text, metrics, assessment
+        return ResponsibilityDetails(function_hotspots=[], anchors=[])
 
     @staticmethod
     def _count_pattern_hits(text: str, patterns: tuple[object, ...]) -> int:
@@ -45,6 +62,32 @@ class ResponsibilityLanguagePlugin(ABC):
                 matched.append(role_name)
         return matched
 
+    @staticmethod
+    def _append_anchor(
+        *,
+        anchors: list[ResponsibilityAnchor],
+        seen_keys: set[tuple[str, str, str]],
+        owner_issue_counts: dict[tuple[str, str], int],
+        anchor: ResponsibilityAnchor,
+        per_owner_issue_limit: int,
+    ) -> None:
+        dedupe_key = (anchor.label, anchor.issue, anchor.evidence)
+        if dedupe_key in seen_keys:
+            return
+        owner_issue_key = (anchor.label, anchor.issue)
+        if owner_issue_counts.get(owner_issue_key, 0) >= per_owner_issue_limit:
+            return
+        anchors.append(anchor)
+        seen_keys.add(dedupe_key)
+        owner_issue_counts[owner_issue_key] = owner_issue_counts.get(owner_issue_key, 0) + 1
+
+    @staticmethod
+    def _anchor_owner(function_ranges: list[tuple[int, int, str]], line: int) -> str:
+        for start, end, name in function_ranges:
+            if start <= line <= end:
+                return name
+        return "file"
+
 
 class KotlinResponsibilityPlugin(ResponsibilityLanguagePlugin):
     import re as _re
@@ -59,8 +102,15 @@ class KotlinResponsibilityPlugin(ResponsibilityLanguagePlugin):
         _re.compile(r"\bLaunchedEffect\b"),
     )
     TOP_LEVEL_FUNCTION_RE = _re.compile(
-        r"^\s*(?:private|internal|public)?\s*fun\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+        r"^\s*(?:private|internal|public)?\s*fun\s+(?:[A-Za-z_][A-Za-z0-9_.<>?]*\s*\.\s*)?([A-Za-z_][A-Za-z0-9_]*)\b"
     )
+    STATE_LINE_PATTERNS = (
+        (_re.compile(r"\bremember\w*\b"), "state holder"),
+        (_re.compile(r"\bmutableStateOf\b"), "mutable state"),
+        (_re.compile(r"\bLaunchedEffect\b"), "effect"),
+    )
+    MODE_LINE_PATTERN = _re.compile(r"\b(if|when)\b[^{\n]*\b(\w*(Mode|mode)|selected\w*|viewMode|displayMode)\b")
+    DRAW_BRANCH_PATTERN = _re.compile(r"\bwhen\s*\(\s*(?:val\s+\w+\s*=\s*)?(drawContent|mode)\s*\)")
 
     def build_scorer(self) -> BaseResponsibilityScorer:
         return KotlinResponsibilityScorer(self.config)
@@ -99,6 +149,197 @@ class KotlinResponsibilityPlugin(ResponsibilityLanguagePlugin):
                 depth = 0
 
         return len(composable_names), composable_names
+
+    def collect_details(
+        self,
+        *,
+        file_path: Path,
+        text: str,
+        metrics: ResponsibilityMetrics,
+        assessment: ResponsibilityAssessment,
+    ) -> ResponsibilityDetails:
+        del file_path, metrics, assessment
+        lines = text.splitlines()
+        functions = self._collect_top_level_function_ranges(lines)
+        hotspots = self._collect_kotlin_function_hotspots(lines, functions)
+        anchors = self._collect_kotlin_anchors(lines, functions)
+        return ResponsibilityDetails(function_hotspots=hotspots, anchors=anchors)
+
+    def _collect_top_level_function_ranges(self, lines: list[str]) -> list[tuple[str, int, int, bool]]:
+        depth = 0
+        pending_composable = False
+        functions: list[tuple[str, int, int, bool]] = []
+        current_name: str | None = None
+        current_start = 0
+        current_is_composable = False
+        pending_signature_lines: list[str] = []
+        pending_signature_start = 0
+
+        for index, raw_line in enumerate(lines, start=1):
+            stripped = raw_line.strip()
+            if depth == 0 and stripped.startswith("@Composable"):
+                pending_composable = True
+            if depth == 0 and current_name is None:
+                if pending_signature_lines:
+                    pending_signature_lines.append(stripped)
+                elif stripped.startswith(("private fun ", "internal fun ", "public fun ", "fun ")):
+                    pending_signature_lines = [stripped]
+                    pending_signature_start = index
+                if pending_signature_lines:
+                    signature = " ".join(part for part in pending_signature_lines if part)
+                    match = self.TOP_LEVEL_FUNCTION_RE.match(signature)
+                    if match and "{" in signature:
+                        current_name = match.group(1)
+                        current_start = pending_signature_start or index
+                        current_is_composable = pending_composable
+                        pending_composable = False
+                        pending_signature_lines = []
+                        pending_signature_start = 0
+                    elif stripped.endswith("{") and not match:
+                        pending_signature_lines = []
+                        pending_signature_start = 0
+            depth += raw_line.count("{") - raw_line.count("}")
+            if depth == 0 and current_name is not None:
+                functions.append((current_name, current_start, index, current_is_composable))
+                current_name = None
+                current_start = 0
+                current_is_composable = False
+            if depth < 0:
+                depth = 0
+        return functions
+
+    def _collect_kotlin_function_hotspots(
+        self,
+        lines: list[str],
+        functions: list[tuple[str, int, int, bool]],
+    ) -> list[ResponsibilityFunctionHotspot]:
+        hotspots: list[ResponsibilityFunctionHotspot] = []
+        for name, start_line, end_line, is_composable in functions:
+            function_lines = lines[start_line - 1 : end_line]
+            line_count = len(function_lines)
+            state_hits = self._count_pattern_hits("\n".join(function_lines), tuple(pattern for pattern, _ in self.STATE_LINE_PATTERNS))
+            mode_hits = sum(1 for line in function_lines if self.MODE_LINE_PATTERN.search(line))
+            draw_dispatch_hits = sum(1 for line in function_lines if self.DRAW_BRANCH_PATTERN.search(line))
+            overlay_hits = sum(1 for line in function_lines if "Overlay(" in line or "Overlay =" in line)
+            score = 0
+            if line_count >= 80:
+                score += 1
+            if line_count >= 140:
+                score += 1
+            if state_hits >= 2:
+                score += 1
+            if state_hits >= 4:
+                score += 1
+            if mode_hits >= 1:
+                score += 1
+            if mode_hits >= 3:
+                score += 1
+            if draw_dispatch_hits >= 1:
+                score += 1
+            if draw_dispatch_hits >= 2:
+                score += 1
+            if overlay_hits >= 2:
+                score += 1
+            has_material_risk = state_hits >= 2 or mode_hits >= 1 or draw_dispatch_hits >= 1
+            if not is_composable and (score < 2 or not has_material_risk):
+                continue
+            if is_composable and (score < 2 or not has_material_risk):
+                continue
+            risks: list[str] = []
+            evidence: list[str] = [f"lines {line_count}"]
+            if state_hits >= 2:
+                risks.append("stateful_side_effects")
+                evidence.append(f"state hits {state_hits}")
+            if mode_hits >= 1 or draw_dispatch_hits >= 1:
+                risks.append("mode_branching")
+                evidence.append(f"mode branches {mode_hits + draw_dispatch_hits}")
+            if overlay_hits >= 2:
+                evidence.append(f"overlays {overlay_hits}")
+            if line_count >= 80:
+                evidence.append("large function")
+            summary_parts: list[str] = []
+            if state_hits >= 2:
+                summary_parts.append("状态/副作用偏多")
+            if mode_hits >= 1 or draw_dispatch_hits >= 1:
+                summary_parts.append("分支分发较多")
+            if overlay_hits >= 2:
+                summary_parts.append("overlay 挂载较多")
+            if not summary_parts:
+                summary_parts.append("局部职责偏重")
+            hotspots.append(
+                ResponsibilityFunctionHotspot(
+                    name=name,
+                    kind="composable" if is_composable else "function",
+                    start_line=start_line,
+                    end_line=end_line,
+                    score=score,
+                    summary="；".join(summary_parts),
+                    risks=risks,
+                    evidence=evidence,
+                )
+            )
+        hotspots.sort(key=lambda item: (-item.score, item.start_line))
+        return hotspots[:4]
+
+    def _collect_kotlin_anchors(
+        self,
+        lines: list[str],
+        functions: list[tuple[str, int, int, bool]],
+    ) -> list[ResponsibilityAnchor]:
+        anchors: list[ResponsibilityAnchor] = []
+        function_by_range = [(start, end, name) for name, start, end, _ in functions]
+        seen_keys: set[tuple[str, str, str]] = set()
+        owner_issue_counts: dict[tuple[str, str], int] = {}
+        for index, raw_line in enumerate(lines, start=1):
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith(("package ", "import ")):
+                continue
+            owner = self._anchor_owner(function_by_range, index)
+            if self.DRAW_BRANCH_PATTERN.search(raw_line):
+                self._append_anchor(
+                    anchors=anchors,
+                    seen_keys=seen_keys,
+                    owner_issue_counts=owner_issue_counts,
+                    anchor=ResponsibilityAnchor(
+                        line=index,
+                        label=owner,
+                        issue="绘制分发分支集中在这里",
+                        evidence=stripped,
+                    ),
+                    per_owner_issue_limit=2,
+                )
+            elif self.MODE_LINE_PATTERN.search(raw_line):
+                self._append_anchor(
+                    anchors=anchors,
+                    seen_keys=seen_keys,
+                    owner_issue_counts=owner_issue_counts,
+                    anchor=ResponsibilityAnchor(
+                        line=index,
+                        label=owner,
+                        issue="mode/style 状态分支出现在这里",
+                        evidence=stripped,
+                    ),
+                    per_owner_issue_limit=2,
+                )
+            else:
+                for pattern, label in self.STATE_LINE_PATTERNS:
+                    if pattern.search(raw_line):
+                        self._append_anchor(
+                            anchors=anchors,
+                            seen_keys=seen_keys,
+                            owner_issue_counts=owner_issue_counts,
+                            anchor=ResponsibilityAnchor(
+                                line=index,
+                                label=owner,
+                                issue=f"{label} 信号出现在这里",
+                                evidence=stripped,
+                            ),
+                            per_owner_issue_limit=2,
+                        )
+                        break
+            if len(anchors) >= 8:
+                break
+        return anchors
 
 
 class PythonResponsibilityPlugin(ResponsibilityLanguagePlugin):
@@ -170,6 +411,14 @@ class PythonResponsibilityPlugin(ResponsibilityLanguagePlugin):
         "apply_write_update": ("apply", "write", "update"),
         "print_render_format": ("print", "render", "format"),
     }
+    IO_LINE_PATTERNS = (
+        (_re.compile(r"\bopen\s*\("), "filesystem"),
+        (_re.compile(r"\bprint\s*\("), "console"),
+        (_re.compile(r"\bsubprocess\b"), "process"),
+        (_re.compile(r"\brequests\b"), "network"),
+        (_re.compile(r"\bos\.environ\b"), "env"),
+        (_re.compile(r"\bjson\.(load|loads|dump|dumps)\b"), "serialization"),
+    )
 
     def build_scorer(self) -> BaseResponsibilityScorer:
         return PythonResponsibilityScorer(self.config)
@@ -243,6 +492,186 @@ class PythonResponsibilityPlugin(ResponsibilityLanguagePlugin):
             1 for name in top_level_function_names if any(name.startswith(prefix) for prefix in helper_prefixes)
         )
         return leak_hits
+
+    def collect_details(
+        self,
+        *,
+        file_path: Path,
+        text: str,
+        metrics: ResponsibilityMetrics,
+        assessment: ResponsibilityAssessment,
+    ) -> ResponsibilityDetails:
+        del metrics, assessment
+        lines = text.splitlines()
+        functions = self._collect_python_symbol_ranges(lines)
+        hotspots = self._collect_python_function_hotspots(file_path=file_path, lines=lines, functions=functions)
+        anchors = self._collect_python_anchors(file_path=file_path, lines=lines, functions=functions)
+        return ResponsibilityDetails(function_hotspots=hotspots, anchors=anchors)
+
+    def _collect_python_symbol_ranges(self, lines: list[str]) -> list[tuple[str, int, int, str]]:
+        symbols: list[tuple[str, int, int, str]] = []
+        stack: list[tuple[int, str, int, str]] = []
+        for index, raw_line in enumerate(lines, start=1):
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            indent = len(raw_line) - len(raw_line.lstrip(" "))
+            while stack and indent <= stack[-1][0]:
+                start_indent, name, start_line, kind = stack.pop()
+                symbols.append((name, start_line, index - 1, kind))
+            if raw_line.startswith((" ", "\t")):
+                continue
+            match = self.TOP_LEVEL_SYMBOL_RE.match(stripped)
+            if match:
+                kind = "class" if stripped.startswith("class ") else "function"
+                stack.append((indent, match.group(1), index, kind))
+        while stack:
+            _, name, start_line, kind = stack.pop()
+            symbols.append((name, start_line, len(lines), kind))
+        symbols.sort(key=lambda item: item[1])
+        return symbols
+
+    def _collect_python_function_hotspots(
+        self,
+        *,
+        file_path: Path,
+        lines: list[str],
+        functions: list[tuple[str, int, int, str]],
+    ) -> list[ResponsibilityFunctionHotspot]:
+        hotspots: list[ResponsibilityFunctionHotspot] = []
+        in_commands = "commands" in {part.lower() for part in file_path.parts}
+        for name, start_line, end_line, kind in functions:
+            function_lines = lines[start_line - 1 : end_line]
+            body_text = "\n".join(function_lines)
+            line_count = len(function_lines)
+            state_hits = self._count_pattern_hits(body_text, self.STATE_SIGNAL_PATTERNS)
+            mode_hits = sum(1 for line in function_lines if any(pattern.search(line) for pattern in self.MODE_BRANCH_PATTERNS))
+            io_kind_hits = self._count_pattern_kinds(body_text, self.IO_KIND_PATTERNS)
+            helper_hits = sum(1 for line in function_lines if any(pattern.match(line.strip()) for pattern in self.RULE_HELPER_PATTERNS))
+            score = 0
+            if line_count >= 60:
+                score += 1
+            if line_count >= 120:
+                score += 1
+            if io_kind_hits >= 2:
+                score += 1
+            if io_kind_hits >= 3:
+                score += 1
+            if helper_hits >= 1:
+                score += 1
+            if mode_hits >= 1:
+                score += 1
+            if state_hits >= 2:
+                score += 1
+            if in_commands and (io_kind_hits >= 2 or helper_hits >= 1):
+                score += 1
+            risks: list[str] = []
+            evidence: list[str] = [f"lines {line_count}"]
+            if io_kind_hits >= 2:
+                risks.append("io_surface_breadth")
+                evidence.append(f"io kinds {io_kind_hits}")
+            if helper_hits >= 1:
+                risks.append("rule_helper_density")
+                evidence.append(f"helpers {helper_hits}")
+            if mode_hits >= 1:
+                risks.append("mode_branching")
+                evidence.append(f"mode branches {mode_hits}")
+            if in_commands and (io_kind_hits >= 2 or helper_hits >= 1):
+                risks.append("command_layer_leak")
+                evidence.append("command layer mixed concerns")
+            if state_hits >= 2:
+                evidence.append(f"state hits {state_hits}")
+            if line_count >= 60:
+                evidence.append("large symbol")
+            if score < 2 or not risks:
+                continue
+            summary_parts: list[str] = []
+            if io_kind_hits >= 2:
+                summary_parts.append("IO 面偏宽")
+            if helper_hits >= 1:
+                summary_parts.append("规则/helper 偏密")
+            if mode_hits >= 1:
+                summary_parts.append("mode/type 分支较多")
+            if in_commands and (io_kind_hits >= 2 or helper_hits >= 1):
+                summary_parts.append("命令层混入底层职责")
+            hotspots.append(
+                ResponsibilityFunctionHotspot(
+                    name=name,
+                    kind=kind,
+                    start_line=start_line,
+                    end_line=end_line,
+                    score=score,
+                    summary="；".join(summary_parts),
+                    risks=risks,
+                    evidence=evidence,
+                )
+            )
+        hotspots.sort(key=lambda item: (-item.score, item.start_line))
+        return hotspots[:4]
+
+    def _collect_python_anchors(
+        self,
+        *,
+        file_path: Path,
+        lines: list[str],
+        functions: list[tuple[str, int, int, str]],
+    ) -> list[ResponsibilityAnchor]:
+        del file_path
+        anchors: list[ResponsibilityAnchor] = []
+        function_ranges = [(start, end, name) for name, start, end, _ in functions]
+        seen_keys: set[tuple[str, str, str]] = set()
+        owner_issue_counts: dict[tuple[str, str], int] = {}
+        for index, raw_line in enumerate(lines, start=1):
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith(("#", "import ", "from ")):
+                continue
+            owner = self._anchor_owner(function_ranges, index)
+            if any(pattern.search(raw_line) for pattern in self.MODE_BRANCH_PATTERNS):
+                self._append_anchor(
+                    anchors=anchors,
+                    seen_keys=seen_keys,
+                    owner_issue_counts=owner_issue_counts,
+                    anchor=ResponsibilityAnchor(
+                        line=index,
+                        label=owner,
+                        issue="mode/kind/type 分支出现在这里",
+                        evidence=stripped,
+                    ),
+                    per_owner_issue_limit=2,
+                )
+                continue
+            if any(pattern.match(stripped) for pattern in self.RULE_HELPER_PATTERNS):
+                self._append_anchor(
+                    anchors=anchors,
+                    seen_keys=seen_keys,
+                    owner_issue_counts=owner_issue_counts,
+                    anchor=ResponsibilityAnchor(
+                        line=index,
+                        label=owner,
+                        issue="规则/helper 逻辑出现在这里",
+                        evidence=stripped,
+                    ),
+                    per_owner_issue_limit=2,
+                )
+                continue
+            for pattern, label in self.IO_LINE_PATTERNS:
+                if pattern.search(raw_line):
+                    self._append_anchor(
+                        anchors=anchors,
+                        seen_keys=seen_keys,
+                        owner_issue_counts=owner_issue_counts,
+                        anchor=ResponsibilityAnchor(
+                            line=index,
+                            label=owner,
+                            issue=f"{label} IO 信号出现在这里",
+                            evidence=stripped,
+                        ),
+                        per_owner_issue_limit=2,
+                    )
+                    break
+            if len(anchors) >= 8:
+                break
+        return anchors
 
 
 class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
@@ -343,6 +772,11 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
         _re.compile(r"\b(Release|Destroy|Cancel|Close|Free)[A-Za-z0-9_]*\b"),
         _re.compile(r"\bGetStringUTFChars\b"),
         _re.compile(r"\bReleaseStringUTFChars\b"),
+    )
+    INTEROP_LINE_PATTERNS = (
+        (_re.compile(r"\bJNIEnv\b"), "jni surface"),
+        (_re.compile(r'extern\s+"C"'), "c api surface"),
+        (_re.compile(r"\b(Get|Set|Call|New)[A-Za-z0-9_]*(Method|Field|Object)\b"), "marshalling helper"),
     )
 
     def build_scorer(self) -> BaseResponsibilityScorer:
@@ -455,6 +889,195 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
         if name in self.CONTROL_FLOW_NAMES:
             return None
         return name
+
+    def collect_details(
+        self,
+        *,
+        file_path: Path,
+        text: str,
+        metrics: ResponsibilityMetrics,
+        assessment: ResponsibilityAssessment,
+    ) -> ResponsibilityDetails:
+        del file_path, metrics, assessment
+        lines = text.splitlines()
+        functions = self._collect_cpp_symbol_ranges(lines)
+        hotspots = self._collect_cpp_function_hotspots(lines=lines, functions=functions)
+        anchors = self._collect_cpp_anchors(lines=lines, functions=functions)
+        return ResponsibilityDetails(function_hotspots=hotspots, anchors=anchors)
+
+    def _collect_cpp_symbol_ranges(self, lines: list[str]) -> list[tuple[str, int, int, str]]:
+        depth = 0
+        pending_signature_parts: list[str] = []
+        pending_start = 0
+        functions: list[tuple[str, int, int, str]] = []
+        current_name: str | None = None
+        current_start = 0
+        for index, raw_line in enumerate(lines, start=1):
+            stripped = raw_line.strip()
+            if depth == 0 and stripped and not stripped.startswith(("#", "//")):
+                if current_name is None:
+                    pending_signature_parts = self._append_signature_part(pending_signature_parts, stripped)
+                    if pending_signature_parts and pending_start == 0:
+                        pending_start = index
+                    function_name = self._maybe_extract_top_level_function_name(pending_signature_parts)
+                    if function_name is not None:
+                        current_name = function_name
+                        current_start = pending_start or index
+                        pending_signature_parts = []
+                        pending_start = 0
+                    elif ";" in stripped and "{" not in stripped:
+                        pending_signature_parts = []
+                        pending_start = 0
+            elif depth > 0:
+                pending_signature_parts = []
+                pending_start = 0
+            depth += raw_line.count("{") - raw_line.count("}")
+            if depth == 0 and current_name is not None:
+                functions.append((current_name, current_start, index, "function"))
+                current_name = None
+                current_start = 0
+            if depth < 0:
+                depth = 0
+        return functions
+
+    def _collect_cpp_function_hotspots(
+        self,
+        *,
+        lines: list[str],
+        functions: list[tuple[str, int, int, str]],
+    ) -> list[ResponsibilityFunctionHotspot]:
+        hotspots: list[ResponsibilityFunctionHotspot] = []
+        for name, start_line, end_line, kind in functions:
+            function_lines = lines[start_line - 1 : end_line]
+            body_text = "\n".join(function_lines)
+            line_count = len(function_lines)
+            mode_hits = sum(1 for line in function_lines if any(pattern.search(line) for pattern in self.MODE_BRANCH_PATTERNS))
+            interop_hits = self._count_pattern_kinds(body_text, self.INTEROP_KIND_PATTERNS)
+            lifecycle_hits = self._count_pattern_hits(body_text, self.RESOURCE_LIFECYCLE_PATTERNS)
+            helper_hits = sum(1 for line in function_lines if any(pattern.match(line) for pattern in self.RULE_HELPER_PATTERNS))
+            state_hits = self._count_pattern_hits(body_text, self.STATE_SIGNAL_PATTERNS)
+            score = 0
+            if line_count >= 50:
+                score += 1
+            if line_count >= 100:
+                score += 1
+            if mode_hits >= 2:
+                score += 1
+            if interop_hits >= 1:
+                score += 1
+            if interop_hits >= 2:
+                score += 1
+            if lifecycle_hits >= 2:
+                score += 1
+            if helper_hits >= 1:
+                score += 1
+            if state_hits >= 2:
+                score += 1
+            risks: list[str] = []
+            evidence: list[str] = [f"lines {line_count}"]
+            if interop_hits >= 1:
+                risks.append("interop_surface_breadth")
+                evidence.append(f"interop kinds {interop_hits}")
+            if lifecycle_hits >= 2:
+                risks.append("resource_lifecycle_density")
+                evidence.append(f"lifecycle hits {lifecycle_hits}")
+            if helper_hits >= 1:
+                risks.append("rule_helper_density")
+                evidence.append(f"helpers {helper_hits}")
+            if mode_hits >= 2:
+                risks.append("mode_branching")
+                evidence.append(f"mode branches {mode_hits}")
+            if state_hits >= 2:
+                evidence.append(f"state hits {state_hits}")
+            if line_count >= 50:
+                evidence.append("large function")
+            if score < 2 or not risks:
+                continue
+            summary_parts: list[str] = []
+            if interop_hits >= 1:
+                summary_parts.append("桥接/interop 面偏宽")
+            if lifecycle_hits >= 2:
+                summary_parts.append("生命周期逻辑偏密")
+            if helper_hits >= 1:
+                summary_parts.append("规则/helper 偏密")
+            if mode_hits >= 2:
+                summary_parts.append("mode/style/state 分支较多")
+            hotspots.append(
+                ResponsibilityFunctionHotspot(
+                    name=name,
+                    kind=kind,
+                    start_line=start_line,
+                    end_line=end_line,
+                    score=score,
+                    summary="；".join(summary_parts),
+                    risks=risks,
+                    evidence=evidence,
+                )
+            )
+        hotspots.sort(key=lambda item: (-item.score, item.start_line))
+        return hotspots[:4]
+
+    def _collect_cpp_anchors(
+        self,
+        *,
+        lines: list[str],
+        functions: list[tuple[str, int, int, str]],
+    ) -> list[ResponsibilityAnchor]:
+        anchors: list[ResponsibilityAnchor] = []
+        function_ranges = [(start, end, name) for name, start, end, _ in functions]
+        seen_keys: set[tuple[str, str, str]] = set()
+        owner_issue_counts: dict[tuple[str, str], int] = {}
+        for index, raw_line in enumerate(lines, start=1):
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith(("#", "//")):
+                continue
+            owner = self._anchor_owner(function_ranges, index)
+            if any(pattern.search(raw_line) for pattern in self.MODE_BRANCH_PATTERNS):
+                self._append_anchor(
+                    anchors=anchors,
+                    seen_keys=seen_keys,
+                    owner_issue_counts=owner_issue_counts,
+                    anchor=ResponsibilityAnchor(
+                        line=index,
+                        label=owner,
+                        issue="mode/style/state 分支出现在这里",
+                        evidence=stripped,
+                    ),
+                    per_owner_issue_limit=2,
+                )
+                continue
+            if any(pattern.match(raw_line) for pattern in self.RULE_HELPER_PATTERNS):
+                self._append_anchor(
+                    anchors=anchors,
+                    seen_keys=seen_keys,
+                    owner_issue_counts=owner_issue_counts,
+                    anchor=ResponsibilityAnchor(
+                        line=index,
+                        label=owner,
+                        issue="规则/helper 逻辑出现在这里",
+                        evidence=stripped,
+                    ),
+                    per_owner_issue_limit=2,
+                )
+                continue
+            for pattern, label in self.INTEROP_LINE_PATTERNS:
+                if pattern.search(raw_line):
+                    self._append_anchor(
+                        anchors=anchors,
+                        seen_keys=seen_keys,
+                        owner_issue_counts=owner_issue_counts,
+                        anchor=ResponsibilityAnchor(
+                            line=index,
+                            label=owner,
+                            issue=f"{label} 信号出现在这里",
+                            evidence=stripped,
+                        ),
+                        per_owner_issue_limit=2,
+                    )
+                    break
+            if len(anchors) >= 8:
+                break
+        return anchors
 
 
 def create_responsibility_language_plugin(

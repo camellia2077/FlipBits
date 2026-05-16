@@ -1,149 +1,67 @@
 from pathlib import Path
 
-from .config import LanguageConfig
+from .report_formatter import FormattedPathSection, FormattedScanReport, ReportFormatter
+from .report_models import ScanReport
 
 
 class LocConsoleReporter:
-    def __init__(self, config: LanguageConfig):
-        self.config = config
+    def __init__(self, formatter: ReportFormatter, detail_md_by_path: dict[str, str] | None = None):
+        self.formatter = formatter
+        self.detail_md_by_path = detail_md_by_path or {}
 
-    def print_line_scan_header(self, mode: str, threshold: int) -> None:
-        mode_text = "大文件" if mode == "over" else "小文件"
-        over_comparator = ">=" if self.config.over_inclusive else ">"
-        comparator = over_comparator if mode == "over" else "<"
+    def print_scan_report(self, report: ScanReport) -> None:
+        formatted = self.formatter.format_scan_report(report)
         print(f"{'=' * 100}")
-        print(
-            f"{self.config.display_name} 代码行数扫描报告 "
-            f"({mode_text}模式: {comparator} {threshold} 行)"
-        )
-        print(f"{'=' * 100}\n")
-
-    def print_line_path_result(
-        self,
-        path: Path,
-        mode: str,
-        threshold: int,
-        matched: list[tuple[str, int]],
-    ) -> None:
-        project_name = path.name if path.name else str(path)
-        print(f"[SCAN] 正在扫描项目: [{project_name}]")
-        print(f"  路径: {path}")
-        if matched:
-            print(f"  找到 {len(matched)} 个匹配文件：")
-            for file_path, lines in matched:
-                print(f'  {lines:<6} lines | File "{file_path}"')
-        else:
-            if mode == "over":
-                print(f"  [OK] 扫描完毕，未发现超过阈值 {threshold} 的文件。")
-            else:
-                print(f"  [OK] 扫描完毕，未发现低于阈值 {threshold} 的文件。")
-        print(f"\n{'-' * 100}\n")
-
-    def print_dir_scan_header(self, threshold: int, max_depth: int | None) -> None:
-        print(f"{'=' * 100}")
-        print(f"{self.config.display_name} 目录文件数扫描报告 (目录内代码文件 > {threshold})")
-        if max_depth is None:
+        print(formatted.heading)
+        if report.scan and report.scan.mode == "responsibility_risk":
+            print("说明: 这是文件级启发式风险预警，不代表最终设计结论。")
+        if report.scan and report.scan.mode == "dir_over_files" and report.scan.max_depth is not None:
+            print(f"扫描层级: <= {report.scan.max_depth}")
+        elif report.scan and report.scan.mode == "dir_over_files":
             print("扫描层级: 不限制")
-        else:
-            print(f"扫描层级: <= {max_depth}")
         print(f"{'=' * 100}\n")
+        for section in formatted.path_sections:
+            self._print_path_section(section)
+        if formatted.error:
+            print(f"[ERROR] {formatted.error}")
 
-    def print_dir_path_result(
-        self,
-        path: Path,
-        threshold: int,
-        matched: list[tuple[str, int]],
-    ) -> None:
-        project_name = path.name if path.name else str(path)
+    def _print_path_section(self, section: FormattedPathSection) -> None:
+        project_name = Path(section.path).name or section.path
         print(f"[SCAN] 正在扫描项目: [{project_name}]")
-        print(f"  路径: {path}")
-        if matched:
-            print(f"  找到 {len(matched)} 个超阈值目录：")
-            for dir_path, file_count in matched:
-                print(f'  {file_count:<6} files | Dir "{dir_path}"')
-        else:
-            print(f"  [OK] 扫描完毕，未发现目录内代码文件数超过阈值 {threshold} 的目录。")
-        print(f"\n{'-' * 100}\n")
-
-    def print_responsibility_scan_header(self, threshold: int) -> None:
-        print(f"{'=' * 100}")
-        print(f"{self.config.display_name} 职责混杂风险扫描报告 (风险分 >= {threshold})")
-        print("说明: 这是文件级启发式风险预警，不代表最终设计结论。")
-        print(f"{'=' * 100}\n")
-
-    def print_responsibility_path_result(
-        self,
-        path: Path,
-        matched: list[dict],
-    ) -> None:
-        project_name = path.name if path.name else str(path)
-        print(f"[SCAN] 正在扫描项目: [{project_name}]")
-        print(f"  路径: {path}")
-        if matched:
-            print(f"  找到 {len(matched)} 个高风险文件：")
-            grouped_items = self._group_responsibility_items_by_priority(matched)
-            for priority in ("P0", "P1", "P2", "P3"):
-                items = grouped_items.get(priority)
-                if not items:
+        print(f"  路径: {section.path}")
+        if section.entries:
+            print(f"  找到 {len(section.entries)} 个匹配项：")
+            grouped = LocConsoleReporter._group_entries_by_priority(section)
+            for priority in ("P0", "P1", "P2", "P3", "-"):
+                entries = grouped.get(priority)
+                if not entries:
                     continue
                 print(f"  [{priority}]")
-                for item in items:
-                    role_display = ",".join(item["role_kinds"]) if item["role_kinds"] else "-"
-                    top_level_label = self._top_level_label()
-                    extra_metrics = self._responsibility_extra_metrics(item)
-                    print(
-                        f'    score {item["score"]:<2} | {item["lines"]:<5} lines | '
-                        f'{top_level_label} {item["top_level_composables"]:<2} | '
-                        f'state {item["state_signal_hits"]:<2} | '
-                        f'{extra_metrics}'
-                        f'roles {role_display:<24} | '
-                        f'mode branches {item["mode_branch_hits"]:<2} | '
-                        f'File "{item["path"]}"'
-                    )
-                    print(f'         -> {item["summary"]}')
-                    dominant_risks = item.get("dominant_risks") or []
-                    if dominant_risks:
-                        print(f'            risks: {", ".join(dominant_risks)}')
-                    suggestion = item.get("suggestion")
-                    if suggestion:
-                        print(f"            suggestion: {suggestion}")
-                    next_action = item.get("next_action")
-                    if next_action:
-                        print(f"            next action: {next_action}")
-        else:
-            print("  [OK] 扫描完毕，未发现超过风险阈值的文件。")
+                for entry in entries:
+                    line = " | ".join(f"{key} {value}" for key, value in entry.columns if key in {"score", "lines", "files"})
+                    path_value = next((value for key, value in entry.columns if key == "path"), entry.title)
+                    print(f'    {line} | File "{path_value}"' if line else f'    File "{path_value}"')
+                    detail_parts: list[str] = []
+                    if entry.summary:
+                        detail_parts.append(entry.summary)
+                    if entry.risks:
+                        detail_parts.append(f"risks: {', '.join(entry.risks)}")
+                    if detail_parts:
+                        print(f"         -> {' | '.join(detail_parts)}")
+                    detail_md_path = self.detail_md_by_path.get(path_value)
+                    if detail_md_path:
+                        print(f"         md: {detail_md_path}")
+                    print()
+        elif section.empty_message:
+            print(f"  [OK] 扫描完毕，{section.empty_message}")
         print(f"\n{'-' * 100}\n")
 
-    def _top_level_label(self) -> str:
-        if self.config.lang in {"py", "cpp"}:
-            return "symbols"
-        return "composables"
-
-    def _responsibility_extra_metrics(self, item: dict) -> str:
-        if self.config.lang == "kt":
-            return ""
-        if self.config.lang == "py":
-            return (
-                f'io {item.get("io_kind_count", 0):<2} | '
-                f'rules {item.get("rule_helper_count", 0):<2} | '
-                f'verbs {item.get("responsibility_verb_kind_count", 0):<2} | '
-                f'cmd leak {item.get("command_layer_leak_hits", 0):<2} | '
-            )
-        if self.config.lang == "cpp":
-            return (
-                f'io {item.get("io_kind_count", 0):<2} | '
-                f'rules {item.get("rule_helper_count", 0):<2} | '
-                f'verbs {item.get("responsibility_verb_kind_count", 0):<2} | '
-                f'interop {item.get("interop_surface_hits", 0):<2} | '
-                f'lifecycle {item.get("resource_lifecycle_hits", 0):<2} | '
-            )
-        return ""
-
     @staticmethod
-    def _group_responsibility_items_by_priority(matched: list[dict]) -> dict[str, list[dict]]:
-        grouped: dict[str, list[dict]] = {}
-        for item in matched:
-            grouped.setdefault(item["priority"], []).append(item)
+    def _group_entries_by_priority(section: FormattedPathSection) -> dict[str, list]:
+        grouped: dict[str, list] = {}
+        for entry in section.entries:
+            priority = next((value for key, value in entry.columns if key == "priority"), "-")
+            grouped.setdefault(priority, []).append(entry)
         return grouped
 
     @staticmethod

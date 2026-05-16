@@ -12,6 +12,18 @@
 - [tools/scripts/loc/docs/agent_responsibility_scan.md](/C:/code/FlipBits/tools/scripts/loc/docs/agent_responsibility_scan.md)
   - 解释职责混杂扫描 JSON 的字段含义，以及 agent 应该如何把这些字段转成重构方向
 
+语言级重构目标 prompt 位于：
+
+- `tools/scripts/loc/prompts/kotlin_refactor_prompt.md`
+- `tools/scripts/loc/prompts/cpp_refactor_prompt.md`
+- `tools/scripts/loc/prompts/python_refactor_prompt.md`
+
+每次扫描后，工具会把对应语言的 prompt 复制到日志语言目录下，例如：
+
+- `tools/scripts/loc/logs/kotlin/refactor_prompt.md`
+- `tools/scripts/loc/logs/cpp/refactor_prompt.md`
+- `tools/scripts/loc/logs/py/refactor_prompt.md`
+
 ## Windows BAT 快捷入口
 
 - `tools/scripts/loc/loc.bat`
@@ -78,6 +90,15 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
       - 一句方向性建议，例如“把底层规则下沉到 core，命令层只保留编排和结果输出”
     - `next_action`
       - 更具体的第一步动作，例如“先把校验/规范化下沉到 core module，再让 command 调用它”
+  - 建议阅读顺序统一为：
+    - `priority`
+    - `summary`
+    - `dominant_risks`
+    - `suggestion`
+    - `next_action`
+    - `lines`
+    - 其余计数型证据
+  - `lines` 保留，因为大文件信号本身仍然有价值；但它只是结论旁边的体量信号，不应替代风险类型判断
   - C++ 第一版也是保守启发式：综合文件行数、共享状态/线程原语、顶层符号数量、角色命名种类数、`mode/style/state` 分支数量，以及更贴近桥接/大实现文件的信号：
     - `interop_surface_hits`
       - 一个文件同时命中的桥接/FFI 面数量，例如 JNI 表面、C ABI 表面、封送 helper
@@ -167,6 +188,56 @@ tools\scripts\loc\scan_py_over.bat tools
 - `tools/scripts/loc/logs/scan_py.json`
 - `tools/scripts/loc/logs/scan_rs.json`
 
+同时会额外生成同名 Markdown 总报告，例如：
+
+- `tools/scripts/loc/logs/scan_kt.md`
+
+同时会在 `tools/scripts/loc/logs/` 下直接写出“按语言 / 扫描等级 / 具体文件”的明细 JSON：
+
+- 目录层级：
+  - 第一层：语言/代码类型目录，例如 `cpp / kotlin / py`
+  - 第二层：扫描等级，例如 `P0 / P1 / P2 / P3`
+- 例如：
+  - `tools/scripts/loc/logs/kotlin/P2/AudioFlashSignalVisualizer_scan.json`
+- 目录扫描结果会写成 `_dir_scan.json`
+- 每个明细 JSON 旁边也会同步生成 Markdown：
+  - `.../AudioFlashSignalVisualizer_scan.md`
+- Kotlin 明细目录根名固定使用 `kotlin`
+- 具体文件名只保留源码文件名本身；完整绝对路径保留在 JSON / Markdown 内容里
+
+当前输出链路已经收口为：
+
+- 扫描层：统一结果模型
+- formatter 层：统一结论/证据分组
+- writer 层：JSON / Markdown
+- console 层：也消费同一套 formatter
+
+也就是说，console 和 Markdown 现在共享同一套展示语义，不再各自拼一套字段解释。
+
+职责混杂扫描现在按三层信息输出，目标是让 agent 直接定位问题而不是再猜：
+
+1. 文件级结论
+   - `priority / score / summary / dominant_risks / suggestion / next_action / lines`
+2. 函数级热点
+   - `function_hotspots`
+   - 指出哪个函数或 composable 更值得先拆，附 `score / lines / summary / risks / evidence`
+3. 行号级锚点
+   - `anchors`
+   - 指出哪一行附近出现了关键的 state/effect/mode 分支/绘制分发信号
+
+当前这套三层输出已覆盖：
+
+- Kotlin 职责风险扫描
+- Python 职责风险扫描
+- C++ 职责风险扫描
+
+对 agent 来说，建议读取顺序是：
+
+1. 文件级结论
+2. 函数级热点
+3. 行号级锚点
+4. 其余计数型 evidence
+
 可通过 `--log-file` 覆盖，例如：
 
 ```powershell
@@ -182,8 +253,22 @@ python tools/scripts/loc/run.py --lang py --under 120 --log-file logs/loc_scan_p
   - `--log-file scan_py_custom.json`
     - 实际落到 [tools/scripts/loc/scan_py_custom.json](/C:/code/FlipBits/tools/scripts/loc/scan_py_custom.json)
 - 如果你不想依赖这条相对路径规则，最稳的是直接传绝对路径
+- 如果你传的是 `--log-file logs/custom_scan_kt.json`
+  - 总日志会落到 `tools/scripts/loc/logs/custom_scan_kt.json`
+  - 明细日志仍会统一落到 `tools/scripts/loc/logs/<lang>/P*/` 下
 
-职责混杂扫描写出的 JSON 日志中，风险条目除了原有的 `score / lines / state_signal_hits / top_level_composables / role_kinds / mode_branch_hits`，还会按语言带出额外字段。
+职责混杂扫描写出的 JSON 日志中，风险条目现在按“先结论、后证据”排序，优先字段是：
+
+- `path`
+- `score`
+- `priority`
+- `summary`
+- `dominant_risks`
+- `suggestion`
+- `next_action`
+- `lines`
+
+然后才是各语言的计数型证据字段，例如 `state_signal_hits / top_level_composables / mode_branch_hits / io_kind_count` 等。
 
 Python 额外字段：
 
@@ -205,7 +290,13 @@ C++ 额外字段：
 - `suggestion`
 - `next_action`
 
-这样终端输出和 `tools/scripts/loc/logs/scan_py.json` 里的结构会保持一致，方便 agent 直接读取日志做后续分析。
+终端输出现在故意保持简短，只用于快速扫一眼：
+
+- 首行只保留 `score / lines / File`
+- 第二行只保留 `summary` 和 `risks`
+- 第三行打印对应明细 Markdown 的绝对路径，方便在 IDE 终端里直接点开
+
+更详细的 `suggestion / next_action / function_hotspots / anchors / evidence` 都保留在 JSON / Markdown 日志里，不再在终端展开。
 
 另外，职责混杂条目的 JSON 字段顺序现在也按“先结论、后证据”排列：
 
@@ -216,4 +307,5 @@ C++ 额外字段：
 5. `dominant_risks`
 6. `suggestion`
 7. `next_action`
-8. 其余计数型证据信号
+8. `lines`
+9. 其余计数型证据信号

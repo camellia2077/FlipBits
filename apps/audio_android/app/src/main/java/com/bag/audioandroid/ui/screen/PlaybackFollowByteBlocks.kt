@@ -1,10 +1,16 @@
 package com.bag.audioandroid.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,8 +24,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.BuildConfig
+import kotlin.math.max
 
 @Composable
 internal fun MorseLetterBlock(
@@ -72,9 +80,44 @@ internal fun MorseLetterBlock(
             focusColor = focusColor,
             onFocusColor = onFocusColor,
             inactiveColor = inactiveColor,
+            modifier = Modifier.wrapContentWidth(),
         )
     }
 }
+
+internal fun morsePatternVisualWidthDp(morse: String): Dp {
+    val symbolCount = morse.count { it == '.' || it == '-' }
+    if (symbolCount == 0) {
+        return MorseDotWidth
+    }
+    val symbolWidths =
+        morse.fold(0.dp) { width, symbol ->
+            width +
+                when (symbol) {
+                    '.' -> MorseDotWidth
+                    '-' -> MorseDashWidth
+                    else -> 0.dp
+                }
+        }
+    val gapWidth = if (symbolCount > 1) MorseElementGap * (symbolCount - 1).toFloat() else 0.dp
+    return symbolWidths + gapWidth
+}
+
+internal fun morseLetterVisualWidthDp(
+    letter: String,
+    morse: String,
+): Dp = max(morsePatternVisualWidthDp(morse).value, morseLabelWidthDp(letter).value).dp
+
+private fun morseLabelWidthDp(letter: String): Dp =
+    when {
+        letter.isEmpty() -> MorseLetterMinimumLabelWidth
+        letter.length > 1 ->
+            (
+                MorseLetterMinimumLabelWidth +
+                    MorseExtraLabelWidthPerCharacter * (letter.length - 1).toFloat()
+            ).coerceAtLeast(MorseLetterMinimumLabelWidth)
+        else -> MorseLetterMinimumLabelWidth
+    }
 
 @Composable
 internal fun PlaybackHexByteBlock(
@@ -325,22 +368,98 @@ internal fun PlaybackByteBlock(
         }
 
     Box(
-        modifier = modifier,
+        modifier =
+            if (mode == PlaybackFollowViewMode.Morse) {
+                modifier.wrapContentWidth()
+            } else {
+                modifier
+            },
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = text,
-            style =
-                MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = FontFamily.Monospace,
-                ),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            softWrap = false,
-        )
+        if (mode == PlaybackFollowViewMode.Morse) {
+            MorsePatternVisual(
+                morse = group,
+                isActive = isActive,
+                isPast = isPast,
+                activeBitIndex = activeBitIndex,
+                isActiveBitTone = isActiveBitTone,
+                focusColor = focusColor,
+                inactiveColor = inactiveColor,
+            )
+        } else {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = text,
+                style =
+                    MaterialTheme.typography.labelLarge.copy(
+                        fontFamily = FontFamily.Monospace,
+                    ),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                softWrap = false,
+            )
+        }
     }
 }
+
+@Composable
+private fun MorsePatternVisual(
+    morse: String,
+    isActive: Boolean,
+    isPast: Boolean,
+    activeBitIndex: Int,
+    isActiveBitTone: Boolean,
+    focusColor: Color,
+    inactiveColor: Color,
+) {
+    val elements = morse.filter { it == '.' || it == '-' }
+    if (elements.isEmpty()) {
+        Spacer(modifier = Modifier.width(MorseDotWidth).height(MorseElementHeight))
+        return
+    }
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(MorseElementGap),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        elements.forEachIndexed { index, element ->
+            val isCurrentElement = isActive && isActiveBitTone && index == activeBitIndex
+            val isHistoryElement =
+                isPast ||
+                    (
+                        isActive &&
+                            activeBitIndex >= 0 &&
+                            if (isActiveBitTone) {
+                                index < activeBitIndex
+                            } else {
+                                index <= activeBitIndex
+                            }
+                    )
+            val elementColor =
+                when {
+                    isCurrentElement -> focusColor
+                    isHistoryElement -> focusColor.copy(alpha = 0.84f)
+                    else -> inactiveColor
+                }
+            Box(
+                modifier =
+                    Modifier
+                        .width(if (element == '-') MorseDashWidth else MorseDotWidth)
+                        .height(MorseElementHeight)
+                        .background(
+                            color = elementColor,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        ),
+            )
+        }
+    }
+}
+
+internal val MorseDotWidth = 6.dp
+internal val MorseDashWidth = 16.dp
+internal val MorseElementGap = 4.dp
+internal val MorseElementHeight = 6.dp
+private val MorseLetterMinimumLabelWidth = 10.dp
+private val MorseExtraLabelWidthPerCharacter = 6.dp
 
 private object PlaybackFollowBinaryRenderTrace {
     private const val Tag = "FlashAlignmentPerf"

@@ -115,12 +115,11 @@ private class AsyncTestSavedAudioRepository(
     private val loadBlock: suspend (String) -> SavedAudioContent?,
 ) : SavedAudioRepository {
     override fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String = "generated.wav"
 
     override fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -129,7 +128,6 @@ private class AsyncTestSavedAudioRepository(
     ): AudioExportResult = AudioExportResult.Failed
 
     override fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,

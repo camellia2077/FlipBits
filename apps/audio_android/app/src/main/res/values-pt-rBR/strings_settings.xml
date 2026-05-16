@@ -21,11 +21,12 @@
     <string name="config_language_expand">Expandir configurações de idioma</string>
     <string name="config_language_collapse">Recolher configurações de idioma</string>
     <string name="config_theme_mode_title">Modo do tema</string>
-    <string name="config_theme_mode_subtitle">Escolha entre sistema, claro ou escuro.</string>
+    <string name="config_theme_mode_subtitle">Escolha sistema, claro ou escuro.</string>
     <string name="config_theme_mode_brand_fixed">Os temas dual-tone usam um visual fixo.</string>
     <string name="config_theme_mode_follow_system">Seguir o sistema</string>
     <string name="config_theme_mode_light">Claro</string>
     <string name="config_theme_mode_dark">Escuro</string>
+    <string name="config_theme_mode_custom">Personalizado</string>
     <string name="config_theme_appearance_title">Aparência do tema</string>
     <string name="config_theme_style_title">Estilo do tema</string>
     <string name="config_theme_style_subtitle">Escolha entre Material ou dual-tone.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">A Queda Exquisita</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">O Labirinto da Mutabilidade</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Personalizado</string>
     <string name="palette_family_reds_pinks">Vermelhos e rosas</string>
     <string name="palette_family_oranges">Laranjas</string>
     <string name="palette_family_yellows">Amarelos</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Decoração de exemplo</string>
     <string name="config_sample_decoration_subtitle">Adiciona marcadores de prefixo opcionais ao texto de exemplo aleatório.</string>
+    <string name="config_sample_text_title">Texto de exemplo</string>
+    <string name="config_sample_text_subtitle">Controla como o texto de exemplo aparece no campo de entrada.</string>
+    <string name="config_sample_auto_fill_subtitle">Preenche o campo de entrada com um exemplo aleatório quando houver texto de exemplo disponível.</string>
+    <string name="config_sample_text_collapse">Recolher configurações de texto de exemplo</string>
+    <string name="config_sample_text_expand">Expandir configurações de texto de exemplo</string>
+    <string name="config_sample_auto_fill_title">Preencher texto de exemplo automaticamente</string>
     <string name="config_demo_mode_title">Modo demonstração</string>
     <string name="config_demo_mode_subtitle">Mostra feedback de toque e dicas para gravação.</string>
     <string name="config_custom_brand_theme_import_title">Importar dual-tone personalizado</string>

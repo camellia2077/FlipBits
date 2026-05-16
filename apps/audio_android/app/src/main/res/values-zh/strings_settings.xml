@@ -27,11 +27,12 @@
     <string name="config_language_expand">展开语言设置</string>
     <string name="config_language_collapse">折叠语言设置</string>
     <string name="config_theme_mode_title">主题模式</string>
-    <string name="config_theme_mode_subtitle">选择系统、浅色或深色模式。</string>
+    <string name="config_theme_mode_subtitle">选择系统、浅色或深色。</string>
     <string name="config_theme_mode_brand_fixed">双色调主题使用固定外观。</string>
     <string name="config_theme_mode_follow_system">跟随系统</string>
     <string name="config_theme_mode_light">浅色</string>
     <string name="config_theme_mode_dark">深色</string>
+    <string name="config_theme_mode_custom">自定义</string>
     <string name="config_theme_appearance_title">外观</string>
     <string name="config_theme_style_title">主题样式</string>
     <string name="config_theme_style_subtitle">选择 Material 或双色调。</string>
@@ -54,6 +55,7 @@
     <string name="config_dual_tone_group_exquisite_fall">极致沉沦</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">万变诡道</string>
     <string name="palette_family_brand">双色调</string>
+    <string name="palette_family_custom">自定义</string>
     <string name="palette_family_reds_pinks">红色与粉色</string>
     <string name="palette_family_oranges">橙色</string>
     <string name="palette_family_yellows">黄色</string>
@@ -192,6 +194,12 @@
 
     <string name="config_sample_decoration_title">Sample decoration</string>
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_text_title">示例文本</string>
+    <string name="config_sample_text_subtitle">控制示例文本如何出现在输入框中。</string>
+    <string name="config_sample_auto_fill_subtitle">当示例文本可用时，用随机示例自动填充输入框。</string>
+    <string name="config_sample_text_collapse">收起示例文本设置</string>
+    <string name="config_sample_text_expand">展开示例文本设置</string>
+    <string name="config_sample_auto_fill_title">自动填充示例文本</string>
     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
     <string name="config_custom_brand_theme_import_title">导入自定义 dual-tone</string>

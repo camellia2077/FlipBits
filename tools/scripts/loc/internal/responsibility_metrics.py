@@ -7,6 +7,32 @@ from .responsibility_categories import ResponsibilityRiskKind
 
 
 @dataclass(frozen=True)
+class ResponsibilityFunctionHotspot:
+    name: str
+    kind: str
+    start_line: int
+    end_line: int
+    score: int
+    summary: str
+    risks: list[str]
+    evidence: list[str]
+
+
+@dataclass(frozen=True)
+class ResponsibilityAnchor:
+    line: int
+    label: str
+    issue: str
+    evidence: str
+
+
+@dataclass(frozen=True)
+class ResponsibilityDetails:
+    function_hotspots: list[ResponsibilityFunctionHotspot]
+    anchors: list[ResponsibilityAnchor]
+
+
+@dataclass(frozen=True)
 class ResponsibilityMetrics:
     line_count: int
     state_signal_hits: int
@@ -36,6 +62,7 @@ def build_responsibility_result(
     file_path: Path,
     metrics: ResponsibilityMetrics,
     assessment: ResponsibilityAssessment,
+    details: ResponsibilityDetails,
 ) -> dict[str, object]:
     return {
         "path": str(file_path),
@@ -58,4 +85,6 @@ def build_responsibility_result(
         else None,
         "suggestion": assessment.suggestion,
         "next_action": assessment.next_action,
+        "function_hotspots": details.function_hotspots,
+        "anchors": details.anchors,
     }

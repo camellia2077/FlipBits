@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Input
-import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -50,7 +50,10 @@ import com.bag.audioandroid.ui.model.toBatchConfigText
 import com.bag.audioandroid.ui.model.toConfigText
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.customMaterialPalette
+import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 internal fun ConfigThemeAppearanceSection(
@@ -63,29 +66,84 @@ internal fun ConfigThemeAppearanceSection(
     onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
     onCustomBrandThemeDeleted: (String) -> Unit,
     onCustomBrandThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
+    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    customMaterialThemeSettings: CustomBrandThemeSettings,
+    onCustomMaterialThemeSaved: (CustomBrandThemeSettings) -> Unit,
+    onCreateCustomMaterialTheme: () -> Unit,
     selectedThemeMode: ThemeModeOption,
     onThemeModeSelected: (ThemeModeOption) -> Unit,
     isExpanded: Boolean,
     onExpandedChanged: (Boolean) -> Unit,
+    isCustomBrandThemeExpanded: Boolean,
+    onCustomBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isSacredMachineBrandThemeExpanded: Boolean,
+    onSacredMachineBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isAncientDynastyBrandThemeExpanded: Boolean,
+    onAncientDynastyBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isImmortalRotBrandThemeExpanded: Boolean,
+    onImmortalRotBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isScarletCarnageBrandThemeExpanded: Boolean,
+    onScarletCarnageBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isExquisiteFallBrandThemeExpanded: Boolean,
+    onExquisiteFallBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isLabyrinthOfMutabilityBrandThemeExpanded: Boolean,
+    onLabyrinthOfMutabilityBrandThemeExpandedChanged: (Boolean) -> Unit,
     selectedPalette: PaletteOption,
     onPaletteSelected: (PaletteOption) -> Unit,
     materialPalettes: List<PaletteOption>,
     brandThemes: List<BrandThemeOption>,
     accentTokens: AppThemeAccentTokens,
 ) {
+    val isBrandStyle = selectedThemeStyle == ThemeStyleOption.BrandDualTone
+    val isCustomMaterialSelected = !isBrandStyle && isCustomMaterialPaletteId(selectedPalette.id)
+    val editCustomMaterialLabel = stringResource(R.string.config_custom_brand_theme_edit)
+    var showCustomThemeDialog by rememberSaveable { mutableStateOf(false) }
+    var showCustomMaterialThemeDialog by rememberSaveable { mutableStateOf(false) }
+    var customThemeDialogPresetId by rememberSaveable { mutableStateOf<String?>(null) }
+    var showCustomThemeImportDialog by rememberSaveable { mutableStateOf(false) }
+    var showCustomThemeExportDialog by rememberSaveable { mutableStateOf(false) }
+    var pendingBatchImport by remember { mutableStateOf<CustomBrandThemeBatchImportPreview?>(null) }
+    var duplicateImportCandidate by remember { mutableStateOf<CustomBrandThemeSettings?>(null) }
+    var duplicateImportPresetId by remember { mutableStateOf<String?>(null) }
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+    val copyConfigLabel = stringResource(R.string.config_custom_brand_theme_copy_config)
+
     val materialPaletteGroups =
-        remember(materialPalettes) {
+        remember(materialPalettes, customMaterialThemePresets, isCustomMaterialSelected, editCustomMaterialLabel) {
             PaletteFamily.entries.mapNotNull { family ->
                 if (family == PaletteFamily.Brand) {
                     return@mapNotNull null
                 }
-                val options = materialPalettes.filter { it.family == family }
+                val options =
+                    when (family) {
+                        PaletteFamily.Custom -> customMaterialThemePresets.map(::customMaterialPalette)
+                        else -> materialPalettes.filter { it.family == family }
+                    }
                 if (options.isEmpty()) {
                     null
                 } else {
                     PaletteGroupUi(
                         family = family,
                         options = options,
+                        onAddOption =
+                            if (family == PaletteFamily.Custom) {
+                                onCreateCustomMaterialTheme
+                            } else {
+                                null
+                            },
+                        onEditOption =
+                            if (family == PaletteFamily.Custom && isCustomMaterialSelected) {
+                                { showCustomMaterialThemeDialog = true }
+                            } else {
+                                null
+                            },
+                        editActionLabel =
+                            if (family == PaletteFamily.Custom && isCustomMaterialSelected) {
+                                editCustomMaterialLabel
+                            } else {
+                                null
+                            },
                     )
                 }
             }
@@ -126,27 +184,27 @@ internal fun ConfigThemeAppearanceSection(
                 it.groupTitleResId == R.string.config_dual_tone_group_labyrinth_of_mutability
             }
         }
-    val isBrandStyle = selectedThemeStyle == ThemeStyleOption.BrandDualTone
-    var sacredMachineExpanded by rememberSaveable { mutableStateOf(false) }
-    var ancientDynastyExpanded by rememberSaveable { mutableStateOf(false) }
-    var immortalRotExpanded by rememberSaveable { mutableStateOf(false) }
-    var scarletCarnageExpanded by rememberSaveable { mutableStateOf(false) }
-    var exquisiteFallExpanded by rememberSaveable { mutableStateOf(false) }
-    var labyrinthOfMutabilityExpanded by rememberSaveable { mutableStateOf(false) }
-    var customExpanded by rememberSaveable { mutableStateOf(false) }
-    var showCustomThemeDialog by rememberSaveable { mutableStateOf(false) }
-    var customThemeDialogPresetId by rememberSaveable { mutableStateOf<String?>(null) }
-    var showCustomThemeImportDialog by rememberSaveable { mutableStateOf(false) }
-    var showCustomThemeExportDialog by rememberSaveable { mutableStateOf(false) }
-    var pendingBatchImport by remember { mutableStateOf<CustomBrandThemeBatchImportPreview?>(null) }
-    var duplicateImportCandidate by remember { mutableStateOf<CustomBrandThemeSettings?>(null) }
-    var duplicateImportPresetId by remember { mutableStateOf<String?>(null) }
-    val clipboard = LocalClipboard.current
-    val coroutineScope = rememberCoroutineScope()
     val selectedCustomBrandThemePreset =
         remember(selectedBrandTheme.id, customBrandThemePresets) {
             customBrandThemePresets.firstOrNull { preset ->
                 selectedBrandTheme.id == customBrandThemeOptionId(preset.presetId)
+            }
+        }
+    val copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit =
+        remember(clipboard, coroutineScope) {
+            { option ->
+                coroutineScope.launch {
+                    copyCustomThemeConfig(
+                        clipboard = clipboard,
+                        settings =
+                            CustomBrandThemeSettings(
+                                displayName = option.titleOverride ?: option.id,
+                                primaryHex = option.primaryColor.toHexString(),
+                                secondaryHex = option.secondaryColor.toHexString(),
+                                outlineHexOrNull = option.outlineColor.toHexString(),
+                            ),
+                    )
+                }
             }
         }
 
@@ -155,13 +213,34 @@ internal fun ConfigThemeAppearanceSection(
             return@LaunchedEffect
         }
         when (selectedBrandTheme.groupTitleResId) {
-            R.string.config_dual_tone_group_custom -> customExpanded = true
-            R.string.config_dual_tone_group_sacred_machine -> sacredMachineExpanded = true
-            R.string.config_dual_tone_group_ancient_dynasty -> ancientDynastyExpanded = true
-            R.string.config_dual_tone_group_immortal_rot -> immortalRotExpanded = true
-            R.string.config_dual_tone_group_scarlet_carnage -> scarletCarnageExpanded = true
-            R.string.config_dual_tone_group_exquisite_fall -> exquisiteFallExpanded = true
-            R.string.config_dual_tone_group_labyrinth_of_mutability -> labyrinthOfMutabilityExpanded = true
+            R.string.config_dual_tone_group_custom ->
+                if (!isCustomBrandThemeExpanded) {
+                    onCustomBrandThemeExpandedChanged(true)
+                }
+            R.string.config_dual_tone_group_sacred_machine ->
+                if (!isSacredMachineBrandThemeExpanded) {
+                    onSacredMachineBrandThemeExpandedChanged(true)
+                }
+            R.string.config_dual_tone_group_ancient_dynasty ->
+                if (!isAncientDynastyBrandThemeExpanded) {
+                    onAncientDynastyBrandThemeExpandedChanged(true)
+                }
+            R.string.config_dual_tone_group_immortal_rot ->
+                if (!isImmortalRotBrandThemeExpanded) {
+                    onImmortalRotBrandThemeExpandedChanged(true)
+                }
+            R.string.config_dual_tone_group_scarlet_carnage ->
+                if (!isScarletCarnageBrandThemeExpanded) {
+                    onScarletCarnageBrandThemeExpandedChanged(true)
+                }
+            R.string.config_dual_tone_group_exquisite_fall ->
+                if (!isExquisiteFallBrandThemeExpanded) {
+                    onExquisiteFallBrandThemeExpandedChanged(true)
+                }
+            R.string.config_dual_tone_group_labyrinth_of_mutability ->
+                if (!isLabyrinthOfMutabilityBrandThemeExpanded) {
+                    onLabyrinthOfMutabilityBrandThemeExpandedChanged(true)
+                }
         }
     }
 
@@ -188,6 +267,16 @@ internal fun ConfigThemeAppearanceSection(
                 onCustomBrandThemeDeleted(presetId)
                 showCustomThemeDialog = false
                 customThemeDialogPresetId = null
+            },
+        )
+    }
+    if (showCustomMaterialThemeDialog) {
+        ConfigMaterialCustomDialog(
+            initialSettings = customMaterialThemeSettings,
+            onDismiss = { showCustomMaterialThemeDialog = false },
+            onSave = { settings ->
+                onCustomMaterialThemeSaved(settings)
+                showCustomMaterialThemeDialog = false
             },
         )
     }
@@ -364,8 +453,12 @@ internal fun ConfigThemeAppearanceSection(
                         }
                         Text(
                             text =
-                                "${stringResource(selectedPalette.family.titleResId)} · " +
-                                    stringResource(selectedPalette.titleResId),
+                                if (isCustomMaterialPaletteId(selectedPalette.id)) {
+                                    stringResource(R.string.palette_family_custom)
+                                } else {
+                                    "${stringResource(selectedPalette.family.titleResId)} · " +
+                                        stringResource(selectedPalette.titleResId)
+                                },
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                         )
@@ -409,8 +502,8 @@ internal fun ConfigThemeAppearanceSection(
                                 title = stringResource(R.string.config_dual_tone_group_custom),
                                 options = customBrandThemes,
                                 selectedBrandTheme = selectedBrandTheme,
-                                expanded = customExpanded,
-                                onExpandedChanged = { customExpanded = it },
+                                expanded = isCustomBrandThemeExpanded,
+                                onExpandedChanged = onCustomBrandThemeExpandedChanged,
                                 onBrandThemeSelected = onBrandThemeSelected,
                                 onEditBrandTheme = { option ->
                                     customThemeDialogPresetId =
@@ -419,6 +512,8 @@ internal fun ConfigThemeAppearanceSection(
                                             ?.presetId
                                     showCustomThemeDialog = true
                                 },
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
                                 actionLabel = stringResource(R.string.config_custom_brand_theme_add),
                                 onActionClick = {
                                     customThemeDialogPresetId = null
@@ -432,8 +527,8 @@ internal fun ConfigThemeAppearanceSection(
                                             onClick = { showCustomThemeImportDialog = true },
                                         ),
                                         BrandThemeSectionIconAction(
-                                            label = stringResource(R.string.config_custom_brand_theme_copy_config),
-                                            icon = Icons.Rounded.Share,
+                                            label = copyConfigLabel,
+                                            icon = Icons.Rounded.ContentCopy,
                                             enabled = selectedCustomBrandThemePreset != null,
                                             onClick = { showCustomThemeExportDialog = true },
                                         ),
@@ -444,54 +539,66 @@ internal fun ConfigThemeAppearanceSection(
                                 title = stringResource(R.string.config_dual_tone_group_sacred_machine),
                                 options = sacredMachineThemes,
                                 selectedBrandTheme = selectedBrandTheme,
-                                expanded = sacredMachineExpanded,
-                                onExpandedChanged = { sacredMachineExpanded = it },
+                                expanded = isSacredMachineBrandThemeExpanded,
+                                onExpandedChanged = onSacredMachineBrandThemeExpandedChanged,
                                 onBrandThemeSelected = onBrandThemeSelected,
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
                             )
                             BrandThemeSection(
                                 accentTokens = accentTokens,
                                 title = stringResource(R.string.config_dual_tone_group_ancient_dynasty),
                                 options = ancientDynastyThemes,
                                 selectedBrandTheme = selectedBrandTheme,
-                                expanded = ancientDynastyExpanded,
-                                onExpandedChanged = { ancientDynastyExpanded = it },
+                                expanded = isAncientDynastyBrandThemeExpanded,
+                                onExpandedChanged = onAncientDynastyBrandThemeExpandedChanged,
                                 onBrandThemeSelected = onBrandThemeSelected,
-                            )
-                            BrandThemeSection(
-                                accentTokens = accentTokens,
-                                title = stringResource(R.string.config_dual_tone_group_immortal_rot),
-                                options = immortalRotThemes,
-                                selectedBrandTheme = selectedBrandTheme,
-                                expanded = immortalRotExpanded,
-                                onExpandedChanged = { immortalRotExpanded = it },
-                                onBrandThemeSelected = onBrandThemeSelected,
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
                             )
                             BrandThemeSection(
                                 accentTokens = accentTokens,
                                 title = stringResource(R.string.config_dual_tone_group_scarlet_carnage),
                                 options = scarletCarnageThemes,
                                 selectedBrandTheme = selectedBrandTheme,
-                                expanded = scarletCarnageExpanded,
-                                onExpandedChanged = { scarletCarnageExpanded = it },
+                                expanded = isScarletCarnageBrandThemeExpanded,
+                                onExpandedChanged = onScarletCarnageBrandThemeExpandedChanged,
                                 onBrandThemeSelected = onBrandThemeSelected,
-                            )
-                            BrandThemeSection(
-                                accentTokens = accentTokens,
-                                title = stringResource(R.string.config_dual_tone_group_exquisite_fall),
-                                options = exquisiteFallThemes,
-                                selectedBrandTheme = selectedBrandTheme,
-                                expanded = exquisiteFallExpanded,
-                                onExpandedChanged = { exquisiteFallExpanded = it },
-                                onBrandThemeSelected = onBrandThemeSelected,
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
                             )
                             BrandThemeSection(
                                 accentTokens = accentTokens,
                                 title = stringResource(R.string.config_dual_tone_group_labyrinth_of_mutability),
                                 options = labyrinthOfMutabilityThemes,
                                 selectedBrandTheme = selectedBrandTheme,
-                                expanded = labyrinthOfMutabilityExpanded,
-                                onExpandedChanged = { labyrinthOfMutabilityExpanded = it },
+                                expanded = isLabyrinthOfMutabilityBrandThemeExpanded,
+                                onExpandedChanged = onLabyrinthOfMutabilityBrandThemeExpandedChanged,
                                 onBrandThemeSelected = onBrandThemeSelected,
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
+                            )
+                            BrandThemeSection(
+                                accentTokens = accentTokens,
+                                title = stringResource(R.string.config_dual_tone_group_immortal_rot),
+                                options = immortalRotThemes,
+                                selectedBrandTheme = selectedBrandTheme,
+                                expanded = isImmortalRotBrandThemeExpanded,
+                                onExpandedChanged = onImmortalRotBrandThemeExpandedChanged,
+                                onBrandThemeSelected = onBrandThemeSelected,
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
+                            )
+                            BrandThemeSection(
+                                accentTokens = accentTokens,
+                                title = stringResource(R.string.config_dual_tone_group_exquisite_fall),
+                                options = exquisiteFallThemes,
+                                selectedBrandTheme = selectedBrandTheme,
+                                expanded = isExquisiteFallBrandThemeExpanded,
+                                onExpandedChanged = onExquisiteFallBrandThemeExpandedChanged,
+                                onBrandThemeSelected = onBrandThemeSelected,
+                                copyConfigLabel = copyConfigLabel,
+                                onCopyConfig = copySelectedBrandThemeConfig,
                             )
                         }
                     }
@@ -702,4 +809,11 @@ private fun buildCustomBrandThemeBatchImportPreview(
         duplicateCount = imported.size - newSettings.size,
         newSettings = newSettings,
     )
+}
+
+private fun androidx.compose.ui.graphics.Color.toHexString(): String {
+    val red = (this.red * 255f).roundToInt().coerceIn(0, 255)
+    val green = (this.green * 255f).roundToInt().coerceIn(0, 255)
+    val blue = (this.blue * 255f).roundToInt().coerceIn(0, 255)
+    return String.format("#%02X%02X%02X", red, green, blue)
 }

@@ -13,59 +13,94 @@ class SampleInputSessionUpdater(
     private val sampleInputTextProvider: SampleInputTextProvider,
     private val random: Random = Random.Default,
 ) {
+    fun clearAutoFilledSessions(
+        sessions: Map<TransportModeOption, ModeAudioSessionState>,
+    ): Map<TransportModeOption, ModeAudioSessionState> =
+        sessions.mapValues { (_, session) ->
+            if (session.sampleInputId == null) {
+                session
+            } else {
+                // Auto-filled sample state should disappear immediately once the
+                // user disables sample auto-fill. Custom text already clears
+                // sampleInputId on edit, so it remains untouched here.
+                session.copy(
+                    inputText = "",
+                    sampleInputId = null,
+                    sampleShuffleState = null,
+                    sampleEmojiShuffleState = null,
+                    appliedSampleEmojiPrefix = null,
+                )
+            }
+        }
+
     fun initialize(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
         language: AppLanguageOption,
         flavor: SampleFlavor,
+        isSampleAutoFillEnabled: Boolean,
         isDecorationEnabled: Boolean = true,
     ): Map<TransportModeOption, ModeAudioSessionState> =
         sessions.mapValues { (mode, session) ->
-            randomizedInitialSession(
-                session = session,
-                mode = mode,
-                language = language,
-                flavor = flavor,
-                isDecorationEnabled = isDecorationEnabled,
-            )
+            if (isSampleAutoFillEnabled) {
+                randomizedInitialSession(
+                    session = session,
+                    mode = mode,
+                    language = language,
+                    flavor = flavor,
+                    isDecorationEnabled = isDecorationEnabled,
+                )
+            } else {
+                session
+            }
         }
 
     fun refreshForLanguageChange(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
         newLanguage: AppLanguageOption,
         flavor: SampleFlavor,
+        isSampleAutoFillEnabled: Boolean,
     ): Map<TransportModeOption, ModeAudioSessionState> =
-        sessions.mapValues { (mode, session) ->
-            session.sampleInputId
-                ?.let { sampleInputTextProvider.sampleById(mode, newLanguage, flavor, it) }
-                ?.let { sample ->
-                    session.copy(
-                        inputText = sample.text,
-                        sampleInputId = sample.id,
-                    )
-                }
-                ?: session
+        if (!isSampleAutoFillEnabled) {
+            sessions
+        } else {
+            sessions.mapValues { (mode, session) ->
+                session.sampleInputId
+                    ?.let { sampleInputTextProvider.sampleById(mode, newLanguage, flavor, it) }
+                    ?.let { sample ->
+                        session.copy(
+                            inputText = sample.text,
+                            sampleInputId = sample.id,
+                        )
+                    }
+                    ?: session
+            }
         }
 
     fun refreshForFlavorChange(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
         language: AppLanguageOption,
         newFlavor: SampleFlavor,
+        isSampleAutoFillEnabled: Boolean,
     ): Map<TransportModeOption, ModeAudioSessionState> =
-        sessions.mapValues { (mode, session) ->
-            val sampleId = session.sampleInputId
-            if (sampleId == null) {
-                session
-            } else {
-                // Flavor changes switch the sample catalog itself. We intentionally
-                // start a fresh shuffled round for the new catalog instead of trying
-                // to preserve a fixed first sample or carry over the old deck.
-                randomizedInitialSession(
-                    session = session,
-                    mode = mode,
-                    language = language,
-                    flavor = newFlavor,
-                    isDecorationEnabled = false,
-                )
+        if (!isSampleAutoFillEnabled) {
+            sessions
+        } else {
+            sessions.mapValues { (mode, session) ->
+                val sampleId = session.sampleInputId
+                if (sampleId == null) {
+                    session
+                } else {
+                    // Flavor changes switch the sample catalog itself. We intentionally
+                    // start a fresh shuffled round for the new catalog instead of trying
+                    // to preserve a fixed first sample or carry over the old deck.
+                    randomizedInitialSession(
+                        session = session,
+                        mode = mode,
+                        language = language,
+                        flavor = newFlavor,
+                        isDecorationEnabled = false,
+                    )
+                }
             }
         }
 

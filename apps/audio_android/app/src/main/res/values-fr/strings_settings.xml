@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Suivre le système</string>
     <string name="config_theme_mode_light">Clair</string>
     <string name="config_theme_mode_dark">Sombre</string>
+    <string name="config_theme_mode_custom">Personnalisé</string>
     <string name="config_theme_appearance_title">Apparence du thème</string>
     <string name="config_theme_style_title">Style du thème</string>
     <string name="config_theme_style_subtitle">Choisir Material ou Dual-tone.</string>
@@ -47,6 +48,7 @@
     <string name="config_dual_tone_group_exquisite_fall">La Chute exquise</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">Le Labyrinthe de la mutabilité</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Personnalisé</string>
     <string name="palette_family_reds_pinks">Rouges et roses</string>
     <string name="palette_family_oranges">Oranges</string>
     <string name="palette_family_yellows">Jaunes</string>
@@ -190,6 +192,12 @@
 
     <string name="config_sample_decoration_title">Décoration des samples</string>
     <string name="config_sample_decoration_subtitle">Ajoute des marqueurs de préfixe optionnels au sample aléatoire.</string>
+    <string name="config_sample_text_title">Texte d’exemple</string>
+    <string name="config_sample_text_subtitle">Contrôle la façon dont le texte d’exemple apparaît dans le champ de saisie.</string>
+    <string name="config_sample_auto_fill_subtitle">Remplit le champ de saisie avec un exemple aléatoire lorsque du texte d’exemple est disponible.</string>
+    <string name="config_sample_text_collapse">Réduire les réglages du texte d’exemple</string>
+    <string name="config_sample_text_expand">Développer les réglages du texte d’exemple</string>
+    <string name="config_sample_auto_fill_title">Remplir automatiquement le texte d’exemple</string>
     <string name="config_demo_mode_title">Mode démo</string>
     <string name="config_demo_mode_subtitle">Affiche un retour tactile et des indications d’action pour l’enregistrement.</string>
     <string name="config_custom_brand_theme_import_title">Importer un dual-tone personnalisé</string>

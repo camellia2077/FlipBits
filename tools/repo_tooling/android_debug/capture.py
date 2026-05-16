@@ -104,7 +104,7 @@ def bool_extra(command: list[str], key: str, value: bool) -> None:
 
 
 def string_extra(command: list[str], key: str, value: str | None) -> None:
-    if value:
+    if value is not None:
         command.extend(["--es", key, value])
 
 

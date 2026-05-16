@@ -15,17 +15,11 @@ data class BrandThemeOption(
     val descriptionOverride: String? = null,
     val accessibilityLabelOverride: String? = null,
     val sampleFlavor: SampleFlavor,
-    val backgroundColor: Color,
-    val accentColor: Color,
+    val primaryColor: Color,
+    val secondaryColor: Color,
     val outlineColor: Color,
     val colorScheme: ColorScheme,
 ) {
     val isDarkTheme: Boolean
-        get() = backgroundColor.luminance() < 0.5f
-
-    val primaryColor: Color
-        get() = backgroundColor
-
-    val secondaryColor: Color
-        get() = accentColor
+        get() = primaryColor.luminance() < 0.5f
 }

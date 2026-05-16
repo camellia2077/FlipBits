@@ -47,7 +47,6 @@ internal class AudioSessionExportActions(
                 val result =
                     withContext(workerDispatcher) {
                         savedAudioRepository.exportGeneratedAudio(
-                            mode = current.transportMode,
                             inputText = session.inputText,
                             pcm = session.generatedPcm,
                             pcmFilePath = session.generatedPcmFilePath,

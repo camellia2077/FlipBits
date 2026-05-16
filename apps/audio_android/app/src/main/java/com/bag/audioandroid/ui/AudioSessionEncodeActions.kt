@@ -19,6 +19,7 @@ import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.WavAudioInfo
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.model.analyzeMorseText
@@ -91,7 +92,7 @@ internal class AudioSessionEncodeActions(
         val request = requestFactory.build(current)
         safeLogE(
             LONG_AUDIO_LOG_TAG,
-            "onEncode:start mode=${request.mode.wireName} chars=${request.inputText.length} payloadBytes=${request.payloadByteCount} frameSamples=${request.frameSamples} source=${current.currentPlaybackSource}",
+            "onEncode:start mode=${request.mode.wireName} chars=${request.inputText.length} encodeChars=${request.encodeText.length} payloadBytes=${request.payloadByteCount} frameSamples=${request.frameSamples} source=${current.currentPlaybackSource}",
         )
         stopPlayback()
         cancelFollowDataJob(request.mode)
@@ -231,27 +232,47 @@ private fun safeLogE(
 private class EncodeRequestFactory(
     private val defaultFrameSamples: Int,
 ) {
-    fun build(current: AudioAppUiState): EncodeRequest =
-        EncodeRequest(
-            mode = current.transportMode,
-            inputText = current.currentSession.inputText,
-            sampleInputId = current.currentSession.sampleInputId,
-            selectedFlashVoicingStyle = current.selectedFlashVoicingStyle,
-            flashPreset =
-                if (current.transportMode == TransportModeOption.Flash && current.isFlashVoicingEnabled) {
-                    current.selectedFlashVoicingStyle
-                } else {
-                    FlashVoicingStyleOption.Standard
-                },
-            frameSamples =
-                if (current.transportMode == TransportModeOption.Mini) {
-                    current.selectedMorseSpeed.frameSamples(defaultFrameSamples)
-                } else {
-                    defaultFrameSamples
-                },
-            appVersion = current.presentationVersion.ifBlank { "unknown" },
-            coreVersion = current.coreVersion.ifBlank { "unknown" },
-        )
+    fun build(current: AudioAppUiState): EncodeRequest {
+        val request =
+            EncodeRequest(
+                mode = current.transportMode,
+                inputText = current.currentSession.inputText,
+                encodeText =
+                    if (current.transportMode == TransportModeOption.Mini) {
+                        analyzeMorseText(current.currentSession.inputText).normalizedText
+                    } else {
+                        current.currentSession.inputText
+                    },
+                sampleInputId = current.currentSession.sampleInputId,
+                selectedFlashVoicingStyle = current.selectedFlashVoicingStyle,
+                flashPreset =
+                    if (current.transportMode == TransportModeOption.Flash && current.isFlashVoicingEnabled) {
+                        current.selectedFlashVoicingStyle
+                    } else {
+                        FlashVoicingStyleOption.Standard
+                    },
+                frameSamples =
+                    if (current.transportMode == TransportModeOption.Mini) {
+                        current.selectedMorseSpeed.frameSamples(defaultFrameSamples)
+                    } else {
+                        defaultFrameSamples
+                    },
+                appVersion = current.presentationVersion.ifBlank { "unknown" },
+                coreVersion = current.coreVersion.ifBlank { "unknown" },
+            )
+        if (request.mode == TransportModeOption.Mini) {
+            val morseAnalysis = analyzeMorseText(request.inputText)
+            safeLogE(
+                LONG_AUDIO_LOG_TAG,
+                "buildRequest:mini rawChars=${request.inputText.length} rawWhitespace=${request.inputText.count(Char::isWhitespace)} " +
+                    "normalizedChars=${morseAnalysis.normalizedText.length} " +
+                    "normalizedWhitespace=${morseAnalysis.normalizedText.count(Char::isWhitespace)} " +
+                    "encodeChars=${request.encodeText.length} " +
+                    "payloadBytes=${request.payloadByteCount} unsupported=${morseAnalysis.unsupportedCharacters.size}",
+            )
+        }
+        return request
+    }
 }
 
 private class EncodeRunner(
@@ -266,7 +287,7 @@ private class EncodeRunner(
             val payloadByteCount = request.payloadByteCount
             val validationIssue =
                 audioCodecGateway.validateEncodeRequest(
-                    request.inputText,
+                    request.encodeText,
                     sampleRateHz,
                     request.frameSamples,
                     request.mode.nativeValue,
@@ -297,7 +318,7 @@ private class EncodeRunner(
             when (
                 val gatewayResult =
                     audioCodecGateway.encodeTextToPcm(
-                        request.inputText,
+                        request.encodeText,
                         sampleRateHz,
                         request.frameSamples,
                         request.mode.nativeValue,
@@ -388,7 +409,7 @@ private class EncodeRunner(
             }
             val result =
                 audioCodecGateway.buildEncodeFollowData(
-                    request.inputText,
+                    request.encodeText,
                     sampleRateHz,
                     request.frameSamples,
                     request.mode.nativeValue,
@@ -435,7 +456,7 @@ private class EncodeRunner(
             } else {
                 val result =
                     audioCodecGateway.buildEncodeFollowData(
-                        request.inputText,
+                        request.encodeText,
                         sampleRateHz,
                         request.frameSamples,
                         request.mode.nativeValue,
@@ -457,7 +478,7 @@ private class EncodeRunner(
 
     private suspend fun encodeSegmented(request: EncodeRequest): EncodeResult {
         val maxPayloadBytes = segmentedPayloadByteLimit(request)
-        val segmentation = splitInputIntoPayloadSegments(request.inputText, maxPayloadBytes)
+        val segmentation = splitInputIntoPayloadSegments(request.encodeText, maxPayloadBytes)
         val segmentByteCounts = segmentation.segments.map { it.toByteArray(UTF_8).size }
         val segmentBytesSummary = segmentByteCounts.joinToString(prefix = "[", postfix = "]")
         safeLogE(
@@ -593,7 +614,7 @@ private class EncodeRunner(
             flashSignalInfo =
                 describeFlashSignalForRequest(
                     request,
-                    text = segmentation.segments.firstOrNull() ?: request.inputText,
+                    text = segmentation.segments.firstOrNull() ?: request.encodeText,
                 ),
             flashVisualTimelineSegments = flashVisualTimelineSegments,
         )
@@ -601,7 +622,7 @@ private class EncodeRunner(
 
     private fun describeFlashSignalForRequest(
         request: EncodeRequest,
-        text: String = request.inputText,
+        text: String = request.encodeText,
     ): FlashSignalInfo =
         if (request.mode == TransportModeOption.Flash) {
             audioCodecGateway.describeFlashSignal(
@@ -850,11 +871,18 @@ private class EncodeStateReducer(
             } else {
                 null
             }
+        val generatedMiniSpeedStyle =
+            if (request.mode == TransportModeOption.Mini && result.pcmSampleCount > 0) {
+                MorseSpeedOption.fromFrameSamples(request.frameSamples)
+            } else {
+                null
+            }
         val payloadByteCount = request.payloadByteCount
         val generatedMetadata =
             GeneratedAudioMetadata(
                 mode = request.mode,
                 flashVoicingStyle = generatedFlashStyle,
+                miniSpeedStyle = generatedMiniSpeedStyle,
                 createdAtIsoUtc = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString(),
                 durationMs = (result.pcmSampleCount.toLong() * 1000L) / sampleRateHz.toLong(),
                 sampleRateHz = sampleRateHz,
@@ -1088,6 +1116,7 @@ private fun FollowDataHydrationRequest.toFollowDataWindowSource(): FollowDataWin
 private data class EncodeRequest(
     val mode: TransportModeOption,
     val inputText: String,
+    val encodeText: String,
     val sampleInputId: String?,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption,
     val flashPreset: FlashVoicingStyleOption,
@@ -1099,12 +1128,7 @@ private data class EncodeRequest(
     val totalPcmSampleCount: Int = 0,
 ) {
     val payloadByteCount: Int
-        get() =
-            if (mode == TransportModeOption.Mini) {
-                analyzeMorseText(inputText).normalizedText.toByteArray(UTF_8).size
-            } else {
-                inputText.toByteArray(UTF_8).size
-            }
+        get() = encodeText.toByteArray(UTF_8).size
 }
 
 private sealed interface EncodeResult {

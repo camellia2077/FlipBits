@@ -1,12 +1,14 @@
 package com.bag.audioandroid.domain
 
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 
 data class GeneratedAudioMetadata(
     val version: Int = CURRENT_VERSION,
     val mode: TransportModeOption,
     val flashVoicingStyle: FlashVoicingStyleOption? = null,
+    val miniSpeedStyle: MorseSpeedOption? = null,
     // ISO-8601 UTC timestamp for when this PCM payload was generated.
     val createdAtIsoUtc: String,
     val durationMs: Long,
@@ -47,6 +49,6 @@ data class GeneratedAudioMetadata(
         get() = segmentCount > 1
 
     companion object {
-        const val CURRENT_VERSION = 6
+        const val CURRENT_VERSION = 7
     }
 }

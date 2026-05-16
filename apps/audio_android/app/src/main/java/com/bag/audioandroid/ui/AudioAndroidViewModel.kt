@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bag.audioandroid.BuildConfig
+import com.bag.audioandroid.R
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.data.SampleInputTextProvider
@@ -27,12 +28,15 @@ import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 
 class AudioAndroidViewModel(
     audioCodecGateway: AudioCodecGateway,
@@ -178,16 +182,22 @@ class AudioAndroidViewModel(
             AppLanguageOption.fromLanguageTags(
                 AppCompatDelegate.getApplicationLocales().toLanguageTags(),
             )
+        val initialSampleAutoFillEnabled = runBlocking { appSettingsRepository.isSampleAutoFillEnabled.first() }
+        val initialSampleDecorationEnabled = runBlocking { appSettingsRepository.isSampleDecorationEnabled.first() }
         uiStateFlow.update {
             it.copy(
                 selectedLanguage = selectedLanguage,
                 presentationVersion = BuildConfig.VERSION_NAME.ifBlank { "" },
                 coreVersion = coreVersion.ifBlank { "" },
+                isSampleAutoFillEnabled = initialSampleAutoFillEnabled,
+                isSampleDecorationEnabled = initialSampleDecorationEnabled,
                 sessions =
                     sampleInputSessionUpdater.initialize(
                         sessions = it.sessions,
                         language = selectedLanguage,
                         flavor = it.currentSampleFlavor,
+                        isSampleAutoFillEnabled = initialSampleAutoFillEnabled,
+                        isDecorationEnabled = initialSampleDecorationEnabled,
                     ),
                 currentPlaybackSource = AudioPlaybackSource.Generated(it.transportMode),
             )
@@ -246,6 +256,14 @@ class AudioAndroidViewModel(
         preferencesActions.onCustomBrandThemeDeleted(presetId)
     }
 
+    fun onCustomMaterialThemeSaved(settings: CustomBrandThemeSettings) {
+        preferencesActions.onCustomMaterialThemeSaved(settings)
+    }
+
+    fun onCreateCustomMaterialTheme() {
+        preferencesActions.onCreateCustomMaterialTheme()
+    }
+
     fun onCustomBrandThemesImported(settings: List<CustomBrandThemeSettings>) {
         preferencesActions.onCustomBrandThemesImported(settings)
     }
@@ -258,12 +276,48 @@ class AudioAndroidViewModel(
         preferencesActions.onConfigThemeAppearanceExpandedChanged(expanded)
     }
 
+    fun onConfigCustomBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigCustomBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigSampleTextExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigSampleTextExpandedChanged(expanded)
+    }
+
+    fun onConfigSacredMachineBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigSacredMachineBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigAncientDynastyBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigAncientDynastyBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigImmortalRotBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigImmortalRotBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigScarletCarnageBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigScarletCarnageBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigExquisiteFallBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigExquisiteFallBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigDebugExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigDebugExpandedChanged(expanded)
+    }
+
     fun onFlashVoicingStyleSelected(style: com.bag.audioandroid.ui.model.FlashVoicingStyleOption) {
         preferencesActions.onFlashVoicingStyleSelected(style)
     }
 
     fun onMorseSpeedSelected(speed: MorseSpeedOption) {
-        uiStateFlow.update { it.copy(selectedMorseSpeed = speed) }
+        preferencesActions.onMorseSpeedStyleSelected(speed)
     }
 
     fun onDemoModeEnabledChanged(enabled: Boolean) {
@@ -272,6 +326,10 @@ class AudioAndroidViewModel(
 
     fun onSampleDecorationEnabledChanged(enabled: Boolean) {
         preferencesActions.onSampleDecorationEnabledChanged(enabled)
+    }
+
+    fun onSampleAutoFillEnabledChanged(enabled: Boolean) {
+        preferencesActions.onSampleAutoFillEnabledChanged(enabled)
     }
 
     fun onFlashVisualPerfOverlayEnabledChanged(enabled: Boolean) {
@@ -357,6 +415,14 @@ class AudioAndroidViewModel(
     }
 
     fun onEncode() {
+        if (uiStateFlow.value.currentSession.inputText
+                .isEmpty()
+        ) {
+            navigationActions.showSnackbar(
+                UiText.Resource(R.string.audio_input_required_or_randomize),
+            )
+            return
+        }
         sessionActions.onEncode()
     }
 

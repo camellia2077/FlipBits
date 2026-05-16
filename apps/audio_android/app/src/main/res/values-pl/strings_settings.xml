@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Jak w systemie</string>
     <string name="config_theme_mode_light">Jasny</string>
     <string name="config_theme_mode_dark">Ciemny</string>
+    <string name="config_theme_mode_custom">Własny</string>
     <string name="config_theme_appearance_title">Wygląd motywu</string>
     <string name="config_theme_style_title">Styl motywu</string>
     <string name="config_theme_style_subtitle">Wybierz Material albo dual-tone.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">Wykwintny Upadek</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">Labirynt Zmienności</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Własny</string>
     <string name="palette_family_reds_pinks">Czerwienie i róże</string>
     <string name="palette_family_oranges">Pomarańcze</string>
     <string name="palette_family_yellows">Żółcie</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Dekoracja sample</string>
     <string name="config_sample_decoration_subtitle">Dodaj opcjonalne prefiksy do losowanego tekstu sample.</string>
+    <string name="config_sample_text_title">Tekst przykładowy</string>
+    <string name="config_sample_text_subtitle">Steruje tym, jak tekst przykładowy pojawia się w polu wejściowym.</string>
+    <string name="config_sample_auto_fill_subtitle">Wypełnia pole wejściowe losowym przykładem, gdy tekst przykładowy jest dostępny.</string>
+    <string name="config_sample_text_collapse">Zwiń ustawienia tekstu przykładowego</string>
+    <string name="config_sample_text_expand">Rozwiń ustawienia tekstu przykładowego</string>
+    <string name="config_sample_auto_fill_title">Automatycznie wypełniaj tekst przykładowy</string>
     <string name="config_demo_mode_title">Tryb demo</string>
     <string name="config_demo_mode_subtitle">Pokazuje efekt dotyku i podpowiedzi do nagrania.</string>
     <string name="config_custom_brand_theme_import_title">Importuj niestandardowy dual-tone</string>

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
@@ -49,6 +50,8 @@ internal fun BrandThemeSection(
     onExpandedChanged: (Boolean) -> Unit,
     onBrandThemeSelected: (BrandThemeOption) -> Unit,
     onEditBrandTheme: ((BrandThemeOption) -> Unit)? = null,
+    copyConfigLabel: String? = null,
+    onCopyConfig: ((BrandThemeOption) -> Unit)? = null,
     actionLabel: String? = null,
     onActionClick: (() -> Unit)? = null,
     iconActions: List<BrandThemeSectionIconAction> = emptyList(),
@@ -122,6 +125,8 @@ internal fun BrandThemeSection(
                 selected = option.id == selectedBrandTheme.id,
                 onClick = { onBrandThemeSelected(option) },
                 onEdit = onEditBrandTheme?.let { callback -> { callback(option) } },
+                copyConfigLabel = copyConfigLabel,
+                onCopyConfig = onCopyConfig?.let { callback -> { callback(option) } },
             )
         }
     }
@@ -141,6 +146,8 @@ internal fun BrandThemeRow(
     selected: Boolean,
     onClick: () -> Unit,
     onEdit: (() -> Unit)? = null,
+    copyConfigLabel: String? = null,
+    onCopyConfig: (() -> Unit)? = null,
 ) {
     val editContentDescription = stringResource(R.string.config_custom_brand_theme_edit)
     val optionTitle = option.titleOverride ?: stringResource(option.titleResId)
@@ -175,10 +182,10 @@ internal fun BrandThemeRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BrandThemePreview(
-                backgroundColor = option.backgroundColor,
-                accentColor = option.accentColor,
+                primaryColor = option.primaryColor,
+                secondaryColor = option.secondaryColor,
                 outlineColor = option.outlineColor,
-                textColor = option.accentColor,
+                textColor = option.secondaryColor,
                 contentDescription = optionAccessibility,
             )
             Column(
@@ -207,6 +214,16 @@ internal fun BrandThemeRow(
                         text = stringResource(R.string.config_palette_selected),
                     )
                 }
+                if (selected && copyConfigLabel != null && onCopyConfig != null) {
+                    TextButton(onClick = onCopyConfig) {
+                        Icon(
+                            imageVector = Icons.Rounded.ContentCopy,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Text(text = copyConfigLabel)
+                    }
+                }
                 if (onEdit != null) {
                     IconButton(
                         onClick = onEdit,
@@ -229,8 +246,8 @@ internal fun BrandThemeRow(
 
 @Composable
 internal fun BrandThemePreview(
-    backgroundColor: Color,
-    accentColor: Color,
+    primaryColor: Color,
+    secondaryColor: Color,
     outlineColor: Color,
     textColor: Color,
     contentDescription: String,
@@ -251,7 +268,7 @@ internal fun BrandThemePreview(
                     Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(backgroundColor),
+                        .background(primaryColor),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -266,7 +283,7 @@ internal fun BrandThemePreview(
                     Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(accentColor),
+                        .background(secondaryColor),
             )
         }
     }

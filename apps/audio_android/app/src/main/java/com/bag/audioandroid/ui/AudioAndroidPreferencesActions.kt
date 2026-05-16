@@ -6,14 +6,19 @@ import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.hasSameConfigAs
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.customBrandTheme
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.customMaterialPalette
+import com.bag.audioandroid.ui.theme.customMaterialPaletteId
+import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -39,6 +44,7 @@ internal class AudioAndroidPreferencesActions(
                         state.sessions,
                         language,
                         state.currentSampleFlavor,
+                        state.isSampleAutoFillEnabled,
                     ),
             )
         }
@@ -101,6 +107,60 @@ internal class AudioAndroidPreferencesActions(
         scope.launch {
             appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
             appSettingsRepository.setSelectedBrandThemeId(uiState.value.activeBrandTheme.id)
+        }
+    }
+
+    fun onCustomMaterialThemeSaved(settings: CustomBrandThemeSettings) {
+        uiState.update { state ->
+            val replacePresetId =
+                state.customMaterialThemePresets
+                    .firstOrNull { customMaterialPalette(it).id == state.selectedPalette.id }
+                    ?.presetId
+            val normalizedSettings =
+                normalizeCustomMaterialThemeSettings(
+                    settings.copy(presetId = replacePresetId ?: settings.presetId.ifBlank { UUID.randomUUID().toString() }),
+                )
+            val updatedPresets =
+                if (replacePresetId == null) {
+                    state.customMaterialThemePresets + normalizedSettings
+                } else {
+                    state.customMaterialThemePresets.map { preset ->
+                        if (preset.presetId == replacePresetId) {
+                            normalizedSettings
+                        } else {
+                            preset
+                        }
+                    }
+                }
+            state.copy(
+                customMaterialThemePresets = updatedPresets,
+                selectedPalette = customMaterialPalette(normalizedSettings),
+            )
+        }
+        scope.launch {
+            appSettingsRepository.setCustomMaterialThemePresets(uiState.value.customMaterialThemePresets)
+            appSettingsRepository.setSelectedPaletteId(uiState.value.selectedPalette.id)
+        }
+    }
+
+    fun onCreateCustomMaterialTheme() {
+        val nextIndex = uiState.value.customMaterialThemePresets.size + 1
+        val settings =
+            normalizeCustomMaterialThemeSettings(
+                DefaultCustomMaterialPaletteSettings.copy(
+                    presetId = UUID.randomUUID().toString(),
+                    displayName = "Custom $nextIndex",
+                ),
+            )
+        uiState.update { state ->
+            state.copy(
+                customMaterialThemePresets = state.customMaterialThemePresets + settings,
+                selectedPalette = customMaterialPalette(settings),
+            )
+        }
+        scope.launch {
+            appSettingsRepository.setCustomMaterialThemePresets(uiState.value.customMaterialThemePresets)
+            appSettingsRepository.setSelectedPaletteId(customMaterialPaletteId(settings.presetId))
         }
     }
 
@@ -187,6 +247,76 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
+    fun onMorseSpeedStyleSelected(speed: MorseSpeedOption) {
+        uiState.update { it.copy(selectedMorseSpeed = speed) }
+        scope.launch {
+            appSettingsRepository.setSelectedMorseSpeedStyleId(speed.id)
+        }
+    }
+
+    fun onConfigCustomBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigCustomBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigCustomBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigSampleTextExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigSampleTextExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigSampleTextExpanded(expanded)
+        }
+    }
+
+    fun onConfigSacredMachineBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigSacredMachineBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigSacredMachineBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigAncientDynastyBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigAncientDynastyBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigAncientDynastyBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigImmortalRotBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigImmortalRotBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigImmortalRotBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigScarletCarnageBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigScarletCarnageBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigScarletCarnageBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigExquisiteFallBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigExquisiteFallBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigExquisiteFallBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigLabyrinthOfMutabilityBrandThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigLabyrinthOfMutabilityBrandThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigDebugExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigDebugExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigDebugExpanded(expanded)
+        }
+    }
+
     fun onDemoModeEnabledChanged(enabled: Boolean) {
         uiState.update { it.copy(isDemoModeEnabled = enabled) }
         scope.launch {
@@ -200,6 +330,30 @@ internal class AudioAndroidPreferencesActions(
         }
         scope.launch {
             appSettingsRepository.setSampleDecorationEnabled(enabled)
+        }
+    }
+
+    fun onSampleAutoFillEnabledChanged(enabled: Boolean) {
+        uiState.update { state ->
+            val updatedSessions =
+                if (enabled) {
+                    sampleInputSessionUpdater.initialize(
+                        sessions = state.sessions,
+                        language = state.selectedLanguage,
+                        flavor = state.currentSampleFlavor,
+                        isSampleAutoFillEnabled = true,
+                        isDecorationEnabled = state.isSampleDecorationEnabled,
+                    )
+                } else {
+                    sampleInputSessionUpdater.clearAutoFilledSessions(state.sessions)
+                }
+            state.copy(
+                isSampleAutoFillEnabled = enabled,
+                sessions = updatedSessions,
+            )
+        }
+        scope.launch {
+            appSettingsRepository.setSampleAutoFillEnabled(enabled)
         }
     }
 

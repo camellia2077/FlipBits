@@ -13,6 +13,7 @@ import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.model.analyzeMorseText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.util.measureElapsedMs
 import kotlinx.coroutines.flow.StateFlow
@@ -86,7 +87,11 @@ internal class AudioDebugScenarioActions(
             return
         }
         if (scenario.scenario == FlashDebugScenarioKind.Ui) {
-            disableDebugUiOverlaysForLyricsMeasurement(logTag = MINI_AUTOMATION_TAG, requestId = scenario.requestId)
+            disableDebugUiOverlaysForLyricsMeasurement(
+                logTag = MINI_AUTOMATION_TAG,
+                requestId = scenario.requestId,
+                visualPerfOverlayEnabled = scenario.visualPerfOverlayEnabled,
+            )
         }
         applyLanguageOverride(
             languageOverride = scenario.languageOverride,
@@ -107,10 +112,15 @@ internal class AudioDebugScenarioActions(
         onTransportModeSelected(TransportModeOption.Mini)
         onMorseSpeedSelected(scenario.speed)
         onInputTextChange(input.text)
+        val morseAnalysis = analyzeMorseText(input.text)
         safeLogD(
             MINI_AUTOMATION_TAG,
             "inputResolved requestId=${scenario.requestId} source=${input.source} " +
                 "sampleId=${input.sampleId.orEmpty()} chars=${input.text.length} " +
+                "normalizedChars=${morseAnalysis.normalizedText.length} " +
+                "whitespaceChars=${input.text.count(Char::isWhitespace)} " +
+                "normalizedWhitespaceChars=${morseAnalysis.normalizedText.count(Char::isWhitespace)} " +
+                "unsupported=${morseAnalysis.unsupportedCharacters.size} " +
                 "language=${(scenario.languageOverride ?: uiState.value.selectedLanguage).languageTag}",
         )
         if (scenario.encode) {
@@ -133,11 +143,19 @@ internal class AudioDebugScenarioActions(
             onMorseSpeedSelected(scenario.speed)
         }
         applyInput(mode = scenario.mode, input = input)
+        val miniAnalysis =
+            input
+                .takeIf { scenario.mode == TransportModeOption.Mini }
+                ?.let { analyzeMorseText(it.text) }
         safeLogD(
             ENCODE_PROGRESS_AUTOMATION_TAG,
             "inputResolved requestId=${scenario.requestId} mode=${scenario.mode.wireName} " +
                 "source=${input.source} sampleId=${input.sampleId.orEmpty()} " +
                 "chars=${input.text.length} payloadBytes=${input.text.toByteArray(UTF_8).size} " +
+                "normalizedChars=${miniAnalysis?.normalizedText?.length ?: -1} " +
+                "normalizedPayloadBytes=${miniAnalysis?.normalizedText?.toByteArray(UTF_8)?.size ?: -1} " +
+                "whitespaceChars=${input.text.count(Char::isWhitespace)} " +
+                "normalizedWhitespaceChars=${miniAnalysis?.normalizedText?.count(Char::isWhitespace) ?: -1} " +
                 "repeat=${scenario.repeatCount} speed=${scenario.speed.id} " +
                 "language=${(scenario.languageOverride ?: uiState.value.selectedLanguage).languageTag}",
         )
@@ -289,7 +307,6 @@ internal class AudioDebugScenarioActions(
             }
             cacheWriter.finish()
             savedAudioRepository.exportGeneratedAudio(
-                mode = scenario.seedMode,
                 inputText = "saved perf ${scenario.seedDurationMs}ms",
                 pcm = shortArrayOf(),
                 pcmFilePath = cacheWriter.filePath,

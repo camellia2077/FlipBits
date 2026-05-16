@@ -21,11 +21,12 @@
     <string name="config_language_expand">展開語言設定</string>
     <string name="config_language_collapse">收合語言設定</string>
     <string name="config_theme_mode_title">主題模式</string>
-    <string name="config_theme_mode_subtitle">選擇系統、淺色或深色模式。</string>
+    <string name="config_theme_mode_subtitle">選擇系統、淺色或深色。</string>
     <string name="config_theme_mode_brand_fixed">Dual-tone 主題使用固定外觀。</string>
     <string name="config_theme_mode_follow_system">跟隨系統</string>
     <string name="config_theme_mode_light">淺色</string>
     <string name="config_theme_mode_dark">深色</string>
+    <string name="config_theme_mode_custom">自訂</string>
     <string name="config_theme_appearance_title">主題外觀</string>
     <string name="config_theme_style_title">主題樣式</string>
     <string name="config_theme_style_subtitle">選擇 Material 或 Dual-tone。</string>
@@ -47,6 +48,7 @@
     <string name="config_dual_tone_group_exquisite_fall">華麗墮落</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">變易迷宮</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">自訂</string>
     <string name="palette_family_reds_pinks">紅色與粉色</string>
     <string name="palette_family_oranges">橘色</string>
     <string name="palette_family_yellows">黃色</string>
@@ -181,6 +183,12 @@
 
     <string name="config_sample_decoration_title">Sample decoration</string>
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_text_title">示例文字</string>
+    <string name="config_sample_text_subtitle">控制示例文字如何出現在輸入欄中。</string>
+    <string name="config_sample_auto_fill_subtitle">當示例文字可用時，以隨機範例自動填入輸入欄。</string>
+    <string name="config_sample_text_collapse">收合示例文字設定</string>
+    <string name="config_sample_text_expand">展開示例文字設定</string>
+    <string name="config_sample_auto_fill_title">自動填入示例文字</string>
     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
     <string name="config_custom_brand_theme_import_title">匯入自訂 dual-tone</string>

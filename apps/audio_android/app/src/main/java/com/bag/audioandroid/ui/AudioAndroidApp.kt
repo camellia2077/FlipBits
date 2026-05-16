@@ -18,6 +18,7 @@ import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.screen.FlashAlignmentPerfTrace
 import com.bag.audioandroid.ui.screen.FlashVisualPerfTrace
+import com.bag.audioandroid.ui.screen.MiniVisualPerfTrace
 import com.bag.audioandroid.ui.screen.currentBitsText
 import com.bag.audioandroid.ui.screen.flashBitReadoutFrame
 import com.bag.audioandroid.ui.screen.previousBitsText
@@ -255,6 +256,9 @@ fun AudioAndroidApp(
             if (scenario.playDurationMs > 0L) {
                 delay(scenario.playDurationMs)
                 viewModel.stopPlayback()
+                MiniVisualPerfTrace.forceReport(
+                    "mini-playback-stop requestId=${scenario.requestId} playMs=${scenario.playDurationMs}",
+                )
             }
         }
     }

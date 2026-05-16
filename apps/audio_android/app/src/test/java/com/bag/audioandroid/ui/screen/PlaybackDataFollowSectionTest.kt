@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -145,7 +146,8 @@ class PlaybackDataFollowSectionTest {
         composeRule.onNodeWithText(string(R.string.audio_follow_view_morse)).assertIsDisplayed()
         composeRule.onAllNodesWithText(string(R.string.audio_follow_view_hex)).assertCountEquals(0)
         composeRule.onAllNodesWithText(string(R.string.audio_follow_view_binary)).assertCountEquals(0)
-        composeRule.onNodeWithText("-...").assertIsDisplayed()
+        composeRule.onNodeWithTag("follow-token-strip").assertIsDisplayed()
+        composeRule.onNodeWithText("BELL").assertIsDisplayed()
     }
 
     @Test
@@ -237,7 +239,27 @@ class PlaybackDataFollowSectionTest {
             .performClick()
 
         composeRule.onNodeWithTag("follow-tokenizer-sheet").assertIsDisplayed()
-        composeRule.onNodeWithTag("follow-tokenizer-card-0", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag("follow-tokenizer-card-1", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `tokenizer opens on the currently playing token`() {
+        composeRule.setContent {
+            PlaybackDataFollowSection(
+                followData = longTokenizerFollowData(),
+                displayedSamples = 41,
+                transportMode = TransportModeOption.Flash,
+            )
+        }
+
+        composeRule
+            .onNodeWithContentDescription(string(R.string.audio_action_open_tokenizer))
+            .performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag("follow-tokenizer-sheet").assertIsDisplayed()
+        composeRule.onNodeWithTag("follow-tokenizer-card-0", useUnmergedTree = true).assertIsNotDisplayed()
+        composeRule.onNodeWithTag("follow-tokenizer-card-10", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -1156,4 +1178,42 @@ class PlaybackDataFollowSectionTest {
             textFollowAvailable = true,
             followAvailable = true,
         )
+
+    private fun longTokenizerFollowData(): PayloadFollowViewData {
+        val tokens = List(12) { index -> "TOKEN-$index" }
+        val timeline =
+            tokens.mapIndexed { index, _ ->
+                TextFollowTimelineEntry(
+                    startSample = index * 4,
+                    sampleCount = 4,
+                    tokenIndex = index,
+                )
+            }
+        val rawDisplayUnits =
+            tokens.mapIndexed { index, token ->
+                val suffix = index.toString(16).uppercase()
+                TextFollowRawDisplayUnitViewData(
+                    tokenIndex = index,
+                    startSample = index * 4,
+                    sampleCount = 4,
+                    byteIndexWithinToken = 0,
+                    byteOffset = index,
+                    byteCount = 1,
+                    hexText = "4$suffix",
+                    binaryText =
+                        token
+                            .first()
+                            .code
+                            .toString(2)
+                            .padStart(8, '0'),
+                )
+            }
+        return PayloadFollowViewData(
+            textTokens = tokens,
+            textTokenTimeline = timeline,
+            textRawDisplayUnits = rawDisplayUnits,
+            textFollowAvailable = true,
+            followAvailable = true,
+        )
+    }
 }

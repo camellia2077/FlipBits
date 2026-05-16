@@ -12,18 +12,18 @@ fun List<CustomBrandThemeSettings>.toBatchConfigText(): String =
 
 private fun StringBuilder.appendThemeBlock(settings: CustomBrandThemeSettings) {
     appendLine("name=${settings.displayName.trim()}")
-    appendLine("primary=${settings.backgroundHex.toExportHex()}")
-    appendLine("secondary=${settings.accentHex.toExportHex()}")
+    appendLine("primary=${settings.primaryHex.toExportHex()}")
+    appendLine("secondary=${settings.secondaryHex.toExportHex()}")
     appendLine("outline=${settings.outlineHexOrNull?.toExportHex().orEmpty()}")
 }
 
 private fun parseCustomBrandThemeBlock(values: Map<String, String>): CustomBrandThemeConfigParseResult {
     val name = values["name"]?.trim().orEmpty()
-    val background = normalizeBrandThemeHex(values["primary"].orEmpty())
-    val accent = normalizeBrandThemeHex(values["secondary"].orEmpty())
+    val primary = normalizeBrandThemeHex(values["primary"].orEmpty())
+    val secondary = normalizeBrandThemeHex(values["secondary"].orEmpty())
     val outlineRaw = values["outline"].orEmpty()
     val outline = normalizeBrandThemeHexOrNull(outlineRaw)
-    val hasInvalidRequiredFields = name.isBlank() || background == null || accent == null
+    val hasInvalidRequiredFields = name.isBlank() || primary == null || secondary == null
     val hasInvalidOutline = outlineRaw.isNotBlank() && outline == null
     if (hasInvalidRequiredFields || hasInvalidOutline) {
         return CustomBrandThemeConfigParseResult.Invalid
@@ -31,8 +31,8 @@ private fun parseCustomBrandThemeBlock(values: Map<String, String>): CustomBrand
     return CustomBrandThemeConfigParseResult.Valid(
         CustomBrandThemeSettings(
             displayName = name,
-            backgroundHex = background,
-            accentHex = accent,
+            primaryHex = primary,
+            secondaryHex = secondary,
             outlineHexOrNull = outline,
         ),
     )
@@ -98,8 +98,8 @@ fun parseCustomBrandThemeConfig(text: String): CustomBrandThemeConfigParseResult
 
 fun CustomBrandThemeSettings.hasSameConfigAs(other: CustomBrandThemeSettings): Boolean =
     displayName.trim() == other.displayName.trim() &&
-        backgroundHex.equals(other.backgroundHex, ignoreCase = true) &&
-        accentHex.equals(other.accentHex, ignoreCase = true) &&
+        primaryHex.equals(other.primaryHex, ignoreCase = true) &&
+        secondaryHex.equals(other.secondaryHex, ignoreCase = true) &&
         (outlineHexOrNull ?: "").equals(other.outlineHexOrNull ?: "", ignoreCase = true)
 
 sealed interface CustomBrandThemeConfigParseResult {

@@ -8,11 +8,7 @@ import com.bag.audioandroid.domain.AudioExportGateway
 import com.bag.audioandroid.domain.AudioExportResult
 import com.bag.audioandroid.domain.AudioIoGateway
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
-import com.bag.audioandroid.ui.model.TransportModeOption
 import java.io.IOException
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class MediaStoreAudioExportGateway(
     context: Context,
@@ -21,12 +17,11 @@ class MediaStoreAudioExportGateway(
     private val contentResolver = context.contentResolver
 
     override fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
-    ): String = buildBaseName(mode, inputText)
+        metadata: GeneratedAudioMetadata,
+    ): String = buildBaseName(inputText, metadata)
 
     override fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -38,7 +33,7 @@ class MediaStoreAudioExportGateway(
             return AudioExportResult.Failed
         }
 
-        val baseName = buildBaseName(mode, inputText)
+        val baseName = buildBaseName(inputText, metadata)
         val displayName = resolveUniqueDisplayName(baseName) ?: return AudioExportResult.Failed
         val collection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
         val contentValues =
@@ -86,7 +81,6 @@ class MediaStoreAudioExportGateway(
     }
 
     override fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -125,18 +119,26 @@ class MediaStoreAudioExportGateway(
     }
 
     private fun buildBaseName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String {
-        val timestamp = LocalDateTime.now().format(FILE_NAME_TIME_FORMATTER)
         val previewStem = buildPreviewStem(inputText)
-        val stem =
-            if (previewStem.isEmpty()) {
-                "flipbits_${mode.wireName}_$timestamp"
-            } else {
-                "${previewStem}_${mode.wireName}_$timestamp"
+        val sanitizedPreviewStem = previewStem.ifEmpty { "audio" }
+        val styleSegment =
+            when (metadata.mode.wireName) {
+                "flash" ->
+                    metadata.flashVoicingStyle
+                        ?.id
+                        ?.let { "[$it]" }
+                        .orEmpty()
+                "mini" ->
+                    metadata.miniSpeedStyle
+                        ?.id
+                        ?.let { "[$it]" }
+                        .orEmpty()
+                else -> ""
             }
-        return "$stem.wav"
+        return "${metadata.mode.wireName}$styleSegment" + "_$sanitizedPreviewStem.wav"
     }
 
     private fun buildPreviewStem(inputText: String): String {
@@ -207,8 +209,6 @@ class MediaStoreAudioExportGateway(
         const val RELATIVE_DIRECTORY = "Music/FlipBits"
         const val RELATIVE_PATH_PREFIX = "Music/FlipBits%"
         const val ILLEGAL_FILE_NAME_CHARACTERS = "\\/:*?\"<>|"
-        val FILE_NAME_TIME_FORMATTER: DateTimeFormatter =
-            DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss", Locale.US)
         val WHITESPACE_REGEX = Regex("\\s+")
     }
 }

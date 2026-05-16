@@ -202,13 +202,13 @@ internal fun DrawScope.drawPitchSegments(
     val edgeFadeSamples = if (enableViewportEdgeFade) edgeFadeSampleCount(segments, viewport) else 0f
 
     drawLine(
-        color = centerLineColor.copy(alpha = 0.48f),
+        color = centerLineColor.copy(alpha = 0.20f),
         start = Offset(leftPadding, highY),
         end = Offset(leftPadding + innerWidth, highY),
         strokeWidth = 1.dp.toPx(),
     )
     drawLine(
-        color = centerLineColor.copy(alpha = 0.48f),
+        color = centerLineColor.copy(alpha = 0.20f),
         start = Offset(leftPadding, lowY),
         end = Offset(leftPadding + innerWidth, lowY),
         strokeWidth = 1.dp.toPx(),
@@ -474,13 +474,13 @@ internal fun DrawScope.drawPitch(
     val pointRadius = (bucketWidth * 0.34f).coerceIn(1.6f, 4.8f)
 
     drawLine(
-        color = centerLineColor.copy(alpha = 0.48f),
+        color = centerLineColor.copy(alpha = 0.20f),
         start = Offset(leftPadding, highY),
         end = Offset(leftPadding + innerWidth, highY),
         strokeWidth = 1.dp.toPx(),
     )
     drawLine(
-        color = centerLineColor.copy(alpha = 0.48f),
+        color = centerLineColor.copy(alpha = 0.20f),
         start = Offset(leftPadding, lowY),
         end = Offset(leftPadding + innerWidth, lowY),
         strokeWidth = 1.dp.toPx(),

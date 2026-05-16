@@ -7,6 +7,24 @@ import org.junit.Test
 
 class AudioInputEncodingAnalysisTest {
     @Test
+    fun `morse analysis keeps a single space input valid`() {
+        val analysis = analyzeMorseText(" ")
+
+        assertTrue(analysis.isValid)
+        assertEquals(" ", analysis.normalizedText)
+        assertEquals("", analysis.morseNotation)
+    }
+
+    @Test
+    fun `morse analysis keeps newline only input valid`() {
+        val analysis = analyzeMorseText("\n\n")
+
+        assertTrue(analysis.isValid)
+        assertEquals(" ", analysis.normalizedText)
+        assertEquals("", analysis.morseNotation)
+    }
+
+    @Test
     fun `mini accepts morse compatible input and normalizes it`() {
         val analysis = analyzeAudioInputEncoding(TransportModeOption.Mini, "praise   1")
 

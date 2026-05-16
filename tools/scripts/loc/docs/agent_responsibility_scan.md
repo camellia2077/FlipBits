@@ -22,7 +22,8 @@ When an agent reads one matched file entry, use this order:
 2. `summary`
 3. `dominant_risks`
 4. `suggestion`
-5. the detailed counts
+5. `lines`
+6. the detailed counts
 
 This order matters.
 
@@ -30,6 +31,7 @@ This order matters.
 - `summary` tells you the mixed-responsibility shape in plain language
 - `dominant_risks` tells you which category is driving the warning
 - `suggestion` gives a safe first split direction
+- `lines` keeps the file-size signal visible without letting it dominate the diagnosis
 - the counts are supporting evidence only
 
 ## Field Meaning

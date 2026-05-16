@@ -1,7 +1,5 @@
 package com.bag.audioandroid.domain
 
-import com.bag.audioandroid.ui.model.TransportModeOption
-
 sealed interface AudioExportResult {
     data class Success(
         val displayName: String,
@@ -13,12 +11,11 @@ sealed interface AudioExportResult {
 
 interface AudioExportGateway {
     fun suggestGeneratedAudioDisplayName(
-        mode: TransportModeOption,
         inputText: String,
+        metadata: GeneratedAudioMetadata,
     ): String
 
     fun exportGeneratedAudio(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,
@@ -27,7 +24,6 @@ interface AudioExportGateway {
     ): AudioExportResult
 
     fun exportGeneratedAudioToDocument(
-        mode: TransportModeOption,
         inputText: String,
         pcm: ShortArray,
         pcmFilePath: String?,

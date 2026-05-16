@@ -15,15 +15,15 @@ If the task is only key existence/alignment, run `key-alignment` first and follo
 1. Discover available commands:
 
 ```powershell
-python tools/scripts/android/translate/run.py --help
+python tools/run.py android-translate --help
 ```
 
 2. Discover available dimensions before running scoped jobs:
 
 ```powershell
-python tools/scripts/android/translate/run.py list-text-types
-python tools/scripts/android/translate/run.py list-groups --text-type sample_text
-python tools/scripts/android/translate/run.py list-langs
+python tools/run.py android-translate list-text-types
+python tools/run.py android-translate list-groups --text-type sample_text
+python tools/run.py android-translate list-langs
 ```
 
 ## Process
@@ -31,13 +31,13 @@ python tools/scripts/android/translate/run.py list-langs
 1. Optional: generate low-markup EN/localized text inspection files:
 
 ```powershell
-python tools/scripts/android/translate/run.py dump-xml-md --lang ko --text-type sample_text --group sacred_machine --with-en --output-dir temp/agent_jobs/job_001/inspect
+python tools/run.py android-translate dump-xml-md --lang ko --text-type sample_text --group sacred_machine --with-en --output-dir temp/agent_jobs/job_001/inspect
 ```
 
 2. Generate scoped compare artifacts for translation review:
 
 ```powershell
-python tools/scripts/android/translate/run.py compare --lang ko --text-type sample_text --group sacred_machine --prompt-mode agent_json --output-dir temp/agent_jobs/job_001/reviews --job-dir temp/agent_jobs/job_001 --no-clean --json-output
+python tools/run.py android-translate compare --lang ko --text-type sample_text --group sacred_machine --prompt-mode agent_json --output-dir temp/agent_jobs/job_001/reviews --job-dir temp/agent_jobs/job_001 --no-clean --json-output
 ```
 
 3. Read task artifacts in this order:
@@ -50,20 +50,20 @@ python tools/scripts/android/translate/run.py compare --lang ko --text-type samp
 5. Convert suggestions into minimal replacements:
 
 ```powershell
-python tools/scripts/android/translate/run.py build-replacements --input temp/agent_jobs/job_001/suggestions.json --output temp/agent_jobs/job_001/replacements.json --json-output
+python tools/run.py android-translate build-replacements --input temp/agent_jobs/job_001/suggestions.json --output temp/agent_jobs/job_001/replacements.json --json-output
 ```
 
 6. Apply replacements and capture result:
 
 ```powershell
-python tools/scripts/android/translate/run.py replace --json temp/agent_jobs/job_001/replacements.json --summary-out temp/agent_jobs/job_001/replace_result.json --job-dir temp/agent_jobs/job_001 --json-output
+python tools/run.py android-translate replace --json temp/agent_jobs/job_001/replacements.json --summary-out temp/agent_jobs/job_001/replace_result.json --job-dir temp/agent_jobs/job_001 --json-output
 ```
 
-7. Re-run validation:
+7. Re-run translation validation:
 
 ```powershell
-python tools/scripts/android/translate/run.py key-alignment --json-output
-python tools/scripts/android/translate/run.py fix-resource-escapes --json-output
+python tools/run.py android-translate key-alignment --json-output
+python tools/run.py android-translate fix-resource-escapes --json-output
 ```
 
 ## Notes

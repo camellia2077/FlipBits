@@ -23,6 +23,7 @@ internal fun AudioAppUiState.withSelectedBrandTheme(
                 sessions = sessions,
                 language = selectedLanguage,
                 newFlavor = newFlavor,
+                isSampleAutoFillEnabled = isSampleAutoFillEnabled,
             )
         } else {
             sessions
@@ -47,6 +48,7 @@ internal fun AudioAppUiState.withSelectedThemeStyle(
                 sessions = sessions,
                 language = selectedLanguage,
                 newFlavor = newFlavor,
+                isSampleAutoFillEnabled = isSampleAutoFillEnabled,
             )
         } else {
             sessions

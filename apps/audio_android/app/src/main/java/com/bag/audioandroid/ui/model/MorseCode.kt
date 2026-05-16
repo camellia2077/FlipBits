@@ -1,16 +1,19 @@
 package com.bag.audioandroid.ui.model
 
+import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.bag.audioandroid.R
 
+@Keep
 enum class MorseSpeedOption(
+    val id: String,
     @param:StringRes val labelResId: Int,
     private val frameSampleNumerator: Int,
     private val frameSampleDenominator: Int,
 ) {
-    Slow(R.string.audio_morse_speed_slow, 3, 2),
-    Standard(R.string.audio_morse_speed_standard, 1, 1),
-    Fast(R.string.audio_morse_speed_fast, 1, 2),
+    Slow("slow", R.string.audio_morse_speed_slow, 3, 2),
+    Standard("standard", R.string.audio_morse_speed_standard, 1, 1),
+    Fast("fast", R.string.audio_morse_speed_fast, 1, 2),
     ;
 
     fun frameSamples(defaultFrameSamples: Int): Int =
@@ -26,6 +29,8 @@ enum class MorseSpeedOption(
             entries.minBy { option ->
                 kotlin.math.abs(option.frameSamples(defaultFrameSamples) - frameSamples)
             }
+
+        fun fromId(id: String?): MorseSpeedOption = entries.firstOrNull { it.id == id } ?: default
     }
 }
 
@@ -38,21 +43,27 @@ internal data class MorseTextAnalysis(
 
     val morseNotation: String
         get() =
-            normalizedText
-                .split(' ')
-                .joinToString(" / ") { word ->
-                    word.mapNotNull(::morsePatternForChar).joinToString(" ")
-                }
+            if (normalizedText.isBlank()) {
+                ""
+            } else {
+                normalizedText
+                    .split(' ')
+                    .joinToString(" / ") { word ->
+                        word.mapNotNull(::morsePatternForChar).joinToString(" ")
+                    }
+            }
 }
 
 internal fun analyzeMorseText(text: String): MorseTextAnalysis {
     val unsupported = linkedSetOf<Char>()
     val normalized = StringBuilder(text.length)
     var previousWasSpace = false
+    var sawWhitespace = false
 
     text.forEach { raw ->
         val ch = raw.uppercaseChar()
-        if (ch == ' ') {
+        if (raw.isWhitespace()) {
+            sawWhitespace = true
             if (!previousWasSpace && normalized.isNotEmpty()) {
                 normalized.append(' ')
             }
@@ -68,6 +79,9 @@ internal fun analyzeMorseText(text: String): MorseTextAnalysis {
     }
     while (normalized.isNotEmpty() && normalized.last() == ' ') {
         normalized.deleteAt(normalized.lastIndex)
+    }
+    if (normalized.isEmpty() && sawWhitespace) {
+        normalized.append(' ')
     }
 
     return MorseTextAnalysis(

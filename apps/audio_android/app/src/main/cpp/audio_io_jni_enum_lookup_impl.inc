@@ -28,6 +28,36 @@ jobject FindFlashStyleById(JNIEnv* env, jobjectArray flash_entries, const char* 
     return nullptr;
 }
 
+jobject FindMorseSpeedById(JNIEnv* env, jobjectArray morse_speed_entries, const char* target_id) {
+    if (morse_speed_entries == nullptr || target_id == nullptr) {
+        return nullptr;
+    }
+    jclass morse_speed_class = env->FindClass("com/bag/audioandroid/ui/model/MorseSpeedOption");
+    if (morse_speed_class == nullptr) {
+        return nullptr;
+    }
+    jmethodID get_id = env->GetMethodID(
+        morse_speed_class,
+        "getId",
+        "()Ljava/lang/String;");
+    if (get_id == nullptr) {
+        return nullptr;
+    }
+    const jsize count = env->GetArrayLength(morse_speed_entries);
+    for (jsize index = 0; index < count; ++index) {
+        jobject entry = env->GetObjectArrayElement(morse_speed_entries, index);
+        if (entry == nullptr) {
+            continue;
+        }
+        jstring id = static_cast<jstring>(env->CallObjectMethod(entry, get_id));
+        const std::string id_text = JStringToStdString(env, id);
+        if (id_text == target_id) {
+            return entry;
+        }
+    }
+    return nullptr;
+}
+
 jobject FindTransportModeByWireName(JNIEnv* env, jobjectArray transport_entries, const char* target_wire_name) {
     if (transport_entries == nullptr || target_wire_name == nullptr) {
         return nullptr;
@@ -124,6 +154,34 @@ audio_io_metadata_flash_voicing_style MapFlashVoicingStyle(JNIEnv* env, jobject 
         return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID;
     }
     return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_UNKNOWN;
+}
+
+audio_io_metadata_mini_speed_style MapMiniSpeedStyle(JNIEnv* env, jobject mini_speed_object) {
+    if (mini_speed_object == nullptr) {
+        return AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;
+    }
+
+    jclass mini_speed_class = env->FindClass("com/bag/audioandroid/ui/model/MorseSpeedOption");
+    jmethodID get_id = env->GetMethodID(
+        mini_speed_class,
+        "getId",
+        "()Ljava/lang/String;");
+    if (get_id == nullptr) {
+        return AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;
+    }
+
+    jstring speed_id = static_cast<jstring>(env->CallObjectMethod(mini_speed_object, get_id));
+    const std::string speed_id_text = JStringToStdString(env, speed_id);
+    if (speed_id_text == "slow") {
+        return AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW;
+    }
+    if (speed_id_text == "standard") {
+        return AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD;
+    }
+    if (speed_id_text == "fast") {
+        return AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST;
+    }
+    return AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;
 }
 
 audio_io_metadata_input_source_kind MapInputSourceKind(JNIEnv* env, jobject input_source_object) {

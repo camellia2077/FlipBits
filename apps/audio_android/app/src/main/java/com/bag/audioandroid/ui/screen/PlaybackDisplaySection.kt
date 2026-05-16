@@ -354,7 +354,11 @@ private fun PlaybackVisualizationContent(
                 followData = followData,
                 displayedSamples = displayedSamples,
                 frameSamples = frameSamples,
+                sampleRateHz = sampleRateHz,
                 isPlaying = isPlaying,
+                playbackSpeed = playbackSpeed,
+                isScrubbing = isScrubbing,
+                showPerfOverlay = isFlashVisualPerfOverlayEnabled,
                 modifier = Modifier.fillMaxWidth(),
             )
     }

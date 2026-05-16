@@ -1,6 +1,7 @@
 package com.bag.audioandroid.domain
 
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 
 data class SavedAudioItem(
     val itemId: String,
@@ -13,6 +14,7 @@ data class SavedAudioItem(
     // Preserves the original render timestamp from generated-audio metadata when the file carries it.
     val generatedAtEpochSeconds: Long? = null,
     val flashVoicingStyle: FlashVoicingStyleOption? = null,
+    val miniSpeedStyle: MorseSpeedOption? = null,
     // Saved/detail surfaces use this to explain the actual render rate that produced the file.
     val sampleRateHz: Int? = null,
     // Distinguishes hand-entered text from built-in sample text so saved audio provenance stays visible.

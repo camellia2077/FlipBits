@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Як у системі</string>
     <string name="config_theme_mode_light">Світла</string>
     <string name="config_theme_mode_dark">Темна</string>
+    <string name="config_theme_mode_custom">Власна</string>
     <string name="config_theme_appearance_title">Вигляд теми</string>
     <string name="config_theme_style_title">Стиль теми</string>
     <string name="config_theme_style_subtitle">Виберіть Material або dual-tone.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">Exquisite Fall</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">The Labyrinth of Mutability</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Власна</string>
     <string name="palette_family_reds_pinks">Червоні та рожеві</string>
     <string name="palette_family_oranges">Помаранчеві</string>
     <string name="palette_family_yellows">Жовті</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Sample decoration</string>
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_text_title">Sample text</string>
+    <string name="config_sample_text_subtitle">Control how example text appears in the input field.</string>
+    <string name="config_sample_auto_fill_subtitle">Fill the input field with a randomized example when sample text is available.</string>
+    <string name="config_sample_text_collapse">Collapse sample text settings</string>
+    <string name="config_sample_text_expand">Expand sample text settings</string>
+    <string name="config_sample_auto_fill_title">Auto-fill sample text</string>
     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
     <string name="config_custom_brand_theme_import_title">Імпорт власного dual-tone</string>

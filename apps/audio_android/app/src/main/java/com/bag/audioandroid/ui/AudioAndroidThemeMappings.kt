@@ -53,7 +53,7 @@ internal fun playerSegmentedButtonColors() =
         activeBorderColor = MaterialTheme.colorScheme.primary,
         inactiveContainerColor = appThemeVisualTokens().segmentedInactiveContainerColor,
         inactiveContentColor = appThemeVisualTokens().segmentedInactiveContentColor,
-        inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
+        inactiveBorderColor = appThemeVisualTokens().subtleOutlineColor,
     )
 
 @Composable
@@ -67,7 +67,7 @@ internal fun appSegmentedButtonColors() =
         activeBorderColor = MaterialTheme.colorScheme.primary,
         inactiveContainerColor = appThemeVisualTokens().segmentedInactiveContainerColor,
         inactiveContentColor = appThemeVisualTokens().segmentedInactiveContentColor,
-        inactiveBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.42f),
+        inactiveBorderColor = appThemeVisualTokens().subtleOutlineColor,
     )
 
 @Composable
@@ -135,16 +135,16 @@ internal fun navigationBarItemColors(uiState: AudioAppUiState): NavigationBarIte
             // making the flipped selection (with its accent indicator) much more prominent.
             val unselectedDualToneForeground =
                 lerp(
-                    brandTheme.accentColor,
-                    brandTheme.backgroundColor,
+                    brandTheme.secondaryColor,
+                    brandTheme.primaryColor,
                     0.42f,
                 )
             NavigationBarItemDefaults.colors(
                 // Dual-tone navigation keeps selected/unselected states on the original
                 // paired colors instead of relying on Material's derived alpha variants.
-                selectedIconColor = brandTheme.backgroundColor,
-                selectedTextColor = brandTheme.accentColor,
-                indicatorColor = brandTheme.accentColor,
+                selectedIconColor = brandTheme.primaryColor,
+                selectedTextColor = brandTheme.secondaryColor,
+                indicatorColor = brandTheme.secondaryColor,
                 unselectedIconColor = unselectedDualToneForeground,
                 unselectedTextColor = unselectedDualToneForeground,
             )

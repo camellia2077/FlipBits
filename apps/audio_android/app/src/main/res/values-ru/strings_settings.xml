@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Как в системе</string>
     <string name="config_theme_mode_light">Светлая</string>
     <string name="config_theme_mode_dark">Тёмная</string>
+    <string name="config_theme_mode_custom">Своя</string>
     <string name="config_theme_appearance_title">Внешний вид темы</string>
     <string name="config_theme_style_title">Стиль темы</string>
     <string name="config_theme_style_subtitle">Выберите Material или Dual-tone.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">Изысканное Падение</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">Лабиринт Изменчивости</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Своя</string>
     <string name="palette_family_reds_pinks">Красные и розовые</string>
     <string name="palette_family_oranges">Оранжевые</string>
     <string name="palette_family_yellows">Жёлтые</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Оформление sample-текста</string>
     <string name="config_sample_decoration_subtitle">Добавляет необязательные префиксные маркеры к случайному sample-тексту.</string>
+    <string name="config_sample_text_title">Пример текста</string>
+    <string name="config_sample_text_subtitle">Управляет тем, как пример текста появляется в поле ввода.</string>
+    <string name="config_sample_auto_fill_subtitle">Заполняет поле ввода случайным примером, когда пример текста доступен.</string>
+    <string name="config_sample_text_collapse">Свернуть настройки примера текста</string>
+    <string name="config_sample_text_expand">Развернуть настройки примера текста</string>
+    <string name="config_sample_auto_fill_title">Автозаполнение примером текста</string>
     <string name="config_demo_mode_title">Демо-режим</string>
     <string name="config_demo_mode_subtitle">Показывает отклик касаний и подсказки действий для записи.</string>
     <string name="config_custom_brand_theme_import_title">Импорт пользовательского dual-tone</string>

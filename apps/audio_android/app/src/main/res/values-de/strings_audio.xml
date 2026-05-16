@@ -37,6 +37,7 @@
     <string name="audio_decode_busy_reason_generated">Aktuelles Audio wird gelesen</string>
     <string name="audio_decode_busy_reason_saved">Gespeichertes Audio wird gelesen</string>
     <string name="audio_action_randomize_sample_input">Zufallsbeispiel</string>
+    <string name="audio_input_required_or_randomize">Gib Text ein oder nutze das Zufallsbeispiel.</string>
     <string name="audio_action_open_input_editor">Editor öffnen</string>
     <string name="audio_sample_length_short">Kurz</string>
     <string name="audio_sample_length_long">Lang</string>
@@ -70,6 +71,10 @@
     <string name="audio_flash_voicing_style_title">Stimmstil</string>
     <string name="audio_action_select_flash_voicing_style">Stimmstil auswählen</string>
     <string name="audio_flash_voicing_style_sheet_title">Stimmstil</string>
+    <string name="audio_mini_speed_style_title">Geschwindigkeitsstil</string>
+    <string name="audio_action_select_mini_speed_style">Geschwindigkeitsstil auswählen</string>
+    <string name="audio_mini_speed_style_hint">Gilt für das nächste erstellte Audio. Bereits erzeugtes Audio behält den Stil, mit dem es erstellt wurde.</string>
+    <string name="audio_mini_speed_style_sheet_title">Geschwindigkeitsstil</string>
     <string name="audio_saved_audio_sheet_title">Gespeichertes Audio</string>
     <string name="audio_saved_audio_empty">Noch kein Audio gespeichert.</string>
     <string name="audio_mini_player_generated_title">Erstelltes %1$s-Audio</string>

@@ -28,8 +28,10 @@ import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.screen.LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
 import com.bag.audioandroid.ui.screen.formatDurationMillis
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
+import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
 
 data class AudioAppUiState(
@@ -40,15 +42,26 @@ data class AudioAppUiState(
     val presentationVersion: String = "",
     val coreVersion: String = "",
     val selectedPalette: PaletteOption = DefaultMaterialPalette,
+    val customMaterialThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomMaterialPaletteSettings),
     val selectedBrandTheme: BrandThemeOption = DefaultBrandTheme,
     val customBrandThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomBrandThemeSettings),
     val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.BrandDualTone,
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
     val isDemoModeEnabled: Boolean = false,
+    val isSampleAutoFillEnabled: Boolean = true,
     val isSampleDecorationEnabled: Boolean = true,
     val isFlashVisualPerfOverlayEnabled: Boolean = false,
     val isConfigLanguageExpanded: Boolean = true,
     val isConfigThemeAppearanceExpanded: Boolean = true,
+    val isConfigSampleTextExpanded: Boolean = false,
+    val isConfigCustomBrandThemeExpanded: Boolean = false,
+    val isConfigSacredMachineBrandThemeExpanded: Boolean = false,
+    val isConfigAncientDynastyBrandThemeExpanded: Boolean = false,
+    val isConfigImmortalRotBrandThemeExpanded: Boolean = false,
+    val isConfigScarletCarnageBrandThemeExpanded: Boolean = false,
+    val isConfigExquisiteFallBrandThemeExpanded: Boolean = false,
+    val isConfigLabyrinthOfMutabilityBrandThemeExpanded: Boolean = false,
+    val isConfigDebugExpanded: Boolean = false,
     val isFlashVoicingEnabled: Boolean = true,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.Standard,
     val selectedMorseSpeed: MorseSpeedOption = MorseSpeedOption.default,
@@ -69,6 +82,12 @@ data class AudioAppUiState(
 ) {
     val customBrandThemes: List<BrandThemeOption>
         get() = customBrandThemePresets.map(::customBrandTheme)
+
+    val customMaterialThemeSettings: CustomBrandThemeSettings
+        get() =
+            customMaterialThemePresets
+                .firstOrNull { customMaterialPalette(it).id == selectedPalette.id }
+                ?: customMaterialThemePresets.first()
 
     val activeBrandTheme: BrandThemeOption
         get() =

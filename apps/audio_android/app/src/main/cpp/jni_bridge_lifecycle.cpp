@@ -61,7 +61,8 @@ jobject NativeTakeEncodeTextJobResult(
     }
 
     bag_pcm16_result result{};
-    if (bag_take_encode_text_job_result(job, &result) != BAG_OK) {
+    const bag_error_code take_code = bag_take_encode_text_job_result(job, &result);
+    if (take_code != BAG_OK) {
         return NewEmptyEncodedAudioPayloadResult(env);
     }
     if (!IsPcmSampleCountWithinJvmLimit(result.sample_count)) {

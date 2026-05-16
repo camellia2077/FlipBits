@@ -46,18 +46,18 @@ fun brandAccentTokens(theme: BrandThemeOption): AppThemeAccentTokens {
     val strongStateTint =
         when {
             theme.id == "black_crimson_rite" ->
-                theme.accentColor
+                theme.secondaryColor
             theme.groupTitleResId == R.string.config_dual_tone_group_ancient_dynasty ->
                 lerp(
-                    theme.accentColor,
+                    theme.secondaryColor,
                     theme.colorScheme.onSurface,
                     0.32f,
                 )
-            else -> theme.accentColor
+            else -> theme.secondaryColor
         }
     val actionIconTint =
         lerp(
-            theme.accentColor,
+            theme.secondaryColor,
             theme.colorScheme.onSurface,
             if (theme.isDarkTheme) 0.18f else 0.32f,
         )

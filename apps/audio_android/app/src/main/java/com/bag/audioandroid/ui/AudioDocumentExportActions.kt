@@ -45,8 +45,8 @@ internal class AudioDocumentExportActions(
                         id = System.nanoTime(),
                         suggestedFileName =
                             savedAudioRepository.suggestGeneratedAudioDisplayName(
-                                mode = state.transportMode,
                                 inputText = session.inputText,
+                                metadata = metadata,
                             ),
                         source = AudioDocumentExportSource.Generated(state.transportMode),
                     ),
@@ -106,7 +106,6 @@ internal class AudioDocumentExportActions(
             return false
         }
         return savedAudioRepository.exportGeneratedAudioToDocument(
-            mode = mode,
             inputText = session.inputText,
             pcm = session.generatedPcm,
             pcmFilePath = session.generatedPcmFilePath,

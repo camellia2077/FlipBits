@@ -26,6 +26,7 @@
     <string name="config_theme_mode_follow_system">Sequere systema</string>
     <string name="config_theme_mode_light">Lux</string>
     <string name="config_theme_mode_dark">Umbra</string>
+    <string name="config_theme_mode_custom">Proprius</string>
     <string name="config_theme_appearance_title">Species thematis</string>
     <string name="config_theme_style_title">Stilus thematis</string>
     <string name="config_theme_style_subtitle">Material aut Dual-tone elige.</string>
@@ -48,6 +49,7 @@
     <string name="config_dual_tone_group_exquisite_fall">Luxuria Perditionis</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">Labyrinthus Aenigmatis</string>
     <string name="palette_family_brand">Dual-tone</string>
+    <string name="palette_family_custom">Proprius</string>
     <string name="palette_family_reds_pinks">Rubra et rosea</string>
     <string name="palette_family_oranges">Aurantia</string>
     <string name="palette_family_yellows">Flava</string>
@@ -194,6 +196,12 @@
 
     <string name="config_sample_decoration_title">Sample decoration</string>
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
+    <string name="config_sample_text_title">Textus exemplaris</string>
+    <string name="config_sample_text_subtitle">Moderatur quomodo textus exemplaris in campo ingressus appareat.</string>
+    <string name="config_sample_auto_fill_subtitle">Campum ingressus exemplo fortuito complet cum textus exemplaris praesto est.</string>
+    <string name="config_sample_text_collapse">Occulta occasus textus exemplaris</string>
+    <string name="config_sample_text_expand">Expande occasus textus exemplaris</string>
+    <string name="config_sample_auto_fill_title">Textum exemplaris automatice inserere</string>
     <string name="config_demo_mode_title">Modus Demonstratio</string>
     <string name="config_demo_mode_subtitle">Monstra signum tactus et monita ad capturam.</string>
     <string name="config_custom_brand_theme_import_title">Importare dual-tone custom</string>

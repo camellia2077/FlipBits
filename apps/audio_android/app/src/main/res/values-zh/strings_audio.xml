@@ -49,6 +49,7 @@
     <string name="audio_decode_busy_reason_generated">正在读取当前音频</string>
     <string name="audio_decode_busy_reason_saved">正在读取已保存的音频</string>
     <string name="audio_action_randomize_sample_input">随机示例</string>
+    <string name="audio_input_required_or_randomize">请输入文本，或使用随机示例。</string>
     <string name="audio_action_open_input_editor">打开编辑器</string>
     <string name="audio_sample_length_short">简短</string>
     <string name="audio_sample_length_long">较长</string>
@@ -83,6 +84,10 @@
     <string name="audio_flash_voicing_style_title">发声风格</string>
     <string name="audio_action_select_flash_voicing_style">选择发声风格</string>
     <string name="audio_flash_voicing_style_sheet_title">发声风格</string>
+    <string name="audio_mini_speed_style_title">速度风格</string>
+    <string name="audio_action_select_mini_speed_style">选择速度风格</string>
+    <string name="audio_mini_speed_style_hint">应用于下次生成的音频。已生成的音频将保留其创建时的风格。</string>
+    <string name="audio_mini_speed_style_sheet_title">速度风格</string>
     <string name="audio_saved_audio_sheet_title">已保存的音频</string>
     <string name="audio_saved_audio_empty">暂无已保存的音频。</string>
     <string name="audio_mini_player_generated_title">%1$s 生成音频</string>

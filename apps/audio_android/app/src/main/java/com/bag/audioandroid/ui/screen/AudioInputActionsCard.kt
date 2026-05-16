@@ -130,7 +130,7 @@ internal fun AudioInputActionsCard(
                     onOpenInputRules = { showInputRules = true },
                 )
 
-                if (inputText.isNotBlank()) {
+                if (inputText.isNotEmpty()) {
                     InputEncodingStatusSection(
                         transportMode = transportMode,
                         analysis = inputEncodingAnalysis,

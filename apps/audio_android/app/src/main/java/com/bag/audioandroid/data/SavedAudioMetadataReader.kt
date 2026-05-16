@@ -6,6 +6,7 @@ import com.bag.audioandroid.domain.AudioIoGateway
 import com.bag.audioandroid.domain.AudioIoMetadataCodes
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioItem
+import com.bag.audioandroid.ui.model.MorseSpeedOption
 import java.time.Instant
 
 internal class SavedAudioMetadataReader(
@@ -38,8 +39,13 @@ internal class SavedAudioMetadataReader(
             modeWireName = metadata?.mode?.wireName ?: unknownModeWireName,
             durationMs = metadata?.durationMs?.takeIf { it > 0L } ?: row.durationMs.coerceAtLeast(0L),
             savedAtEpochSeconds = row.dateAddedEpochSeconds.coerceAtLeast(0L),
-            generatedAtEpochSeconds = metadata?.createdAtIsoUtc?.let(::parseCreatedAtEpochSeconds),
+            generatedAtEpochSeconds =
+                metadata
+                    ?.createdAtIsoUtc
+                    ?.let(::parseCreatedAtEpochSeconds)
+                    ?: row.dateAddedEpochSeconds.coerceAtLeast(0L),
             flashVoicingStyle = metadata?.flashVoicingStyle,
+            miniSpeedStyle = metadata?.miniSpeedStyle ?: MorseSpeedOption.fromFrameSamples(metadata?.frameSamples ?: 2205),
             sampleRateHz = metadata?.sampleRateHz?.takeIf { it > 0 },
             inputSourceKind = metadata?.inputSourceKind,
             fileSizeBytes = row.sizeBytes.takeIf { it >= 0L },
@@ -66,8 +72,13 @@ internal class SavedAudioMetadataReader(
                     ?: pcmSize.toLong() * 1000L / sampleRateHz.toLong(),
             savedAtEpochSeconds =
                 Instant.now().epochSecond,
-            generatedAtEpochSeconds = metadata?.createdAtIsoUtc?.let(::parseCreatedAtEpochSeconds),
+            generatedAtEpochSeconds =
+                metadata
+                    ?.createdAtIsoUtc
+                    ?.let(::parseCreatedAtEpochSeconds)
+                    ?: Instant.now().epochSecond,
             flashVoicingStyle = metadata?.flashVoicingStyle,
+            miniSpeedStyle = metadata?.miniSpeedStyle ?: MorseSpeedOption.fromFrameSamples(metadata?.frameSamples ?: sampleRateHz),
             sampleRateHz = metadata?.sampleRateHz?.takeIf { it > 0 } ?: sampleRateHz,
             inputSourceKind = metadata?.inputSourceKind,
             fileSizeBytes = fileSizeBytes?.takeIf { it >= 0L },

@@ -349,9 +349,12 @@ private class DecodeRunner(
             }
 
             val decoded = decodeWithFallback(request)
+            val decodedText = decoded.decodedPayload.text
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
-                "decodeRunner:done mode=${request.mode.wireName} decodedStatus=${decoded.decodedPayload.textDecodeStatusCode} followAvailable=${decoded.followData.followAvailable}",
+                "decodeRunner:done mode=${request.mode.wireName} decodedStatus=${decoded.decodedPayload.textDecodeStatusCode} " +
+                    "followAvailable=${decoded.followData.followAvailable} textChars=${decodedText.length} " +
+                    "textWhitespace=${decodedText.count(Char::isWhitespace)} rawBytesHex=${decoded.decodedPayload.rawBytesHex}",
             )
 
             DecodeResult.Success(decoded)
