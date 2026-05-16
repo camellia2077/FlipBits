@@ -7,6 +7,7 @@ type AudioIoWavStatus = c_int;
 type AudioIoMetadataStatus = c_int;
 type AudioIoMetadataMode = c_int;
 type AudioIoMetadataFlashVoicingStyle = c_int;
+type AudioIoMetadataMiniSpeedStyle = c_int;
 type AudioIoMetadataInputSourceKind = c_int;
 
 const AUDIO_IO_WAV_OK: AudioIoWavStatus = 0;
@@ -21,6 +22,9 @@ const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE: AudioIoMetadataFlashVoicing
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE: AudioIoMetadataFlashVoicingStyle = 5;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_ZEAL: AudioIoMetadataFlashVoicingStyle = 6;
 const AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID: AudioIoMetadataFlashVoicingStyle = 7;
+const AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW: AudioIoMetadataMiniSpeedStyle = 1;
+const AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD: AudioIoMetadataMiniSpeedStyle = 2;
+const AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST: AudioIoMetadataMiniSpeedStyle = 3;
 const AUDIO_IO_METADATA_INPUT_SOURCE_KIND_MANUAL: AudioIoMetadataInputSourceKind = 1;
 
 #[repr(C)]
@@ -47,6 +51,8 @@ struct AudioIoMetadataView {
     mode: AudioIoMetadataMode,
     has_flash_voicing_style: u8,
     flash_voicing_style: AudioIoMetadataFlashVoicingStyle,
+    has_mini_speed_style: u8,
+    mini_speed_style: AudioIoMetadataMiniSpeedStyle,
     created_at_iso_utc: AudioIoStringView,
     duration_ms: u32,
     sample_rate_hz: u32,
@@ -69,6 +75,8 @@ struct AudioIoMetadata {
     mode: AudioIoMetadataMode,
     has_flash_voicing_style: u8,
     flash_voicing_style: AudioIoMetadataFlashVoicingStyle,
+    has_mini_speed_style: u8,
+    mini_speed_style: AudioIoMetadataMiniSpeedStyle,
     created_at_iso_utc: AudioIoOwnedString,
     duration_ms: u32,
     sample_rate_hz: u32,
@@ -98,6 +106,7 @@ pub struct FlipBitsMetadata {
     pub version: u8,
     pub mode: TransportMode,
     pub flash_voicing_style: Option<FlashStyle>,
+    pub mini_speed_style: Option<MiniSpeedStyle>,
     pub created_at_iso_utc: String,
     pub duration_ms: u32,
     pub sample_rate_hz: i32,
@@ -181,6 +190,8 @@ impl DecodedWavGuard {
                 mode: 0,
                 has_flash_voicing_style: 0,
                 flash_voicing_style: 0,
+                has_mini_speed_style: 0,
+                mini_speed_style: 0,
                 created_at_iso_utc: AudioIoOwnedString {
                     data: ptr::null_mut(),
                     size: 0,
@@ -254,6 +265,11 @@ pub fn encode_mono_pcm16_wav_with_metadata(
         flash_voicing_style: metadata
             .flash_voicing_style
             .map(to_flash_voicing_style)
+            .unwrap_or(0),
+        has_mini_speed_style: metadata.mini_speed_style.is_some() as u8,
+        mini_speed_style: metadata
+            .mini_speed_style
+            .map(to_mini_speed_style)
             .unwrap_or(0),
         created_at_iso_utc: AudioIoStringView {
             data: created_at_bytes.as_ptr() as *const c_char,
@@ -330,6 +346,8 @@ pub fn free_empty_metadata_for_contract_test() {
         mode: 0,
         has_flash_voicing_style: 0,
         flash_voicing_style: 0,
+        has_mini_speed_style: 0,
+        mini_speed_style: 0,
         created_at_iso_utc: AudioIoOwnedString {
             data: ptr::null_mut(),
             size: 0,
@@ -363,6 +381,11 @@ fn convert_metadata(raw: &AudioIoMetadata) -> Result<FlipBitsMetadata, CliError>
         mode: from_metadata_mode(raw.mode)?,
         flash_voicing_style: if raw.has_flash_voicing_style != 0 {
             Some(from_flash_voicing_style(raw.flash_voicing_style)?)
+        } else {
+            None
+        },
+        mini_speed_style: if raw.has_mini_speed_style != 0 {
+            Some(from_mini_speed_style(raw.mini_speed_style)?)
         } else {
             None
         },
@@ -469,6 +492,34 @@ fn from_flash_voicing_style(
         AUDIO_IO_METADATA_FLASH_VOICING_STYLE_VOID => Ok(FlashStyle::Void),
         _ => Err(CliError::Api(
             "WAV metadata contained an unknown flash voicing style".to_string(),
+        )),
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MiniSpeedStyle {
+    Slow,
+    Standard,
+    Fast,
+}
+
+fn to_mini_speed_style(style: MiniSpeedStyle) -> AudioIoMetadataMiniSpeedStyle {
+    match style {
+        MiniSpeedStyle::Slow => AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW,
+        MiniSpeedStyle::Standard => AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD,
+        MiniSpeedStyle::Fast => AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST,
+    }
+}
+
+fn from_mini_speed_style(
+    style: AudioIoMetadataMiniSpeedStyle,
+) -> Result<MiniSpeedStyle, CliError> {
+    match style {
+        AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW => Ok(MiniSpeedStyle::Slow),
+        AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD => Ok(MiniSpeedStyle::Standard),
+        AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST => Ok(MiniSpeedStyle::Fast),
+        _ => Err(CliError::Api(
+            "WAV metadata contained an unknown mini speed style".to_string(),
         )),
     }
 }

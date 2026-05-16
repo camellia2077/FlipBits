@@ -112,9 +112,10 @@ fn wav_bytes_start_with_riff_header() {
     config.flash_style = FlashStyle::Litany;
     let pcm_samples = bag_api::encode_text_with_progress(&config, "FlipBits WAV", |_| {}).unwrap();
     let metadata = audio_io_api::FlipBitsMetadata {
-        version: 6,
+        version: 7,
         mode: TransportMode::Ultra,
         flash_voicing_style: None,
+        mini_speed_style: None,
         created_at_iso_utc: "1970-01-01T00:00:00Z".to_string(),
         duration_ms: 0,
         sample_rate_hz: config.sample_rate_hz,
@@ -138,9 +139,10 @@ fn wav_bytes_start_with_riff_header() {
 fn wav_metadata_roundtrips_new_flash_styles() {
     for style in [FlashStyle::Zeal, FlashStyle::Void] {
         let metadata = audio_io_api::FlipBitsMetadata {
-            version: 6,
+            version: 7,
             mode: TransportMode::Flash,
             flash_voicing_style: Some(style),
+            mini_speed_style: None,
             created_at_iso_utc: "1970-01-01T00:00:00Z".to_string(),
             duration_ms: 0,
             sample_rate_hz: DEFAULT_SAMPLE_RATE_HZ,
@@ -160,6 +162,36 @@ fn wav_metadata_roundtrips_new_flash_styles() {
 
         assert_eq!(decoded.metadata.unwrap().flash_voicing_style, Some(style));
     }
+}
+
+#[test]
+fn wav_metadata_roundtrips_mini_speed_style() {
+    let metadata = audio_io_api::FlipBitsMetadata {
+        version: 7,
+        mode: TransportMode::Mini,
+        flash_voicing_style: None,
+        mini_speed_style: Some(audio_io_api::MiniSpeedStyle::Fast),
+        created_at_iso_utc: "1970-01-01T00:00:00Z".to_string(),
+        duration_ms: 0,
+        sample_rate_hz: DEFAULT_SAMPLE_RATE_HZ,
+        frame_samples: DEFAULT_SAMPLE_RATE_HZ / DEFAULT_FRAME_RATE_DIVISOR / 2,
+        pcm_sample_count: 4,
+        payload_byte_count: 1,
+        app_version: "FlipBits/test".to_string(),
+        core_version: "test-core".to_string(),
+    };
+    let wav_bytes = audio_io_api::encode_mono_pcm16_wav_with_metadata(
+        DEFAULT_SAMPLE_RATE_HZ,
+        &[0, 1, -1, 0],
+        &metadata,
+    )
+    .unwrap();
+    let decoded = audio_io_api::decode_mono_pcm16_wav(&wav_bytes).unwrap();
+
+    assert_eq!(
+        decoded.metadata.unwrap().mini_speed_style,
+        Some(audio_io_api::MiniSpeedStyle::Fast)
+    );
 }
 
 #[test]

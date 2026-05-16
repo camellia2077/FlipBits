@@ -32,7 +32,7 @@
 
 - CLI 当前是 Rust `clap` 表现层，不要把共享业务逻辑重新写进 `apps/audio_cli`。
 - 文本 `<->` PCM 编解码优先通过 `libs/audio_api/include/bag_api.h` 对应的 Rust FFI 封装接入。
-- mono PCM16 WAV 与 `WBAG` metadata 优先通过 `libs/audio_io/include/audio_io_api.h` 对应的 Rust FFI 封装接入。
+- mono PCM16 WAV 与 `WBAG metadata v7` 优先通过 `libs/audio_io/include/audio_io_api.h` 对应的 Rust FFI 封装接入。
 - transport mode / 字符集规则以 `docs/design/transports.md` 为准：
   - `flash` 不限字符集
   - `pro` 仅允许 ASCII
@@ -54,7 +54,7 @@
   - `rust/src/bag_api.rs`
   - `libs/audio_api/include/bag_api.h`
   - `libs/audio_api/src/bag_api.cpp`
-- 改 WAV、`WBAG` metadata 或 `audio_io` 接线：
+- 改 WAV、`WBAG metadata v7` 或 `audio_io` 接线：
   - `rust/src/audio_io_api.rs`
   - `libs/audio_io/include/audio_io_api.h`
   - `libs/audio_io/include/wav_io.h`
