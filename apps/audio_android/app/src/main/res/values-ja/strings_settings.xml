@@ -68,8 +68,8 @@
     <string name="config_flash_style_subtitle">flashオーディオのサウンド方式を選択します。</string>
     <string name="config_flash_style_standard_label">標準</string>
     <string name="config_flash_style_standard_description">明瞭で安定した機械信号。</string>
-    <string name="config_flash_style_hostile_label">敵意</string>
-    <string name="config_flash_style_hostile_description">より短く硬い信号タイミングを使う、怒りの命令プリセット。</string>
+    <string name="config_flash_style_hostility_label">敵意</string>
+    <string name="config_flash_style_hostility_description">より短く硬い信号タイミングを使う、怒りの命令プリセット。</string>
     <string name="config_flash_style_litany_label">崇敬</string>
     <string name="config_flash_style_litany_description">祈りのプリセット。より遅い儀式的な信号リズムを使用します。</string>
     <string name="config_flash_style_collapse_label">崩壊</string>

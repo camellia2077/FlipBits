@@ -141,8 +141,8 @@ audio_io_metadata_flash_voicing_style MapFlashVoicingStyle(JNIEnv* env, jobject 
     if (style_id_text == "litany") {
         return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY;
     }
-    if (style_id_text == "hostile") {
-        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE;
+    if (style_id_text == "hostility") {
+        return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY;
     }
     if (style_id_text == "collapse") {
         return AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE;

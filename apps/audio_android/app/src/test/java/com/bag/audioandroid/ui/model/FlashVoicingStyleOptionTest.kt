@@ -7,7 +7,7 @@ class FlashVoicingStyleOptionTest {
     @Test
     fun `fromId maps current emotion ids`() {
         assertEquals(FlashVoicingStyleOption.Standard, FlashVoicingStyleOption.fromId("standard"))
-        assertEquals(FlashVoicingStyleOption.Hostile, FlashVoicingStyleOption.fromId("hostile"))
+        assertEquals(FlashVoicingStyleOption.Hostility, FlashVoicingStyleOption.fromId("hostility"))
         assertEquals(FlashVoicingStyleOption.Litany, FlashVoicingStyleOption.fromId("litany"))
         assertEquals(FlashVoicingStyleOption.Collapse, FlashVoicingStyleOption.fromId("collapse"))
     }
@@ -22,8 +22,8 @@ class FlashVoicingStyleOptionTest {
     fun `emotion presets carry separate signal and voicing axes`() {
         assertEquals(FlashSignalProfileWire.STANDARD, FlashVoicingStyleOption.Standard.signalProfileValue)
         assertEquals(FlashVoicingFlavorWire.STANDARD, FlashVoicingStyleOption.Standard.voicingFlavorValue)
-        assertEquals(FlashSignalProfileWire.HOSTILE, FlashVoicingStyleOption.Hostile.signalProfileValue)
-        assertEquals(FlashVoicingFlavorWire.HOSTILE, FlashVoicingStyleOption.Hostile.voicingFlavorValue)
+        assertEquals(FlashSignalProfileWire.HOSTILITY, FlashVoicingStyleOption.Hostility.signalProfileValue)
+        assertEquals(FlashVoicingFlavorWire.HOSTILITY, FlashVoicingStyleOption.Hostility.voicingFlavorValue)
         assertEquals(FlashSignalProfileWire.LITANY, FlashVoicingStyleOption.Litany.signalProfileValue)
         assertEquals(FlashVoicingFlavorWire.LITANY, FlashVoicingStyleOption.Litany.voicingFlavorValue)
         assertEquals(FlashSignalProfileWire.COLLAPSE, FlashVoicingStyleOption.Collapse.signalProfileValue)

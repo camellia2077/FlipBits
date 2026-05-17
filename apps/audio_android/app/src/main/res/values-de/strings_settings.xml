@@ -61,8 +61,8 @@
     <string name="config_flash_style_subtitle">Wähle, wie Flash-Audio klingen soll.</string>
     <string name="config_flash_style_standard_label">Standard</string>
     <string name="config_flash_style_standard_description">Klare, stabile Maschinensignale.</string>
-    <string name="config_flash_style_hostile_label">Feindseligkeit</string>
-    <string name="config_flash_style_hostile_description">Ein wütendes Befehls-Preset mit kürzerem, härterem Signaltiming.</string>
+    <string name="config_flash_style_hostility_label">Feindseligkeit</string>
+    <string name="config_flash_style_hostility_description">Ein wütendes Befehls-Preset mit kürzerem, härterem Signaltiming.</string>
     <string name="config_flash_style_litany_label">Litanei</string>
     <string name="config_flash_style_litany_description">Ein ehrfürchtiges Gebets-Preset mit langsamerem rituellem Signaltakt.</string>
     <string name="config_flash_style_collapse_label">Zusammenbruch</string>

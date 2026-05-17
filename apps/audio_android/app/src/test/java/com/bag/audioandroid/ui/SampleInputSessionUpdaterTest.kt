@@ -230,7 +230,7 @@ class SampleInputSessionUpdaterTest {
                 language = AppLanguageOption.English,
                 newFlavor = SampleFlavor.AncientDynasty,
                 isSampleAutoFillEnabled = false,
-        )
+            )
         assertEquals(initialSessions, flavorRefreshed)
     }
 

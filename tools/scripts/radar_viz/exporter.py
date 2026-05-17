@@ -11,7 +11,7 @@ import config_fonts
 
 
 # Flash 模式统一输出到 {lang}/flash/ 子目录
-_FLASH_MODES = {"Steady", "Hostile", "Litany", "Collapse", "Zeal", "Void"}
+_FLASH_MODES = {"Steady", "Hostility", "Litany", "Collapse", "Zeal", "Void"}
 
 
 def _resolve_out_path(mode_key, lang, script_dir):

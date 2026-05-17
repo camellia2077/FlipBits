@@ -60,7 +60,7 @@
   - 先看 `docs/design/transports.md`
   - 再看 `docs/design/modes/README.md`
   - flash 情绪音色总览看 `docs/design/modes/flash/voicing-emotions.md`
-  - 具体 `Standard / Hostile / Litany / Collapse / Zeal / Void` 设计看 `docs/design/modes/flash/<preset>.md`
+  - 具体 `Standard / Hostility / Litany / Collapse / Zeal / Void` 设计看 `docs/design/modes/flash/<preset>.md`
   - 再看 `docs/architecture/repo-map.md`
 - 改 `bag_api`
   - 先看 `docs/architecture/repo-map.md`

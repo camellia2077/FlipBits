@@ -789,7 +789,7 @@ class AudioSessionCodecFlashPresetTest {
                 fixture.uiState.value.copy(
                     transportMode = TransportModeOption.Flash,
                     isFlashVoicingEnabled = false,
-                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Hostile,
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Hostility,
                     sessions =
                         fixture.uiState.value.sessions.mapValues { (_, session) ->
                             session.copy(inputText = "flash baseline")
@@ -823,10 +823,10 @@ class AudioSessionCodecFlashPresetTest {
                 fixture.uiState.value.copy(
                     transportMode = TransportModeOption.Flash,
                     isFlashVoicingEnabled = true,
-                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Hostile,
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Hostility,
                     sessions =
                         fixture.uiState.value.sessions.mapValues { (_, session) ->
-                            session.copy(inputText = "hostile flash")
+                            session.copy(inputText = "hostility flash")
                         },
                 )
 
@@ -835,7 +835,7 @@ class AudioSessionCodecFlashPresetTest {
 
             assertTrue(seenPresets.isNotEmpty())
             assertEquals(
-                listOf(FlashVoicingStyleOption.Hostile.signalProfileValue to FlashVoicingStyleOption.Hostile.voicingFlavorValue),
+                listOf(FlashVoicingStyleOption.Hostility.signalProfileValue to FlashVoicingStyleOption.Hostility.voicingFlavorValue),
                 seenPresets.distinct(),
             )
         }

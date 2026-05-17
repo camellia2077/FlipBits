@@ -55,6 +55,28 @@ private data class FlashSignalPlaybackReadoutState(
     val bitReadoutFrame: FlashBitReadoutFrame?,
 )
 
+private data class FlashSignalAnalysisInputs(
+    val analysisCache: FlashSignalAnalysisCache,
+    val analysisDisplayedSamplePosition: Float,
+    val followAnalysisSampleStep: Int,
+)
+
+private data class FlashSignalRenderContext(
+    val visualizerModel: FlashSignalVisualizerModel,
+    val totalSamples: Int,
+    val followTimelineSource: FlashSignalBucketSource.FollowTimeline?,
+    val followTimelineTotalSamples: Int,
+    val displayedSamplePosition: Float,
+    val followDisplayedSamplePosition: Float,
+    val windowedTimelineFrame: FlashSignalFixedTimelineFrame?,
+)
+
+private data class FlashSignalVisualStyleContext(
+    val activeWindowBucketCount: Int,
+    val toneFrequencyScale: ToneFrequencyScale,
+    val toneCarrierLayout: ToneCarrierLayout,
+)
+
 @Composable
 internal fun rememberFlashSignalVisualizerRenderState(
     input: FlashSignalVisualizationInput,
@@ -70,18 +92,157 @@ internal fun rememberFlashSignalVisualizerRenderState(
 ): FlashSignalVisualizerRenderState {
     val pcm = input.pcm
     val sampleRateHz = input.sampleRateHz
+    val renderContext =
+        rememberFlashSignalRenderContext(
+            input = input,
+            flashVisualWindow = flashVisualWindow,
+        )
+    val analysisInputs =
+        rememberFlashSignalAnalysisInputs(
+            pcm = pcm,
+            sampleRateHz = sampleRateHz,
+            bucketSource = input.bucketSource,
+            displayedSamplePosition = renderContext.displayedSamplePosition,
+            totalSamples = renderContext.totalSamples,
+            followTimelineTotalSamples = renderContext.followTimelineTotalSamples,
+        )
+    val visualStyle =
+        rememberFlashSignalVisualStyleContext(
+            flashVoicingStyle = flashVoicingStyle,
+        )
+    val timelineStrategy =
+        rememberFlashSignalTimelineStrategy(
+            mode = mode,
+            bucketSource = input.bucketSource,
+            windowedTimelineFrame = renderContext.windowedTimelineFrame,
+            followTimelineTotalSamples = renderContext.followTimelineTotalSamples,
+            isScrubbing = isScrubbing,
+        )
+    val followData = renderContext.followTimelineSource?.followData
+    val playbackReadoutState =
+        rememberFlashSignalPlaybackReadoutState(
+            sharedPlaybackSampleState = sharedPlaybackSampleState,
+            displayedSamplePosition = renderContext.displayedSamplePosition,
+            followDisplayedSamplePosition = renderContext.followDisplayedSamplePosition,
+            isPlaying = isPlaying,
+            isScrubbing = isScrubbing,
+            playbackSpeed = playbackSpeed,
+            sampleRateHz = sampleRateHz,
+            visualTotalSamples = timelineStrategy.visualTotalSamples,
+            followAnalysisSampleStep = analysisInputs.followAnalysisSampleStep,
+            followTimelineTotalSamples = renderContext.followTimelineTotalSamples,
+            followData = followData,
+        )
+    val bucketFrame =
+        rememberFlashSignalBucketFrame(
+            pcm = pcm,
+            sampleRateHz = sampleRateHz,
+            bucketSource = input.bucketSource,
+            analysisCache = analysisInputs.analysisCache,
+            targetBucketCount = targetBucketCount,
+            windowSampleCount = windowSampleCount,
+            analysisDisplayedSamplePosition = analysisInputs.analysisDisplayedSamplePosition,
+            visualFollowAnalysisDisplayedSamplePosition = playbackReadoutState.visualFollowAnalysisDisplayedSamplePosition,
+            displayedSamplePosition = renderContext.displayedSamplePosition,
+            visualFollowDisplayedSamplePosition = playbackReadoutState.visualFollowDisplayedSamplePosition,
+            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
+        )
+    val toneSpectrumBuckets =
+        rememberFlashSignalToneSpectrumBuckets(
+            pcm = pcm,
+            sampleRateHz = sampleRateHz,
+            targetBucketCount = targetBucketCount,
+            windowSampleCount = windowSampleCount,
+            visualFollowAnalysisDisplayedSamplePosition = playbackReadoutState.visualFollowAnalysisDisplayedSamplePosition,
+            toneFrequencyScale = visualStyle.toneFrequencyScale,
+            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
+            mode = mode,
+        )
+    val primitiveEstimate =
+        rememberFlashSignalPrimitiveEstimate(
+            mode = mode,
+            visualSegments = timelineStrategy.visualSegments,
+            toneSpectrumBuckets = toneSpectrumBuckets,
+            bucketFrame = bucketFrame,
+            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
+        )
+    return remember(
+        bucketFrame,
+        toneSpectrumBuckets,
+        visualStyle.toneFrequencyScale,
+        visualStyle.toneCarrierLayout,
+        timelineStrategy.fixedTimelineFrame,
+        timelineStrategy.visualSegments,
+        playbackReadoutState.playbackSampleState,
+        followData,
+        playbackReadoutState.bitReadoutSource,
+        playbackReadoutState.bitReadoutFrame,
+        playbackReadoutState.visualFollowDisplayedSamplePosition,
+        visualStyle.activeWindowBucketCount,
+        primitiveEstimate,
+        timelineStrategy.usesFallbackTimeline,
+        flashVoicingStyle,
+        flashVisualWindow,
+        timelineStrategy.visualTotalSamples,
+    ) {
+        FlashSignalVisualizerRenderState(
+            buckets = bucketFrame.buckets,
+            toneSpectrumBuckets = toneSpectrumBuckets,
+            toneFrequencyScale = visualStyle.toneFrequencyScale,
+            toneCarrierLayout = visualStyle.toneCarrierLayout,
+            bucketFrame = bucketFrame,
+            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
+            visualSegments = timelineStrategy.visualSegments,
+            playbackSampleState = playbackReadoutState.playbackSampleState,
+            followData = followData,
+            bitReadoutSource = playbackReadoutState.bitReadoutSource,
+            bitReadoutFrame = playbackReadoutState.bitReadoutFrame,
+            bitReadoutSample = playbackReadoutState.visualFollowDisplayedSamplePosition,
+            activeWindowBucketCount = visualStyle.activeWindowBucketCount,
+            primitiveEstimate = primitiveEstimate,
+            usesFallbackTimeline = timelineStrategy.usesFallbackTimeline,
+            enableViewportEdgeFade = flashVoicingStyle != FlashVoicingStyleOption.Litany,
+            traceWindowSamples = flashVisualWindow.endSampleExclusive - flashVisualWindow.startSample,
+            traceWindowStartSample = flashVisualWindow.startSample,
+            traceWindowEndSample = flashVisualWindow.endSampleExclusive,
+            totalSamples = timelineStrategy.visualTotalSamples,
+        )
+    }
+}
+
+@Composable
+private fun rememberFlashSignalRenderContext(
+    input: FlashSignalVisualizationInput,
+    flashVisualWindow: FlashVisualWindowState,
+): FlashSignalRenderContext {
     val visualizerModel =
         rememberFlashSignalVisualizerModel(
             input = input,
             flashVisualWindow = flashVisualWindow,
         )
-    val totalSamples = visualizerModel.totalSamples
-    val followTimelineSource = visualizerModel.followTimelineSource
-    val followTimelineTotalSamples = visualizerModel.followTimelineTotalSamples
-    val displayedSamplePosition = visualizerModel.displayedSamplePosition
-    val followDisplayedSamplePosition = visualizerModel.followDisplayedSamplePosition
-    val windowedTimelineFrame = visualizerModel.windowedTimelineFrame
-    val analysisCache = remember(pcm, sampleRateHz, input.bucketSource.stableCacheKey()) { FlashSignalAnalysisCache() }
+    return remember(visualizerModel) {
+        FlashSignalRenderContext(
+            visualizerModel = visualizerModel,
+            totalSamples = visualizerModel.totalSamples,
+            followTimelineSource = visualizerModel.followTimelineSource,
+            followTimelineTotalSamples = visualizerModel.followTimelineTotalSamples,
+            displayedSamplePosition = visualizerModel.displayedSamplePosition,
+            followDisplayedSamplePosition = visualizerModel.followDisplayedSamplePosition,
+            windowedTimelineFrame = visualizerModel.windowedTimelineFrame,
+        )
+    }
+}
+
+@Composable
+private fun rememberFlashSignalAnalysisInputs(
+    pcm: ShortArray,
+    sampleRateHz: Int,
+    bucketSource: FlashSignalBucketSource,
+    displayedSamplePosition: Float,
+    totalSamples: Int,
+    followTimelineTotalSamples: Int,
+): FlashSignalAnalysisInputs {
+    val analysisCache = remember(pcm, sampleRateHz, bucketSource.stableCacheKey()) { FlashSignalAnalysisCache() }
     val analysisSampleStep =
         remember(sampleRateHz, totalSamples) {
             visualizationAnalysisSampleStep(sampleRateHz = sampleRateHz, totalSamples = totalSamples)
@@ -98,6 +259,21 @@ internal fun rememberFlashSignalVisualizerRenderState(
         remember(sampleRateHz, followTimelineTotalSamples) {
             visualizationAnalysisSampleStep(sampleRateHz = sampleRateHz, totalSamples = followTimelineTotalSamples)
         }
+    return remember(
+        analysisCache,
+        analysisDisplayedSamplePosition,
+        followAnalysisSampleStep,
+    ) {
+        FlashSignalAnalysisInputs(
+            analysisCache = analysisCache,
+            analysisDisplayedSamplePosition = analysisDisplayedSamplePosition,
+            followAnalysisSampleStep = followAnalysisSampleStep,
+        )
+    }
+}
+
+@Composable
+private fun rememberFlashSignalVisualStyleContext(flashVoicingStyle: FlashVoicingStyleOption?): FlashSignalVisualStyleContext {
     val activeWindowBucketCount =
         remember(flashVoicingStyle) {
             flashSignalActiveWindowBucketCount(flashVoicingStyle)
@@ -110,102 +286,15 @@ internal fun rememberFlashSignalVisualizerRenderState(
         remember(flashVoicingStyle) {
             toneCarrierLayoutForStyle(flashVoicingStyle)
         }
-    val timelineStrategy =
-        rememberFlashSignalTimelineStrategy(
-            mode = mode,
-            bucketSource = input.bucketSource,
-            windowedTimelineFrame = windowedTimelineFrame,
-            followTimelineTotalSamples = followTimelineTotalSamples,
-            isScrubbing = isScrubbing,
-        )
-    val followData = followTimelineSource?.followData
-    val playbackReadoutState =
-        rememberFlashSignalPlaybackReadoutState(
-            sharedPlaybackSampleState = sharedPlaybackSampleState,
-            displayedSamplePosition = displayedSamplePosition,
-            followDisplayedSamplePosition = followDisplayedSamplePosition,
-            isPlaying = isPlaying,
-            isScrubbing = isScrubbing,
-            playbackSpeed = playbackSpeed,
-            sampleRateHz = sampleRateHz,
-            visualTotalSamples = timelineStrategy.visualTotalSamples,
-            followAnalysisSampleStep = followAnalysisSampleStep,
-            followTimelineTotalSamples = followTimelineTotalSamples,
-            followData = followData,
-        )
-    val bucketFrame =
-        rememberFlashSignalBucketFrame(
-            pcm = pcm,
-            sampleRateHz = sampleRateHz,
-            bucketSource = input.bucketSource,
-            analysisCache = analysisCache,
-            targetBucketCount = targetBucketCount,
-            windowSampleCount = windowSampleCount,
-            analysisDisplayedSamplePosition = analysisDisplayedSamplePosition,
-            visualFollowAnalysisDisplayedSamplePosition = playbackReadoutState.visualFollowAnalysisDisplayedSamplePosition,
-            displayedSamplePosition = displayedSamplePosition,
-            visualFollowDisplayedSamplePosition = playbackReadoutState.visualFollowDisplayedSamplePosition,
-            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
-        )
-    val toneSpectrumBuckets =
-        rememberFlashSignalToneSpectrumBuckets(
-            pcm = pcm,
-            sampleRateHz = sampleRateHz,
-            targetBucketCount = targetBucketCount,
-            windowSampleCount = windowSampleCount,
-            visualFollowAnalysisDisplayedSamplePosition = playbackReadoutState.visualFollowAnalysisDisplayedSamplePosition,
-            toneFrequencyScale = toneFrequencyScale,
-            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
-            mode = mode,
-        )
-    val primitiveEstimate =
-        rememberFlashSignalPrimitiveEstimate(
-            mode = mode,
-            visualSegments = timelineStrategy.visualSegments,
-            toneSpectrumBuckets = toneSpectrumBuckets,
-            bucketFrame = bucketFrame,
-            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
-        )
     return remember(
-        bucketFrame,
-        toneSpectrumBuckets,
+        activeWindowBucketCount,
         toneFrequencyScale,
         toneCarrierLayout,
-        timelineStrategy.fixedTimelineFrame,
-        timelineStrategy.visualSegments,
-        playbackReadoutState.playbackSampleState,
-        followData,
-        playbackReadoutState.bitReadoutSource,
-        playbackReadoutState.bitReadoutFrame,
-        playbackReadoutState.visualFollowDisplayedSamplePosition,
-        activeWindowBucketCount,
-        primitiveEstimate,
-        timelineStrategy.usesFallbackTimeline,
-        flashVoicingStyle,
-        flashVisualWindow,
-        timelineStrategy.visualTotalSamples,
     ) {
-        FlashSignalVisualizerRenderState(
-            buckets = bucketFrame.buckets,
-            toneSpectrumBuckets = toneSpectrumBuckets,
+        FlashSignalVisualStyleContext(
+            activeWindowBucketCount = activeWindowBucketCount,
             toneFrequencyScale = toneFrequencyScale,
             toneCarrierLayout = toneCarrierLayout,
-            bucketFrame = bucketFrame,
-            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
-            visualSegments = timelineStrategy.visualSegments,
-            playbackSampleState = playbackReadoutState.playbackSampleState,
-            followData = followData,
-            bitReadoutSource = playbackReadoutState.bitReadoutSource,
-            bitReadoutFrame = playbackReadoutState.bitReadoutFrame,
-            bitReadoutSample = playbackReadoutState.visualFollowDisplayedSamplePosition,
-            activeWindowBucketCount = activeWindowBucketCount,
-            primitiveEstimate = primitiveEstimate,
-            usesFallbackTimeline = timelineStrategy.usesFallbackTimeline,
-            enableViewportEdgeFade = flashVoicingStyle != FlashVoicingStyleOption.Litany,
-            traceWindowSamples = flashVisualWindow.endSampleExclusive - flashVisualWindow.startSample,
-            traceWindowStartSample = flashVisualWindow.startSample,
-            traceWindowEndSample = flashVisualWindow.endSampleExclusive,
-            totalSamples = timelineStrategy.visualTotalSamples,
         )
     }
 }

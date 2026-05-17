@@ -20,6 +20,7 @@ class LocCliApplication:
         tool_root = self._tool_root()
         log_path = self._resolve_log_path(args.log_file, args.lang, tool_root=tool_root)
         log_path.parent.mkdir(parents=True, exist_ok=True)
+        self._clear_language_detail_logs(lang=args.lang, logs_root=log_path.parent)
 
         exit_code, report, artifacts, formatter = self._run_scan(args, repo_root)
         detail_md_by_path = self._write_reports(log_path=log_path, report=report, artifacts=artifacts, formatter=formatter)
@@ -126,6 +127,12 @@ class LocCliApplication:
         target_dir = logs_root / ("kotlin" if lang == "kt" else lang)
         target_dir.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source_path, target_dir / "refactor_prompt.md")
+
+    @staticmethod
+    def _clear_language_detail_logs(*, lang: str, logs_root: Path) -> None:
+        detail_dir = logs_root / ("kotlin" if lang == "kt" else lang)
+        if detail_dir.exists():
+            shutil.rmtree(detail_dir)
 
     @staticmethod
     def parse_args() -> argparse.Namespace:

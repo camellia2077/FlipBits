@@ -68,8 +68,8 @@
     <string name="config_flash_style_subtitle">选择 Flash 音频的发声效果。</string>
     <string name="config_flash_style_standard_label">标准</string>
     <string name="config_flash_style_standard_description">清晰稳定的机械信号。</string>
-    <string name="config_flash_style_hostile_label">敌意</string>
-    <string name="config_flash_style_hostile_description">愤怒的命令预设，使用更短、更硬的信号时序。</string>
+    <string name="config_flash_style_hostility_label">敌意</string>
+    <string name="config_flash_style_hostility_description">愤怒的命令预设，使用更短、更硬的信号时序。</string>
     <string name="config_flash_style_litany_label">崇敬</string>
     <string name="config_flash_style_litany_description">崇敬祷告预设，使用更慢的仪式信号节奏。</string>
     <string name="config_flash_style_collapse_label">崩溃</string>

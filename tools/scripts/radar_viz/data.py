@@ -62,8 +62,8 @@ DATA_DICT = {
             emotional_richness=0, sense_of_ritual=0
         ),
     },
-    "Hostile": {
-        "name_en": "Hostile",
+    "Hostility": {
+        "name_en": "Hostility",
         "name_zh": "敌意",
         "vals": build_metrics(
             transmission_speed=3, encoding_efficiency=3, transmission_stability=6,

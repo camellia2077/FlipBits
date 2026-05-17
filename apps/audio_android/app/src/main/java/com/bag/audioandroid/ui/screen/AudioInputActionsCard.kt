@@ -38,6 +38,19 @@ import com.bag.audioandroid.ui.model.analyzeAudioInputEncoding
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 import kotlin.math.roundToInt
 
+private data class AudioInputActionSelectorState(
+    val showFlashVoicingSelector: Boolean,
+    val showMorseSpeedSelector: Boolean,
+)
+
+private data class AudioInputActionRenderState(
+    val isEncodingBusy: Boolean,
+    val canEncodeInput: Boolean,
+    val enabled: Boolean,
+    val showInputEncodingStatus: Boolean,
+    val selectorState: AudioInputActionSelectorState,
+)
+
 @Composable
 internal fun AudioInputActionsCard(
     selectedThemeStyle: ThemeStyleOption,
@@ -65,13 +78,27 @@ internal fun AudioInputActionsCard(
     onCancelEncode: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isEncodingBusy = isCodecBusy && encodeProgress != null
     val accentTokens = appThemeAccentTokens()
     val inputEncodingAnalysis =
         remember(transportMode, inputText) {
             analyzeAudioInputEncoding(transportMode, inputText)
         }
-    val canEncodeInput = !inputEncodingAnalysis.isBlockingInvalid
+    val renderState =
+        remember(
+            transportMode,
+            isCodecBusy,
+            encodeProgress,
+            inputText,
+            inputEncodingAnalysis.isBlockingInvalid,
+        ) {
+            audioInputActionRenderState(
+                transportMode = transportMode,
+                isCodecBusy = isCodecBusy,
+                encodeProgress = encodeProgress,
+                inputText = inputText,
+                isBlockingInvalid = inputEncodingAnalysis.isBlockingInvalid,
+            )
+        }
     var showInputRules by remember { mutableStateOf(false) }
     if (showInputRules) {
         InputEncodingRulesDialog(
@@ -91,28 +118,28 @@ internal fun AudioInputActionsCard(
         ) {
             AudioInputCardHeader(
                 title = stringResource(R.string.audio_input_label),
-                enabled = !isCodecBusy,
+                enabled = renderState.enabled,
                 expanded = inputCardExpanded,
                 onToggleExpanded = onToggleInputCardExpanded,
             )
             if (inputCardExpanded) {
-                if (transportMode == TransportModeOption.Flash) {
+                if (renderState.selectorState.showFlashVoicingSelector) {
                     FlashVoicingSelectorSection(
-                        enabled = !isCodecBusy,
+                        enabled = renderState.enabled,
                         isFlashVoicingEnabled = isFlashVoicingEnabled,
                         selectedFlashVoicingStyle = selectedFlashVoicingStyle,
                         onFlashVoicingStyleSelected = onFlashVoicingStyleSelected,
                     )
                 }
-                if (transportMode == TransportModeOption.Mini) {
+                if (renderState.selectorState.showMorseSpeedSelector) {
                     MorseSpeedSelectorSection(
-                        enabled = !isCodecBusy,
+                        enabled = renderState.enabled,
                         selectedMorseSpeed = selectedMorseSpeed,
                         onMorseSpeedSelected = onMorseSpeedSelected,
                     )
                 }
                 AudioInputToolbar(
-                    enabled = !isCodecBusy,
+                    enabled = renderState.enabled,
                     onOpenInputEditor = onOpenInputEditor,
                     sampleInputLength = sampleInputLength,
                     onSampleInputLengthSelected = onSampleInputLengthSelected,
@@ -123,14 +150,14 @@ internal fun AudioInputActionsCard(
                 AudioInputTextFieldSection(
                     selectedThemeStyle = selectedThemeStyle,
                     transportMode = transportMode,
-                    enabled = !isCodecBusy,
+                    enabled = renderState.enabled,
                     inputText = inputText,
                     inputPlaceholderText = inputPlaceholderText,
                     onInputTextChange = onInputTextChange,
                     onOpenInputRules = { showInputRules = true },
                 )
 
-                if (inputText.isNotEmpty()) {
+                if (renderState.showInputEncodingStatus) {
                     InputEncodingStatusSection(
                         transportMode = transportMode,
                         analysis = inputEncodingAnalysis,
@@ -146,57 +173,107 @@ internal fun AudioInputActionsCard(
                 AudioEncodeStatusSection(
                     encodeProgress = encodeProgress,
                     encodePhase = encodePhase,
-                    isEncodingBusy = isEncodingBusy,
+                    isEncodingBusy = renderState.isEncodingBusy,
                 )
 
-                if (isEncodingBusy) {
-                    val currentEncodeProgress = requireNotNull(encodeProgress)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        val encodePercent = (currentEncodeProgress.coerceIn(0f, 1f) * 100f).roundToInt()
-                        ActionButton(
-                            text = stringResource(R.string.audio_action_encode_busy_progress, encodePercent),
-                            onClick = {},
-                            enabled = false,
-                            borderColor = accentTokens.selectionBorderAccentTint,
-                            borderWidth = 2.dp,
-                            modifier = Modifier.weight(1f),
-                        )
-                        ActionButton(
-                            text =
-                                stringResource(
-                                    if (isEncodeCancelling) {
-                                        R.string.audio_action_cancel_encode_busy
-                                    } else {
-                                        R.string.audio_action_cancel_encode
-                                    },
-                                ),
-                            onClick = onCancelEncode,
-                            enabled = !isEncodeCancelling,
-                            borderColor = accentTokens.selectionBorderAccentTint,
-                            borderWidth = 2.dp,
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
+                if (renderState.isEncodingBusy) {
+                    BusyAudioEncodeActionRow(
+                        encodeProgress = requireNotNull(encodeProgress),
+                        isEncodeCancelling = isEncodeCancelling,
+                        onCancelEncode = onCancelEncode,
+                        accentBorderColor = accentTokens.selectionBorderAccentTint,
+                    )
                 } else {
-                    ActionButton(
-                        text = stringResource(R.string.audio_action_encode),
-                        onClick = onEncode,
-                        enabled = !isCodecBusy && canEncodeInput,
+                    IdleAudioEncodeActionButton(
+                        enabled = renderState.enabled && renderState.canEncodeInput,
+                        onEncode = onEncode,
                         textColor = accentTokens.disclosureAccentTint,
                         borderColor = accentTokens.selectionBorderAccentTint,
-                        borderWidth = 2.dp,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .testTag("audio-encode-button"),
                     )
                 }
             }
         }
     }
+}
+
+private fun audioInputActionRenderState(
+    transportMode: TransportModeOption,
+    isCodecBusy: Boolean,
+    encodeProgress: Float?,
+    inputText: String,
+    isBlockingInvalid: Boolean,
+): AudioInputActionRenderState {
+    val isEncodingBusy = isCodecBusy && encodeProgress != null
+    return AudioInputActionRenderState(
+        isEncodingBusy = isEncodingBusy,
+        canEncodeInput = !isBlockingInvalid,
+        enabled = !isCodecBusy,
+        showInputEncodingStatus = inputText.isNotEmpty(),
+        selectorState =
+            AudioInputActionSelectorState(
+                showFlashVoicingSelector = transportMode == TransportModeOption.Flash,
+                showMorseSpeedSelector = transportMode == TransportModeOption.Mini,
+            ),
+    )
+}
+
+@Composable
+private fun BusyAudioEncodeActionRow(
+    encodeProgress: Float,
+    isEncodeCancelling: Boolean,
+    onCancelEncode: () -> Unit,
+    accentBorderColor: androidx.compose.ui.graphics.Color,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        val encodePercent = (encodeProgress.coerceIn(0f, 1f) * 100f).roundToInt()
+        ActionButton(
+            text = stringResource(R.string.audio_action_encode_busy_progress, encodePercent),
+            onClick = {},
+            enabled = false,
+            borderColor = accentBorderColor,
+            borderWidth = 2.dp,
+            modifier = Modifier.weight(1f),
+        )
+        ActionButton(
+            text =
+                stringResource(
+                    if (isEncodeCancelling) {
+                        R.string.audio_action_cancel_encode_busy
+                    } else {
+                        R.string.audio_action_cancel_encode
+                    },
+                ),
+            onClick = onCancelEncode,
+            enabled = !isEncodeCancelling,
+            borderColor = accentBorderColor,
+            borderWidth = 2.dp,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun IdleAudioEncodeActionButton(
+    enabled: Boolean,
+    onEncode: () -> Unit,
+    textColor: androidx.compose.ui.graphics.Color,
+    borderColor: androidx.compose.ui.graphics.Color,
+) {
+    ActionButton(
+        text = stringResource(R.string.audio_action_encode),
+        onClick = onEncode,
+        enabled = enabled,
+        textColor = textColor,
+        borderColor = borderColor,
+        borderWidth = 2.dp,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag("audio-encode-button"),
+    )
 }
 
 @Composable

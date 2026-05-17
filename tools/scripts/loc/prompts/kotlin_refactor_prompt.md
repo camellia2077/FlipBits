@@ -14,11 +14,18 @@
 - 底层 metadata contract
 - 跨平台 bridge/interop 规则
 
+重构默认前提：
+- 默认把重构视为行为等价变换，不顺手修改交互、视觉、状态语义
+- 默认优先保持 public API 稳定，不随意修改 Composable 对外参数、callback 语义、state contract
+- 默认先做文件内部重组，只有在收益明确时才跨文件扩散
+- 默认优先保留现有 section/dialog/export/import 流程，不把 settings 页面里的状态流顺手改成另一套交互模型
+
 因此重构时优先关注：
 - UI orchestration 是否过深
 - state/effect/render decision 是否混在一起
 - Composable 主体是否同时承担太多职责
 - 显示模式、视觉分支、overlay 逻辑是否难以局部修改
+- settings section 是否把展开状态、dialog state、action routing、render policy 全堆在入口函数里
 
 核心目标：
 - 提高 UI 可维护性，而不是机械降低行数
@@ -28,20 +35,32 @@
 
 优先方向：
 - 把 state/mode/style decision 下沉到小模型或 state holder
-- 把绘制分发、overlay 组装、telemetry 记录从主 Composable 拆开
+- 把 scene/setup、render policy、overlay 组装、telemetry 记录从主 Composable 拆开
 - 把可复用的 UI 规则和 mapping 从页面 orchestration 中抽离
 - 保持主流程可读，减少“读一个 Composable 要同时理解五种职责”
+- 对 settings/config 页面，优先抽 dialog state、section expansion policy、import/export action routing，再考虑拆细子组件
+- 对 visualizer/overlay 页面，优先抽 scene state、render policy、overlay assembly，再考虑深入 draw path
+
+Compose 特别注意：
+- 不要在重构中改变 `remember` / `rememberSaveable` / `LaunchedEffect` 的 key 语义
+- 优先保持状态归属清晰，不要把 Compose state 在更多层之间来回传递
+- 如果拆分导致参数明显膨胀，优先引入小模型或 policy，而不是继续堆参数
+- 先拆装配层，再考虑底层绘制算法、动画细节、视觉实现细节
+- 如果一个 section 已经依赖很多展开状态或 dialog 开关，优先用小的 internal state holder 收拢，而不是继续把布尔值和回调平铺到主体里
+- 拆 helper 时优先保持 composable tree 和 side-effect 入口稳定，不为了“更函数式”而重排现有 effect 生命周期
 
 不以这些为目标：
 - 不以单纯减少文件行数为目标
 - 不为了拆分而拆分成过多小组件
 - 不为了复用而制造更重的跳转成本
 - 不把简单 UI 逻辑过度抽象成难读的框架层
+- 不把视觉细节微调伪装成重构
 
 判断重构是否有效：
 - 主 Composable 是否更浅
 - 状态和副作用是否更容易定位
 - mode/style 分支是否更集中
+- scene/setup 与 render path 是否更容易区分
 - 改一个显示模式或视觉细节时，影响面是否更局部
 
 重构停止条件：
@@ -55,3 +74,9 @@
 - 一次只处理同一条 UI 链路里的一个层级
 - 一个文件连续做 2-4 小步后，应重新评估是否还值得继续
 - 如果当前文件的主流程、关键分支、状态入口都已经清晰，就优先转去下一条更痛的链路，而不是继续深挖
+- 先验证 `quality` / 测试通过，再继续下一步拆分
+- 本仓库 Compose 重构常见顺序：
+  先抽 derived state / render policy
+  再抽 dialog state / section action routing / expansion policy
+  再抽 scene content 或大型子块装配
+  最后才考虑是否还需要继续拆视觉实现细节

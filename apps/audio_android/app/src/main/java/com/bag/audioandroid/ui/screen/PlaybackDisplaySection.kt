@@ -47,6 +47,16 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerSegmentedButtonColors
 import com.bag.audioandroid.ui.state.FlashVisualWindowState
 
+private data class PlaybackDisplayRenderPolicy(
+    val topSpacing: Dp,
+    val showsVisualization: Boolean,
+    val showsMixSpacer: Boolean,
+    val showsFollowSection: Boolean,
+    val followContentSpacing: Dp,
+    val showsExpandableLyrics: Boolean,
+    val bottomSpacing: Dp?,
+)
+
 @Composable
 internal fun PlaybackDisplaySection(
     displayedSamples: Int,
@@ -78,6 +88,7 @@ internal fun PlaybackDisplaySection(
 ) {
     var tokenStripHeightDp by remember(playbackDisplayMode, transportMode) { mutableStateOf<Float?>(null) }
     var stableTokenStripHeightDp by remember(playbackDisplayMode, transportMode) { mutableStateOf<Float?>(null) }
+    val renderPolicy = rememberPlaybackDisplayRenderPolicy(playbackDisplayMode)
     val layoutModel =
         rememberPlaybackDisplayLayoutModel(
             transportMode = transportMode,
@@ -116,6 +127,12 @@ internal fun PlaybackDisplaySection(
             speed = MorseSpeedOption.fromFrameSamples(frameSamples).name.lowercase(),
         )
     }
+    val resolvedTokenStripHeightDp =
+        if (transportMode?.supportsSharedTokenPage() == true) {
+            stableTokenStripHeightDp ?: tokenStripHeightDp
+        } else {
+            tokenStripHeightDp
+        }
 
     Column(
         modifier =
@@ -149,8 +166,8 @@ internal fun PlaybackDisplaySection(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(if (playbackDisplayMode == PlaybackDisplayMode.Lyrics) 6.dp else 10.dp))
-        if (playbackDisplayMode == PlaybackDisplayMode.Visual || playbackDisplayMode == PlaybackDisplayMode.Mix) {
+        Spacer(modifier = Modifier.height(renderPolicy.topSpacing))
+        if (renderPolicy.showsVisualization) {
             PlaybackVisualizationContent(
                 waveformPcm = waveformPcm,
                 sampleRateHz = sampleRateHz,
@@ -170,10 +187,10 @@ internal fun PlaybackDisplaySection(
                 onFlashVisualizationModeSelected = onFlashVisualizationModeSelected,
             )
         }
-        if (playbackDisplayMode == PlaybackDisplayMode.Mix) {
+        if (renderPolicy.showsMixSpacer) {
             Spacer(modifier = Modifier.height(14.dp))
         }
-        if (playbackDisplayMode == PlaybackDisplayMode.Lyrics || playbackDisplayMode == PlaybackDisplayMode.Mix) {
+        if (renderPolicy.showsFollowSection) {
             // The playback area mirrors a music player: visual mode works like album art,
             // while lyrics mode hands off to the formal line-timeline lyric page.
             PlaybackDataFollowSection(
@@ -181,7 +198,7 @@ internal fun PlaybackDisplaySection(
                 displayedSamples = followSectionDisplayedSamples,
                 transportMode = transportMode,
                 initialAnnotationMode = initialFollowViewMode,
-                contentSpacing = if (playbackDisplayMode == PlaybackDisplayMode.Mix) 6.dp else 10.dp,
+                contentSpacing = renderPolicy.followContentSpacing,
                 onTokenStripHeightDpChanged = { heightDp ->
                     tokenStripHeightDp = heightDp
                     stableTokenStripHeightDp =
@@ -193,8 +210,10 @@ internal fun PlaybackDisplaySection(
                 onSeekToSample = onSeekToSample,
             )
         }
-        if (playbackDisplayMode != PlaybackDisplayMode.Mix) {
-            Spacer(modifier = Modifier.height(if (playbackDisplayMode == PlaybackDisplayMode.Lyrics) 6.dp else 10.dp))
+        renderPolicy.bottomSpacing?.let { bottomSpacing ->
+            Spacer(modifier = Modifier.height(bottomSpacing))
+        }
+        if (renderPolicy.showsExpandableLyrics) {
             ExpandablePlaybackLyricsSection(
                 followData = followData,
                 displayedSamples = displayedSamples,
@@ -203,12 +222,7 @@ internal fun PlaybackDisplaySection(
                 transportMode = transportMode,
                 playbackDisplayMode = playbackDisplayMode,
                 lyricsExpanded = lyricsExpanded,
-                tokenStripHeightDp =
-                    if (transportMode?.supportsSharedTokenPage() == true) {
-                        stableTokenStripHeightDp ?: tokenStripHeightDp
-                    } else {
-                        tokenStripHeightDp
-                    },
+                tokenStripHeightDp = resolvedTokenStripHeightDp,
                 extraLyricsRecoveryHeight = extraLyricsRecoveryHeight,
                 applyLyricsPreviewBonusLine = applyLyricsPreviewBonusLine,
                 onLyricsExpandedChanged = onLyricsExpandedChanged,
@@ -218,6 +232,45 @@ internal fun PlaybackDisplaySection(
         }
     }
 }
+
+@Composable
+private fun rememberPlaybackDisplayRenderPolicy(playbackDisplayMode: PlaybackDisplayMode): PlaybackDisplayRenderPolicy =
+    remember(playbackDisplayMode) {
+        when (playbackDisplayMode) {
+            PlaybackDisplayMode.Visual ->
+                PlaybackDisplayRenderPolicy(
+                    topSpacing = 10.dp,
+                    showsVisualization = true,
+                    showsMixSpacer = false,
+                    showsFollowSection = false,
+                    followContentSpacing = 10.dp,
+                    showsExpandableLyrics = true,
+                    bottomSpacing = 10.dp,
+                )
+
+            PlaybackDisplayMode.Mix ->
+                PlaybackDisplayRenderPolicy(
+                    topSpacing = 10.dp,
+                    showsVisualization = true,
+                    showsMixSpacer = true,
+                    showsFollowSection = true,
+                    followContentSpacing = 6.dp,
+                    showsExpandableLyrics = false,
+                    bottomSpacing = null,
+                )
+
+            PlaybackDisplayMode.Lyrics ->
+                PlaybackDisplayRenderPolicy(
+                    topSpacing = 6.dp,
+                    showsVisualization = false,
+                    showsMixSpacer = false,
+                    showsFollowSection = true,
+                    followContentSpacing = 10.dp,
+                    showsExpandableLyrics = true,
+                    bottomSpacing = 6.dp,
+                )
+        }
+    }
 
 internal fun playbackFollowSectionDisplayedSamples(
     playbackDisplayMode: PlaybackDisplayMode,
@@ -241,8 +294,7 @@ private fun rememberMixFlashPlaybackSampleState(
     playbackSpeed: Float,
     sampleRateHz: Int,
 ): FlashVisualPlaybackSampleState? {
-    val flashRoute = visualizationRoute as? PlaybackVisualizationRoute.FlashSignal
-    val followTimelineSource = flashRoute?.input?.bucketSource as? FlashSignalBucketSource.FollowTimeline
+    val followTimelineSource = playbackMixFollowTimelineSourceOrNull(visualizationRoute)
     val totalSamples =
         followTimelineSource
             ?.followData
@@ -309,10 +361,7 @@ private fun PlaybackVisualizationContent(
             )
 
         is PlaybackVisualizationRoute.FlashSignal -> {
-            val flashVisualizationMode =
-                FlashSignalVisualizationMode.values().firstOrNull { mode ->
-                    mode.name == flashVisualizationModeName
-                } ?: FlashSignalVisualizationMode.Lanes
+            val flashVisualizationMode = flashVisualizationModeFromName(flashVisualizationModeName)
             FlashSignalVisualizationModeSwitcher(
                 selectedMode = flashVisualizationMode,
                 onModeSelected = onFlashVisualizationModeSelected,
@@ -363,6 +412,18 @@ private fun PlaybackVisualizationContent(
             )
     }
 }
+
+private fun playbackMixFollowTimelineSourceOrNull(
+    visualizationRoute: PlaybackVisualizationRoute,
+): FlashSignalBucketSource.FollowTimeline? =
+    (visualizationRoute as? PlaybackVisualizationRoute.FlashSignal)
+        ?.input
+        ?.bucketSource as? FlashSignalBucketSource.FollowTimeline
+
+private fun flashVisualizationModeFromName(flashVisualizationModeName: String): FlashSignalVisualizationMode =
+    FlashSignalVisualizationMode.entries.firstOrNull { mode ->
+        mode.name == flashVisualizationModeName
+    } ?: FlashSignalVisualizationMode.Lanes
 
 @Composable
 private fun ExpandablePlaybackLyricsSection(

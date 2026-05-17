@@ -19,12 +19,12 @@ enum class FlashVoicingStyleOption(
         labelResId = R.string.config_flash_style_standard_label,
         descriptionResId = R.string.config_flash_style_standard_description,
     ),
-    Hostile(
-        id = "hostile",
-        signalProfileValue = FlashSignalProfileWire.HOSTILE,
-        voicingFlavorValue = FlashVoicingFlavorWire.HOSTILE,
-        labelResId = R.string.config_flash_style_hostile_label,
-        descriptionResId = R.string.config_flash_style_hostile_description,
+    Hostility(
+        id = "hostility",
+        signalProfileValue = FlashSignalProfileWire.HOSTILITY,
+        voicingFlavorValue = FlashVoicingFlavorWire.HOSTILITY,
+        labelResId = R.string.config_flash_style_hostility_label,
+        descriptionResId = R.string.config_flash_style_hostility_description,
     ),
     Litany(
         id = "litany",

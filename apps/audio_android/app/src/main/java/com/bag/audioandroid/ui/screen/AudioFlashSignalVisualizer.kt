@@ -98,14 +98,11 @@ internal fun AudioFlashSignalVisualizer(
                 .fillMaxWidth()
                 .height(if (showPerfOverlay) 230.dp else 170.dp),
     ) {
-        val layoutModel =
-            rememberFlashSignalVisualizerLayoutModel(
+        val sceneState =
+            rememberFlashSignalVisualizerSceneState(
                 density = density,
                 maxWidth = maxWidth,
                 sampleRateHz = sampleRateHz,
-            )
-        val renderState =
-            rememberFlashSignalVisualizerRenderState(
                 input = input,
                 isPlaying = isPlaying,
                 mode = mode,
@@ -114,54 +111,114 @@ internal fun AudioFlashSignalVisualizer(
                 sharedPlaybackSampleState = sharedPlaybackSampleState,
                 playbackSpeed = playbackSpeed,
                 isScrubbing = isScrubbing,
-                targetBucketCount = layoutModel.targetBucketCount,
-                windowSampleCount = layoutModel.windowSampleCount,
-            )
-        val visualStyle =
-            rememberFlashSignalVisualStyle(
-                colorScheme = MaterialTheme.colorScheme,
                 visualTokens = visualTokens,
+                colorScheme = MaterialTheme.colorScheme,
             )
         recordFlashSignalVisualizerComposeTrace(
             mode = mode,
             isPlaying = isPlaying,
-            renderState = renderState,
+            renderState = sceneState.renderState,
         )
+        FlashSignalVisualizerContent(
+            mode = mode,
+            isPlaying = isPlaying,
+            sampleRateHz = sampleRateHz,
+            showPerfOverlay = showPerfOverlay,
+            sceneState = sceneState,
+        )
+    }
+}
 
-        Column(
+@Composable
+private fun rememberFlashSignalVisualizerSceneState(
+    density: androidx.compose.ui.unit.Density,
+    maxWidth: Dp,
+    sampleRateHz: Int,
+    input: FlashSignalVisualizationInput,
+    isPlaying: Boolean,
+    mode: FlashSignalVisualizationMode,
+    flashVoicingStyle: FlashVoicingStyleOption?,
+    flashVisualWindow: FlashVisualWindowState,
+    sharedPlaybackSampleState: FlashVisualPlaybackSampleState?,
+    playbackSpeed: Float,
+    isScrubbing: Boolean,
+    visualTokens: AppThemeVisualTokens,
+    colorScheme: ColorScheme,
+): FlashSignalVisualizerSceneState {
+    val layoutModel =
+        rememberFlashSignalVisualizerLayoutModel(
+            density = density,
+            maxWidth = maxWidth,
+            sampleRateHz = sampleRateHz,
+        )
+    val renderState =
+        rememberFlashSignalVisualizerRenderState(
+            input = input,
+            isPlaying = isPlaying,
+            mode = mode,
+            flashVoicingStyle = flashVoicingStyle,
+            flashVisualWindow = flashVisualWindow,
+            sharedPlaybackSampleState = sharedPlaybackSampleState,
+            playbackSpeed = playbackSpeed,
+            isScrubbing = isScrubbing,
+            targetBucketCount = layoutModel.targetBucketCount,
+            windowSampleCount = layoutModel.windowSampleCount,
+        )
+    val visualStyle =
+        rememberFlashSignalVisualStyle(
+            colorScheme = colorScheme,
+            visualTokens = visualTokens,
+        )
+    return remember(layoutModel, renderState, visualStyle) {
+        FlashSignalVisualizerSceneState(
+            layoutModel = layoutModel,
+            renderState = renderState,
+            visualStyle = visualStyle,
+        )
+    }
+}
+
+@Composable
+private fun FlashSignalVisualizerContent(
+    mode: FlashSignalVisualizationMode,
+    isPlaying: Boolean,
+    sampleRateHz: Int,
+    showPerfOverlay: Boolean,
+    sceneState: FlashSignalVisualizerSceneState,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        FlashSignalCanvas(
+            mode = mode,
+            isPlaying = isPlaying,
+            renderState = sceneState.renderState,
+            sampleRateHz = sampleRateHz,
+            windowSampleCount = sceneState.layoutModel.windowSampleCount,
+            activeToneColor = sceneState.visualStyle.activeToneColor,
+            inactiveToneColor = sceneState.visualStyle.inactiveToneColor,
+            glowColor = sceneState.visualStyle.glowColor,
+            baseBackground = sceneState.visualStyle.baseBackground,
+            centerLineColor = sceneState.visualStyle.centerLineColor,
+            pulseGuideColor = sceneState.visualStyle.pulseGuideColor,
+            showPerfOverlay = showPerfOverlay,
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            FlashSignalCanvas(
-                mode = mode,
-                isPlaying = isPlaying,
-                renderState = renderState,
-                sampleRateHz = sampleRateHz,
-                windowSampleCount = layoutModel.windowSampleCount,
-                activeToneColor = visualStyle.activeToneColor,
-                inactiveToneColor = visualStyle.inactiveToneColor,
-                glowColor = visualStyle.glowColor,
-                baseBackground = visualStyle.baseBackground,
-                centerLineColor = visualStyle.centerLineColor,
-                pulseGuideColor = visualStyle.pulseGuideColor,
-                showPerfOverlay = showPerfOverlay,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            if (showPerfOverlay) {
-                FlashVisualFpsOverlay(
-                    snapshot = FlashVisualPerfTrace.snapshot(),
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 18.dp),
-                )
-            }
-            FlashSignalBitReadoutSection(
-                bitReadoutFrame = renderState.bitReadoutFrame,
-                activeToneColor = visualStyle.activeToneColor,
-                baseBackground = visualStyle.baseBackground,
+        )
+        if (showPerfOverlay) {
+            FlashVisualFpsOverlay(
+                snapshot = FlashVisualPerfTrace.snapshot(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp),
             )
         }
+        FlashSignalBitReadoutSection(
+            bitReadoutFrame = sceneState.renderState.bitReadoutFrame,
+            activeToneColor = sceneState.visualStyle.activeToneColor,
+            baseBackground = sceneState.visualStyle.baseBackground,
+        )
     }
 }
 
@@ -274,6 +331,19 @@ private data class FlashSignalVisualStyle(
     val pulseGuideColor: Color,
 )
 
+private data class FlashSignalVisualizerSceneState(
+    val layoutModel: FlashSignalVisualizerLayoutModel,
+    val renderState: FlashSignalVisualizerRenderState,
+    val visualStyle: FlashSignalVisualStyle,
+)
+
+private data class FlashSignalCanvasVisualState(
+    val followDisplayedSamplePosition: Float,
+    val runtimeState: FlashSignalCanvasRuntimeState,
+    val glowPulse: Float,
+    val ambientBrush: Brush,
+)
+
 private data class FlashSignalDrawMetrics(
     val visibleSegmentCount: Int,
     val visiblePrimitiveEstimate: Int,
@@ -296,6 +366,130 @@ private fun FlashSignalCanvas(
     showPerfOverlay: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val canvasVisualState =
+        rememberFlashSignalCanvasVisualState(
+            isPlaying = isPlaying,
+            renderState = renderState,
+            activeToneColor = activeToneColor,
+            inactiveToneColor = inactiveToneColor,
+        )
+    val canvasDecisionState = remember { mutableStateOf<FlashSignalCanvasDecision?>(null) }
+
+    Box(modifier = modifier.height(112.dp)) {
+        Canvas(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(112.dp),
+        ) {
+            if (renderState.buckets.isEmpty() && renderState.fixedTimelineFrame == null && renderState.toneSpectrumBuckets.isEmpty()) {
+                return@Canvas
+            }
+
+            val corner = CornerRadius(24f, 24f)
+            val leftPadding = 12.dp.toPx()
+            val rightPadding = 12.dp.toPx()
+            val topPadding = 12.dp.toPx()
+            val bottomPadding = 12.dp.toPx()
+            val innerWidth = (size.width - leftPadding - rightPadding).coerceAtLeast(1f)
+            val innerHeight = (size.height - topPadding - bottomPadding).coerceAtLeast(1f)
+            val canvasDecision =
+                buildFlashSignalCanvasDecision(
+                    mode = mode,
+                    renderState = renderState,
+                    runtimeState = canvasVisualState.runtimeState,
+                    followDisplayedSamplePosition = canvasVisualState.followDisplayedSamplePosition,
+                    windowSampleCount = windowSampleCount,
+                    innerWidth = innerWidth,
+                    showPerfOverlay = showPerfOverlay,
+                )
+            canvasDecisionState.value = canvasDecision
+            recordFlashSignalCanvasTelemetry(
+                mode = mode,
+                isPlaying = isPlaying,
+                renderState = renderState,
+                runtimeState = canvasVisualState.runtimeState,
+                followDisplayedSamplePosition = canvasVisualState.followDisplayedSamplePosition,
+                sampleRateHz = sampleRateHz,
+                windowSampleCount = windowSampleCount,
+                viewportStartSample = canvasDecision.fixedViewport?.startSample ?: 0f,
+                viewportWidthPx = innerWidth,
+            )
+            val drawMetrics =
+                buildFlashSignalDrawMetrics(
+                    mode = mode,
+                    renderState = renderState,
+                    fixedViewport = canvasDecision.fixedViewport,
+                )
+            val drawStartNanos = System.nanoTime()
+
+            drawRoundRect(
+                color = baseBackground,
+                size = size,
+                cornerRadius = corner,
+            )
+            drawRoundRect(
+                brush = canvasVisualState.ambientBrush,
+                size = size,
+                cornerRadius = corner,
+            )
+            drawFlashSignalCanvasContent(
+                canvasDecision = canvasDecision,
+                renderState = renderState,
+                isPlaying = isPlaying,
+                displayedSample = canvasVisualState.followDisplayedSamplePosition,
+                sampleRateHz = sampleRateHz,
+                activeToneColor = activeToneColor,
+                inactiveToneColor = inactiveToneColor,
+                centerLineColor = centerLineColor,
+                glowPulse = canvasVisualState.glowPulse,
+                leftPadding = leftPadding,
+                topPadding = topPadding,
+                innerWidth = innerWidth,
+                innerHeight = innerHeight,
+                showPerfOverlay = showPerfOverlay,
+            )
+            val drawDurationNanos = System.nanoTime() - drawStartNanos
+            FlashVisualPerfTrace.recordDraw(
+                mode = mode,
+                isPlaying = isPlaying,
+                displayedSample = canvasVisualState.followDisplayedSamplePosition,
+                drawableSegments = renderState.visualSegments.size,
+                exactSegments = renderState.fixedTimelineFrame?.segments?.size ?: 0,
+                primitiveEstimate = renderState.primitiveEstimate,
+                visibleSegments = drawMetrics.visibleSegmentCount,
+                visiblePrimitiveEstimate = drawMetrics.visiblePrimitiveEstimate,
+                drawDurationNanos = drawDurationNanos,
+                buckets = drawMetrics.visibleBucketCount,
+                hasFixedTimeline = renderState.fixedTimelineFrame != null,
+                usesFallbackTimeline = renderState.usesFallbackTimeline,
+                hasBitReadout = renderState.bitReadoutFrame != null,
+                windowSamples = renderState.traceWindowSamples,
+                totalSamples = renderState.totalSamples,
+                windowStartSample = renderState.traceWindowStartSample,
+                windowEndSample = renderState.traceWindowEndSample,
+            )
+        }
+        val canvasDecision = canvasDecisionState.value
+        FlashSignalCanvasOverlays(
+            mode = mode,
+            canvasDecision = canvasDecision,
+            runtimeState = canvasVisualState.runtimeState,
+            activeToneColor = activeToneColor,
+            inactiveToneColor = inactiveToneColor,
+            pulseGuideColor = pulseGuideColor,
+            glowColor = glowColor,
+        )
+    }
+}
+
+@Composable
+private fun rememberFlashSignalCanvasVisualState(
+    isPlaying: Boolean,
+    renderState: FlashSignalVisualizerRenderState,
+    activeToneColor: Color,
+    inactiveToneColor: Color,
+): FlashSignalCanvasVisualState {
     val followDisplayedSamplePosition = renderState.playbackSampleState.displayedSample
     val runtimeState =
         rememberFlashSignalCanvasRuntimeState(
@@ -329,120 +523,27 @@ private fun FlashSignalCanvas(
     val glowPulse = if (isPlaying) glowPulseAnimated else 0.82f
     val sweepPhase = if (isPlaying) sweepAnimated else 0.24f
     val ambientBrush =
-        Brush.horizontalGradient(
-            colors =
-                listOf(
-                    inactiveToneColor.copy(alpha = 0.10f + 0.02f * glowPulse),
-                    activeToneColor.copy(alpha = 0.12f + 0.02f * sweepPhase),
-                    inactiveToneColor.copy(alpha = 0.10f + 0.02f * glowPulse),
-                ),
-        )
-    val canvasDecisionState = remember { mutableStateOf<FlashSignalCanvasDecision?>(null) }
-
-    Box(modifier = modifier.height(112.dp)) {
-        Canvas(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(112.dp),
-        ) {
-            if (renderState.buckets.isEmpty() && renderState.fixedTimelineFrame == null && renderState.toneSpectrumBuckets.isEmpty()) {
-                return@Canvas
-            }
-
-            val corner = CornerRadius(24f, 24f)
-            val leftPadding = 12.dp.toPx()
-            val rightPadding = 12.dp.toPx()
-            val topPadding = 12.dp.toPx()
-            val bottomPadding = 12.dp.toPx()
-            val innerWidth = (size.width - leftPadding - rightPadding).coerceAtLeast(1f)
-            val innerHeight = (size.height - topPadding - bottomPadding).coerceAtLeast(1f)
-            val canvasDecision =
-                buildFlashSignalCanvasDecision(
-                    mode = mode,
-                    renderState = renderState,
-                    runtimeState = runtimeState,
-                    followDisplayedSamplePosition = followDisplayedSamplePosition,
-                    windowSampleCount = windowSampleCount,
-                    innerWidth = innerWidth,
-                    showPerfOverlay = showPerfOverlay,
-                )
-            canvasDecisionState.value = canvasDecision
-            recordFlashSignalCanvasTelemetry(
-                mode = mode,
-                isPlaying = isPlaying,
-                renderState = renderState,
-                runtimeState = runtimeState,
-                followDisplayedSamplePosition = followDisplayedSamplePosition,
-                sampleRateHz = sampleRateHz,
-                windowSampleCount = windowSampleCount,
-                viewportStartSample = canvasDecision.fixedViewport?.startSample ?: 0f,
-                viewportWidthPx = innerWidth,
-            )
-            val drawMetrics =
-                buildFlashSignalDrawMetrics(
-                    mode = mode,
-                    renderState = renderState,
-                    fixedViewport = canvasDecision.fixedViewport,
-                )
-            val drawStartNanos = System.nanoTime()
-
-            drawRoundRect(
-                color = baseBackground,
-                size = size,
-                cornerRadius = corner,
-            )
-            drawRoundRect(
-                brush = ambientBrush,
-                size = size,
-                cornerRadius = corner,
-            )
-            drawFlashSignalCanvasContent(
-                canvasDecision = canvasDecision,
-                renderState = renderState,
-                isPlaying = isPlaying,
-                displayedSample = followDisplayedSamplePosition,
-                sampleRateHz = sampleRateHz,
-                activeToneColor = activeToneColor,
-                inactiveToneColor = inactiveToneColor,
-                centerLineColor = centerLineColor,
-                glowPulse = glowPulse,
-                leftPadding = leftPadding,
-                topPadding = topPadding,
-                innerWidth = innerWidth,
-                innerHeight = innerHeight,
-                showPerfOverlay = showPerfOverlay,
-            )
-            val drawDurationNanos = System.nanoTime() - drawStartNanos
-            FlashVisualPerfTrace.recordDraw(
-                mode = mode,
-                isPlaying = isPlaying,
-                displayedSample = followDisplayedSamplePosition,
-                drawableSegments = renderState.visualSegments.size,
-                exactSegments = renderState.fixedTimelineFrame?.segments?.size ?: 0,
-                primitiveEstimate = renderState.primitiveEstimate,
-                visibleSegments = drawMetrics.visibleSegmentCount,
-                visiblePrimitiveEstimate = drawMetrics.visiblePrimitiveEstimate,
-                drawDurationNanos = drawDurationNanos,
-                buckets = drawMetrics.visibleBucketCount,
-                hasFixedTimeline = renderState.fixedTimelineFrame != null,
-                usesFallbackTimeline = renderState.usesFallbackTimeline,
-                hasBitReadout = renderState.bitReadoutFrame != null,
-                windowSamples = renderState.traceWindowSamples,
-                totalSamples = renderState.totalSamples,
-                windowStartSample = renderState.traceWindowStartSample,
-                windowEndSample = renderState.traceWindowEndSample,
+        remember(activeToneColor, inactiveToneColor, glowPulse, sweepPhase) {
+            Brush.horizontalGradient(
+                colors =
+                    listOf(
+                        inactiveToneColor.copy(alpha = 0.10f + 0.02f * glowPulse),
+                        activeToneColor.copy(alpha = 0.12f + 0.02f * sweepPhase),
+                        inactiveToneColor.copy(alpha = 0.10f + 0.02f * glowPulse),
+                    ),
             )
         }
-        val canvasDecision = canvasDecisionState.value
-        FlashSignalCanvasOverlays(
-            mode = mode,
-            canvasDecision = canvasDecision,
+    return remember(
+        followDisplayedSamplePosition,
+        runtimeState,
+        glowPulse,
+        ambientBrush,
+    ) {
+        FlashSignalCanvasVisualState(
+            followDisplayedSamplePosition = followDisplayedSamplePosition,
             runtimeState = runtimeState,
-            activeToneColor = activeToneColor,
-            inactiveToneColor = inactiveToneColor,
-            pulseGuideColor = pulseGuideColor,
-            glowColor = glowColor,
+            glowPulse = glowPulse,
+            ambientBrush = ambientBrush,
         )
     }
 }

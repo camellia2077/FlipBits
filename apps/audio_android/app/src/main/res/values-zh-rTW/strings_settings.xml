@@ -60,8 +60,8 @@
     <string name="config_flash_style_subtitle">選擇 flash 音訊的聲音風格。</string>
     <string name="config_flash_style_standard_label">標準</string>
     <string name="config_flash_style_standard_description">清晰穩定的機械訊號。</string>
-    <string name="config_flash_style_hostile_label">敵意</string>
-    <string name="config_flash_style_hostile_description">憤怒的命令預設，使用更短、更硬的訊號時序。</string>
+    <string name="config_flash_style_hostility_label">敵意</string>
+    <string name="config_flash_style_hostility_description">憤怒的命令預設，使用更短、更硬的訊號時序。</string>
     <string name="config_flash_style_litany_label">崇敬</string>
     <string name="config_flash_style_litany_description">崇敬祈禱預設，使用較慢的儀式訊號節奏。</string>
     <string name="config_flash_style_collapse_label">恐懼</string>

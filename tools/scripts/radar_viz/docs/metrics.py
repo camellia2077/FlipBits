@@ -22,7 +22,7 @@ import os
 RAW_DATA = {
     # Flash 模式 (基准 BFSK)
     "Steady":   {"fs": 0.9375, "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
-    "Hostile":  {"fs": 0.875,  "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
+    "Hostility":  {"fs": 0.875,  "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
     "Litany":   {"fs": 6.0,    "bps": 1,    "charset": 256, "silence": 2, "jitter": 0, "dtmf": 0},
     "Collapse": {"fs": 1.0,    "bps": 1,    "charset": 256, "silence": 0, "jitter": 5, "dtmf": 0},
     "Zeal":     {"fs": 0.625,  "bps": 1,    "charset": 256, "silence": 0, "jitter": 2, "dtmf": 0},  # 变速均值

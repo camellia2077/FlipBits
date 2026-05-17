@@ -61,8 +61,8 @@
     <string name="config_flash_style_subtitle">Wybierz, jak ma brzmieć audio flash.</string>
     <string name="config_flash_style_standard_label">Standard</string>
     <string name="config_flash_style_standard_description">Wyraźna, stabilna sygnalizacja mechaniczna.</string>
-    <string name="config_flash_style_hostile_label">Wrogość</string>
-    <string name="config_flash_style_hostile_description">Gniewny preset rozkazu z krótszym, twardszym taktowaniem sygnału.</string>
+    <string name="config_flash_style_hostility_label">Wrogość</string>
+    <string name="config_flash_style_hostility_description">Gniewny preset rozkazu z krótszym, twardszym taktowaniem sygnału.</string>
     <string name="config_flash_style_litany_label">Litania</string>
     <string name="config_flash_style_litany_description">Preset nabożnej modlitwy z wolniejszą rytualną kadencją sygnału.</string>
     <string name="config_flash_style_collapse_label">Załamanie</string>

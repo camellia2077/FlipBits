@@ -72,8 +72,8 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
             case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_LITANY:
                 flash_style_object = FindFlashStyleById(env, flash_entries, "litany");
                 break;
-            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILE:
-                flash_style_object = FindFlashStyleById(env, flash_entries, "hostile");
+            case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_HOSTILITY:
+                flash_style_object = FindFlashStyleById(env, flash_entries, "hostility");
                 break;
             case AUDIO_IO_METADATA_FLASH_VOICING_STYLE_COLLAPSE:
                 flash_style_object = FindFlashStyleById(env, flash_entries, "collapse");

@@ -61,8 +61,8 @@
     <string name="config_flash_style_subtitle">Scegli come deve suonare l’audio flash.</string>
     <string name="config_flash_style_standard_label">Standard</string>
     <string name="config_flash_style_standard_description">Segnalazione meccanica chiara e stabile.</string>
-    <string name="config_flash_style_hostile_label">Ostilità</string>
-    <string name="config_flash_style_hostile_description">Preset di comando furioso con temporizzazione del segnale più corta e dura.</string>
+    <string name="config_flash_style_hostility_label">Ostilità</string>
+    <string name="config_flash_style_hostility_description">Preset di comando furioso con temporizzazione del segnale più corta e dura.</string>
     <string name="config_flash_style_litany_label">Litania</string>
     <string name="config_flash_style_litany_description">Preset di preghiera riverente con cadenza rituale più lenta.</string>
     <string name="config_flash_style_collapse_label">Collasso</string>

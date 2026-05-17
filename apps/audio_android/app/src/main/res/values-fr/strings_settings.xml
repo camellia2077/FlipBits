@@ -60,8 +60,8 @@
     <string name="config_flash_style_subtitle">Choisissez le rendu sonore de l’audio flash.</string>
     <string name="config_flash_style_standard_label">Standard</string>
     <string name="config_flash_style_standard_description">Signalisation mécanique claire et stable.</string>
-    <string name="config_flash_style_hostile_label">Hostilité</string>
-    <string name="config_flash_style_hostile_description">Préréglage de commandement furieux avec un timing de signal plus court et plus dur.</string>
+    <string name="config_flash_style_hostility_label">Hostilité</string>
+    <string name="config_flash_style_hostility_description">Préréglage de commandement furieux avec un timing de signal plus court et plus dur.</string>
     <string name="config_flash_style_litany_label">Litanie</string>
     <string name="config_flash_style_litany_description">Préréglage de prière révérencielle avec une cadence rituelle plus lente.</string>
     <string name="config_flash_style_collapse_label">Effondrement</string>

@@ -559,7 +559,7 @@ internal fun toneFrequencyScaleForStyle(flashVoicingStyle: FlashVoicingStyleOpti
                         ToneFrequencyReference(600f, 600f, "600 Hz"),
                     ),
             )
-        FlashVoicingStyleOption.Hostile ->
+        FlashVoicingStyleOption.Hostility ->
             ToneFrequencyScale(
                 minHz = 420f,
                 maxHz = 1_320f,
@@ -596,7 +596,7 @@ internal fun toneCarrierLayoutForStyle(flashVoicingStyle: FlashVoicingStyleOptio
         FlashVoicingStyleOption.Litany -> ToneCarrierLayout(lowHz = 220f, highHz = 440f)
         FlashVoicingStyleOption.Collapse -> ToneCarrierLayout(lowHz = 273f, highHz = 546f)
         FlashVoicingStyleOption.Standard -> ToneCarrierLayout(lowHz = 300f, highHz = 600f)
-        FlashVoicingStyleOption.Hostile -> ToneCarrierLayout(lowHz = 559f, highHz = 1_118f)
+        FlashVoicingStyleOption.Hostility -> ToneCarrierLayout(lowHz = 559f, highHz = 1_118f)
         FlashVoicingStyleOption.Zeal -> ToneCarrierLayout(lowHz = 730f, highHz = 1_460f)
         FlashVoicingStyleOption.Void -> ToneCarrierLayout(lowHz = 205f, highHz = 410f)
     }

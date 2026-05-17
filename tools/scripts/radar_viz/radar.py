@@ -12,7 +12,7 @@ import config
 import config_fonts
 
 # Flash 模式使用 JetBrains Mono，其余使用 IBM Plex Mono
-_FLASH_MODES = {"Steady", "Hostile", "Litany", "Collapse", "Zeal", "Void"}
+_FLASH_MODES = {"Steady", "Hostility", "Litany", "Collapse", "Zeal", "Void"}
 
 
 class RadarChart:

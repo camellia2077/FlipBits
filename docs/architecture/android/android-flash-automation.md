@@ -19,7 +19,7 @@ Covered:
 - Scenario kinds:
   - `ui`: real foreground UI regression through player detail + Compose visual rendering.
   - `headless`: generated-audio diagnostics without opening player detail or depending on the visual Canvas.
-- Flash voicing styles: `standard`, `hostile`, `litany`, `collapse`, `zeal`, `void`
+- Flash voicing styles: `standard`, `hostility`, `litany`, `collapse`, `zeal`, `void`
 - Flash visual modes accepted by the adb scenario: `lanes`, `pulse`, `pitch`
 - Playback detail display modes accepted by the adb scenario: `lyrics`, `visual`, `mix`
 - UI scenario actions driven through the normal ViewModel path:
@@ -133,7 +133,7 @@ Supported extras:
   - Applied before sample resolution and before the player detail capture.
   - Useful when the same scenario should be replayed across multiple languages without manually opening Settings first.
 - `wb.flash.style`
-  - `standard`, `hostile`, `litany`, `collapse`, `zeal`, `void`
+  - `standard`, `hostility`, `litany`, `collapse`, `zeal`, `void`
 - `wb.display`
   - `lyrics` by default.
   - Supports `lyrics`, `visual`, and `mix`.
@@ -406,7 +406,7 @@ Headless does not validate Compose drawing, edge fades, visual bar spacing, clip
 All-style fast sweep example:
 
 ```powershell
-$styles = @("standard", "hostile", "litany", "collapse", "zeal", "void")
+$styles = @("standard", "hostility", "litany", "collapse", "zeal", "void")
 foreach ($style in $styles) {
     adb logcat -c
     adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_FLASH_SCENARIO --es wb.scenario ui --es wb.flash.style $style --es wb.visual lanes --ez wb.encode true --ez wb.play true --el wb.play.ms 6000

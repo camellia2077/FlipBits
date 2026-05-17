@@ -69,8 +69,8 @@
     <string name="config_flash_style_subtitle">Flash 오디오의 사운드 방식을 선택하세요.</string>
     <string name="config_flash_style_standard_label">표준</string>
     <string name="config_flash_style_standard_description">명확하고 안정적인 기계 신호.</string>
-    <string name="config_flash_style_hostile_label">적의</string>
-    <string name="config_flash_style_hostile_description">더 짧고 단단한 신호 타이밍을 사용하는 분노한 명령 프리셋입니다.</string>
+    <string name="config_flash_style_hostility_label">적의</string>
+    <string name="config_flash_style_hostility_description">더 짧고 단단한 신호 타이밍을 사용하는 분노한 명령 프리셋입니다.</string>
     <string name="config_flash_style_litany_label">경배</string>
     <string name="config_flash_style_litany_description">기도 프리셋이며 더 느린 의식 신호 박자를 사용합니다.</string>
     <string name="config_flash_style_collapse_label">공포</string>
