@@ -5,11 +5,11 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 
-internal val materialCyansBluesPalettes: List<PaletteOption> =
+internal val materialBluePalettes: List<PaletteOption> =
     listOf(
         vividPalette(
             id = "teal",
-            family = PaletteFamily.CyansBlues,
+            family = PaletteFamily.Blues,
             titleResId = R.string.palette_teal_title,
             primary = Color(0xFF00839B),
             primaryContainer = Color(0xFFABEEFF),
@@ -27,7 +27,7 @@ internal val materialCyansBluesPalettes: List<PaletteOption> =
         ),
         vividPalette(
             id = "cyan",
-            family = PaletteFamily.CyansBlues,
+            family = PaletteFamily.Blues,
             titleResId = R.string.palette_cyan_title,
             primary = Color(0xFF00A7C2),
             primaryContainer = Color(0xFFB8F4FF),
@@ -45,7 +45,7 @@ internal val materialCyansBluesPalettes: List<PaletteOption> =
         ),
         vividPalette(
             id = "sky",
-            family = PaletteFamily.CyansBlues,
+            family = PaletteFamily.Blues,
             titleResId = R.string.palette_sky_title,
             primary = Color(0xFF1A7BFF),
             primaryContainer = Color(0xFFD8E7FF),
@@ -62,26 +62,8 @@ internal val materialCyansBluesPalettes: List<PaletteOption> =
                 ),
         ),
         vividPalette(
-            id = "ocean",
-            family = PaletteFamily.CyansBlues,
-            titleResId = R.string.palette_ocean_title,
-            primary = Color(0xFF005CE6),
-            primaryContainer = Color(0xFFDCE2FF),
-            secondary = Color(0xFF505E7A),
-            tertiary = Color(0xFF6B5778),
-            background = Color(0xFFF7F9FF),
-            dark =
-                darkSeed(
-                    background = Color(0xFF0B121A),
-                    surface = Color(0xFF131C27),
-                    primary = Color(0xFF8AB4FF),
-                    secondary = Color(0xFFBECAE0),
-                    tertiary = Color(0xFFD3B4DA),
-                ),
-        ),
-        vividPalette(
             id = "cobalt",
-            family = PaletteFamily.CyansBlues,
+            family = PaletteFamily.Blues,
             titleResId = R.string.palette_cobalt_title,
             primary = Color(0xFF2563EB),
             primaryContainer = Color(0xFFDCE4FF),
@@ -99,7 +81,7 @@ internal val materialCyansBluesPalettes: List<PaletteOption> =
         ),
         vividPalette(
             id = "indigo",
-            family = PaletteFamily.CyansBlues,
+            family = PaletteFamily.Blues,
             titleResId = R.string.palette_indigo_title,
             primary = Color(0xFF3D4FD4),
             primaryContainer = Color(0xFFDFE0FF),
@@ -113,6 +95,24 @@ internal val materialCyansBluesPalettes: List<PaletteOption> =
                     primary = Color(0xFFB2BAFF),
                     secondary = Color(0xFFC8CAE0),
                     tertiary = Color(0xFFE1B4CC),
+                ),
+        ),
+        vividPalette(
+            id = "ocean",
+            family = PaletteFamily.Blues,
+            titleResId = R.string.palette_ocean_title,
+            primary = Color(0xFF005CE6),
+            primaryContainer = Color(0xFFDCE2FF),
+            secondary = Color(0xFF505E7A),
+            tertiary = Color(0xFF6B5778),
+            background = Color(0xFFF7F9FF),
+            dark =
+                darkSeed(
+                    background = Color(0xFF0B121A),
+                    surface = Color(0xFF131C27),
+                    primary = Color(0xFF8AB4FF),
+                    secondary = Color(0xFFBECAE0),
+                    tertiary = Color(0xFFD3B4DA),
                 ),
         ),
     )

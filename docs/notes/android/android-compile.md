@@ -25,9 +25,8 @@ adb install -r apps\audio_android\app\build\outputs\apk\release\FlipBits-release
 
 如果签名不一致又想装，只能先卸载旧包再装（会丢应用数据）：
 
-adb uninstall com.your.package
-adb install path\to\app-release.apk
-
+adb uninstall com.bag.audioandroid
+adb install apps\audio_android\app\build\outputs\apk\release\FlipBits-release.apk
 
 ## Debug 
 

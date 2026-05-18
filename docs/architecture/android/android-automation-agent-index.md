@@ -73,6 +73,7 @@
 适用场景：
 
 - `wb.lang` 语言覆盖
+- `Audio / Saved / Settings` tab 跳转
 - measurement baseline reset
 - 判断哪些 Settings 状态能通过 adb scenario 驱动
 - 判断 `capture-*` wrapper 和 raw adb extras 的差异

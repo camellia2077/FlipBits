@@ -23,6 +23,7 @@ internal fun vividPalette(
     id: String,
     family: PaletteFamily,
     titleResId: Int,
+    titleOverride: String? = null,
     primary: Color,
     primaryContainer: Color,
     secondary: Color,
@@ -43,6 +44,7 @@ internal fun vividPalette(
         id = id,
         family = family,
         titleResId = titleResId,
+        titleOverride = titleOverride,
         previewColor = primary,
         lightScheme =
             lightColorScheme(
@@ -146,6 +148,7 @@ fun customMaterialPalette(settings: CustomBrandThemeSettings): PaletteOption {
         id = customMaterialPaletteId(settings.presetId),
         family = PaletteFamily.Custom,
         titleResId = R.string.palette_family_custom,
+        titleOverride = settings.displayName,
         primary = primary,
         primaryContainer = lightPrimaryContainer,
         secondary = secondary,

@@ -62,6 +62,7 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     flash_capture.add_argument("--scenario", choices=["ui", "headless"], default="ui")
     flash_capture.add_argument("--style", default="litany", help="Flash voicing style.")
     flash_capture.add_argument("--display", choices=["lyrics", "visual", "mix"], default="lyrics")
+    flash_capture.add_argument("--lang", help="Optional app language override, for example en or zh.")
     flash_capture.add_argument("--follow-view", choices=["binary", "hex", "morse"], default="binary")
     flash_capture.add_argument("--visual", default="lanes", help="Flash visual mode.")
     flash_capture.add_argument("--input", dest="input_text", help="Optional text override.")
@@ -104,8 +105,15 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     mini_capture.add_argument("--wait-ms", type=int, default=20000, help="Delay before dumping logcat.")
     mini_capture.add_argument("--scenario", choices=["ui"], default="ui")
     mini_capture.add_argument("--speed", choices=["slow", "standard", "fast"], default="standard")
+    mini_capture.add_argument("--lang", help="Optional app language override, for example en or zh.")
+    mini_capture.add_argument("--display", choices=["lyrics", "visual"], default="lyrics")
+    mini_capture.add_argument("--morse-visual", choices=["vertical", "horizontal"], default="vertical")
+    mini_capture.add_argument("--expand-lyrics", action="store_true", help="Pass wb.lyrics.expand=true.")
+    mini_capture.add_argument("--perf-overlay", action="store_true", help="Pass wb.visual.perf_overlay=true.")
     mini_capture.add_argument("--input", dest="input_text", help="Optional text override.")
     mini_capture.add_argument("--play-ms", type=int, default=6000)
+    mini_capture.add_argument("--play-end", choices=["stop", "pause"], default="stop", help="Action to take when play-ms elapses.")
+    mini_capture.add_argument("--play-script", help="Comma-separated toggle script like 700:pause,820:resume,940:pause,1060:resume.")
     mini_capture.add_argument("--no-encode", action="store_true", help="Pass wb.encode=false.")
     mini_capture.add_argument("--no-play", action="store_true", help="Pass wb.play=false.")
     mini_capture.add_argument("--max-rows", type=int, default=24, help="Maximum summary rows.")
@@ -118,6 +126,7 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     progress_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")
     progress_capture.add_argument("--wait-ms", type=int, default=140000, help="Delay before dumping logcat.")
     progress_capture.add_argument("--mode", choices=["mini", "pro", "ultra"], default="mini")
+    progress_capture.add_argument("--lang", help="Optional app language override, for example en or zh.")
     progress_capture.add_argument("--speed", choices=["slow", "standard", "fast"], default="standard")
     progress_capture.add_argument("--input", dest="input_text", help="Optional text override.")
     progress_capture.add_argument("--sample-length", choices=["short", "long"], help="Built-in sample length.")
@@ -128,6 +137,33 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     progress_capture.add_argument("--no-encode", action="store_true", help="Pass wb.encode=false.")
     progress_capture.add_argument("--max-rows", type=int, default=80, help="Maximum summary rows.")
     progress_capture.set_defaults(func=cmd_android_debug)
+
+    saved_capture = action_parsers.add_parser("capture-saved", help="Run Saved-audio debug scenario and write logs.")
+    saved_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")
+    saved_capture.add_argument("--wait-ms", type=int, default=15000, help="Delay before dumping logcat.")
+    saved_capture.add_argument("--item-id", help="Exact Saved item id.")
+    saved_capture.add_argument("--display-name", help="Exact Saved display name.")
+    saved_capture.add_argument("--seed-duration-ms", type=int, help="Optional duration for debug-only seeding.")
+    saved_capture.add_argument("--seed-mode", choices=["mini", "pro", "ultra"], default="mini")
+    saved_capture.set_defaults(func=cmd_android_debug)
+
+    tab_capture = action_parsers.add_parser("capture-tab", help="Jump to an app tab through adb and write logs.")
+    tab_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")
+    tab_capture.add_argument("--wait-ms", type=int, default=3000, help="Delay before dumping logcat.")
+    tab_capture.add_argument("--tab", choices=["audio", "saved", "settings"], required=True)
+    tab_capture.add_argument("--lang", help="Optional app language override, for example en or zh.")
+    tab_capture.set_defaults(func=cmd_android_debug)
+
+    settings_import_capture = action_parsers.add_parser(
+        "capture-settings-import",
+        help="Run the Settings material copy/import duplicate-check scenario and write logs.",
+    )
+    settings_import_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")
+    settings_import_capture.add_argument("--wait-ms", type=int, default=3000, help="Delay before dumping logcat.")
+    settings_import_capture.add_argument("--lang", help="Optional app language override, for example en or zh.")
+    settings_import_capture.add_argument("--confirm", choices=["none", "overwrite", "copy"], default="none")
+    settings_import_capture.add_argument("--scope", choices=["current", "all"], default="current")
+    settings_import_capture.set_defaults(func=cmd_android_debug)
 
 
 def _path_arg(value: str):

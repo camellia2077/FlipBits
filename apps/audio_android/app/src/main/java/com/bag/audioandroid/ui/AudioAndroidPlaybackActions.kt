@@ -58,6 +58,8 @@ internal class AudioAndroidPlaybackActions(
         commandActions.onTogglePlayback()
     }
 
+    fun pauseCurrentPlaybackIfPlaying(): Boolean = commandActions.pauseCurrentPlaybackIfPlaying()
+
     fun onScrubStarted() {
         scrubActions.onScrubStarted()
     }

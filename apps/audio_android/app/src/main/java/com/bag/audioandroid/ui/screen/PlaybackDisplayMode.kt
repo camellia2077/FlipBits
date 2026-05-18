@@ -15,6 +15,11 @@ data class DebugPlaybackDisplayModeRequest(
     val mode: PlaybackDisplayMode,
 )
 
+data class DebugMorseVisualizationModeRequest(
+    val requestId: Long,
+    val mode: MiniMorseVisualizationMode,
+)
+
 fun String?.toPlaybackDisplayMode(): PlaybackDisplayMode =
     when (this?.trim()?.lowercase()) {
         "visual" -> PlaybackDisplayMode.Visual

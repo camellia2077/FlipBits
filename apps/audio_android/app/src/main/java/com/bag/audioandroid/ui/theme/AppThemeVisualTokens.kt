@@ -14,6 +14,7 @@ import com.bag.audioandroid.ui.model.ThemeStyleOption
 @Immutable
 data class AppThemeVisualTokens(
     val themeStyle: ThemeStyleOption,
+    val audioEncodeGlyphColors: AudioEncodeGlyphColors,
     val dockContainerColor: Color,
     val modalContainerColor: Color,
     val modalContentColor: Color,
@@ -46,6 +47,12 @@ data class AppThemeVisualTokens(
 internal val DefaultAppThemeVisualTokens =
     AppThemeVisualTokens(
         themeStyle = ThemeStyleOption.Material,
+        audioEncodeGlyphColors =
+            AudioEncodeGlyphColors(
+                primarySplit = Color.Unspecified,
+                secondarySplit = Color.Unspecified,
+                outline = Color.Unspecified,
+            ),
         dockContainerColor = Color.Unspecified,
         modalContainerColor = Color.Unspecified,
         modalContentColor = Color.Unspecified,
@@ -92,6 +99,11 @@ fun appThemeVisualTokens(): AppThemeVisualTokens = LocalAppThemeVisualTokens.cur
 fun materialThemeVisualTokens(colorScheme: ColorScheme): AppThemeVisualTokens =
     AppThemeVisualTokens(
         themeStyle = ThemeStyleOption.Material,
+        audioEncodeGlyphColors =
+            audioEncodeGlyphColorsForMaterial(
+                colorScheme = colorScheme,
+                isDarkTheme = colorScheme.background.luminance() < 0.5f,
+            ),
         dockContainerColor = colorScheme.surface,
         modalContainerColor = colorScheme.primaryContainer,
         modalContentColor = colorScheme.onPrimaryContainer,
@@ -136,6 +148,7 @@ fun brandThemeVisualTokens(
 
     return AppThemeVisualTokens(
         themeStyle = ThemeStyleOption.BrandDualTone,
+        audioEncodeGlyphColors = audioEncodeGlyphColorsForBrandTheme(theme),
         // Keep the dock on the main color lane with just enough accent tint to separate it from
         // the page background. This avoids falling back to Material's primaryContainer semantics.
         dockContainerColor = blend(base, accent, 0.10f),

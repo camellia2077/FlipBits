@@ -458,4 +458,8 @@
     <!-- CONTEXT: Tab label for the playback screen's mixed mode that combines the visualizer and token view. Keep it short and preserve the English product term Mix in all locales. -->
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
+    <!-- CONTEXT: Short mode label in the mini/Morse visualizer for the existing stacked timeline view. -->
+    <string name="audio_morse_visualizer_mode_vertical">Vertical</string>
+    <!-- CONTEXT: Short mode label in the mini/Morse visualizer for the new left-to-right playback strip. -->
+    <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
 </resources>

@@ -30,9 +30,11 @@ import com.bag.audioandroid.ui.screen.formatDurationMillis
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
+import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.customBrandTheme
 import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 
 data class AudioAppUiState(
     val selectedTab: AppTab = AppTab.Audio,
@@ -42,17 +44,29 @@ data class AudioAppUiState(
     val presentationVersion: String = "",
     val coreVersion: String = "",
     val selectedPalette: PaletteOption = DefaultMaterialPalette,
+    val selectedMaterialPaletteIdLight: String? = null,
+    val selectedMaterialPaletteIdDark: String? = null,
     val customMaterialThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomMaterialPaletteSettings),
     val selectedBrandTheme: BrandThemeOption = DefaultBrandTheme,
     val customBrandThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomBrandThemeSettings),
     val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.BrandDualTone,
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
+    val isMaterialDarkThemeActive: Boolean = false,
     val isDemoModeEnabled: Boolean = false,
     val isSampleAutoFillEnabled: Boolean = true,
     val isSampleDecorationEnabled: Boolean = true,
     val isFlashVisualPerfOverlayEnabled: Boolean = false,
     val isConfigLanguageExpanded: Boolean = true,
     val isConfigThemeAppearanceExpanded: Boolean = true,
+    val isConfigCustomMaterialThemeExpanded: Boolean = true,
+    val isConfigBuiltInMaterialPalettesExpanded: Boolean = true,
+    val isConfigMaterialRedsPaletteExpanded: Boolean = true,
+    val isConfigMaterialOrangesPaletteExpanded: Boolean = true,
+    val isConfigMaterialYellowsPaletteExpanded: Boolean = true,
+    val isConfigMaterialGreensPaletteExpanded: Boolean = true,
+    val isConfigMaterialBluesPaletteExpanded: Boolean = true,
+    val isConfigMaterialPurplesPaletteExpanded: Boolean = true,
+    val isConfigMaterialNeutralsPaletteExpanded: Boolean = true,
     val isConfigSampleTextExpanded: Boolean = false,
     val isConfigCustomBrandThemeExpanded: Boolean = false,
     val isConfigSacredMachineBrandThemeExpanded: Boolean = false,
@@ -447,3 +461,40 @@ private fun savedMiniPlayerSubtitle(
         listOf(modeLabel, formatDurationMillis(durationMs)),
     )
 }
+
+internal fun AudioAppUiState.materialPaletteIdForMode(isDarkTheme: Boolean): String? =
+    if (isDarkTheme) {
+        selectedMaterialPaletteIdDark ?: selectedMaterialPaletteIdLight ?: selectedPalette.id
+    } else {
+        selectedMaterialPaletteIdLight ?: selectedMaterialPaletteIdDark ?: selectedPalette.id
+    }
+
+internal fun AudioAppUiState.withMaterialDarkThemeActive(isDarkTheme: Boolean): AudioAppUiState =
+    if (isMaterialDarkThemeActive == isDarkTheme) {
+        this
+    } else {
+        copy(
+            isMaterialDarkThemeActive = isDarkTheme,
+            selectedPalette = resolveMaterialPaletteById(materialPaletteIdForMode(isDarkTheme)),
+        )
+    }
+
+internal fun AudioAppUiState.withSelectedThemeMode(themeMode: ThemeModeOption): AudioAppUiState {
+    val resolvedDarkTheme =
+        when (themeMode) {
+            ThemeModeOption.Light -> false
+            ThemeModeOption.Dark -> true
+            ThemeModeOption.FollowSystem -> isMaterialDarkThemeActive
+        }
+    return copy(selectedThemeMode = themeMode).withMaterialDarkThemeActive(resolvedDarkTheme)
+}
+
+internal fun AudioAppUiState.resolveMaterialPaletteById(paletteId: String?): PaletteOption =
+    if (paletteId != null && isCustomMaterialPaletteId(paletteId)) {
+        customMaterialThemePresets
+            .map(::customMaterialPalette)
+            .firstOrNull { it.id == paletteId }
+            ?: customMaterialPalette(customMaterialThemePresets.first())
+    } else {
+        MaterialPalettes.firstOrNull { it.id == paletteId } ?: DefaultMaterialPalette
+    }

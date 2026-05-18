@@ -103,6 +103,12 @@ internal fun morsePatternVisualWidthDp(morse: String): Dp {
     return symbolWidths + gapWidth
 }
 
+internal fun morseElementVisualWidthDp(symbol: Char): Dp =
+    when (symbol) {
+        '-' -> MorseDashWidth
+        else -> MorseDotWidth
+    }
+
 internal fun morseLetterVisualWidthDp(
     letter: String,
     morse: String,

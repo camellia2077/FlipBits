@@ -25,6 +25,7 @@ import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.screen.AudioTabScreen
 import com.bag.audioandroid.ui.screen.ConfigTabScreen
+import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
 import com.bag.audioandroid.ui.screen.MiniPlayerBar
@@ -53,6 +54,8 @@ internal fun AudioAndroidMainScaffold(
     onDebugExpandLyricsHandled: (Long) -> Unit = {},
     debugPlaybackDisplayModeRequest: DebugPlaybackDisplayModeRequest? = null,
     onDebugPlaybackDisplayModeHandled: (Long) -> Unit = {},
+    debugMorseVisualizationModeRequest: DebugMorseVisualizationModeRequest? = null,
+    onDebugMorseVisualizationModeHandled: (Long) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val currentSession = uiState.currentSession
@@ -212,6 +215,8 @@ internal fun AudioAndroidMainScaffold(
                     onDebugExpandLyricsHandled = onDebugExpandLyricsHandled,
                     debugPlaybackDisplayModeRequest = debugPlaybackDisplayModeRequest,
                     onDebugPlaybackDisplayModeHandled = onDebugPlaybackDisplayModeHandled,
+                    debugMorseVisualizationModeRequest = debugMorseVisualizationModeRequest,
+                    onDebugMorseVisualizationModeHandled = onDebugMorseVisualizationModeHandled,
                     initialFollowViewMode = debugScenario?.followViewMode ?: PlaybackFollowViewMode.Binary,
                     initialFlashVisualizationMode = debugScenario?.visualMode,
                     modifier = Modifier.padding(sheetInnerPadding),
@@ -268,15 +273,37 @@ internal fun AudioAndroidMainScaffold(
                     onCustomBrandThemeSaved = viewModel::onCustomBrandThemeSaved,
                     onCustomBrandThemeDeleted = viewModel::onCustomBrandThemeDeleted,
                     onCustomBrandThemesImported = viewModel::onCustomBrandThemesImported,
+                    onCustomBrandThemesReordered = viewModel::onCustomBrandThemesReordered,
                     customMaterialThemePresets = uiState.customMaterialThemePresets,
                     customMaterialThemeSettings = uiState.customMaterialThemeSettings,
                     onCustomMaterialThemeSaved = viewModel::onCustomMaterialThemeSaved,
+                    onCustomMaterialThemeDeleted = viewModel::onCustomMaterialThemeDeleted,
+                    onCustomMaterialThemesImported = viewModel::onCustomMaterialThemesImported,
+                    onCustomMaterialThemesReordered = viewModel::onCustomMaterialThemesReordered,
                     onCreateCustomMaterialTheme = viewModel::onCreateCustomMaterialTheme,
                     customBrandThemePresets = uiState.customBrandThemePresets,
                     selectedThemeMode = uiState.selectedThemeMode,
                     onThemeModeSelected = viewModel::onThemeModeSelected,
                     isThemeAppearanceExpanded = uiState.isConfigThemeAppearanceExpanded,
                     onThemeAppearanceExpandedChanged = viewModel::onConfigThemeAppearanceExpandedChanged,
+                    isCustomMaterialThemeExpanded = uiState.isConfigCustomMaterialThemeExpanded,
+                    onCustomMaterialThemeExpandedChanged = viewModel::onConfigCustomMaterialThemeExpandedChanged,
+                    isBuiltInMaterialPalettesExpanded = uiState.isConfigBuiltInMaterialPalettesExpanded,
+                    onBuiltInMaterialPalettesExpandedChanged = viewModel::onConfigBuiltInMaterialPalettesExpandedChanged,
+                    isMaterialRedsPaletteExpanded = uiState.isConfigMaterialRedsPaletteExpanded,
+                    onMaterialRedsPaletteExpandedChanged = viewModel::onConfigMaterialRedsPaletteExpandedChanged,
+                    isMaterialOrangesPaletteExpanded = uiState.isConfigMaterialOrangesPaletteExpanded,
+                    onMaterialOrangesPaletteExpandedChanged = viewModel::onConfigMaterialOrangesPaletteExpandedChanged,
+                    isMaterialYellowsPaletteExpanded = uiState.isConfigMaterialYellowsPaletteExpanded,
+                    onMaterialYellowsPaletteExpandedChanged = viewModel::onConfigMaterialYellowsPaletteExpandedChanged,
+                    isMaterialGreensPaletteExpanded = uiState.isConfigMaterialGreensPaletteExpanded,
+                    onMaterialGreensPaletteExpandedChanged = viewModel::onConfigMaterialGreensPaletteExpandedChanged,
+                    isMaterialBluesPaletteExpanded = uiState.isConfigMaterialBluesPaletteExpanded,
+                    onMaterialBluesPaletteExpandedChanged = viewModel::onConfigMaterialBluesPaletteExpandedChanged,
+                    isMaterialPurplesPaletteExpanded = uiState.isConfigMaterialPurplesPaletteExpanded,
+                    onMaterialPurplesPaletteExpandedChanged = viewModel::onConfigMaterialPurplesPaletteExpandedChanged,
+                    isMaterialNeutralsPaletteExpanded = uiState.isConfigMaterialNeutralsPaletteExpanded,
+                    onMaterialNeutralsPaletteExpandedChanged = viewModel::onConfigMaterialNeutralsPaletteExpandedChanged,
                     isCustomBrandThemeExpanded = uiState.isConfigCustomBrandThemeExpanded,
                     onCustomBrandThemeExpandedChanged = viewModel::onConfigCustomBrandThemeExpandedChanged,
                     isSampleTextExpanded = uiState.isConfigSampleTextExpanded,

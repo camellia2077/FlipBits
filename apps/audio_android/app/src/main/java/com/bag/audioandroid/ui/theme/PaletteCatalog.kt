@@ -14,14 +14,14 @@ val DefaultCustomMaterialPaletteSettings =
 val MaterialPalettes: List<PaletteOption> =
     buildList {
         add(customMaterialPalette(DefaultCustomMaterialPaletteSettings))
-        addAll(materialRedsPinksPalettes)
+        addAll(materialRedsPalettes)
         addAll(materialOrangePalettes)
         addAll(materialYellowPalettes)
         addAll(materialGreenPalettes)
-        addAll(materialCyansBluesPalettes)
-        addAll(materialPurplesMagentasPalettes)
+        addAll(materialBluePalettes)
+        addAll(materialPurplePalettes)
         addAll(materialNeutralPalettes)
     }
 
 val DefaultMaterialPalette: PaletteOption =
-    MaterialPalettes.firstOrNull { it.id == "mars_relic" } ?: MaterialPalettes.first()
+    MaterialPalettes.firstOrNull { it.id == "stone" } ?: MaterialPalettes.first()

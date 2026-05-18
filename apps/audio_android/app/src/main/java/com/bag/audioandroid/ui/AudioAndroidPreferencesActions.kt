@@ -5,15 +5,20 @@ import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomThemeImportMode
+import com.bag.audioandroid.ui.model.DefaultCustomBrandThemePresetId
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
-import com.bag.audioandroid.ui.model.hasSameConfigAs
+import com.bag.audioandroid.ui.model.findDuplicateImportedThemePresetId
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.withMaterialDarkThemeActive
+import com.bag.audioandroid.ui.state.withSelectedThemeMode
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
+import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.customBrandTheme
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
 import com.bag.audioandroid.ui.theme.customMaterialPalette
@@ -31,6 +36,19 @@ internal class AudioAndroidPreferencesActions(
     private val appSettingsRepository: AppSettingsRepository,
     private val scope: CoroutineScope,
 ) {
+    private fun persistSelectedMaterialThemeState(state: AudioAppUiState) {
+        scope.launch {
+            appSettingsRepository.setSelectedThemeStyleId(state.selectedThemeStyle.id)
+            appSettingsRepository.setSelectedPaletteId(state.selectedPalette.id)
+            appSettingsRepository.setSelectedMaterialPaletteIdLight(
+                state.selectedMaterialPaletteIdLight ?: state.selectedPalette.id,
+            )
+            appSettingsRepository.setSelectedMaterialPaletteIdDark(
+                state.selectedMaterialPaletteIdDark ?: state.selectedPalette.id,
+            )
+        }
+    }
+
     fun onLanguageSelected(language: AppLanguageOption) {
         val previousLanguage = uiState.value.selectedLanguage
         if (previousLanguage == language) {
@@ -52,23 +70,41 @@ internal class AudioAndroidPreferencesActions(
     }
 
     fun onPaletteSelected(palette: PaletteOption) {
-        uiState.update { it.copy(selectedPalette = palette) }
-        scope.launch {
-            appSettingsRepository.setSelectedPaletteId(palette.id)
+        uiState.update { state ->
+            state.withSelectedMaterialPaletteTheme(palette)
         }
+        val updatedState = uiState.value
+        persistSelectedMaterialThemeState(updatedState)
     }
 
     fun onThemeModeSelected(themeMode: ThemeModeOption) {
-        uiState.update { it.copy(selectedThemeMode = themeMode) }
+        uiState.update { state -> state.withSelectedThemeMode(themeMode) }
+        val updatedState = uiState.value
         scope.launch {
             appSettingsRepository.setSelectedThemeModeId(themeMode.id)
         }
+        persistSelectedMaterialThemeState(updatedState)
+    }
+
+    fun onMaterialDarkThemeActiveChanged(isDarkTheme: Boolean) {
+        uiState.update { state -> state.withMaterialDarkThemeActive(isDarkTheme) }
     }
 
     fun onThemeStyleSelected(themeStyle: ThemeStyleOption) {
-        uiState.update { state -> state.withSelectedThemeStyle(themeStyle, sampleInputSessionUpdater) }
-        scope.launch {
-            appSettingsRepository.setSelectedThemeStyleId(themeStyle.id)
+        uiState.update { state ->
+            if (themeStyle == ThemeStyleOption.Material) {
+                state.withSelectedMaterialThemeStyle(sampleInputSessionUpdater)
+            } else {
+                state.withSelectedThemeStyle(themeStyle, sampleInputSessionUpdater)
+            }
+        }
+        val updatedState = uiState.value
+        if (themeStyle == ThemeStyleOption.Material) {
+            persistSelectedMaterialThemeState(updatedState)
+        } else {
+            scope.launch {
+                appSettingsRepository.setSelectedThemeStyleId(themeStyle.id)
+            }
         }
     }
 
@@ -110,37 +146,16 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
-    fun onCustomMaterialThemeSaved(settings: CustomBrandThemeSettings) {
-        uiState.update { state ->
-            val replacePresetId =
-                state.customMaterialThemePresets
-                    .firstOrNull { customMaterialPalette(it).id == state.selectedPalette.id }
-                    ?.presetId
-            val normalizedSettings =
-                normalizeCustomMaterialThemeSettings(
-                    settings.copy(presetId = replacePresetId ?: settings.presetId.ifBlank { UUID.randomUUID().toString() }),
-                )
-            val updatedPresets =
-                if (replacePresetId == null) {
-                    state.customMaterialThemePresets + normalizedSettings
-                } else {
-                    state.customMaterialThemePresets.map { preset ->
-                        if (preset.presetId == replacePresetId) {
-                            normalizedSettings
-                        } else {
-                            preset
-                        }
-                    }
-                }
-            state.copy(
-                customMaterialThemePresets = updatedPresets,
-                selectedPalette = customMaterialPalette(normalizedSettings),
-            )
-        }
+    fun onCustomMaterialThemeSaved(
+        settings: CustomBrandThemeSettings,
+        replacePresetId: String? = null,
+    ) {
+        uiState.update { state -> state.withSavedCustomMaterialTheme(settings, replacePresetId) }
+        val updatedState = uiState.value
         scope.launch {
-            appSettingsRepository.setCustomMaterialThemePresets(uiState.value.customMaterialThemePresets)
-            appSettingsRepository.setSelectedPaletteId(uiState.value.selectedPalette.id)
+            appSettingsRepository.setCustomMaterialThemePresets(updatedState.customMaterialThemePresets)
         }
+        persistSelectedMaterialThemeState(updatedState)
     }
 
     fun onCreateCustomMaterialTheme() {
@@ -153,14 +168,83 @@ internal class AudioAndroidPreferencesActions(
                 ),
             )
         uiState.update { state ->
+            state
+                .copy(customMaterialThemePresets = state.customMaterialThemePresets + settings)
+                .withSelectedMaterialPaletteTheme(customMaterialPalette(settings))
+        }
+        val updatedState = uiState.value
+        scope.launch {
+            appSettingsRepository.setCustomMaterialThemePresets(updatedState.customMaterialThemePresets)
+        }
+        persistSelectedMaterialThemeState(updatedState)
+    }
+
+    fun onCustomMaterialThemeDeleted(presetId: String) {
+        uiState.update { state ->
+            val remainingPresets = state.customMaterialThemePresets.filterNot { it.presetId == presetId }
+            if (remainingPresets.isEmpty()) {
+                return@update state
+            }
+
+            val deletedSelectedPalette = customMaterialPaletteId(presetId) == state.selectedPalette.id
+            val nextSelectedPalette =
+                if (deletedSelectedPalette) {
+                    customMaterialPalette(remainingPresets.first())
+                } else {
+                    state.selectedPalette
+                }
             state.copy(
-                customMaterialThemePresets = state.customMaterialThemePresets + settings,
-                selectedPalette = customMaterialPalette(settings),
+                customMaterialThemePresets = remainingPresets,
+                selectedMaterialPaletteIdLight =
+                    if (state.selectedMaterialPaletteIdLight == customMaterialPaletteId(presetId)) {
+                        nextSelectedPalette.id
+                    } else {
+                        state.selectedMaterialPaletteIdLight
+                    },
+                selectedMaterialPaletteIdDark =
+                    if (state.selectedMaterialPaletteIdDark == customMaterialPaletteId(presetId)) {
+                        nextSelectedPalette.id
+                    } else {
+                        state.selectedMaterialPaletteIdDark
+                    },
+                selectedPalette = nextSelectedPalette,
             )
+        }
+        val updatedState = uiState.value
+        scope.launch {
+            appSettingsRepository.setCustomMaterialThemePresets(updatedState.customMaterialThemePresets)
+        }
+        persistSelectedMaterialThemeState(updatedState)
+    }
+
+    fun onCustomMaterialThemesImported(settings: List<CustomBrandThemeSettings>) {
+        if (settings.isEmpty()) {
+            return
+        }
+        uiState.update { state -> state.withImportedCustomMaterialThemes(settings) }
+        val updatedState = uiState.value
+        scope.launch {
+            appSettingsRepository.setCustomMaterialThemePresets(updatedState.customMaterialThemePresets)
+        }
+        persistSelectedMaterialThemeState(updatedState)
+    }
+
+    fun onCustomMaterialThemesReordered(
+        fromIndex: Int,
+        toIndex: Int,
+    ) {
+        uiState.update { state ->
+            val presets = state.customMaterialThemePresets
+            if (fromIndex !in presets.indices || toIndex !in presets.indices || fromIndex == toIndex) {
+                return@update state
+            }
+            val reordered = presets.toMutableList()
+            val moved = reordered.removeAt(fromIndex)
+            reordered.add(toIndex, moved)
+            state.copy(customMaterialThemePresets = reordered)
         }
         scope.launch {
             appSettingsRepository.setCustomMaterialThemePresets(uiState.value.customMaterialThemePresets)
-            appSettingsRepository.setSelectedPaletteId(customMaterialPaletteId(settings.presetId))
         }
     }
 
@@ -190,22 +274,25 @@ internal class AudioAndroidPreferencesActions(
         if (settings.isEmpty()) {
             return
         }
+        uiState.update { state -> state.withImportedCustomBrandThemes(settings) }
+        scope.launch {
+            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
+        }
+    }
+
+    fun onCustomBrandThemesReordered(
+        fromIndex: Int,
+        toIndex: Int,
+    ) {
         uiState.update { state ->
-            val imported =
-                settings
-                    .map { setting ->
-                        setting.copy(
-                            presetId = UUID.randomUUID().toString(),
-                            displayName = setting.displayName.trim(),
-                        )
-                    }.filterNot { candidate ->
-                        state.customBrandThemePresets.any { preset -> preset.hasSameConfigAs(candidate) }
-                    }
-            if (imported.isEmpty()) {
-                state
-            } else {
-                state.copy(customBrandThemePresets = state.customBrandThemePresets + imported)
+            val presets = state.customBrandThemePresets
+            if (fromIndex !in presets.indices || toIndex !in presets.indices || fromIndex == toIndex) {
+                return@update state
             }
+            val reordered = presets.toMutableList()
+            val moved = reordered.removeAt(fromIndex)
+            reordered.add(toIndex, moved)
+            state.copy(customBrandThemePresets = reordered)
         }
         scope.launch {
             appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
@@ -244,6 +331,69 @@ internal class AudioAndroidPreferencesActions(
         uiState.update { it.copy(isConfigThemeAppearanceExpanded = expanded) }
         scope.launch {
             appSettingsRepository.setConfigThemeAppearanceExpanded(expanded)
+        }
+    }
+
+    fun onConfigCustomMaterialThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigCustomMaterialThemeExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigCustomMaterialThemeExpanded(expanded)
+        }
+    }
+
+    fun onConfigBuiltInMaterialPalettesExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigBuiltInMaterialPalettesExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigBuiltInMaterialPalettesExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialRedsPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialRedsPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialRedsPaletteExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialOrangesPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialOrangesPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialOrangesPaletteExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialYellowsPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialYellowsPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialYellowsPaletteExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialGreensPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialGreensPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialGreensPaletteExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialBluesPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialBluesPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialBluesPaletteExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialPurplesPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialPurplesPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialPurplesPaletteExpanded(expanded)
+        }
+    }
+
+    fun onConfigMaterialNeutralsPaletteExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigMaterialNeutralsPaletteExpanded = expanded) }
+        scope.launch {
+            appSettingsRepository.setConfigMaterialNeutralsPaletteExpanded(expanded)
         }
     }
 
@@ -378,3 +528,171 @@ internal fun AudioAppUiState.withSampleDecoration(isDecorationEnabled: Boolean):
         sessions = sessions + (transportMode to updatedSession),
     )
 }
+
+internal fun AudioAppUiState.withSelectedMaterialPaletteTheme(
+    palette: PaletteOption,
+    isDarkTheme: Boolean = isMaterialDarkThemeActive,
+): AudioAppUiState =
+    copy(selectedThemeStyle = ThemeStyleOption.Material).withSelectedMaterialPalette(
+        palette = palette,
+        isDarkTheme = isDarkTheme,
+    )
+
+internal fun AudioAppUiState.withSelectedMaterialPalette(
+    palette: PaletteOption,
+    isDarkTheme: Boolean = isMaterialDarkThemeActive,
+): AudioAppUiState =
+    copy(
+        selectedPalette = palette,
+        selectedMaterialPaletteIdLight =
+            if (isDarkTheme) {
+                selectedMaterialPaletteIdLight
+            } else {
+                palette.id
+            },
+        selectedMaterialPaletteIdDark =
+            if (isDarkTheme) {
+                palette.id
+            } else {
+                selectedMaterialPaletteIdDark
+            },
+    )
+
+internal fun AudioAppUiState.withSelectedMaterialThemeStyle(sampleInputSessionUpdater: SampleInputSessionUpdater): AudioAppUiState {
+    val materialStyleState = withSelectedThemeStyle(ThemeStyleOption.Material, sampleInputSessionUpdater)
+    val hasPersistedMaterialPalette =
+        selectedMaterialPaletteIdLight != null || selectedMaterialPaletteIdDark != null
+    if (hasPersistedMaterialPalette) {
+        return materialStyleState
+    }
+    val defaultStonePalette =
+        MaterialPalettes.firstOrNull { it.id == DefaultFirstMaterialPaletteId } ?: materialStyleState.selectedPalette
+    return materialStyleState.withSelectedMaterialPalette(defaultStonePalette)
+}
+
+internal fun AudioAppUiState.withSavedCustomMaterialTheme(
+    settings: CustomBrandThemeSettings,
+    replacePresetId: String? = null,
+): AudioAppUiState {
+    val normalizedSettings =
+        normalizeCustomMaterialThemeSettings(
+            settings.copy(
+                presetId = replacePresetId ?: settings.presetId.ifBlank { UUID.randomUUID().toString() },
+            ),
+        )
+    val updatedPresets =
+        if (replacePresetId == null) {
+            customMaterialThemePresets + normalizedSettings
+        } else {
+            customMaterialThemePresets.map { preset ->
+                if (preset.presetId == replacePresetId) {
+                    normalizedSettings
+                } else {
+                    preset
+                }
+            }
+        }
+    val palette = customMaterialPalette(normalizedSettings)
+    return copy(
+        selectedThemeStyle = ThemeStyleOption.Material,
+        customMaterialThemePresets = updatedPresets,
+        selectedPalette = palette,
+        selectedMaterialPaletteIdLight =
+            if (isMaterialDarkThemeActive) {
+                selectedMaterialPaletteIdLight
+            } else {
+                palette.id
+            },
+        selectedMaterialPaletteIdDark =
+            if (isMaterialDarkThemeActive) {
+                palette.id
+            } else {
+                selectedMaterialPaletteIdDark
+            },
+    )
+}
+
+internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<CustomBrandThemeSettings>): AudioAppUiState {
+    var updatedPresets = customMaterialThemePresets
+    val importedResolved = mutableListOf<CustomBrandThemeSettings>()
+    settings.forEach { setting ->
+        val normalizedCandidate =
+            normalizeCustomMaterialThemeSettings(
+                setting.copy(
+                    presetId = importedPresetIdOrNew(setting.presetId),
+                    displayName = setting.displayName.trim(),
+                ),
+            )
+        val duplicatePresetId =
+            findDuplicateImportedThemePresetId(
+                existing = updatedPresets,
+                imported = normalizedCandidate,
+                mode = CustomThemeImportMode.Material,
+            )
+        val resolved =
+            normalizedCandidate.copy(
+                presetId = duplicatePresetId ?: normalizedCandidate.presetId.ifBlank { UUID.randomUUID().toString() },
+            )
+        updatedPresets =
+            if (duplicatePresetId == null) {
+                listOf(resolved) + updatedPresets
+            } else {
+                updatedPresets.map { preset ->
+                    if (preset.presetId == duplicatePresetId) {
+                        resolved
+                    } else {
+                        preset
+                    }
+                }
+            }
+        importedResolved += resolved
+    }
+    val updatedState = copy(customMaterialThemePresets = updatedPresets)
+    return if (importedResolved.size == 1) {
+        updatedState.withSavedCustomMaterialTheme(importedResolved.single(), importedResolved.single().presetId)
+    } else {
+        updatedState
+    }
+}
+
+internal fun AudioAppUiState.withImportedCustomBrandThemes(settings: List<CustomBrandThemeSettings>): AudioAppUiState {
+    var updatedPresets = customBrandThemePresets
+    settings.forEach { setting ->
+        val normalizedCandidate =
+            setting.copy(
+                presetId = importedPresetIdOrNew(setting.presetId),
+                displayName = setting.displayName.trim(),
+            )
+        val duplicatePresetId =
+            findDuplicateImportedThemePresetId(
+                existing = updatedPresets,
+                imported = normalizedCandidate,
+                mode = CustomThemeImportMode.DualTone,
+            )
+        val resolved =
+            normalizedCandidate.copy(
+                presetId = duplicatePresetId ?: normalizedCandidate.presetId.ifBlank { UUID.randomUUID().toString() },
+            )
+        updatedPresets =
+            if (duplicatePresetId == null) {
+                updatedPresets + resolved
+            } else {
+                updatedPresets.map { preset ->
+                    if (preset.presetId == duplicatePresetId) {
+                        resolved
+                    } else {
+                        preset
+                    }
+                }
+            }
+    }
+    return copy(customBrandThemePresets = updatedPresets)
+}
+
+private const val DefaultFirstMaterialPaletteId = "stone"
+
+private fun importedPresetIdOrNew(presetId: String): String =
+    presetId
+        .takeUnless {
+            it.isBlank() || it == DefaultCustomBrandThemePresetId
+        } ?: UUID.randomUUID().toString()

@@ -72,7 +72,12 @@ internal fun PlaybackFollowTokenCard(
             modifier
         }
 
-    val inactiveRawColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isPast) 0.5f else 1.0f)
+    val inactiveRawColor =
+        when (annotationMode) {
+            PlaybackFollowViewMode.Morse ->
+                visualTokens.visualizationInactiveToneColor.copy(alpha = MorseInactiveToneAlpha)
+            else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isPast) 0.5f else 1.0f)
+        }
     val inactiveCharacterColor = tokenColor
     val annotationByteGroups = annotationByteGroupsForMode(annotationMode, rawDisplayUnits)
     val textCharacters =

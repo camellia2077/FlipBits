@@ -76,12 +76,14 @@ internal fun PlaybackDisplaySection(
     playbackSpeed: Float = 1f,
     playbackDisplayMode: PlaybackDisplayMode,
     flashVisualizationModeName: String,
+    morseVisualizationModeName: String = MiniMorseVisualizationMode.Horizontal.name,
     initialFollowViewMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
     lyricsExpanded: Boolean,
     extraLyricsRecoveryHeight: Dp = 0.dp,
     applyLyricsPreviewBonusLine: Boolean = false,
     onDisplayModeSelected: (PlaybackDisplayMode) -> Unit,
     onFlashVisualizationModeSelected: (FlashSignalVisualizationMode) -> Unit,
+    onMorseVisualizationModeSelected: (MiniMorseVisualizationMode) -> Unit = {},
     onLyricsExpandedChanged: (Boolean) -> Unit,
     onSeekToSample: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -176,6 +178,7 @@ internal fun PlaybackDisplaySection(
                 frameSamples = frameSamples,
                 isPlaying = isPlaying,
                 flashVisualizationModeName = flashVisualizationModeName,
+                morseVisualizationModeName = morseVisualizationModeName,
                 flashVoicingStyle = flashVoicingStyle,
                 flashVisualWindow = flashVisualWindow,
                 isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
@@ -185,6 +188,7 @@ internal fun PlaybackDisplaySection(
                 visualizationRoute = layoutModel.visualizationRoute,
                 sharedFlashPlaybackSampleState = sharedFlashPlaybackSampleState,
                 onFlashVisualizationModeSelected = onFlashVisualizationModeSelected,
+                onMorseVisualizationModeSelected = onMorseVisualizationModeSelected,
             )
         }
         if (renderPolicy.showsMixSpacer) {
@@ -326,6 +330,7 @@ private fun PlaybackVisualizationContent(
     frameSamples: Int,
     isPlaying: Boolean,
     flashVisualizationModeName: String,
+    morseVisualizationModeName: String,
     flashVoicingStyle: FlashVoicingStyleOption?,
     flashVisualWindow: FlashVisualWindowState,
     isFlashVisualPerfOverlayEnabled: Boolean,
@@ -335,6 +340,7 @@ private fun PlaybackVisualizationContent(
     visualizationRoute: PlaybackVisualizationRoute,
     sharedFlashPlaybackSampleState: FlashVisualPlaybackSampleState?,
     onFlashVisualizationModeSelected: (FlashSignalVisualizationMode) -> Unit,
+    onMorseVisualizationModeSelected: (MiniMorseVisualizationMode) -> Unit,
 ) {
     if (waveformPcm.isEmpty()) {
         return
@@ -399,17 +405,41 @@ private fun PlaybackVisualizationContent(
             )
 
         PlaybackVisualizationRoute.MorseTimeline ->
-            MorseTimelineVisualizer(
-                followData = followData,
-                displayedSamples = displayedSamples,
-                frameSamples = frameSamples,
-                sampleRateHz = sampleRateHz,
-                isPlaying = isPlaying,
-                playbackSpeed = playbackSpeed,
-                isScrubbing = isScrubbing,
-                showPerfOverlay = isFlashVisualPerfOverlayEnabled,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            run {
+                val morseVisualizationMode = miniMorseVisualizationModeFromName(morseVisualizationModeName)
+                MiniMorseVisualizationModeSwitcher(
+                    selectedMode = morseVisualizationMode,
+                    onModeSelected = onMorseVisualizationModeSelected,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                when (morseVisualizationMode) {
+                    MiniMorseVisualizationMode.Vertical ->
+                        MorseTimelineVisualizer(
+                            followData = followData,
+                            displayedSamples = displayedSamples,
+                            frameSamples = frameSamples,
+                            sampleRateHz = sampleRateHz,
+                            isPlaying = isPlaying,
+                            playbackSpeed = playbackSpeed,
+                            isScrubbing = isScrubbing,
+                            showPerfOverlay = isFlashVisualPerfOverlayEnabled,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                    MiniMorseVisualizationMode.Horizontal ->
+                        MorseHorizontalPlaybackVisualizer(
+                            followData = followData,
+                            displayedSamples = displayedSamples,
+                            frameSamples = frameSamples,
+                            sampleRateHz = sampleRateHz,
+                            isPlaying = isPlaying,
+                            playbackSpeed = playbackSpeed,
+                            isScrubbing = isScrubbing,
+                            showPerfOverlay = isFlashVisualPerfOverlayEnabled,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                }
+            }
     }
 }
 

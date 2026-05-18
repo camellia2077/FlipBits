@@ -328,6 +328,66 @@ class PlayerDetailSheetContentTest {
     }
 
     @Test
+    fun `mini visual shows morse mode switcher and can switch between horizontal and vertical playback`() {
+        composeRule.setContent {
+            PlayerDetailSheetContent(
+                miniPlayerModel =
+                    MiniPlayerUiModel(
+                        title = UiText.Plain("Mini"),
+                        subtitle = UiText.Plain("generated"),
+                        leadingIcon = MiniPlayerLeadingIcon.Generated,
+                        durationMs = 44_000L,
+                        transportMode = TransportModeOption.Mini,
+                        isFlashMode = false,
+                        flashVoicingStyle = null,
+                        source = MiniPlayerSource.Generated,
+                    ),
+                displayedSamples = 900,
+                totalSamples = 4_800,
+                isScrubbing = false,
+                waveformPcm = shortArrayOf(1, 2, 3, 4, 5, 6),
+                sampleRateHz = 44_100,
+                frameSamples = 100,
+                displayedTime = "0:07",
+                totalTime = "0:12",
+                isPlaying = false,
+                playbackSequenceMode = PlaybackSequenceMode.Normal,
+                playbackSpeed = 1.0f,
+                canSkipPrevious = false,
+                canSkipNext = false,
+                canExportGeneratedAudio = false,
+                followData = sampleMiniFollowData(),
+                savedAudioItem = null,
+                onTogglePlayback = {},
+                onSkipToPreviousTrack = {},
+                onSkipToNextTrack = {},
+                onPlaybackSequenceModeSelected = {},
+                onPlaybackSpeedSelected = {},
+                onExportGeneratedAudio = {},
+                onExportGeneratedAudioToDocument = {},
+                onShareSavedAudio = null,
+                onOpenSavedAudioSheet = {},
+                onScrubStarted = {},
+                onScrubChanged = {},
+                onScrubFinished = {},
+                initialDisplayMode = PlaybackDisplayMode.Visual,
+            )
+        }
+
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.audio_morse_visualizer_mode_vertical)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.audio_morse_visualizer_mode_horizontal)).assertIsDisplayed()
+        composeRule.onNodeWithTag("morse-horizontal-visualizer").assertIsDisplayed()
+
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.audio_morse_visualizer_mode_vertical)).performClick()
+
+        composeRule.onNodeWithTag("morse-timeline-visualizer").assertIsDisplayed()
+
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.audio_morse_visualizer_mode_horizontal)).performClick()
+
+        composeRule.onNodeWithTag("morse-horizontal-visualizer").assertIsDisplayed()
+    }
+
+    @Test
     fun `mix mode token follow uses visual displayed samples`() {
         assertEquals(
             409,
@@ -603,6 +663,42 @@ class PlayerDetailSheetContentTest {
                 ),
             textFollowAvailable = true,
             followAvailable = true,
+        )
+
+    private fun sampleMiniFollowData(): PayloadFollowViewData =
+        sampleFollowData().copy(
+            binaryGroupTimeline =
+                listOf(
+                    PayloadFollowBinaryGroupTimelineEntry(
+                        startSample = 0,
+                        sampleCount = 100,
+                        groupIndex = 0,
+                        bitOffset = 0,
+                        bitCount = 1,
+                    ),
+                    PayloadFollowBinaryGroupTimelineEntry(
+                        startSample = 200,
+                        sampleCount = 300,
+                        groupIndex = 1,
+                        bitOffset = 1,
+                        bitCount = 1,
+                    ),
+                    PayloadFollowBinaryGroupTimelineEntry(
+                        startSample = 700,
+                        sampleCount = 100,
+                        groupIndex = 2,
+                        bitOffset = 2,
+                        bitCount = 1,
+                    ),
+                    PayloadFollowBinaryGroupTimelineEntry(
+                        startSample = 1_000,
+                        sampleCount = 300,
+                        groupIndex = 3,
+                        bitOffset = 3,
+                        bitCount = 1,
+                    ),
+                ),
+            totalPcmSampleCount = 4_800,
         )
 
     private fun longTimelineFollowData(): PayloadFollowViewData =

@@ -9,13 +9,14 @@ import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.materialPaletteIdForMode
+import com.bag.audioandroid.ui.state.resolveMaterialPaletteById
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.customBrandTheme
-import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
@@ -24,11 +25,13 @@ import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@Suppress("LargeClass")
 internal class AudioAndroidPreferencesBindings(
     private val uiState: MutableStateFlow<AudioAppUiState>,
     private val sampleInputSessionUpdater: SampleInputSessionUpdater,
@@ -38,6 +41,8 @@ internal class AudioAndroidPreferencesBindings(
     fun startObserving() {
         observeSelectedPalette()
         observeSelectedThemeMode()
+        observeSelectedMaterialPaletteIdLight()
+        observeSelectedMaterialPaletteIdDark()
         observeSelectedThemeStyle()
         observeCustomMaterialThemeSettings()
         observeCustomBrandThemeSettings()
@@ -48,6 +53,15 @@ internal class AudioAndroidPreferencesBindings(
         observeSelectedPlaybackSequenceMode()
         observeConfigLanguageExpanded()
         observeConfigThemeAppearanceExpanded()
+        observeConfigCustomMaterialThemeExpanded()
+        observeConfigBuiltInMaterialPalettesExpanded()
+        observeConfigMaterialRedsPaletteExpanded()
+        observeConfigMaterialOrangesPaletteExpanded()
+        observeConfigMaterialYellowsPaletteExpanded()
+        observeConfigMaterialGreensPaletteExpanded()
+        observeConfigMaterialBluesPaletteExpanded()
+        observeConfigMaterialPurplesPaletteExpanded()
+        observeConfigMaterialNeutralsPaletteExpanded()
         observeConfigCustomBrandThemeExpanded()
         observeConfigSampleTextExpanded()
         observeConfigSacredMachineBrandThemeExpanded()
@@ -70,14 +84,9 @@ internal class AudioAndroidPreferencesBindings(
                 .collect { paletteId ->
                     uiState.update { state ->
                         val resolvedPalette =
-                            if (paletteId != null && isCustomMaterialPaletteId(paletteId)) {
-                                state.customMaterialThemePresets
-                                    .map(::customMaterialPalette)
-                                    .firstOrNull { it.id == paletteId }
-                                    ?: customMaterialPalette(state.customMaterialThemeSettings)
-                            } else {
-                                MaterialPalettes.firstOrNull { it.id == paletteId } ?: DefaultMaterialPalette
-                            }
+                            state.resolveMaterialPaletteById(
+                                state.materialPaletteIdForMode(state.isMaterialDarkThemeActive) ?: paletteId,
+                            )
                         if (state.selectedPalette.id == resolvedPalette.id &&
                             state.selectedPalette.lightScheme == resolvedPalette.lightScheme &&
                             state.selectedPalette.darkScheme == resolvedPalette.darkScheme
@@ -105,14 +114,9 @@ internal class AudioAndroidPreferencesBindings(
                 .collect { presets ->
                     uiState.update { state ->
                         val selectedCustomPalette =
-                            if (isCustomMaterialPaletteId(state.selectedPalette.id)) {
-                                presets
-                                    .map(::customMaterialPalette)
-                                    .firstOrNull { it.id == state.selectedPalette.id }
-                                    ?: customMaterialPalette(presets.first())
-                            } else {
-                                state.selectedPalette
-                            }
+                            state.resolveMaterialPaletteById(
+                                state.materialPaletteIdForMode(state.isMaterialDarkThemeActive),
+                            )
                         state.copy(
                             customMaterialThemePresets = presets,
                             selectedPalette = selectedCustomPalette,
@@ -141,10 +145,20 @@ internal class AudioAndroidPreferencesBindings(
 
     private fun observeSelectedThemeStyle() {
         scope.launch {
-            appSettingsRepository.selectedThemeStyleId
-                .distinctUntilChanged()
-                .collect { themeStyleId ->
-                    val themeStyle = ThemeStyleOption.fromId(themeStyleId)
+            combine(
+                appSettingsRepository.selectedThemeStyleId,
+                appSettingsRepository.selectedPaletteId,
+                appSettingsRepository.selectedMaterialPaletteIdLight,
+                appSettingsRepository.selectedMaterialPaletteIdDark,
+            ) { themeStyleId, paletteId, lightPaletteId, darkPaletteId ->
+                inferPersistedThemeStyle(
+                    themeStyleId = themeStyleId,
+                    paletteId = paletteId,
+                    lightPaletteId = lightPaletteId,
+                    darkPaletteId = darkPaletteId,
+                )
+            }.distinctUntilChanged()
+                .collect { themeStyle ->
                     uiState.update { state ->
                         state.withSelectedThemeStyle(themeStyle, sampleInputSessionUpdater)
                     }
@@ -304,6 +318,190 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(selectedMorseSpeed = style)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSelectedMaterialPaletteIdLight() {
+        scope.launch {
+            appSettingsRepository.selectedMaterialPaletteIdLight
+                .distinctUntilChanged()
+                .collect { paletteId ->
+                    uiState.update { state ->
+                        state.copy(
+                            selectedMaterialPaletteIdLight = paletteId,
+                            selectedPalette =
+                                if (!state.isMaterialDarkThemeActive && paletteId != null) {
+                                    state.resolveMaterialPaletteById(paletteId)
+                                } else {
+                                    state.selectedPalette
+                                },
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun observeSelectedMaterialPaletteIdDark() {
+        scope.launch {
+            appSettingsRepository.selectedMaterialPaletteIdDark
+                .distinctUntilChanged()
+                .collect { paletteId ->
+                    uiState.update { state ->
+                        state.copy(
+                            selectedMaterialPaletteIdDark = paletteId,
+                            selectedPalette =
+                                if (state.isMaterialDarkThemeActive && paletteId != null) {
+                                    state.resolveMaterialPaletteById(paletteId)
+                                } else {
+                                    state.selectedPalette
+                                },
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigCustomMaterialThemeExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigCustomMaterialThemeExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigCustomMaterialThemeExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigCustomMaterialThemeExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigBuiltInMaterialPalettesExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigBuiltInMaterialPalettesExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigBuiltInMaterialPalettesExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigBuiltInMaterialPalettesExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialRedsPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialRedsPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialRedsPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialRedsPaletteExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialOrangesPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialOrangesPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialOrangesPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialOrangesPaletteExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialYellowsPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialYellowsPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialYellowsPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialYellowsPaletteExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialGreensPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialGreensPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialGreensPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialGreensPaletteExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialBluesPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialBluesPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialBluesPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialBluesPaletteExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialPurplesPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialPurplesPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialPurplesPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialPurplesPaletteExpanded = expanded)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeConfigMaterialNeutralsPaletteExpanded() {
+        scope.launch {
+            appSettingsRepository.isConfigMaterialNeutralsPaletteExpanded
+                .distinctUntilChanged()
+                .collect { expanded ->
+                    uiState.update { state ->
+                        if (state.isConfigMaterialNeutralsPaletteExpanded == expanded) {
+                            state
+                        } else {
+                            state.copy(isConfigMaterialNeutralsPaletteExpanded = expanded)
                         }
                     }
                 }
@@ -524,5 +722,29 @@ internal class AudioAndroidPreferencesBindings(
                     }
                 }
         }
+    }
+}
+
+internal fun inferPersistedThemeStyle(
+    themeStyleId: String?,
+    paletteId: String?,
+    lightPaletteId: String?,
+    darkPaletteId: String?,
+): ThemeStyleOption {
+    if (themeStyleId != null) {
+        return ThemeStyleOption.fromId(themeStyleId)
+    }
+
+    val persistedMaterialPaletteIds = listOfNotNull(paletteId, lightPaletteId, darkPaletteId)
+    val hasCustomMaterialPalette = persistedMaterialPaletteIds.any(::isCustomMaterialPaletteId)
+    val hasNonDefaultBuiltInMaterialPalette =
+        persistedMaterialPaletteIds.any { persistedId ->
+            persistedId != DefaultMaterialPalette.id && MaterialPalettes.any { palette -> palette.id == persistedId }
+        }
+
+    return if (hasCustomMaterialPalette || hasNonDefaultBuiltInMaterialPalette) {
+        ThemeStyleOption.Material
+    } else {
+        ThemeStyleOption.BrandDualTone
     }
 }

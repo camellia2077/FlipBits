@@ -44,6 +44,24 @@ internal val materialGreenPalettes: List<PaletteOption> =
                 ),
         ),
         vividPalette(
+            id = "forest",
+            family = PaletteFamily.Greens,
+            titleResId = R.string.palette_forest_title,
+            primary = Color(0xFF2E7D32),
+            primaryContainer = Color(0xFFCAEFCF),
+            secondary = Color(0xFF566650),
+            tertiary = Color(0xFF2E6A5A),
+            background = Color(0xFFF5FBF4),
+            dark =
+                darkSeed(
+                    background = Color(0xFF0E150F),
+                    surface = Color(0xFF172019),
+                    primary = Color(0xFF8FD98E),
+                    secondary = Color(0xFFC0D4BE),
+                    tertiary = Color(0xFF95D6C7),
+                ),
+        ),
+        vividPalette(
             id = "emerald",
             family = PaletteFamily.Greens,
             titleResId = R.string.palette_emerald_title,
@@ -95,24 +113,6 @@ internal val materialGreenPalettes: List<PaletteOption> =
                     primary = Color(0xFF6EE6B1),
                     secondary = Color(0xFFB5D8CF),
                     tertiary = Color(0xFFA8C8EA),
-                ),
-        ),
-        vividPalette(
-            id = "forest",
-            family = PaletteFamily.Greens,
-            titleResId = R.string.palette_forest_title,
-            primary = Color(0xFF2E7D32),
-            primaryContainer = Color(0xFFCAEFCF),
-            secondary = Color(0xFF566650),
-            tertiary = Color(0xFF2E6A5A),
-            background = Color(0xFFF5FBF4),
-            dark =
-                darkSeed(
-                    background = Color(0xFF0E150F),
-                    surface = Color(0xFF172019),
-                    primary = Color(0xFF8FD98E),
-                    secondary = Color(0xFFC0D4BE),
-                    tertiary = Color(0xFF95D6C7),
                 ),
         ),
     )

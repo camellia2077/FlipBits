@@ -148,6 +148,34 @@ pwsh -NoLogo -Command "python tools/run.py android-translate compare"
 pwsh -NoLogo -Command "python tools/run.py android-translate replace --json <path-to-json>"
 ```
 
+## Two High-Level Capabilities
+
+默认优先记这两条，不要先想“还缺不缺一个更细的专用命令”：
+
+### 1. Scoped entry round-trip
+
+适合已知 key 范围的小批量修订。
+
+链路：
+
+```powershell
+pwsh -NoLogo -Command "python tools/run.py android-translate export-entries --lang de --text-type app_text --group strings_settings --key-pattern '^palette_.*_title$' --output temp/agent_jobs/job_001/entries.de.json --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate build-export-replacements --input temp/agent_jobs/job_001/entries.de.edited.json --output temp/agent_jobs/job_001/replacements.json --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --json temp/agent_jobs/job_001/replacements.json"
+```
+
+### 2. Review-to-replacement pipeline
+
+适合需要英文对照审校、风格统一、语义修订的场景。
+
+链路：
+
+```powershell
+pwsh -NoLogo -Command "python tools/run.py android-translate compare --lang de --text-type app_text --group strings_settings --prompt-mode agent_json --output-dir temp/agent_jobs/job_001/reviews --job-dir temp/agent_jobs/job_001 --no-clean --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate build-replacements --input temp/agent_jobs/job_001/suggestions.json --output temp/agent_jobs/job_001/replacements.json --json-output"
+pwsh -NoLogo -Command "python tools/run.py android-translate replace --json temp/agent_jobs/job_001/replacements.json"
+```
+
 ## Most Useful Documents By Task
 
 按任务选文档：

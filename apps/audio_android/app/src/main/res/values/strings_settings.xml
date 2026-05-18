@@ -50,12 +50,12 @@
     <string name="config_dual_tone_group_labyrinth_of_mutability">The Labyrinth of Mutability</string>
     <string name="palette_family_brand">Dual-tone</string>
     <string name="palette_family_custom">Custom</string>
-    <string name="palette_family_reds_pinks">Reds &amp; Pinks</string>
+    <string name="palette_family_reds_pinks">Reds</string>
     <string name="palette_family_oranges">Oranges</string>
     <string name="palette_family_yellows">Yellows</string>
     <string name="palette_family_greens">Greens</string>
-    <string name="palette_family_cyans_blues">Cyans &amp; Blues</string>
-    <string name="palette_family_purples_magentas">Purples &amp; Magentas</string>
+    <string name="palette_family_cyans_blues">Blues</string>
+    <string name="palette_family_purples_magentas">Purples</string>
     <string name="palette_family_neutrals">Neutrals</string>
     <string name="config_flash_style_title">Flash style</string>
     <string name="config_flash_style_subtitle">Choose how flash audio should sound.</string>
@@ -69,8 +69,9 @@
     <string name="config_flash_style_collapse_description">A fear and breakdown preset; currently uses the standard signal shell.</string>
     <string name="config_about_title">About</string>
     <string name="config_about_subtitle">Author, project link, and licenses</string>
-    <string name="palette_ruby_title">Ruby Red</string>
-    <string name="palette_mars_relic_title">Mars Relic</string>
+    <string name="palette_ruby_title">Ruby</string>
+    <string name="palette_red_title">Material Red</string>
+    <string name="palette_mars_relic_title">Mars</string>
     <string name="brand_theme_mars_relic_title">Mars Relic</string>
     <string name="brand_theme_mars_relic_description">Deep red paired with parchment for a ceremonial archive look.</string>
     <string name="brand_theme_mars_relic_accessibility">Mars Relic theme, deep red with parchment beige.</string>
@@ -92,18 +93,30 @@
     <string name="brand_theme_ancient_alloy_title">Ancient Alloy</string>
     <string name="brand_theme_ancient_alloy_description">Weathered metal shadows and cold turquoise for a tomb-forge glow.</string>
     <string name="brand_theme_ancient_alloy_accessibility">Ancient Alloy theme, dark bronze gray with bright turquoise.</string>
-    <string name="brand_theme_immortal_rot_title">The Immortal Rot</string>
+    <string name="brand_theme_immortal_rot_title">Toxic Effluence</string>
     <string name="brand_theme_immortal_rot_description">Fern green and citrine yellow create a damp, overgrown dual-tone palette.</string>
-    <string name="brand_theme_immortal_rot_accessibility">The Immortal Rot theme, fern green with citrine yellow.</string>
-    <string name="brand_theme_scarlet_carnage_title">The Scarlet Carnage</string>
+    <string name="brand_theme_immortal_rot_accessibility">Toxic Effluence theme, fern green with citrine yellow.</string>
+    <string name="brand_theme_plague_mire_title">Plague Mire</string>
+    <string name="brand_theme_plague_mire_description">Bog-black green, sickly lime, and a caustic orange outline churn into a plague-soaked dual-tone mire.</string>
+    <string name="brand_theme_plague_mire_accessibility">Plague Mire theme, bog-black green with sickly lime and a caustic orange outline.</string>
+    <string name="brand_theme_scarlet_carnage_title">Blood-Soaked Ivory</string>
     <string name="brand_theme_scarlet_carnage_description">Dark red and brass forge a brutal dual-tone palette of blood and war metal.</string>
-    <string name="brand_theme_scarlet_carnage_accessibility">The Scarlet Carnage theme, dark red with dark goldenrod brass.</string>
-    <string name="brand_theme_exquisite_fall_title">The Exquisite Fall</string>
-    <string name="brand_theme_exquisite_fall_description">Deep dark purple and screamer pink create a decadent dual-tone palette of vanity and sensation.</string>
-    <string name="brand_theme_exquisite_fall_accessibility">Exquisite Fall theme, deep dark purple with screamer pink and gold outline.</string>
-    <string name="brand_theme_labyrinth_of_mutability_title">The Labyrinth of Mutability</string>
-    <string name="brand_theme_labyrinth_of_mutability_description">Low-saturation cyan blue and bright fluorescent purple form a shifting dual-tone maze with a golden edge.</string>
-    <string name="brand_theme_labyrinth_of_mutability_accessibility">The Labyrinth of Mutability theme, low-saturation cyan blue with bright fluorescent purple and gold outline.</string>
+    <string name="brand_theme_scarlet_carnage_accessibility">Blood-Soaked Ivory theme, dark red with dark goldenrod brass.</string>
+    <string name="brand_theme_brass_forge_title">Brass Forge</string>
+    <string name="brand_theme_brass_forge_description">Near-black crimson, furnace brass, and a flame-orange outline cast a molten dual-tone forge of war metal.</string>
+    <string name="brand_theme_brass_forge_accessibility">Brass Forge theme, near-black crimson with furnace brass and a flame-orange outline.</string>
+    <string name="brand_theme_exquisite_fall_title">Velvet Nightmare</string>
+    <string name="brand_theme_exquisite_fall_description">Midnight violet and hot pink with a soft peach outline create a decadent dual-tone palette of vanity and sensation.</string>
+    <string name="brand_theme_exquisite_fall_accessibility">Velvet Nightmare theme, midnight violet with hot pink and a soft peach outline.</string>
+    <string name="brand_theme_ecstatic_rapture_title">Ecstatic Rapture</string>
+    <string name="brand_theme_ecstatic_rapture_description">Orchid violet, blush pink, and a radiant gold outline bloom into a euphoric dual-tone fever dream.</string>
+    <string name="brand_theme_ecstatic_rapture_accessibility">Ecstatic Rapture theme, orchid violet with blush pink and a radiant gold outline.</string>
+    <string name="brand_theme_labyrinth_of_mutability_title">Arcane Abyss</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">Midnight navy, electric cyan, and a lavender outline form a shifting dual-tone maze of cold signal light.</string>
+    <string name="brand_theme_labyrinth_of_mutability_accessibility">Arcane Abyss theme, midnight navy with electric cyan and a lavender outline.</string>
+    <string name="brand_theme_fires_of_fate_title">Fires of Fate</string>
+    <string name="brand_theme_fires_of_fate_description">Fatefire blue, magenta flame, and a venom-lime outline ignite an omen-lit dual-tone blaze.</string>
+    <string name="brand_theme_fires_of_fate_accessibility">Fires of Fate theme, fatefire blue with magenta flame and a venom-lime outline.</string>
     <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
     <string name="brand_theme_custom_title">Custom dual-tone</string>
     <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
@@ -113,13 +126,17 @@
     <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
     <string name="config_custom_brand_theme_add">Add</string>
     <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_edit">Edit custom colors</string>
+    <string name="config_custom_brand_theme_edit">Edit colors</string>
     <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
     <string name="config_custom_brand_theme_dialog_title">Custom dual-tone colors</string>
     <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
     <string name="config_custom_brand_theme_dialog_title_new">New custom dual-tone</string>
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
     <string name="config_custom_brand_theme_dialog_title_edit">Edit custom dual-tone</string>
+    <!-- CONTEXT: Dialog title when creating a brand-new custom Material palette preset. -->
+    <string name="config_custom_material_theme_dialog_title_new">New custom colors</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom Material palette preset. -->
+    <string name="config_custom_material_theme_dialog_title_edit">Edit colors</string>
     <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
     <string name="config_custom_brand_theme_dialog_description">Enter hex colors in #RRGGBB format. Leave outline empty to reuse the secondary color.</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
@@ -144,51 +161,55 @@
     <string name="config_custom_brand_theme_delete_title">Delete custom dual-tone</string>
     <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
     <string name="config_custom_brand_theme_delete_message">Delete the preset %1$s?</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom Material palette preset. -->
+    <string name="config_custom_material_theme_delete_title">Delete custom colors</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom Material palette preset. %1$s is the preset name. -->
+    <string name="config_custom_material_theme_delete_message">Delete the preset %1$s?</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
     <string name="config_custom_brand_theme_invalid_name">Enter a preset name.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
     <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
-    <string name="palette_crimson_title">Crimson Red</string>
-    <string name="palette_rose_title">Rose Pink</string>
-    <string name="palette_sakura_title">Sakura Pink</string>
-    <string name="palette_raspberry_title">Raspberry Bloom</string>
-    <string name="palette_blush_title">Blush Pink</string>
-    <string name="palette_orange_title">Solar Orange</string>
-    <string name="palette_coral_title">Coral Bloom</string>
-    <string name="palette_tangerine_title">Tangerine Glow</string>
-    <string name="palette_apricot_title">Apricot Mist</string>
-    <string name="palette_terracotta_title">Terracotta Clay</string>
-    <string name="palette_persimmon_title">Persimmon Fire</string>
-    <string name="palette_amber_title">Sun Yellow</string>
-    <string name="palette_gold_title">Golden Hour</string>
-    <string name="palette_sunflower_title">Sunflower Gold</string>
-    <string name="palette_lemon_title">Lemon Light</string>
-    <string name="palette_honey_title">Honey Amber</string>
-    <string name="palette_marigold_title">Marigold Glow</string>
-    <string name="palette_lime_title">Lime Burst</string>
-    <string name="palette_olive_title">Olive Moss</string>
-    <string name="palette_emerald_title">Emerald Green</string>
-    <string name="palette_mint_title">Mint Wave</string>
-    <string name="palette_jade_title">Jade Stream</string>
-    <string name="palette_forest_title">Forest Pine</string>
-    <string name="palette_teal_title">Aqua Cyan</string>
-    <string name="palette_cyan_title">Neon Cyan</string>
-    <string name="palette_sky_title">Sky Blue</string>
-    <string name="palette_ocean_title">Electric Blue</string>
-    <string name="palette_cobalt_title">Cobalt Blue</string>
-    <string name="palette_indigo_title">Deep Indigo</string>
-    <string name="palette_violet_title">Violet Pulse</string>
-    <string name="palette_plum_title">Plum Night</string>
-    <string name="palette_magenta_title">Magenta Pop</string>
-    <string name="palette_fuchsia_title">Fuchsia Flash</string>
-    <string name="palette_orchid_title">Orchid Mist</string>
-    <string name="palette_lilac_title">Lilac Haze</string>
-    <string name="palette_mocha_title">Mocha Brown</string>
-    <string name="palette_slate_title">Slate Gray</string>
-    <string name="palette_sand_title">Sand Stone</string>
-    <string name="palette_stone_title">Stone Taupe</string>
-    <string name="palette_graphite_title">Graphite Ink</string>
-    <string name="palette_ivory_title">Ivory Linen</string>
+    <string name="palette_crimson_title">Crimson</string>
+    <string name="palette_rose_title">Rose</string>
+    <string name="palette_sakura_title">Sakura</string>
+    <string name="palette_raspberry_title">Raspberry</string>
+    <string name="palette_blush_title">Blush</string>
+    <string name="palette_orange_title">Orange</string>
+    <string name="palette_coral_title">Coral</string>
+    <string name="palette_tangerine_title">Tangerine</string>
+    <string name="palette_apricot_title">Apricot</string>
+    <string name="palette_terracotta_title">Terracotta</string>
+    <string name="palette_persimmon_title">Persimmon</string>
+    <string name="palette_amber_title">Amber</string>
+    <string name="palette_gold_title">Gold</string>
+    <string name="palette_sunflower_title">Sunflower</string>
+    <string name="palette_lemon_title">Lemon</string>
+    <string name="palette_honey_title">Honey</string>
+    <string name="palette_marigold_title">Marigold</string>
+    <string name="palette_lime_title">Lime</string>
+    <string name="palette_olive_title">Olive</string>
+    <string name="palette_emerald_title">Emerald</string>
+    <string name="palette_mint_title">Mint</string>
+    <string name="palette_jade_title">Jade</string>
+    <string name="palette_forest_title">Forest</string>
+    <string name="palette_teal_title">Teal</string>
+    <string name="palette_cyan_title">Cyan</string>
+    <string name="palette_sky_title">Sky</string>
+    <string name="palette_ocean_title">Ocean</string>
+    <string name="palette_cobalt_title">Cobalt</string>
+    <string name="palette_indigo_title">Indigo</string>
+    <string name="palette_violet_title">Violet</string>
+    <string name="palette_plum_title">Plum</string>
+    <string name="palette_magenta_title">Magenta</string>
+    <string name="palette_fuchsia_title">Fuchsia</string>
+    <string name="palette_orchid_title">Orchid</string>
+    <string name="palette_lilac_title">Lilac</string>
+    <string name="palette_mocha_title">Mocha</string>
+    <string name="palette_slate_title">Slate</string>
+    <string name="palette_sand_title">Sand</string>
+    <string name="palette_stone_title">Stone</string>
+    <string name="palette_graphite_title">Graphite</string>
+    <string name="palette_ivory_title">Ivory</string>
     <string name="config_flash_style_zeal_label">Zeal</string>
     <string name="config_flash_style_zeal_description">A bright, dense preset with variable rapid timing and punctuation pauses.</string>
     <string name="config_flash_style_void_label">Void</string>
@@ -203,18 +224,20 @@
     <string name="config_custom_brand_theme_import">Import</string>
     <!-- CONTEXT: Action label for copying one custom dual-tone preset as plain text. -->
     <string name="config_custom_brand_theme_copy_config">Copy config</string>
+    <!-- CONTEXT: Action label for copying every custom color preset in the current custom section. -->
+    <string name="config_custom_theme_copy_all">Copy all colors</string>
     <!-- CONTEXT: Helper text in the custom dual-tone import dialog. -->
     <string name="config_custom_brand_theme_import_description">Paste a FlipBits custom theme config.</string>
     <!-- CONTEXT: Text field label for pasted custom dual-tone theme configuration. -->
     <string name="config_custom_brand_theme_import_config_label">Theme config</string>
     <!-- CONTEXT: Validation error shown when pasted custom dual-tone theme configuration cannot be parsed. -->
     <string name="config_custom_brand_theme_import_invalid">Paste a valid FlipBits custom theme config.</string>
-    <!-- CONTEXT: Dialog message shown when importing a custom dual-tone preset that exactly matches an existing preset. -->
-    <string name="config_custom_brand_theme_import_duplicate_message">This config matches an existing custom theme. Overwrite it or add another copy?</string>
+    <!-- CONTEXT: Dialog message shown when importing a custom theme or color preset whose name matches an existing preset. -->
+    <string name="config_custom_brand_theme_import_duplicate_message">This name matches an existing custom theme. Overwrite it or add another copy?</string>
     <!-- CONTEXT: Action label for replacing an existing custom dual-tone preset during import. -->
     <string name="config_custom_brand_theme_import_overwrite">Overwrite</string>
-    <!-- CONTEXT: Dialog title shown when importing a custom dual-tone preset that exactly matches an existing preset. -->
-    <string name="config_custom_brand_theme_import_duplicate_title">Theme already exists</string>
+    <!-- CONTEXT: Dialog title shown when importing a custom theme or color preset whose name matches an existing preset. -->
+    <string name="config_custom_brand_theme_import_duplicate_title">Theme name already exists</string>
     <!-- CONTEXT: Action label for importing a duplicate custom dual-tone preset as a separate copy. -->
     <string name="config_custom_brand_theme_import_add_copy">Add copy</string>
     <!-- CONTEXT: Helper text in the custom dual-tone export dialog. -->
@@ -227,14 +250,54 @@
     <string name="config_custom_brand_theme_export_scope_all">All</string>
     <!-- CONTEXT: Dialog title for confirming a batch custom dual-tone import. -->
     <string name="config_custom_brand_theme_batch_import_title">Import custom dual-tones</string>
-    <!-- CONTEXT: Batch import summary. Placeholder 1 is total themes, 2 is new themes, 3 is exact duplicates. -->
-    <string name="config_custom_brand_theme_batch_import_summary">%1$d themes found. %2$d new, %3$d exact duplicates.</string>
+    <!-- CONTEXT: Batch import summary. Placeholder 1 is total themes, 2 is new themes, 3 is presets whose names match existing presets. -->
+    <string name="config_custom_brand_theme_batch_import_summary">%1$d themes found. %2$d new, %3$d matching existing names.</string>
     <!-- CONTEXT: Helper text shown when confirming batch custom dual-tone import. -->
-    <string name="config_custom_brand_theme_batch_import_duplicate_note">Exact duplicates will be skipped.</string>
+    <string name="config_custom_brand_theme_batch_import_duplicate_note">Matching existing names will be overwritten after you confirm.</string>
+    <!-- CONTEXT: Dialog title for importing one or more custom Material color presets from pasted text. -->
+    <string name="config_custom_material_theme_import_title">Import custom colors</string>
+    <!-- CONTEXT: Action label for importing custom Material color presets from pasted text. -->
+    <string name="config_custom_material_theme_import">Import</string>
+    <!-- CONTEXT: Helper text in the custom Material import dialog. The format is repeated blocks with name and primary. -->
+    <string name="config_custom_material_theme_import_description">Paste custom color presets using name and primary values.</string>
+    <!-- CONTEXT: Text field label for pasted custom Material color preset configuration. -->
+    <string name="config_custom_material_theme_import_config_label">Color config</string>
+    <!-- CONTEXT: Validation error shown when pasted custom Material color preset configuration cannot be parsed. -->
+    <string name="config_custom_material_theme_import_invalid">Paste a valid custom color config.</string>
     <string name="config_sample_text_title">Sample text</string>
     <string name="config_sample_text_subtitle">Control how example text appears in the input field.</string>
     <string name="config_sample_auto_fill_subtitle">Fill the input field with a randomized example when sample text is available.</string>
     <string name="config_sample_text_collapse">Collapse sample text settings</string>
     <string name="config_sample_text_expand">Expand sample text settings</string>
     <string name="config_sample_auto_fill_title">Auto-fill sample text</string>
+    <string name="config_palette_custom_section_title">Custom palettes</string>
+    <string name="config_palette_builtin_section_title">Built-in palettes</string>
+    <string name="config_palette_custom_section_subtitle">Create, name, import, and reorder your own presets.</string>
+    <string name="config_palette_builtin_section_subtitle">Browse the fixed palette collection grouped by color family.</string>
+    <string name="config_custom_material_theme_expand">Expand custom colors</string>
+    <string name="config_custom_material_theme_collapse">Collapse custom colors</string>
+    <!-- CONTEXT: Validation error shown when an imported custom preset block contains a field name that is not allowed. Placeholder 1 is the 1-based block number and 2 is the field name. -->
+    <string name="config_custom_theme_import_error_unknown_field">Block %1$d has an unsupported field: %2$s.</string>
+    <!-- CONTEXT: Validation error shown when no importable custom preset block was pasted into a custom color/theme import dialog. -->
+    <string name="config_custom_theme_import_error_empty">Paste at least one custom preset block.</string>
+    <!-- CONTEXT: Validation error shown when an import line is missing the key=value format. Placeholder 1 is the 1-based line number. -->
+    <string name="config_custom_theme_import_error_malformed_line">Line %1$d must use key=value.</string>
+    <!-- CONTEXT: Validation error shown when an imported custom preset block repeats a field. Placeholder 1 is the 1-based block number and 2 is the localized field label. -->
+    <string name="config_custom_theme_import_error_duplicate_field">Block %1$d repeats %2$s.</string>
+    <!-- CONTEXT: Validation error shown when an imported custom preset block is missing a required field. Placeholder 1 is the 1-based block number and 2 is the localized field label. -->
+    <string name="config_custom_theme_import_error_missing_field">Block %1$d is missing %2$s.</string>
+    <!-- CONTEXT: Validation error shown when an imported custom preset block contains an invalid hex color value. Placeholder 1 is the 1-based block number, 2 is the localized field label, and 3 is the pasted value. -->
+    <string name="config_custom_theme_import_error_invalid_hex">Block %1$d has an invalid %2$s hex color: %3$s.</string>
+    <!-- CONTEXT: Validation error shown when a custom dual-tone preset block is pasted into the custom Material colors import dialog. Placeholder 1 is the 1-based block number. -->
+    <string name="config_custom_theme_import_error_wrong_target_dual_tone">Block %1$d uses custom dual-tone fields. Import it from custom dual-tone instead.</string>
+    <!-- CONTEXT: Validation error shown when a custom Material color preset block is pasted into the custom dual-tone import dialog. Placeholder 1 is the 1-based block number. -->
+    <string name="config_custom_theme_import_error_wrong_target_material">Block %1$d uses custom color fields. Import it from custom colors instead.</string>
+    <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
+    <string name="config_custom_theme_import_field_name">name</string>
+    <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
+    <string name="config_custom_theme_import_field_primary">primary</string>
+    <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
+    <string name="config_custom_theme_import_field_secondary">secondary</string>
+    <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
+    <string name="config_custom_theme_import_field_outline">outline</string>
 </resources>

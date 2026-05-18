@@ -70,7 +70,9 @@ Covered scenarios:
 - Mini generated playback alignment: `docs/architecture/android/android-mini-automation.md`
 - Mini/Pro/Ultra encode progress display: `docs/architecture/android/android-encode-progress-automation.md`
 - Saved library selection + player-detail latency: `docs/architecture/android/android-saved-automation.md`
+- App tab navigation (`Audio / Saved / Settings`) through adb: `docs/architecture/android/android-settings-automation.md`
 - Settings-owned automation surface: `docs/architecture/android/android-settings-automation.md`
+- Settings material custom copy/import duplicate-check: `docs/architecture/android/android-settings-automation.md`
 
 Common coverage:
 
@@ -101,6 +103,7 @@ Not covered:
 | Ultra encode | Covered | Not mode-specific | Covered | Encode-progress scenario caught and verifies the no-bounce regression. |
 | Generated mini player | Covered | Covered smoke | Covered diagnostics | Failure cleanup is covered in JVM. |
 | Saved playback source | Covered | Partial through UI surfaces | Covered diagnostics | ADB scenario covers selection/detail timing and long-audio hydration. |
+| Tab navigation | Partial through state tests | Not covered | Covered | ADB now covers `Audio / Saved / Settings` jumps without coordinate taps. |
 | Decode/Roundtrip | Covered | Not covered | Not covered | Generated `flash/mini/pro/ultra` roundtrip is JVM-only. |
 | Long text segmentation | Covered | Not covered | Covered indirectly | ADB progress captures long generated input; JVM validates metadata/state. |
 | File-backed generated PCM | Covered | Not covered | Covered by logs | Real file size/perf is device-observed, not asserted. |
@@ -141,6 +144,9 @@ Useful things a new agent should know before debugging Android playback alignmen
   - `summary.md`
   - `crash-summary.txt`
 - `python tools/run.py android-debug crash-summary <raw.log>` can be reused on any existing adb dump; it is not Flash-specific.
+- `capture-tab` is the stable way to jump to `Audio / Saved / Settings` from adb without coordinate taps.
+- `capture-settings-import` is the stable way to exercise material custom copy/import duplicate detection without coordinate taps.
+- `capture-saved` is now the stable wrapper for the Saved selection/detail scenario.
 - Flash adb scenarios support:
   - `--scenario ui|headless`
   - `--display lyrics|visual|mix`
@@ -154,11 +160,12 @@ Useful things a new agent should know before debugging Android playback alignmen
 - Important wrapper limitation:
   - the raw adb Flash scenario supports `wb.display` and `wb.lang`
   - `capture-flash` now exposes `--display`
-  - `capture-flash` still does not expose `wb.lang`
-  - use raw `adb shell am start ...` when you need language override from the wrapper path
+  - `capture-flash` now also exposes `--lang`
 - Important Mini wrapper limitation:
   - the raw adb Mini scenario supports `wb.display`, `wb.lyrics.expand`, and `wb.lang`
-  - `capture-mini` does not expose them yet
+  - `capture-mini` now exposes all three through `--display`, `--expand-lyrics`, and `--lang`
+- Encode-progress wrapper note:
+  - `capture-encode-progress` now exposes `--lang`
 - `FlashAlignmentPerf` is the preferred unified sync stream for Flash:
   - it carries Visual, `8 bits`, and token-card state in one throttled row
   - current fields are enough to distinguish offset drift from bit-value mismatch

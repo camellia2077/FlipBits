@@ -46,3 +46,17 @@ For generated agent jobs, prefer `*.task.json` over parsing markdown.
   - command-first discovery (`--help`, `list-*`)
   - scoped EN vs localized review artifacts (`compare`)
   - optional low-markup EN/localized inspection (`dump-xml-md --with-en`)
+
+## Two High-Level Paths
+
+Prefer one of these two paths instead of inventing task-specific one-off tooling:
+
+1. Scoped entry round-trip
+   - Use when you already know the target file/group/keys and want a machine-editable payload.
+   - Flow: `export-entries` -> edit exported JSON -> `build-export-replacements` -> `replace`
+   - Best for: a small key subset such as one settings section, palette names, or a handful of validation strings.
+
+2. Review-to-replacement pipeline
+   - Use when you need translation judgment, consistency review, or broader EN-vs-localized comparison.
+   - Flow: `compare` -> review `*.task.json` / prompt refs -> produce suggestions JSON -> `build-replacements` -> `replace`
+   - Best for: larger copy updates, tone cleanup, drift repair, or sample-text review.

@@ -72,8 +72,70 @@ internal object FlashVisualPerfTrace {
     fun setEnabled(value: Boolean) {
         enabled = value
         if (!value) {
-            latestSnapshot = FlashVisualPerfSnapshot()
+            reset()
         }
+    }
+
+    fun reset() {
+        windowStartNanos = 0L
+        composeCount = 0
+        drawCount = 0
+        windowRequestCount = 0
+        windowBuildCount = 0
+        windowActiveJobSkipCount = 0
+        drawDurationTotalNanos = 0L
+        drawDurationMaxNanos = 0L
+        motionSampleRateHz = 0
+        motionFrameCount = 0
+        motionStepCount = 0
+        rawPositionUpdateCount = 0
+        rawStepTotalSamples = 0f
+        rawStepMaxSamples = 0f
+        smoothStepTotalSamples = 0f
+        smoothStepMaxSamples = 0f
+        visualPxStepTotal = 0f
+        visualPxStepMax = 0f
+        largePxStepCount = 0
+        smoothResetCount = 0
+        anchorJumpMaxSamples = 0f
+        windowShiftMaxSamples = 0f
+        viewportStartStepMaxSamples = 0f
+        intervalStartDisplayedSample = null
+        previousRawMotionSample = null
+        previousSmoothMotionSample = null
+        previousMotionWindowStartSample = null
+        previousViewportStartSample = null
+        lastMode = "unknown"
+        lastIsPlaying = false
+        lastDisplayedSample = 0f
+        lastRawSample = 0f
+        lastSmoothSample = 0f
+        lastVisualErrorMs = 0f
+        lastDrawableSegments = 0
+        lastExactSegments = 0
+        lastPrimitiveEstimate = 0
+        lastVisibleSegments = 0
+        lastVisiblePrimitiveEstimate = 0
+        lastBuckets = 0
+        lastFixedTimeline = false
+        lastFallbackTimeline = false
+        lastBitReadout = false
+        lastWindowStart = 0
+        lastWindowEnd = 0
+        lastWindowSamples = 0
+        lastDistanceToWindowStart = 0f
+        lastDistanceToWindowEnd = 0f
+        lastComfortablyInside = false
+        lastTotalSamples = 0
+        lastReadoutSample = 0f
+        lastReadoutCurrentBitOffset = null
+        lastReadoutRevealedBitOffset = -1
+        lastReadoutGroupStart = -1
+        lastReadoutPreviousBits = ""
+        lastReadoutCurrentBits = ""
+        lastVisualBitOffset = null
+        lastRawBitOffset = null
+        latestSnapshot = FlashVisualPerfSnapshot()
     }
 
     fun recordCompose(

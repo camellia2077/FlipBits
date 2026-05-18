@@ -5,29 +5,29 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 
-internal val materialPurplesMagentasPalettes: List<PaletteOption> =
+internal val materialPurplePalettes: List<PaletteOption> =
     listOf(
         vividPalette(
-            id = "violet",
-            family = PaletteFamily.PurplesMagentas,
-            titleResId = R.string.palette_violet_title,
-            primary = Color(0xFF7A2CF5),
-            primaryContainer = Color(0xFFE9DCFF),
-            secondary = Color(0xFF695A80),
-            tertiary = Color(0xFF8A4E78),
-            background = Color(0xFFFCF7FF),
+            id = "lilac",
+            family = PaletteFamily.Purples,
+            titleResId = R.string.palette_lilac_title,
+            primary = Color(0xFFAA7CFF),
+            primaryContainer = Color(0xFFEEDDFF),
+            secondary = Color(0xFF75608A),
+            tertiary = Color(0xFF9A6086),
+            background = Color(0xFFFDFAFF),
             dark =
                 darkSeed(
-                    background = Color(0xFF13101A),
-                    surface = Color(0xFF1E1827),
-                    primary = Color(0xFFD2B5FF),
-                    secondary = Color(0xFFD4C4EA),
-                    tertiary = Color(0xFFF0B6DE),
+                    background = Color(0xFF14111A),
+                    surface = Color(0xFF201927),
+                    primary = Color(0xFFDFC2FF),
+                    secondary = Color(0xFFD8CAE5),
+                    tertiary = Color(0xFFF0C3DD),
                 ),
         ),
         vividPalette(
             id = "plum",
-            family = PaletteFamily.PurplesMagentas,
+            family = PaletteFamily.Purples,
             titleResId = R.string.palette_plum_title,
             primary = Color(0xFF8E44AD),
             primaryContainer = Color(0xFFF0DBFF),
@@ -44,8 +44,44 @@ internal val materialPurplesMagentasPalettes: List<PaletteOption> =
                 ),
         ),
         vividPalette(
+            id = "orchid",
+            family = PaletteFamily.Purples,
+            titleResId = R.string.palette_orchid_title,
+            primary = Color(0xFF9C27B0),
+            primaryContainer = Color(0xFFF5D8FF),
+            secondary = Color(0xFF7E5B84),
+            tertiary = Color(0xFFA45A70),
+            background = Color(0xFFFFF7FF),
+            dark =
+                darkSeed(
+                    background = Color(0xFF161019),
+                    surface = Color(0xFF221925),
+                    primary = Color(0xFFE8B3FF),
+                    secondary = Color(0xFFDEC7E2),
+                    tertiary = Color(0xFFF1BCD0),
+                ),
+        ),
+        vividPalette(
+            id = "violet",
+            family = PaletteFamily.Purples,
+            titleResId = R.string.palette_violet_title,
+            primary = Color(0xFF7A2CF5),
+            primaryContainer = Color(0xFFE9DCFF),
+            secondary = Color(0xFF695A80),
+            tertiary = Color(0xFF8A4E78),
+            background = Color(0xFFFCF7FF),
+            dark =
+                darkSeed(
+                    background = Color(0xFF13101A),
+                    surface = Color(0xFF1E1827),
+                    primary = Color(0xFFD2B5FF),
+                    secondary = Color(0xFFD4C4EA),
+                    tertiary = Color(0xFFF0B6DE),
+                ),
+        ),
+        vividPalette(
             id = "magenta",
-            family = PaletteFamily.PurplesMagentas,
+            family = PaletteFamily.Purples,
             titleResId = R.string.palette_magenta_title,
             primary = Color(0xFFC2188F),
             primaryContainer = Color(0xFFFFD7F0),
@@ -63,7 +99,7 @@ internal val materialPurplesMagentasPalettes: List<PaletteOption> =
         ),
         vividPalette(
             id = "fuchsia",
-            family = PaletteFamily.PurplesMagentas,
+            family = PaletteFamily.Purples,
             titleResId = R.string.palette_fuchsia_title,
             primary = Color(0xFFE11D8D),
             primaryContainer = Color(0xFFFFD8EC),
@@ -77,42 +113,6 @@ internal val materialPurplesMagentasPalettes: List<PaletteOption> =
                     primary = Color(0xFFFFA9DD),
                     secondary = Color(0xFFE3BDD0),
                     tertiary = Color(0xFFF0C0BE),
-                ),
-        ),
-        vividPalette(
-            id = "orchid",
-            family = PaletteFamily.PurplesMagentas,
-            titleResId = R.string.palette_orchid_title,
-            primary = Color(0xFF9C27B0),
-            primaryContainer = Color(0xFFF5D8FF),
-            secondary = Color(0xFF7E5B84),
-            tertiary = Color(0xFFA45A70),
-            background = Color(0xFFFFF7FF),
-            dark =
-                darkSeed(
-                    background = Color(0xFF161019),
-                    surface = Color(0xFF221925),
-                    primary = Color(0xFFE8B3FF),
-                    secondary = Color(0xFFDEC7E2),
-                    tertiary = Color(0xFFF1BCD0),
-                ),
-        ),
-        vividPalette(
-            id = "lilac",
-            family = PaletteFamily.PurplesMagentas,
-            titleResId = R.string.palette_lilac_title,
-            primary = Color(0xFFAA7CFF),
-            primaryContainer = Color(0xFFEEDDFF),
-            secondary = Color(0xFF75608A),
-            tertiary = Color(0xFF9A6086),
-            background = Color(0xFFFDFAFF),
-            dark =
-                darkSeed(
-                    background = Color(0xFF14111A),
-                    surface = Color(0xFF201927),
-                    primary = Color(0xFFDFC2FF),
-                    secondary = Color(0xFFD8CAE5),
-                    tertiary = Color(0xFFF0C3DD),
                 ),
         ),
     )

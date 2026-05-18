@@ -56,6 +56,16 @@ val repoRootDir = rootProject.projectDir.parentFile.parentFile
 val translateRunScript = repoRootDir.resolve("tools/repo_tooling/android_translate/run.py")
 val translateLintBaselineFile = repoRootDir.resolve("temp/translations/lint-baseline.json")
 val androidJniKeepCheckScript = repoRootDir.resolve("tools/repo_tooling/android_jni_keep_check.py")
+val requestedTaskNames = gradle.startParameter.taskNames.map(String::lowercase)
+val enableAboutLibrariesPlugin =
+    requestedTaskNames.any { taskName ->
+        taskName.contains("aboutlibraries") ||
+            taskName.contains("release") ||
+            taskName.contains("staging") ||
+            taskName.endsWith("build") ||
+            taskName.endsWith("assemble") ||
+            taskName.endsWith("bundle")
+    }
 val pythonCommand =
     if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
         listOf("py", "-3")
@@ -67,7 +77,10 @@ plugins {
     id("com.android.application")
     id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.mikepenz.aboutlibraries.plugin")
+}
+
+if (enableAboutLibrariesPlugin) {
+    apply(plugin = "com.mikepenz.aboutlibraries.plugin")
 }
 
 android {
@@ -185,7 +198,9 @@ android {
     }
 
     sourceSets {
-        getByName("main").res.directories.add("build/generated/aboutlibraries/res")
+        if (enableAboutLibrariesPlugin) {
+            getByName("main").res.directories.add("build/generated/aboutlibraries/res")
+        }
     }
 
     testOptions {
@@ -231,13 +246,15 @@ if (!hasReleaseSigningProperties) {
     )
 }
 
-extensions.configure<AboutLibrariesExtension>("aboutLibraries") {
-    collect {
-        filterVariants.add("release")
-    }
-    export {
-        variant.set("release")
-        outputFile.set(layout.buildDirectory.file("generated/aboutlibraries/res/raw/aboutlibraries.json"))
+if (enableAboutLibrariesPlugin) {
+    extensions.configure<AboutLibrariesExtension>("aboutLibraries") {
+        collect {
+            filterVariants.add("release")
+        }
+        export {
+            variant.set("release")
+            outputFile.set(layout.buildDirectory.file("generated/aboutlibraries/res/raw/aboutlibraries.json"))
+        }
     }
 }
 
@@ -250,7 +267,6 @@ ktlint {
 }
 
 tasks.named("preBuild").configure {
-    dependsOn("exportLibraryDefinitions")
     dependsOn(checkTranslationKeyAlignment)
     dependsOn(translationLintWarn)
 }

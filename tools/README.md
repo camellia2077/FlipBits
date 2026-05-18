@@ -28,7 +28,7 @@ Host 侧根目录 `CMake` 工程当前要求 `CMake 3.28+`。
   - 用于 Android Gradle 构建与 Kotlin 质量 gate
 - `android-debug`
   - 用于 adb/logcat 调试采集与摘要入口
-  - 子命令：`device-prep`、`capture-flash`、`capture-mini`、`capture-encode-progress`、`flash-summary`、`mini-summary`、`encode-progress-summary`、`crash-summary`
+  - 子命令：`device-prep`、`capture-flash`、`capture-flash-visual-sweep`、`capture-mini`、`capture-encode-progress`、`capture-saved`、`capture-tab`、`capture-settings-import`、`flash-summary`、`mini-summary`、`encode-progress-summary`、`crash-summary`
 - `android-translate`
   - 用于 Android XML 翻译提示词生成、资源检查、lint/autofix、key alignment 与批量替换
 - `windows`
@@ -141,7 +141,11 @@ python tools/run.py android native-debug
 python tools/run.py android assemble-debug
 python tools/run.py android assemble-release
 python tools/run.py android-translate key-alignment --quiet
-python tools/run.py android-debug capture-flash --scenario ui --style litany --sample-length long --wait-ms 90000
+python tools/run.py android-debug capture-flash --scenario ui --style litany --sample-length long --lang ja --wait-ms 90000
+python tools/run.py android-debug capture-mini --speed standard --display visual --morse-visual horizontal --perf-overlay --lang fr
+python tools/run.py android-debug capture-saved --seed-duration-ms 181000 --seed-mode pro
+python tools/run.py android-debug capture-tab --tab settings --lang en
+python tools/run.py android-debug capture-settings-import --confirm overwrite --scope current --lang en
 python tools/run.py android-debug flash-summary temp\flash_alignment_raw.log --output temp\flash_alignment_summary.md
 python tools/run.py windows build
 python tools/run.py file-name prep

@@ -80,6 +80,26 @@ internal class AudioPlaybackCommandActions(
         }
     }
 
+    fun pauseCurrentPlaybackIfPlaying(): Boolean {
+        val current = uiState.value
+        val playbackTarget = playbackSourceCoordinator.resolveTarget(current) ?: return false
+        val playback = playbackTarget.playback
+        if (!playback.isPlaying) {
+            return false
+        }
+        val sourceKey = playbackSourceCoordinator.sourceKey(playbackTarget.source)
+        safeLogD(
+            PLAYBACK_AUTOMATION_TAG,
+            "pauseOnly source=$sourceKey played=${playback.playedSamples} total=${playback.totalSamples}",
+        )
+        playbackCoordinator.pausePlayback(sourceKey)
+        playbackUiStateSync.updatePlaybackState(playbackTarget.source) {
+            playbackRuntimeGateway.paused(it)
+        }
+        playbackUiStateSync.setCurrentStatusText(UiText.Resource(R.string.status_playback_paused))
+        return true
+    }
+
     fun stopPlayback() {
         playbackCoordinator.stopPlayback { sourceKey ->
             playbackSourceCoordinator.sourceForKey(uiState.value, sourceKey)?.let(playbackUiStateSync::applyPlaybackStopped)

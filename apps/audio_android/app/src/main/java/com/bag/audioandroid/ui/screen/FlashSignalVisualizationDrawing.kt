@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 internal data class ToneSpectrumDrawStats(
     val validBuckets: Int,
@@ -576,6 +577,7 @@ internal fun DrawScope.drawToneSpectrum(
     activeToneColor: Color,
     inactiveToneColor: Color,
     centerLineColor: Color,
+    referenceLabelColor: Color,
     glowPulse: Float,
 ): ToneSpectrumDrawStats {
     if (buckets.isEmpty()) {
@@ -591,6 +593,7 @@ internal fun DrawScope.drawToneSpectrum(
         innerHeight = innerHeight,
         activeToneColor = activeToneColor,
         centerLineColor = centerLineColor,
+        referenceLabelColor = referenceLabelColor,
     )
 
     var validBuckets = 0
@@ -669,6 +672,7 @@ internal fun DrawScope.drawToneTimelineSegments(
     activeToneColor: Color,
     inactiveToneColor: Color,
     centerLineColor: Color,
+    referenceLabelColor: Color,
     glowPulse: Float,
 ): ToneSpectrumDrawStats {
     if (segments.isEmpty()) {
@@ -682,6 +686,7 @@ internal fun DrawScope.drawToneTimelineSegments(
         innerHeight = innerHeight,
         activeToneColor = activeToneColor,
         centerLineColor = centerLineColor,
+        referenceLabelColor = referenceLabelColor,
     )
 
     var validSegments = 0
@@ -780,6 +785,7 @@ internal fun DrawScope.drawToneTimelineSegments(
     }
     drawToneCurrentFrequencyHud(
         frequencyHz = currentFrequency,
+        maxFrequencyHz = frequencyScale.maxHz,
         leftPadding = leftPadding,
         topPadding = topPadding,
         innerWidth = innerWidth,
@@ -802,13 +808,16 @@ internal fun DrawScope.drawToneTimelineSegments(
 
 private fun DrawScope.drawToneCurrentFrequencyHud(
     frequencyHz: Float,
+    maxFrequencyHz: Float,
     leftPadding: Float,
     topPadding: Float,
     innerWidth: Float,
     activeToneColor: Color,
     inactiveToneColor: Color,
 ) {
-    val label = if (frequencyHz > 0f) "${frequencyHz.toInt()} Hz" else "-- Hz"
+    val valueLabel = if (frequencyHz > 0f) frequencyHz.toInt().toString() else "--"
+    val fixedWidthValueLabel = maxFrequencyHz.roundToInt().coerceAtLeast(0).toString()
+    val unitLabel = " Hz"
     val textPaint =
         Paint().apply {
             isAntiAlias = true
@@ -817,7 +826,9 @@ private fun DrawScope.drawToneCurrentFrequencyHud(
         }
     val horizontalPadding = 6.dp.toPx()
     val verticalPadding = 4.dp.toPx()
-    val textWidth = textPaint.measureText(label)
+    val valueWidth = maxOf(textPaint.measureText(valueLabel), textPaint.measureText(fixedWidthValueLabel))
+    val unitWidth = textPaint.measureText(unitLabel)
+    val textWidth = valueWidth + unitWidth
     val textHeight = textPaint.textSize
     val boxWidth = textWidth + horizontalPadding * 2f
     val boxHeight = textHeight + verticalPadding * 2f
@@ -836,10 +847,18 @@ private fun DrawScope.drawToneCurrentFrequencyHud(
         cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx()),
     )
     drawIntoCanvas { canvas ->
+        val textBaseline = boxTop + verticalPadding + textHeight * 0.82f
+        val unitX = boxLeft + horizontalPadding + valueWidth
         canvas.nativeCanvas.drawText(
-            label,
+            valueLabel,
             boxLeft + horizontalPadding,
-            boxTop + verticalPadding + textHeight * 0.82f,
+            textBaseline,
+            textPaint,
+        )
+        canvas.nativeCanvas.drawText(
+            unitLabel,
+            unitX,
+            textBaseline,
             textPaint,
         )
     }
@@ -907,8 +926,9 @@ private fun DrawScope.drawToneFrequencyReferences(
     innerHeight: Float,
     activeToneColor: Color,
     centerLineColor: Color,
+    referenceLabelColor: Color,
 ) {
-    val lineColor = centerLineColor.copy(alpha = 0.46f)
+    val lineColor = centerLineColor
     val bandColor = activeToneColor.copy(alpha = 0.10f)
     frequencyScale.references.forEach { reference ->
         if (reference.isBand) {
@@ -943,7 +963,7 @@ private fun DrawScope.drawToneFrequencyReferences(
                 label = reference.label,
                 x = leftPadding + 6.dp.toPx(),
                 y = labelY,
-                color = lineColor,
+                color = referenceLabelColor,
             )
         } else {
             val y =
@@ -970,7 +990,7 @@ private fun DrawScope.drawToneFrequencyReferences(
                 label = reference.label,
                 x = leftPadding + 6.dp.toPx(),
                 y = labelY,
-                color = lineColor,
+                color = referenceLabelColor,
             )
         }
     }

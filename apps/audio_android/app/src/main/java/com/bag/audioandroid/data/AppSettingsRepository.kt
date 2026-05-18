@@ -68,6 +68,26 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SelectedThemeModeId] }
 
+    val selectedMaterialPaletteIdLight: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedMaterialPaletteIdLight] }
+
+    val selectedMaterialPaletteIdDark: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedMaterialPaletteIdDark] }
+
     val selectedThemeStyleId: Flow<String?> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -139,6 +159,96 @@ class AppSettingsRepository(
                     throw exception
                 }
             }.map { preferences -> preferences[Keys.ConfigThemeAppearanceExpanded] ?: true }
+
+    val isConfigCustomMaterialThemeExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigCustomMaterialThemeExpanded] ?: true }
+
+    val isConfigBuiltInMaterialPalettesExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigBuiltInMaterialPalettesExpanded] ?: true }
+
+    val isConfigMaterialRedsPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialRedsPaletteExpanded] ?: true }
+
+    val isConfigMaterialOrangesPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialOrangesPaletteExpanded] ?: true }
+
+    val isConfigMaterialYellowsPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialYellowsPaletteExpanded] ?: true }
+
+    val isConfigMaterialGreensPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialGreensPaletteExpanded] ?: true }
+
+    val isConfigMaterialBluesPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialBluesPaletteExpanded] ?: true }
+
+    val isConfigMaterialPurplesPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialPurplesPaletteExpanded] ?: true }
+
+    val isConfigMaterialNeutralsPaletteExpanded: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.ConfigMaterialNeutralsPaletteExpanded] ?: true }
 
     val isConfigCustomBrandThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
@@ -300,6 +410,18 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setSelectedMaterialPaletteIdLight(paletteId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedMaterialPaletteIdLight] = paletteId
+        }
+    }
+
+    suspend fun setSelectedMaterialPaletteIdDark(paletteId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedMaterialPaletteIdDark] = paletteId
+        }
+    }
+
     suspend fun setSelectedThemeStyleId(themeStyleId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedThemeStyleId] = themeStyleId
@@ -339,6 +461,60 @@ class AppSettingsRepository(
     suspend fun setConfigThemeAppearanceExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.ConfigThemeAppearanceExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigCustomMaterialThemeExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigCustomMaterialThemeExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigBuiltInMaterialPalettesExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigBuiltInMaterialPalettesExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialRedsPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialRedsPaletteExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialOrangesPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialOrangesPaletteExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialYellowsPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialYellowsPaletteExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialGreensPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialGreensPaletteExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialBluesPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialBluesPaletteExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialPurplesPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialPurplesPaletteExpanded] = expanded
+        }
+    }
+
+    suspend fun setConfigMaterialNeutralsPaletteExpanded(expanded: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.ConfigMaterialNeutralsPaletteExpanded] = expanded
         }
     }
 
@@ -426,6 +602,8 @@ class AppSettingsRepository(
         val SelectedMorseSpeedStyleId: Preferences.Key<String> = stringPreferencesKey("mini_speed_style")
         val FlashVoicingEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("flash_voicing_enabled")
         val SelectedThemeModeId: Preferences.Key<String> = stringPreferencesKey("theme_mode")
+        val SelectedMaterialPaletteIdLight: Preferences.Key<String> = stringPreferencesKey("material_palette_id_light")
+        val SelectedMaterialPaletteIdDark: Preferences.Key<String> = stringPreferencesKey("material_palette_id_dark")
         val SelectedThemeStyleId: Preferences.Key<String> = stringPreferencesKey("theme_style")
         val SelectedBrandThemeId: Preferences.Key<String> = stringPreferencesKey("brand_theme_id")
         val CustomBrandThemePresetsJson: Preferences.Key<String> = stringPreferencesKey("custom_brand_presets_json")
@@ -433,6 +611,20 @@ class AppSettingsRepository(
         val SelectedPlaybackSequenceModeId: Preferences.Key<String> = stringPreferencesKey("playback_sequence_mode")
         val ConfigLanguageExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_language_expanded")
         val ConfigThemeAppearanceExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_theme_appearance_expanded")
+        val ConfigCustomMaterialThemeExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_custom_material_theme_expanded")
+        val ConfigBuiltInMaterialPalettesExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_built_in_material_palettes_expanded")
+        val ConfigMaterialRedsPaletteExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_material_reds_palette_expanded")
+        val ConfigMaterialOrangesPaletteExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_material_oranges_palette_expanded")
+        val ConfigMaterialYellowsPaletteExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_material_yellows_palette_expanded")
+        val ConfigMaterialGreensPaletteExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_material_greens_palette_expanded")
+        val ConfigMaterialBluesPaletteExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_material_blues_palette_expanded")
+        val ConfigMaterialPurplesPaletteExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_material_purples_palette_expanded")
+        val ConfigMaterialNeutralsPaletteExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_material_neutrals_palette_expanded")
         val ConfigCustomBrandThemeExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_custom_brand_theme_expanded")
         val ConfigSampleTextExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_sample_text_expanded")
         val ConfigSacredMachineBrandThemeExpanded: Preferences.Key<Boolean> =

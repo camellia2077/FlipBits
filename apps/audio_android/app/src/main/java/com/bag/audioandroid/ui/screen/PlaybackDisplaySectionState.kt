@@ -10,9 +10,11 @@ import androidx.compose.runtime.setValue
 internal data class PlaybackDisplaySectionState(
     val playbackDisplayMode: PlaybackDisplayMode,
     val flashVisualizationModeName: String,
+    val morseVisualizationModeName: String,
     val lyricsExpanded: Boolean,
     val onDisplayModeSelected: (PlaybackDisplayMode) -> Unit,
     val onFlashVisualizationModeSelected: (FlashSignalVisualizationMode) -> Unit,
+    val onMorseVisualizationModeSelected: (MiniMorseVisualizationMode) -> Unit,
     val onLyricsExpandedChanged: (Boolean) -> Unit,
 )
 
@@ -22,11 +24,15 @@ internal fun rememberPlaybackDisplaySectionState(
     onLyricsRequested: () -> Unit,
     initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
     initialFlashVisualizationMode: FlashSignalVisualizationMode = FlashSignalVisualizationMode.Lanes,
+    initialMorseVisualizationMode: MiniMorseVisualizationMode = MiniMorseVisualizationMode.Horizontal,
     onDisplayModeSelected: (PlaybackDisplayMode) -> Unit = {},
 ): PlaybackDisplaySectionState {
     var playbackDisplayModeName by rememberSaveable { mutableStateOf(initialDisplayMode.name) }
     var flashVisualizationModeName by rememberSaveable(isFlashMode, initialFlashVisualizationMode) {
         mutableStateOf(initialFlashVisualizationMode.name)
+    }
+    var morseVisualizationModeName by rememberSaveable(initialMorseVisualizationMode) {
+        mutableStateOf(initialMorseVisualizationMode.name)
     }
     var lyricsExpanded by rememberSaveable { mutableStateOf(false) }
     val playbackDisplayMode =
@@ -37,6 +43,7 @@ internal fun rememberPlaybackDisplaySectionState(
     return remember(
         playbackDisplayMode,
         flashVisualizationModeName,
+        morseVisualizationModeName,
         lyricsExpanded,
         onLyricsRequested,
         onDisplayModeSelected,
@@ -44,6 +51,7 @@ internal fun rememberPlaybackDisplaySectionState(
         PlaybackDisplaySectionState(
             playbackDisplayMode = playbackDisplayMode,
             flashVisualizationModeName = flashVisualizationModeName,
+            morseVisualizationModeName = morseVisualizationModeName,
             lyricsExpanded = lyricsExpanded,
             onDisplayModeSelected = { option ->
                 playbackDisplayModeName = option.name
@@ -54,6 +62,9 @@ internal fun rememberPlaybackDisplaySectionState(
             },
             onFlashVisualizationModeSelected = { selectedMode ->
                 flashVisualizationModeName = selectedMode.name
+            },
+            onMorseVisualizationModeSelected = { selectedMode ->
+                morseVisualizationModeName = selectedMode.name
             },
             onLyricsExpandedChanged = { expanded ->
                 lyricsExpanded = expanded

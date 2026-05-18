@@ -105,6 +105,24 @@ pwsh -NoLogo -Command "python tools/run.py android-translate key-alignment --qui
 - [android-translation-tooling-agent-index.md](/C:/code/FlipBits/docs/design/android/android-translation-tooling-agent-index.md)
 - [tools/repo_tooling/android_translate/docs/architecture.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/architecture.md)
 
+## Two Recommended High-Level Capabilities
+
+为了避免把 workflow 做成一堆过细的专用命令，日常翻译改动默认收敛到这两条高层路径：
+
+1. Scoped entry round-trip
+   - 适合你已经知道目标语言、目标文件、目标 key 子集的场景
+   - 典型链路：
+     `export-entries` -> 编辑导出的 JSON -> `build-export-replacements` -> `replace`
+   - 适合：某个 settings 分组、小批量 palette title、导入校验文案等
+
+2. Review-to-replacement pipeline
+   - 适合需要结合英文基线做语义判断、风格统一或漂移修订的场景
+   - 典型链路：
+     `compare` -> 阅读 `*.task.json` / prompt refs -> 生成 suggestions JSON -> `build-replacements` -> `replace`
+   - 适合：大一点的 UI 文案修订、同组文案一致性整理、样例文本审校
+
+这两条能力已经足够覆盖大多数 Android 文案翻译任务；不需要再为 palette、settings、dialog 等子场景继续拆更多专用工具。
+
 ## Gradle Integration
 
 Android app 的 Gradle 已经把翻译结构检查接进默认构建链路。

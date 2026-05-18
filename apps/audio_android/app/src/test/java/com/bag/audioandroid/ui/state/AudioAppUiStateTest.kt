@@ -6,8 +6,12 @@ import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.screen.LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
+import com.bag.audioandroid.ui.theme.customMaterialPalette
+import com.bag.audioandroid.ui.theme.customMaterialPaletteId
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -175,4 +179,81 @@ class AudioAppUiStateTest {
         assertEquals(48_000, state.currentPlaybackWavAudioInfo.sampleRateHz)
         assertEquals(192_044L, state.currentPlaybackWavAudioInfo.fileByteCount)
     }
+
+    @Test
+    fun `material palette id for light prefers light selection`() {
+        val state =
+            AudioAppUiState(
+                selectedMaterialPaletteIdLight = customMaterialPaletteId("light"),
+                selectedMaterialPaletteIdDark = customMaterialPaletteId("dark"),
+            )
+
+        assertEquals(customMaterialPaletteId("light"), state.materialPaletteIdForMode(isDarkTheme = false))
+    }
+
+    @Test
+    fun `material palette id for dark prefers dark selection`() {
+        val state =
+            AudioAppUiState(
+                selectedMaterialPaletteIdLight = customMaterialPaletteId("light"),
+                selectedMaterialPaletteIdDark = customMaterialPaletteId("dark"),
+            )
+
+        assertEquals(customMaterialPaletteId("dark"), state.materialPaletteIdForMode(isDarkTheme = true))
+    }
+
+    @Test
+    fun `switching to dark theme mode restores last dark custom palette`() {
+        val state =
+            AudioAppUiState(
+                customMaterialThemePresets =
+                    listOf(
+                        customMaterialSettings("light", "#D0BCFF"),
+                        customMaterialSettings("dark", "#7D5260"),
+                    ),
+                selectedMaterialPaletteIdLight = customMaterialPaletteId("light"),
+                selectedMaterialPaletteIdDark = customMaterialPaletteId("dark"),
+            )
+
+        val updated = state.withSelectedThemeMode(ThemeModeOption.Dark)
+
+        assertEquals(ThemeModeOption.Dark, updated.selectedThemeMode)
+        assertEquals(true, updated.isMaterialDarkThemeActive)
+        assertEquals(customMaterialPaletteId("dark"), updated.selectedPalette.id)
+    }
+
+    @Test
+    fun `switching back to light restores last light custom palette`() {
+        val darkSettings = customMaterialSettings("dark", "#7D5260")
+        val state =
+            AudioAppUiState(
+                customMaterialThemePresets =
+                    listOf(
+                        customMaterialSettings("light", "#D0BCFF"),
+                        darkSettings,
+                    ),
+                selectedThemeMode = ThemeModeOption.Dark,
+                isMaterialDarkThemeActive = true,
+                selectedPalette = customMaterialPalette(darkSettings),
+                selectedMaterialPaletteIdLight = customMaterialPaletteId("light"),
+                selectedMaterialPaletteIdDark = customMaterialPaletteId("dark"),
+            )
+
+        val updated = state.withSelectedThemeMode(ThemeModeOption.Light)
+
+        assertEquals(ThemeModeOption.Light, updated.selectedThemeMode)
+        assertEquals(false, updated.isMaterialDarkThemeActive)
+        assertEquals(customMaterialPaletteId("light"), updated.selectedPalette.id)
+    }
+
+    private fun customMaterialSettings(
+        presetId: String,
+        primaryHex: String,
+    ) = CustomBrandThemeSettings(
+        presetId = presetId,
+        displayName = presetId,
+        primaryHex = primaryHex,
+        secondaryHex = primaryHex,
+        outlineHexOrNull = primaryHex,
+    )
 }

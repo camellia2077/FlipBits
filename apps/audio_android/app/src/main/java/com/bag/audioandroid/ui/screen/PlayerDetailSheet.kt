@@ -82,6 +82,8 @@ internal fun PlayerDetailSheetContent(
     onDebugExpandLyricsHandled: (Long) -> Unit = {},
     debugPlaybackDisplayModeRequest: DebugPlaybackDisplayModeRequest? = null,
     onDebugPlaybackDisplayModeHandled: (Long) -> Unit = {},
+    debugMorseVisualizationModeRequest: DebugMorseVisualizationModeRequest? = null,
+    onDebugMorseVisualizationModeHandled: (Long) -> Unit = {},
     onSeekToSample: (Int) -> Unit = { targetSamples ->
         onScrubStarted()
         onScrubChanged(targetSamples)
@@ -90,6 +92,7 @@ internal fun PlayerDetailSheetContent(
     initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
     initialFollowViewMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
     initialFlashVisualizationMode: FlashSignalVisualizationMode? = null,
+    initialMorseVisualizationMode: MiniMorseVisualizationMode = MiniMorseVisualizationMode.Horizontal,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -104,6 +107,7 @@ internal fun PlayerDetailSheetContent(
             onLyricsRequested = onLyricsRequested,
             initialDisplayMode = initialDisplayMode,
             initialFlashVisualizationMode = initialFlashVisualizationMode ?: FlashSignalVisualizationMode.Lanes,
+            initialMorseVisualizationMode = initialMorseVisualizationMode,
             onDisplayModeSelected = onPlaybackDisplayModeSelected,
         )
     val layoutPolicyState =
@@ -128,6 +132,15 @@ internal fun PlayerDetailSheetContent(
             "displayModeApplied requestId=${request.requestId} mode=${request.mode.name.lowercase()}",
         )
         onDebugPlaybackDisplayModeHandled(request.requestId)
+    }
+    LaunchedEffect(debugMorseVisualizationModeRequest) {
+        val request = debugMorseVisualizationModeRequest ?: return@LaunchedEffect
+        displaySectionState.onMorseVisualizationModeSelected(request.mode)
+        android.util.Log.d(
+            playerDetailAutomationTag(miniPlayerModel.transportMode),
+            "morseVisualizationModeApplied requestId=${request.requestId} mode=${request.mode.name.lowercase()}",
+        )
+        onDebugMorseVisualizationModeHandled(request.requestId)
     }
     LaunchedEffect(
         miniPlayerModel.transportMode,

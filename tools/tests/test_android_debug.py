@@ -12,6 +12,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from repo_tooling.android_debug import capture, flash_alignment
 from repo_tooling.android_debug import flash_visual_sweep
+from repo_tooling.android_debug import mini_alignment
 from repo_tooling.commands import android_debug
 
 
@@ -72,6 +73,7 @@ def test_capture_flash_defaults_ui_play_ms_to_longer_duration(monkeypatch, tmp_p
             scenario="ui",
             style="litany",
             display="mix",
+            lang="ja",
             follow_view="binary",
             visual="lanes",
             input_text=None,
@@ -88,6 +90,7 @@ def test_capture_flash_defaults_ui_play_ms_to_longer_duration(monkeypatch, tmp_p
     assert captured[0]["wait_ms"] == 90000
     assert started[0][0] == capture.FLASH_ACTION
     assert started[0][1][started[0][1].index("wb.display") + 1] == "mix"
+    assert started[0][1][started[0][1].index("wb.lang") + 1] == "ja"
     assert started[0][1][started[0][1].index("wb.follow.view") + 1] == "binary"
     assert started[0][1][started[0][1].index("wb.playback.speed") + 1] == "0.1"
     assert "--el" in started[0][1]
@@ -119,6 +122,7 @@ def test_capture_flash_defaults_headless_play_ms_to_short_duration(monkeypatch, 
             scenario="headless",
             style="litany",
             display="lyrics",
+            lang=None,
             follow_view="binary",
             visual="lanes",
             input_text="flash smoke",
@@ -177,6 +181,199 @@ def test_capture_common_writes_summary_and_crash_files_without_device(monkeypatc
     crash_summary = result.crash_summary.read_text(encoding="utf-8")
     assert "total_lines: 3" in crash_summary
     assert "pattern_hits:" in crash_summary
+
+
+def test_capture_mini_exposes_language_display_and_expand(monkeypatch, tmp_path) -> None:
+    started: list[list[str]] = []
+
+    def fake_start_activity(_action: str, extras: list[str]) -> None:
+        started.append(list(extras))
+
+    def fake_capture_common(**kwargs):
+        kwargs["start"]()
+        return capture.CaptureResult(
+            raw_log=tmp_path / "raw.log",
+            summary=tmp_path / "summary.md",
+            crash_summary=tmp_path / "crash-summary.txt",
+        )
+
+    monkeypatch.setattr(capture, "start_activity", fake_start_activity)
+    monkeypatch.setattr(capture, "capture_common", fake_capture_common)
+
+    android_debug.cmd_android_debug(
+        argparse.Namespace(
+            action="capture-mini",
+            output_dir=tmp_path,
+            wait_ms=20000,
+            scenario="ui",
+            speed="fast",
+            lang="fr",
+            display="visual",
+            morse_visual="horizontal",
+            expand_lyrics=True,
+            perf_overlay=True,
+            input_text=None,
+            play_ms=6000,
+            play_end="pause",
+            play_script="700:pause,820:resume",
+            no_encode=False,
+            no_play=False,
+            max_rows=24,
+        )
+    )
+
+    assert started[0][started[0].index("wb.lang") + 1] == "fr"
+    assert started[0][started[0].index("wb.display") + 1] == "visual"
+    assert started[0][started[0].index("wb.morse.visual") + 1] == "horizontal"
+    assert started[0][started[0].index("wb.lyrics.expand") + 1] == "true"
+    assert started[0][started[0].index("wb.visual.perf_overlay") + 1] == "true"
+    assert started[0][started[0].index("wb.play.end") + 1] == "pause"
+    assert started[0][started[0].index("wb.play.script") + 1] == "700:pause,820:resume"
+
+
+def test_mini_summary_includes_mini_visual_perf_rollup(tmp_path) -> None:
+    raw_log = tmp_path / "mini-raw.log"
+    raw_log.write_text(
+        "\n".join(
+            [
+                "05-19 10:00:00.000 D/MiniAutomation(12345): received scenario=ui speed=standard playMs=10000 input=text text=mini_sync_test sampleLength=short",
+                "05-19 10:00:00.100 D/MiniAutomation(12345): inputResolved source=text sampleId= chars=14 payloadBytes=14",
+                "05-19 10:00:01.000 D/MiniVisualPerf(12345): reason=interval drawAvgMs=0.80 rawUpdate/s=44.0 rawStepMaxMs=26.7 smoothStepMaxMs=19.4 visualErrorMs=8.1 windowStepMaxMs=12.3",
+                "05-19 10:00:02.000 D/MiniVisualPerf(12345): reason=interval drawAvgMs=1.10 rawUpdate/s=45.0 rawStepMaxMs=30.2 smoothStepMaxMs=21.5 visualErrorMs=-9.6 windowStepMaxMs=18.8",
+                "05-19 10:00:02.100 D/MiniAlignmentPerf(12345): speed=standard playing=true frameSamples=480 visualSample=1200 lyricsSample=1195 sampleDelta=5 visualGroup=1 visualBitOffset=2 token=0 tokenText=mini tokenProgress=0.25 lyricBitOffset=3 tone=true",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    events = [event for line in raw_log.read_text(encoding="utf-8").splitlines() if (event := mini_alignment.parse_event(line)) is not None]
+    summary = mini_alignment.build_summary(events, max_rows=8)
+
+    assert "- MiniVisualPerf rows: 2" in summary
+    assert "Latest MiniVisualPerf: reason=interval drawAvgMs=1.10 rawUpdate/s=45.0" in summary
+    assert "Peak MiniVisualPerf: drawAvgMs=1.10 rawUpdate/s=45.0 rawStepMaxMs=30.2 smoothStepMaxMs=21.5 visualErrorMs(abs)=9.6 windowStepMaxMs=18.8" in summary
+    assert "## Mini Visual Perf" in summary
+    assert "| 05-19 10:00:02.000 | interval | 1.10 | 45.0 | 30.2 | 21.5 | -9.6 | 18.8 |" in summary
+
+
+def test_capture_tab_uses_tab_action(monkeypatch, tmp_path) -> None:
+    started: list[tuple[str, list[str]]] = []
+
+    def fake_start_activity(action: str, extras: list[str]) -> None:
+        started.append((action, list(extras)))
+
+    def fake_capture_common(**kwargs):
+        kwargs["start"]()
+        return capture.CaptureResult(
+            raw_log=tmp_path / "raw.log",
+            summary=tmp_path / "summary.md",
+            crash_summary=tmp_path / "crash-summary.txt",
+        )
+
+    monkeypatch.setattr(capture, "start_activity", fake_start_activity)
+    monkeypatch.setattr(capture, "capture_common", fake_capture_common)
+
+    android_debug.cmd_android_debug(
+        argparse.Namespace(
+            action="capture-tab",
+            output_dir=tmp_path,
+            wait_ms=3000,
+            tab="settings",
+            lang="zh",
+        )
+    )
+
+    assert started == [
+        (
+            capture.APP_TAB_ACTION,
+            ["--es", "wb.tab", "settings", "--es", "wb.lang", "zh"],
+        )
+    ]
+
+
+def test_capture_settings_import_uses_settings_import_action(monkeypatch, tmp_path) -> None:
+    started: list[tuple[str, list[str]]] = []
+
+    def fake_start_activity(action: str, extras: list[str]) -> None:
+        started.append((action, list(extras)))
+
+    def fake_capture_common(**kwargs):
+        kwargs["start"]()
+        return capture.CaptureResult(
+            raw_log=tmp_path / "raw.log",
+            summary=tmp_path / "summary.md",
+            crash_summary=tmp_path / "crash-summary.txt",
+        )
+
+    monkeypatch.setattr(capture, "start_activity", fake_start_activity)
+    monkeypatch.setattr(capture, "capture_common", fake_capture_common)
+
+    android_debug.cmd_android_debug(
+        argparse.Namespace(
+            action="capture-settings-import",
+            output_dir=tmp_path,
+            wait_ms=3000,
+            lang="en",
+            confirm="overwrite",
+            scope="current",
+        )
+    )
+
+    assert started == [
+        (
+            capture.APP_TAB_ACTION,
+            [
+                "--es",
+                "wb.lang",
+                "en",
+                "--es",
+                "wb.tab",
+                "settings",
+                "--es",
+                "wb.import.confirm",
+                "overwrite",
+                "--es",
+                "wb.import.scope",
+                "current",
+            ],
+        )
+    ]
+
+
+def test_capture_settings_import_accepts_batch_scope(monkeypatch, tmp_path) -> None:
+    started: list[tuple[str, list[str]]] = []
+
+    def fake_start_activity(action: str, extras: list[str]) -> None:
+        started.append((action, list(extras)))
+
+    def fake_capture_common(**kwargs):
+        kwargs["start"]()
+        return capture.CaptureResult(
+            raw_log=tmp_path / "raw.log",
+            summary=tmp_path / "summary.md",
+            crash_summary=tmp_path / "crash-summary.txt",
+        )
+
+    monkeypatch.setattr(capture, "start_activity", fake_start_activity)
+    monkeypatch.setattr(capture, "capture_common", fake_capture_common)
+
+    android_debug.cmd_android_debug(
+        argparse.Namespace(
+            action="capture-settings-import",
+            output_dir=tmp_path,
+            wait_ms=3000,
+            lang=None,
+            confirm="none",
+            scope="all",
+        )
+    )
+
+    assert started == [
+        (
+            capture.APP_TAB_ACTION,
+            ["--es", "wb.tab", "settings", "--es", "wb.import.confirm", "none", "--es", "wb.import.scope", "all"],
+        )
+    ]
 
 
 def test_capture_flash_visual_sweep_runs_all_modes(monkeypatch, tmp_path) -> None:

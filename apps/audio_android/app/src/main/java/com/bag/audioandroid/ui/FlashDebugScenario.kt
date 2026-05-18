@@ -4,15 +4,36 @@ import android.content.Intent
 import android.util.Log
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.screen.FlashSignalVisualizationMode
+import com.bag.audioandroid.ui.screen.MiniMorseVisualizationMode
 import com.bag.audioandroid.ui.screen.PlaybackDisplayMode
 import com.bag.audioandroid.ui.screen.toPlaybackDisplayMode
 import com.bag.audioandroid.ui.screen.toPlaybackFollowViewMode
+
+data class DebugPlaybackScriptStep(
+    val atMs: Long,
+    val action: DebugPlaybackScriptAction,
+)
+
+enum class DebugPlaybackScriptAction(
+    val id: String,
+) {
+    Toggle("toggle"),
+    Pause("pause"),
+    Play("play"),
+    Stop("stop"),
+    ;
+
+    companion object {
+        fun fromId(id: String?): DebugPlaybackScriptAction? = entries.firstOrNull { it.id == id?.trim()?.lowercase() }
+    }
+}
 
 data class FlashDebugScenario(
     val text: String = DefaultText,
@@ -31,6 +52,7 @@ data class FlashDebugScenario(
     val play: Boolean = true,
     val playDurationMs: Long = DefaultPlayDurationMs,
     val playEndAction: FlashDebugPlayEndAction = FlashDebugPlayEndAction.Stop,
+    val playbackScript: List<DebugPlaybackScriptStep> = emptyList(),
     val seekFractions: List<Float> = emptyList(),
     val seekStartDelayMs: Long = DefaultSeekStartDelayMs,
     val seekDragDurationMs: Long = DefaultSeekDragDurationMs,
@@ -55,6 +77,7 @@ data class FlashDebugScenario(
         const val ExtraPlay = "wb.play"
         const val ExtraPlayDurationMs = "wb.play.ms"
         const val ExtraPlayEndAction = "wb.play.end"
+        const val ExtraPlaybackScript = "wb.play.script"
         const val ExtraSeekFractions = "wb.seek.fractions"
         const val ExtraSeekStartDelayMs = "wb.seek.start.ms"
         const val ExtraSeekDragDurationMs = "wb.seek.drag.ms"
@@ -103,6 +126,7 @@ data class FlashDebugScenario(
                     play = intent.getBooleanExtra(ExtraPlay, true),
                     playDurationMs = intent.getLongExtra(ExtraPlayDurationMs, DefaultPlayDurationMs).coerceAtLeast(0L),
                     playEndAction = FlashDebugPlayEndAction.fromId(intent.getStringExtra(ExtraPlayEndAction)),
+                    playbackScript = intent.getStringExtra(ExtraPlaybackScript).toDebugPlaybackScript(),
                     seekFractions = intent.getStringExtra(ExtraSeekFractions).toSeekFractions(),
                     seekStartDelayMs = intent.getLongExtra(ExtraSeekStartDelayMs, DefaultSeekStartDelayMs).coerceAtLeast(0L),
                     seekDragDurationMs =
@@ -111,19 +135,26 @@ data class FlashDebugScenario(
                         intent.getLongExtra(ExtraSeekStepIntervalMs, DefaultSeekStepIntervalMs).coerceAtLeast(1L),
                     seekSettleDelayMs = intent.getLongExtra(ExtraSeekSettleDelayMs, DefaultSeekSettleDelayMs).coerceAtLeast(0L),
                 )
+            val visualPerfOverlayLabel = scenario.visualPerfOverlayEnabled?.toString() ?: "default"
+            val seekFractionsLabel =
+                scenario.seekFractions.joinToString(prefix = "[", postfix = "]") { "%.3f".format(it) }
+            val playbackScriptLabel =
+                scenario.playbackScript.joinToString(prefix = "[", postfix = "]") { "${it.atMs}:${it.action.id}" }
+            val languageLabel = scenario.languageOverride?.languageTag ?: "current"
             Log.d(
                 Tag,
                 "received scenario=${scenario.scenario.id} style=${scenario.style.id} display=${scenario.displayMode.name.lowercase()} " +
                     "followView=${scenario.followViewMode.name.lowercase()} " +
                     "visual=${scenario.visualMode.name} " +
-                    "visualPerfOverlay=${scenario.visualPerfOverlayEnabled?.toString() ?: "default"} " +
+                    "visualPerfOverlay=$visualPerfOverlayLabel " +
                     "playbackSpeed=${scenario.playbackSpeed} " +
-                    "seekFractions=${scenario.seekFractions.joinToString(prefix = "[", postfix = "]") { "%.3f".format(it) }} " +
+                    "seekFractions=$seekFractionsLabel " +
                     "seekStartMs=${scenario.seekStartDelayMs} seekDragMs=${scenario.seekDragDurationMs} " +
                     "seekStepMs=${scenario.seekStepIntervalMs} seekSettleMs=${scenario.seekSettleDelayMs} " +
-                    "lang=${scenario.languageOverride?.languageTag ?: "current"} " +
+                    "lang=$languageLabel " +
                     "encode=${scenario.encode} play=${scenario.play} playMs=${scenario.playDurationMs} " +
                     "playEnd=${scenario.playEndAction.id} " +
+                    "playScript=$playbackScriptLabel " +
                     "requestId=${scenario.requestId} input=${scenario.inputDebugSummary()}",
             )
             return scenario
@@ -157,10 +188,13 @@ data class MiniDebugScenario(
     val speed: MorseSpeedOption = MorseSpeedOption.default,
     val expandLyrics: Boolean = false,
     val displayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics,
+    val morseVisualizationMode: MiniMorseVisualizationMode = MiniMorseVisualizationMode.Horizontal,
     val visualPerfOverlayEnabled: Boolean? = null,
     val encode: Boolean = true,
     val play: Boolean = true,
     val playDurationMs: Long = DefaultPlayDurationMs,
+    val playEndAction: FlashDebugPlayEndAction = FlashDebugPlayEndAction.Stop,
+    val playbackScript: List<DebugPlaybackScriptStep> = emptyList(),
     val requestId: Long = System.nanoTime(),
 ) {
     companion object {
@@ -172,10 +206,13 @@ data class MiniDebugScenario(
         const val ExtraSpeed = "wb.mini.speed"
         const val ExtraExpandLyrics = "wb.lyrics.expand"
         const val ExtraDisplay = "wb.display"
+        const val ExtraMorseVisualization = "wb.morse.visual"
         const val ExtraVisualPerfOverlay = FlashDebugScenario.ExtraVisualPerfOverlay
         const val ExtraEncode = FlashDebugScenario.ExtraEncode
         const val ExtraPlay = FlashDebugScenario.ExtraPlay
         const val ExtraPlayDurationMs = FlashDebugScenario.ExtraPlayDurationMs
+        const val ExtraPlayEndAction = FlashDebugScenario.ExtraPlayEndAction
+        const val ExtraPlaybackScript = FlashDebugScenario.ExtraPlaybackScript
         const val DefaultText = "mini sync test"
         const val DefaultPlayDurationMs = 6_000L
         private const val Tag = "MiniAutomation"
@@ -196,6 +233,7 @@ data class MiniDebugScenario(
                     speed = intent.getStringExtra(ExtraSpeed).toMorseSpeedOption(),
                     expandLyrics = intent.getBooleanExtra(ExtraExpandLyrics, false),
                     displayMode = intent.getStringExtra(ExtraDisplay).toPlaybackDisplayMode(),
+                    morseVisualizationMode = intent.getStringExtra(ExtraMorseVisualization).toMiniMorseVisualizationMode(),
                     visualPerfOverlayEnabled =
                         intent
                             .takeIf { it.hasExtra(ExtraVisualPerfOverlay) }
@@ -203,14 +241,23 @@ data class MiniDebugScenario(
                     encode = intent.getBooleanExtra(ExtraEncode, true),
                     play = intent.getBooleanExtra(ExtraPlay, true),
                     playDurationMs = intent.getLongExtra(ExtraPlayDurationMs, DefaultPlayDurationMs).coerceAtLeast(0L),
+                    playEndAction = FlashDebugPlayEndAction.fromId(intent.getStringExtra(ExtraPlayEndAction)),
+                    playbackScript = intent.getStringExtra(ExtraPlaybackScript).toDebugPlaybackScript(),
                 )
+            val visualPerfOverlayLabel = scenario.visualPerfOverlayEnabled?.toString() ?: "default"
+            val playbackScriptLabel =
+                scenario.playbackScript.joinToString(prefix = "[", postfix = "]") { "${it.atMs}:${it.action.id}" }
+            val languageLabel = scenario.languageOverride?.languageTag ?: "current"
             Log.d(
                 Tag,
                 "received scenario=${scenario.scenario.id} speed=${scenario.speed.id} expandLyrics=${scenario.expandLyrics} " +
                     "display=${scenario.displayMode.name.lowercase()} " +
-                    "visualPerfOverlay=${scenario.visualPerfOverlayEnabled?.toString() ?: "default"} " +
-                    "lang=${scenario.languageOverride?.languageTag ?: "current"} " +
+                    "morseVisual=${scenario.morseVisualizationMode.name.lowercase()} " +
+                    "visualPerfOverlay=$visualPerfOverlayLabel " +
+                    "lang=$languageLabel " +
                     "encode=${scenario.encode} play=${scenario.play} playMs=${scenario.playDurationMs} " +
+                    "playEnd=${scenario.playEndAction.id} " +
+                    "playScript=$playbackScriptLabel " +
                     "requestId=${scenario.requestId} input=${scenario.inputDebugSummary()}",
             )
             return scenario
@@ -349,6 +396,109 @@ data class SavedAudioDebugScenario(
     }
 }
 
+data class AppTabDebugScenario(
+    val tab: AppTab = AppTab.Audio,
+    val languageOverride: AppLanguageOption? = null,
+    val settingsImportConfirmAction: SettingsImportConfirmAction? = null,
+    val settingsImportCopyScope: SettingsImportCopyScope? = null,
+    val requestId: Long = System.nanoTime(),
+) {
+    companion object {
+        const val Action = "com.bag.audioandroid.DEBUG_APP_TAB_SCENARIO"
+        const val ExtraTab = "wb.tab"
+        const val ExtraLanguage = FlashDebugScenario.ExtraLanguage
+        const val ExtraSettingsImportConfirm = "wb.import.confirm"
+        const val ExtraSettingsImportScope = "wb.import.scope"
+        private const val Tag = "TabAutomation"
+
+        fun fromIntent(intent: Intent?): AppTabDebugScenario? {
+            if (!BuildConfig.DEBUG || intent?.action != Action) {
+                return null
+            }
+            val scenario =
+                AppTabDebugScenario(
+                    tab = AppTab.fromAutomationId(intent.getStringExtra(ExtraTab)),
+                    languageOverride = intent.getStringExtra(ExtraLanguage).toDebugAppLanguageOption(),
+                    settingsImportConfirmAction =
+                        intent
+                            .getStringExtra(ExtraSettingsImportConfirm)
+                            ?.let(SettingsImportConfirmAction::fromId),
+                    settingsImportCopyScope =
+                        intent
+                            .getStringExtra(ExtraSettingsImportScope)
+                            ?.let(SettingsImportCopyScope::fromId),
+                )
+            Log.d(
+                Tag,
+                "received requestId=${scenario.requestId} tab=${scenario.tab.automationId} " +
+                    "lang=${scenario.languageOverride?.languageTag ?: "current"} " +
+                    "importConfirm=${scenario.settingsImportConfirmAction?.id ?: "off"} " +
+                    "importScope=${scenario.settingsImportCopyScope?.id ?: "off"}",
+            )
+            return scenario
+        }
+    }
+}
+
+data class SettingsImportDebugScenario(
+    val languageOverride: AppLanguageOption? = null,
+    val confirmAction: SettingsImportConfirmAction = SettingsImportConfirmAction.None,
+    val copyScope: SettingsImportCopyScope = SettingsImportCopyScope.Current,
+    val requestId: Long = System.nanoTime(),
+) {
+    companion object {
+        const val Action = "com.bag.audioandroid.DEBUG_SETTINGS_IMPORT_SCENARIO"
+        const val ExtraLanguage = FlashDebugScenario.ExtraLanguage
+        const val ExtraConfirm = "wb.import.confirm"
+        const val ExtraScope = "wb.import.scope"
+        private const val Tag = "SettingsImportAuto"
+
+        fun fromIntent(intent: Intent?): SettingsImportDebugScenario? {
+            if (!BuildConfig.DEBUG || intent?.action != Action) {
+                return null
+            }
+            val scenario =
+                SettingsImportDebugScenario(
+                    languageOverride = intent.getStringExtra(ExtraLanguage).toDebugAppLanguageOption(),
+                    confirmAction = SettingsImportConfirmAction.fromId(intent.getStringExtra(ExtraConfirm)),
+                    copyScope = SettingsImportCopyScope.fromId(intent.getStringExtra(ExtraScope)),
+                )
+            Log.d(
+                Tag,
+                "received requestId=${scenario.requestId} confirm=${scenario.confirmAction.id} " +
+                    "scope=${scenario.copyScope.id} " +
+                    "lang=${scenario.languageOverride?.languageTag ?: "current"}",
+            )
+            return scenario
+        }
+    }
+}
+
+enum class SettingsImportConfirmAction(
+    val id: String,
+) {
+    None("none"),
+    Overwrite("overwrite"),
+    Copy("copy"),
+    ;
+
+    companion object {
+        fun fromId(id: String?): SettingsImportConfirmAction = entries.firstOrNull { it.id == id?.trim()?.lowercase() } ?: None
+    }
+}
+
+enum class SettingsImportCopyScope(
+    val id: String,
+) {
+    Current("current"),
+    All("all"),
+    ;
+
+    companion object {
+        fun fromId(id: String?): SettingsImportCopyScope = entries.firstOrNull { it.id == id?.trim()?.lowercase() } ?: Current
+    }
+}
+
 enum class FlashDebugScenarioKind(
     val id: String,
 ) {
@@ -404,20 +554,32 @@ private fun String?.toSeekFractions(): List<Float> =
         }?.distinct()
         .orEmpty()
 
-internal val MorseSpeedOption.id: String
-    get() =
-        when (this) {
-            MorseSpeedOption.Slow -> "slow"
-            MorseSpeedOption.Standard -> "standard"
-            MorseSpeedOption.Fast -> "fast"
-        }
-
 private fun String?.toMorseSpeedOption(): MorseSpeedOption =
     when (this?.lowercase()) {
         "slow" -> MorseSpeedOption.Slow
         "fast" -> MorseSpeedOption.Fast
         else -> MorseSpeedOption.Standard
     }
+
+private fun String?.toMiniMorseVisualizationMode(): MiniMorseVisualizationMode =
+    when (this?.trim()?.lowercase()) {
+        "horizontal" -> MiniMorseVisualizationMode.Horizontal
+        else -> MiniMorseVisualizationMode.Horizontal
+    }
+
+private fun String?.toDebugPlaybackScript(): List<DebugPlaybackScriptStep> =
+    this
+        ?.split(',')
+        ?.mapNotNull { token ->
+            val parts = token.trim().split(':')
+            if (parts.size != 2) {
+                return@mapNotNull null
+            }
+            val atMs = parts[0].trim().toLongOrNull()?.coerceAtLeast(0L) ?: return@mapNotNull null
+            val action = DebugPlaybackScriptAction.fromId(parts[1].trim()) ?: return@mapNotNull null
+            DebugPlaybackScriptStep(atMs = atMs, action = action)
+        }?.sortedBy(DebugPlaybackScriptStep::atMs)
+        .orEmpty()
 
 private fun String?.toProgressScenarioMode(): TransportModeOption =
     when (this?.lowercase()) {

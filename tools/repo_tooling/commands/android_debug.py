@@ -4,7 +4,17 @@ import argparse
 from pathlib import Path
 
 from ..constants import ROOT_DIR
-from ..android_debug import capture, crash_summary, encode_progress, flash_alignment, flash_visual_sweep, mini_alignment
+from ..android_debug import (
+    capture,
+    crash_summary,
+    encode_progress,
+    flash_alignment,
+    flash_visual_sweep,
+    mini_alignment,
+    saved_audio,
+    settings_import,
+    tab_navigation,
+)
 
 
 def _write_or_print(summary: str, output: Path | None) -> None:
@@ -54,6 +64,7 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
     if args.action == "capture-flash":
         extras: list[str] = []
         play_ms = args.play_ms if args.play_ms is not None else (30000 if args.scenario == "ui" else 6000)
+        capture.string_extra(extras, "wb.lang", args.lang)
         capture.string_extra(extras, "wb.scenario", args.scenario)
         capture.string_extra(extras, "wb.flash.style", args.style)
         capture.string_extra(extras, "wb.display", args.display)
@@ -119,12 +130,19 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
         return
     if args.action == "capture-mini":
         extras = []
+        capture.string_extra(extras, "wb.lang", args.lang)
         capture.string_extra(extras, "wb.scenario", args.scenario)
         capture.string_extra(extras, "wb.mini.speed", args.speed)
         capture.string_extra(extras, "wb.input", args.input_text)
+        capture.string_extra(extras, "wb.display", args.display)
+        capture.string_extra(extras, "wb.morse.visual", args.morse_visual)
+        capture.bool_extra(extras, "wb.lyrics.expand", args.expand_lyrics)
+        capture.bool_extra(extras, "wb.visual.perf_overlay", args.perf_overlay)
         capture.bool_extra(extras, "wb.encode", not args.no_encode)
         capture.bool_extra(extras, "wb.play", not args.no_play)
         capture.long_extra(extras, "wb.play.ms", args.play_ms)
+        capture.string_extra(extras, "wb.play.end", args.play_end)
+        capture.string_extra(extras, "wb.play.script", args.play_script)
         capture.capture_common(
             output_dir=_output_dir(args, f"mini-{args.speed}"),
             wait_ms=args.wait_ms,
@@ -136,6 +154,7 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
         return
     if args.action == "capture-encode-progress":
         extras = []
+        capture.string_extra(extras, "wb.lang", args.lang)
         capture.string_extra(extras, "wb.mode", args.mode)
         capture.string_extra(extras, "wb.mini.speed", args.speed)
         capture.string_extra(extras, "wb.input", args.input_text)
@@ -152,6 +171,49 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
             event_parser=encode_progress.parse_event,
             summary_builder=lambda events: encode_progress.build_summary(events, max_rows=args.max_rows),
             start=lambda: capture.start_activity(capture.ENCODE_PROGRESS_ACTION, extras),
+        )
+        return
+    if args.action == "capture-saved":
+        extras = []
+        capture.string_extra(extras, "wb.saved.item_id", args.item_id)
+        capture.string_extra(extras, "wb.saved.display_name", args.display_name)
+        capture.long_extra(extras, "wb.saved.seed_duration_ms", args.seed_duration_ms)
+        capture.string_extra(extras, "wb.saved.seed_mode", args.seed_mode)
+        capture.capture_common(
+            output_dir=_output_dir(args, "saved-audio"),
+            wait_ms=args.wait_ms,
+            filters=capture.SAVED_AUDIO_LOGCAT_FILTERS,
+            event_parser=saved_audio.parse_event,
+            summary_builder=saved_audio.build_summary,
+            start=lambda: capture.start_activity(capture.SAVED_AUDIO_ACTION, extras),
+        )
+        return
+    if args.action == "capture-tab":
+        extras = []
+        capture.string_extra(extras, "wb.tab", args.tab)
+        capture.string_extra(extras, "wb.lang", args.lang)
+        capture.capture_common(
+            output_dir=_output_dir(args, f"tab-{args.tab}"),
+            wait_ms=args.wait_ms,
+            filters=capture.TAB_LOGCAT_FILTERS,
+            event_parser=tab_navigation.parse_event,
+            summary_builder=tab_navigation.build_summary,
+            start=lambda: capture.start_activity(capture.APP_TAB_ACTION, extras),
+        )
+        return
+    if args.action == "capture-settings-import":
+        extras = []
+        capture.string_extra(extras, "wb.lang", args.lang)
+        capture.string_extra(extras, "wb.tab", "settings")
+        capture.string_extra(extras, "wb.import.confirm", args.confirm)
+        capture.string_extra(extras, "wb.import.scope", args.scope)
+        capture.capture_common(
+            output_dir=_output_dir(args, f"settings-import-{args.scope}-{args.confirm}"),
+            wait_ms=args.wait_ms,
+            filters=capture.SETTINGS_IMPORT_LOGCAT_FILTERS,
+            event_parser=settings_import.parse_event,
+            summary_builder=settings_import.build_summary,
+            start=lambda: capture.start_activity(capture.APP_TAB_ACTION, extras),
         )
         return
     raise AssertionError(f"Unhandled android-debug action: {args.action}")

@@ -29,8 +29,16 @@ import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.theme.BrandDualToneThemes
+import com.bag.audioandroid.ui.theme.DefaultBrandTheme
+import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
+import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
+import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.customMaterialPalette
+import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,12 +56,14 @@ class AudioAndroidViewModel(
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
     private val savedAudioDecodeCacheGateway: SavedAudioDecodeCacheGateway,
 ) : ViewModel() {
-    private val uiStateFlow = MutableStateFlow(AudioAppUiState())
+    private val uiStateFlow = MutableStateFlow(loadInitialUiState(appSettingsRepository))
     val uiState: StateFlow<AudioAppUiState> = uiStateFlow
     private val debugExpandLyricsRequestIdFlow = MutableStateFlow<Long?>(null)
     val debugExpandLyricsRequestId: StateFlow<Long?> = debugExpandLyricsRequestIdFlow
     private val debugPlaybackDisplayModeRequestFlow = MutableStateFlow<DebugPlaybackDisplayModeRequest?>(null)
     val debugPlaybackDisplayModeRequest: StateFlow<DebugPlaybackDisplayModeRequest?> = debugPlaybackDisplayModeRequestFlow
+    private val debugMorseVisualizationModeRequestFlow = MutableStateFlow<DebugMorseVisualizationModeRequest?>(null)
+    val debugMorseVisualizationModeRequest: StateFlow<DebugMorseVisualizationModeRequest?> = debugMorseVisualizationModeRequestFlow
 
     private val uiTextMapper = BagUiTextMapper()
     private val sampleInputSessionUpdater = SampleInputSessionUpdater(sampleInputTextProvider)
@@ -170,6 +180,10 @@ class AudioAndroidViewModel(
             onPlaybackSpeedSelected = ::onPlaybackSpeedSelected,
             onShellSavedAudioSelected = ::onShellSavedAudioSelected,
             onOpenPlayerDetailSheet = ::onOpenPlayerDetailSheet,
+            onTabSelected = ::onTabSelected,
+            onThemeStyleSelected = ::onThemeStyleSelected,
+            onCustomMaterialThemeSaved = ::onCustomMaterialThemeSaved,
+            onCustomMaterialThemesImported = ::onCustomMaterialThemesImported,
         )
 
     init {
@@ -237,6 +251,10 @@ class AudioAndroidViewModel(
         preferencesActions.onThemeModeSelected(themeMode)
     }
 
+    fun onMaterialDarkThemeActiveChanged(isDarkTheme: Boolean) {
+        preferencesActions.onMaterialDarkThemeActiveChanged(isDarkTheme)
+    }
+
     fun onThemeStyleSelected(themeStyle: ThemeStyleOption) {
         preferencesActions.onThemeStyleSelected(themeStyle)
     }
@@ -256,16 +274,41 @@ class AudioAndroidViewModel(
         preferencesActions.onCustomBrandThemeDeleted(presetId)
     }
 
-    fun onCustomMaterialThemeSaved(settings: CustomBrandThemeSettings) {
-        preferencesActions.onCustomMaterialThemeSaved(settings)
+    fun onCustomMaterialThemeSaved(
+        settings: CustomBrandThemeSettings,
+        replacePresetId: String? = null,
+    ) {
+        preferencesActions.onCustomMaterialThemeSaved(settings, replacePresetId)
+    }
+
+    fun onCustomMaterialThemeDeleted(presetId: String) {
+        preferencesActions.onCustomMaterialThemeDeleted(presetId)
     }
 
     fun onCreateCustomMaterialTheme() {
         preferencesActions.onCreateCustomMaterialTheme()
     }
 
+    fun onCustomMaterialThemesImported(settings: List<CustomBrandThemeSettings>) {
+        preferencesActions.onCustomMaterialThemesImported(settings)
+    }
+
+    fun onCustomMaterialThemesReordered(
+        fromIndex: Int,
+        toIndex: Int,
+    ) {
+        preferencesActions.onCustomMaterialThemesReordered(fromIndex, toIndex)
+    }
+
     fun onCustomBrandThemesImported(settings: List<CustomBrandThemeSettings>) {
         preferencesActions.onCustomBrandThemesImported(settings)
+    }
+
+    fun onCustomBrandThemesReordered(
+        fromIndex: Int,
+        toIndex: Int,
+    ) {
+        preferencesActions.onCustomBrandThemesReordered(fromIndex, toIndex)
     }
 
     fun onConfigLanguageExpandedChanged(expanded: Boolean) {
@@ -274,6 +317,42 @@ class AudioAndroidViewModel(
 
     fun onConfigThemeAppearanceExpandedChanged(expanded: Boolean) {
         preferencesActions.onConfigThemeAppearanceExpandedChanged(expanded)
+    }
+
+    fun onConfigCustomMaterialThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigCustomMaterialThemeExpandedChanged(expanded)
+    }
+
+    fun onConfigBuiltInMaterialPalettesExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigBuiltInMaterialPalettesExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialRedsPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialRedsPaletteExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialOrangesPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialOrangesPaletteExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialYellowsPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialYellowsPaletteExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialGreensPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialGreensPaletteExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialBluesPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialBluesPaletteExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialPurplesPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialPurplesPaletteExpandedChanged(expanded)
+    }
+
+    fun onConfigMaterialNeutralsPaletteExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigMaterialNeutralsPaletteExpandedChanged(expanded)
     }
 
     fun onConfigCustomBrandThemeExpandedChanged(expanded: Boolean) {
@@ -369,6 +448,11 @@ class AudioAndroidViewModel(
                 requestId = scenario.requestId,
                 mode = scenario.displayMode,
             )
+        debugMorseVisualizationModeRequestFlow.value =
+            DebugMorseVisualizationModeRequest(
+                requestId = scenario.requestId,
+                mode = scenario.morseVisualizationMode,
+            )
         debugScenarioActions.startMiniDebugScenario(scenario)
     }
 
@@ -384,12 +468,26 @@ class AudioAndroidViewModel(
         }
     }
 
+    fun onDebugMorseVisualizationModeHandled(requestId: Long) {
+        if (debugMorseVisualizationModeRequestFlow.value?.requestId == requestId) {
+            debugMorseVisualizationModeRequestFlow.value = null
+        }
+    }
+
     fun startEncodeProgressDebugScenario(scenario: EncodeProgressDebugScenario) {
         debugScenarioActions.startEncodeProgressDebugScenario(scenario)
     }
 
     fun startSavedAudioDebugScenario(scenario: SavedAudioDebugScenario) {
         debugScenarioActions.startSavedAudioDebugScenario(scenario)
+    }
+
+    fun startAppTabDebugScenario(scenario: AppTabDebugScenario) {
+        debugScenarioActions.startAppTabDebugScenario(scenario)
+    }
+
+    fun startSettingsImportDebugScenario(scenario: SettingsImportDebugScenario) {
+        debugScenarioActions.startSettingsImportDebugScenario(scenario)
     }
 
     fun onRandomizeSampleInput(length: SampleInputLengthOption) {
@@ -433,6 +531,8 @@ class AudioAndroidViewModel(
     fun onTogglePlayback() {
         playbackActions.onTogglePlayback()
     }
+
+    fun pauseCurrentPlaybackIfPlaying(): Boolean = playbackActions.pauseCurrentPlaybackIfPlaying()
 
     fun stopPlayback() {
         playbackActions.stopPlayback()
@@ -650,3 +750,67 @@ class AudioAndroidViewModel(
         const val FRAME_SAMPLES = 2205
     }
 }
+
+private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): AudioAppUiState =
+    runBlocking {
+        val customBrandThemePresets =
+            appSettingsRepository.customBrandThemePresets.first().ifEmpty {
+                listOf(com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings)
+            }
+        val customMaterialThemePresets =
+            appSettingsRepository.customMaterialThemePresets.first().ifEmpty {
+                listOf(DefaultCustomMaterialPaletteSettings)
+            }
+        val selectedThemeMode = ThemeModeOption.fromId(appSettingsRepository.selectedThemeModeId.first())
+        val selectedThemeStyle =
+            inferPersistedThemeStyle(
+                themeStyleId = appSettingsRepository.selectedThemeStyleId.first(),
+                paletteId = appSettingsRepository.selectedPaletteId.first(),
+                lightPaletteId = appSettingsRepository.selectedMaterialPaletteIdLight.first(),
+                darkPaletteId = appSettingsRepository.selectedMaterialPaletteIdDark.first(),
+            )
+        val selectedBrandThemeId = appSettingsRepository.selectedBrandThemeId.first()
+        val selectedBrandTheme =
+            if (selectedBrandThemeId != null && isCustomBrandThemeOptionId(selectedBrandThemeId)) {
+                customBrandThemePresets
+                    .map(::customBrandTheme)
+                    .firstOrNull { it.id == selectedBrandThemeId }
+                    ?: customBrandTheme(customBrandThemePresets.first())
+            } else {
+                BrandDualToneThemes.firstOrNull { it.id == selectedBrandThemeId } ?: DefaultBrandTheme
+            }
+        val selectedMaterialPaletteIdLight = appSettingsRepository.selectedMaterialPaletteIdLight.first()
+        val selectedMaterialPaletteIdDark = appSettingsRepository.selectedMaterialPaletteIdDark.first()
+        val isMaterialDarkThemeActive = selectedThemeMode == ThemeModeOption.Dark
+        val selectedPaletteId =
+            if (isMaterialDarkThemeActive) {
+                selectedMaterialPaletteIdDark ?: selectedMaterialPaletteIdLight ?: appSettingsRepository.selectedPaletteId.first()
+            } else {
+                selectedMaterialPaletteIdLight ?: selectedMaterialPaletteIdDark ?: appSettingsRepository.selectedPaletteId.first()
+            }
+        val selectedPalette =
+            if (selectedPaletteId != null) {
+                customMaterialThemePresets
+                    .map(::customMaterialPalette)
+                    .firstOrNull { it.id == selectedPaletteId }
+                    ?: BrandNewOrBuiltInMaterialPalette(selectedPaletteId)
+            } else {
+                DefaultMaterialPalette
+            }
+
+        AudioAppUiState(
+            selectedPalette = selectedPalette,
+            selectedMaterialPaletteIdLight = selectedMaterialPaletteIdLight,
+            selectedMaterialPaletteIdDark = selectedMaterialPaletteIdDark,
+            customMaterialThemePresets = customMaterialThemePresets,
+            selectedBrandTheme = selectedBrandTheme,
+            customBrandThemePresets = customBrandThemePresets,
+            selectedThemeStyle = selectedThemeStyle,
+            selectedThemeMode = selectedThemeMode,
+            isMaterialDarkThemeActive = isMaterialDarkThemeActive,
+        )
+    }
+
+private fun BrandNewOrBuiltInMaterialPalette(selectedPaletteId: String): PaletteOption =
+    com.bag.audioandroid.ui.theme.MaterialPalettes
+        .firstOrNull { it.id == selectedPaletteId } ?: DefaultMaterialPalette

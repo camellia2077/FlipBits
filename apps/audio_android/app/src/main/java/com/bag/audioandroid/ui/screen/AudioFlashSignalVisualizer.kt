@@ -202,6 +202,7 @@ private fun FlashSignalVisualizerContent(
             baseBackground = sceneState.visualStyle.baseBackground,
             centerLineColor = sceneState.visualStyle.centerLineColor,
             pulseGuideColor = sceneState.visualStyle.pulseGuideColor,
+            referenceLabelColor = sceneState.visualStyle.referenceLabelColor,
             showPerfOverlay = showPerfOverlay,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -261,8 +262,11 @@ private fun rememberFlashSignalVisualStyle(
             inactiveToneColor = visualTokens.visualizationInactiveToneColor,
             glowColor = colorScheme.onPrimaryContainer,
             baseBackground = visualTokens.visualizationBaseBackgroundColor,
-            centerLineColor = visualTokens.subtleOutlineColor.copy(alpha = 0.20f),
-            pulseGuideColor = visualTokens.subtleOutlineColor.copy(alpha = 0.18f),
+            centerLineColor = flashSignalOutlineColor(visualTokens.subtleOutlineColor),
+            pulseGuideColor = flashSignalOutlineColor(visualTokens.subtleOutlineColor),
+            // low/high Hz reference labels sit on the mini player surface, so they should
+            // contrast with that background instead of following primary/secondary slots.
+            referenceLabelColor = colorScheme.onSurface,
         )
     }
 
@@ -329,6 +333,7 @@ private data class FlashSignalVisualStyle(
     val baseBackground: Color,
     val centerLineColor: Color,
     val pulseGuideColor: Color,
+    val referenceLabelColor: Color,
 )
 
 private data class FlashSignalVisualizerSceneState(
@@ -363,6 +368,7 @@ private fun FlashSignalCanvas(
     baseBackground: Color,
     centerLineColor: Color,
     pulseGuideColor: Color,
+    referenceLabelColor: Color,
     showPerfOverlay: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -442,6 +448,7 @@ private fun FlashSignalCanvas(
                 activeToneColor = activeToneColor,
                 inactiveToneColor = inactiveToneColor,
                 centerLineColor = centerLineColor,
+                referenceLabelColor = referenceLabelColor,
                 glowPulse = canvasVisualState.glowPulse,
                 leftPadding = leftPadding,
                 topPadding = topPadding,
@@ -651,6 +658,7 @@ private fun DrawScope.drawFlashSignalCanvasContent(
     activeToneColor: Color,
     inactiveToneColor: Color,
     centerLineColor: Color,
+    referenceLabelColor: Color,
     glowPulse: Float,
     leftPadding: Float,
     topPadding: Float,
@@ -736,6 +744,7 @@ private fun DrawScope.drawFlashSignalCanvasContent(
                 activeToneColor = activeToneColor,
                 inactiveToneColor = inactiveToneColor,
                 centerLineColor = centerLineColor,
+                referenceLabelColor = referenceLabelColor,
                 glowPulse = glowPulse,
                 leftPadding = leftPadding,
                 topPadding = topPadding,
@@ -758,6 +767,7 @@ private fun DrawScope.drawFlashHzContent(
     activeToneColor: Color,
     inactiveToneColor: Color,
     centerLineColor: Color,
+    referenceLabelColor: Color,
     glowPulse: Float,
     leftPadding: Float,
     topPadding: Float,
@@ -779,6 +789,7 @@ private fun DrawScope.drawFlashHzContent(
                 activeToneColor = activeToneColor,
                 inactiveToneColor = inactiveToneColor,
                 centerLineColor = centerLineColor,
+                referenceLabelColor = referenceLabelColor,
                 glowPulse = glowPulse,
             )
         } else {
@@ -796,6 +807,7 @@ private fun DrawScope.drawFlashHzContent(
                 activeToneColor = activeToneColor,
                 inactiveToneColor = inactiveToneColor,
                 centerLineColor = centerLineColor,
+                referenceLabelColor = referenceLabelColor,
                 glowPulse = glowPulse,
             )
         }
@@ -925,6 +937,8 @@ private fun Float.samplesToMs(sampleRateHz: Int): Int =
 private fun Float.formatOneDecimal(): String = "%.1f".format(java.util.Locale.US, this)
 
 private fun Double.formatTwoDecimals(): String = "%.2f".format(java.util.Locale.US, this)
+
+private fun flashSignalOutlineColor(color: Color): Color = color.copy(alpha = FlashSignalOutlineAlpha)
 
 private fun safeLogD(
     tag: String,
@@ -1475,6 +1489,7 @@ private fun FlashBitReadoutRow(
 private const val FlashSignalMinBucketCount = 56
 private const val FlashSignalMaxBucketCount = 124
 private const val FlashSignalMaxVisualBucketOffset = 3f
+private const val FlashSignalOutlineAlpha = 0.20f
 private val FlashPulseOverlayHorizontalPadding = 18.dp
 private val FlashPulseOverlayVerticalPadding = 18.dp
 

@@ -80,12 +80,20 @@ Recommended device prep:
 python tools/run.py android-debug device-prep
 ```
 
-Recommended log capture:
+Wrapper capture:
 
 ```powershell
-adb logcat -c
-adb logcat -v time SavedAudioAutomation:D SavedAudioPerf:D PlaybackAutomation:D AndroidRuntime:E libc:E *:S > temp\saved_audio_perf.log
+python tools/run.py android-debug capture-saved --seed-duration-ms 181000 --seed-mode pro
+python tools/run.py android-debug capture-saved --display-name "saved perf 181_pro_20260511_224633.wav"
 ```
+
+Recommended log capture:
+
+- `capture-saved` writes:
+  - `raw.log`
+  - `summary.md`
+  - `crash-summary.txt`
+- Use raw `adb logcat` only when you need a custom filter set or an extra wrapper parameter that still does not exist.
 
 ## Success Criteria
 

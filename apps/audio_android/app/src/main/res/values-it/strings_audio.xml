@@ -250,5 +250,7 @@
     <string name="audio_saved_audio_decode_loading_body">Questo clip viene letto una volta per creare la sua vista riutilizzabile di testo e parole. Il risultato resta solo in questa app per riaprirlo più velocemente.</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
+    <string name="audio_morse_visualizer_mode_vertical">Verticale</string>
+    <string name="audio_morse_visualizer_mode_horizontal">Orizzontale</string>
 </resources>
 

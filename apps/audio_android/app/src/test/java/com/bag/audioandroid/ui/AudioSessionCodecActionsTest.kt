@@ -703,12 +703,13 @@ class AudioSessionCodecSegmentationTest {
             advanceUntilIdle()
 
             val session = fixture.uiState.value.currentSession
-            assertEquals(26_496, session.generatedAudioMetadata?.payloadByteCount)
-            assertTrue((session.generatedAudioMetadata?.segmentCount ?: 0) > 8)
+            val metadata = requireNotNull(session.generatedAudioMetadata)
+            assertEquals(26_496, metadata.payloadByteCount)
+            assertTrue(metadata.segmentCount > 8)
             assertEquals(0, session.generatedPcm.size)
             assertTrue(session.generatedWaveformPcm.isNotEmpty())
             assertTrue(session.followWindowSource != null)
-            assertTrue(session.followWindow.endSampleExclusive < session.generatedAudioMetadata!!.pcmSampleCount)
+            assertTrue(session.followWindow.endSampleExclusive < metadata.pcmSampleCount)
             assertTrue(session.flashVisualWindowSource != null)
             assertTrue(session.flashVisualWindow.available)
             assertTrue(session.flashVisualWindow.segments.isNotEmpty())
@@ -716,7 +717,7 @@ class AudioSessionCodecSegmentationTest {
             assertTrue(session.followData.textFollowAvailable)
             assertTrue(session.followData.lyricLineFollowAvailable)
             assertTrue(session.followData.binaryGroupTimeline.isNotEmpty())
-            assertTrue(session.followData.textTokens.size < session.generatedAudioMetadata!!.segmentCount)
+            assertTrue(session.followData.textTokens.size < metadata.segmentCount)
         }
 
     @Test

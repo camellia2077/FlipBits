@@ -8,6 +8,7 @@ data class PaletteOption(
     val id: String,
     val family: PaletteFamily,
     @param:StringRes val titleResId: Int,
+    val titleOverride: String? = null,
     val previewColor: Color,
     val lightScheme: ColorScheme,
     val darkScheme: ColorScheme,

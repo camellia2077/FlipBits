@@ -15,6 +15,11 @@ data class RandomCustomBrandThemeColors(
     val outlineHex: String,
 )
 
+enum class RandomCustomMaterialProfile {
+    Light,
+    Dark,
+}
+
 fun randomCustomBrandThemeColors(random: Random = Random.Default): RandomCustomBrandThemeColors {
     // Keep the first pass intentionally simple: randomize in HSV so colors stay
     // vivid enough to read, force primary/accent apart, and derive outline from
@@ -83,6 +88,46 @@ fun randomCustomBrandThemeColors(random: Random = Random.Default): RandomCustomB
         secondaryHex = fallbackSecondary.toHexString(),
         outlineHex = fallbackOutline.toHexString(),
     )
+}
+
+fun randomCustomMaterialPrimaryHex(
+    profile: RandomCustomMaterialProfile,
+    random: Random = Random.Default,
+): String {
+    repeat(24) {
+        val hue = random.nextInt(360).toFloat()
+        val candidate =
+            when (profile) {
+                RandomCustomMaterialProfile.Light ->
+                    hsvColor(
+                        hue = hue,
+                        saturation = random.nextFloat().lerp(0.48f, 0.88f),
+                        value = random.nextFloat().lerp(0.42f, 0.68f),
+                    )
+                RandomCustomMaterialProfile.Dark ->
+                    hsvColor(
+                        hue = hue,
+                        saturation = random.nextFloat().lerp(0.40f, 0.82f),
+                        value = random.nextFloat().lerp(0.58f, 0.82f),
+                    )
+            }
+        val luminance = candidate.luminance()
+        val acceptable =
+            when (profile) {
+                RandomCustomMaterialProfile.Light -> luminance in 0.12f..0.46f
+                RandomCustomMaterialProfile.Dark -> luminance in 0.24f..0.64f
+            }
+        if (acceptable) {
+            return candidate.toHexString()
+        }
+    }
+
+    val fallback =
+        when (profile) {
+            RandomCustomMaterialProfile.Light -> Color(0xFFB3261E)
+            RandomCustomMaterialProfile.Dark -> Color(0xFFFF8A80)
+        }
+    return fallback.toHexString()
 }
 
 private fun chooseOutlineColor(

@@ -10,7 +10,7 @@ from pathlib import Path
 KEY_VALUE_RE = re.compile(r"([A-Za-z][A-Za-z0-9/]*)=([^ ]+)")
 TEXT_FIELD_RE = re.compile(r"(text|tokenText|sourceLineText)=([^=]*?)(?= [A-Za-z][A-Za-z0-9/]*=|$)")
 TIME_RE = re.compile(r"^(\d\d-\d\d \d\d:\d\d:\d\d\.\d{3})")
-TAGS = ("MiniAutomation", "MiniAlignmentPerf", "FlashLyricsPerf")
+TAGS = ("MiniAutomation", "MiniAlignmentPerf", "MiniVisualPerf", "FlashLyricsPerf")
 
 
 @dataclass(frozen=True)
@@ -53,6 +53,13 @@ def str_field(event: Event, key: str, default: str = "") -> str:
     return event.fields.get(key, default)
 
 
+def float_field(event: Event, key: str, default: float = 0.0) -> float:
+    try:
+        return float(event.fields.get(key, str(default)))
+    except ValueError:
+        return default
+
+
 def latest_with_field(events: list[Event], field: str) -> Event | None:
     return next((event for event in reversed(events) if field in event.fields), None)
 
@@ -60,12 +67,14 @@ def latest_with_field(events: list[Event], field: str) -> Event | None:
 def build_summary(events: list[Event], max_rows: int) -> str:
     automation = [event for event in events if event.tag == "MiniAutomation"]
     alignment = [event for event in events if event.tag == "MiniAlignmentPerf"]
+    visual_perf = [event for event in events if event.tag == "MiniVisualPerf"]
     lyrics = [event for event in events if event.tag == "FlashLyricsPerf"]
     lines: list[str] = []
     lines.append("# Mini Alignment Log Summary")
     lines.append("")
     lines.append(f"- MiniAutomation rows: {len(automation)}")
     lines.append(f"- MiniAlignmentPerf rows: {len(alignment)}")
+    lines.append(f"- MiniVisualPerf rows: {len(visual_perf)}")
     lines.append(f"- FlashLyricsPerf rows: {len(lyrics)}")
     received = latest_with_field(automation, "scenario")
     if received:
@@ -96,7 +105,47 @@ def build_summary(events: list[Event], max_rows: int) -> str:
     if alignment:
         sample_deltas = [abs(int_field(event, "sampleDelta", 0)) for event in alignment]
         lines.append(f"- Max absolute sampleDelta: {max(sample_deltas)}")
+    if visual_perf:
+        latest_perf = visual_perf[-1]
+        lines.append(
+            "- Latest MiniVisualPerf: "
+            f"reason={str_field(latest_perf, 'reason', '_')} "
+            f"drawAvgMs={str_field(latest_perf, 'drawAvgMs', '_')} "
+            f"rawUpdate/s={str_field(latest_perf, 'rawUpdate/s', '_')} "
+            f"rawStepMaxMs={str_field(latest_perf, 'rawStepMaxMs', '_')} "
+            f"smoothStepMaxMs={str_field(latest_perf, 'smoothStepMaxMs', '_')} "
+            f"visualErrorMs={str_field(latest_perf, 'visualErrorMs', '_')} "
+            f"windowStepMaxMs={str_field(latest_perf, 'windowStepMaxMs', '_')}"
+        )
+        max_visual_error_ms = max(abs(float_field(event, "visualErrorMs")) for event in visual_perf)
+        lines.append(
+            "- Peak MiniVisualPerf: "
+            f"drawAvgMs={max(float_field(event, 'drawAvgMs') for event in visual_perf):.2f} "
+            f"rawUpdate/s={max(float_field(event, 'rawUpdate/s') for event in visual_perf):.1f} "
+            f"rawStepMaxMs={max(float_field(event, 'rawStepMaxMs') for event in visual_perf):.1f} "
+            f"smoothStepMaxMs={max(float_field(event, 'smoothStepMaxMs') for event in visual_perf):.1f} "
+            f"visualErrorMs(abs)={max_visual_error_ms:.1f} "
+            f"windowStepMaxMs={max(float_field(event, 'windowStepMaxMs') for event in visual_perf):.1f}"
+        )
     lines.append("")
+    if visual_perf:
+        lines.append("## Mini Visual Perf")
+        lines.append("")
+        lines.append("| time | reason | drawAvgMs | rawUpdate/s | rawStepMaxMs | smoothStepMaxMs | visualErrorMs | windowStepMaxMs |")
+        lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |")
+        for event in visual_perf[:max_rows]:
+            lines.append(
+                "| "
+                f"{event.time} | "
+                f"{str_field(event, 'reason', '_')} | "
+                f"{float_field(event, 'drawAvgMs'):.2f} | "
+                f"{float_field(event, 'rawUpdate/s'):.1f} | "
+                f"{float_field(event, 'rawStepMaxMs'):.1f} | "
+                f"{float_field(event, 'smoothStepMaxMs'):.1f} | "
+                f"{float_field(event, 'visualErrorMs'):.1f} | "
+                f"{float_field(event, 'windowStepMaxMs'):.1f} |"
+            )
+        lines.append("")
     lines.append("## Alignment Rows")
     lines.append("")
     lines.append(

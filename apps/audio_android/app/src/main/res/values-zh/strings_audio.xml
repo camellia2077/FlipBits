@@ -271,5 +271,7 @@
     <string name="audio_saved_audio_decode_loading_body">此片段会被读取一次，以生成可复用的文本和歌词视图。结果只保存在此应用内，以便下次更快打开。</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
+    <string name="audio_morse_visualizer_mode_vertical">纵向</string>
+    <string name="audio_morse_visualizer_mode_horizontal">横向</string>
 </resources>
 

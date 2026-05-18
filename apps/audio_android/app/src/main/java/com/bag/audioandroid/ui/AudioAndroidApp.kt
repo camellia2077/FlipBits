@@ -33,6 +33,8 @@ fun AudioAndroidApp(
     miniDebugScenario: MiniDebugScenario? = null,
     encodeProgressDebugScenario: EncodeProgressDebugScenario? = null,
     savedAudioDebugScenario: SavedAudioDebugScenario? = null,
+    appTabDebugScenario: AppTabDebugScenario? = null,
+    settingsImportDebugScenario: SettingsImportDebugScenario? = null,
 ) {
     val appContext = LocalContext.current.applicationContext
     val factory = rememberAudioAndroidViewModelFactory(appContext)
@@ -40,6 +42,7 @@ fun AudioAndroidApp(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val debugExpandLyricsRequestId by viewModel.debugExpandLyricsRequestId.collectAsStateWithLifecycle()
     val debugPlaybackDisplayModeRequest by viewModel.debugPlaybackDisplayModeRequest.collectAsStateWithLifecycle()
+    val debugMorseVisualizationModeRequest by viewModel.debugMorseVisualizationModeRequest.collectAsStateWithLifecycle()
     val importAudioLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocument(),
@@ -113,6 +116,18 @@ fun AudioAndroidApp(
     LaunchedEffect(savedAudioDebugScenario?.requestId) {
         if (BuildConfig.DEBUG && savedAudioDebugScenario != null) {
             viewModel.startSavedAudioDebugScenario(savedAudioDebugScenario)
+        }
+    }
+
+    LaunchedEffect(appTabDebugScenario?.requestId) {
+        if (BuildConfig.DEBUG && appTabDebugScenario != null) {
+            viewModel.startAppTabDebugScenario(appTabDebugScenario)
+        }
+    }
+
+    LaunchedEffect(settingsImportDebugScenario?.requestId) {
+        if (BuildConfig.DEBUG && settingsImportDebugScenario != null) {
+            viewModel.startSettingsImportDebugScenario(settingsImportDebugScenario)
         }
     }
 
@@ -205,6 +220,38 @@ fun AudioAndroidApp(
                 "uiPlaybackToggle requestId=${scenario.requestId} mode=flash " +
                     "playMs=${scenario.playDurationMs} speed=${scenario.playbackSpeed}",
             )
+            if (scenario.playbackScript.isNotEmpty()) {
+                var previousAtMs = 0L
+                scenario.playbackScript.forEachIndexed { index, step ->
+                    delay((step.atMs - previousAtMs).coerceAtLeast(0L))
+                    previousAtMs = step.atMs
+                    Log.d(
+                        "FlashAutomation",
+                        "uiPlaybackScript requestId=${scenario.requestId} index=$index atMs=${step.atMs} action=${step.action.id}",
+                    )
+                    when (step.action) {
+                        DebugPlaybackScriptAction.Toggle -> viewModel.onTogglePlayback()
+                        DebugPlaybackScriptAction.Pause -> {
+                            if (viewModel.uiState.value.currentPlayback.isPlaying) {
+                                viewModel.onTogglePlayback()
+                            }
+                        }
+                        DebugPlaybackScriptAction.Play -> {
+                            val playback = viewModel.uiState.value.currentPlayback
+                            if (!playback.isPlaying) {
+                                viewModel.onTogglePlayback()
+                            }
+                        }
+                        DebugPlaybackScriptAction.Stop -> viewModel.stopPlayback()
+                    }
+                    logUiDebugPlaybackStep(
+                        label = "script-${step.action.id}-$index",
+                        requestId = scenario.requestId,
+                        mode = TransportModeOption.Flash,
+                        uiState = viewModel.uiState.value,
+                    )
+                }
+            }
             runFlashDebugSeeks(
                 scenario = scenario,
                 totalSamples = uiState.currentPlaybackSampleCount,
@@ -213,16 +260,39 @@ fun AudioAndroidApp(
                 onScrubFinished = viewModel::onScrubFinished,
             )
             if (scenario.playDurationMs > 0L) {
-                delay(scenario.playDurationMs)
+                val lastScriptAtMs = scenario.playbackScript.lastOrNull()?.atMs ?: 0L
+                delay((scenario.playDurationMs - lastScriptAtMs).coerceAtLeast(0L))
+                logUiDebugPlaybackStep(
+                    label = "before-end-action",
+                    requestId = scenario.requestId,
+                    mode = TransportModeOption.Flash,
+                    uiState = viewModel.uiState.value,
+                )
                 val settledReason =
                     when (scenario.playEndAction) {
                         FlashDebugPlayEndAction.Pause -> {
-                            Log.d(
-                                "FlashAutomation",
-                                "uiPlaybackPause requestId=${scenario.requestId} mode=flash playMs=${scenario.playDurationMs}",
-                            )
-                            viewModel.onTogglePlayback()
-                            "playback-pause-settled"
+                            val paused =
+                                viewModel.pauseCurrentPlaybackIfPlaying()
+                            if (paused) {
+                                Log.d(
+                                    "FlashAutomation",
+                                    "uiPlaybackPause requestId=${scenario.requestId} mode=flash playMs=${scenario.playDurationMs}",
+                                )
+                                logUiDebugPlaybackStep(
+                                    label = "pause-immediate",
+                                    requestId = scenario.requestId,
+                                    mode = TransportModeOption.Flash,
+                                    uiState = viewModel.uiState.value,
+                                )
+                                "playback-pause-settled"
+                            } else {
+                                Log.d(
+                                    "FlashAutomation",
+                                    "uiPlaybackPauseSkipped requestId=${scenario.requestId} mode=flash " +
+                                        "reason=not-playing playMs=${scenario.playDurationMs}",
+                                )
+                                "playback-pause-skipped"
+                            }
                         }
                         FlashDebugPlayEndAction.Stop -> {
                             Log.d(
@@ -234,6 +304,12 @@ fun AudioAndroidApp(
                         }
                     }
                 delay(FlashDebugStopSettleDelayMs)
+                logUiDebugPlaybackStep(
+                    label = "after-end-action-settled",
+                    requestId = scenario.requestId,
+                    mode = TransportModeOption.Flash,
+                    uiState = viewModel.uiState.value,
+                )
                 FlashAlignmentPerfTrace.forceReport(
                     "$settledReason requestId=${scenario.requestId} playMs=${scenario.playDurationMs}",
                 )
@@ -253,11 +329,91 @@ fun AudioAndroidApp(
             )
             viewModel.onOpenPlayerDetailSheet()
             viewModel.onTogglePlayback()
+            if (scenario.playbackScript.isNotEmpty()) {
+                var previousAtMs = 0L
+                scenario.playbackScript.forEachIndexed { index, step ->
+                    delay((step.atMs - previousAtMs).coerceAtLeast(0L))
+                    previousAtMs = step.atMs
+                    Log.d(
+                        "MiniAutomation",
+                        "uiPlaybackScript requestId=${scenario.requestId} index=$index atMs=${step.atMs} action=${step.action.id}",
+                    )
+                    when (step.action) {
+                        DebugPlaybackScriptAction.Toggle -> viewModel.onTogglePlayback()
+                        DebugPlaybackScriptAction.Pause -> {
+                            if (viewModel.uiState.value.currentPlayback.isPlaying) {
+                                viewModel.onTogglePlayback()
+                            }
+                        }
+                        DebugPlaybackScriptAction.Play -> {
+                            val playback = viewModel.uiState.value.currentPlayback
+                            if (!playback.isPlaying) {
+                                viewModel.onTogglePlayback()
+                            }
+                        }
+                        DebugPlaybackScriptAction.Stop -> viewModel.stopPlayback()
+                    }
+                    logUiDebugPlaybackStep(
+                        label = "script-${step.action.id}-$index",
+                        requestId = scenario.requestId,
+                        mode = TransportModeOption.Mini,
+                        uiState = viewModel.uiState.value,
+                    )
+                }
+            }
             if (scenario.playDurationMs > 0L) {
-                delay(scenario.playDurationMs)
-                viewModel.stopPlayback()
+                val lastScriptAtMs = scenario.playbackScript.lastOrNull()?.atMs ?: 0L
+                delay((scenario.playDurationMs - lastScriptAtMs).coerceAtLeast(0L))
+                logUiDebugPlaybackStep(
+                    label = "before-end-action",
+                    requestId = scenario.requestId,
+                    mode = TransportModeOption.Mini,
+                    uiState = viewModel.uiState.value,
+                )
+                val settledReason =
+                    when (scenario.playEndAction) {
+                        FlashDebugPlayEndAction.Pause -> {
+                            val paused =
+                                viewModel.pauseCurrentPlaybackIfPlaying()
+                            if (paused) {
+                                Log.d(
+                                    "MiniAutomation",
+                                    "uiPlaybackPause requestId=${scenario.requestId} mode=mini playMs=${scenario.playDurationMs}",
+                                )
+                                logUiDebugPlaybackStep(
+                                    label = "pause-immediate",
+                                    requestId = scenario.requestId,
+                                    mode = TransportModeOption.Mini,
+                                    uiState = viewModel.uiState.value,
+                                )
+                                "mini-playback-pause-settled"
+                            } else {
+                                Log.d(
+                                    "MiniAutomation",
+                                    "uiPlaybackPauseSkipped requestId=${scenario.requestId} mode=mini " +
+                                        "reason=not-playing playMs=${scenario.playDurationMs}",
+                                )
+                                "mini-playback-pause-skipped"
+                            }
+                        }
+                        FlashDebugPlayEndAction.Stop -> {
+                            Log.d(
+                                "MiniAutomation",
+                                "uiPlaybackStop requestId=${scenario.requestId} mode=mini playMs=${scenario.playDurationMs}",
+                            )
+                            viewModel.stopPlayback()
+                            "mini-playback-stop"
+                        }
+                    }
+                delay(FlashDebugStopSettleDelayMs)
+                logUiDebugPlaybackStep(
+                    label = "after-end-action-settled",
+                    requestId = scenario.requestId,
+                    mode = TransportModeOption.Mini,
+                    uiState = viewModel.uiState.value,
+                )
                 MiniVisualPerfTrace.forceReport(
-                    "mini-playback-stop requestId=${scenario.requestId} playMs=${scenario.playDurationMs}",
+                    "$settledReason requestId=${scenario.requestId} playMs=${scenario.playDurationMs}",
                 )
             }
         }
@@ -365,6 +521,8 @@ fun AudioAndroidApp(
         onDebugExpandLyricsHandled = viewModel::onDebugExpandLyricsHandled,
         debugPlaybackDisplayModeRequest = debugPlaybackDisplayModeRequest,
         onDebugPlaybackDisplayModeHandled = viewModel::onDebugPlaybackDisplayModeHandled,
+        debugMorseVisualizationModeRequest = debugMorseVisualizationModeRequest,
+        onDebugMorseVisualizationModeHandled = viewModel::onDebugMorseVisualizationModeHandled,
         onImportAudio = { importAudioLauncher.launch(arrayOf("audio/*")) },
         viewModel = viewModel,
     )
@@ -459,7 +617,9 @@ private fun logUiDebugPlaybackStep(
         "uiPlaybackStep requestId=$requestId label=$label mode=${mode.wireName} " +
             "source=${uiState.currentPlaybackSource.debugSourceId()} " +
             "detailSheet=${uiState.showPlayerDetailSheet} miniPlayer=${uiState.miniPlayerModel != null} " +
-            "playbackSamples=${uiState.currentPlaybackSampleCount} playing=${uiState.currentPlayback.isPlaying}",
+            "playbackSamples=${uiState.currentPlaybackSampleCount} playing=${uiState.currentPlayback.isPlaying} " +
+            "played=${uiState.currentPlayback.playedSamples} displayed=${uiState.currentPlayback.displayedSamples} " +
+            "paused=${uiState.currentPlayback.isPaused}",
     )
 }
 

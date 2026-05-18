@@ -9,11 +9,21 @@ import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
+import com.bag.audioandroid.ui.model.AppTab
+import com.bag.audioandroid.ui.model.CustomBrandThemeImportParseResult
+import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomThemeImportMode
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
+import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.analyzeMorseText
+import com.bag.audioandroid.ui.model.findDuplicateImportedThemePresetId
+import com.bag.audioandroid.ui.model.parseCustomMaterialThemeImportText
+import com.bag.audioandroid.ui.model.toMaterialBatchConfigText
+import com.bag.audioandroid.ui.screen.FlashAlignmentPerfTrace
+import com.bag.audioandroid.ui.screen.FlashVisualPerfTrace
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.util.measureElapsedMs
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +47,10 @@ internal class AudioDebugScenarioActions(
     private val onPlaybackSpeedSelected: (Float) -> Unit,
     private val onShellSavedAudioSelected: (String) -> Unit,
     private val onOpenPlayerDetailSheet: () -> Unit,
+    private val onTabSelected: (AppTab) -> Unit,
+    private val onThemeStyleSelected: (ThemeStyleOption) -> Unit,
+    private val onCustomMaterialThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
+    private val onCustomMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
 ) {
     fun startFlashDebugScenario(scenario: FlashDebugScenario) {
         if (!BuildConfig.DEBUG) {
@@ -175,6 +189,8 @@ internal class AudioDebugScenarioActions(
         onDemoModeEnabledChanged(false)
         val overlayEnabled = visualPerfOverlayEnabled ?: false
         onFlashVisualPerfOverlayEnabledChanged(overlayEnabled)
+        FlashAlignmentPerfTrace.reset()
+        FlashVisualPerfTrace.reset()
         safeLogD(
             logTag,
             "measurementBaselineReset requestId=$requestId demoMode=false visualPerfOverlay=$overlayEnabled",
@@ -248,6 +264,159 @@ internal class AudioDebugScenarioActions(
             SAVED_AUDIO_AUTOMATION_TAG,
             "openDetail requestId=${scenario.requestId} itemId=${target.itemId} " +
                 "elapsedMs=$openDetailMs detailVisible=${uiState.value.showPlayerDetailSheet}",
+        )
+    }
+
+    fun startAppTabDebugScenario(scenario: AppTabDebugScenario) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        applyLanguageOverride(
+            languageOverride = scenario.languageOverride,
+            requestId = scenario.requestId,
+            logTag = TAB_AUTOMATION_TAG,
+        )
+        onTabSelected(scenario.tab)
+        val selectedTab = uiState.value.selectedTab
+        safeLogD(
+            TAB_AUTOMATION_TAG,
+            "tabSelected requestId=${scenario.requestId} requested=${scenario.tab.automationId} " +
+                "selected=${selectedTab.automationId}",
+        )
+        scenario.settingsImportConfirmAction?.let { confirmAction ->
+            runSettingsImportProbe(
+                requestId = scenario.requestId,
+                confirmAction = confirmAction,
+                copyScope = scenario.settingsImportCopyScope ?: SettingsImportCopyScope.Current,
+            )
+        }
+    }
+
+    fun startSettingsImportDebugScenario(scenario: SettingsImportDebugScenario) {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        applyLanguageOverride(
+            languageOverride = scenario.languageOverride,
+            requestId = scenario.requestId,
+            logTag = SETTINGS_IMPORT_AUTOMATION_TAG,
+        )
+        onTabSelected(AppTab.Config)
+        runSettingsImportProbe(
+            requestId = scenario.requestId,
+            confirmAction = scenario.confirmAction,
+            copyScope = scenario.copyScope,
+        )
+    }
+
+    private fun runSettingsImportProbe(
+        requestId: Long,
+        confirmAction: SettingsImportConfirmAction,
+        copyScope: SettingsImportCopyScope,
+    ) {
+        onThemeStyleSelected(ThemeStyleOption.Material)
+        safeLogD(
+            SETTINGS_IMPORT_AUTOMATION_TAG,
+            "baselineApplied requestId=$requestId tab=${uiState.value.selectedTab.automationId} " +
+                "themeStyle=${uiState.value.selectedThemeStyle.id}",
+        )
+
+        val state = uiState.value
+        val currentSettings = state.customMaterialThemeSettings
+        val exportedSettings =
+            when (copyScope) {
+                SettingsImportCopyScope.Current -> listOf(currentSettings)
+                SettingsImportCopyScope.All -> state.customMaterialThemePresets
+            }
+        val exportedText = exportedSettings.toMaterialBatchConfigText()
+        safeLogD(
+            SETTINGS_IMPORT_AUTOMATION_TAG,
+            "copyResolved requestId=$requestId scope=${copyScope.id} presetCount=${exportedSettings.size} " +
+                "presetId=${currentSettings.presetId} name=${currentSettings.displayName.trim()} " +
+                "primary=${currentSettings.primaryHex} chars=${exportedText.length}",
+        )
+
+        when (val parsed = parseCustomMaterialThemeImportText(exportedText)) {
+            is CustomBrandThemeImportParseResult.Invalid -> {
+                safeLogD(
+                    SETTINGS_IMPORT_AUTOMATION_TAG,
+                    "importInvalid requestId=$requestId reason=${parsed.error::class.simpleName}",
+                )
+            }
+
+            is CustomBrandThemeImportParseResult.Valid -> {
+                val firstImported = parsed.settings.first()
+                safeLogD(
+                    SETTINGS_IMPORT_AUTOMATION_TAG,
+                    "importParsed requestId=$requestId scope=${copyScope.id} blocks=${parsed.settings.size} " +
+                        "name=${firstImported.displayName.trim()} primary=${firstImported.primaryHex}",
+                )
+                if (parsed.settings.size > 1) {
+                    val duplicateCount =
+                        parsed.settings.count { candidate ->
+                            findDuplicateImportedThemePresetId(
+                                existing = uiState.value.customMaterialThemePresets,
+                                imported = candidate,
+                                mode = CustomThemeImportMode.Material,
+                            ) != null
+                        }
+                    safeLogD(
+                        SETTINGS_IMPORT_AUTOMATION_TAG,
+                        "batchImportPreview requestId=$requestId scope=${copyScope.id} " +
+                            "blocks=${parsed.settings.size} duplicateCount=$duplicateCount " +
+                            "newCount=${parsed.settings.size - duplicateCount}",
+                    )
+                    if (confirmAction != SettingsImportConfirmAction.None) {
+                        onCustomMaterialThemesImported(parsed.settings)
+                        logSettingsImportApplied(
+                            requestId = requestId,
+                            action = confirmAction,
+                            copyScope = copyScope,
+                            importedBlockCount = parsed.settings.size,
+                        )
+                    }
+                    return
+                }
+                val imported = parsed.settings.single()
+                val duplicatePresetId =
+                    findDuplicateImportedThemePresetId(
+                        existing = uiState.value.customMaterialThemePresets,
+                        imported = imported,
+                        mode = CustomThemeImportMode.Material,
+                    )
+                safeLogD(
+                    SETTINGS_IMPORT_AUTOMATION_TAG,
+                    "duplicatePrompt requestId=$requestId shown=${duplicatePresetId != null} " +
+                        "duplicatePresetId=${duplicatePresetId.orEmpty()}",
+                )
+                when (confirmAction) {
+                    SettingsImportConfirmAction.None -> Unit
+                    SettingsImportConfirmAction.Overwrite -> {
+                        onCustomMaterialThemeSaved(imported, duplicatePresetId)
+                        logSettingsImportApplied(requestId, confirmAction, copyScope, parsed.settings.size)
+                    }
+                    SettingsImportConfirmAction.Copy -> {
+                        onCustomMaterialThemeSaved(imported, null)
+                        logSettingsImportApplied(requestId, confirmAction, copyScope, parsed.settings.size)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun logSettingsImportApplied(
+        requestId: Long,
+        action: SettingsImportConfirmAction,
+        copyScope: SettingsImportCopyScope,
+        importedBlockCount: Int,
+    ) {
+        val updatedState = uiState.value
+        safeLogD(
+            SETTINGS_IMPORT_AUTOMATION_TAG,
+            "importApplied requestId=$requestId action=${action.id} scope=${copyScope.id} " +
+                "blocks=$importedBlockCount " +
+                "presetCount=${updatedState.customMaterialThemePresets.size} " +
+                "selectedPresetId=${updatedState.customMaterialThemeSettings.presetId}",
         )
     }
 
@@ -420,6 +589,8 @@ private const val FLASH_AUTOMATION_TAG = "FlashAutomation"
 private const val MINI_AUTOMATION_TAG = "MiniAutomation"
 private const val ENCODE_PROGRESS_AUTOMATION_TAG = "EncodeProgressAutomation"
 private const val SAVED_AUDIO_AUTOMATION_TAG = "SavedAudioAutomation"
+private const val TAB_AUTOMATION_TAG = "TabAutomation"
+private const val SETTINGS_IMPORT_AUTOMATION_TAG = "TabAutomation"
 
 private data class DebugResolvedInput(
     val text: String,

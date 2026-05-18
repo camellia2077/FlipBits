@@ -39,6 +39,29 @@ python tools/run.py android test-debug
 
 Use the full workflow below when the change needs translation judgment, broader consistency review, or prepared replacement artifacts.
 
+## Preferred High-Level Paths
+
+Choose one of these two paths first:
+
+1. Scoped entry round-trip
+   - Use when the task is a known key subset inside one `strings_*.xml` group.
+   - Export editable entries:
+
+```powershell
+python tools/run.py android-translate export-entries --lang de --text-type app_text --group strings_settings --key-pattern "^palette_.*_title$" --output temp/agent_jobs/job_001/entries.de.json --json-output
+```
+
+   - Edit the exported `proposed_text` values, then convert and apply:
+
+```powershell
+python tools/run.py android-translate build-export-replacements --input temp/agent_jobs/job_001/entries.de.edited.json --output temp/agent_jobs/job_001/replacements.json --json-output
+python tools/run.py android-translate replace --json temp/agent_jobs/job_001/replacements.json --summary-out temp/agent_jobs/job_001/replace_result.json --job-dir temp/agent_jobs/job_001 --json-output
+```
+
+2. Review-to-replacement pipeline
+   - Use when the task needs translation judgment or wider EN-vs-localized review.
+   - Generate scoped compare artifacts, produce suggestions JSON, then convert with `build-replacements` and apply with `replace`.
+
 ## Process
 
 1. Confirm the English baseline file under `apps/audio_android/app/src/main/res/values/`.
@@ -55,6 +78,12 @@ python tools/run.py android-translate key-alignment
 python tools/run.py android-translate compare --text-type app_text
 ```
 
+For direct scoped entry export when you already know the target keys and want a machine-editable JSON instead of review markdown:
+
+```powershell
+python tools/run.py android-translate export-entries --lang de --text-type app_text --group strings_settings --key-pattern "^palette_.*_title$" --output temp/agent_jobs/job_001/entries.de.json --json-output
+```
+
 5. For a scoped agent job, prefer:
 
 ```powershell
@@ -68,4 +97,10 @@ python tools/run.py android-translate compare --lang de --text-type app_text --g
 ```powershell
 python tools/run.py android-translate build-replacements --input temp/agent_jobs/job_001/suggestions.json --output temp/agent_jobs/job_001/replacements.json --json-output
 python tools/run.py android-translate replace --json temp/agent_jobs/job_001/replacements.json --summary-out temp/agent_jobs/job_001/replace_result.json --job-dir temp/agent_jobs/job_001 --json-output
+```
+
+If your working artifact is an edited `export-entries` JSON, convert it with:
+
+```powershell
+python tools/run.py android-translate build-export-replacements --input temp/agent_jobs/job_001/entries.de.edited.json --output temp/agent_jobs/job_001/replacements.json --json-output
 ```

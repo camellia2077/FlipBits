@@ -15,20 +15,35 @@ enum class AppTab(
     @param:StringRes val labelResId: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
+    val automationId: String,
 ) {
     Audio(
         labelResId = R.string.tab_audio,
         selectedIcon = Icons.Filled.GraphicEq,
         unselectedIcon = Icons.Outlined.GraphicEq,
+        automationId = "audio",
     ),
     Library(
         labelResId = R.string.tab_library,
         selectedIcon = Icons.Filled.LibraryMusic,
         unselectedIcon = Icons.Outlined.LibraryMusic,
+        automationId = "saved",
     ),
     Config(
         labelResId = R.string.tab_config,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings,
+        automationId = "settings",
     ),
+    ;
+
+    companion object {
+        fun fromAutomationId(id: String?): AppTab =
+            when (id?.trim()?.lowercase()) {
+                "audio" -> Audio
+                "saved", "library" -> Library
+                "settings", "config" -> Config
+                else -> Audio
+            }
+    }
 }

@@ -12,10 +12,14 @@ from ..errors import ToolError
 from ..process import print_command
 
 
-APP_COMPONENT = "com.bag.audioandroid/.MainActivity"
+APP_PACKAGE = "com.bag.audioandroid"
+APP_COMPONENT = f"{APP_PACKAGE}/.MainActivity"
 FLASH_ACTION = "com.bag.audioandroid.DEBUG_FLASH_SCENARIO"
 MINI_ACTION = "com.bag.audioandroid.DEBUG_MINI_SCENARIO"
 ENCODE_PROGRESS_ACTION = "com.bag.audioandroid.DEBUG_ENCODE_PROGRESS_SCENARIO"
+SAVED_AUDIO_ACTION = "com.bag.audioandroid.DEBUG_SAVED_AUDIO_SCENARIO"
+APP_TAB_ACTION = "com.bag.audioandroid.DEBUG_APP_TAB_SCENARIO"
+SETTINGS_IMPORT_ACTION = "com.bag.audioandroid.DEBUG_SETTINGS_IMPORT_SCENARIO"
 
 FLASH_LOGCAT_FILTERS = [
     "FlashAutomation:D",
@@ -32,7 +36,13 @@ FLASH_LOGCAT_FILTERS = [
 ]
 MINI_LOGCAT_FILTERS = [
     "MiniAutomation:D",
+    "FlashAutomation:D",
     "MiniAlignmentPerf:D",
+    "MiniVisualPerf:D",
+    "MiniHorizontalGap:D",
+    "MiniHorizontalGeometry:D",
+    "PlaybackAutomation:D",
+    "PlaybackLyricsLayout:D",
     "FlashLyricsPerf:D",
     "AndroidRuntime:E",
     "libc:E",
@@ -42,6 +52,26 @@ ENCODE_PROGRESS_LOGCAT_FILTERS = [
     "EncodeProgressAutomation:D",
     "FlipBitsLongAudio:D",
     "GeneratedAudioCache:D",
+    "AndroidRuntime:E",
+    "libc:E",
+    "*:S",
+]
+SAVED_AUDIO_LOGCAT_FILTERS = [
+    "SavedAudioAutomation:D",
+    "SavedAudioPerf:D",
+    "PlaybackAutomation:D",
+    "AndroidRuntime:E",
+    "libc:E",
+    "*:S",
+]
+TAB_LOGCAT_FILTERS = [
+    "TabAutomation:D",
+    "AndroidRuntime:E",
+    "libc:E",
+    "*:S",
+]
+SETTINGS_IMPORT_LOGCAT_FILTERS = [
+    "TabAutomation:D",
     "AndroidRuntime:E",
     "libc:E",
     "*:S",
@@ -97,6 +127,10 @@ def device_prep() -> None:
     run_adb(["shell", "svc", "power", "stayon", "usb"])
     run_adb(["shell", "input", "keyevent", "KEYCODE_WAKEUP"])
     run_adb(["shell", "wm", "dismiss-keyguard"], check=False)
+
+
+def force_stop_app() -> None:
+    run_adb(["shell", "am", "force-stop", APP_PACKAGE], check=False)
 
 
 def bool_extra(command: list[str], key: str, value: bool) -> None:
@@ -176,6 +210,7 @@ def capture_common(
 
     device_prep()
     run_adb(["logcat", "-c"])
+    force_stop_app()
     start()
     print(f"Waiting {wait_ms} ms before dumping logcat...")
     time.sleep(wait_ms / 1000)

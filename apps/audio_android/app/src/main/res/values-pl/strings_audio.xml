@@ -250,5 +250,7 @@
     <string name="audio_saved_audio_decode_loading_body">Ten klip jest odczytywany jednorazowo, aby utworzyć jego wielokrotnie używany widok tekstu i tekstu piosenki. Wynik pozostaje tylko w tej aplikacji, aby kolejne otwarcie było szybsze.</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
+    <string name="audio_morse_visualizer_mode_vertical">Pionowo</string>
+    <string name="audio_morse_visualizer_mode_horizontal">Poziomo</string>
 </resources>
 

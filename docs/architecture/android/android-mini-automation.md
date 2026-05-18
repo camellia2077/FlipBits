@@ -77,6 +77,12 @@ Visual-page perf-overlay scenario:
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
 ```
 
+Visual-page horizontal Morse scenario:
+
+```powershell
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --es wb.morse.visual horizontal --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
+```
+
 Supported extras:
 
 - `wb.scenario`
@@ -97,6 +103,10 @@ Supported extras:
   - `lyrics` by default.
   - Supports `lyrics` and `visual`.
   - When `visual`, the debug scenario switches player detail to the Visual page before capture.
+- `wb.morse.visual`
+  - `vertical` by default.
+  - Supports `vertical` and `horizontal`.
+  - When `horizontal`, the debug scenario switches Mini Visual to the horizontal Morse renderer before capture.
 - `wb.visual.perf_overlay`
   - `false` by default.
   - When `true`, the debug scenario leaves `Settings > Visual perf overlay` enabled for the capture instead of forcing it off.
@@ -110,26 +120,26 @@ Supported extras:
   - Defaults to `6000`.
   - Use `0` to leave playback running.
 
-`python tools/run.py android-debug capture-mini` is a convenience wrapper around the same debug scenario, but it exposes only the common Mini path today.
+`python tools/run.py android-debug capture-mini` is a convenience wrapper around the same debug scenario and now exposes the common Mini visual toggles too.
 
 Current `capture-mini` CLI surface:
 
 - exposed:
   - `--speed`
+  - `--display`
+  - `--morse-visual`
+  - `--perf-overlay`
+  - `--expand-lyrics`
+  - `--lang`
   - `--input`
   - `--play-ms`
   - `--no-encode`
   - `--no-play`
-- not exposed yet:
-  - `wb.lang`
-  - `wb.display`
-  - `wb.lyrics.expand`
-  - `wb.visual.perf_overlay`
 
 So:
 
-- use `capture-mini` for the common speed sweep and baseline sync capture
-- use raw `adb shell am start ...` when you need Visual-page capture, expanded lyrics, or language override without extending the CLI first
+- use `capture-mini` for the common speed sweep, Visual-page capture, and horizontal/overlay Mini diagnostics
+- use raw `adb shell am start ...` only when you need a future extra that is still outside the wrapper surface
 
 ## Shared Flow
 
@@ -250,8 +260,8 @@ adb logcat -d MiniVisualPerf:D MiniAlignmentPerf:D MiniAutomation:D *:S
 
 Wrapper limitation to remember:
 
-- `capture-mini` summary is built from the parsed `MiniAutomation` / `MiniAlignmentPerf` / `FlashLyricsPerf` rows only
-- if you are investigating `PlaybackLyricsLayout`, `MiniVisualPerf`, or other extra debug tags, use manual `adb logcat` capture instead of assuming the wrapper collected them
+- `capture-mini` summary now includes rollups for parsed `MiniAutomation` / `MiniAlignmentPerf` / `MiniVisualPerf` / `FlashLyricsPerf` rows
+- `PlaybackLyricsLayout` and any future extra debug tags still require manual `adb logcat` review; they are collected in `raw.log` but not currently summarized into `summary.md`
 
 ## Success Criteria
 

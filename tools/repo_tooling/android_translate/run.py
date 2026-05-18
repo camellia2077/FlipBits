@@ -16,6 +16,8 @@ from commands.check_translation_key_alignment import (
 from commands.compare_translation_quality import generate_comparisons_for_res
 from commands.dump_xml_text_md import generate_xml_text_dump
 from commands.build_replacements_from_suggestions import build_replacements_from_suggestions
+from commands.build_replacements_from_exported_entries import build_replacements_from_exported_entries
+from commands.export_translation_entries import export_translation_entries
 from commands.suggest_translation_terms import (
     build_term_suggestion_payload,
     print_term_suggestion_report,
@@ -193,6 +195,46 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Suppress routine progress output.",
     )
+    export_entries_parser = subparsers.add_parser(
+        "export-entries",
+        help="Export scoped EN/current localized entries into structured JSON for direct editing.",
+    )
+    export_entries_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    export_entries_parser.add_argument(
+        "--output",
+        required=True,
+        help="Path to write the exported entry JSON.",
+    )
+    export_entries_parser.add_argument(
+        "--lang",
+        required=True,
+        help="Localized language folder suffix such as de, ja, or zh-rTW.",
+    )
+    export_entries_parser.add_argument(
+        "--text-type",
+        default="",
+        choices=("", *TEXT_TYPES),
+        help="Optional text type scope: app_text or sample_text.",
+    )
+    export_entries_parser.add_argument(
+        "--group",
+        default="",
+        help="Optional group scope such as strings_settings or sacred_machine.",
+    )
+    export_entries_parser.add_argument(
+        "--key-pattern",
+        default="",
+        help="Optional regex filter applied to string names, such as ^palette_.*_title$.",
+    )
+    export_entries_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
     list_text_types_parser = subparsers.add_parser(
         "list-text-types",
         help="List supported text types.",
@@ -343,6 +385,25 @@ def parse_args() -> argparse.Namespace:
         help="Path to write the generated replacements JSON.",
     )
     build_replacements_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
+    build_export_replacements_parser = subparsers.add_parser(
+        "build-export-replacements",
+        help="Convert edited export-entries JSON into replace-ready replacements JSON.",
+    )
+    build_export_replacements_parser.add_argument(
+        "--input",
+        required=True,
+        help="Path to edited export-entries JSON containing current_text and proposed_text.",
+    )
+    build_export_replacements_parser.add_argument(
+        "--output",
+        required=True,
+        help="Path to write the generated replacements JSON.",
+    )
+    build_export_replacements_parser.add_argument(
         "--json-output",
         action="store_true",
         help="Emit machine-readable JSON instead of human-readable text.",
@@ -587,6 +648,37 @@ def run() -> int:
         if result.error:
             print(str(result.error))
         return result.exit_code
+    if command == "export-entries":
+        result = export_translation_entries(
+            res_dir=args.res_dir,
+            output_path=args.output,
+            lang=args.lang,
+            text_type=args.text_type or "",
+            group=args.group or "",
+            key_pattern=args.key_pattern or "",
+        )
+        payload = {
+            "ok": result.exit_code == 0,
+            "command": "export-entries",
+            "exit_code": result.exit_code,
+            "summary": {
+                "dir": result.dir_name,
+                "items": result.item_count,
+            },
+            "artifacts": {
+                "output_json": normalize_path_string(result.output_path) if result.output_path else None,
+            },
+            "errors": list(result.errors),
+        }
+        if json_output:
+            emit_json_payload(payload)
+        elif result.exit_code == 0:
+            print(f"Exported entries: {result.item_count}")
+            print(f"Wrote: {result.output_path}")
+        else:
+            for error in result.errors:
+                print(error)
+        return result.exit_code
     if command == "list-text-types":
         if quiet:
             for value in TEXT_TYPES:
@@ -692,6 +784,35 @@ def run() -> int:
                     "errors": list(result.errors),
                 }
             )
+        elif result.exit_code == 0:
+            print(f"Built replacements: {result.built_items} (skipped unchanged: {result.skipped_items})")
+            print(f"Wrote: {result.output_path}")
+        else:
+            for error in result.errors:
+                print(error)
+        return result.exit_code
+    if command == "build-export-replacements":
+        result = build_replacements_from_exported_entries(
+            input_path=args.input,
+            output_path=args.output,
+        )
+        payload = {
+            "ok": result.exit_code == 0,
+            "command": "build-export-replacements",
+            "exit_code": result.exit_code,
+            "summary": {
+                "built_items": result.built_items,
+                "skipped_items": result.skipped_items,
+                "dir": result.dir_name,
+            },
+            "artifacts": {
+                "input_json": normalize_path_string(args.input),
+                "output_json": normalize_path_string(args.output) if result.output_path else None,
+            },
+            "errors": list(result.errors),
+        }
+        if json_output:
+            emit_json_payload(payload)
         elif result.exit_code == 0:
             print(f"Built replacements: {result.built_items} (skipped unchanged: {result.skipped_items})")
             print(f"Wrote: {result.output_path}")

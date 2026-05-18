@@ -10,6 +10,20 @@ Use this workflow when the task is to check localized XML text against the Engli
 
 If the task is only key existence/alignment, run `key-alignment` first and follow that workflow.
 
+## Preferred High-Level Paths
+
+Choose one of these two paths before dropping to ad hoc scripting:
+
+1. Scoped entry round-trip
+   - Use when the target keys are already known and the job is narrow.
+   - Flow: `export-entries` -> edit JSON -> `build-export-replacements` -> `replace`
+   - This is the fastest path for key-scoped cleanup in files like `strings_settings.xml`.
+
+2. Review-to-replacement pipeline
+   - Use when the job needs translation review against current English intent.
+   - Flow: `compare` -> read generated `*.task.json` / prompt refs -> suggestions JSON -> `build-replacements` -> `replace`
+   - This is the default path for broader wording drift or consistency repair.
+
 ## Command-First Discovery
 
 1. Discover available commands:
@@ -40,6 +54,14 @@ python tools/run.py android-translate dump-xml-md --lang ko --text-type sample_t
 python tools/run.py android-translate compare --lang ko --text-type sample_text --group sacred_machine --prompt-mode agent_json --output-dir temp/agent_jobs/job_001/reviews --job-dir temp/agent_jobs/job_001 --no-clean --json-output
 ```
 
+Alternative high-level path for narrow key-scoped edits:
+
+```powershell
+python tools/run.py android-translate export-entries --lang ko --text-type app_text --group strings_settings --key-pattern "^palette_.*_title$" --output temp/agent_jobs/job_001/entries.ko.json --json-output
+```
+
+This writes structured `en_text/current_text/proposed_text` items that can be edited directly without first generating compare markdown.
+
 3. Read task artifacts in this order:
 - `*.task.json` (primary)
 - `_prompts/*.md` from `prompt_ref` (secondary)
@@ -52,6 +74,14 @@ python tools/run.py android-translate compare --lang ko --text-type sample_text 
 ```powershell
 python tools/run.py android-translate build-replacements --input temp/agent_jobs/job_001/suggestions.json --output temp/agent_jobs/job_001/replacements.json --json-output
 ```
+
+Alternative high-level path when starting from edited export JSON:
+
+```powershell
+python tools/run.py android-translate build-export-replacements --input temp/agent_jobs/job_001/entries.ko.edited.json --output temp/agent_jobs/job_001/replacements.json --json-output
+```
+
+This converts item-level `current_text -> proposed_text` edits into minimal `find/replace` replacements for the strict `replace` step.
 
 6. Apply replacements and capture result:
 

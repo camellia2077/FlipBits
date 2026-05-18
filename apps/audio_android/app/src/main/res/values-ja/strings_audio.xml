@@ -271,5 +271,7 @@
     <string name="audio_saved_audio_decode_loading_body">このクリップは、再利用できるテキスト表示と歌詞表示を作るために一度だけ読み取られます。結果は再度開くときに速くするため、このアプリ内にのみ保存されます。</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
+    <string name="audio_morse_visualizer_mode_vertical">縦向き</string>
+    <string name="audio_morse_visualizer_mode_horizontal">横向き</string>
 </resources>
 

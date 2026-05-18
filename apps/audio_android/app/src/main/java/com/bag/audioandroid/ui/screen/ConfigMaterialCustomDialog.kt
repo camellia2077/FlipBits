@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +40,10 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.audioInputTextFieldColors
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.ThemeStyleOption
+import com.bag.audioandroid.ui.theme.LocalAudioEncodeGlyphColors
+import com.bag.audioandroid.ui.theme.audioEncodeGlyphColorsForMaterial
 import com.bag.audioandroid.ui.theme.brandThemeColorOrNull
+import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
 import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
 import com.bag.audioandroid.ui.theme.randomCustomBrandThemeColors
@@ -55,6 +59,26 @@ internal fun ConfigMaterialCustomDialog(
     val previewPrimary = remember(normalizedPrimary) { brandThemeColorOrNull(normalizedPrimary ?: "") }
     val canSave = normalizedPrimary != null
     val isPreviewDark = (previewPrimary?.luminance() ?: 1f) < 0.46f
+    val previewPalette =
+        remember(primaryHex, normalizedPrimary, initialSettings) {
+            customMaterialPalette(
+                normalizeCustomMaterialThemeSettings(
+                    initialSettings.copy(primaryHex = normalizedPrimary ?: initialSettings.primaryHex),
+                ),
+            )
+        }
+    val previewGlyphColors =
+        remember(previewPalette, isPreviewDark) {
+            audioEncodeGlyphColorsForMaterial(
+                colorScheme =
+                    if (isPreviewDark) {
+                        previewPalette.darkScheme
+                    } else {
+                        previewPalette.lightScheme
+                    },
+                isDarkTheme = isPreviewDark,
+            )
+        }
     val previewContainerColor by animateColorAsState(
         targetValue = previewPrimary ?: MaterialTheme.colorScheme.surface,
         animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
@@ -93,14 +117,16 @@ internal fun ConfigMaterialCustomDialog(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    MaterialCustomPreviewSwatch(
-                        previewColor = previewPrimary,
-                        fallbackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        borderColor = previewBorderColor,
-                    )
+                    CompositionLocalProvider(LocalAudioEncodeGlyphColors provides previewGlyphColors) {
+                        AudioEncodeGlyph(
+                            encodeProgress = 0.65f,
+                            isEncodingBusy = false,
+                            baseSize = 72.dp,
+                        )
+                    }
                     IconButton(
                         onClick = { primaryHex = randomCustomBrandThemeColors().primaryHex },
                         colors =

@@ -49,6 +49,50 @@ internal object FlashAlignmentPerfTrace {
     private var tokenViewMode = "unknown"
     private var lastTokenUnitDumpKey = ""
 
+    fun reset() {
+        lastReportNanos = 0L
+        lastTokenBinaryReportNanos = 0L
+        visualPlaying = false
+        visualSample = 0
+        rawSample = 0
+        readoutSample = 0
+        readoutBit = -1
+        readoutBitValue = "_"
+        revealedBit = -1
+        visualBit = -1
+        rawBit = -1
+        visualCurrentBitValue = "_"
+        fallback = false
+        bitReadout = false
+        mode = "unknown"
+        lyricsPlaying = false
+        lyricsSample = 0
+        token = -1
+        tokenText = "_"
+        tokenStart = -1
+        tokenEnd = -1
+        tokenProgress = "-1.00"
+        byte = -1
+        lyricBit = -1
+        lyricBitOffset = -1
+        tone = false
+        displayUnitByteOffset = -1
+        displayUnitByteCount = -1
+        displayUnitHex = "_"
+        displayUnitBinary = "_"
+        displayCardHex = "_"
+        displayCardBinary = "_"
+        displayBitInByte = -1
+        displayGlobalBit = -1
+        cardCurrentBitValue = "_"
+        displayGroupIndex = -1
+        displayGroupBits = "_"
+        playbackBitFromTokenPage = -1
+        playbackBitValueFromTokenPage = "_"
+        tokenViewMode = "unknown"
+        lastTokenUnitDumpKey = ""
+    }
+
     fun recordVisual(
         mode: FlashSignalVisualizationMode,
         isPlaying: Boolean,

@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.theme
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
@@ -35,6 +36,21 @@ fun audioEncodeGlyphColorsForBrandTheme(theme: BrandThemeOption): AudioEncodeGly
         primarySplit = theme.secondaryColor,
         secondarySplit = theme.primaryColor,
         outline = theme.outlineColor,
+    )
+
+fun audioEncodeGlyphColorsForMaterial(
+    colorScheme: ColorScheme,
+    isDarkTheme: Boolean,
+): AudioEncodeGlyphColors =
+    AudioEncodeGlyphColors(
+        primarySplit = colorScheme.primary,
+        secondarySplit = colorScheme.surface,
+        outline =
+            if (isDarkTheme) {
+                Color.White.copy(alpha = 0.82f)
+            } else {
+                Color.Black.copy(alpha = 0.72f)
+            },
     )
 
 fun defaultAudioEncodeGlyphColors(): AudioEncodeGlyphColors = DefaultAudioEncodeGlyphColors

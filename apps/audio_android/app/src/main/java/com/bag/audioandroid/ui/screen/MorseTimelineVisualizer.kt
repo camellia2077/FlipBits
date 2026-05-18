@@ -61,6 +61,7 @@ internal fun MorseTimelineVisualizer(
             rawSample = rawCurrentSample.toFloat(),
             isPlaying = isPlaying && !isScrubbing,
             snapWhenNotPlaying = true,
+            holdVisualPositionOnPause = true,
             playbackSpeed = playbackSpeed,
             sampleRateHz = sampleRateHz,
             totalSamples = totalSamples,
@@ -149,6 +150,21 @@ internal fun MorseTimelineVisualizer(
                     } else {
                         innerHeight * 0.42f
                     }
+                val highlightWholeCurrentSegment = currentSample in entryStart until entryEnd
+                if (highlightWholeCurrentSegment) {
+                    drawMorseTimelineSegmentPart(
+                        visibleStart = visibleStart,
+                        visibleEnd = visibleEnd,
+                        window = window,
+                        visibleSamples = visibleSamples,
+                        leftPadding = leftPadding,
+                        innerWidth = innerWidth,
+                        centerY = centerY,
+                        blockHeight = blockHeight,
+                        color = toneColor.copy(alpha = if (isPlaying) 0.88f else 0.72f),
+                    )
+                    return@forEach
+                }
                 drawMorseTimelineSegmentPart(
                     visibleStart = visibleStart,
                     visibleEnd = visibleEnd.coerceAtMost(currentSample),
@@ -169,7 +185,7 @@ internal fun MorseTimelineVisualizer(
                     innerWidth = innerWidth,
                     centerY = centerY,
                     blockHeight = blockHeight,
-                    color = inactiveToneColor.copy(alpha = 0.48f),
+                    color = inactiveToneColor.copy(alpha = MorseInactiveToneAlpha),
                 )
             }
 
@@ -210,7 +226,7 @@ internal fun MorseTimelineVisualizer(
 }
 
 @Composable
-private fun MiniVisualPerfOverlay(
+internal fun MiniVisualPerfOverlay(
     snapshot: MiniVisualPerfSnapshot,
     modifier: Modifier = Modifier,
 ) {
@@ -285,3 +301,4 @@ internal fun morseTimelineSampleWidthFraction(
 
 private const val MorseTimelinePlayheadAnchorRatio = 0.40f
 private const val MorseDashUnitThreshold = 3
+internal const val MorseInactiveToneAlpha = 0.48f

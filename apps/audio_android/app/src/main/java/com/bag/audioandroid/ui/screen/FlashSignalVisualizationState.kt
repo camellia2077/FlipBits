@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -804,16 +805,53 @@ internal fun rememberFlashVisualPlaybackSampleState(
     rawSample: Float,
     isPlaying: Boolean,
     snapWhenNotPlaying: Boolean = false,
+    holdVisualPositionOnPause: Boolean = false,
     playbackSpeed: Float,
     sampleRateHz: Int,
     totalSamples: Int,
 ): FlashVisualPlaybackSampleState {
     var visualSample by remember { mutableFloatStateOf(rawSample) }
+    var previousIsPlaying by remember { mutableStateOf(isPlaying) }
+    var pausedHoldRawSample by remember { mutableStateOf<Float?>(null) }
+    var pausedHoldDisplayedSample by remember { mutableStateOf<Float?>(null) }
     val clampedRawSample = rawSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
     val safeSpeed = playbackSpeed.coerceIn(0.1f, 4f)
     val latestAnchorSample by rememberUpdatedState(rawSample)
     val latestTotalSamples by rememberUpdatedState(totalSamples)
     if (!isPlaying || sampleRateHz <= 0 || totalSamples <= 0) {
+        val justPaused = previousIsPlaying && !isPlaying
+        val holdRawSample = pausedHoldRawSample
+        val holdDisplayedSample = pausedHoldDisplayedSample
+        val pausedHoldCanApply =
+            holdVisualPositionOnPause &&
+                (
+                    justPaused ||
+                        (
+                            holdRawSample != null &&
+                                holdDisplayedSample != null &&
+                                abs(clampedRawSample - holdRawSample) <= 0.5f
+                        )
+                )
+        if (pausedHoldCanApply) {
+            val displayedSample =
+                (
+                    if (justPaused) {
+                        visualSample
+                    } else {
+                        holdDisplayedSample ?: visualSample
+                    }
+                ).coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
+            SideEffect {
+                visualSample = displayedSample
+                pausedHoldRawSample = clampedRawSample
+                pausedHoldDisplayedSample = displayedSample
+                previousIsPlaying = false
+            }
+            return FlashVisualPlaybackSampleState(
+                rawSample = rawSample,
+                displayedSample = displayedSample,
+            )
+        }
         val shouldSnapToRaw =
             snapWhenNotPlaying ||
                 sampleRateHz <= 0 ||
@@ -827,6 +865,15 @@ internal fun rememberFlashVisualPlaybackSampleState(
         if (shouldSnapToRaw) {
             SideEffect {
                 visualSample = clampedRawSample
+                pausedHoldDisplayedSample = null
+                pausedHoldRawSample = null
+                previousIsPlaying = false
+            }
+        } else {
+            SideEffect {
+                pausedHoldDisplayedSample = null
+                pausedHoldRawSample = null
+                previousIsPlaying = false
             }
         }
         return FlashVisualPlaybackSampleState(
@@ -835,13 +882,25 @@ internal fun rememberFlashVisualPlaybackSampleState(
         )
     }
     LaunchedEffect(safeSpeed, sampleRateHz, totalSamples) {
+        previousIsPlaying = true
+        pausedHoldRawSample = null
+        pausedHoldDisplayedSample = null
         FlashVisualPerfTrace.recordSmoothReset(
             anchorSample = latestAnchorSample,
             previousSmoothSample = visualSample,
             sampleRateHz = sampleRateHz,
         )
         val maxSample = latestTotalSamples.toFloat()
-        visualSample = visualSample.coerceIn(0f, maxSample)
+        val initialAnchor = latestAnchorSample.coerceIn(0f, maxSample)
+        val forwardAnchorThreshold = sampleRateHz * PlaybackResumeForwardAnchorThresholdSeconds
+        val shouldSnapBackwardToAnchor = initialAnchor + 0.5f < visualSample
+        val shouldSnapForwardToAnchor = initialAnchor - visualSample > forwardAnchorThreshold
+        visualSample =
+            if (shouldSnapBackwardToAnchor || shouldSnapForwardToAnchor) {
+                initialAnchor
+            } else {
+                visualSample.coerceIn(0f, maxSample)
+            }
         var frameAnchorNanos = withFrameNanos { it }
         var frameAnchorSample = visualSample
         while (true) {
@@ -1094,6 +1153,8 @@ private fun Int.floorMod(divisor: Int): Int =
     } else {
         ((this % divisor) + divisor) % divisor
     }
+
+private const val PlaybackResumeForwardAnchorThresholdSeconds = 0.08f
 
 internal fun flashVisualPrimitiveEstimate(
     mode: FlashSignalVisualizationMode,
