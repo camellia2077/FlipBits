@@ -18,5 +18,6 @@
     <string name="licenses_title">Open Source Licenses</string>
     <!-- CONTEXT: Short loading state shown while the licenses screen is still loading. -->
     <string name="licenses_loading">Loading licenses</string>
+    <!-- CONTEXT: About page row for the project's Bilibili link/value. If the surrounding UI already labels the row as Bilibili, this can stay as just the raw %1$s value. -->
     <string name="about_bilibili">%1$s</string>
 </resources>

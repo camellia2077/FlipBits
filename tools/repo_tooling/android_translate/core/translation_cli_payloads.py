@@ -71,9 +71,11 @@ def mixed_language_payload(result) -> dict[str, object]:
         "summary": {
             "suspicious_issue_count": result.suspicious_issue_count,
             "report_file_count": result.report_file_count,
+            "task_json_count": len(result.task_json_paths),
         },
         "artifacts": {
             "output_dir": str(result.output_dir),
+            "task_json_paths": list(result.task_json_paths),
         },
         "errors": [],
     }
@@ -92,6 +94,49 @@ def key_alignment_payload(result) -> dict[str, object]:
         },
         "artifacts": {
             "output_dir": str(result.output_dir),
+        },
+        "errors": [],
+    }
+
+
+def mixed_language_context_audit_payload(result) -> dict[str, object]:
+    return {
+        "ok": result.exit_code == 0,
+        "command": "mixed-language-context-audit",
+        "exit_code": result.exit_code,
+        "summary": {
+            "total_entries": result.total_entries,
+            "keep_en_count": result.keep_en_count,
+            "needs_translation_count": result.needs_translation_count,
+            "needs_context_count": result.needs_context_count,
+            "missing_context_count": result.missing_context_count,
+            "report_file_count": result.report_file_count,
+        },
+        "artifacts": {
+            "output_dir": str(result.output_dir),
+            "json_path": result.json_path,
+        },
+        "errors": [],
+    }
+
+
+def untranslated_equals_english_payload(result) -> dict[str, object]:
+    return {
+        "ok": result.exit_code == 0,
+        "command": "untranslated-equals-english",
+        "exit_code": result.exit_code,
+        "summary": {
+            "total_entries": result.total_entries,
+            "keep_en_count": result.keep_en_count,
+            "needs_translation_count": result.needs_translation_count,
+            "needs_context_count": result.needs_context_count,
+            "missing_context_count": result.missing_context_count,
+            "report_file_count": result.report_file_count,
+            "per_language": result.per_language,
+        },
+        "artifacts": {
+            "output_dir": str(result.output_dir),
+            "summary_json_path": result.summary_json_path,
         },
         "errors": [],
     }

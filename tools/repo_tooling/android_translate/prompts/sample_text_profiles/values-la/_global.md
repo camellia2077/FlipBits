@@ -6,7 +6,6 @@ It is not expected to be classical textbook Latin.
 Hard constraints:
 - Keep SHORT samples short and LONG samples long.
 - Keep pro/ASCII sample keys strict ASCII when context indicates pro/ASCII.
-- Preserve product/protocol relic tokens when already used: mini, flash, pro, ultra, ASCII, UTF-8, Hex, Morse, Hz, byte, token, payload.
 - Favor ornate cadence, elevated vocabulary, and ceremonial phrasing.
 - Do not normalize everything into plain modern language.
 

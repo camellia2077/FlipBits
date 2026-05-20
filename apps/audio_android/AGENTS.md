@@ -7,10 +7,11 @@
 
 ## First Read
 
-- 这里的文档指向默认按“主入口 -> 分支索引 -> 专题文档”使用：
-  - 先判断当前任务属于哪一类。
-  - 只展开当前分支需要的那一篇指向文档。
-  - 不要因为 `AGENTS.md` 里列出了多个指向，就一次性把它们全部读完。
+- 这里的入口职责固定为：
+  - 项目入口看 `apps/audio_android/AGENTS.md`
+  - 执行步骤看 `.agent/workflows/`
+  - 工具定义看 `tools/repo_tooling/android_translate/docs/`
+- 先判断当前任务属于哪一类，只展开当前分支需要的文档。
 
 - `apps/audio_android` 是 Android 官方 `Gradle` root。
 - 先读 `apps/audio_android/README.md` 的“快速定位 / 常见改动入口”。
@@ -26,10 +27,7 @@
   - 具体 preset 细节看 `docs/design/modes/flash/<preset>.md`
 - 如果改动涉及 XML 文案 / 本地化 / 样例文本 / 翻译检查失败，再按需读：
   - `.agent/workflows/translations/README.md`
-  - `.agent/workflows/translations/android-app-text.md`
-  - `.agent/workflows/translations/android-sample-text.md`
-  - `docs/design/android/android-translation-workflow.md`
-  - `docs/design/android/android-translation-tooling-agent-index.md`
+  - `tools/repo_tooling/android_translate/docs/README.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
   - `docs/architecture/android/android-ui-structure.md`
 - 如果改动涉及任何 Android 自动化、adb scenario、capture 命令、summary、稳定 test tag 或回归分层，统一先读：
@@ -44,6 +42,7 @@
 - Android 真机自动化先从 `docs/architecture/android/android-automation-agent-index.md` 选分支，不要在 `AGENTS.md` 里平铺展开所有自动化专题。
 - Flash 真机自动化优先使用对应自动化文档里的 debug scenario，不要默认走坐标点击、随机 sample 或无障碍服务。
 - 修改可见 XML 文案、本地化结构或样例文本时，必须先按 `.agent/workflows/translations/README.md` 选择 app text 或 sample text workflow；不要跳过 translation key alignment。
+- 查看翻译工具命令、JSON contract、产物目录时，不要再读工具侧 `AGENTS.md`；统一看 `tools/repo_tooling/android_translate/docs/README.md` 和其下专题文档。
 - 新增 XML 文案 key 时，必须使用脚手架：`python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`。
 - `strings-add` 默认只写英文 `values/` 基线，并生成 translation key alignment 报告；不要手工把英文原文复制到 `values-*` 当本地化。
 - 只有品牌名、协议 token、不可翻译 UI 符号等明确全语言共享的文本，才允许给 `strings-add` 传 `--localized`。

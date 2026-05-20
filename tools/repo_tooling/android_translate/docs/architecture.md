@@ -21,7 +21,7 @@
 ## 典型工作流
 
 1. 运行 `compare` 生成 review markdown
-2. 从 `temp/ai_translation_reviews` 里挑目标语言的 md
+2. 从 `temp/translations/reviews` 里挑目标语言的 md
 3. 把 md 丢给网页端 AI 或人工审校
 4. 让对方输出 JSON：
 

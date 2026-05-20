@@ -24,11 +24,8 @@
   - `docs/design/android/android-player-ui.md`
 - Android Flash Visual 数据流与性能诊断：
   - `docs/architecture/android/android-flash-visual.md`
-- Android 本地化规则：
-  - `docs/design/android/android-localization-guidelines.md`
-  - `docs/design/android/android-translation-workflow.md`
-  - `docs/design/android/android-translation-tooling-agent-index.md`
-  - `docs/design/android/translation/android-split-strings-translation-guide.md`
+- Android 多语言翻译入口：
+  - `apps/audio_android/AGENTS.md`
 - Android 子项目规则：
   - `apps/audio_android/AGENTS.md`
 
@@ -66,6 +63,7 @@
 - 想看 UI 职责和代码归属：去 `docs/architecture/android/android-ui-structure.md`
 - 想看 agent 必须遵守的硬规则：去 `apps/audio_android/AGENTS.md`
 - 想按需展开 Android 自动化文档：先去 `docs/architecture/android/android-automation-agent-index.md`
+- 想处理 Android 多语言翻译：去 `apps/audio_android/AGENTS.md`
 
 ## 代码地图
 

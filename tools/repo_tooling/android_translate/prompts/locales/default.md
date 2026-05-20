@@ -11,13 +11,11 @@ This locale uses the standard translation profile for the FlipBits Android app. 
 
 [identity_rule]
 Treat this locale as a normal target-language localization.
-Preserve the app's protocol and signal terms unless the existing locale already has a stable localized form: mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, FSK, PCM, Hz, bit, byte, token, payload, low, and high.
 Do not translate transport mode labels such as mini, flash, pro, and ultra as ordinary adjectives.
 Keep placeholders, numeric units, and protocol casing exactly valid for Android string resources.
 
 [app_text_rule]
 For app UI text, keep labels compact because many strings appear in Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.
-Use stable terminology for input rules, playback speed, saved audio, read/decode results, Visual/Tokens tabs, byte/token explanations, and low/high bit visualization.
 Do not turn technical labels into explanatory sentences.
 
 [sample_text_rule]

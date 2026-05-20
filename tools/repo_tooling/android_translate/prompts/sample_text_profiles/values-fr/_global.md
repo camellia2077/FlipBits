@@ -4,7 +4,6 @@ Use natural contemporary French for themed sample prose while preserving lineup 
 
 Hard constraints:
 - Keep SHORT samples short and LONG samples long.
-- Keep product/protocol tokens unchanged when present: mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, nibble.
 - Keep pro/ASCII sample keys strict ASCII when context indicates pro/ASCII.
 - Prefer fluent French syntax over literal English order.
 - Preserve imperative force when EN uses commands.

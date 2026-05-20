@@ -15,7 +15,7 @@
     <string name="audio_action_pause">Pauza</string>
     <string name="audio_action_previous_track">Poprzedni utwór</string>
     <string name="audio_action_next_track">Następny utwór</string>
-    <string name="audio_action_open_audio_info">Info</string>
+    <string name="audio_action_open_audio_info">Informacje</string>
     <string name="audio_action_normal_playback">Normalnie</string>
     <string name="audio_action_shuffle_playback">Losowo</string>
     <string name="audio_action_repeat_one">Powtórz jeden</string>
@@ -110,7 +110,7 @@
     <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Pozycja bajtu</string>
     <string name="audio_pro_visual_then">Potem</string>
-    <string name="audio_info_dialog_title">Info</string>
+    <string name="audio_info_dialog_title">Informacje</string>
     <string name="audio_info_user_section">Szczegóły</string>
     <string name="audio_info_technical_section">Informacje techniczne</string>
     <string name="audio_info_encoding_type">Typ</string>
@@ -130,7 +130,7 @@
     <string name="audio_ultra_visual_level_low">Niski</string>
     <string name="audio_follow_unavailable">Follow payloadu jest teraz niedostępny dla tego audio.</string>
     <string name="audio_follow_text_unavailable">Follow tekstu jest teraz niedostępny dla tego audio.</string>
-    <string name="audio_follow_display_lyrics">Liryka</string>
+    <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Dane</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>
@@ -235,13 +235,13 @@
 
     <string name="demo_hint_demo_mode_on">Tryb demo włączony</string>
     <string name="demo_hint_tab_audio">Przełączono na Audio</string>
-    <string name="demo_hint_tab_saved">Przełączono na Saved</string>
-    <string name="demo_hint_tab_settings">Przełączono na Settings</string>
+    <string name="demo_hint_tab_saved">Przełączono na Zapisane</string>
+    <string name="demo_hint_tab_settings">Przełączono na Ustawienia</string>
     <string name="demo_hint_generate_audio">Generuj audio</string>
     <string name="demo_hint_decode_audio">Dekoduj audio</string>
-    <string name="demo_hint_open_mini_player">Otwórz mini player</string>
+    <string name="demo_hint_open_mini_player">Otwórz mini odtwarzacz</string>
     <string name="demo_hint_switch_to_lyrics">Przełączono na Tokens</string>
-    <string name="demo_hint_switch_to_visual">Przełączono na Visual</string>
+    <string name="demo_hint_switch_to_visual">Przełączono na Wizualizacja</string>
     <string name="demo_hint_play">Odtwarzanie uruchomione</string>
     <string name="demo_hint_pause">Odtwarzanie wstrzymane</string>
     <string name="demo_hint_theme_changed">Motyw zmieniony</string>

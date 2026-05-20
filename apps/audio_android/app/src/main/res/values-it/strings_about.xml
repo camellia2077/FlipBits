@@ -2,7 +2,7 @@
 <resources>
     <string name="about_title">Info</string>
     <string name="about_author">%1$s</string>
-    <string name="about_presentation_version">App v%1$s</string>
+    <string name="about_presentation_version">Versione app %1$s</string>
     <string name="about_core_version">Motore v%1$s</string>
     <string name="about_github">%1$s</string>
     <string name="about_licenses_title">Licenze open source</string>

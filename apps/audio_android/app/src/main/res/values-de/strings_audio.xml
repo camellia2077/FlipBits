@@ -94,7 +94,7 @@
     <string name="audio_pro_visual_low_nibble">Niedriges Nibble</string>
     <string name="audio_pro_visual_high_group">Hohe Gruppe</string>
     <string name="audio_pro_visual_low_group">Niedrige Gruppe</string>
-    <string name="audio_pro_visual_nibble_value">Nibble %1$s</string>
+    <string name="audio_pro_visual_nibble_value">Halbbyte %1$s</string>
     <string name="audio_pro_visual_playing_now">Jetzt aktiv</string>
     <string name="audio_pro_visual_up_next">Als Nächstes</string>
     <string name="audio_pro_visual_guide_title">So wird dieses Byte gesendet</string>

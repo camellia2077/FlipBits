@@ -11,6 +11,7 @@ from core.translation_paths import (
     TEXT_TYPES,
     get_review_groups_for_text_type,
 )
+from core.translation_agent_tasks import infer_decision_hint, infer_length_pressure, infer_ui_surface
 from core.translation_resources import AndroidStringResourceRepository
 
 DEFAULT_OUTPUT_DIRECTORY = DEFAULT_TRANSLATIONS_TEMP_DIRECTORY / "entry_exports"
@@ -107,6 +108,20 @@ def export_translation_entries(
                     "xml": f"{dir_name}/{xml_name}",
                     "name": key,
                     "context": base_meta.contexts.get(key),
+                    "decision_hint": infer_decision_hint(
+                        context=base_meta.contexts.get(key),
+                        localized_text=localized_parsed.strings[key],
+                    ),
+                    "ui_surface": infer_ui_surface(
+                        resource_file=base_meta,
+                        key=key,
+                        context=base_meta.contexts.get(key),
+                    ),
+                    "length_pressure": infer_length_pressure(
+                        sample_length=base_meta.sample_lengths.get(key),
+                        key=key,
+                        context=base_meta.contexts.get(key),
+                    ),
                     "en_text": en_text,
                     "current_text": localized_parsed.strings[key],
                     "proposed_text": localized_parsed.strings[key],

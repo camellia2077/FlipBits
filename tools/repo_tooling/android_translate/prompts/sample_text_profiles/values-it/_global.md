@@ -4,7 +4,6 @@ Use fluent modern Italian for themed sample prose while preserving lineup tone a
 
 Hard constraints:
 - Keep SHORT samples short and LONG samples long.
-- Keep product/protocol tokens unchanged when present: mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, nibble.
 - Keep pro/ASCII sample keys strict ASCII when context indicates pro/ASCII.
 - Prefer natural Italian syntax over literal English order.
 - Preserve imperative force when EN uses commands.

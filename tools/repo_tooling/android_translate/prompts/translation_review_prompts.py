@@ -100,6 +100,8 @@ def build_translation_review_prompt_for_text_type(locale_code: str, language_tag
         "Do not require strict word-for-word translation from English. "
         f"Prefer wording that fits [{language_tag}] sentence structure, grammar, rhythm, pronunciation, and idiom. "
         "Meaning only needs to be broadly consistent with English. "
+        "Use the locale_profile and optional style_profile already embedded in the task JSON as the primary locale/style contract. "
+        "Do not restate or expand those profile rules unless a specific entry needs clarification. "
         + profile.identity_rule
     )
     if text_type == "sample_text":
@@ -111,7 +113,7 @@ def build_translation_review_prompt_for_text_type(locale_code: str, language_tag
             + RESOURCE_TEXT_CONTENT_RULE
             + CHANGE_THRESHOLD_RULE
             + _build_agent_sample_text_rule()
-            + profile.sample_text_rule
+            + "Use entry-level fields such as sample_length, decision_hint, ui_surface, and length_pressure to decide how aggressive to be. "
             + "For stylized titles or proper nouns, preserve the original meaning first; do not replace a title word with a different concept because it looks or sounds similar. "
             + "For user-facing audio, style, or settings terminology, prefer natural product language over clinical, implementation-oriented, or state-flag wording. "
             + JSON_OUTPUT_RULE
@@ -121,7 +123,7 @@ def build_translation_review_prompt_for_text_type(locale_code: str, language_tag
         + RESOURCE_TEXT_CONTENT_RULE
         + CHANGE_THRESHOLD_RULE
         + _build_agent_app_text_rule()
-        + profile.app_text_rule
+        + "Use entry-level fields such as decision_hint, ui_surface, and length_pressure to decide whether the line needs compact UI wording, broader review, or no change. "
         + JSON_OUTPUT_RULE
     )
 
@@ -156,6 +158,8 @@ def build_manual_translation_review_prompt_for_text_type(locale_code: str, langu
         "Do not require strict word-for-word translation from English. "
         f"Prefer wording that fits [{language_tag}] sentence structure, grammar, rhythm, pronunciation, and idiom. "
         "Meaning only needs to be broadly consistent with English. "
+        "Use the locale_profile and optional style_profile already embedded in the task JSON as the primary locale/style contract. "
+        "Do not restate or expand those profile rules unless a specific entry needs clarification. "
         + profile.identity_rule
     )
     if text_type == "sample_text":
@@ -167,7 +171,7 @@ def build_manual_translation_review_prompt_for_text_type(locale_code: str, langu
             + CHANGE_THRESHOLD_RULE
             + "Return review notes in plain natural-language text. "
             + _build_manual_sample_text_rule()
-            + profile.sample_text_rule
+            + "Use entry-level fields such as sample_length, decision_hint, ui_surface, and length_pressure to decide how aggressive to be. "
             + "For stylized titles or proper nouns, preserve the original meaning first; do not replace a title word with a different concept because it looks or sounds similar. "
         )
     return (
@@ -175,7 +179,7 @@ def build_manual_translation_review_prompt_for_text_type(locale_code: str, langu
         + CHANGE_THRESHOLD_RULE
         + "Return review notes in plain natural-language text. "
         + _build_manual_app_text_rule()
-        + profile.app_text_rule
+        + "Use entry-level fields such as decision_hint, ui_surface, and length_pressure to decide whether the line needs compact UI wording, broader review, or no change. "
     )
 
 

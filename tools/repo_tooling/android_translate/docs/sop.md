@@ -12,22 +12,22 @@ It is optimized for:
 
 The replacement step is intentionally strict so it can update XML safely.
 
-Agent-specific workflow now lives in:
+Execution-step workflow now lives in:
 
-- [AGENTS.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/AGENTS.md)
+- [README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md)
 
 ## Human Workflow
 
 1. Generate review markdown.
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" compare
+python tools/run.py android-translate compare
 ```
 
 2. Open the generated review file under:
 
-- `temp/ai_translation_reviews/<lang>/app_text/...`
-- `temp/ai_translation_reviews/<lang>/sample_text/...`
+- `temp/translations/reviews/<lang>/app_text/...`
+- `temp/translations/reviews/<lang>/sample_text/...`
 
 3. Paste the review markdown into your web AI chat and ask it to return JSON only.
 
@@ -48,19 +48,13 @@ Each review block includes:
 5. Run replace.
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" replace
-```
-
-Windows wrapper:
-
-```powershell
-"C:\code\FlipBits\tools\scripts\android\translate\replace.cmd"
+python tools/run.py android-translate replace --json tools/repo_tooling/android_translate/replacements.json
 ```
 
 6. If the JSON has a high-confidence syntax issue such as unescaped quotes inside a JSON string, use:
 
 ```powershell
-"C:\code\FlipBits\tools\scripts\android\translate\replace_auto_fix_json.cmd"
+python tools/run.py android-translate replace --json tools/repo_tooling/android_translate/replacements.json --auto-fix-json
 ```
 
 ## Review Rules
@@ -77,29 +71,29 @@ Windows wrapper:
 Generate review markdown:
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" compare
+python tools/run.py android-translate compare
 ```
 
 Run mixed-language report:
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" mixed-language
+python tools/run.py android-translate mixed-language
 ```
 
 Run translation key alignment report:
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" key-alignment
+python tools/run.py android-translate key-alignment
 ```
 
 Run replace:
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" replace
+python tools/run.py android-translate replace --json tools/repo_tooling/android_translate/replacements.json
 ```
 
 Run replace with JSON auto-fix:
 
 ```powershell
-py "C:\code\FlipBits\tools\scripts\android\translate\run.py" replace --auto-fix-json
+python tools/run.py android-translate replace --json tools/repo_tooling/android_translate/replacements.json --auto-fix-json
 ```

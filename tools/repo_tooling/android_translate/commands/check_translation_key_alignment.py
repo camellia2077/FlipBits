@@ -18,6 +18,7 @@ from core.translation_reporting import (
     ReportKeyBlock,
 )
 from core.translation_resources import AndroidStringResourceRepository, ResourceFile
+from core.translation_agent_tasks import infer_decision_hint, infer_length_pressure, infer_ui_surface
 from prompts.language_prompt_profiles import get_locale_prompt_profile
 from prompts.translation_review_prompts import build_key_alignment_repair_prompt
 
@@ -160,6 +161,9 @@ class TranslationKeyAlignmentChecker:
                     "dir": f"values-{lang_code}",
                     "xml": f"values-{lang_code}/{filename}",
                     "name": "__extra_file__",
+                    "decision_hint": "inspect_only",
+                    "ui_surface": "resource/alignment",
+                    "length_pressure": "normal",
                     "localized": "",
                     "action": "inspect_only",
                 }
@@ -207,6 +211,9 @@ class TranslationKeyAlignmentChecker:
                         "dir": f"values-{lang_code}",
                         "xml": f"values-{lang_code}/{filename}",
                         "name": "__missing_file__",
+                        "decision_hint": "translate_missing",
+                        "ui_surface": self._infer_alignment_ui_surface(resource_file),
+                        "length_pressure": "normal",
                         "missing_key_count": len(base_keys),
                         "example_keys": example_keys,
                         "action": "create_file_if_requested",
@@ -256,6 +263,20 @@ class TranslationKeyAlignmentChecker:
                         "xml": f"values-{lang_code}/{filename}",
                         "name": key,
                         "context": resource_file.contexts.get(key),
+                        "decision_hint": infer_decision_hint(
+                            context=resource_file.contexts.get(key),
+                            localized_text="[MISSING TRANSLATION / 此条目未翻译]",
+                        ),
+                        "ui_surface": infer_ui_surface(
+                            resource_file=resource_file,
+                            key=key,
+                            context=resource_file.contexts.get(key),
+                        ),
+                        "length_pressure": infer_length_pressure(
+                            sample_length=resource_file.sample_lengths.get(key),
+                            key=key,
+                            context=resource_file.contexts.get(key),
+                        ),
                         "en": resource_file.strings[key],
                         "localized": "",
                         "suggested_insert_after": insert_after,
@@ -286,6 +307,13 @@ class TranslationKeyAlignmentChecker:
                         "dir": f"values-{lang_code}",
                         "xml": f"values-{lang_code}/{filename}",
                         "name": key,
+                        "decision_hint": "inspect_only",
+                        "ui_surface": self._infer_alignment_ui_surface(resource_file),
+                        "length_pressure": infer_length_pressure(
+                            sample_length=resource_file.sample_lengths.get(key),
+                            key=key,
+                            context=resource_file.contexts.get(key),
+                        ),
                         "localized": localized_strings[key],
                         "action": "inspect_only",
                     }
@@ -304,7 +332,7 @@ class TranslationKeyAlignmentChecker:
     ) -> str:
         output_path = self.output_manager.output_dir / lang_code / f"{lang_code}_key_alignment.task.json"
         payload = {
-            "task_version": 1,
+            "task_version": 2,
             "task_type": "key_alignment_repair",
             "language": lang_code,
             "language_tag": display_language_tag(lang_code),
@@ -316,6 +344,17 @@ class TranslationKeyAlignmentChecker:
                 "app_text_rule": profile.app_text_rule,
                 "sample_text_rule": profile.sample_text_rule,
                 "key_alignment_rule": profile.key_alignment_rule,
+            },
+            "execution_contract": {
+                "json_first": True,
+                "markdown_optional": True,
+                "primary_task_fields": (
+                    "decision_hint",
+                    "ui_surface",
+                    "length_pressure",
+                    "context",
+                    "locale_profile",
+                ),
             },
             "prompt": prompt,
             "entry_count": len(task_entries),
@@ -361,6 +400,18 @@ class TranslationKeyAlignmentChecker:
                 continue
             nearby.append({"name": candidate, "localized": localized_strings[candidate]})
         return nearby
+
+    @staticmethod
+    def _infer_alignment_ui_surface(resource_file: ResourceFile) -> str:
+        if resource_file.filename == "strings_settings.xml":
+            return "settings/general"
+        if resource_file.filename == "strings_audio.xml":
+            return "audio/general"
+        if resource_file.filename == "strings_validation.xml":
+            return "validation/message"
+        if resource_file.filename.startswith("audio_samples_"):
+            return f"sample_text/{resource_file.faction}"
+        return "resource/alignment"
 
 
 def run_translation_key_alignment_check(

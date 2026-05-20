@@ -263,7 +263,7 @@ Recommended shape:
     "prompt_version": "v2"
   },
   "artifacts": {
-    "output_dir": "C:/code/FlipBits/temp/ai_translation_reviews"
+    "output_dir": "C:/code/WaveBits/temp/translations/reviews"
   },
   "errors": []
 }
@@ -307,11 +307,18 @@ These are part of the human-readable artifact, not the CLI JSON envelope, but ag
 
 Generated `*.task.json` files may also include locale-specific persona metadata under `locale_profile`, including a stable profile id, mode, note, and rule fragments. This is part of the machine-readable agent contract for locale-specific writing modes such as `values-la`.
 
-Current `*.task.json` shape:
+Agents should treat task JSON as the primary contract and markdown as optional review context.
+Current rollout is explicitly JSON-first:
+
+- read `entries[]`, `locale_profile`, `style_profile`, and `execution_contract` first
+- use markdown only when the JSON payload does not provide enough inspection detail
+- avoid rebuilding locale guidance by re-parsing raw prompt prose unless the task explicitly requires it
+
+Current `compare` `*.task.json` shape:
 
 ```json
 {
-  "task_version": 2,
+  "task_version": 3,
   "prompt_mode": "agent_json",
   "prompt_version": "v4",
   "generated_at": "2026-04-29T01:31:49Z",
@@ -326,6 +333,18 @@ Current `*.task.json` shape:
     "sample_text_rule": "For sample prose, atmosphere outranks literal fidelity...",
     "key_alignment_rule": "When filling missing entries, write in the repository's High Gothic house style..."
   },
+  "execution_contract": {
+    "json_first": true,
+    "markdown_optional": true,
+    "primary_task_fields": [
+      "decision_hint",
+      "ui_surface",
+      "length_pressure",
+      "context",
+      "locale_profile",
+      "style_profile"
+    ]
+  },
   "text_type": "sample_text",
   "prompt_text_type": "sample_text",
   "group": "ancient_dynasty",
@@ -338,6 +357,9 @@ Current `*.task.json` shape:
       "name": "audio_sample_ancient_dynasty_themed_molecular_law_unthreads_flesh",
       "sample_length": "SHORT",
       "context": "This file contains localized themed sample text for flash/ultra.",
+      "decision_hint": "review_translation",
+      "ui_surface": "sample_text/ancient_dynasty",
+      "length_pressure": "tight",
       "en": "Molecular bonds severed; organic matter eradicated.",
       "localized": "Vincula molecularia soluta; carnis penitus eradicata."
     }
@@ -349,6 +371,10 @@ Stability notes:
 
 - `task_version` is the top-level schema version for agent task files.
 - `locale_profile` is the stable place for locale-specific writing persona data.
+- `execution_contract` states that JSON is the primary interface and names the fields the agent should consume first.
+- `decision_hint` is a lightweight action bias such as `translate_missing`, `keep_en`, `review_translation`, or `inspect_only`.
+- `ui_surface` gives a stable UI/location hint such as `settings/theme_picker` or `audio/demo_hint`.
+- `length_pressure` tells the agent whether the string should stay compact (`tight`), normal, or more flexible (`relaxed`).
 - Agents that skip Markdown should read `locale_profile` directly instead of inferring persona only from `prompt_ref`.
 
 For subgroup-specific sample style overlays, `*.task.json` may include an optional `style_profile` object.  
@@ -412,7 +438,7 @@ Example:
     "suspicious_issue_count": 3
   },
   "artifacts": {
-    "output_dir": "C:/code/FlipBits/temp/mixed_language_reports"
+    "output_dir": "C:/code/WaveBits/temp/translations/mixed_language"
   },
   "errors": []
 }

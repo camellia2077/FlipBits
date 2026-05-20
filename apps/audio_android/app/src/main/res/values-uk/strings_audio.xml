@@ -130,7 +130,7 @@
     <string name="audio_ultra_visual_level_low">Низький</string>
     <string name="audio_follow_unavailable">Супровід payload зараз недоступний для цього аудіо.</string>
     <string name="audio_follow_text_unavailable">Текстовий супровід зараз недоступний для цього аудіо.</string>
-    <string name="audio_follow_display_lyrics">Лірика</string>
+    <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Дані</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>

@@ -7,21 +7,10 @@ import re
 import xml.etree.ElementTree as ET
 
 from core.android_resource_escapes import run_fix_android_resource_escapes
+from core.mixed_language_policy import load_mixed_language_policy
 
 HEX_LITERAL_PATTERN = re.compile(r"#RRGGBB")
 PLACEHOLDER_PATTERN = re.compile(r"%\d+\$[sdf]")
-LOCKED_TERMS = (
-    "flash",
-    "pro",
-    "mini",
-    "ultra",
-    "ASCII",
-    "UTF-8",
-    "Hex",
-    "Binary",
-    "Morse",
-    "Emoji",
-)
 
 
 def _contains_locked_term(source_text: str, term: str) -> bool:
@@ -59,6 +48,8 @@ class LintResult:
 class AutofixResult:
     changed_files: list[str]
     total_replacements: int
+    escape_files_updated: int
+    escape_strings_updated: int
 
 
 def _issue_fingerprint(issue: LintIssue, *, res_dir: str) -> str:
@@ -164,6 +155,7 @@ def run_translation_lint(*, res_dir: str, lang: str | None = None) -> LintResult
     issues: list[LintIssue] = []
     files = _iter_xml_files(res_dir, lang)
     en = _english_map(res_dir)
+    locked_terms = load_mixed_language_policy().detection.shared_locked_terms
     for path in files:
         raw_text = path.read_text(encoding="utf-8")
         try:
@@ -193,7 +185,7 @@ def run_translation_lint(*, res_dir: str, lang: str | None = None) -> LintResult
                             f"Placeholder mismatch. en={src_ph}, loc={dst_ph}",
                         )
                     )
-                for term in LOCKED_TERMS:
+                for term in locked_terms:
                     if _contains_locked_term(en_text, term) and _missing_locked_term(text, term):
                         issues.append(
                             LintIssue(
@@ -232,4 +224,9 @@ def run_translation_autofix(*, res_dir: str, lang: str | None = None) -> Autofix
         if path not in changed_files:
             changed_files.append(path)
     total += escape_result.strings_updated
-    return AutofixResult(changed_files=changed_files, total_replacements=total)
+    return AutofixResult(
+        changed_files=changed_files,
+        total_replacements=total,
+        escape_files_updated=escape_result.files_updated,
+        escape_strings_updated=escape_result.strings_updated,
+    )

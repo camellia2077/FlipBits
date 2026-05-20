@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from core.mixed_language_policy import load_mixed_language_policy
+
 
 @dataclass(frozen=True)
 class SampleTextStyleProfile:
@@ -303,6 +305,14 @@ _PT_RBR_SAMPLE_GROUP_PROFILES: dict[str, tuple[str, str]] = {
 }
 
 
+def _build_shared_sample_text_prefix() -> str:
+    locked_terms = ", ".join(load_mixed_language_policy().detection.shared_locked_terms)
+    return (
+        "Shared locked-term policy for sample text:\n"
+        f"- Keep locked product/protocol terms exactly as English tokens when they appear: {locked_terms}."
+    )
+
+
 def get_sample_text_style_profile(
     *,
     locale_code: str,
@@ -353,9 +363,10 @@ def get_sample_text_style_profile(
         return None
     profile_id, profile_file = config
     profile_path = _PROFILE_ROOT / profile_file
+    shared_prompt = _build_shared_sample_text_prefix()
     global_prompt = global_profile_path.read_text(encoding="utf-8").strip()
     local_prompt = profile_path.read_text(encoding="utf-8").strip()
-    prompt_text = f"{global_prompt}\n\n---\n\n{local_prompt}"
+    prompt_text = f"{shared_prompt}\n\n---\n\n{global_prompt}\n\n---\n\n{local_prompt}"
     prompt_ref = profile_path.relative_to(_REPO_ROOT).as_posix()
     return SampleTextStyleProfile(
         profile_id=profile_id,

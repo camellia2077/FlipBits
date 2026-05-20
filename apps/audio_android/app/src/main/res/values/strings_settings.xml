@@ -4,24 +4,39 @@
     <string name="config_language_title">Language</string>
     <string name="config_language_subtitle">Choose app language</string>
     <string name="config_language_follow_system">Follow system</string>
+    <!-- CONTEXT: Language picker option label for Simplified Chinese. This is the native language name shown inside the app language list. -->
     <string name="config_language_chinese">简体中文</string>
+    <!-- CONTEXT: Language picker option label for Traditional Chinese. This is the native language name shown inside the app language list. -->
     <string name="config_language_traditional_chinese">繁體中文</string>
+    <!-- CONTEXT: Language picker option label for English. This is the native language name shown inside the app language list. -->
     <string name="config_language_english">English</string>
+    <!-- CONTEXT: Language picker option label for Japanese. This is the native language name shown inside the app language list. -->
     <string name="config_language_japanese">日本語</string>
+    <!-- CONTEXT: Language picker option label for German. This is the native language name shown inside the app language list. -->
     <string name="config_language_german">Deutsch</string>
+    <!-- CONTEXT: Language picker option label for Russian. This is the native language name shown inside the app language list. -->
     <string name="config_language_russian">Русский</string>
+    <!-- CONTEXT: Language picker option label for Spanish. This is the native language name shown inside the app language list. -->
     <string name="config_language_spanish">Español</string>
+    <!-- CONTEXT: Language picker option label for Brazilian Portuguese. This is the native language name shown inside the app language list. -->
     <string name="config_language_portuguese">Português</string>
+    <!-- CONTEXT: Language picker option label for Ukrainian. This is the native language name shown inside the app language list. -->
     <string name="config_language_ukrainian">Українська</string>
+    <!-- CONTEXT: Language picker option label for Korean. This is the native language name shown inside the app language list. -->
     <string name="config_language_korean">한국어</string>
+    <!-- CONTEXT: Language picker option label for French. This is the native language name shown inside the app language list. -->
     <string name="config_language_french">Français</string>
+    <!-- CONTEXT: Language picker option label for Italian. This is the native language name shown inside the app language list. -->
     <string name="config_language_italian">Italiano</string>
+    <!-- CONTEXT: Language picker option label for Polish. This is the language name shown inside the app language list. -->
     <string name="config_language_polish">Polish</string>
+    <!-- CONTEXT: Language picker option label for the custom High Gothic locale. Keep this stylized display name rather than translating it as ordinary prose. -->
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Expand language settings</string>
     <string name="config_language_collapse">Collapse language settings</string>
     <string name="config_theme_mode_title">Theme mode</string>
     <string name="config_theme_mode_subtitle">Choose system, light, or dark.</string>
+    <!-- CONTEXT: Helper text under Theme mode. It explains that dual-tone themes do not switch between light/dark variants and instead keep one fixed appearance. -->
     <string name="config_theme_mode_brand_fixed">Dual-tone themes use a fixed look.</string>
     <string name="config_theme_mode_follow_system">Follow system</string>
     <string name="config_theme_mode_light">Light</string>
@@ -29,7 +44,9 @@
     <string name="config_theme_mode_custom">Custom</string>
     <string name="config_theme_appearance_title">Theme appearance</string>
     <string name="config_theme_style_title">Theme style</string>
+    <!-- CONTEXT: Subtitle shown under the "Theme style" setting in the Settings screen. It tells the user to choose between the standard Material look and the custom dual-tone theme system. -->
     <string name="config_theme_style_subtitle">Choose Material or dual-tone.</string>
+    <!-- CONTEXT: Label for the standard Material theme-style option in the Settings screen. This is the segmented/selectable option name, not a long description. -->
     <string name="config_theme_style_material">Material</string>
     <string name="config_theme_style_brand_dual_tone">Dual-tone</string>
     <string name="config_theme_appearance_expand">Expand theme appearance settings</string>
@@ -38,7 +55,9 @@
     <string name="config_palette_selected">Selected</string>
     <string name="config_palette_expand">Expand palettes</string>
     <string name="config_palette_collapse">Collapse palettes</string>
+    <!-- CONTEXT: Section title above the built-in dual-tone theme picker in Settings. Keep it compact like a settings section heading. -->
     <string name="config_brand_theme_title">Dual-tone themes</string>
+    <!-- CONTEXT: Short description under the built-in dual-tone theme section. It explains that these presets have a fixed appearance and are previewed with two colors. -->
     <string name="config_brand_theme_description">Each dual-tone theme keeps a fixed look with a two-color preview.</string>
     <string name="config_dual_tone_group_sacred_machine">The Sacred Machine</string>
     <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
@@ -48,17 +67,22 @@
     <string name="config_dual_tone_group_scarlet_carnage">The Scarlet Carnage</string>
     <string name="config_dual_tone_group_exquisite_fall">The Exquisite Fall</string>
     <string name="config_dual_tone_group_labyrinth_of_mutability">The Labyrinth of Mutability</string>
+    <!-- CONTEXT: Palette family heading shown above the built-in dual-tone theme presets in the color palette picker. -->
     <string name="palette_family_brand">Dual-tone</string>
     <string name="palette_family_custom">Custom</string>
     <string name="palette_family_reds_pinks">Reds</string>
+    <!-- CONTEXT: Palette family heading shown above built-in orange-toned Material presets in the color palette picker. -->
     <string name="palette_family_oranges">Oranges</string>
     <string name="palette_family_yellows">Yellows</string>
     <string name="palette_family_greens">Greens</string>
     <string name="palette_family_cyans_blues">Blues</string>
     <string name="palette_family_purples_magentas">Purples</string>
     <string name="palette_family_neutrals">Neutrals</string>
+    <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
     <string name="config_flash_style_title">Flash style</string>
+    <!-- CONTEXT: Subtitle under the Flash style setting. It tells the user to choose the sound character of flash-mode audio. -->
     <string name="config_flash_style_subtitle">Choose how flash audio should sound.</string>
+    <!-- CONTEXT: Label for the default flash-style preset in Settings. Keep it short like a segmented option or preset chip. -->
     <string name="config_flash_style_standard_label">Standard</string>
     <string name="config_flash_style_standard_description">Clear, stable machine signaling.</string>
     <string name="config_flash_style_hostility_label">Hostility</string>
@@ -70,52 +94,66 @@
     <string name="config_about_title">About</string>
     <string name="config_about_subtitle">Author, project link, and licenses</string>
     <string name="palette_ruby_title">Ruby</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. "Material" refers to the design-system palette family and may remain as the shared term. -->
     <string name="palette_red_title">Material Red</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_mars_relic_title">Mars</string>
     <string name="brand_theme_mars_relic_title">Mars Relic</string>
-    <string name="brand_theme_mars_relic_description">Deep red paired with parchment for a ceremonial archive look.</string>
+    <string name="brand_theme_mars_relic_description">Deep red and parchment for a ceremonial archive glow.</string>
     <string name="brand_theme_mars_relic_accessibility">Mars Relic theme, deep red with parchment beige.</string>
     <string name="brand_theme_black_crimson_rite_title">Black Crimson Rite</string>
-    <string name="brand_theme_black_crimson_rite_description">Soot black and ritual crimson for a severe machine shrine mood.</string>
+    <string name="brand_theme_black_crimson_rite_description">Soot black and ritual crimson for a severe shrine glow.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Black Crimson Rite theme, near-black with vivid crimson red.</string>
     <string name="brand_theme_scarlet_guard_title">Scarlet Guard</string>
-    <string name="brand_theme_scarlet_guard_description">Ivory white and sealed crimson for a disciplined heraldic tone.</string>
+    <string name="brand_theme_scarlet_guard_description">Ivory and sealed crimson for a disciplined heraldic tone.</string>
     <string name="brand_theme_scarlet_guard_accessibility">Scarlet Guard theme, light ivory with dark scarlet red.</string>
     <string name="brand_theme_dynasty_revival_title">Dynasty Revival</string>
-    <string name="brand_theme_dynasty_revival_description">Tomb-metal black with classic reactor green for a reawakened dynasty core.</string>
+    <string name="brand_theme_dynasty_revival_description">Tomb-metal black and reactor green for a reawakened dynasty glow.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Dynasty Revival theme, deep tomb-metal black with bright reactor green.</string>
     <string name="brand_theme_sepulcher_cyan_title">Sepulcher Cyan</string>
-    <string name="brand_theme_sepulcher_cyan_description">Cold sepulcher steel with restrained cyan-green for a quieter royal machine glow.</string>
+    <string name="brand_theme_sepulcher_cyan_description">Cold sepulcher steel and restrained cyan-green for a quiet royal glow.</string>
     <string name="brand_theme_sepulcher_cyan_accessibility">Sepulcher Cyan theme, cold dark steel with muted cyan-green.</string>
     <string name="brand_theme_tomb_sigil_title">Tomb Sigil</string>
     <string name="brand_theme_tomb_sigil_description">Warm crypt iron and sharp revival green for a ceremonial dynasty mark.</string>
     <string name="brand_theme_tomb_sigil_accessibility">Tomb Sigil theme, dark crypt iron with vivid revival green.</string>
     <string name="brand_theme_ancient_alloy_title">Ancient Alloy</string>
-    <string name="brand_theme_ancient_alloy_description">Weathered metal shadows and cold turquoise for a tomb-forge glow.</string>
+    <string name="brand_theme_ancient_alloy_description">Weathered metal and cold turquoise for a tomb-forge glow.</string>
     <string name="brand_theme_ancient_alloy_accessibility">Ancient Alloy theme, dark bronze gray with bright turquoise.</string>
     <string name="brand_theme_immortal_rot_title">Toxic Effluence</string>
-    <string name="brand_theme_immortal_rot_description">Fern green and citrine yellow create a damp, overgrown dual-tone palette.</string>
+    <string name="brand_theme_immortal_rot_description">Fern green and citrine yellow in a damp, overgrown hush.</string>
     <string name="brand_theme_immortal_rot_accessibility">Toxic Effluence theme, fern green with citrine yellow.</string>
+    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
     <string name="brand_theme_plague_mire_title">Plague Mire</string>
-    <string name="brand_theme_plague_mire_description">Bog-black green, sickly lime, and a caustic orange outline churn into a plague-soaked dual-tone mire.</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Plague Mire" dual-tone preset in the Settings theme picker. It describes the color mood of the preview card, not a technical color editor field. -->
+    <string name="brand_theme_plague_mire_description">Bog-black green, sickly lime, and caustic orange in a feverish marsh haze.</string>
+    <!-- CONTEXT: Accessibility label read for the "Plague Mire" dual-tone theme preview. It should clearly describe the theme name and visible colors for screen readers. -->
     <string name="brand_theme_plague_mire_accessibility">Plague Mire theme, bog-black green with sickly lime and a caustic orange outline.</string>
     <string name="brand_theme_scarlet_carnage_title">Blood-Soaked Ivory</string>
-    <string name="brand_theme_scarlet_carnage_description">Dark red and brass forge a brutal dual-tone palette of blood and war metal.</string>
+    <string name="brand_theme_scarlet_carnage_description">Dark red and brass in a stern martial glow.</string>
     <string name="brand_theme_scarlet_carnage_accessibility">Blood-Soaked Ivory theme, dark red with dark goldenrod brass.</string>
+    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
     <string name="brand_theme_brass_forge_title">Brass Forge</string>
-    <string name="brand_theme_brass_forge_description">Near-black crimson, furnace brass, and a flame-orange outline cast a molten dual-tone forge of war metal.</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Brass Forge" dual-tone preset in the Settings theme picker. It describes the visual mood and color mix of the preview card. -->
+    <string name="brand_theme_brass_forge_description">Near-black crimson, furnace brass, and flame-orange in a molten martial glow.</string>
+    <!-- CONTEXT: Accessibility label read for the "Brass Forge" dual-tone theme preview. It should describe the theme name and its key colors for screen readers. -->
     <string name="brand_theme_brass_forge_accessibility">Brass Forge theme, near-black crimson with furnace brass and a flame-orange outline.</string>
     <string name="brand_theme_exquisite_fall_title">Velvet Nightmare</string>
-    <string name="brand_theme_exquisite_fall_description">Midnight violet and hot pink with a soft peach outline create a decadent dual-tone palette of vanity and sensation.</string>
+    <string name="brand_theme_exquisite_fall_description">Midnight violet, hot pink, and soft peach in a languid decadent bloom.</string>
     <string name="brand_theme_exquisite_fall_accessibility">Velvet Nightmare theme, midnight violet with hot pink and a soft peach outline.</string>
+    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
     <string name="brand_theme_ecstatic_rapture_title">Ecstatic Rapture</string>
-    <string name="brand_theme_ecstatic_rapture_description">Orchid violet, blush pink, and a radiant gold outline bloom into a euphoric dual-tone fever dream.</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Ecstatic Rapture" dual-tone preset in the Settings theme picker. It describes the preview palette's color mood, not editable fields. -->
+    <string name="brand_theme_ecstatic_rapture_description">Orchid violet, blush pink, and radiant gold in a luminous rapturous bloom.</string>
+    <!-- CONTEXT: Accessibility label read for the "Ecstatic Rapture" dual-tone theme preview. It should describe the theme name and dominant colors for screen readers. -->
     <string name="brand_theme_ecstatic_rapture_accessibility">Ecstatic Rapture theme, orchid violet with blush pink and a radiant gold outline.</string>
     <string name="brand_theme_labyrinth_of_mutability_title">Arcane Abyss</string>
-    <string name="brand_theme_labyrinth_of_mutability_description">Midnight navy, electric cyan, and a lavender outline form a shifting dual-tone maze of cold signal light.</string>
+    <string name="brand_theme_labyrinth_of_mutability_description">Midnight navy, electric cyan, and lavender in a shifting maze of cold light.</string>
     <string name="brand_theme_labyrinth_of_mutability_accessibility">Arcane Abyss theme, midnight navy with electric cyan and a lavender outline.</string>
+    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
     <string name="brand_theme_fires_of_fate_title">Fires of Fate</string>
-    <string name="brand_theme_fires_of_fate_description">Fatefire blue, magenta flame, and a venom-lime outline ignite an omen-lit dual-tone blaze.</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Fires of Fate" dual-tone preset in the Settings theme picker. It describes the preview palette's color mood and atmosphere. -->
+    <string name="brand_theme_fires_of_fate_description">Fatefire blue, magenta flame, and venom-lime in an omen-lit blaze.</string>
+    <!-- CONTEXT: Accessibility label read for the "Fires of Fate" dual-tone theme preview. It should describe the theme name and key colors for screen readers. -->
     <string name="brand_theme_fires_of_fate_accessibility">Fires of Fate theme, fatefire blue with magenta flame and a venom-lime outline.</string>
     <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
     <string name="brand_theme_custom_title">Custom dual-tone</string>
@@ -170,44 +208,61 @@
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
     <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">Crimson</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_rose_title">Rose</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_sakura_title">Sakura</string>
     <string name="palette_raspberry_title">Raspberry</string>
     <string name="palette_blush_title">Blush</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_orange_title">Orange</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_coral_title">Coral</string>
     <string name="palette_tangerine_title">Tangerine</string>
     <string name="palette_apricot_title">Apricot</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_terracotta_title">Terracotta</string>
     <string name="palette_persimmon_title">Persimmon</string>
     <string name="palette_amber_title">Amber</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_gold_title">Gold</string>
     <string name="palette_sunflower_title">Sunflower</string>
     <string name="palette_lemon_title">Lemon</string>
     <string name="palette_honey_title">Honey</string>
     <string name="palette_marigold_title">Marigold</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_lime_title">Lime</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_olive_title">Olive</string>
     <string name="palette_emerald_title">Emerald</string>
     <string name="palette_mint_title">Mint</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_jade_title">Jade</string>
     <string name="palette_forest_title">Forest</string>
     <string name="palette_teal_title">Teal</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_cyan_title">Cyan</string>
     <string name="palette_sky_title">Sky</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_ocean_title">Ocean</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_cobalt_title">Cobalt</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_indigo_title">Indigo</string>
     <string name="palette_violet_title">Violet</string>
     <string name="palette_plum_title">Plum</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_magenta_title">Magenta</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_fuchsia_title">Fuchsia</string>
     <string name="palette_orchid_title">Orchid</string>
     <string name="palette_lilac_title">Lilac</string>
     <string name="palette_mocha_title">Mocha</string>
     <string name="palette_slate_title">Slate</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_sand_title">Sand</string>
     <string name="palette_stone_title">Stone</string>
+    <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_graphite_title">Graphite</string>
     <string name="palette_ivory_title">Ivory</string>
     <string name="config_flash_style_zeal_label">Zeal</string>

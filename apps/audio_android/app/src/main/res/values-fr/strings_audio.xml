@@ -15,7 +15,7 @@
     <string name="audio_action_pause">Pause</string>
     <string name="audio_action_previous_track">Piste précédente</string>
     <string name="audio_action_next_track">Piste suivante</string>
-    <string name="audio_action_open_audio_info">Info</string>
+    <string name="audio_action_open_audio_info">Infos</string>
     <string name="audio_action_normal_playback">Normal</string>
     <string name="audio_action_shuffle_playback">Aléatoire</string>
     <string name="audio_action_repeat_one">Répéter un</string>
@@ -110,7 +110,7 @@
     <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Position de l’octet</string>
     <string name="audio_pro_visual_then">Puis</string>
-    <string name="audio_info_dialog_title">Info</string>
+    <string name="audio_info_dialog_title">Infos</string>
     <string name="audio_info_user_section">Détails</string>
     <string name="audio_info_technical_section">Infos techniques</string>
     <string name="audio_info_encoding_type">Type</string>
@@ -130,7 +130,7 @@
     <string name="audio_ultra_visual_level_low">Bas</string>
     <string name="audio_follow_unavailable">Le suivi de payload n’est pas disponible pour cet audio pour le moment.</string>
     <string name="audio_follow_text_unavailable">Le suivi de texte n’est pas disponible pour cet audio pour le moment.</string>
-    <string name="audio_follow_display_lyrics">Paroles</string>
+    <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Données</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>
@@ -240,7 +240,7 @@
     <string name="demo_hint_generate_audio">Générer l’audio</string>
     <string name="demo_hint_decode_audio">Décoder l’audio</string>
     <string name="demo_hint_open_mini_player">Ouvrir le mini-lecteur</string>
-    <string name="demo_hint_switch_to_lyrics">Passage à Paroles</string>
+    <string name="demo_hint_switch_to_lyrics">Passage à Tokens</string>
     <string name="demo_hint_switch_to_visual">Passage à Visuel</string>
     <string name="demo_hint_play">Lecture démarrée</string>
     <string name="demo_hint_pause">Lecture en pause</string>

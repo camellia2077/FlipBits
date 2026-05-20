@@ -56,7 +56,7 @@ Android APK 将通过 GitHub Releases 发布。
 
 Android 用户可读更新摘要见：
 
-- [`docs/presentation/android/CHANGELOG.md`](docs/presentation/android/CHANGELOG.md)
+- [`docs/presentation/android/CHANGELOG.zh-CN.md`](docs/presentation/android/CHANGELOG.zh-CN.md)
 
 ## 模式总览
 

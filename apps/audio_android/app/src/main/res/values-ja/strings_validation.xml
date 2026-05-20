@@ -10,11 +10,11 @@
     <string name="validation_invalid_sample_rate">サンプルレートは0より大きい必要があります。</string>
     <string name="validation_invalid_frame_samples">フレームサイズは0より大きい必要があります。</string>
     <string name="validation_invalid_mode">サポートされていない転送モードです。</string>
-    <string name="validation_invalid_flash_signal_profile">サポートされていないflash信号プロファイルです。</string>
+    <string name="validation_invalid_flash_signal_profile">flash信号プロファイルはサポートされていません。</string>
     <!-- CONTEXT: Validation error for an unsupported flash style preset. -->
-    <string name="validation_invalid_flash_voicing_flavor">サポートされていないflashスタイルです。</string>
+    <string name="validation_invalid_flash_voicing_flavor">flashスタイルはサポートされていません。</string>
     <string name="validation_pro_ascii_only">pro モードは ASCII のみをサポートしています。</string>
-    <string name="validation_mini_morse_only">Mini Morse supports A-Z, 0-9, spaces, and common Morse punctuation.</string>
+    <string name="validation_mini_morse_only">Mini Morse は A-Z、0-9、スペース、および一般的な Morse 句読点に対応しています。</string>
     <string name="validation_payload_too_large">入力テキストがこのモードの 512 バイト単一フレーム上限を超えています。</string>
     <string name="error_invalid_argument">無効な引数です。</string>
     <!-- CONTEXT: Short user-facing error. Means required result/data is not ready yet. -->

@@ -12,7 +12,6 @@ French (`values-fr`) is a standard French localization for Android UI, playback,
 [identity_rule]
 Treat this locale as contemporary French product localization.
 Prefer natural French UI phrasing over literal English structure.
-Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing French locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.

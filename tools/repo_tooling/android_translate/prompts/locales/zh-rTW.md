@@ -15,13 +15,11 @@ Prefer natural contemporary Traditional Chinese wording, terminology, grammar, p
 Use Traditional Chinese characters consistently.
 Avoid calques, mixed-locale phrasing, or wording that sounds mechanically transferred from English or Simplified Chinese.
 Focus on script, locale terminology, punctuation, and natural UI phrasing.
-Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Traditional Chinese locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels concise and natural in Taiwan Traditional Chinese.
 Use stable Taiwan Traditional Chinese product terminology across related controls, settings, dialogs, and validation messages.
 Prefer the clearer Taiwan Traditional Chinese expression when direct transfer from another locale would sound unnatural.
-Follow existing project terms where present: 音訊, 字元, 位元組, 輸入規則, 視覺, 歌詞, 二進位, 十六進位, 低頻載波, and 高頻載波.
 Keep mini-player, tab, segmented-control, and chip labels short.
 
 [sample_text_rule]

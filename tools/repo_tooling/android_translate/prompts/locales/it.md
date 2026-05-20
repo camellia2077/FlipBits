@@ -12,7 +12,6 @@ Italian (`values-it`) is a standard Italian localization for Android UI, playbac
 [identity_rule]
 Treat this locale as contemporary Italian UI localization.
 Prefer natural Italian sentence order over English structure, especially in playback, input-rule, byte-count, and visualizer strings.
-Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Italian locale keeps them as technical terms.
 For Android string safety, do not introduce raw backslashes, pseudo unicode escapes, or ad-hoc quote escapes. Keep apostrophes/quotes compatible with Android resource parsing and rely on the toolchain escape normalizer before build.
 
 [app_text_rule]

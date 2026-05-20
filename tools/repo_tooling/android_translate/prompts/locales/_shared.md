@@ -11,6 +11,7 @@ Shared constraints that apply to every locale profile unless explicitly overridd
 
 [identity_rule]
 Never translate these product/protocol terms; preserve exact English spelling and casing: flash, pro, mini, ultra, ASCII, UTF-8, Hex, Binary, Morse, Emoji, Tokens, Mix.
+Apply this locked-term rule automatically; locale-specific profiles should only add exceptions or language-specific phrasing guidance when truly necessary.
 
 [app_text_rule]
 Keep the non-translatable term list unchanged in UI labels, hints, validation text, and settings descriptions: flash, pro, mini, ultra, ASCII, UTF-8, Hex, Binary, Morse, Emoji, Tokens, Mix.

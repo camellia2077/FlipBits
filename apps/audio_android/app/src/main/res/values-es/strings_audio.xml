@@ -15,7 +15,7 @@
     <string name="audio_action_pause">Pausar</string>
     <string name="audio_action_previous_track">Pista anterior</string>
     <string name="audio_action_next_track">Pista siguiente</string>
-    <string name="audio_action_open_audio_info">Info</string>
+    <string name="audio_action_open_audio_info">Información</string>
     <string name="audio_action_normal_playback">Normal</string>
     <string name="audio_action_shuffle_playback">Aleatorio</string>
     <string name="audio_action_repeat_one">Repetir una</string>
@@ -102,15 +102,15 @@
     <string name="audio_pro_visual_next">Siguiente</string>
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">Byte completo</string>
-    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">Token n.º %1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">Frecuencias del siguiente símbolo: %1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">Este es el segundo nibble, así que el reproductor avanzará al siguiente byte después.</string>
     <string name="audio_pro_visual_ascii_byte">Byte ASCII %1$d</string>
-    <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d/%3$d</string>
+    <string name="audio_pro_visual_token_byte">Token n.º %1$d • byte %2$d/%3$d</string>
     <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Posición del byte</string>
     <string name="audio_pro_visual_then">Luego</string>
-    <string name="audio_info_dialog_title">Info</string>
+    <string name="audio_info_dialog_title">Información</string>
     <string name="audio_info_user_section">Detalles</string>
     <string name="audio_info_technical_section">Info técnica</string>
     <string name="audio_info_encoding_type">Tipo</string>

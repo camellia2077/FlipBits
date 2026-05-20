@@ -8,7 +8,16 @@ from commands.apply_translation_replacements import (
 )
 from commands.add_translation_key import add_translation_key
 from commands.fix_android_resource_escapes import run_fix_android_resource_escapes
-from commands.check_mixed_language import run_mixed_language_check
+from commands.check_mixed_language import (
+    DEFAULT_OUTPUT_DIRECTORY as DEFAULT_MIXED_LANGUAGE_OUTPUT_DIRECTORY,
+    run_mixed_language_check,
+)
+from commands.mixed_language_context_audit import (
+    run_mixed_language_context_audit,
+)
+from commands.check_untranslated_equals_english import (
+    run_untranslated_equals_english_check,
+)
 from commands.check_translation_key_alignment import (
     DEFAULT_OUTPUT_DIRECTORY as DEFAULT_KEY_ALIGNMENT_OUTPUT_DIRECTORY,
     run_translation_key_alignment_check,
@@ -22,6 +31,10 @@ from commands.suggest_translation_terms import (
     build_term_suggestion_payload,
     print_term_suggestion_report,
     suggest_translation_terms,
+)
+from commands.locked_term_suggestions import (
+    build_locked_term_suggestion_payload,
+    suggest_locked_term_fixes,
 )
 from commands.translation_lint_and_autofix import (
     filter_new_lint_issues,
@@ -37,8 +50,10 @@ from core.translation_cli_payloads import (
     emit_json_payload,
     fix_resource_escapes_payload,
     key_alignment_payload,
+    mixed_language_context_audit_payload,
     mixed_language_payload,
     replace_payload,
+    untranslated_equals_english_payload,
     write_json_payload,
 )
 from core.translation_job_manifest import (
@@ -278,11 +293,84 @@ def parse_args() -> argparse.Namespace:
         help="Generate mixed-language reports.",
     )
     mixed_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    mixed_parser.add_argument(
+        "--output-dir",
+        default="",
+        help="Override output directory for generated mixed-language markdown reports.",
+    )
+    mixed_parser.add_argument(
+        "--lang",
+        default="",
+        help="Optional language folder suffix such as ko, ja, or zh-rTW.",
+    )
+    mixed_parser.add_argument(
         "--quiet",
         action="store_true",
         help="Suppress routine progress output.",
     )
     mixed_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
+    mixed_context_audit_parser = subparsers.add_parser(
+        "mixed-language-context-audit",
+        help="Classify mixed-language hits into keep_en / needs_translation / needs_context buckets.",
+    )
+    mixed_context_audit_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    mixed_context_audit_parser.add_argument(
+        "--output-dir",
+        default="",
+        help="Override output directory for generated mixed-language audit artifacts.",
+    )
+    mixed_context_audit_parser.add_argument(
+        "--lang",
+        default="",
+        help="Required language folder suffix such as ko, ja, or zh-rTW.",
+    )
+    mixed_context_audit_parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress routine progress output.",
+    )
+    mixed_context_audit_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
+    untranslated_equals_english_parser = subparsers.add_parser(
+        "untranslated-equals-english",
+        help="Find localized entries whose text is still identical to the English source.",
+    )
+    untranslated_equals_english_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    untranslated_equals_english_parser.add_argument(
+        "--output-dir",
+        default="",
+        help="Override output directory for generated untranslated-English audit artifacts.",
+    )
+    untranslated_equals_english_parser.add_argument(
+        "--lang",
+        default="",
+        help="Optional language folder suffix such as de, it, or fr. Omit to scan all locales.",
+    )
+    untranslated_equals_english_parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress routine progress output.",
+    )
+    untranslated_equals_english_parser.add_argument(
         "--json-output",
         action="store_true",
         help="Emit machine-readable JSON instead of human-readable text.",
@@ -449,6 +537,25 @@ def parse_args() -> argparse.Namespace:
         help="Use case-sensitive matching.",
     )
     term_suggestions_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
+    locked_term_suggestions_parser = subparsers.add_parser(
+        "locked-term-suggestions",
+        help="Generate JSON suggestions for translationLint locked_term_missing issues without editing XML.",
+    )
+    locked_term_suggestions_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    locked_term_suggestions_parser.add_argument(
+        "--lang",
+        default="",
+        help="Optional language folder suffix such as fr, ko, or zh-rTW.",
+    )
+    locked_term_suggestions_parser.add_argument(
         "--json-output",
         action="store_true",
         help="Emit machine-readable JSON instead of human-readable text.",
@@ -712,9 +819,111 @@ def run() -> int:
     if command == "mixed-language":
         if not quiet and not json_output:
             print("[translate] Generating mixed-language reports")
-        result = run_mixed_language_check(quiet=quiet or json_output, emit_text=not json_output)
+        try:
+            result = run_mixed_language_check(
+                res_dir=args.res_dir,
+                output_dir=args.output_dir or DEFAULT_MIXED_LANGUAGE_OUTPUT_DIRECTORY,
+                lang=args.lang or None,
+                quiet=quiet or json_output,
+                emit_text=not json_output,
+            )
+        except ValueError as exc:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "mixed-language",
+                        "exit_code": 2,
+                        "summary": {
+                            "suspicious_issue_count": 0,
+                            "report_file_count": 0,
+                        },
+                        "artifacts": {
+                            "output_dir": args.output_dir or "",
+                        },
+                        "errors": [str(exc)],
+                    }
+                )
+            else:
+                print(str(exc))
+            return 2
         if json_output:
             emit_json_payload(mixed_language_payload(result))
+        return result.exit_code
+    if command == "mixed-language-context-audit":
+        try:
+            result = run_mixed_language_context_audit(
+                res_dir=args.res_dir,
+                output_dir=args.output_dir or None,
+                lang=args.lang or "",
+                quiet=quiet or json_output,
+                emit_text=not json_output,
+            )
+        except ValueError as exc:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "mixed-language-context-audit",
+                        "exit_code": 2,
+                        "summary": {
+                            "total_entries": 0,
+                            "keep_en_count": 0,
+                            "needs_translation_count": 0,
+                            "needs_context_count": 0,
+                            "missing_context_count": 0,
+                            "report_file_count": 0,
+                        },
+                        "artifacts": {
+                            "output_dir": args.output_dir or "",
+                            "json_path": None,
+                        },
+                        "errors": [str(exc)],
+                    }
+                )
+            else:
+                print(str(exc))
+            return 2
+        if json_output:
+            emit_json_payload(mixed_language_context_audit_payload(result))
+        return result.exit_code
+    if command == "untranslated-equals-english":
+        try:
+            result = run_untranslated_equals_english_check(
+                res_dir=args.res_dir,
+                output_dir=args.output_dir or None,
+                lang=args.lang or None,
+                quiet=quiet or json_output,
+                emit_text=not json_output,
+            )
+        except ValueError as exc:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "untranslated-equals-english",
+                        "exit_code": 2,
+                        "summary": {
+                            "total_entries": 0,
+                            "keep_en_count": 0,
+                            "needs_translation_count": 0,
+                            "needs_context_count": 0,
+                            "missing_context_count": 0,
+                            "report_file_count": 0,
+                            "per_language": {},
+                        },
+                        "artifacts": {
+                            "output_dir": args.output_dir or "",
+                            "summary_json_path": None,
+                        },
+                        "errors": [str(exc)],
+                    }
+                )
+            else:
+                print(str(exc))
+            return 2
+        if json_output:
+            emit_json_payload(untranslated_equals_english_payload(result))
         return result.exit_code
     if command == "key-alignment":
         if not quiet and not json_output:
@@ -834,6 +1043,31 @@ def run() -> int:
             emit_json_payload(build_term_suggestion_payload(result))
         else:
             print_term_suggestion_report(result)
+        return result.exit_code
+    if command == "locked-term-suggestions":
+        result = suggest_locked_term_fixes(
+            res_dir=args.res_dir,
+            lang=args.lang or None,
+        )
+        payload = build_locked_term_suggestion_payload(result)
+        if json_output:
+            emit_json_payload(payload)
+        else:
+            if result.errors:
+                for error in result.errors:
+                    print(error)
+            else:
+                print(
+                    f"Locked-term suggestions: {result.suggestion_count} "
+                    f"(safe direct replacements: {result.safe_replace_count})"
+                )
+                for item in result.suggestions:
+                    print(
+                        f"- {display_language_tag(item.lang)} {item.file}::{item.key} "
+                        f"{','.join(item.missing_terms)} -> {item.suggestion_strategy}"
+                    )
+                    if item.suggested_localized is not None:
+                        print(f"  Suggested: {item.suggested_localized}")
         return result.exit_code
     if command == "fix-resource-escapes":
         result = run_fix_android_resource_escapes(
@@ -986,6 +1220,8 @@ def run() -> int:
             "summary": {
                 "changed_files": len(result.changed_files),
                 "replacement_passes": result.total_replacements,
+                "escape_files_updated": result.escape_files_updated,
+                "escape_strings_updated": result.escape_strings_updated,
             },
             "artifacts": {
                 "changed_files": [normalize_path_string(path) for path in result.changed_files],
@@ -996,6 +1232,10 @@ def run() -> int:
             emit_json_payload(payload)
         else:
             print(f"Autofix changed files: {len(result.changed_files)}")
+            print(
+                f"Escape normalization updated files: {result.escape_files_updated}; "
+                f"strings: {result.escape_strings_updated}"
+            )
             for path in result.changed_files:
                 print(f"- {normalize_path_string(path)}")
         return 0

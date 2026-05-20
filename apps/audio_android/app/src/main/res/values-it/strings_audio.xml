@@ -15,7 +15,7 @@
     <string name="audio_action_pause">Pausa</string>
     <string name="audio_action_previous_track">Brano precedente</string>
     <string name="audio_action_next_track">Brano successivo</string>
-    <string name="audio_action_open_audio_info">Info</string>
+    <string name="audio_action_open_audio_info">Informazioni</string>
     <string name="audio_action_normal_playback">Normale</string>
     <string name="audio_action_shuffle_playback">Casuale</string>
     <string name="audio_action_repeat_one">Ripeti uno</string>
@@ -102,15 +102,15 @@
     <string name="audio_pro_visual_next">Successivo</string>
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">Byte completato</string>
-    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">Token n. %1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">Frequenze del simbolo successivo: %1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">Questo è il secondo nibble, quindi il lettore avanzerà al byte successivo dopo di esso.</string>
     <string name="audio_pro_visual_ascii_byte">Byte ASCII %1$d</string>
-    <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d/%3$d</string>
+    <string name="audio_pro_visual_token_byte">Token n. %1$d • byte %2$d/%3$d</string>
     <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Posizione del byte</string>
     <string name="audio_pro_visual_then">Poi</string>
-    <string name="audio_info_dialog_title">Info</string>
+    <string name="audio_info_dialog_title">Informazioni</string>
     <string name="audio_info_user_section">Dettagli</string>
     <string name="audio_info_technical_section">Info tecniche</string>
     <string name="audio_info_encoding_type">Tipo</string>
@@ -130,7 +130,7 @@
     <string name="audio_ultra_visual_level_low">Basso</string>
     <string name="audio_follow_unavailable">Il follow del payload non è disponibile per questo audio al momento.</string>
     <string name="audio_follow_text_unavailable">Il follow del testo non è disponibile per questo audio al momento.</string>
-    <string name="audio_follow_display_lyrics">Testi</string>
+    <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Dati</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>
@@ -240,7 +240,7 @@
     <string name="demo_hint_generate_audio">Genera audio</string>
     <string name="demo_hint_decode_audio">Decodifica audio</string>
     <string name="demo_hint_open_mini_player">Apri mini lettore</string>
-    <string name="demo_hint_switch_to_lyrics">Passato a Testi</string>
+    <string name="demo_hint_switch_to_lyrics">Passato a Tokens</string>
     <string name="demo_hint_switch_to_visual">Passato a Visuale</string>
     <string name="demo_hint_play">Riproduzione avviata</string>
     <string name="demo_hint_pause">Riproduzione in pausa</string>

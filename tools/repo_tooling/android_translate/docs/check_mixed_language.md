@@ -14,7 +14,7 @@ The current Android resource layout is split-aware:
 ## Default paths
 
 - Input: `apps/audio_android/app/src/main/res`
-- Output: `temp/mixed_language_reports/<lang>/app_text/mixed_language_report.md` and `temp/mixed_language_reports/<lang>/sample_text/mixed_language_report.md`
+- Output: `temp/translations/mixed_language/<lang>/app_text/mixed_language_report.md` and `temp/translations/mixed_language/<lang>/sample_text/mixed_language_report.md`
 
 The script resolves these paths from the repository root, so it can be run from the repository root with:
 
@@ -35,8 +35,8 @@ pwsh -NoLogo -Command "python tools/run.py android-translate"
 
 Reports are split by language first, then by responsibility:
 
-- `temp/mixed_language_reports/<lang>/app_text/mixed_language_report.md` for app UI strings, such as `strings_common.xml`, `strings_audio.xml`, and other `strings_*.xml` files.
-- `temp/mixed_language_reports/<lang>/sample_text/mixed_language_report.md` for sample text XML files whose names start with `audio_samples_`.
+- `temp/translations/mixed_language/<lang>/app_text/mixed_language_report.md` for app UI strings, such as `strings_common.xml`, `strings_audio.xml`, and other `strings_*.xml` files.
+- `temp/translations/mixed_language/<lang>/sample_text/mixed_language_report.md` for sample text XML files whose names start with `audio_samples_`.
 
 This makes it easier to send only app UI text or only sample text to a reviewer or another agent.
 
@@ -122,5 +122,5 @@ Add to the whitelist only when a term is intentionally shared across localized U
 - If new Pro protocol UI keys are added and false-positive, update `is_pro_ascii_context_key()`.
 - If new non-translated technical terms are expected across languages, update `WHITELIST`.
 - For app UI text, expect report `FILE:` blocks to point at split `strings_*.xml` files rather than a single monolithic `strings.xml`.
-- Output reports are generated under `temp/mixed_language_reports/<lang>/app_text/` and `temp/mixed_language_reports/<lang>/sample_text/` and should usually not be committed.
+- Output reports are generated under `temp/translations/mixed_language/<lang>/app_text/` and `temp/translations/mixed_language/<lang>/sample_text/` and should usually not be committed.
 - XML scanning, resource parsing, and Markdown writing are intentionally shared with `compare_translation_quality.py`; keep parsing and output formatting decoupled from report logic.

@@ -15,13 +15,11 @@ Prefer natural contemporary Simplified Chinese wording, terminology, grammar, pu
 Use Simplified Chinese characters consistently.
 Avoid calques, mixed-locale phrasing, or wording that sounds mechanically transferred from English or another Chinese locale.
 Focus on script, locale terminology, punctuation, and natural UI phrasing.
-Preserve FlipBits protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Binary, Morse, Hz, payload, token, byte, and nibble when the existing Simplified Chinese locale keeps them as technical terms.
 
 [app_text_rule]
 For app UI text, keep labels concise and natural in Simplified Chinese.
 Use stable Simplified Chinese product terminology across related controls, settings, dialogs, and validation messages.
 Prefer the clearer Simplified Chinese expression when direct transfer from another locale would sound unnatural.
-Follow existing project terms where present: 音频, 字符, 字节, 输入规则, 视觉效果, 歌词, 二进制, 十六进制, 低频载波, and 高频载波.
 Keep mini-player, tab, segmented-control, and chip labels short.
 
 [sample_text_rule]

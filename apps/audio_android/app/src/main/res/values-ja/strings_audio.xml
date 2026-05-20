@@ -75,11 +75,11 @@
     <string name="audio_result_title">読み取り結果</string>
     <string name="audio_result_empty">結果はまだありません。</string>
     <string name="audio_decode_view_text">テキスト</string>
-    <string name="audio_decode_view_raw">RAW</string>
+    <string name="audio_decode_view_raw">生データ</string>
     <string name="audio_decode_raw_binary_label">Binary</string>
     <string name="audio_decode_raw_hex_label">Hex</string>
-    <string name="audio_decode_text_unavailable">このペイロードはテキストとして解釈できませんでした。RAWデータは引き続き利用可能です。</string>
-    <string name="audio_decode_raw_unavailable">RAWペイロードデータはまだ利用できません。</string>
+    <string name="audio_decode_text_unavailable">このペイロードはテキストとして解釈できませんでした。生データは引き続き利用できます。</string>
+    <string name="audio_decode_raw_unavailable">生のペイロードデータはまだ利用できません。</string>
     <string name="audio_flash_style_hint">次に生成されるオーディオに適用されます。既存の生成済みオーディオは、作成時のスタイルを維持します。</string>
     <string name="audio_flash_voicing_style_title">音声スタイル</string>
     <string name="audio_action_select_flash_voicing_style">音声スタイルを選択</string>
@@ -148,7 +148,7 @@
     <string name="audio_ultra_visual_level_low">低</string>
     <string name="audio_follow_unavailable">このオーディオでは現在ペイロードフォローを利用できません。</string>
     <string name="audio_follow_text_unavailable">このオーディオでは現在テキストフォローを利用できません。</string>
-    <string name="audio_follow_display_lyrics">歌詞</string>
+    <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">データ</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>
@@ -180,7 +180,7 @@
     <string name="audio_transport_pro_hint">pro モードは ASCII テキストのみを使用します。</string>
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra モードは UTF-8 テキストを使用します。</string>
-    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_transport_mini_hint">mini モードは Morse 互換の ASCII テキストを使用します。</string>
     <string name="audio_morse_speed_slow">低速</string>
     <string name="audio_morse_speed_standard">標準</string>
     <string name="audio_morse_speed_fast">高速</string>
@@ -255,14 +255,14 @@
     <string name="audio_info_flash_bit_duration_samples_value">%1$s サンプル</string>
 
     <string name="demo_hint_demo_mode_on">デモモードを有効化</string>
-    <string name="demo_hint_tab_audio">Audio に切り替え</string>
-    <string name="demo_hint_tab_saved">Saved に切り替え</string>
-    <string name="demo_hint_tab_settings">Settings に切り替え</string>
+    <string name="demo_hint_tab_audio">オーディオに切り替え</string>
+    <string name="demo_hint_tab_saved">保存済みに切り替え</string>
+    <string name="demo_hint_tab_settings">設定に切り替え</string>
     <string name="demo_hint_generate_audio">オーディオを生成</string>
     <string name="demo_hint_decode_audio">オーディオを解析</string>
-    <string name="demo_hint_open_mini_player">mini player を開く</string>
+    <string name="demo_hint_open_mini_player">mini プレーヤーを開く</string>
     <string name="demo_hint_switch_to_lyrics">Tokens に切り替え</string>
-    <string name="demo_hint_switch_to_visual">Visual に切り替え</string>
+    <string name="demo_hint_switch_to_visual">ビジュアルに切り替え</string>
     <string name="demo_hint_play">再生開始</string>
     <string name="demo_hint_pause">再生一時停止</string>
     <string name="demo_hint_theme_changed">テーマを変更</string>

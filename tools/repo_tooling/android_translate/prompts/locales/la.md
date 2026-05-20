@@ -14,7 +14,6 @@ This locale is High Gothic, not classical Latin and not a standard translation l
 Treat it as a deliberate Dog Latin / pseudo-Latin / Latinized-English register built for entertainment, immersion, ritual atmosphere, liturgical religious texture, and classical authority.
 A controlled mixture of Latin, ecclesiastical-sounding diction, invented pseudo-Latin phrasing, and selective English carry-over is acceptable when it strengthens the setting voice.
 Do not correct the locale into textbook Latin if that removes the intended atmosphere.
-Preserve product/protocol tokens such as mini, flash, pro, ultra, ASCII, UTF-8, Hex, Morse, Hz, byte, token, and payload when the existing High Gothic locale already carries them as recognizable technical relics.
 
 [app_text_rule]
 For app UI text, keep labels recognizable enough to navigate, but favor elevated, ceremonial, archaic wording over plain utilitarian phrasing.

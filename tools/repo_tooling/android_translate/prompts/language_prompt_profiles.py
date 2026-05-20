@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from prompts.generate_shared_locale_profile import ensure_generated_shared_locale_profile
+
 
 @dataclass(frozen=True)
 class LocalePromptProfile:
@@ -65,6 +67,7 @@ def _ensure_sentence_gap(value: str) -> str:
 
 
 def _load_profile(locale_code: str) -> LocalePromptProfile:
+    ensure_generated_shared_locale_profile(SHARED_PROFILE_PATH)
     shared = _parse_profile_file(SHARED_PROFILE_PATH) if SHARED_PROFILE_PATH.exists() else None
     path = PROFILE_DIRECTORY / f"{locale_code}.md"
     parsed = _parse_profile_file(path)

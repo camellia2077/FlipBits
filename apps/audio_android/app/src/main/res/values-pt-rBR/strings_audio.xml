@@ -15,7 +15,7 @@
     <string name="audio_action_pause">Pausar</string>
     <string name="audio_action_previous_track">Faixa anterior</string>
     <string name="audio_action_next_track">Próxima faixa</string>
-    <string name="audio_action_open_audio_info">Info</string>
+    <string name="audio_action_open_audio_info">Detalhes</string>
     <string name="audio_action_normal_playback">Normal</string>
     <string name="audio_action_shuffle_playback">Aleatório</string>
     <string name="audio_action_repeat_one">Repetir uma</string>
@@ -110,7 +110,7 @@
     <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Posição do byte</string>
     <string name="audio_pro_visual_then">Depois</string>
-    <string name="audio_info_dialog_title">Info</string>
+    <string name="audio_info_dialog_title">Informações</string>
     <string name="audio_info_user_section">Detalhes</string>
     <string name="audio_info_technical_section">Info técnica</string>
     <string name="audio_info_encoding_type">Tipo</string>
@@ -130,7 +130,7 @@
     <string name="audio_ultra_visual_level_low">Baixo</string>
     <string name="audio_follow_unavailable">O acompanhamento do payload não está disponível para este áudio agora.</string>
     <string name="audio_follow_text_unavailable">O acompanhamento de texto não está disponível para este áudio agora.</string>
-    <string name="audio_follow_display_lyrics">Letra</string>
+    <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Dados</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>
@@ -159,7 +159,7 @@
     <string name="audio_transport_pro_hint">pro usa apenas texto ASCII.</string>
     <string name="audio_transport_pro_example">SINEIROS MARCAM A PRIMEIRA VIGILIA</string>
     <string name="audio_transport_ultra_hint">ultra usa texto UTF-8.</string>
-    <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
+    <string name="audio_transport_mini_hint">mini usa texto ASCII compatível com Morse.</string>
     <string name="audio_morse_speed_slow">Lento</string>
     <string name="audio_morse_speed_standard">Padrão</string>
     <string name="audio_morse_speed_fast">Rápido</string>
@@ -240,7 +240,7 @@
     <string name="demo_hint_generate_audio">Gerar áudio</string>
     <string name="demo_hint_decode_audio">Decodificar áudio</string>
     <string name="demo_hint_open_mini_player">Abrir mini player</string>
-    <string name="demo_hint_switch_to_lyrics">Mudou para Letra</string>
+    <string name="demo_hint_switch_to_lyrics">Mudou para Tokens</string>
     <string name="demo_hint_switch_to_visual">Mudou para Visual</string>
     <string name="demo_hint_play">Reprodução iniciada</string>
     <string name="demo_hint_pause">Reprodução pausada</string>

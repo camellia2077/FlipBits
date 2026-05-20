@@ -42,7 +42,7 @@
     <string name="library_folder_rename_title">Zmień nazwę folderu</string>
     <string name="library_folder_delete_title">Usuń folder</string>
     <string name="library_folder_delete_message">Usunąć folder %1$s? Pliki audio pozostaną w bibliotece.</string>
-    <string name="library_folder_row_label">Folder: %1$s</string>
+    <string name="library_folder_row_label">Folder docelowy: %1$s</string>
     <string name="library_move_title">Przenieś</string>
     <string name="library_move_single_message">Przenieś %1$s</string>
     <string name="library_move_multiple_message">Przenieś %1$d plików</string>

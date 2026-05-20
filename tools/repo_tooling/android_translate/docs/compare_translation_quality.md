@@ -14,7 +14,7 @@ The current Android resource layout is split-aware:
 ## Default paths
 
 - Input: `apps/audio_android/app/src/main/res`
-- Output: `temp/ai_translation_reviews`
+- Output: `temp/translations/reviews`
 
 The script clears the output directory before writing fresh review files, so older flat-layout files do not remain mixed with the newer `app_text` / `sample_text` layout. If you need to keep previous artifacts for an isolated agent job, use `--no-clean`.
 
@@ -68,13 +68,13 @@ For locale-specific writing modes, generated localized review files and shared p
 
 This is intentional. Some locales are not standard "translate English into natural target language" outputs. For example, `values-la` is treated as a stylized High Gothic / Dog Latin profile rather than classical Latin, so the generated artifacts must carry those instructions directly.
 
-To reduce token duplication, `compare` now writes shared prompt documents under each language directory, such as `temp/ai_translation_reviews/de/_prompts`. Review files reference those prompt docs instead of inlining the full prompt text into every `.md`.
+To reduce token duplication, `compare` now writes shared prompt documents under each language directory, such as `temp/translations/reviews/de/_prompts`. Review files reference those prompt docs instead of inlining the full prompt text into every `.md`.
 
 Structured `*.task.json` artifacts now also carry a `locale_profile` object so agent workflows that do not read Markdown can still receive locale-specific writing instructions directly.
 
 ## What it generates
 
-For English source text, the script writes `.md` review files under `temp/ai_translation_reviews/en`, first grouped by text type:
+For English source text, the script writes `.md` review files under `temp/translations/reviews/en`, first grouped by text type:
 
 - `app_text`: normal app-visible Android strings such as `strings_common.xml`, `strings_audio.xml`, and other `strings_*.xml`
 - `sample_text`: sample-resource XML files such as `audio_samples_*.xml`
@@ -86,10 +86,10 @@ Within each text type, the script writes one review file per review group.
 
 For each localized Android resource directory, the script also writes review files grouped the same way. For example:
 
-- `temp/ai_translation_reviews/en/sample_text/ancient_dynasty.md`
-- `temp/ai_translation_reviews/ja/sample_text/ancient_dynasty.md`
-- `temp/ai_translation_reviews/zh-rTW/sample_text/sacred_machine.md`
-- `temp/ai_translation_reviews/de/app_text/strings_settings.md`
+- `temp/translations/reviews/en/sample_text/ancient_dynasty.md`
+- `temp/translations/reviews/ja/sample_text/ancient_dynasty.md`
+- `temp/translations/reviews/zh-rTW/sample_text/sacred_machine.md`
+- `temp/translations/reviews/de/app_text/strings_settings.md`
 
 Each generated file keeps the `.md` extension, but now uses lighter Markdown with only the minimum structure needed for review. The output keeps headings and field labels, while avoiding list-heavy formatting to reduce token cost when pasted into prompts.
 
