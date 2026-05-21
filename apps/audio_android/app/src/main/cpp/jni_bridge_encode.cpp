@@ -85,6 +85,7 @@ jobject NativeBuildEncodeFollowData(
     std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments(input.size());
     std::vector<bag_payload_follow_byte_entry> byte_entries(input.size() * 4);
     std::vector<bag_payload_follow_binary_group_entry> binary_entries(input.size() * 8);
+    std::vector<bag_ultra_frame_symbol_entry> ultra_frame_entries(input.size() * 8 + 64);
 
     result.raw_bytes_hex_buffer = raw_bytes_hex_buffer.data();
     result.raw_bytes_hex_buffer_size = raw_bytes_hex_buffer.size();
@@ -116,6 +117,8 @@ jobject NativeBuildEncodeFollowData(
     result.follow_data.byte_timeline_buffer_count = byte_entries.size();
     result.follow_data.binary_group_timeline_buffer = binary_entries.data();
     result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
+    result.follow_data.ultra_frame_timeline_buffer = ultra_frame_entries.data();
+    result.follow_data.ultra_frame_timeline_buffer_count = ultra_frame_entries.size();
     if (bag_build_encode_follow_data(&config, input.c_str(), &result) != BAG_OK) {
         return NewEmptyEncodedAudioPayloadResult(env);
     }
@@ -233,6 +236,8 @@ jobject NativeDecodeGeneratedPcm(
         probe.follow_data.byte_timeline_count);
     std::vector<bag_payload_follow_binary_group_entry> binary_entries(
         probe.follow_data.binary_group_timeline_count);
+    std::vector<bag_ultra_frame_symbol_entry> ultra_frame_entries(
+        probe.follow_data.ultra_frame_timeline_count);
     bag_decode_result result{};
     result.text_buffer = text_buffer.data();
     result.text_buffer_size = text_buffer.size();
@@ -266,6 +271,8 @@ jobject NativeDecodeGeneratedPcm(
     result.follow_data.byte_timeline_buffer_count = byte_entries.size();
     result.follow_data.binary_group_timeline_buffer = binary_entries.data();
     result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
+    result.follow_data.ultra_frame_timeline_buffer = ultra_frame_entries.data();
+    result.follow_data.ultra_frame_timeline_buffer_count = ultra_frame_entries.size();
     if (bag_poll_decode_result(decoder, &result) != BAG_OK) {
         bag_destroy_decoder(decoder);
         return NewEmptyDecodedAudioPayloadResult(
@@ -281,6 +288,7 @@ jobject NativeDecodeGeneratedPcm(
     line_raw_segments.resize(result.text_follow_data.line_raw_segments_count);
     byte_entries.resize(result.follow_data.byte_timeline_count);
     binary_entries.resize(result.follow_data.binary_group_timeline_count);
+    ultra_frame_entries.resize(result.follow_data.ultra_frame_timeline_count);
     const std::string text(text_buffer.data(), result.text_size);
     const std::string text_tokens(text_tokens_buffer.data(), result.text_follow_data.text_tokens_size);
     const std::string text_character_text(
@@ -312,6 +320,7 @@ jobject NativeDecodeGeneratedPcm(
         line_raw_segments,
         byte_entries,
         binary_entries,
+        ultra_frame_entries,
         result.text_follow_data.available != 0 ? JNI_TRUE : JNI_FALSE,
         (result.text_follow_data.available != 0 &&
          result.text_follow_data.lyric_line_timeline_count > 0 &&

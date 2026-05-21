@@ -1,5 +1,9 @@
 package com.bag.audioandroid.ui.screen
 
+import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
+import com.bag.audioandroid.domain.PayloadFollowViewData
+import com.bag.audioandroid.domain.UltraFrameSection
+import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
 import com.bag.audioandroid.ui.model.TransportModeOption
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -113,6 +117,50 @@ class SymbolEnvelopeVisualizationAnalysisTest {
 
         assertNotNull(state)
         assertNull(state?.nextBucket)
+    }
+
+    @Test
+    fun `ultra visualization state prefers full frame timeline over payload groups`() {
+        val state =
+            buildUltraSymbolStepVisualizationState(
+                followData =
+                    PayloadFollowViewData(
+                        binaryGroupTimeline =
+                            listOf(
+                                PayloadFollowBinaryGroupTimelineEntry(
+                                    startSample = 0,
+                                    sampleCount = 10,
+                                    groupIndex = 0,
+                                    bitOffset = 0,
+                                    bitCount = 4,
+                                    carrierFrequencyHz = 1000f,
+                                ),
+                            ),
+                        ultraFrameTimeline =
+                            listOf(
+                                UltraFrameSymbolTimelineEntry(
+                                    startSample = 0,
+                                    sampleCount = 10,
+                                    frameByteIndex = 0,
+                                    nibbleIndexInByte = 0,
+                                    nibbleValue = 15,
+                                    carrierFrequencyHz = 3100f,
+                                    sectionCode = UltraFrameSection.Preamble.wireValue,
+                                    isPayload = false,
+                                    payloadByteIndex = -1,
+                                ),
+                            ),
+                        followAvailable = true,
+                    ),
+                currentSample = 0,
+                targetBucketCount = 4,
+            )
+
+        assertNotNull(state)
+        assertEquals(3100, state?.currentBucket?.dominantFrequencyHz)
+        assertEquals(UltraFrameSection.Preamble, state?.currentBucket?.ultraFrameSection)
+        assertFalse(state?.currentBucket?.isUltraPayloadSymbol ?: true)
+        assertEquals(15, state?.currentBucket?.ultraNibbleValue)
     }
 
     @Test

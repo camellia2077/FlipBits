@@ -1,6 +1,6 @@
 # Design 文档
 
-更新时间：2026-05-04
+更新时间：2026-05-21
 
 ## 目的
 - 记录模式设计与当前实现口径。
@@ -13,11 +13,13 @@
 - `docs/design/modes/README.md`
   - mode-first 文档总入口。
 - `docs/design/modes/mini.md`
-  - `mini` 的输入规范、Morse 节奏、follow / visual 与主链路文件。
+  - `mini` 的输入规范、`10 / 15 / 20 WPM` Morse 速度、follow / visual 与主链路文件。
 - `docs/design/modes/pro.md`
   - `pro` 的 ASCII-only 结构、`DTMF-like` clean PHY 与主链路文件。
 - `docs/design/modes/ultra.md`
-  - `ultra` 的 UTF-8 byte 结构、clean `16-FSK` 与主链路文件。
+  - `ultra` 的 UTF-8 payload、`Ultra clean frame v1`、clean `16-FSK` baseline 与主链路文件。
+- `docs/design/modes/multi-tone-fsk.md`
+  - 未来 Multi-tone FSK 的高速传输定位、与 `ultra` 的取舍关系和推进顺序。
 - `docs/design/modes/flash/README.md`
   - `flash` 主说明：bit-by-bit `BFSK`、emotion / style 结构、decode 边界与主链路文件。
 - `docs/design/modes/flash/voicing-emotions.md`

@@ -1,6 +1,6 @@
 # `mini / flash / pro / ultra` 模式总览
 
-更新时间：2026-05-04
+更新时间：2026-05-21
 
 ## 目的
 - 提供四种 mode 的总览、对比和快速跳转。
@@ -13,7 +13,9 @@
   - 信息层：文本 / 字节 / symbol 的变换
   - clean PHY：symbol 与 PCM 的互转
 - 当前先保证“生成音频 -> 解析生成音频”闭环。
-- 当前不做复杂风格层、抗干扰、FEC、自动拆帧、录音环境 decode 或复杂同步搜索。
+- 当前不做复杂风格层、真实录音环境 decode、频偏估计、timing recovery 或复杂同步搜索。
+- `ultra` 已使用 `Ultra clean frame v1`，包含 preamble / sync / length / CRC；它是项目内 clean `16-FSK` baseline，不代表外部 `16-FSK` / `MFSK` 协议兼容。
+- 未来 Multi-tone FSK 应作为独立高速方向处理，定位是近距离、低干扰环境下用并行 tone 或更短 symbol 换吞吐量。
 
 ## 命名映射
 - `mini` -> Morse code
@@ -29,7 +31,7 @@
 | `flash` | 不限字符集；输入按原始字节直通处理；公共入口仍是字符串接口 | `1 byte -> 8 bit` | low/high `BFSK` |
 | `mini` | Morse-compatible text；支持 `A-Z / 0-9 / space / 常见 Morse 标点` | text -> dot/dash pattern | Morse tone + protocol silence |
 | `pro` | 仅允许 ASCII | `1 byte -> 2 nibble` | `DTMF-like` dual-tone |
-| `ultra` | 面向 UTF-8 文本，按 UTF-8 byte 处理 | `1 byte -> 2 nibble` | clean `16-FSK` |
+| `ultra` | 面向 UTF-8 文本，按 UTF-8 byte 处理 | UTF-8 payload -> frame v1 -> nibble symbols | clean `16-FSK` |
 
 ## 模式跳转
 
@@ -44,6 +46,7 @@
 ### `mini`
 - 定位：Morse code 文本音频模式，强调点 / 划 / 静音间隔的可听、可视、可跟随表达。
 - 核心：文本先规范化为 Morse-compatible text，再按 dot / dash / silence unit 渲染。
+- speed preset 固定为 `10 WPM / 15 WPM / 20 WPM`，属于 Morse 协议速度，不是 style。
 - 详细设计：
   - [`docs/design/modes/mini.md`](modes/mini.md)
   - [`docs/design/modes/mini-whitespace-contract.md`](modes/mini-whitespace-contract.md)
@@ -55,10 +58,18 @@
   - [`docs/design/modes/pro.md`](modes/pro.md)
 
 ### `ultra`
-- 定位：面向 UTF-8 文本字节忠实传输的正式模式。
-- 核心：UTF-8 byte 拆成两个 nibble，再映射到 clean `16-FSK` 固定频点。
+- 定位：面向 UTF-8 文本字节忠实传输的正式模式；低速、清晰、可视化友好、参数保守。
+- 核心：UTF-8 payload 先进入 `Ultra clean frame v1`，再拆成 nibble 并映射到 clean `16-FSK` 固定频点。
+- frame v1 设计为 `preamble | sync | version | flags | payload_length | payload | crc16`，正文 follow 只覆盖 payload。
 - 详细设计：
   - [`docs/design/modes/ultra.md`](modes/ultra.md)
+
+### Future Multi-tone FSK
+- 定位：未来高速模式，面向近距离、低干扰环境。
+- 核心：用更多并行 tone、更多 bits per symbol 或更短 symbol duration 换传输速度。
+- 代价：降低抗混响、抗窄带干扰、抗设备频响凹陷和复杂声学拓扑的余量。
+- 详细设计：
+  - [`docs/design/modes/multi-tone-fsk.md`](modes/multi-tone-fsk.md)
 
 ## 外部统一入口
 - transport 分发：
@@ -68,7 +79,7 @@
 
 ## 当前明确不做
 - 随机化或不可预测的 style layer，例如可变长度背景层、随机前导/收尾
-- FEC / CRC / 重传
+- FEC / 重传
 - 多帧拆分与长文本协议
 - 真实环境同步搜索
 - `mini` 的录音环境 decode 鲁棒性

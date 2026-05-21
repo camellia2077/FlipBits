@@ -146,6 +146,41 @@ std::size_t MorseToneElementCountForText(const std::string& value) {
     return count;
 }
 
+int HexNibbleValue(const char ch) {
+    if (ch >= '0' && ch <= '9') {
+        return ch - '0';
+    }
+    if (ch >= 'A' && ch <= 'F') {
+        return 10 + ch - 'A';
+    }
+    if (ch >= 'a' && ch <= 'f') {
+        return 10 + ch - 'a';
+    }
+    return -1;
+}
+
+double UltraCarrierFrequencyForNibble(int nibble) {
+    static constexpr std::array<double, 16> kUltraCarrierFreqsHz = {
+        1000.0, 1140.0, 1280.0, 1420.0, 1560.0, 1700.0, 1840.0, 1980.0,
+        2120.0, 2260.0, 2400.0, 2540.0, 2680.0, 2820.0, 2960.0, 3100.0};
+    return kUltraCarrierFreqsHz[static_cast<std::size_t>(nibble)];
+}
+
+std::size_t UltraFramePayloadBeginSample(const test::ConfigCase& config_case) {
+    constexpr std::size_t kUltraFrameV1PrefixBytes = 16;
+    return kUltraFrameV1PrefixBytes * static_cast<std::size_t>(2) *
+           static_cast<std::size_t>(config_case.frame_samples);
+}
+
+std::size_t UltraFrameTotalSampleCount(
+    const test::ConfigCase& config_case,
+    std::size_t payload_byte_count) {
+    constexpr std::size_t kUltraFrameV1FixedBytes = 18;
+    return (payload_byte_count + kUltraFrameV1FixedBytes) *
+           static_cast<std::size_t>(2) *
+           static_cast<std::size_t>(config_case.frame_samples);
+}
+
 void AssertFollowTimelineIsContinuous(
     const bag_payload_follow_data& follow_data,
     const std::vector<bag_payload_follow_binary_group_entry>& binary_entries,
@@ -644,6 +679,7 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
             std::array<char, 32768> raw_bits_buffer{};
             std::array<bag_payload_follow_byte_entry, 2048> byte_entries{};
             std::array<bag_payload_follow_binary_group_entry, 4096> binary_entries{};
+            std::array<bag_ultra_frame_symbol_entry, 4096> ultra_frame_entries{};
             bag_encode_result result{};
             result.raw_bytes_hex_buffer = raw_hex_buffer.data();
             result.raw_bytes_hex_buffer_size = raw_hex_buffer.size();
@@ -653,6 +689,8 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
             result.follow_data.byte_timeline_buffer_count = byte_entries.size();
             result.follow_data.binary_group_timeline_buffer = binary_entries.data();
             result.follow_data.binary_group_timeline_buffer_count = binary_entries.size();
+            result.follow_data.ultra_frame_timeline_buffer = ultra_frame_entries.data();
+            result.follow_data.ultra_frame_timeline_buffer_count = ultra_frame_entries.size();
 
             test::AssertEq(
                 bag_encode_text_with_follow(&encoder_config, item.text.c_str(), &result),
@@ -694,6 +732,83 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
                     saw_dash_duration,
                     "Mini Morse follow should keep dash length in sample_count, not bit_count.");
             }
+            if (item.mode == BAG_TRANSPORT_ULTRA) {
+                const std::size_t expected_ultra_frame_symbol_count =
+                    (hex_tokens.size() + static_cast<std::size_t>(18)) *
+                    static_cast<std::size_t>(2);
+                test::AssertEq(
+                    result.follow_data.ultra_frame_timeline_count,
+                    expected_ultra_frame_symbol_count,
+                    "Ultra frame timeline should cover every clean frame nibble symbol.");
+                test::AssertEq(
+                    ultra_frame_entries[0].section,
+                    BAG_ULTRA_FRAME_SECTION_PREAMBLE,
+                    "Ultra frame timeline should start with preamble symbols.");
+                test::AssertEq(
+                    ultra_frame_entries[16].section,
+                    BAG_ULTRA_FRAME_SECTION_SYNC,
+                    "Ultra frame timeline should mark sync symbols after the preamble.");
+                test::AssertEq(
+                    ultra_frame_entries[20].section,
+                    BAG_ULTRA_FRAME_SECTION_VERSION,
+                    "Ultra frame timeline should mark the version byte symbols.");
+                test::AssertEq(
+                    ultra_frame_entries[22].section,
+                    BAG_ULTRA_FRAME_SECTION_FLAGS,
+                    "Ultra frame timeline should mark the flags byte symbols.");
+                test::AssertEq(
+                    ultra_frame_entries[24].section,
+                    BAG_ULTRA_FRAME_SECTION_PAYLOAD_LENGTH,
+                    "Ultra frame timeline should mark payload-length byte symbols.");
+                test::AssertEq(
+                    ultra_frame_entries[32].section,
+                    BAG_ULTRA_FRAME_SECTION_PAYLOAD,
+                    "Ultra frame timeline should mark payload symbols after the v1 header.");
+                test::AssertTrue(
+                    ultra_frame_entries[32].is_payload != 0,
+                    "Ultra frame payload symbols should be flagged as payload.");
+                test::AssertEq(
+                    ultra_frame_entries[32].payload_byte_index,
+                    static_cast<std::size_t>(0),
+                    "Ultra first payload symbol should reference payload byte 0.");
+                const std::size_t crc_symbol_index =
+                    (static_cast<std::size_t>(16) + hex_tokens.size()) *
+                    static_cast<std::size_t>(2);
+                test::AssertEq(
+                    ultra_frame_entries[crc_symbol_index].section,
+                    BAG_ULTRA_FRAME_SECTION_CRC16,
+                    "Ultra frame timeline should mark CRC symbols after payload.");
+                test::AssertEq(
+                    result.follow_data.payload_begin_sample,
+                    UltraFramePayloadBeginSample(config_case),
+                    "Ultra payload follow should start after the clean frame metadata prefix.");
+                test::AssertEq(
+                    result.follow_data.payload_sample_count,
+                    hex_tokens.size() * static_cast<std::size_t>(2) *
+                        static_cast<std::size_t>(config_case.frame_samples),
+                    "Ultra payload follow should cover payload symbols only.");
+                test::AssertEq(
+                    result.follow_data.total_pcm_sample_count,
+                    UltraFrameTotalSampleCount(config_case, hex_tokens.size()),
+                    "Ultra follow total sample count should cover the full clean frame.");
+                if (result.follow_data.byte_timeline_count > 0) {
+                    test::AssertEq(
+                        byte_entries[0].start_sample,
+                        result.follow_data.payload_begin_sample,
+                        "Ultra first payload byte should begin at the payload start sample.");
+                }
+                for (std::size_t index = 0; index < result.follow_data.binary_group_timeline_count; ++index) {
+                    const auto& entry = binary_entries[index];
+                    const std::size_t byte_index = index / static_cast<std::size_t>(2);
+                    const std::size_t nibble_index = index % static_cast<std::size_t>(2);
+                    const std::string& hex_token = hex_tokens.at(byte_index);
+                    const int nibble = HexNibbleValue(hex_token.at(nibble_index));
+                    test::AssertTrue(nibble >= 0, "Ultra raw hex should contain valid nibbles.");
+                    test::AssertTrue(
+                        std::abs(entry.carrier_freq_hz - UltraCarrierFrequencyForNibble(nibble)) < 0.001,
+                        "Ultra binary group follow should publish the encoded symbol carrier.");
+                }
+            }
             AssertFollowTimelineIsContinuous(
                 result.follow_data,
                 std::vector<bag_payload_follow_binary_group_entry>(
@@ -725,6 +840,7 @@ void TestApiEncodeAndDecodeFollowStayAligned() {
             std::array<char, 32768> encode_raw_bits_buffer{};
             std::array<bag_payload_follow_byte_entry, 2048> encode_byte_entries{};
             std::array<bag_payload_follow_binary_group_entry, 4096> encode_binary_entries{};
+            std::array<bag_ultra_frame_symbol_entry, 4096> encode_ultra_frame_entries{};
             bag_encode_result encode_result{};
             encode_result.raw_bytes_hex_buffer = encode_raw_hex_buffer.data();
             encode_result.raw_bytes_hex_buffer_size = encode_raw_hex_buffer.size();
@@ -734,6 +850,8 @@ void TestApiEncodeAndDecodeFollowStayAligned() {
             encode_result.follow_data.byte_timeline_buffer_count = encode_byte_entries.size();
             encode_result.follow_data.binary_group_timeline_buffer = encode_binary_entries.data();
             encode_result.follow_data.binary_group_timeline_buffer_count = encode_binary_entries.size();
+            encode_result.follow_data.ultra_frame_timeline_buffer = encode_ultra_frame_entries.data();
+            encode_result.follow_data.ultra_frame_timeline_buffer_count = encode_ultra_frame_entries.size();
             test::AssertEq(
                 bag_encode_text_with_follow(&encoder_config, "FOLLOW", &encode_result),
                 BAG_OK,
@@ -751,6 +869,7 @@ void TestApiEncodeAndDecodeFollowStayAligned() {
             std::array<char, 32768> decode_raw_bits_buffer{};
             std::array<bag_payload_follow_byte_entry, 2048> decode_byte_entries{};
             std::array<bag_payload_follow_binary_group_entry, 4096> decode_binary_entries{};
+            std::array<bag_ultra_frame_symbol_entry, 4096> decode_ultra_frame_entries{};
             bag_decode_result decode_result{};
             decode_result.text_buffer = decode_text_buffer.data();
             decode_result.text_buffer_size = decode_text_buffer.size();
@@ -762,6 +881,8 @@ void TestApiEncodeAndDecodeFollowStayAligned() {
             decode_result.follow_data.byte_timeline_buffer_count = decode_byte_entries.size();
             decode_result.follow_data.binary_group_timeline_buffer = decode_binary_entries.data();
             decode_result.follow_data.binary_group_timeline_buffer_count = decode_binary_entries.size();
+            decode_result.follow_data.ultra_frame_timeline_buffer = decode_ultra_frame_entries.data();
+            decode_result.follow_data.ultra_frame_timeline_buffer_count = decode_ultra_frame_entries.size();
             test::AssertEq(
                 bag_poll_decode_result(decoder, &decode_result),
                 BAG_OK,
@@ -784,6 +905,19 @@ void TestApiEncodeAndDecodeFollowStayAligned() {
                 encode_result.follow_data.binary_group_timeline_count,
                 decode_result.follow_data.binary_group_timeline_count,
                 "Encode-side and decode-side binary group counts should match.");
+            test::AssertEq(
+                encode_result.follow_data.ultra_frame_timeline_count,
+                decode_result.follow_data.ultra_frame_timeline_count,
+                "Encode-side and decode-side Ultra frame timeline counts should match.");
+            if (mode == BAG_TRANSPORT_ULTRA) {
+                test::AssertTrue(
+                    decode_result.follow_data.ultra_frame_timeline_count > 0,
+                    "Structured Ultra decode should publish the full-frame timeline.");
+                test::AssertEq(
+                    decode_ultra_frame_entries[0].section,
+                    BAG_ULTRA_FRAME_SECTION_PREAMBLE,
+                    "Structured Ultra decode frame timeline should start with preamble.");
+            }
 
             bag_free_encode_result(&encode_result);
         }
@@ -807,6 +941,7 @@ void TestApiBuildEncodeFollowDataMatchesStructuredEncode() {
             std::array<char, 256> structured_lyric_lines_buffer{};
             std::array<bag_payload_follow_byte_entry, 2048> structured_byte_entries{};
             std::array<bag_payload_follow_binary_group_entry, 4096> structured_binary_entries{};
+            std::array<bag_ultra_frame_symbol_entry, 4096> structured_ultra_frame_entries{};
             std::array<bag_text_follow_token_entry, 64> structured_text_entries{};
             std::array<bag_text_follow_raw_segment_entry, 64> structured_text_raw_segments{};
             std::array<bag_text_follow_raw_display_unit_entry, 256> structured_text_raw_display_units{};
@@ -838,6 +973,8 @@ void TestApiBuildEncodeFollowDataMatchesStructuredEncode() {
             structured_result.follow_data.byte_timeline_buffer_count = structured_byte_entries.size();
             structured_result.follow_data.binary_group_timeline_buffer = structured_binary_entries.data();
             structured_result.follow_data.binary_group_timeline_buffer_count = structured_binary_entries.size();
+            structured_result.follow_data.ultra_frame_timeline_buffer = structured_ultra_frame_entries.data();
+            structured_result.follow_data.ultra_frame_timeline_buffer_count = structured_ultra_frame_entries.size();
 
             std::array<char, 4096> follow_only_raw_hex_buffer{};
             std::array<char, 32768> follow_only_raw_bits_buffer{};
@@ -845,6 +982,7 @@ void TestApiBuildEncodeFollowDataMatchesStructuredEncode() {
             std::array<char, 256> follow_only_lyric_lines_buffer{};
             std::array<bag_payload_follow_byte_entry, 2048> follow_only_byte_entries{};
             std::array<bag_payload_follow_binary_group_entry, 4096> follow_only_binary_entries{};
+            std::array<bag_ultra_frame_symbol_entry, 4096> follow_only_ultra_frame_entries{};
             std::array<bag_text_follow_token_entry, 64> follow_only_text_entries{};
             std::array<bag_text_follow_raw_segment_entry, 64> follow_only_text_raw_segments{};
             std::array<bag_text_follow_raw_display_unit_entry, 256> follow_only_text_raw_display_units{};
@@ -876,6 +1014,8 @@ void TestApiBuildEncodeFollowDataMatchesStructuredEncode() {
             follow_only_result.follow_data.byte_timeline_buffer_count = follow_only_byte_entries.size();
             follow_only_result.follow_data.binary_group_timeline_buffer = follow_only_binary_entries.data();
             follow_only_result.follow_data.binary_group_timeline_buffer_count = follow_only_binary_entries.size();
+            follow_only_result.follow_data.ultra_frame_timeline_buffer = follow_only_ultra_frame_entries.data();
+            follow_only_result.follow_data.ultra_frame_timeline_buffer_count = follow_only_ultra_frame_entries.size();
 
             test::AssertEq(
                 bag_encode_text_with_follow(&encoder_config, text.c_str(), &structured_result),
@@ -909,6 +1049,10 @@ void TestApiBuildEncodeFollowDataMatchesStructuredEncode() {
                 structured_result.follow_data.byte_timeline_count,
                 follow_only_result.follow_data.byte_timeline_count,
                 "Follow-only metadata build should preserve byte timeline count.");
+            test::AssertEq(
+                structured_result.follow_data.ultra_frame_timeline_count,
+                follow_only_result.follow_data.ultra_frame_timeline_count,
+                "Follow-only metadata build should preserve Ultra frame timeline count.");
             test::AssertEq(
                 structured_result.text_follow_data.text_token_timeline_count,
                 follow_only_result.text_follow_data.text_token_timeline_count,

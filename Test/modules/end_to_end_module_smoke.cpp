@@ -325,9 +325,10 @@ void TestUltraPhyCleanRoundTrip() {
         "Ultra clean module encode should succeed.");
     test::AssertEq(
         pcm.size(),
-        std::vector<std::uint8_t>(input.begin(), input.end()).size() *
+        (std::vector<std::uint8_t>(input.begin(), input.end()).size() +
+         bag::ultra::kCleanFrameV1FixedByteCount) *
             bag::ultra::kSymbolsPerPayloadByte * static_cast<std::size_t>(config.frame_samples),
-        "Ultra clean module PCM length should be byte count * 2 symbols * frame size.");
+        "Ultra clean module PCM length should be frame byte count * 2 symbols * frame size.");
 
     std::string decoded;
     test::AssertEq(

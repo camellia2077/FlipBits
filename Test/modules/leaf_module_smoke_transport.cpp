@@ -103,6 +103,79 @@ void TestUltraCodecModule() {
         bag::ErrorCode::kOk,
         "Ultra codec module should encode UTF-8 payload.");
 
+    std::vector<std::uint8_t> frame;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToFrame(payload, &frame),
+        bag::ErrorCode::kOk,
+        "Ultra codec module should encode payload into a clean frame.");
+    const std::vector<std::uint8_t> expected_prefix = {
+        0xA5, 0x5A, 0xA5, 0x5A, 0xA5, 0x5A, 0xA5, 0x5A, 0xD3, 0x91,
+        0x01, 0x00};
+    test::AssertTrue(
+        frame.size() == payload.size() + bag::ultra::kCleanFrameV1FixedByteCount,
+        "Ultra clean frame should add fixed v1 metadata and CRC bytes.");
+    const std::vector<std::uint8_t> actual_prefix(
+        frame.begin(), frame.begin() + static_cast<std::ptrdiff_t>(expected_prefix.size()));
+    test::AssertTrue(
+        actual_prefix == expected_prefix,
+        "Ultra clean frame should start with preamble, sync, version, and flags.");
+    test::AssertEq(
+        frame[12],
+        static_cast<std::uint8_t>((payload.size() >> 24) & 0xFFu),
+        "Ultra clean frame length byte 0 should be big-endian.");
+    test::AssertEq(
+        frame[13],
+        static_cast<std::uint8_t>((payload.size() >> 16) & 0xFFu),
+        "Ultra clean frame length byte 1 should be big-endian.");
+    test::AssertEq(
+        frame[14],
+        static_cast<std::uint8_t>((payload.size() >> 8) & 0xFFu),
+        "Ultra clean frame length byte 2 should be big-endian.");
+    test::AssertEq(
+        frame[15],
+        static_cast<std::uint8_t>(payload.size() & 0xFFu),
+        "Ultra clean frame length byte 3 should be big-endian.");
+    const std::vector<std::uint8_t> actual_payload(
+        frame.begin() + static_cast<std::ptrdiff_t>(16),
+        frame.begin() + static_cast<std::ptrdiff_t>(16 + payload.size()));
+    test::AssertTrue(
+        actual_payload == payload,
+        "Ultra clean frame should keep UTF-8 payload after the v1 header.");
+    std::vector<std::uint8_t> decoded_frame_payload;
+    test::AssertEq(
+        bag::ultra::DecodeFrameToPayload(frame, &decoded_frame_payload),
+        bag::ErrorCode::kOk,
+        "Ultra codec module should decode a valid clean frame.");
+    test::AssertEq(
+        decoded_frame_payload,
+        payload,
+        "Ultra codec module should extract only payload bytes from a clean frame.");
+
+    std::vector<std::uint8_t> bad_frame = frame;
+    bad_frame[0] ^= 0xFF;
+    test::AssertEq(
+        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra codec module should reject a bad clean frame preamble.");
+    bad_frame = frame;
+    bad_frame[10] = 0x02;
+    test::AssertEq(
+        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra codec module should reject an unsupported clean frame version.");
+    bad_frame = frame;
+    bad_frame[15] ^= 0x01;
+    test::AssertEq(
+        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra codec module should reject a mismatched clean frame payload length.");
+    bad_frame = frame;
+    bad_frame[frame.size() - 1] ^= 0x01;
+    test::AssertEq(
+        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra codec module should reject a bad clean frame CRC.");
+
     std::vector<std::uint8_t> symbols;
     test::AssertEq(
         bag::ultra::EncodePayloadToSymbols(payload, &symbols),

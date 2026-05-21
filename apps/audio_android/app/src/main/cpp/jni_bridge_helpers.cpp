@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <limits>
 
 namespace jni_bridge {
 
@@ -218,6 +219,39 @@ jobject NewPayloadFollowBinaryGroupEntry(
         static_cast<jint>(entry.bit_offset),
         static_cast<jint>(entry.bit_count),
         static_cast<jfloat>(entry.carrier_freq_hz));
+}
+
+jint SizeToJIntOrMinusOne(std::size_t value) {
+    if (value > static_cast<std::size_t>(std::numeric_limits<jint>::max())) {
+        return -1;
+    }
+    return static_cast<jint>(value);
+}
+
+jobject NewUltraFrameSymbolEntry(
+    JNIEnv* env,
+    const bag_ultra_frame_symbol_entry& entry) {
+    jclass entry_class =
+        FindClassOrNull(env, "com/bag/audioandroid/domain/UltraFrameSymbolTimelineEntry");
+    if (entry_class == nullptr) {
+        return nullptr;
+    }
+    jmethodID ctor = env->GetMethodID(entry_class, "<init>", "(IIIIIFIZI)V");
+    if (ctor == nullptr) {
+        return nullptr;
+    }
+    return env->NewObject(
+        entry_class,
+        ctor,
+        static_cast<jint>(entry.start_sample),
+        static_cast<jint>(entry.sample_count),
+        static_cast<jint>(entry.frame_byte_index),
+        static_cast<jint>(entry.nibble_index_in_byte),
+        static_cast<jint>(entry.nibble_value),
+        static_cast<jfloat>(entry.carrier_freq_hz),
+        static_cast<jint>(entry.section),
+        entry.is_payload != 0 ? JNI_TRUE : JNI_FALSE,
+        SizeToJIntOrMinusOne(entry.payload_byte_index));
 }
 
 jobject NewTextFollowTimelineEntry(JNIEnv* env, const bag_text_follow_token_entry& entry) {
@@ -519,6 +553,23 @@ jobject NewBinaryTimelineList(
     return list;
 }
 
+jobject NewUltraFrameTimelineList(
+    JNIEnv* env,
+    const std::vector<bag_ultra_frame_symbol_entry>& entries) {
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    if (list == nullptr) {
+        return nullptr;
+    }
+    for (const auto& entry : entries) {
+        jobject item = NewUltraFrameSymbolEntry(env, entry);
+        if (item == nullptr || !AddToList(env, list, item)) {
+            return nullptr;
+        }
+        env->DeleteLocalRef(item);
+    }
+    return list;
+}
+
 jobject NewTextTimelineList(JNIEnv* env,
                             const std::vector<bag_text_follow_token_entry>& entries) {
     jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
@@ -656,6 +707,7 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
                                  const std::vector<bag_text_follow_line_raw_segment_entry>& line_raw_segments,
                                  const std::vector<bag_payload_follow_byte_entry>& byte_entries,
                                  const std::vector<bag_payload_follow_binary_group_entry>& binary_entries,
+                                 const std::vector<bag_ultra_frame_symbol_entry>& ultra_frame_entries,
                                  jboolean text_follow_available,
                                  jboolean lyric_line_follow_available,
                                  jint payload_begin_sample,
@@ -670,7 +722,7 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         env->GetMethodID(
             result_class,
             "<init>",
-            "(Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;IIIZ)V");
+            "(Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;IIIZLjava/util/List;)V");
     if (ctor == nullptr) {
         return nullptr;
     }
@@ -710,6 +762,7 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
     jobject binary_list = NewStringList(env, binary_tokens);
     jobject byte_timeline_list = NewByteTimelineList(env, byte_entries);
     jobject binary_timeline_list = NewBinaryTimelineList(env, binary_entries);
+    jobject ultra_frame_timeline_list = NewUltraFrameTimelineList(env, ultra_frame_entries);
     if (text_list == nullptr || text_timeline_list == nullptr ||
         text_character_list == nullptr ||
         text_raw_segment_list == nullptr || text_raw_display_unit_list == nullptr ||
@@ -717,7 +770,8 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         lyric_line_timeline_list == nullptr || line_token_range_list == nullptr ||
         line_raw_segment_list == nullptr ||
         hex_list == nullptr || binary_list == nullptr ||
-        byte_timeline_list == nullptr || binary_timeline_list == nullptr) {
+        byte_timeline_list == nullptr || binary_timeline_list == nullptr ||
+        ultra_frame_timeline_list == nullptr) {
         return nullptr;
     }
     return env->NewObject(
@@ -741,7 +795,8 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         payload_begin_sample,
         payload_sample_count,
         total_pcm_sample_count,
-        follow_available);
+        follow_available,
+        ultra_frame_timeline_list);
 }
 
 jobject NewDecodedPayloadViewData(JNIEnv* env,
@@ -867,7 +922,7 @@ jshortArray NewShortArrayFromPcmResult(JNIEnv* env, const bag_pcm16_result& resu
 
 jobject NewEmptyPayloadFollowViewData(JNIEnv* env) {
     return NewPayloadFollowViewData(
-        env, "", "", "", "", "", {}, {}, {}, {}, {}, {}, {}, {}, {}, JNI_FALSE, JNI_FALSE, 0, 0, 0, JNI_FALSE);
+        env, "", "", "", "", "", {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, JNI_FALSE, JNI_FALSE, 0, 0, 0, JNI_FALSE);
 }
 
 jobject NewEmptyDecodedAudioPayloadResult(JNIEnv* env,
@@ -925,6 +980,8 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
         result.follow_data.byte_timeline_count);
     std::vector<bag_payload_follow_binary_group_entry> binary_entries(
         result.follow_data.binary_group_timeline_count);
+    std::vector<bag_ultra_frame_symbol_entry> ultra_frame_entries(
+        result.follow_data.ultra_frame_timeline_count);
     if (!text_entries.empty()) {
         std::copy_n(result.text_follow_data.text_token_timeline_buffer,
                     text_entries.size(), text_entries.begin());
@@ -962,6 +1019,10 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
         std::copy_n(result.follow_data.binary_group_timeline_buffer,
                     binary_entries.size(), binary_entries.begin());
     }
+    if (!ultra_frame_entries.empty()) {
+        std::copy_n(result.follow_data.ultra_frame_timeline_buffer,
+                    ultra_frame_entries.size(), ultra_frame_entries.begin());
+    }
     bag_pcm16_result pcm_result{};
     pcm_result.samples = result.samples;
     pcm_result.sample_count = result.sample_count;
@@ -982,6 +1043,7 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
         line_raw_segments,
         byte_entries,
         binary_entries,
+        ultra_frame_entries,
         result.text_follow_data.available != 0 ? JNI_TRUE : JNI_FALSE,
         (result.text_follow_data.available != 0 &&
          result.text_follow_data.lyric_line_timeline_count > 0 &&

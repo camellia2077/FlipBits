@@ -1,6 +1,6 @@
 # 仓库结构与文件地图
 
-更新时间：2026-03-15
+更新时间：2026-05-21
 
 ## 目标
 这份文档用于快速回答两个问题：
@@ -133,9 +133,10 @@
   - `libs/audio_core/modules/bag/ultra/phy_compat.cppm`
   - `libs/audio_core/src/ultra/phy_compat.cpp`
 - 当前语义：
-  - UTF-8 byte
-  - `UTF-8 byte -> nibble`
-  - clean `16-FSK`
+  - UTF-8 payload
+  - `Ultra clean frame v1`: `preamble | sync | version | flags | payload_length | payload | crc16`
+  - frame byte -> nibble -> clean `16-FSK`
+  - Text follow / Binary / Hex 正文语义只覆盖 payload，不把 frame metadata 当成用户文本
 
 ### `mini`
 - 先看：

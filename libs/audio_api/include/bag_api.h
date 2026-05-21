@@ -112,6 +112,28 @@ typedef struct bag_payload_follow_binary_group_entry {
   double carrier_freq_hz;
 } bag_payload_follow_binary_group_entry;
 
+typedef enum bag_ultra_frame_section {
+  BAG_ULTRA_FRAME_SECTION_PREAMBLE = 0,
+  BAG_ULTRA_FRAME_SECTION_SYNC = 1,
+  BAG_ULTRA_FRAME_SECTION_VERSION = 2,
+  BAG_ULTRA_FRAME_SECTION_FLAGS = 3,
+  BAG_ULTRA_FRAME_SECTION_PAYLOAD_LENGTH = 4,
+  BAG_ULTRA_FRAME_SECTION_PAYLOAD = 5,
+  BAG_ULTRA_FRAME_SECTION_CRC16 = 6
+} bag_ultra_frame_section;
+
+typedef struct bag_ultra_frame_symbol_entry {
+  size_t start_sample;
+  size_t sample_count;
+  size_t frame_byte_index;
+  size_t nibble_index_in_byte;
+  size_t nibble_value;
+  double carrier_freq_hz;
+  bag_ultra_frame_section section;
+  int is_payload;
+  size_t payload_byte_index;
+} bag_ultra_frame_symbol_entry;
+
 typedef struct bag_payload_follow_data {
   bag_payload_follow_byte_entry* byte_timeline_buffer;
   size_t byte_timeline_buffer_count;
@@ -121,6 +143,10 @@ typedef struct bag_payload_follow_data {
   size_t binary_group_timeline_buffer_count;
   size_t binary_group_timeline_count;
   bag_decode_content_status binary_group_timeline_status;
+  bag_ultra_frame_symbol_entry* ultra_frame_timeline_buffer;
+  size_t ultra_frame_timeline_buffer_count;
+  size_t ultra_frame_timeline_count;
+  bag_decode_content_status ultra_frame_timeline_status;
   size_t payload_begin_sample;
   size_t payload_sample_count;
   size_t total_pcm_sample_count;
@@ -316,6 +342,7 @@ typedef struct bag_encode_result_layout {
   int raw_payload_available;
   size_t byte_timeline_count;
   size_t binary_group_timeline_count;
+  size_t ultra_frame_timeline_count;
   size_t text_tokens_size;
   size_t text_character_text_size;
   size_t text_token_timeline_count;

@@ -205,10 +205,14 @@ size_t ExpectedPcmSampleCount(const std::string& text,
         return payload_samples + leading_nonpayload_samples + trailing_nonpayload_samples;
     }
 
-    // At the boundary layer, the current product contract is byte-oriented:
-    // flash uses 8 BFSK bits per byte, while pro/ultra use 2 symbols per byte.
-    if (mode == BAG_TRANSPORT_PRO || mode == BAG_TRANSPORT_ULTRA) {
+    // At the boundary layer, pro remains bare-payload nibble symbols.
+    if (mode == BAG_TRANSPORT_PRO) {
         return text.size() * 2 * static_cast<size_t>(config_case.frame_samples);
+    }
+    if (mode == BAG_TRANSPORT_ULTRA) {
+        constexpr size_t kUltraCleanFrameV1FixedByteCount = 18;
+        return (text.size() + kUltraCleanFrameV1FixedByteCount) * 2 *
+               static_cast<size_t>(config_case.frame_samples);
     }
 
     test::Fail("Artifact expected-length helper received an unsupported transport mode.");

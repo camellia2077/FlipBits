@@ -20,6 +20,40 @@ data class PayloadFollowBinaryGroupTimelineEntry(
 )
 
 @Keep
+enum class UltraFrameSection(
+    val wireValue: Int,
+) {
+    Preamble(0),
+    Sync(1),
+    Version(2),
+    Flags(3),
+    PayloadLength(4),
+    Payload(5),
+    Crc16(6),
+    ;
+
+    companion object {
+        fun fromWireValue(value: Int): UltraFrameSection = entries.firstOrNull { it.wireValue == value } ?: Payload
+    }
+}
+
+@Keep
+data class UltraFrameSymbolTimelineEntry(
+    val startSample: Int,
+    val sampleCount: Int,
+    val frameByteIndex: Int,
+    val nibbleIndexInByte: Int,
+    val nibbleValue: Int,
+    val carrierFrequencyHz: Float,
+    val sectionCode: Int,
+    val isPayload: Boolean,
+    val payloadByteIndex: Int,
+) {
+    val section: UltraFrameSection
+        get() = UltraFrameSection.fromWireValue(sectionCode)
+}
+
+@Keep
 enum class TextFollowCharacterKind(
     val wireValue: Int,
 ) {
@@ -130,6 +164,7 @@ data class PayloadFollowViewData(
     val payloadSampleCount: Int = 0,
     val totalPcmSampleCount: Int = 0,
     val followAvailable: Boolean = false,
+    val ultraFrameTimeline: List<UltraFrameSymbolTimelineEntry> = emptyList(),
 ) {
     companion object {
         val Empty = PayloadFollowViewData()

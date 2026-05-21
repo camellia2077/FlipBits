@@ -65,13 +65,14 @@ struct UltraEncodeWorkBudget {
 };
 
 UltraEncodeWorkBudget BuildEncodeWorkBudget(std::size_t payload_size,
+                                            std::size_t frame_size,
                                             int symbol_samples) {
   const std::size_t symbol_count =
-      payload_size * kSymbolsPerPayloadByteForProgress;
+      frame_size * kSymbolsPerPayloadByteForProgress;
 
   UltraEncodeWorkBudget budget{};
   budget.prepare_payload_work = NonZeroWork(payload_size);
-  budget.prepare_symbol_work = NonZeroWork(symbol_count);
+  budget.prepare_symbol_work = NonZeroWork(frame_size + symbol_count);
   budget.render_work = NonZeroWork(
       symbol_count * static_cast<std::size_t>(std::max(symbol_samples, 0)));
   budget.finalize_work = 1;
@@ -342,8 +343,13 @@ ErrorCode EncodePayloadToPcm16(const std::vector<uint8_t>& payload,
     return ErrorCode::kInvalidArgument;
   }
 
+  std::vector<uint8_t> frame;
+  const ErrorCode frame_code = EncodePayloadToFrame(payload, &frame);
+  if (frame_code != ErrorCode::kOk) {
+    return frame_code;
+  }
   std::vector<uint8_t> symbols;
-  const ErrorCode symbols_code = EncodePayloadToSymbols(payload, &symbols);
+  const ErrorCode symbols_code = EncodePayloadToSymbols(frame, &symbols);
   if (symbols_code != ErrorCode::kOk) {
     return symbols_code;
   }
@@ -362,7 +368,12 @@ ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
   if (symbols_code != ErrorCode::kOk) {
     return symbols_code;
   }
-  return DecodeSymbolsToPayload(symbols, out_payload);
+  std::vector<uint8_t> frame;
+  const ErrorCode frame_bytes_code = DecodeSymbolsToPayload(symbols, &frame);
+  if (frame_bytes_code != ErrorCode::kOk) {
+    return frame_bytes_code;
+  }
+  return DecodeFrameToPayload(frame, out_payload);
 }
 
 ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
@@ -387,8 +398,13 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
   if (payload_code != ErrorCode::kOk) {
     return payload_code;
   }
+  std::vector<uint8_t> frame;
+  const ErrorCode frame_code = EncodePayloadToFrame(payload, &frame);
+  if (frame_code != ErrorCode::kOk) {
+    return frame_code;
+  }
   const UltraEncodeWorkBudget work_budget =
-      BuildEncodeWorkBudget(payload.size(), config.frame_samples);
+      BuildEncodeWorkBudget(payload.size(), frame.size(), config.frame_samples);
   std::size_t completed_work = work_budget.prepare_payload_work;
   ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPreparingInput,
                        static_cast<float>(completed_work) /
@@ -397,7 +413,7 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
     return ErrorCode::kCancelled;
   }
   std::vector<uint8_t> symbols;
-  const ErrorCode symbols_code = EncodePayloadToSymbols(payload, &symbols);
+  const ErrorCode symbols_code = EncodePayloadToSymbols(frame, &symbols);
   if (symbols_code != ErrorCode::kOk) {
     return symbols_code;
   }

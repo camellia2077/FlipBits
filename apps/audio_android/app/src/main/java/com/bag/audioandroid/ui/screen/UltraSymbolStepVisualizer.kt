@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,13 +24,17 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
@@ -41,7 +46,10 @@ internal fun UltraSymbolStepVisualizer(
     followData: PayloadFollowViewData,
     modifier: Modifier = Modifier,
 ) {
-    if (!followData.followAvailable || followData.binaryGroupTimeline.isEmpty()) {
+    if (
+        !followData.followAvailable ||
+        (followData.ultraFrameTimeline.isEmpty() && followData.binaryGroupTimeline.isEmpty())
+    ) {
         return
     }
 
@@ -52,7 +60,13 @@ internal fun UltraSymbolStepVisualizer(
         modifier =
             modifier
                 .fillMaxWidth()
-                .testTag("ultra-symbol-step-visualizer"),
+                .debugUltraVisualLayout(
+                    label = "root",
+                    extra =
+                        "displayedSamples=$displayedSamples " +
+                            "frameSymbols=${followData.ultraFrameTimeline.size} " +
+                            "payloadGroups=${followData.binaryGroupTimeline.size}",
+                ).testTag("ultra-symbol-step-visualizer"),
     ) {
         val widthPx = with(density) { maxWidth.toPx() }
         val targetBucketCount =
@@ -97,6 +111,7 @@ private fun UltraSymbolStepChart(
     val activeColor = MaterialTheme.colorScheme.primary
     val nextColor = MaterialTheme.colorScheme.secondary
     val inactiveColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.42f)
+    val metadataColor = MaterialTheme.colorScheme.outline
     val guideColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
     val baseBackground = visualTokens.visualizationBaseBackgroundColor
     val ambientBrush =
@@ -112,7 +127,12 @@ private fun UltraSymbolStepChart(
         modifier =
             modifier
                 .height(84.dp)
-                .testTag("ultra-symbol-step-chart"),
+                .debugUltraVisualLayout(
+                    label = "chart",
+                    extra =
+                        "buckets=${buckets.size} " +
+                            "activeBucket=$activeBucketIndex",
+                ).testTag("ultra-symbol-step-chart"),
     ) {
         UltraReferenceTicks(modifier = Modifier.matchParentSize())
 
@@ -205,11 +225,15 @@ private fun UltraSymbolStepChart(
                 val markerHeight = (8.dp.toPx() + 10.dp.toPx() * bucket.upperEnergy.coerceIn(0f, 1f)).coerceAtLeast(8.dp.toPx())
                 val markerWidth = (bucketWidth - stepXInset * 2f).coerceAtLeast(4.dp.toPx())
                 val color =
-                    when (index) {
-                        safeActiveBucketIndex -> activeColor
-                        safeActiveBucketIndex + 1 -> nextColor.copy(alpha = 0.82f)
-                        else -> inactiveColor.copy(alpha = 0.34f)
-                    }
+                    ultraSymbolMarkerColor(
+                        bucket = bucket,
+                        index = index,
+                        activeBucketIndex = safeActiveBucketIndex,
+                        activeColor = activeColor,
+                        nextColor = nextColor,
+                        inactiveColor = inactiveColor,
+                        metadataColor = metadataColor,
+                    )
 
                 drawRoundRect(
                     color = color,
@@ -229,6 +253,31 @@ private fun UltraSymbolStepChart(
         }
     }
 }
+
+private fun ultraSymbolMarkerColor(
+    bucket: SymbolEnvelopeBucket,
+    index: Int,
+    activeBucketIndex: Int,
+    activeColor: Color,
+    nextColor: Color,
+    inactiveColor: Color,
+    metadataColor: Color,
+): Color =
+    when (index) {
+        activeBucketIndex -> activeColor
+        activeBucketIndex + 1 ->
+            if (bucket.isUltraPayloadSymbol) {
+                nextColor.copy(alpha = 0.82f)
+            } else {
+                metadataColor.copy(alpha = 0.70f)
+            }
+        else ->
+            if (bucket.isUltraPayloadSymbol) {
+                inactiveColor.copy(alpha = 0.34f)
+            } else {
+                metadataColor.copy(alpha = 0.38f)
+            }
+    }
 
 @Composable
 private fun UltraReferenceTicks(modifier: Modifier = Modifier) {
@@ -272,7 +321,14 @@ private fun UltraNowNextRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.testTag("ultra-now-next-row"),
+        modifier =
+            modifier
+                .debugUltraVisualLayout(
+                    label = "nowNext",
+                    extra =
+                        "currentHz=${currentFrequencyHz ?: -1} " +
+                            "nextHz=${nextFrequencyHz ?: -1}",
+                ).testTag("ultra-now-next-row"),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         UltraFrequencyPill(
@@ -328,6 +384,28 @@ private data class IndexedStepPoint(
     val index: Int,
     val point: Offset,
 )
+
+private fun Modifier.debugUltraVisualLayout(
+    label: String,
+    extra: String = "",
+): Modifier =
+    if (!BuildConfig.DEBUG) {
+        this
+    } else {
+        onGloballyPositioned { coordinates ->
+            val bounds = coordinates.boundsInRoot()
+            runCatching {
+                Log.d(
+                    "UltraVisualLayout",
+                    "$label " +
+                        "size=${coordinates.size.width}x${coordinates.size.height}px " +
+                        "rootLeft=${bounds.left.toInt()} rootTop=${bounds.top.toInt()} " +
+                        "rootRight=${bounds.right.toInt()} rootBottom=${bounds.bottom.toInt()} " +
+                        extra,
+                )
+            }
+        }
+    }
 
 private const val UltraMinBucketCount = 12
 private const val UltraMaxBucketCount = 16

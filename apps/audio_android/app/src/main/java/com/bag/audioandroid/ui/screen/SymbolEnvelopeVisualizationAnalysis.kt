@@ -2,6 +2,8 @@ package com.bag.audioandroid.ui.screen
 
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
+import com.bag.audioandroid.domain.UltraFrameSection
+import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
 import com.bag.audioandroid.ui.model.TransportModeOption
 import kotlin.math.PI
 import kotlin.math.abs
@@ -18,6 +20,9 @@ internal data class SymbolEnvelopeBucket(
     val peakAmplitude: Float,
     val dominantLaneIndex: Int? = null,
     val dominantFrequencyHz: Int? = null,
+    val ultraFrameSection: UltraFrameSection? = null,
+    val isUltraPayloadSymbol: Boolean = false,
+    val ultraNibbleValue: Int? = null,
 )
 
 internal data class UltraSymbolStepVisualizationState(
@@ -187,15 +192,73 @@ internal fun buildUltraSymbolStepVisualizationState(
     currentSample: Int,
     targetBucketCount: Int,
 ): UltraSymbolStepVisualizationState? {
-    if (!followData.followAvailable || followData.binaryGroupTimeline.isEmpty()) {
+    if (!followData.followAvailable) {
         return null
     }
-    val entries =
-        followData.binaryGroupTimeline.sortedBy(
-            PayloadFollowBinaryGroupTimelineEntry::startSample,
+    if (followData.ultraFrameTimeline.isNotEmpty()) {
+        return buildUltraFrameSymbolStepVisualizationState(
+            entries =
+                followData.ultraFrameTimeline.sortedBy(
+                    UltraFrameSymbolTimelineEntry::startSample,
+                ),
+            currentSample = currentSample,
+            targetBucketCount = targetBucketCount,
         )
-    val activeEntryIndex = activeTimelineEntryIndex(entries, currentSample)
+    }
+    if (followData.binaryGroupTimeline.isEmpty()) {
+        return null
+    }
+    return buildLegacyUltraPayloadSymbolStepVisualizationState(
+        entries =
+            followData.binaryGroupTimeline.sortedBy(
+                PayloadFollowBinaryGroupTimelineEntry::startSample,
+            ),
+        currentSample = currentSample,
+        targetBucketCount = targetBucketCount,
+    )
+}
+
+private fun buildUltraFrameSymbolStepVisualizationState(
+    entries: List<UltraFrameSymbolTimelineEntry>,
+    currentSample: Int,
+    targetBucketCount: Int,
+): UltraSymbolStepVisualizationState? {
+    val activeEntryIndex = activeUltraFrameEntryIndex(entries, currentSample)
     if (activeEntryIndex < 0) {
+        return null
+    }
+    return buildUltraSymbolStepVisualizationStateFromWindow(
+        entries = entries,
+        activeEntryIndex = activeEntryIndex,
+        targetBucketCount = targetBucketCount,
+        toBucket = ::ultraFrameTimelineBucket,
+    )
+}
+
+private fun buildLegacyUltraPayloadSymbolStepVisualizationState(
+    entries: List<PayloadFollowBinaryGroupTimelineEntry>,
+    currentSample: Int,
+    targetBucketCount: Int,
+): UltraSymbolStepVisualizationState? {
+    val activeEntryIndex = activePayloadGroupEntryIndex(entries, currentSample)
+    if (activeEntryIndex < 0) {
+        return null
+    }
+    return buildUltraSymbolStepVisualizationStateFromWindow(
+        entries = entries,
+        activeEntryIndex = activeEntryIndex,
+        targetBucketCount = targetBucketCount,
+        toBucket = ::legacyUltraPayloadTimelineBucket,
+    )
+}
+
+private fun <T> buildUltraSymbolStepVisualizationStateFromWindow(
+    entries: List<T>,
+    activeEntryIndex: Int,
+    targetBucketCount: Int,
+    toBucket: (T) -> SymbolEnvelopeBucket?,
+): UltraSymbolStepVisualizationState? {
+    if (entries.isEmpty()) {
         return null
     }
     val safeBucketCount = targetBucketCount.coerceAtLeast(1)
@@ -207,7 +270,7 @@ internal fun buildUltraSymbolStepVisualizationState(
     val windowStartIndex = (activeEntryIndex - desiredCurrentBucketIndex).coerceIn(0, maxStartIndex)
     val windowEndIndex = (windowStartIndex + safeBucketCount).coerceAtMost(entries.size)
     val windowEntries = entries.subList(windowStartIndex, windowEndIndex)
-    val buckets = windowEntries.mapNotNull(::ultraTimelineBucket)
+    val buckets = windowEntries.mapNotNull(toBucket)
     if (buckets.isEmpty()) {
         return null
     }
@@ -220,7 +283,7 @@ internal fun buildUltraSymbolStepVisualizationState(
     )
 }
 
-private fun activeTimelineEntryIndex(
+private fun activePayloadGroupEntryIndex(
     entries: List<PayloadFollowBinaryGroupTimelineEntry>,
     currentSample: Int,
 ): Int {
@@ -243,7 +306,30 @@ private fun activeTimelineEntryIndex(
     return previousIndex.coerceIn(-1, entries.lastIndex)
 }
 
-private fun ultraTimelineBucket(entry: PayloadFollowBinaryGroupTimelineEntry): SymbolEnvelopeBucket? {
+private fun activeUltraFrameEntryIndex(
+    entries: List<UltraFrameSymbolTimelineEntry>,
+    currentSample: Int,
+): Int {
+    var low = 0
+    var high = entries.lastIndex
+    var previousIndex = -1
+    while (low <= high) {
+        val mid = (low + high).ushr(1)
+        val entry = entries[mid]
+        val end = entry.startSample + entry.sampleCount
+        when {
+            currentSample < entry.startSample -> high = mid - 1
+            currentSample >= end -> {
+                previousIndex = mid
+                low = mid + 1
+            }
+            else -> return mid
+        }
+    }
+    return previousIndex.coerceIn(-1, entries.lastIndex)
+}
+
+private fun ultraFrameTimelineBucket(entry: UltraFrameSymbolTimelineEntry): SymbolEnvelopeBucket? {
     val frequencyHz = entry.carrierFrequencyHz.takeIf { it > 0f } ?: return null
     val laneIndex = nearestUltraFrequencyLane(frequencyHz)
     return SymbolEnvelopeBucket(
@@ -252,6 +338,23 @@ private fun ultraTimelineBucket(entry: PayloadFollowBinaryGroupTimelineEntry): S
         peakAmplitude = 1f,
         dominantLaneIndex = laneIndex,
         dominantFrequencyHz = frequencyHz.toInt(),
+        ultraFrameSection = entry.section,
+        isUltraPayloadSymbol = entry.isPayload,
+        ultraNibbleValue = entry.nibbleValue,
+    )
+}
+
+private fun legacyUltraPayloadTimelineBucket(entry: PayloadFollowBinaryGroupTimelineEntry): SymbolEnvelopeBucket? {
+    val frequencyHz = entry.carrierFrequencyHz.takeIf { it > 0f } ?: return null
+    val laneIndex = nearestUltraFrequencyLane(frequencyHz)
+    return SymbolEnvelopeBucket(
+        upperEnergy = 0.88f,
+        lowerEnergy = 0.88f,
+        peakAmplitude = 1f,
+        dominantLaneIndex = laneIndex,
+        dominantFrequencyHz = frequencyHz.toInt(),
+        ultraFrameSection = UltraFrameSection.Payload,
+        isUltraPayloadSymbol = true,
     )
 }
 
@@ -364,6 +467,9 @@ private fun smoothEnvelopeBuckets(buckets: List<SymbolEnvelopeBucket>): List<Sym
                 peakAmplitude = (peakSum / weightSum).coerceIn(0f, 1f),
                 dominantLaneIndex = buckets[index].dominantLaneIndex,
                 dominantFrequencyHz = buckets[index].dominantFrequencyHz,
+                ultraFrameSection = buckets[index].ultraFrameSection,
+                isUltraPayloadSymbol = buckets[index].isUltraPayloadSymbol,
+                ultraNibbleValue = buckets[index].ultraNibbleValue,
             )
     }
     return smoothed

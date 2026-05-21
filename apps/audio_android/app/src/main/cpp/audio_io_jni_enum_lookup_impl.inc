@@ -172,13 +172,13 @@ audio_io_metadata_mini_speed_style MapMiniSpeedStyle(JNIEnv* env, jobject mini_s
 
     jstring speed_id = static_cast<jstring>(env->CallObjectMethod(mini_speed_object, get_id));
     const std::string speed_id_text = JStringToStdString(env, speed_id);
-    if (speed_id_text == "slow") {
+    if (speed_id_text == "wpm10") {
         return AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW;
     }
-    if (speed_id_text == "standard") {
+    if (speed_id_text == "wpm15") {
         return AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD;
     }
-    if (speed_id_text == "fast") {
+    if (speed_id_text == "wpm20") {
         return AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST;
     }
     return AUDIO_IO_METADATA_MINI_SPEED_STYLE_UNKNOWN;

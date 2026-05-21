@@ -30,6 +30,7 @@ import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
 import com.bag.audioandroid.domain.WavAudioInfo
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
@@ -766,6 +767,66 @@ class AudioSessionCodecSegmentationTest {
         assertTrue(plan.segmentCount > 1)
         assertEquals(longText, plan.segments.joinToString(separator = ""))
         assertTrue(plan.segments.all { it.toByteArray(UTF_8).size <= 512 })
+    }
+
+    @Test
+    fun `segmented follow data preserves ultra frame timeline`() {
+        val merged =
+            mergeSegmentedFollowData(
+                listOf(
+                    DefaultFollowData.copy(
+                        totalPcmSampleCount = 10,
+                        ultraFrameTimeline =
+                            listOf(
+                                UltraFrameSymbolTimelineEntry(
+                                    startSample = 0,
+                                    sampleCount = 5,
+                                    frameByteIndex = 0,
+                                    nibbleIndexInByte = 0,
+                                    nibbleValue = 10,
+                                    carrierFrequencyHz = 2400f,
+                                    sectionCode = 0,
+                                    isPayload = false,
+                                    payloadByteIndex = -1,
+                                ),
+                                UltraFrameSymbolTimelineEntry(
+                                    startSample = 5,
+                                    sampleCount = 5,
+                                    frameByteIndex = 1,
+                                    nibbleIndexInByte = 0,
+                                    nibbleValue = 4,
+                                    carrierFrequencyHz = 1560f,
+                                    sectionCode = 5,
+                                    isPayload = true,
+                                    payloadByteIndex = 0,
+                                ),
+                            ),
+                    ),
+                    DefaultFollowData.copy(
+                        totalPcmSampleCount = 20,
+                        hexTokens = listOf("42", "43"),
+                        ultraFrameTimeline =
+                            listOf(
+                                UltraFrameSymbolTimelineEntry(
+                                    startSample = 0,
+                                    sampleCount = 6,
+                                    frameByteIndex = 0,
+                                    nibbleIndexInByte = 1,
+                                    nibbleValue = 2,
+                                    carrierFrequencyHz = 1280f,
+                                    sectionCode = 5,
+                                    isPayload = true,
+                                    payloadByteIndex = 1,
+                                ),
+                            ),
+                    ),
+                ),
+            )
+
+        assertEquals(3, merged.ultraFrameTimeline.size)
+        assertEquals(10, merged.ultraFrameTimeline[2].startSample)
+        assertEquals(2, merged.ultraFrameTimeline[2].frameByteIndex)
+        assertEquals(2, merged.ultraFrameTimeline[2].payloadByteIndex)
     }
 }
 

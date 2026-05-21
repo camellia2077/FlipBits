@@ -8,6 +8,9 @@ void ClearApiFollowData(bag_payload_follow_data* out_follow) {
   out_follow->binary_group_timeline_count = 0;
   out_follow->binary_group_timeline_status =
       BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+  out_follow->ultra_frame_timeline_count = 0;
+  out_follow->ultra_frame_timeline_status =
+      BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_follow->payload_begin_sample = 0;
   out_follow->payload_sample_count = 0;
   out_follow->total_pcm_sample_count = 0;

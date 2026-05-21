@@ -17,6 +17,7 @@ import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowRawSegmentViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -173,6 +174,7 @@ private fun PayloadFollowViewData.toJson() =
         .put("binary_tokens", JSONArray(binaryTokens))
         .put("byte_timeline", JSONArray().apply { byteTimeline.forEach { put(it.toJson()) } })
         .put("binary_group_timeline", JSONArray().apply { binaryGroupTimeline.forEach { put(it.toJson()) } })
+        .put("ultra_frame_timeline", JSONArray().apply { ultraFrameTimeline.forEach { put(it.toJson()) } })
         .put("payload_begin_sample", payloadBeginSample)
         .put("payload_sample_count", payloadSampleCount)
         .put("total_pcm_sample_count", totalPcmSampleCount)
@@ -195,6 +197,7 @@ private fun JSONObject.toFollowData() =
         binaryTokens = optJSONArray("binary_tokens").toStringList(),
         byteTimeline = optJSONArray("byte_timeline").toObjectList { it.toPayloadFollowByteTimelineEntry() },
         binaryGroupTimeline = optJSONArray("binary_group_timeline").toObjectList { it.toPayloadFollowBinaryGroupTimelineEntry() },
+        ultraFrameTimeline = optJSONArray("ultra_frame_timeline").toObjectList { it.toUltraFrameSymbolTimelineEntry() },
         payloadBeginSample = optInt("payload_begin_sample"),
         payloadSampleCount = optInt("payload_sample_count"),
         totalPcmSampleCount = optInt("total_pcm_sample_count"),
@@ -368,6 +371,31 @@ private fun JSONObject.toPayloadFollowBinaryGroupTimelineEntry() =
         bitOffset = optInt("bit_offset"),
         bitCount = optInt("bit_count"),
         carrierFrequencyHz = optDouble("carrier_frequency_hz", 0.0).toFloat(),
+    )
+
+private fun UltraFrameSymbolTimelineEntry.toJson() =
+    JSONObject()
+        .put("start_sample", startSample)
+        .put("sample_count", sampleCount)
+        .put("frame_byte_index", frameByteIndex)
+        .put("nibble_index_in_byte", nibbleIndexInByte)
+        .put("nibble_value", nibbleValue)
+        .put("carrier_frequency_hz", carrierFrequencyHz.toDouble())
+        .put("section_code", sectionCode)
+        .put("is_payload", isPayload)
+        .put("payload_byte_index", payloadByteIndex)
+
+private fun JSONObject.toUltraFrameSymbolTimelineEntry() =
+    UltraFrameSymbolTimelineEntry(
+        startSample = optInt("start_sample"),
+        sampleCount = optInt("sample_count"),
+        frameByteIndex = optInt("frame_byte_index"),
+        nibbleIndexInByte = optInt("nibble_index_in_byte"),
+        nibbleValue = optInt("nibble_value"),
+        carrierFrequencyHz = optDouble("carrier_frequency_hz", 0.0).toFloat(),
+        sectionCode = optInt("section_code"),
+        isPayload = optBoolean("is_payload"),
+        payloadByteIndex = optInt("payload_byte_index", -1),
     )
 
 private fun JSONArray?.toStringList(): List<String> =

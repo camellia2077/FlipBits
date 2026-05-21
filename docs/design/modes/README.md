@@ -1,6 +1,6 @@
 # Mode Design Docs
 
-更新时间：2026-05-04
+更新时间：2026-05-21
 
 ## 目的
 - 把 `mini / flash / pro / ultra` 统一收口到同一层级的 mode-first 文档结构。
@@ -21,7 +21,9 @@
 - [`pro.md`](pro.md)
   - ASCII-only + `DTMF-like` 双音映射模式的定位、字节结构与 clean PHY 口径。
 - [`ultra.md`](ultra.md)
-  - UTF-8 byte + clean `16-FSK` 模式的定位、nibble 映射与主链路文件。
+  - UTF-8 payload + `Ultra clean frame v1` + clean `16-FSK` baseline 的定位、frame layout、nibble 映射与主链路文件。
+- [`multi-tone-fsk.md`](multi-tone-fsk.md)
+  - 未来 Multi-tone FSK 的定位、与 `ultra` 的取舍关系、适用场景和推进顺序。
 
 ## 建议阅读顺序
 - 想快速比较四种 mode：

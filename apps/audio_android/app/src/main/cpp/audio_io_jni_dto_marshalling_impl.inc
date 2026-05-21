@@ -96,13 +96,13 @@ jobject ToGeneratedAudioMetadata(JNIEnv* env, const audio_io_metadata& metadata,
     if (metadata.has_mini_speed_style != 0u) {
         switch (metadata.mini_speed_style) {
             case AUDIO_IO_METADATA_MINI_SPEED_STYLE_SLOW:
-                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "slow");
+                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "wpm10");
                 break;
             case AUDIO_IO_METADATA_MINI_SPEED_STYLE_STANDARD:
-                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "standard");
+                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "wpm15");
                 break;
             case AUDIO_IO_METADATA_MINI_SPEED_STYLE_FAST:
-                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "fast");
+                mini_speed_style_object = FindMorseSpeedById(env, morse_speed_entries, "wpm20");
                 break;
             default:
                 return nullptr;

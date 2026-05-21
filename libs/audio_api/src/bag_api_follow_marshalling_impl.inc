@@ -29,9 +29,13 @@ void CopyFollowDataToApi(const bag::PayloadFollowData& follow_data,
   out_follow->byte_timeline_count = follow_data.byte_timeline.size();
   out_follow->binary_group_timeline_count =
       follow_data.binary_group_timeline.size();
+  out_follow->ultra_frame_timeline_count =
+      follow_data.ultra_frame_timeline.size();
   if (!follow_data.available) {
     out_follow->byte_timeline_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
     out_follow->binary_group_timeline_status =
+        BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+    out_follow->ultra_frame_timeline_status =
         BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
     return;
   }
@@ -57,6 +61,22 @@ void CopyFollowDataToApi(const bag::PayloadFollowData& follow_data,
         destination->bit_offset = source.bit_offset;
         destination->bit_count = source.bit_count;
         destination->carrier_freq_hz = source.carrier_freq_hz;
+      });
+  out_follow->ultra_frame_timeline_status = CopyTimelineEntries(
+      follow_data.ultra_frame_timeline,
+      out_follow->ultra_frame_timeline_buffer,
+      out_follow->ultra_frame_timeline_buffer_count,
+      [](const bag::UltraFrameSymbolEntry& source,
+         bag_ultra_frame_symbol_entry* destination) {
+        destination->start_sample = source.start_sample;
+        destination->sample_count = source.sample_count;
+        destination->frame_byte_index = source.frame_byte_index;
+        destination->nibble_index_in_byte = source.nibble_index_in_byte;
+        destination->nibble_value = source.nibble_value;
+        destination->carrier_freq_hz = source.carrier_freq_hz;
+        destination->section = static_cast<bag_ultra_frame_section>(source.section);
+        destination->is_payload = source.is_payload ? 1 : 0;
+        destination->payload_byte_index = source.payload_byte_index;
       });
 }
 

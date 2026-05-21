@@ -12,12 +12,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowByteTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.domain.UltraFrameSection
+import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
 import com.bag.audioandroid.ui.model.TransportModeOption
 import org.junit.Rule
 import org.junit.Test
@@ -315,6 +318,50 @@ class AudioPlaybackProgressSectionTest {
                     ),
                 ),
             byteTimeline = listOf(PayloadFollowByteTimelineEntry(0, 8, 0)),
+            binaryGroupTimeline =
+                listOf(
+                    PayloadFollowBinaryGroupTimelineEntry(
+                        startSample = 0,
+                        sampleCount = 4,
+                        groupIndex = 0,
+                        bitOffset = 0,
+                        bitCount = 4,
+                        carrierFrequencyHz = 1000f,
+                    ),
+                    PayloadFollowBinaryGroupTimelineEntry(
+                        startSample = 4,
+                        sampleCount = 4,
+                        groupIndex = 1,
+                        bitOffset = 4,
+                        bitCount = 4,
+                        carrierFrequencyHz = 1140f,
+                    ),
+                ),
+            ultraFrameTimeline =
+                listOf(
+                    UltraFrameSymbolTimelineEntry(
+                        startSample = 0,
+                        sampleCount = 4,
+                        frameByteIndex = 0,
+                        nibbleIndexInByte = 0,
+                        nibbleValue = 10,
+                        carrierFrequencyHz = 2400f,
+                        sectionCode = UltraFrameSection.Preamble.wireValue,
+                        isPayload = false,
+                        payloadByteIndex = -1,
+                    ),
+                    UltraFrameSymbolTimelineEntry(
+                        startSample = 4,
+                        sampleCount = 4,
+                        frameByteIndex = 1,
+                        nibbleIndexInByte = 1,
+                        nibbleValue = 1,
+                        carrierFrequencyHz = 1140f,
+                        sectionCode = UltraFrameSection.Payload.wireValue,
+                        isPayload = true,
+                        payloadByteIndex = 0,
+                    ),
+                ),
             textFollowAvailable = true,
             lyricLines = listOf("ASH BELL RITE"),
             lyricLineTimeline = listOf(TextFollowLyricLineTimelineEntry(0, 12, 0)),

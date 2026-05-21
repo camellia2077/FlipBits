@@ -75,6 +75,28 @@ struct PayloadFollowBinaryGroupEntry {
   double carrier_freq_hz = 0.0;
 };
 
+enum class UltraFrameSection {
+  kPreamble = 0,
+  kSync = 1,
+  kVersion = 2,
+  kFlags = 3,
+  kPayloadLength = 4,
+  kPayload = 5,
+  kCrc16 = 6,
+};
+
+struct UltraFrameSymbolEntry {
+  std::size_t start_sample = 0;
+  std::size_t sample_count = 0;
+  std::size_t frame_byte_index = 0;
+  std::size_t nibble_index_in_byte = 0;
+  std::size_t nibble_value = 0;
+  double carrier_freq_hz = 0.0;
+  UltraFrameSection section = UltraFrameSection::kPayload;
+  bool is_payload = false;
+  std::size_t payload_byte_index = std::numeric_limits<std::size_t>::max();
+};
+
 struct TextFollowTokenTimelineEntry {
   std::size_t start_sample = 0;
   std::size_t sample_count = 0;
@@ -161,6 +183,7 @@ struct PayloadFollowData {
   std::vector<std::uint8_t> raw_payload_bytes;
   std::vector<PayloadFollowByteEntry> byte_timeline;
   std::vector<PayloadFollowBinaryGroupEntry> binary_group_timeline;
+  std::vector<UltraFrameSymbolEntry> ultra_frame_timeline;
   std::size_t payload_begin_sample = 0;
   std::size_t payload_sample_count = 0;
   std::size_t total_pcm_sample_count = 0;
