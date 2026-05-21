@@ -14,7 +14,9 @@ import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
+import com.bag.audioandroid.ui.state.PlayerShellEvent
 import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
+import com.bag.audioandroid.ui.state.reduce
 import com.bag.audioandroid.util.measureElapsedMs
 import com.bag.audioandroid.util.safeDebugLog
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,6 +33,7 @@ internal class AudioSavedAudioSelectionActions(
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
     private val savedAudioRepository: SavedAudioRepository,
     private val stopPlayback: () -> Unit,
+    private val playCurrentFromStart: () -> Boolean,
     private val setCurrentStatusText: (UiText) -> Unit,
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
     private val savedAudioDecodeCacheGateway: SavedAudioDecodeCacheGateway,
@@ -67,11 +70,52 @@ internal class AudioSavedAudioSelectionActions(
         switchToAudioTab: Boolean = false,
         clearLibrarySelection: Boolean = false,
         closeSavedAudioSheet: Boolean = false,
-        onLoaded: (() -> Unit)? = null,
+    ): Boolean =
+        prepareSavedAudioSelection(
+            itemId = itemId,
+            switchToAudioTab = switchToAudioTab,
+            clearLibrarySelection = clearLibrarySelection,
+            closeSavedAudioSheet = closeSavedAudioSheet,
+            followUp = SavedAudioSelectionFollowUp.None,
+        )
+
+    fun prepareSavedAudioSelectionForPlayback(
+        itemId: String,
+        switchToAudioTab: Boolean = false,
+        clearLibrarySelection: Boolean = false,
+        closeSavedAudioSheet: Boolean = false,
+    ): Boolean =
+        prepareSavedAudioSelection(
+            itemId = itemId,
+            switchToAudioTab = switchToAudioTab,
+            clearLibrarySelection = clearLibrarySelection,
+            closeSavedAudioSheet = closeSavedAudioSheet,
+            followUp = SavedAudioSelectionFollowUp.PlayFromStart,
+        )
+
+    private fun prepareSavedAudioSelection(
+        itemId: String,
+        switchToAudioTab: Boolean,
+        clearLibrarySelection: Boolean,
+        closeSavedAudioSheet: Boolean,
+        followUp: SavedAudioSelectionFollowUp,
     ): Boolean {
         pendingSavedSelectionLoad?.cancel()
         val selectionStartedAtNs = System.nanoTime()
         val previousSelection = uiState.value.selectedSavedAudio
+        safeDebugLog(
+            SavedAudioPerfTag,
+            "selectionRequest itemId=$itemId previousItemId=${previousSelection?.item?.itemId.orEmpty()} " +
+                "currentSource=${uiState.value.currentPlaybackSource} " +
+                "currentSaved=${uiState.value.selectedSavedAudio?.item?.itemId.orEmpty()}",
+        )
+        if (uiState.value.currentPlaybackSource != AudioPlaybackSource.Saved(itemId)) {
+            safeDebugLog(
+                SavedAudioPerfTag,
+                "selectionRequestStop itemId=$itemId currentSource=${uiState.value.currentPlaybackSource}",
+            )
+            stopPlayback()
+        }
         val placeholderItem = resolveSavedAudioItem(itemId) ?: return false
         if (shouldHydrateSavedAudioAsync(placeholderItem)) {
             applySelection(
@@ -154,7 +198,7 @@ internal class AudioSavedAudioSelectionActions(
                             listOf(hydrated.item.displayName),
                         ),
                     )
-                    onLoaded?.invoke()
+                    runFollowUp(followUp)
                 }
             return true
         }
@@ -196,14 +240,21 @@ internal class AudioSavedAudioSelectionActions(
             itemId = itemId,
             selectionStartedAtNs = selectionStartedAtNs,
         )
-        onLoaded?.invoke()
+        runFollowUp(followUp)
         return true
     }
 
     fun onShellSavedAudioSelected(itemId: String) {
         stopPlayback()
         if (!prepareSavedAudioSelection(itemId, closeSavedAudioSheet = true)) {
-            uiState.update { it.copy(showSavedAudioSheet = false) }
+            uiState.update { state ->
+                state.copy(
+                    playerShellState =
+                        state.playerShellState.reduce(
+                            PlayerShellEvent.SelectQueueItem(keepExpandedPlayer = state.isExpandedPlayerVisible),
+                        ),
+                )
+            }
             setCurrentStatusText(UiText.Resource(R.string.status_saved_audio_load_failed))
             return
         }
@@ -294,6 +345,11 @@ internal class AudioSavedAudioSelectionActions(
         selectionStartedAtNs: Long,
     ) {
         if (previousSelection?.item?.itemId != savedAudio.item.itemId) {
+            safeDebugLog(
+                SavedAudioPerfTag,
+                "selectionDisposePrevious previousItemId=${previousSelection?.item?.itemId.orEmpty()} " +
+                    "previousFile=${previousSelection?.pcmFilePath.orEmpty()} nextItemId=${savedAudio.item.itemId}",
+            )
             generatedAudioCacheGateway.deleteCachedFile(previousSelection?.pcmFilePath)
         }
         val (_, stateUpdateMs) =
@@ -301,7 +357,14 @@ internal class AudioSavedAudioSelectionActions(
                 uiState.update { state ->
                     state.copy(
                         selectedTab = if (switchToAudioTab) AppTab.Audio else state.selectedTab,
-                        showSavedAudioSheet = if (closeSavedAudioSheet || switchToAudioTab) false else state.showSavedAudioSheet,
+                        playerShellState =
+                            if (closeSavedAudioSheet || switchToAudioTab) {
+                                state.playerShellState.reduce(
+                                    PlayerShellEvent.SelectQueueItem(keepExpandedPlayer = state.isExpandedPlayerVisible),
+                                )
+                            } else {
+                                state.playerShellState
+                            },
                         currentPlaybackSource = AudioPlaybackSource.Saved(savedAudio.item.itemId),
                         selectedSavedAudio = savedAudio,
                         librarySelection =
@@ -317,7 +380,8 @@ internal class AudioSavedAudioSelectionActions(
             SavedAudioPerfTag,
             "selectionStateUpdate itemId=$itemId elapsedMs=$stateUpdateMs " +
                 "waveformSamples=${savedAudio.waveformPcm.size} fileBacked=${!savedAudio.pcmFilePath.isNullOrBlank()} " +
-                "loading=${savedAudio.isLoadingContent}",
+                "loading=${savedAudio.isLoadingContent} previousItemId=${previousSelection?.item?.itemId.orEmpty()} " +
+                "currentSource=${uiState.value.currentPlaybackSource}",
         )
         val (_, pruneMs) =
             measureElapsedMs {
@@ -364,11 +428,23 @@ internal class AudioSavedAudioSelectionActions(
             isLoadingContent = true,
         )
     }
+
+    private fun runFollowUp(followUp: SavedAudioSelectionFollowUp) {
+        when (followUp) {
+            SavedAudioSelectionFollowUp.None -> Unit
+            SavedAudioSelectionFollowUp.PlayFromStart -> playCurrentFromStart()
+        }
+    }
 }
 
 private const val SavedAudioPerfTag = "SavedAudioPerf"
 private const val LONG_AUDIO_FILE_THRESHOLD_MS = 120_000L
 private const val DEFAULT_SAVED_AUDIO_SAMPLE_RATE_HZ = 44_100
+
+private enum class SavedAudioSelectionFollowUp {
+    None,
+    PlayFromStart,
+}
 
 private fun SavedAudioContent.toSelection(
     playbackSpeed: Float,

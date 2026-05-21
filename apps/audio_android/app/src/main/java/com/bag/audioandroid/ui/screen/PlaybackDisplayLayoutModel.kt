@@ -215,6 +215,28 @@ internal fun lyricsPreviewVisibleLineCount(
     val transportBonus =
         when (transportMode) {
             TransportModeOption.Mini -> 2
+            TransportModeOption.Flash ->
+                if (applyBonusLine) {
+                    if (!prefersWrappedLines && stripHeight < 200f) {
+                        2
+                    } else {
+                        1
+                    }
+                } else {
+                    0
+                }
+            TransportModeOption.Pro,
+            TransportModeOption.Ultra,
+            ->
+                if (applyBonusLine) {
+                    if (!prefersWrappedLines && stripHeight < 200f) {
+                        2
+                    } else {
+                        1
+                    }
+                } else {
+                    0
+                }
             else -> if (applyBonusLine) 1 else 0
         }
     return baseCount + transportBonus

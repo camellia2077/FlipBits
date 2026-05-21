@@ -24,12 +24,12 @@ internal fun runStaticPlaybackLoop(
             reportedTotalSamples = reportedTotalSamples,
             playbackLimitSamples = bufferedSamples,
         ).apply {
-            reset(track.playbackHeadPosition, playback.playbackSpeed)
+            reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
         }
     while (!playback.stopRequested && track.playbackHeadPosition < bufferedSamples) {
         if (playback.pauseRequested) {
             safelyPauseTrack(track)
-            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed)
+            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
             while (playback.pauseRequested && !playback.stopRequested) {
                 Thread.sleep(PlaybackProgressUpdateIntervalMs)
             }
@@ -37,14 +37,17 @@ internal fun runStaticPlaybackLoop(
                 return PlaybackResult.Stopped
             }
             safelyPlayTrack(track)
-            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed)
+            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
         }
         if (track.playState != AudioTrack.PLAYSTATE_PLAYING) {
-            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed)
+            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
             Thread.sleep(PlaybackProgressUpdateIntervalMs)
             continue
         }
-        onProgressChanged(progressClock.interpolatedProgress(track.playbackHeadPosition, playback.playbackSpeed), reportedTotalSamples)
+        onProgressChanged(
+            progressClock.interpolatedProgress(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion),
+            reportedTotalSamples,
+        )
         Thread.sleep(PlaybackProgressUpdateIntervalMs)
     }
     if (playback.stopRequested) {
@@ -116,12 +119,12 @@ internal fun runStreamingPlaybackLoop(
             reportedTotalSamples = reportedTotalSamples,
             playbackLimitSamples = streamedSamples,
         ).apply {
-            reset(track.playbackHeadPosition, playback.playbackSpeed)
+            reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
         }
     while (!playback.stopRequested && track.playbackHeadPosition < streamedSamples) {
         if (playback.pauseRequested) {
             safelyPauseTrack(track)
-            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed)
+            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
             while (playback.pauseRequested && !playback.stopRequested) {
                 Thread.sleep(PlaybackProgressUpdateIntervalMs)
             }
@@ -129,9 +132,12 @@ internal fun runStreamingPlaybackLoop(
                 return PlaybackResult.Stopped
             }
             safelyPlayTrack(track)
-            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed)
+            progressClock.reset(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion)
         }
-        onProgressChanged(progressClock.interpolatedProgress(track.playbackHeadPosition, playback.playbackSpeed), reportedTotalSamples)
+        onProgressChanged(
+            progressClock.interpolatedProgress(track.playbackHeadPosition, playback.playbackSpeed, playback.seekVersion),
+            reportedTotalSamples,
+        )
         Thread.sleep(PlaybackProgressUpdateIntervalMs)
     }
     if (playback.stopRequested) {
@@ -170,39 +176,58 @@ private class PlaybackProgressClock(
     private var anchorHeadSamples: Int = 0
     private var anchorTimeNanos: Long = 0L
     private var anchorPlaybackSpeed: Float = 1.0f
+    private var lastSeekVersion: Int = 0
+    private var lastReportedHeadSamples: Int = 0
 
     fun reset(
         playbackHeadSamples: Int,
         playbackSpeed: Float,
+        seekVersion: Int = lastSeekVersion,
     ) {
         anchorHeadSamples = playbackHeadSamples.coerceIn(0, playbackLimitSamples)
         anchorTimeNanos = System.nanoTime()
         anchorPlaybackSpeed = playbackSpeed.coerceAtLeast(MinInterpolatedPlaybackSpeed)
+        lastSeekVersion = seekVersion
+        lastReportedHeadSamples = anchorHeadSamples
     }
 
     fun interpolatedProgress(
         playbackHeadSamples: Int,
         playbackSpeed: Float,
+        seekVersion: Int,
     ): Int {
         val nowNanos = System.nanoTime()
         val currentSpeed = playbackSpeed.coerceAtLeast(MinInterpolatedPlaybackSpeed)
         val estimatedHeadSamples = estimateHeadSamples(nowNanos, currentSpeed)
         val clampedPlaybackHeadSamples = playbackHeadSamples.coerceIn(0, playbackLimitSamples)
+        val seekChanged = seekVersion != lastSeekVersion
         val driftSamples = kotlin.math.abs(clampedPlaybackHeadSamples - estimatedHeadSamples)
         if (
             currentSpeed != anchorPlaybackSpeed ||
+            seekChanged ||
             clampedPlaybackHeadSamples < anchorHeadSamples ||
             driftSamples > InterpolationMaxDriftSamples
         ) {
-            reset(clampedPlaybackHeadSamples, currentSpeed)
-            return absoluteProgress(clampedPlaybackHeadSamples)
+            // AudioTrack can briefly report an older playback head during startup
+            // on release builds. Keep automatic playback monotonic, but still let
+            // real user seeks move the reported position backward.
+            if (clampedPlaybackHeadSamples < lastReportedHeadSamples && !seekChanged) {
+                return absoluteProgress(lastReportedHeadSamples)
+            }
+            reset(clampedPlaybackHeadSamples, currentSpeed, seekVersion)
+            return absoluteProgress(recordReportedHead(clampedPlaybackHeadSamples))
         }
 
-        val progress = absoluteProgress(estimatedHeadSamples)
+        val progress = absoluteProgress(recordReportedHead(estimatedHeadSamples))
         if (nowNanos - anchorTimeNanos >= PlaybackHeadAnchorRefreshIntervalNanos) {
-            reset(clampedPlaybackHeadSamples, currentSpeed)
+            reset(clampedPlaybackHeadSamples.coerceAtLeast(lastReportedHeadSamples), currentSpeed, seekVersion)
         }
         return progress
+    }
+
+    private fun recordReportedHead(playbackHeadSamples: Int): Int {
+        lastReportedHeadSamples = playbackHeadSamples.coerceAtLeast(lastReportedHeadSamples)
+        return lastReportedHeadSamples
     }
 
     private fun estimateHeadSamples(

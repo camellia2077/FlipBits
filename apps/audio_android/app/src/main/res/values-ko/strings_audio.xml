@@ -20,6 +20,7 @@
     <string name="audio_action_previous_track">이전 트랙</string>
     <string name="audio_action_next_track">다음 트랙</string>
     <string name="audio_action_open_audio_info">정보</string>
+    <string name="audio_action_collapse_player_detail">플레이어 접기</string>
     <!-- CONTEXT: Playback mode option. Means normal play order. Paired with Random / Repeat one / Repeat all. Do not translate as ordinary quality or 'average'. -->
     <string name="audio_action_normal_playback">일반 재생</string>
     <!-- CONTEXT: Playback mode option. Means random order, not manual shuffling UI. -->
@@ -36,6 +37,7 @@
     <string name="audio_action_clear_result">결과 지우기</string>
     <string name="audio_action_clear_result_busy">지우는 중…</string>
     <string name="audio_action_export">저장</string>
+    <string name="audio_action_already_saved_to_library">라이브러리에 이미 저장됨</string>
     <string name="audio_action_export_to_file">파일로 내보내기</string>
     <string name="audio_action_playback_speed_short">속도</string>
     <string name="audio_action_open_playback_speed_menu">재생 속도 메뉴 열기</string>

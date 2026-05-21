@@ -75,6 +75,12 @@ internal fun PlaybackFollowLineStrip(
                     } else {
                         -1
                     },
+                activeBitCountWithinByte =
+                    if (absoluteTokenIndex == presentationState.activeTextIndex) {
+                        presentationState.activeBitCountWithinByte
+                    } else {
+                        0
+                    },
                 isActiveBitTone =
                     absoluteTokenIndex == presentationState.activeTextIndex &&
                         presentationState.isActiveBitTone,

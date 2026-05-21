@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.Icon
@@ -26,22 +27,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
@@ -57,6 +52,9 @@ internal data class PaletteGroupUi(
     val iconActions: List<PaletteGroupIconAction> = emptyList(),
     val addActionLabel: String? = null,
     val onMoveOption: ((Int, Int) -> Unit)? = null,
+    val deleteActionLabel: String? = null,
+    val onDeleteOption: ((PaletteOption) -> Unit)? = null,
+    val canDeleteOption: ((PaletteOption) -> Boolean)? = null,
 )
 
 internal data class PaletteGroupIconAction(
@@ -234,10 +232,15 @@ private fun MaterialBuiltInPaletteRow(
             MaterialTheme.colorScheme.outlineVariant
         }
     Surface(
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         tonalElevation = 0.dp,
         shadowElevation = if (selected) 2.dp else 0.dp,
         shape = MaterialTheme.shapes.medium,
+        border =
+            BorderStroke(
+                width = if (selected) SelectedOutlineWidth else 1.dp,
+                color = borderColor,
+            ),
         modifier =
             modifier
                 .clickable(onClick = onClick),
@@ -316,17 +319,6 @@ private fun MaterialCustomPaletteSection(
     expanded: Boolean,
 ) {
     val visualTokens = appThemeVisualTokens()
-    val optionIds = group.options.map { it.id }
-    val dragState =
-        rememberReorderDragState(
-            itemIds = optionIds,
-            estimatedRowHeightPx = EstimatedMaterialCustomRowHeightPx,
-            rowSpacingPx = MaterialCustomRowSpacingPx,
-            thresholdFraction = MaterialCustomReorderThresholdFraction,
-        )
-    val currentOptions by rememberUpdatedState(group.options)
-    val currentOnMoveOption by rememberUpdatedState(group.onMoveOption)
-    val hapticFeedback = LocalHapticFeedback.current
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -366,47 +358,43 @@ private fun MaterialCustomPaletteSection(
             }
 
             if (expanded) {
-                Column(verticalArrangement = Arrangement.spacedBy(MaterialCustomRowSpacing)) {
-                    group.options.forEachIndexed { index, option ->
-                        key(option.id) {
-                            Box(
-                                modifier = Modifier.zIndex(dragState.zIndexFor(option.id)),
-                            ) {
-                                MaterialCustomPaletteRow(
-                                    accentTokens = accentTokens,
-                                    option = option,
-                                    selected = option.id == selectedPalette.id,
-                                    onClick = { onPaletteSelected(option) },
-                                    modifier =
-                                        Modifier
-                                            .onGloballyPositioned { coordinates ->
-                                                dragState.onItemMeasured(
-                                                    itemId = option.id,
-                                                    heightPx = coordinates.size.height.toFloat(),
-                                                )
-                                            }.then(
-                                                if (group.onMoveOption != null && group.options.size > 1) {
-                                                    Modifier
-                                                        .reorderableLongPressDrag(
-                                                            enabled = true,
-                                                            itemId = option.id,
-                                                            itemIds = currentOptions.map { it.id },
-                                                            dragState = dragState,
-                                                            hapticFeedback = hapticFeedback,
-                                                            onMove = currentOnMoveOption,
-                                                        )
-                                                } else {
-                                                    Modifier
-                                                },
-                                            ),
-                                    dragOffsetY = dragState.dragOffsetFor(option.id),
-                                )
-                                if (dragState.shouldShowPreviewBefore(index)) {
-                                    ReorderDropIndicator(accentTokens = accentTokens)
-                                }
-                            }
-                        }
-                    }
+                ConfigThemeReorderableSwipeRows(
+                    items = group.options,
+                    itemId = PaletteOption::id,
+                    rowSpacing = MaterialCustomRowSpacing,
+                    estimatedRowHeightPx = EstimatedMaterialCustomRowHeightPx,
+                    rowSpacingPx = MaterialCustomRowSpacingPx,
+                    reorderThresholdFraction = MaterialCustomReorderThresholdFraction,
+                    reorderEnabled = group.onMoveOption != null,
+                    onMove = group.onMoveOption,
+                    deleteSpec = { option ->
+                        ConfigThemeSwipeDeleteSpec(
+                            enabled =
+                                group.deleteActionLabel != null &&
+                                    group.onDeleteOption != null &&
+                                    group.canDeleteOption?.invoke(option) == true,
+                            deleteLabel = group.deleteActionLabel.orEmpty(),
+                            actionLaneWidthDp = MaterialCustomDeleteActionLaneWidth,
+                            actionContainerColor = MaterialTheme.colorScheme.error,
+                            actionContentColor = MaterialTheme.colorScheme.onError,
+                            onDelete = { group.onDeleteOption?.invoke(option) },
+                        )
+                    },
+                    showDropIndicator = { true },
+                    dropIndicator = { ReorderDropIndicator(accentTokens = accentTokens) },
+                ) { option, rowModifier, dragOffsetY ->
+                    MaterialCustomPaletteRow(
+                        accentTokens = accentTokens,
+                        option = option,
+                        selected = option.id == selectedPalette.id,
+                        onClick = { onPaletteSelected(option) },
+                        onEdit =
+                            group.onEditOption
+                                ?.takeIf { option.id == selectedPalette.id },
+                        editLabel = group.editActionLabel,
+                        modifier = rowModifier,
+                        dragOffsetY = dragOffsetY,
+                    )
                 }
             }
         }
@@ -419,6 +407,8 @@ private fun MaterialCustomPaletteRow(
     option: PaletteOption,
     selected: Boolean,
     onClick: () -> Unit,
+    onEdit: (() -> Unit)? = null,
+    editLabel: String? = null,
     modifier: Modifier = Modifier,
     dragOffsetY: Float = 0f,
 ) {
@@ -429,10 +419,15 @@ private fun MaterialCustomPaletteRow(
             MaterialTheme.colorScheme.outlineVariant
         }
     Surface(
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         tonalElevation = 0.dp,
         shadowElevation = if (selected) 2.dp else 0.dp,
         shape = MaterialTheme.shapes.medium,
+        border =
+            BorderStroke(
+                width = if (selected) SelectedOutlineWidth else 1.dp,
+                color = borderColor,
+            ),
         modifier =
             modifier
                 .fillMaxWidth()
@@ -492,11 +487,27 @@ private fun MaterialCustomPaletteRow(
                     )
                 }
             }
+            if (onEdit != null && editLabel != null) {
+                IconButton(
+                    onClick = onEdit,
+                    colors = utilityActionIconButtonColors(),
+                    modifier =
+                        Modifier.semantics {
+                            contentDescription = editLabel
+                        },
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Edit,
+                        contentDescription = null,
+                    )
+                }
+            }
         }
     }
 }
 
 private val MaterialCustomRowSpacing = 8.dp
+private val MaterialCustomDeleteActionLaneWidth = 96.dp
 private val MaterialBuiltInRowSpacing = 8.dp
 private val MaterialBuiltInCardSpacing = 8.dp
 private const val MaterialBuiltInColumns = 2

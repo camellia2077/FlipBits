@@ -6,6 +6,7 @@ import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -49,6 +50,7 @@ internal class AudioAndroidPreferencesBindings(
         observeSelectedBrandTheme()
         observeSelectedFlashVoicingStyle()
         observeSelectedMorseSpeedStyle()
+        observeSelectedSampleInputLength()
         observeFlashVoicingEnabled()
         observeSelectedPlaybackSequenceMode()
         observeConfigLanguageExpanded()
@@ -318,6 +320,23 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(selectedMorseSpeed = style)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSelectedSampleInputLength() {
+        scope.launch {
+            appSettingsRepository.selectedSampleInputLengthId
+                .distinctUntilChanged()
+                .collect { lengthId ->
+                    val length = SampleInputLengthOption.fromId(lengthId) ?: SampleInputLengthOption.Short
+                    uiState.update { state ->
+                        if (state.selectedSampleInputLength == length) {
+                            state
+                        } else {
+                            state.copy(selectedSampleInputLength = length)
                         }
                     }
                 }

@@ -26,6 +26,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
@@ -200,6 +202,7 @@ internal fun PlaybackDisplaySection(
             PlaybackDataFollowSection(
                 followData = followData,
                 displayedSamples = followSectionDisplayedSamples,
+                isPlaying = isPlaying,
                 transportMode = transportMode,
                 initialAnnotationMode = initialFollowViewMode,
                 contentSpacing = renderPolicy.followContentSpacing,
@@ -397,10 +400,8 @@ private fun PlaybackVisualizationContent(
 
         PlaybackVisualizationRoute.UltraStep ->
             UltraSymbolStepVisualizer(
-                pcm = waveformPcm,
-                sampleRateHz = sampleRateHz,
                 displayedSamples = visualDisplayedSamples,
-                frameSamples = frameSamples,
+                followData = followData,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -482,6 +483,20 @@ private fun ExpandablePlaybackLyricsSection(
             applyLyricsPreviewBonusLine = applyLyricsPreviewBonusLine,
             lyricsExpanded = lyricsExpanded,
         )
+    SideEffect {
+        debugPlayerLyricsCapacity(
+            "lyricsLayout",
+            "transport=${transportMode?.wireName ?: "unknown"} " +
+                "displayMode=${playbackDisplayMode.name.lowercase()} expanded=$lyricsExpanded " +
+                "tokenStripHeightDp=${tokenStripHeightDp ?: -1f} " +
+                "extraRecoveryDp=${extraLyricsRecoveryHeight.value} " +
+                "effectiveExtraRecoveryDp=${lyricsLayoutModel.effectiveExtraLyricsRecoveryHeight.value} " +
+                "bonusLine=$applyLyricsPreviewBonusLine " +
+                "compactVisibleLineCount=${lyricsLayoutModel.compactVisibleLineCount} " +
+                "displayLineCount=${lyricsLayoutModel.displayLineRanges.size} " +
+                "prefersWrapped=${lyricsLayoutModel.prefersWrappedLines}",
+        )
+    }
     Row(
         modifier =
             modifier
@@ -527,6 +542,19 @@ private fun ExpandablePlaybackLyricsSection(
                 onExpandedChanged = onLyricsExpandedChanged,
             )
         }
+    }
+}
+
+private fun debugPlayerLyricsCapacity(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        Log.d("PlayerLyricsCapacity", "$label $message")
+    } catch (_: RuntimeException) {
     }
 }
 

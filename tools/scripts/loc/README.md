@@ -298,6 +298,19 @@ C++ 额外字段：
 
 更详细的 `suggestion / next_action / function_hotspots / anchors / evidence` 都保留在 JSON / Markdown 日志里，不再在终端展开。
 
+Markdown 明细报告还会额外给 agent 可执行的重构辅助信息：
+
+- `stop_signal`
+  - 建议继续、暂停或人工复核，避免只为了降低 score 继续拆文件。
+- `validation_hints`
+  - 给出最小验证方向，例如 Kotlin 编译或相关 focused test。
+- `False Positive Notes`
+  - 说明 Compose state、mode branch 等可能是框架内正常信号，不应机械追数。
+- `Responsibility Clusters`
+  - 把热点按职责聚类，例如 dialog/import/export、Canvas runtime、state orchestration。
+- `Suggested Extraction Candidates`
+  - 给出候选 owner、行号、建议边界、风险和验证方式；一次重构通常只选一个候选。
+
 另外，职责混杂条目的 JSON 字段顺序现在也按“先结论、后证据”排列：
 
 1. `path`

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ internal fun PlaybackFollowTokenStrip(
     followData: PayloadFollowViewData,
     presentationState: PlaybackFollowPresentationState,
     displayedSamples: Int,
+    isPlaying: Boolean,
     transportMode: TransportModeOption?,
     onMeasuredHeightDpChanged: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -52,6 +54,16 @@ internal fun PlaybackFollowTokenStrip(
     var measuredStripHeightPx by remember { mutableStateOf(0) }
     var measuredActiveCardHeightPx by remember { mutableStateOf(0) }
     var hasAutoPositioned by remember(followData, presentationState.followViewMode) { mutableStateOf(false) }
+
+    SideEffect {
+        PlaybackStartupTrace.recordTokenFollow(
+            followData = followData,
+            presentationState = presentationState,
+            displayedSamples = displayedSamples,
+            isPlaying = isPlaying,
+            transportMode = transportMode,
+        )
+    }
 
     fun pauseAutoFollowBriefly() {
         autoFollowPaused = true
@@ -163,6 +175,12 @@ internal fun PlaybackFollowTokenStrip(
                             presentationState.activeBitIndexWithinByte
                         } else {
                             -1
+                        },
+                    activeBitCountWithinByte =
+                        if (index == presentationState.activeTextIndex) {
+                            presentationState.activeBitCountWithinByte
+                        } else {
+                            0
                         },
                     isActiveBitTone =
                         index == presentationState.activeTextIndex &&

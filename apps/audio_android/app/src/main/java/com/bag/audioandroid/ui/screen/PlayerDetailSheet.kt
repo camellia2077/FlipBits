@@ -1,6 +1,7 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,11 +28,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
+import com.bag.audioandroid.ui.PlayerDetailBottomActions
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
@@ -69,10 +72,11 @@ internal fun PlayerDetailSheetContent(
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
     onPlaybackSpeedSelected: (Float) -> Unit,
-    onExportGeneratedAudio: () -> Unit,
-    onExportGeneratedAudioToDocument: () -> Unit,
-    onShareSavedAudio: (() -> Unit)?,
-    onOpenSavedAudioSheet: () -> Unit,
+    onExportGeneratedAudio: () -> Unit = {},
+    onExportGeneratedAudioToDocument: () -> Unit = {},
+    onShareSavedAudio: (() -> Unit)? = null,
+    onOpenSavedAudioSheet: () -> Unit = {},
+    bottomActions: PlayerDetailBottomActions? = null,
     onScrubStarted: () -> Unit,
     onScrubChanged: (Int) -> Unit,
     onScrubFinished: () -> Unit,
@@ -93,8 +97,15 @@ internal fun PlayerDetailSheetContent(
     initialFollowViewMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
     initialFlashVisualizationMode: FlashSignalVisualizationMode? = null,
     initialMorseVisualizationMode: MiniMorseVisualizationMode = MiniMorseVisualizationMode.Horizontal,
+    topContentPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
+    val resolvedBottomActions =
+        bottomActions ?: PlayerDetailBottomActions(
+            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
+            onSaveToLibrary = if (canExportGeneratedAudio) onExportGeneratedAudio else null,
+            isAlreadySavedToLibrary = savedAudioItem != null,
+        )
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
     var rootSlice by remember { mutableStateOf<PlaybackVerticalSlice?>(null) }
@@ -175,75 +186,77 @@ internal fun PlayerDetailSheetContent(
                     rootSlice = coordinates.toPlaybackVerticalSlice()
                 }.testTag("player-detail-sheet-content"),
     ) {
-        PlayerDetailScrollContent(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(scrollState),
-            displayedSamples = displayedSamples,
-            waveformDisplayedSamples = waveformDisplayedSamples,
-            waveformPcm = waveformPcm,
-            isWaveformPreview = isWaveformPreview,
-            sampleRateHz = sampleRateHz,
-            frameSamples = frameSamples,
-            transportMode = miniPlayerModel.transportMode,
-            isFlashMode = miniPlayerModel.isFlashMode,
-            flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
-            followData = followData,
-            flashVisualWindow = flashVisualWindow,
-            isPlaying = isPlaying,
-            isScrubbing = isScrubbing,
-            isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
-            playbackSpeed = playbackSpeed,
-            displaySectionState = displaySectionState,
-            initialFollowViewMode = initialFollowViewMode,
-            savedAudioItem = savedAudioItem,
-            showSavedAudioDecodeLoadingNotice = showSavedAudioDecodeLoadingNotice,
-            extraLyricsRecoveryHeight = layoutPolicyState.extraLyricsRecoveryHeight,
-            applyLyricsPreviewBonusLine = layoutPolicyState.applyLyricsPreviewBonusLine,
-            onLayoutMeasured = { slice -> displaySlice = slice },
-            onSeekToSample = onSeekToSample,
-            onContainerMeasured = { slice -> scrollSlice = slice },
-        )
-        PlayerDetailBottomDock(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        bottomDockSlice = coordinates.toPlaybackVerticalSlice()
-                    },
-            displayedSamples = displayedSamples,
-            totalSamples = totalSamples,
-            isScrubbing = isScrubbing,
-            displayedTime = displayedTime,
-            totalTime = totalTime,
-            isPlaying = isPlaying,
-            playbackSequenceMode = playbackSequenceMode,
-            playbackSpeed = playbackSpeed,
-            canSkipPrevious = canSkipPrevious,
-            canSkipNext = canSkipNext,
-            canExportGeneratedAudio = canExportGeneratedAudio,
-            transportMode = miniPlayerModel.transportMode,
-            durationMs = miniPlayerModel.durationMs,
-            sampleRateHz = sampleRateHz,
-            frameSamples = frameSamples,
-            wavAudioInfo = wavAudioInfo,
-            flashSignalInfo = flashSignalInfo,
-            flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
-            savedAudioItem = savedAudioItem,
-            onTogglePlayback = onTogglePlayback,
-            onSkipToPreviousTrack = onSkipToPreviousTrack,
-            onSkipToNextTrack = onSkipToNextTrack,
-            onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
-            onPlaybackSpeedSelected = onPlaybackSpeedSelected,
-            onExportGeneratedAudio = onExportGeneratedAudio,
-            onExportGeneratedAudioToDocument = onExportGeneratedAudioToDocument,
-            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
-            onScrubStarted = onScrubStarted,
-            onScrubChanged = onScrubChanged,
-            onScrubFinished = onScrubFinished,
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                PlayerDetailScrollContent(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .verticalScroll(scrollState),
+                    displayedSamples = displayedSamples,
+                    waveformDisplayedSamples = waveformDisplayedSamples,
+                    waveformPcm = waveformPcm,
+                    isWaveformPreview = isWaveformPreview,
+                    sampleRateHz = sampleRateHz,
+                    frameSamples = frameSamples,
+                    transportMode = miniPlayerModel.transportMode,
+                    isFlashMode = miniPlayerModel.isFlashMode,
+                    flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
+                    followData = followData,
+                    flashVisualWindow = flashVisualWindow,
+                    isPlaying = isPlaying,
+                    isScrubbing = isScrubbing,
+                    isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
+                    playbackSpeed = playbackSpeed,
+                    displaySectionState = displaySectionState,
+                    initialFollowViewMode = initialFollowViewMode,
+                    savedAudioItem = savedAudioItem,
+                    showSavedAudioDecodeLoadingNotice = showSavedAudioDecodeLoadingNotice,
+                    topContentPadding = topContentPadding,
+                    extraLyricsRecoveryHeight = layoutPolicyState.extraLyricsRecoveryHeight,
+                    applyLyricsPreviewBonusLine = layoutPolicyState.applyLyricsPreviewBonusLine,
+                    onLayoutMeasured = { slice -> displaySlice = slice },
+                    onSeekToSample = onSeekToSample,
+                    onContainerMeasured = { slice -> scrollSlice = slice },
+                )
+                PlayerDetailBottomDock(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                bottomDockSlice = coordinates.toPlaybackVerticalSlice()
+                            },
+                    displayedSamples = displayedSamples,
+                    totalSamples = totalSamples,
+                    isScrubbing = isScrubbing,
+                    displayedTime = displayedTime,
+                    totalTime = totalTime,
+                    isPlaying = isPlaying,
+                    playbackSequenceMode = playbackSequenceMode,
+                    playbackSpeed = playbackSpeed,
+                    canSkipPrevious = canSkipPrevious,
+                    canSkipNext = canSkipNext,
+                    transportMode = miniPlayerModel.transportMode,
+                    durationMs = miniPlayerModel.durationMs,
+                    sampleRateHz = sampleRateHz,
+                    frameSamples = frameSamples,
+                    wavAudioInfo = wavAudioInfo,
+                    flashSignalInfo = flashSignalInfo,
+                    flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
+                    savedAudioItem = savedAudioItem,
+                    onTogglePlayback = onTogglePlayback,
+                    onSkipToPreviousTrack = onSkipToPreviousTrack,
+                    onSkipToNextTrack = onSkipToNextTrack,
+                    onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
+                    onPlaybackSpeedSelected = onPlaybackSpeedSelected,
+                    bottomActions = resolvedBottomActions,
+                    onScrubStarted = onScrubStarted,
+                    onScrubChanged = onScrubChanged,
+                    onScrubFinished = onScrubFinished,
+                )
+            }
+        }
     }
 }
 
@@ -268,6 +281,7 @@ private fun PlayerDetailScrollContent(
     initialFollowViewMode: PlaybackFollowViewMode,
     savedAudioItem: SavedAudioItem?,
     showSavedAudioDecodeLoadingNotice: Boolean,
+    topContentPadding: Dp,
     extraLyricsRecoveryHeight: Dp,
     applyLyricsPreviewBonusLine: Boolean,
     onContainerMeasured: (PlaybackVerticalSlice) -> Unit,
@@ -280,7 +294,12 @@ private fun PlayerDetailScrollContent(
             modifier
                 .onGloballyPositioned { coordinates ->
                     onContainerMeasured(coordinates.toPlaybackVerticalSlice())
-                }.padding(horizontal = PlayerDetailHorizontalPadding, vertical = 8.dp),
+                }.padding(
+                    start = PlayerDetailHorizontalPadding,
+                    top = topContentPadding + 8.dp,
+                    end = PlayerDetailHorizontalPadding,
+                    bottom = 8.dp,
+                ),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         if (savedAudioItem != null && showSavedAudioDecodeLoadingNotice) {
@@ -360,7 +379,6 @@ private fun PlayerDetailBottomDock(
     playbackSpeed: Float,
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
-    canExportGeneratedAudio: Boolean,
     transportMode: TransportModeOption,
     durationMs: Long,
     sampleRateHz: Int,
@@ -374,24 +392,31 @@ private fun PlayerDetailBottomDock(
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
     onPlaybackSpeedSelected: (Float) -> Unit,
-    onExportGeneratedAudio: () -> Unit,
-    onExportGeneratedAudioToDocument: () -> Unit,
-    onOpenSavedAudioSheet: () -> Unit,
+    bottomActions: PlayerDetailBottomActions,
     onScrubStarted: () -> Unit,
     onScrubChanged: (Int) -> Unit,
     onScrubFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val density = LocalDensity.current
     Column(
         modifier =
             modifier
                 .padding(
                     start = PlayerDetailHorizontalPadding,
-                    top = 16.dp,
+                    top = 8.dp,
                     end = PlayerDetailHorizontalPadding,
-                    bottom = 8.dp,
-                ),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    bottom = 0.dp,
+                ).onGloballyPositioned { coordinates ->
+                    debugPlayerBottomDockLayout(
+                        "dock",
+                        "heightDp=${coordinates.toPlaybackVerticalSlice().heightDp(density)} " +
+                            "paddingTopDp=8.0 paddingBottomDp=0.0 " +
+                            "horizontalPaddingDp=${PlayerDetailHorizontalPadding.value} " +
+                            "columnSpacingDp=8.0",
+                    )
+                },
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AudioPlaybackTimelineBlock(
             displayedSamples = displayedSamples,
@@ -410,7 +435,6 @@ private fun PlayerDetailBottomDock(
             playbackSpeed = playbackSpeed,
             canSkipPrevious = canSkipPrevious,
             canSkipNext = canSkipNext,
-            canExportGeneratedAudio = canExportGeneratedAudio,
             transportMode = transportMode,
             durationMs = durationMs,
             totalSamples = totalSamples,
@@ -425,9 +449,20 @@ private fun PlayerDetailBottomDock(
             onSkipToNextTrack = onSkipToNextTrack,
             onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
             onPlaybackSpeedSelected = onPlaybackSpeedSelected,
-            onExportGeneratedAudio = onExportGeneratedAudio,
-            onExportGeneratedAudioToDocument = onExportGeneratedAudioToDocument,
-            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
+            bottomActions = bottomActions,
         )
+    }
+}
+
+private fun debugPlayerBottomDockLayout(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        android.util.Log.d("PlayerBottomDockLayout", "$label $message")
+    } catch (_: RuntimeException) {
     }
 }

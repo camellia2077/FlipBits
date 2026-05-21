@@ -18,6 +18,7 @@ internal class AudioAndroidLibraryActions(
     playbackRuntimeGateway: PlaybackRuntimeGateway,
     savedAudioRepository: SavedAudioRepository,
     stopPlayback: () -> Unit,
+    playCurrentFromStart: () -> Boolean,
     generatedAudioCacheGateway: GeneratedAudioCacheGateway,
     savedAudioDecodeCacheGateway: SavedAudioDecodeCacheGateway,
     workerDispatcher: CoroutineDispatcher,
@@ -34,6 +35,7 @@ internal class AudioAndroidLibraryActions(
             playbackRuntimeGateway = playbackRuntimeGateway,
             savedAudioRepository = savedAudioRepository,
             stopPlayback = stopPlayback,
+            playCurrentFromStart = playCurrentFromStart,
             setCurrentStatusText = setCurrentStatusText,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
             savedAudioDecodeCacheGateway = savedAudioDecodeCacheGateway,
@@ -61,13 +63,22 @@ internal class AudioAndroidLibraryActions(
         itemId: String,
         switchToAudioTab: Boolean = false,
         clearLibrarySelection: Boolean = false,
-        onLoaded: (() -> Unit)? = null,
     ): Boolean =
         selectionActions.prepareSavedAudioSelection(
             itemId = itemId,
             switchToAudioTab = switchToAudioTab,
             clearLibrarySelection = clearLibrarySelection,
-            onLoaded = onLoaded,
+        )
+
+    fun prepareSavedAudioSelectionForPlayback(
+        itemId: String,
+        switchToAudioTab: Boolean = false,
+        clearLibrarySelection: Boolean = false,
+    ): Boolean =
+        selectionActions.prepareSavedAudioSelectionForPlayback(
+            itemId = itemId,
+            switchToAudioTab = switchToAudioTab,
+            clearLibrarySelection = clearLibrarySelection,
         )
 
     fun onEnterLibrarySelection(itemId: String) {

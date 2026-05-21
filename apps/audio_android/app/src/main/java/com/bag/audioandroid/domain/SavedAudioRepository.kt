@@ -43,6 +43,11 @@ interface SavedAudioRepository {
 
     fun shareSavedAudio(item: SavedAudioItem): Boolean
 
+    fun shareAudio(
+        displayName: String,
+        uriString: String,
+    ): Boolean = false
+
     fun readLibraryMetadata(): SavedAudioLibraryMetadata = SavedAudioLibraryMetadata()
 
     fun createSavedAudioFolder(name: String): SavedAudioFolderMutationResult = SavedAudioFolderMutationResult.Failed

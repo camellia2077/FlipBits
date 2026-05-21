@@ -101,7 +101,17 @@ internal class AudioPlaybackCommandActions(
     }
 
     fun stopPlayback() {
+        val currentState = uiState.value
+        safeLogD(
+            PLAYBACK_AUTOMATION_TAG,
+            "stopRequested currentSource=${currentState.currentPlaybackSource.debugSourceId()} " +
+                "selectedSaved=${currentState.selectedSavedAudio?.item?.itemId.orEmpty()}",
+        )
         playbackCoordinator.stopPlayback { sourceKey ->
+            safeLogD(
+                PLAYBACK_AUTOMATION_TAG,
+                "stopApplied source=$sourceKey currentSource=${uiState.value.currentPlaybackSource.debugSourceId()}",
+            )
             playbackSourceCoordinator.sourceForKey(uiState.value, sourceKey)?.let(playbackUiStateSync::applyPlaybackStopped)
         }
     }
@@ -141,7 +151,8 @@ internal class AudioPlaybackCommandActions(
             PLAYBACK_AUTOMATION_TAG,
             "start source=$sourceKey total=${target.totalSamples} inMemory=${target.pcm.size} " +
                 "fileBacked=${!target.pcmFilePath.isNullOrBlank()} sampleRate=${target.sampleRateHz} " +
-                "start=${startedPlayback.playedSamples} restart=$restartFromBeginning",
+                "start=${startedPlayback.playedSamples} restart=$restartFromBeginning " +
+                "savedSelection=${uiState.value.selectedSavedAudio?.item?.itemId.orEmpty()}",
         )
         playbackCoordinator.startPlayback(
             scope = scope,
@@ -160,6 +171,11 @@ internal class AudioPlaybackCommandActions(
                 playbackUiStateSync.applyPlaybackProgress(target.source, playedSamples, totalSamples)
             },
             onFinished = { _, result ->
+                safeLogD(
+                    PLAYBACK_AUTOMATION_TAG,
+                    "finished source=$sourceKey result=$result currentSource=${uiState.value.currentPlaybackSource.debugSourceId()} " +
+                        "selectedSaved=${uiState.value.selectedSavedAudio?.item?.itemId.orEmpty()}",
+                )
                 when (result) {
                     PlaybackResult.Completed -> {
                         if (!onPlaybackCompleted(target.source)) {
@@ -170,7 +186,14 @@ internal class AudioPlaybackCommandActions(
                     PlaybackResult.Stopped -> playbackUiStateSync.applyPlaybackStopped(target.source)
                 }
             },
-            onFailed = playbackUiStateSync::applyPlaybackFailed,
+            onFailed = { failedSourceKey ->
+                safeLogD(
+                    PLAYBACK_AUTOMATION_TAG,
+                    "failed source=$failedSourceKey currentSource=${uiState.value.currentPlaybackSource.debugSourceId()} " +
+                        "selectedSaved=${uiState.value.selectedSavedAudio?.item?.itemId.orEmpty()}",
+                )
+                playbackUiStateSync.applyPlaybackFailed(failedSourceKey)
+            },
         )
     }
 }

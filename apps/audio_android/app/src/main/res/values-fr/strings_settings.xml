@@ -219,7 +219,7 @@
     <string name="config_demo_mode_subtitle">Affiche un retour tactile et des indications d’action pour l’enregistrement.</string>
     <string name="config_custom_brand_theme_import_title">Importer un dual-tone personnalisé</string>
     <string name="config_custom_brand_theme_import">Importer</string>
-    <string name="config_custom_brand_theme_copy_config">Copier la configuration</string>
+    <string name="config_custom_brand_theme_copy_config">Copier</string>
     <string name="config_custom_theme_copy_all">Copier toutes les couleurs</string>
     <string name="config_custom_brand_theme_import_description">Collez une configuration de thème personnalisé FlipBits.</string>
     <string name="config_custom_brand_theme_import_config_label">Configuration du thème</string>

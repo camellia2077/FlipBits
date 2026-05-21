@@ -69,12 +69,15 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     flash_capture.add_argument("--sample-length", choices=["short", "long"], help="Built-in sample length.")
     flash_capture.add_argument("--sample-id", help="Built-in sample id.")
     flash_capture.add_argument("--playback-speed", type=float, default=1.0, help="Player playback speed to apply before playback.")
+    flash_capture.add_argument("--perf-overlay", action="store_true", help="Pass wb.visual.perf_overlay=true.")
     flash_capture.add_argument(
         "--play-ms",
         type=int,
         default=None,
         help="Playback duration. Defaults to 30000 for ui and 6000 for headless.",
     )
+    flash_capture.add_argument("--play-end", choices=["stop", "pause"], default="stop", help="Action to take when play-ms elapses.")
+    flash_capture.add_argument("--play-script", help="Comma-separated toggle script like 700:pause,820:play,940:pause,1060:play.")
     flash_capture.add_argument("--no-encode", action="store_true", help="Pass wb.encode=false.")
     flash_capture.add_argument("--no-play", action="store_true", help="Pass wb.play=false.")
     flash_capture.add_argument("--max-rows", type=int, default=24, help="Maximum summary rows.")

@@ -1,5 +1,7 @@
 package com.bag.audioandroid.ui.screen
 
+import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.TransportModeOption
 import kotlin.math.PI
 import kotlin.math.abs
@@ -20,6 +22,7 @@ internal data class SymbolEnvelopeBucket(
 
 internal data class UltraSymbolStepVisualizationState(
     val buckets: List<SymbolEnvelopeBucket>,
+    val currentBucketIndex: Int,
     val currentBucket: SymbolEnvelopeBucket,
     val nextBucket: SymbolEnvelopeBucket?,
 )
@@ -173,10 +176,89 @@ internal fun buildUltraSymbolStepVisualizationState(
             .coerceIn(0, buckets.lastIndex)
     return UltraSymbolStepVisualizationState(
         buckets = buckets,
+        currentBucketIndex = currentBucketIndex,
         currentBucket = buckets[currentBucketIndex],
         nextBucket = buckets.getOrNull(currentBucketIndex + 1),
     )
 }
+
+internal fun buildUltraSymbolStepVisualizationState(
+    followData: PayloadFollowViewData,
+    currentSample: Int,
+    targetBucketCount: Int,
+): UltraSymbolStepVisualizationState? {
+    if (!followData.followAvailable || followData.binaryGroupTimeline.isEmpty()) {
+        return null
+    }
+    val entries =
+        followData.binaryGroupTimeline.sortedBy(
+            PayloadFollowBinaryGroupTimelineEntry::startSample,
+        )
+    val activeEntryIndex = activeTimelineEntryIndex(entries, currentSample)
+    if (activeEntryIndex < 0) {
+        return null
+    }
+    val safeBucketCount = targetBucketCount.coerceAtLeast(1)
+    val desiredCurrentBucketIndex =
+        (safeBucketCount * SymbolEnvelopePlayheadAnchorRatio)
+            .toInt()
+            .coerceIn(0, safeBucketCount - 1)
+    val maxStartIndex = (entries.size - safeBucketCount).coerceAtLeast(0)
+    val windowStartIndex = (activeEntryIndex - desiredCurrentBucketIndex).coerceIn(0, maxStartIndex)
+    val windowEndIndex = (windowStartIndex + safeBucketCount).coerceAtMost(entries.size)
+    val windowEntries = entries.subList(windowStartIndex, windowEndIndex)
+    val buckets = windowEntries.mapNotNull(::ultraTimelineBucket)
+    if (buckets.isEmpty()) {
+        return null
+    }
+    val currentBucketIndex = (activeEntryIndex - windowStartIndex).coerceIn(0, buckets.lastIndex)
+    return UltraSymbolStepVisualizationState(
+        buckets = buckets,
+        currentBucketIndex = currentBucketIndex,
+        currentBucket = buckets[currentBucketIndex],
+        nextBucket = buckets.getOrNull(currentBucketIndex + 1),
+    )
+}
+
+private fun activeTimelineEntryIndex(
+    entries: List<PayloadFollowBinaryGroupTimelineEntry>,
+    currentSample: Int,
+): Int {
+    var low = 0
+    var high = entries.lastIndex
+    var previousIndex = -1
+    while (low <= high) {
+        val mid = (low + high).ushr(1)
+        val entry = entries[mid]
+        val end = entry.startSample + entry.sampleCount
+        when {
+            currentSample < entry.startSample -> high = mid - 1
+            currentSample >= end -> {
+                previousIndex = mid
+                low = mid + 1
+            }
+            else -> return mid
+        }
+    }
+    return previousIndex.coerceIn(-1, entries.lastIndex)
+}
+
+private fun ultraTimelineBucket(entry: PayloadFollowBinaryGroupTimelineEntry): SymbolEnvelopeBucket? {
+    val frequencyHz = entry.carrierFrequencyHz.takeIf { it > 0f } ?: return null
+    val laneIndex = nearestUltraFrequencyLane(frequencyHz)
+    return SymbolEnvelopeBucket(
+        upperEnergy = 0.88f,
+        lowerEnergy = 0.88f,
+        peakAmplitude = 1f,
+        dominantLaneIndex = laneIndex,
+        dominantFrequencyHz = frequencyHz.toInt(),
+    )
+}
+
+private fun nearestUltraFrequencyLane(frequencyHz: Float): Int =
+    UltraFreqsHz.indices.minByOrNull { index ->
+        kotlin.math.abs(UltraFreqsHz[index] - frequencyHz.toDouble())
+    } ?: 0
 
 internal fun snapDisplayedSampleToSymbol(
     displayedSample: Int,

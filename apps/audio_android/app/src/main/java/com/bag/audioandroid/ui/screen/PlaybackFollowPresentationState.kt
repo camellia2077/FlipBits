@@ -73,6 +73,7 @@ internal fun rememberPlaybackFollowPresentationState(
             activeTextIndex = activeTextIndex,
             activeByteIndexWithinToken = activeByteIndexWithinToken,
             activeBitIndexWithinByte = activeBitPositionWithinByte.bitIndexWithinByte,
+            activeBitCountWithinByte = activeBitPositionWithinByte.bitCountWithinByte,
             isActiveBitTone = activeBitPositionWithinByte.isToneActive,
             rawDisplayUnitsByToken = rawDisplayUnitsByToken,
         )
@@ -86,6 +87,7 @@ internal data class PlaybackFollowPresentationState(
     val activeTextIndex: Int,
     val activeByteIndexWithinToken: Int,
     val activeBitIndexWithinByte: Int,
+    val activeBitCountWithinByte: Int,
     val isActiveBitTone: Boolean,
     val rawDisplayUnitsByToken: Map<Int, List<TextFollowRawDisplayUnitViewData>>,
 )

@@ -31,33 +31,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import kotlin.math.ceil
 
 @Composable
 internal fun UltraSymbolStepVisualizer(
-    pcm: ShortArray,
-    sampleRateHz: Int,
     displayedSamples: Int,
-    frameSamples: Int,
+    followData: PayloadFollowViewData,
     modifier: Modifier = Modifier,
 ) {
-    if (pcm.isEmpty() || sampleRateHz <= 0 || frameSamples <= 0) {
+    if (!followData.followAvailable || followData.binaryGroupTimeline.isEmpty()) {
         return
     }
 
     val visualTokens = appThemeVisualTokens()
     val density = LocalDensity.current
-    val totalSamples = pcm.size.coerceAtLeast(1)
-    val clampedDisplayedSamples = displayedSamples.coerceIn(0, totalSamples)
-    val snappedDisplayedSamples =
-        remember(clampedDisplayedSamples, frameSamples, totalSamples) {
-            snapDisplayedSampleToSymbol(
-                displayedSample = clampedDisplayedSamples,
-                symbolSamples = frameSamples,
-                totalSamples = totalSamples,
-            )
-        }
 
     BoxWithConstraints(
         modifier =
@@ -72,12 +61,10 @@ internal fun UltraSymbolStepVisualizer(
                 ceil((widthPx / bucketSpacingPx).toDouble()).toInt().coerceIn(UltraMinBucketCount, UltraMaxBucketCount)
             }
         val state =
-            remember(pcm, sampleRateHz, snappedDisplayedSamples, frameSamples, targetBucketCount) {
+            remember(followData, displayedSamples, targetBucketCount) {
                 buildUltraSymbolStepVisualizationState(
-                    pcm = pcm,
-                    sampleRateHz = sampleRateHz,
-                    currentSample = snappedDisplayedSamples.toFloat(),
-                    symbolSamples = frameSamples,
+                    followData = followData,
+                    currentSample = displayedSamples,
                     targetBucketCount = targetBucketCount,
                 )
             } ?: return@BoxWithConstraints
@@ -87,6 +74,7 @@ internal fun UltraSymbolStepVisualizer(
         ) {
             UltraSymbolStepChart(
                 buckets = state.buckets,
+                activeBucketIndex = state.currentBucketIndex,
                 visualTokens = visualTokens,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -102,6 +90,7 @@ internal fun UltraSymbolStepVisualizer(
 @Composable
 private fun UltraSymbolStepChart(
     buckets: List<SymbolEnvelopeBucket>,
+    activeBucketIndex: Int,
     visualTokens: com.bag.audioandroid.ui.theme.AppThemeVisualTokens,
     modifier: Modifier = Modifier,
 ) {
@@ -143,10 +132,7 @@ private fun UltraSymbolStepChart(
             val innerHeight = (size.height - topPadding - bottomPadding).coerceAtLeast(1f)
             val bucketWidth = innerWidth / buckets.size.toFloat()
             val stepXInset = bucketWidth * 0.22f
-            val activeBucketIndex =
-                (buckets.size * SymbolEnvelopePlayheadAnchorRatio)
-                    .toInt()
-                    .coerceIn(0, buckets.lastIndex)
+            val safeActiveBucketIndex = activeBucketIndex.coerceIn(0, buckets.lastIndex)
 
             drawRoundRect(
                 color = baseBackground,
@@ -194,8 +180,8 @@ private fun UltraSymbolStepChart(
                 )
             }
 
-            val activePoint = stepPoints.firstOrNull { it.index == activeBucketIndex }?.point
-            val nextPoint = stepPoints.firstOrNull { it.index == activeBucketIndex + 1 }?.point
+            val activePoint = stepPoints.firstOrNull { it.index == safeActiveBucketIndex }?.point
+            val nextPoint = stepPoints.firstOrNull { it.index == safeActiveBucketIndex + 1 }?.point
             if (activePoint != null && nextPoint != null) {
                 drawLine(
                     color = nextColor.copy(alpha = 0.88f),
@@ -220,8 +206,8 @@ private fun UltraSymbolStepChart(
                 val markerWidth = (bucketWidth - stepXInset * 2f).coerceAtLeast(4.dp.toPx())
                 val color =
                     when (index) {
-                        activeBucketIndex -> activeColor
-                        activeBucketIndex + 1 -> nextColor.copy(alpha = 0.82f)
+                        safeActiveBucketIndex -> activeColor
+                        safeActiveBucketIndex + 1 -> nextColor.copy(alpha = 0.82f)
                         else -> inactiveColor.copy(alpha = 0.34f)
                     }
 

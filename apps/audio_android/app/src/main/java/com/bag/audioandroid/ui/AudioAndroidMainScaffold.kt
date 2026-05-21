@@ -1,26 +1,31 @@
 package com.bag.audioandroid.ui
 
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.MiniPlayerSource
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.screen.AudioTabScreen
@@ -30,7 +35,6 @@ import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
 import com.bag.audioandroid.ui.screen.MiniPlayerBar
 import com.bag.audioandroid.ui.screen.PlaybackFollowViewMode
-import com.bag.audioandroid.ui.screen.PlayerDetailSheetContent
 import com.bag.audioandroid.ui.screen.SavedAudioPickerSheet
 import com.bag.audioandroid.ui.screen.formatDurationMillis
 import com.bag.audioandroid.ui.screen.samplesToMillis
@@ -38,7 +42,6 @@ import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AudioAndroidMainScaffold(
     uiState: AudioAppUiState,
@@ -103,7 +106,7 @@ internal fun AudioAndroidMainScaffold(
     LaunchedEffect(snackbarMessage?.id) {
         val message = snackbarMessage ?: return@LaunchedEffect
         val hostState =
-            if (uiState.showPlayerDetailSheet) {
+            if (uiState.isExpandedPlayerVisible) {
                 playerDetailSnackbarHostState
             } else {
                 snackbarHostState
@@ -128,101 +131,28 @@ internal fun AudioAndroidMainScaffold(
     }
 
     LaunchedEffect(
-        uiState.showPlayerDetailSheet,
+        uiState.isExpandedPlayerVisible,
         uiState.currentPlaybackSource,
         uiState.currentPlaybackDecodedPayload?.textDecodeStatusCode,
         uiState.currentPlaybackFollowData.textFollowAvailable,
     ) {
-        if (uiState.showPlayerDetailSheet && uiState.currentPlaybackSource is AudioPlaybackSource.Saved) {
+        if (uiState.isExpandedPlayerVisible && uiState.currentPlaybackSource is AudioPlaybackSource.Saved) {
             viewModel.ensureCurrentPlaybackDecodedForLyrics()
         }
     }
 
-    if (uiState.showSavedAudioSheet) {
-        ModalBottomSheet(
-            onDismissRequest = viewModel::onCloseSavedAudioSheet,
-        ) {
-            SavedAudioPickerSheet(
-                savedAudioItems = uiState.savedAudioItems,
-                selectedFilter = savedAudioFilter,
-                onFilterSelected = onSavedAudioFilterChange,
-                onSavedAudioSelected = viewModel::onShellSavedAudioSelected,
-            )
-        }
-    }
-
-    if (uiState.showPlayerDetailSheet && miniPlayerModel != null) {
-        ModalBottomSheet(
-            onDismissRequest = viewModel::onClosePlayerDetailSheet,
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ) {
-            Scaffold(
-                containerColor = Color.Transparent,
-                snackbarHost = {
-                    SnackbarHost(hostState = playerDetailSnackbarHostState)
-                },
-            ) { sheetInnerPadding ->
-                PlayerDetailSheetContent(
-                    miniPlayerModel = miniPlayerModel,
-                    displayedSamples = currentPlayback.displayedSamples,
-                    waveformDisplayedSamples = waveformDisplayedSamples,
-                    totalSamples = currentPlayback.totalSamples,
-                    isScrubbing = currentPlayback.isScrubbing,
-                    waveformPcm = waveformPcm,
-                    isWaveformPreview = playbackVisualData.isPreview,
-                    sampleRateHz = currentPlayback.sampleRateHz,
-                    frameSamples = uiState.currentPlaybackFrameSamples,
-                    wavAudioInfo = uiState.currentPlaybackWavAudioInfo,
-                    flashSignalInfo = uiState.currentPlaybackFlashSignalInfo,
-                    displayedTime = displayedTime,
-                    totalTime = totalTime,
-                    isPlaying = currentPlayback.isPlaying,
-                    playbackSequenceMode = uiState.playbackSequenceMode,
-                    playbackSpeed = uiState.currentPlaybackSpeed,
-                    canSkipPrevious = uiState.canSkipPrevious,
-                    canSkipNext = uiState.canSkipNext,
-                    canExportGeneratedAudio =
-                        uiState.currentPlaybackSource is AudioPlaybackSource.Generated &&
-                            uiState.currentPlaybackSampleCount > 0,
-                    followData = uiState.currentPlaybackFollowData,
-                    flashVisualWindow = uiState.currentPlaybackFlashVisualWindow,
-                    savedAudioItem = uiState.currentSavedAudioItem,
-                    showSavedAudioDecodeLoadingNotice =
-                        uiState.selectedSavedAudio
-                            ?.takeIf { selection -> selection.item.itemId == uiState.currentSavedAudioItem?.itemId }
-                            ?.let { it.needsDecodedContent || it.isDecodingContent }
-                            ?: false,
-                    isFlashVisualPerfOverlayEnabled = uiState.isFlashVisualPerfOverlayEnabled,
-                    onTogglePlayback = viewModel::onTogglePlayback,
-                    onSkipToPreviousTrack = viewModel::onSkipToPreviousTrack,
-                    onSkipToNextTrack = viewModel::onSkipToNextTrack,
-                    onPlaybackSequenceModeSelected = viewModel::onPlaybackSequenceModeSelected,
-                    onPlaybackSpeedSelected = viewModel::onPlaybackSpeedSelected,
-                    onExportGeneratedAudio = viewModel::onExportAudio,
-                    onExportGeneratedAudioToDocument = viewModel::onRequestExportGeneratedAudioToDocument,
-                    onShareSavedAudio = uiState.currentSavedAudioItem?.let { viewModel::onShareCurrentSavedAudio },
-                    onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheet,
-                    onScrubStarted = viewModel::onScrubStarted,
-                    onScrubChanged = viewModel::onScrubChanged,
-                    onScrubFinished = viewModel::onScrubFinished,
-                    onLyricsRequested = viewModel::ensureCurrentPlaybackDecodedForLyrics,
-                    onPlaybackDisplayModeSelected = { mode ->
-                        viewModel.onPlaybackDisplayModeSelected(mode == com.bag.audioandroid.ui.screen.PlaybackDisplayMode.Lyrics)
-                    },
-                    debugExpandLyricsRequestId = debugExpandLyricsRequestId,
-                    onDebugExpandLyricsHandled = onDebugExpandLyricsHandled,
-                    debugPlaybackDisplayModeRequest = debugPlaybackDisplayModeRequest,
-                    onDebugPlaybackDisplayModeHandled = onDebugPlaybackDisplayModeHandled,
-                    debugMorseVisualizationModeRequest = debugMorseVisualizationModeRequest,
-                    onDebugMorseVisualizationModeHandled = onDebugMorseVisualizationModeHandled,
-                    initialFollowViewMode = debugScenario?.followViewMode ?: PlaybackFollowViewMode.Binary,
-                    initialFlashVisualizationMode = debugScenario?.visualMode,
-                    modifier = Modifier.padding(sheetInnerPadding),
-                )
-            }
-        }
+    LaunchedEffect(
+        uiState.isQueueVisible,
+        uiState.isExpandedPlayerVisible,
+        uiState.miniPlayerModel,
+        uiState.currentPlaybackSource,
+    ) {
+        debugMiniPlayerOverlayLog(
+            "state",
+            "surface=${uiState.playerShellState.surface.current} queue=${uiState.playerShellState.queue.current} " +
+                "savedSheet=${uiState.isQueueVisible} detailSheet=${uiState.isExpandedPlayerVisible} " +
+                "miniPlayer=${uiState.miniPlayerModel != null} source=${uiState.currentPlaybackSource}",
+        )
     }
 
     PlayerScaffold(
@@ -233,6 +163,163 @@ internal fun AudioAndroidMainScaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
+        playerShellOverlay =
+            if (uiState.isDockQueueVisible || uiState.isExpandedPlayerVisible) {
+                { overlayPadding ->
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        if (uiState.isDockQueueVisible) {
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(bottom = overlayPadding.dockOverlayBottomPadding)
+                                        .onGloballyPositioned { coordinates ->
+                                            val position = coordinates.boundsInRoot().topLeft
+                                            debugMiniPlayerOverlayLog(
+                                                "dismissLayer",
+                                                "x=${position.x.toInt()} y=${position.y.toInt()} " +
+                                                    "w=${coordinates.size.width} h=${coordinates.size.height} " +
+                                                    "bottomPadding=${overlayPadding.dockOverlayBottomPadding.value}",
+                                            )
+                                        }.clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null,
+                                            onClick = viewModel::onCloseSavedAudioSheet,
+                                        ),
+                            )
+                            SavedAudioPickerSheet(
+                                savedAudioItems = uiState.savedAudioItems,
+                                selectedFilter = savedAudioFilter,
+                                onFilterSelected = onSavedAudioFilterChange,
+                                onSavedAudioSelected = viewModel::onShellSavedAudioSelected,
+                                currentItemId = uiState.currentSavedAudioItem?.itemId,
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = 12.dp,
+                                            end = 12.dp,
+                                            bottom = overlayPadding.dockOverlayBottomPadding,
+                                        ).onGloballyPositioned { coordinates ->
+                                            val position = coordinates.boundsInRoot().topLeft
+                                            debugMiniPlayerOverlayLog(
+                                                "savedSheetCard",
+                                                "x=${position.x.toInt()} y=${position.y.toInt()} " +
+                                                    "w=${coordinates.size.width} h=${coordinates.size.height} " +
+                                                    "bottomPadding=${overlayPadding.dockOverlayBottomPadding.value}",
+                                            )
+                                        },
+                            )
+                        }
+
+                        if (uiState.isExpandedPlayerVisible) {
+                            miniPlayerModel?.let { model ->
+                                val isGeneratedPlayback =
+                                    model.source == MiniPlayerSource.Generated &&
+                                        uiState.currentPlaybackSource is AudioPlaybackSource.Generated
+                                val isSavedPlayback =
+                                    model.source == MiniPlayerSource.Saved &&
+                                        uiState.currentPlaybackSource is AudioPlaybackSource.Saved
+                                PlayerSurfaceHost(
+                                    miniPlayerModel = model,
+                                    topBarActions =
+                                        PlayerDetailTopBarActions(
+                                            modeLabelResId = model.transportMode.labelResId,
+                                            onCollapse = viewModel::onClosePlayerDetailSheet,
+                                            onShareAudio =
+                                                when {
+                                                    isSavedPlayback -> viewModel::onShareCurrentSavedAudio
+                                                    isGeneratedPlayback -> viewModel::onShareCurrentGeneratedAudio
+                                                    else -> null
+                                                },
+                                            onDownloadToDevice =
+                                                when {
+                                                    isSavedPlayback -> viewModel::onRequestExportCurrentSavedAudioToDocument
+                                                    isGeneratedPlayback -> viewModel::onRequestExportGeneratedAudioToDocument
+                                                    else -> null
+                                                },
+                                        ),
+                                    bottomActions =
+                                        PlayerDetailBottomActions(
+                                            onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheetFromPlayerDetail,
+                                            onSaveToLibrary =
+                                                if (isGeneratedPlayback) {
+                                                    viewModel::onExportAudio
+                                                } else {
+                                                    null
+                                                },
+                                            isAlreadySavedToLibrary = isSavedPlayback,
+                                        ),
+                                    displayedSamples = currentPlayback.displayedSamples,
+                                    waveformDisplayedSamples = waveformDisplayedSamples,
+                                    totalSamples = currentPlayback.totalSamples,
+                                    isScrubbing = currentPlayback.isScrubbing,
+                                    waveformPcm = waveformPcm,
+                                    isWaveformPreview = playbackVisualData.isPreview,
+                                    sampleRateHz = currentPlayback.sampleRateHz,
+                                    frameSamples = uiState.currentPlaybackFrameSamples,
+                                    wavAudioInfo = uiState.currentPlaybackWavAudioInfo,
+                                    flashSignalInfo = uiState.currentPlaybackFlashSignalInfo,
+                                    displayedTime = displayedTime,
+                                    totalTime = totalTime,
+                                    isPlaying = currentPlayback.isPlaying,
+                                    playbackSequenceMode = uiState.playbackSequenceMode,
+                                    playbackSpeed = uiState.currentPlaybackSpeed,
+                                    canSkipPrevious = uiState.canSkipPrevious,
+                                    canSkipNext = uiState.canSkipNext,
+                                    canExportGeneratedAudio = isGeneratedPlayback,
+                                    followData = uiState.currentPlaybackFollowData,
+                                    flashVisualWindow = uiState.currentPlaybackFlashVisualWindow,
+                                    savedAudioItem = uiState.currentSavedAudioItem,
+                                    showSavedAudioDecodeLoadingNotice =
+                                        uiState.selectedSavedAudio
+                                            ?.takeIf { selection -> selection.item.itemId == uiState.currentSavedAudioItem?.itemId }
+                                            ?.let { it.needsDecodedContent || it.isDecodingContent }
+                                            ?: false,
+                                    isFlashVisualPerfOverlayEnabled = uiState.isFlashVisualPerfOverlayEnabled,
+                                    showQueueSheet = uiState.isExpandedQueueVisible,
+                                    queueSheetValue = uiState.playerShellState.queue.current,
+                                    savedAudioItems = uiState.savedAudioItems,
+                                    savedAudioFilter = savedAudioFilter,
+                                    currentSavedAudioItemId = uiState.currentSavedAudioItem?.itemId,
+                                    playerDetailSnackbarHostState = playerDetailSnackbarHostState,
+                                    onTogglePlayback = viewModel::onTogglePlayback,
+                                    onSkipToPreviousTrack = viewModel::onSkipToPreviousTrack,
+                                    onSkipToNextTrack = viewModel::onSkipToNextTrack,
+                                    onPlaybackSequenceModeSelected = viewModel::onPlaybackSequenceModeSelected,
+                                    onPlaybackSpeedSelected = viewModel::onPlaybackSpeedSelected,
+                                    onCloseSavedAudioSheet = viewModel::onCloseSavedAudioSheet,
+                                    onQueueValueChanged = viewModel::onQueueSheetValueChanged,
+                                    onSavedAudioFilterChange = onSavedAudioFilterChange,
+                                    onSavedAudioSelected = viewModel::onShellSavedAudioSelected,
+                                    onScrubStarted = viewModel::onScrubStarted,
+                                    onScrubChanged = viewModel::onScrubChanged,
+                                    onScrubFinished = viewModel::onScrubFinished,
+                                    onLyricsRequested = viewModel::ensureCurrentPlaybackDecodedForLyrics,
+                                    onPlaybackDisplayModeSelected = { mode ->
+                                        viewModel.onPlaybackDisplayModeSelected(
+                                            mode == com.bag.audioandroid.ui.screen.PlaybackDisplayMode.Lyrics,
+                                        )
+                                    },
+                                    debugExpandLyricsRequestId = debugExpandLyricsRequestId,
+                                    onDebugExpandLyricsHandled = onDebugExpandLyricsHandled,
+                                    debugPlaybackDisplayModeRequest = debugPlaybackDisplayModeRequest,
+                                    onDebugPlaybackDisplayModeHandled = onDebugPlaybackDisplayModeHandled,
+                                    debugMorseVisualizationModeRequest = debugMorseVisualizationModeRequest,
+                                    onDebugMorseVisualizationModeHandled = onDebugMorseVisualizationModeHandled,
+                                    initialFollowViewMode = debugScenario?.followViewMode ?: PlaybackFollowViewMode.Binary,
+                                    initialFlashVisualizationMode = debugScenario?.visualMode,
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                null
+            },
         bottomBar = {
             AudioAndroidBottomBar(
                 uiState = uiState,
@@ -241,13 +328,13 @@ internal fun AudioAndroidMainScaffold(
             )
         },
         miniPlayer =
-            uiState.miniPlayerModel?.takeIf { !uiState.showPlayerDetailSheet }?.let { model ->
+            uiState.miniPlayerModel?.takeIf { !uiState.isExpandedPlayerVisible }?.let { model ->
                 {
                     MiniPlayerBar(
                         model = model,
                         isPlaying = uiState.currentPlayback.isPlaying,
                         onTogglePlayback = viewModel::onTogglePlayback,
-                        onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheet,
+                        onOpenSavedAudioSheet = viewModel::onOpenSavedAudioSheetFromDock,
                         onOpenDetails = viewModel::onOpenPlayerDetailSheet,
                         // Keep the mini-player on the same dock container color as the tab bar.
                         // The two pieces should read as one bottom playback system that adapts
@@ -357,6 +444,9 @@ internal fun AudioAndroidMainScaffold(
                     onFlashVoicingStyleSelected = viewModel::onFlashVoicingStyleSelected,
                     selectedMorseSpeed = uiState.selectedMorseSpeed,
                     onMorseSpeedSelected = viewModel::onMorseSpeedSelected,
+                    isSampleAutoFillEnabled = uiState.isSampleAutoFillEnabled,
+                    sampleInputLength = uiState.selectedSampleInputLength,
+                    onSampleInputLengthSelected = viewModel::onSampleInputLengthSelected,
                     inputText = currentSession.inputText,
                     inputPlaceholderText = viewModel.currentPlaceholderText(uiState.transportMode),
                     onInputTextChange = viewModel::onInputTextChange,
@@ -403,5 +493,18 @@ internal fun AudioAndroidMainScaffold(
                             .padding(horizontal = 16.dp, vertical = 16.dp),
                 )
         }
+    }
+}
+
+private fun debugMiniPlayerOverlayLog(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        Log.d("MiniPlayerOverlayDiag", "$label $message")
+    } catch (_: RuntimeException) {
     }
 }

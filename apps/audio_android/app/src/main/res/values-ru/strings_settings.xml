@@ -223,7 +223,7 @@
     <string name="config_demo_mode_subtitle">Показывает отклик касаний и подсказки действий для записи.</string>
     <string name="config_custom_brand_theme_import_title">Импорт пользовательского dual-tone</string>
     <string name="config_custom_brand_theme_import">Импорт</string>
-    <string name="config_custom_brand_theme_copy_config">Копировать конфиг</string>
+    <string name="config_custom_brand_theme_copy_config">Копировать</string>
     <string name="config_custom_theme_copy_all">Копировать все цвета</string>
     <string name="config_custom_brand_theme_import_description">Вставьте конфиг пользовательской темы FlipBits.</string>
     <string name="config_custom_brand_theme_import_config_label">Конфиг темы</string>

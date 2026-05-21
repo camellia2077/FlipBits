@@ -62,6 +62,7 @@ internal fun MorseTimelineVisualizer(
             isPlaying = isPlaying && !isScrubbing,
             snapWhenNotPlaying = true,
             holdVisualPositionOnPause = true,
+            isScrubbing = isScrubbing,
             playbackSpeed = playbackSpeed,
             sampleRateHz = sampleRateHz,
             totalSamples = totalSamples,

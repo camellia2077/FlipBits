@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,8 +30,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import kotlinx.coroutines.delay
 import kotlin.math.hypot
 import kotlin.math.pow
@@ -43,6 +47,11 @@ private object PlayerScaffoldDefaults {
     val contentBottomBreath = 16.dp
     val snackbarBottomSpacing = 12.dp
 }
+
+internal data class PlayerScaffoldOverlayPadding(
+    val bottomBarPadding: Dp,
+    val dockOverlayBottomPadding: Dp,
+)
 
 /**
  * The scaffold uses a bottom-aligned dock layered over the content viewport so the mini-player
@@ -59,9 +68,11 @@ internal fun PlayerScaffold(
     demoTouchStrokeColor: Color = MaterialTheme.colorScheme.primary,
     snackbarHost: (@Composable () -> Unit)? = null,
     miniPlayer: (@Composable () -> Unit)? = null,
+    playerShellOverlay: (@Composable (PlayerScaffoldOverlayPadding) -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val safeTopPadding = WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()
+    val navigationBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val bottomNavigationHeight = PlayerScaffoldDefaults.bottomNavigationBarHeight
     val miniPlayerHeight = if (miniPlayer != null) PlayerScaffoldDefaults.miniPlayerHeight else 0.dp
     val dockSpacing = if (miniPlayer != null) PlayerScaffoldDefaults.dockSectionSpacing else 0.dp
@@ -69,6 +80,16 @@ internal fun PlayerScaffold(
         bottomNavigationHeight + miniPlayerHeight + dockSpacing + PlayerScaffoldDefaults.contentBottomBreath
     val snackbarBottomPadding =
         bottomNavigationHeight + miniPlayerHeight + dockSpacing + PlayerScaffoldDefaults.snackbarBottomSpacing
+    val playerShellOverlayPadding =
+        PlayerScaffoldOverlayPadding(
+            bottomBarPadding = bottomNavigationHeight + navigationBottomPadding,
+            dockOverlayBottomPadding =
+                bottomNavigationHeight +
+                    miniPlayerHeight +
+                    dockSpacing +
+                    navigationBottomPadding +
+                    PlayerScaffoldDefaults.dockSectionSpacing,
+        )
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -216,6 +237,12 @@ internal fun PlayerScaffold(
                     .fillMaxSize()
                     .onGloballyPositioned { coordinates ->
                         overlaySize.value = coordinates.size
+                        val position = coordinates.positionInWindow()
+                        debugPlayerScaffoldLayoutLog(
+                            "root",
+                            "x=${position.x.toInt()} y=${position.y.toInt()} " +
+                                "w=${coordinates.size.width} h=${coordinates.size.height}",
+                        )
                     }.then(drawModifier),
         ) {
             content(
@@ -230,7 +257,14 @@ internal fun PlayerScaffold(
                     Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.navigationBars),
+                        .onGloballyPositioned { coordinates ->
+                            val position = coordinates.positionInWindow()
+                            debugPlayerScaffoldLayoutLog(
+                                "dockColumn",
+                                "x=${position.x.toInt()} y=${position.y.toInt()} " +
+                                    "w=${coordinates.size.width} h=${coordinates.size.height}",
+                            )
+                        }.windowInsetsPadding(WindowInsets.navigationBars),
             ) {
                 miniPlayer?.let { miniPlayerContent ->
                     Box(
@@ -238,14 +272,31 @@ internal fun PlayerScaffold(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = PlayerScaffoldDefaults.dockHorizontalPadding),
+                        contentAlignment = Alignment.Center,
                     ) {
                         miniPlayerContent()
                     }
                     Spacer(modifier = Modifier.height(PlayerScaffoldDefaults.dockSectionSpacing))
                 }
 
-                bottomBar()
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                val position = coordinates.positionInWindow()
+                                debugPlayerScaffoldLayoutLog(
+                                    "bottomBar",
+                                    "x=${position.x.toInt()} y=${position.y.toInt()} " +
+                                        "w=${coordinates.size.width} h=${coordinates.size.height}",
+                                )
+                            },
+                ) {
+                    bottomBar()
+                }
             }
+
+            playerShellOverlay?.invoke(playerShellOverlayPadding)
 
             snackbarHost?.let { host ->
                 Box(
@@ -269,3 +320,16 @@ internal fun PlayerScaffold(
 private const val DemoClickMoveThresholdPx = 10f
 private const val DemoWaveDelayMs = 60L
 private const val DemoReleaseDotDurationMs = 280L
+
+private fun debugPlayerScaffoldLayoutLog(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        Log.d("PlayerScaffoldDiag", "$label $message")
+    } catch (_: RuntimeException) {
+    }
+}

@@ -7,7 +7,7 @@
 - `build/` 只保留 CMake / Gradle 的原生构建输出与测试产物
 - `dist/` 只保留 Python 复制出的最终导出物
 - 推荐统一使用：`python tools/run.py <command>`
-- host 唯一正式主线：`clang++ + Ninja + build/dev`
+- host 默认主线：`Ninja + build/dev`。未设置 `--compiler` / `CXX` 时，工具让 CMake 按本机环境发现 C++ 编译器；需要固定编译器时显式传 `--compiler` 或设置 `CXX`。
 
 ## Host 本地构建
 
@@ -20,7 +20,7 @@ python tools/run.py build --build-dir build/dev
 python tools/run.py test --build-dir build/dev
 ```
 
-- root host 不再名义支持 GNU / MSVC / Visual Studio / Ninja Multi-Config 组合。
+- root host 的标准 generator 仍是 `Ninja`；如需固定某个 C++ 编译器，使用 `--compiler <path-or-name>` 或 `CXX=<path-or-name>`。
 
 ## 一键验证
 

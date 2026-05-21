@@ -20,6 +20,7 @@ import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
@@ -79,6 +80,7 @@ data class AudioAppUiState(
     val isFlashVoicingEnabled: Boolean = true,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.Standard,
     val selectedMorseSpeed: MorseSpeedOption = MorseSpeedOption.default,
+    val selectedSampleInputLength: SampleInputLengthOption = SampleInputLengthOption.Short,
     val transportMode: TransportModeOption = TransportModeOption.Flash,
     val sessions: Map<TransportModeOption, ModeAudioSessionState> = defaultModeSessions(),
     val currentPlaybackSource: AudioPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),
@@ -88,12 +90,23 @@ data class AudioAppUiState(
     val savedAudioFolders: List<SavedAudioFolder> = emptyList(),
     val savedAudioFolderAssignments: Map<String, String> = emptyMap(),
     val librarySelection: LibrarySelectionUiState = LibrarySelectionUiState(),
-    val showSavedAudioSheet: Boolean = false,
-    val showPlayerDetailSheet: Boolean = false,
+    val playerShellState: PlayerShellState = PlayerShellState(),
     val libraryStatusText: UiText = UiText.Empty,
     val snackbarMessage: SnackbarMessage? = null,
     val pendingDocumentExportRequest: PendingAudioDocumentExportRequest? = null,
 ) {
+    val isExpandedPlayerVisible: Boolean
+        get() = playerShellState.isExpandedPlayerVisible
+
+    val isQueueVisible: Boolean
+        get() = playerShellState.isQueueVisible
+
+    val isDockQueueVisible: Boolean
+        get() = playerShellState.isDockQueueVisible
+
+    val isExpandedQueueVisible: Boolean
+        get() = playerShellState.isExpandedQueueVisible
+
     val customBrandThemes: List<BrandThemeOption>
         get() = customBrandThemePresets.map(::customBrandTheme)
 

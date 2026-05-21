@@ -16,6 +16,7 @@
     <string name="audio_action_previous_track">Попередній трек</string>
     <string name="audio_action_next_track">Наступний трек</string>
     <string name="audio_action_open_audio_info">Інфо</string>
+    <string name="audio_action_collapse_player_detail">Згорнути плеєр</string>
     <string name="audio_action_normal_playback">Звичайний</string>
     <string name="audio_action_shuffle_playback">Випадково</string>
     <string name="audio_action_repeat_one">Повторювати один</string>
@@ -26,6 +27,7 @@
     <string name="audio_action_clear_result">Очистити результат</string>
     <string name="audio_action_clear_result_busy">Очищення…</string>
     <string name="audio_action_export">Зберегти</string>
+    <string name="audio_action_already_saved_to_library">Уже збережено в бібліотеці</string>
     <string name="audio_action_export_to_file">Експортувати у файл</string>
     <string name="audio_action_playback_speed_short">Швидкість</string>
     <string name="audio_action_open_playback_speed_menu">Відкрити меню швидкості відтворення</string>

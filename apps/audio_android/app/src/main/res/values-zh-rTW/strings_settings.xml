@@ -210,7 +210,7 @@
     <string name="config_demo_mode_subtitle">為錄製顯示點按回饋與按鍵操作提示。</string>
     <string name="config_custom_brand_theme_import_title">匯入自訂 dual-tone</string>
     <string name="config_custom_brand_theme_import">匯入</string>
-    <string name="config_custom_brand_theme_copy_config">複製設定</string>
+    <string name="config_custom_brand_theme_copy_config">複製</string>
     <string name="config_custom_theme_copy_all">複製全部顏色</string>
     <string name="config_custom_brand_theme_import_description">貼上 FlipBits 自訂主題設定。</string>
     <string name="config_custom_brand_theme_import_config_label">主題設定</string>

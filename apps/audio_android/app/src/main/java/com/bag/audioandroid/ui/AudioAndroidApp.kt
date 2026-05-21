@@ -71,14 +71,14 @@ fun AudioAndroidApp(
     val headlessLogSampleBucket =
         uiState.currentPlayback.displayedSamples / (headlessSampleRate / 2).coerceAtLeast(1)
 
-    LaunchedEffect(uiState.showSavedAudioSheet, uiState.currentPlaybackSource, uiState.transportMode) {
-        if (uiState.showSavedAudioSheet) {
+    LaunchedEffect(uiState.isQueueVisible, uiState.currentPlaybackSource, uiState.transportMode) {
+        if (uiState.isQueueVisible) {
             savedAudioFilter = defaultSavedAudioFilter(uiState)
         }
     }
 
-    LaunchedEffect(uiState.showPlayerDetailSheet, uiState.miniPlayerModel) {
-        if (uiState.showPlayerDetailSheet && uiState.miniPlayerModel == null) {
+    LaunchedEffect(uiState.isExpandedPlayerVisible, uiState.miniPlayerModel) {
+        if (uiState.isExpandedPlayerVisible && uiState.miniPlayerModel == null) {
             viewModel.onClosePlayerDetailSheet()
         }
     }
@@ -207,7 +207,7 @@ fun AudioAndroidApp(
             Log.d(
                 "FlashAutomation",
                 "uiPlaybackOpenDetail requestId=${scenario.requestId} mode=flash " +
-                    "detailBefore=${uiState.showPlayerDetailSheet}",
+                    "detailBefore=${uiState.isExpandedPlayerVisible}",
             )
             viewModel.onPlaybackSpeedSelected(scenario.playbackSpeed)
             Log.d(
@@ -249,6 +249,12 @@ fun AudioAndroidApp(
                         requestId = scenario.requestId,
                         mode = TransportModeOption.Flash,
                         uiState = viewModel.uiState.value,
+                    )
+                    FlashAlignmentPerfTrace.forceReport(
+                        "script-${step.action.id}-$index requestId=${scenario.requestId} atMs=${step.atMs}",
+                    )
+                    FlashVisualPerfTrace.forceReport(
+                        "script-${step.action.id}-$index requestId=${scenario.requestId} atMs=${step.atMs}",
                     )
                 }
             }
@@ -491,7 +497,7 @@ fun AudioAndroidApp(
         uiState.currentPlaybackSampleCount,
         uiState.currentPlayback.isPlaying,
         uiState.miniPlayerModel?.durationMs,
-        uiState.showPlayerDetailSheet,
+        uiState.isExpandedPlayerVisible,
     ) {
         if (BuildConfig.DEBUG && debugScenario != null && flashDebugSession != null) {
             val followData = flashDebugSession.followData
@@ -505,7 +511,7 @@ fun AudioAndroidApp(
                     "fileBacked=${!flashDebugSession.generatedPcmFilePath.isNullOrBlank()} " +
                     "playbackSamples=${uiState.currentPlaybackSampleCount} " +
                     "miniPlayer=${uiState.miniPlayerModel != null} miniDurationMs=${uiState.miniPlayerModel?.durationMs ?: 0} " +
-                    "detailSheet=${uiState.showPlayerDetailSheet} " +
+                    "detailSheet=${uiState.isExpandedPlayerVisible} " +
                     "follow=${followData.followAvailable} textFollow=${followData.textFollowAvailable} " +
                     "binaryGroups=${followData.binaryGroupTimeline.size} playing=${uiState.currentPlayback.isPlaying}",
             )
@@ -616,7 +622,7 @@ private fun logUiDebugPlaybackStep(
         "FlashAutomation",
         "uiPlaybackStep requestId=$requestId label=$label mode=${mode.wireName} " +
             "source=${uiState.currentPlaybackSource.debugSourceId()} " +
-            "detailSheet=${uiState.showPlayerDetailSheet} miniPlayer=${uiState.miniPlayerModel != null} " +
+            "detailSheet=${uiState.isExpandedPlayerVisible} miniPlayer=${uiState.miniPlayerModel != null} " +
             "playbackSamples=${uiState.currentPlaybackSampleCount} playing=${uiState.currentPlayback.isPlaying} " +
             "played=${uiState.currentPlayback.playedSamples} displayed=${uiState.currentPlayback.displayedSamples} " +
             "paused=${uiState.currentPlayback.isPaused}",

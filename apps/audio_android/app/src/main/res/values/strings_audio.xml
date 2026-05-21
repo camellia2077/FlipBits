@@ -52,6 +52,7 @@
     <string name="audio_action_clear_result_busy">Clearing…</string>
     <!-- CONTEXT: Action button/icon that saves the current generated audio into the app's own Saved library, not the device file system. -->
     <string name="audio_action_export">Save to library</string>
+    <string name="audio_action_already_saved_to_library">Already saved to library</string>
     <!-- CONTEXT: Action/icon that exports the current audio through Android's file picker so the user can choose an exact destination file on the device. -->
     <string name="audio_action_export_to_file">Export to file</string>
     <string name="audio_action_playback_speed_short">Speed</string>
@@ -484,4 +485,5 @@
     <string name="audio_morse_visualizer_mode_vertical">Vertical</string>
     <!-- CONTEXT: Short mode label in the mini/Morse visualizer for the new left-to-right playback strip. -->
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
+    <string name="audio_action_collapse_player_detail">Collapse player</string>
 </resources>

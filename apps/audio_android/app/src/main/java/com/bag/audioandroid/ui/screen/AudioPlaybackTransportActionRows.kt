@@ -8,13 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAddCheck
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.RepeatOne
-import androidx.compose.material.icons.rounded.SaveAlt
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
@@ -30,14 +30,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.PlayerChromeColors
+import com.bag.audioandroid.ui.PlayerDetailBottomActions
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.playerSegmentedButtonColors
@@ -55,8 +59,17 @@ internal fun AudioPlaybackPrimaryControlsRow(
     onOpenSavedAudioSheet: () -> Unit,
     colors: PlayerChromeColors,
 ) {
+    val density = LocalDensity.current
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    debugPlayerBottomDockLayout(
+                        "primaryControls",
+                        "heightDp=${coordinates.toPlaybackVerticalSlice().heightDp(density)}",
+                    )
+                },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -138,20 +151,34 @@ internal fun AudioPlaybackSecondaryActionsRow(
     onCyclePlaybackSpeed: () -> Unit,
     onToggleSpeedAdjustment: () -> Unit,
     onPlaybackSpeedSelected: (Float) -> Unit,
-    onExportGeneratedAudio: () -> Unit,
-    onExportGeneratedAudioToDocument: () -> Unit,
-    canExportGeneratedAudio: Boolean,
+    bottomActions: PlayerDetailBottomActions,
     contentColor: androidx.compose.ui.graphics.Color,
 ) {
+    val alreadySavedDescription = stringResource(R.string.audio_action_already_saved_to_library)
+    val density = LocalDensity.current
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    debugPlayerBottomDockLayout(
+                        "secondaryActions",
+                        "heightDp=${coordinates.toPlaybackVerticalSlice().heightDp(density)} columnSpacingDp=4.0",
+                    )
+                },
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                    .padding(horizontal = 32.dp)
+                    .onGloballyPositioned { coordinates ->
+                        debugPlayerBottomDockLayout(
+                            "secondaryActionRow",
+                            "heightDp=${coordinates.toPlaybackVerticalSlice().heightDp(density)} horizontalPaddingDp=32.0",
+                        )
+                    },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -172,31 +199,44 @@ internal fun AudioPlaybackSecondaryActionsRow(
                 onToggleSpeedAdjustment = onToggleSpeedAdjustment,
                 contentColor = contentColor,
             )
-            if (canExportGeneratedAudio) {
-                UtilityIconButton(
-                    onClick = onExportGeneratedAudioToDocument,
-                    contentDescription = stringResource(R.string.audio_action_export_to_file),
-                    contentColor = contentColor,
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.SaveAlt,
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp),
-                    )
+            when {
+                bottomActions.onSaveToLibrary != null -> {
+                    UtilityIconButton(
+                        onClick = bottomActions.onSaveToLibrary,
+                        contentDescription = stringResource(R.string.audio_action_export),
+                        contentColor = contentColor,
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.PlaylistAdd,
+                            contentDescription = null,
+                            modifier = Modifier.size(30.dp),
+                        )
+                    }
                 }
-                UtilityIconButton(
-                    onClick = onExportGeneratedAudio,
-                    contentDescription = stringResource(R.string.audio_action_export),
-                    contentColor = contentColor,
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.PlaylistAdd,
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp),
-                    )
+                bottomActions.isAlreadySavedToLibrary -> {
+                    IconButton(
+                        onClick = {},
+                        enabled = false,
+                        modifier =
+                            Modifier
+                                .size(36.dp)
+                                .semantics { this.contentDescription = alreadySavedDescription },
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                contentColor = contentColor.copy(alpha = 0.6f),
+                                disabledContentColor = contentColor.copy(alpha = 0.6f),
+                            ),
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.PlaylistAddCheck,
+                            contentDescription = null,
+                            modifier = Modifier.size(30.dp),
+                        )
+                    }
                 }
-            } else {
-                SpacerUtilitySlot()
+                else -> {
+                    SpacerUtilitySlot()
+                }
             }
         }
         if (showSpeedAdjustment) {
@@ -426,6 +466,19 @@ private fun SpacerUtilitySlot() {
     Row(
         modifier = Modifier.size(36.dp),
     ) {
-        // Keep the speed control centered even when export is unavailable.
+        // Keep the speed control centered even when add-to-list is unavailable.
+    }
+}
+
+private fun debugPlayerBottomDockLayout(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        android.util.Log.d("PlayerBottomDockLayout", "$label $message")
+    } catch (_: RuntimeException) {
     }
 }

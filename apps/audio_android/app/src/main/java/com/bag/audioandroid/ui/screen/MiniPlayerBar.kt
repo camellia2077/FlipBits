@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,15 +27,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.asString
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
+import com.bag.audioandroid.ui.utilityActionIconButtonColors
 
 @Composable
 internal fun MiniPlayerBar(
@@ -58,34 +63,54 @@ internal fun MiniPlayerBar(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable(onClick = onOpenDetails),
+                .onGloballyPositioned { coordinates ->
+                    val position = coordinates.boundsInRoot().topLeft
+                    debugMiniPlayerBarLog(
+                        "surface",
+                        "leadingIcon=${model.leadingIcon.name} playing=$isPlaying " +
+                            "x=${position.x.toInt()} y=${position.y.toInt()} " +
+                            "w=${coordinates.size.width} h=${coordinates.size.height}",
+                    )
+                },
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            MiniPlayerLeadingIcon(model = model)
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+            Row(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .clickable(onClick = onOpenDetails),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(
-                    text = model.title.asString(),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = model.subtitle.asString(),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                MiniPlayerLeadingIcon(model = model)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(
+                        text = model.title.asString(),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = model.subtitle.asString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
-            IconButton(onClick = onOpenSavedAudioSheet) {
+            IconButton(
+                onClick = onOpenSavedAudioSheet,
+                colors = utilityActionIconButtonColors(),
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
                     contentDescription = stringResource(R.string.audio_action_open_saved_audio_list),
@@ -108,6 +133,19 @@ internal fun MiniPlayerBar(
                 )
             }
         }
+    }
+}
+
+private fun debugMiniPlayerBarLog(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        Log.d("MiniPlayerBarDiag", "$label $message")
+    } catch (_: RuntimeException) {
     }
 }
 

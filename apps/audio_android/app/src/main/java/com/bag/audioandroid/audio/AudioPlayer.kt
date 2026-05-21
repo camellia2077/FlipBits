@@ -1,6 +1,7 @@
 package com.bag.audioandroid.audio
 
 import android.media.AudioTrack
+import com.bag.audioandroid.util.safeDebugLog
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 
@@ -34,6 +35,9 @@ class AudioPlayer {
 
         @Volatile
         var playbackSpeed = 1.0f
+
+        @Volatile
+        var seekVersion = 0
     }
 
     fun prepareForNewPlayback(): PlaybackHandle = PlaybackHandle().also { currentPlayback = it }
@@ -48,6 +52,11 @@ class AudioPlayer {
     ): PlaybackResult {
         val totalSamples = pcm.size
         val startOffsetSamples = startSampleIndex.coerceIn(0, totalSamples)
+        safeDebugLog(
+            AudioPlayerDiagTag,
+            "playPcm handle=${playback.debugHandleId()} total=$totalSamples sampleRate=$sampleRateHz " +
+                "speed=$playbackSpeed start=$startOffsetSamples",
+        )
         if (startOffsetSamples >= totalSamples) {
             currentPlayback = playback
             playback.track = null
@@ -107,6 +116,11 @@ class AudioPlayer {
         onProgressChanged: (Int, Int) -> Unit = { _, _ -> },
     ): PlaybackResult {
         val startOffsetSamples = startSampleIndex.coerceIn(0, totalSamples)
+        safeDebugLog(
+            AudioPlayerDiagTag,
+            "playPcmFile handle=${playback.debugHandleId()} total=$totalSamples sampleRate=$sampleRateHz " +
+                "speed=$playbackSpeed start=$startOffsetSamples path=$pcmFilePath",
+        )
         if (startOffsetSamples >= totalSamples) {
             currentPlayback = playback
             playback.track = null
@@ -160,6 +174,7 @@ class AudioPlayer {
         }
         val relativePosition = clampedPosition - playback.bufferStartSamples
         return if (setPlaybackHeadPositionSafely(track, relativePosition)) {
+            playback.seekVersion += 1
             clampedPosition
         } else {
             null
@@ -168,6 +183,10 @@ class AudioPlayer {
 
     fun pause() {
         currentPlayback?.let { playback ->
+            safeDebugLog(
+                AudioPlayerDiagTag,
+                "pause handle=${playback.debugHandleId()} track=${playback.track != null}",
+            )
             playback.pauseRequested = true
             playback.track?.let(::safelyPauseTrack)
         }
@@ -175,6 +194,10 @@ class AudioPlayer {
 
     fun resume() {
         currentPlayback?.let { playback ->
+            safeDebugLog(
+                AudioPlayerDiagTag,
+                "resume handle=${playback.debugHandleId()} track=${playback.track != null} speed=${playback.playbackSpeed}",
+            )
             playback.pauseRequested = false
             playback.track?.let { track ->
                 setPlaybackSpeedSafely(track, playback.playbackSpeed)
@@ -186,6 +209,10 @@ class AudioPlayer {
     fun setPlaybackSpeed(playbackSpeed: Float): Boolean {
         val playback = currentPlayback ?: return false
         val resolvedPlaybackSpeed = playbackSpeed.coerceIn(MinPlaybackSpeed, MaxPlaybackSpeed)
+        safeDebugLog(
+            AudioPlayerDiagTag,
+            "setSpeed handle=${playback.debugHandleId()} from=${playback.playbackSpeed} to=$resolvedPlaybackSpeed",
+        )
         playback.playbackSpeed = resolvedPlaybackSpeed
         val track = playback.track ?: return true
         return setPlaybackSpeedSafely(track, resolvedPlaybackSpeed)
@@ -193,6 +220,11 @@ class AudioPlayer {
 
     fun stop() {
         currentPlayback?.let { playback ->
+            safeDebugLog(
+                AudioPlayerDiagTag,
+                "stop handle=${playback.debugHandleId()} track=${playback.track != null} " +
+                    "stopRequested=${playback.stopRequested} pauseRequested=${playback.pauseRequested}",
+            )
             playback.stopRequested = true
             playback.pauseRequested = false
             playback.track?.let(::safelyStopTrack)
@@ -203,6 +235,11 @@ class AudioPlayer {
         playback: PlaybackHandle,
         track: AudioTrack,
     ) {
+        safeDebugLog(
+            AudioPlayerDiagTag,
+            "releaseTrack handle=${playback.debugHandleId()} playState=${track.playState} " +
+                "bufferStart=${playback.bufferStartSamples} buffered=${playback.bufferedSamples}",
+        )
         if (track.playState != AudioTrack.PLAYSTATE_STOPPED) {
             safelyStopTrack(track)
         }
@@ -226,6 +263,10 @@ class AudioPlayer {
         const val StreamingBufferBytes = 32 * 1024
     }
 }
+
+private const val AudioPlayerDiagTag = "AudioPlayerDiag"
+
+private fun AudioPlayer.PlaybackHandle.debugHandleId(): String = Integer.toHexString(System.identityHashCode(this))
 
 private fun skipFully(
     input: BufferedInputStream,

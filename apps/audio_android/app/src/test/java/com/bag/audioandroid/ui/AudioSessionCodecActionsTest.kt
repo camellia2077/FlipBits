@@ -338,6 +338,7 @@ class AudioSessionCodecFailureStateTest {
                     playbackRuntimeGateway = FakePlaybackRuntimeGateway(),
                     savedAudioRepository = CodecFakeSavedAudioRepository(mapOf(savedItem.itemId to savedContent)),
                     stopPlayback = {},
+                    playCurrentFromStart = { false },
                     setCurrentStatusText = {},
                     generatedAudioCacheGateway = CodecFakeGeneratedAudioCacheGateway(),
                     savedAudioDecodeCacheGateway = CodecFakeSavedAudioDecodeCacheGateway(),

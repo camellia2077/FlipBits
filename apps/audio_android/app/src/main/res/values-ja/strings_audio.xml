@@ -20,6 +20,7 @@
     <string name="audio_action_previous_track">前のトラック</string>
     <string name="audio_action_next_track">次のトラック</string>
     <string name="audio_action_open_audio_info">情報</string>
+    <string name="audio_action_collapse_player_detail">プレーヤーを閉じる</string>
     <!-- CONTEXT: Playback mode option. Means normal play order. Paired with Random / Repeat one / Repeat all. Do not translate as ordinary quality or 'average'. -->
     <string name="audio_action_normal_playback">通常</string>
     <!-- CONTEXT: Playback mode option. Means random order, not manual shuffling UI. -->
@@ -36,6 +37,7 @@
     <string name="audio_action_clear_result">結果をクリア</string>
     <string name="audio_action_clear_result_busy">クリア中…</string>
     <string name="audio_action_export">保存</string>
+    <string name="audio_action_already_saved_to_library">ライブラリに保存済み</string>
     <string name="audio_action_export_to_file">ファイルへ書き出し</string>
     <string name="audio_action_playback_speed_short">速度</string>
     <string name="audio_action_open_playback_speed_menu">再生速度メニューを開く</string>

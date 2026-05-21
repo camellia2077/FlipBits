@@ -20,6 +20,7 @@
     <string name="audio_action_previous_track">上一首</string>
     <string name="audio_action_next_track">下一首</string>
     <string name="audio_action_open_audio_info">信息</string>
+    <string name="audio_action_collapse_player_detail">收起播放器</string>
     <!-- CONTEXT: Playback mode option. Means normal play order. Paired with Random / Repeat one / Repeat all. Do not translate as ordinary quality or 'average'. -->
     <string name="audio_action_normal_playback">顺序播放</string>
     <!-- CONTEXT: Playback mode option. Means random order, not manual shuffling UI. -->
@@ -36,6 +37,7 @@
     <string name="audio_action_clear_result">清除结果</string>
     <string name="audio_action_clear_result_busy">正在清除…</string>
     <string name="audio_action_export">保存</string>
+    <string name="audio_action_already_saved_to_library">已保存到列表</string>
     <string name="audio_action_export_to_file">导出到文件</string>
     <string name="audio_action_playback_speed_short">速度</string>
     <string name="audio_action_open_playback_speed_menu">打开播放速度菜单</string>

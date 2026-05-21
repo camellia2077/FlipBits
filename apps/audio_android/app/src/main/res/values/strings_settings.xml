@@ -278,7 +278,7 @@
     <!-- CONTEXT: Action label for importing a custom dual-tone preset from pasted text. -->
     <string name="config_custom_brand_theme_import">Import</string>
     <!-- CONTEXT: Action label for copying one custom dual-tone preset as plain text. -->
-    <string name="config_custom_brand_theme_copy_config">Copy config</string>
+    <string name="config_custom_brand_theme_copy_config">Copy</string>
     <!-- CONTEXT: Action label for copying every custom color preset in the current custom section. -->
     <string name="config_custom_theme_copy_all">Copy all colors</string>
     <!-- CONTEXT: Helper text in the custom dual-tone import dialog. -->

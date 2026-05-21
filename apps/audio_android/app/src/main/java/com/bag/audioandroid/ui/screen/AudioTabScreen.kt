@@ -42,6 +42,9 @@ fun AudioTabScreen(
     onFlashVoicingStyleSelected: (FlashVoicingStyleOption) -> Unit,
     selectedMorseSpeed: MorseSpeedOption,
     onMorseSpeedSelected: (MorseSpeedOption) -> Unit,
+    isSampleAutoFillEnabled: Boolean,
+    sampleInputLength: SampleInputLengthOption,
+    onSampleInputLengthSelected: (SampleInputLengthOption) -> Unit,
     inputText: String,
     inputPlaceholderText: String,
     onInputTextChange: (String) -> Unit,
@@ -62,7 +65,6 @@ fun AudioTabScreen(
     var inputCardExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
     var resultExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
     var resultContentExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
-    var sampleInputLength by rememberSaveable { mutableStateOf(SampleInputLengthOption.Short) }
 
     if (showInputEditor) {
         AudioInputEditorDialog(
@@ -127,8 +129,10 @@ fun AudioTabScreen(
                 sampleInputLength = sampleInputLength,
                 onSampleInputLengthSelected = { length ->
                     if (sampleInputLength != length) {
-                        sampleInputLength = length
-                        onRandomizeSampleInput(length)
+                        onSampleInputLengthSelected(length)
+                        if (isSampleAutoFillEnabled) {
+                            onRandomizeSampleInput(length)
+                        }
                     }
                 },
                 onRandomizeSampleInput = { onRandomizeSampleInput(sampleInputLength) },

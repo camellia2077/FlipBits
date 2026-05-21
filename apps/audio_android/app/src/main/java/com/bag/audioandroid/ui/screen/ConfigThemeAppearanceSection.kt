@@ -1,7 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
 import android.content.ClipData
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,57 +12,36 @@ import androidx.compose.material.icons.automirrored.rounded.Input
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
-import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.model.BrandThemeOption
-import com.bag.audioandroid.ui.model.CustomBrandThemeImportParseResult
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
-import com.bag.audioandroid.ui.model.CustomThemeImportError
-import com.bag.audioandroid.ui.model.CustomThemeImportMode
-import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
-import com.bag.audioandroid.ui.model.findDuplicateImportedThemePresetId
-import com.bag.audioandroid.ui.model.parseCustomBrandThemeImportText
-import com.bag.audioandroid.ui.model.parseCustomMaterialThemeImportText
 import com.bag.audioandroid.ui.model.toBatchConfigText
-import com.bag.audioandroid.ui.model.toConfigText
 import com.bag.audioandroid.ui.model.toMaterialBatchConfigText
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
 import com.bag.audioandroid.ui.theme.customMaterialPalette
+import com.bag.audioandroid.ui.theme.customMaterialPaletteId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 import com.bag.audioandroid.ui.utilityActionIconButtonColors
 import kotlinx.coroutines.launch
@@ -83,6 +61,13 @@ private data class ConfigThemeAppearanceSectionRenderState(
     val materialPaletteGroups: List<PaletteGroupUi>,
     val brandThemeGroups: ConfigThemeAppearanceBrandThemeGroups,
     val selectedCustomBrandThemePreset: CustomBrandThemeSettings?,
+)
+
+private data class BrandThemeBuiltInSectionUi(
+    val titleResId: Int,
+    val options: List<BrandThemeOption>,
+    val expanded: Boolean,
+    val onExpandedChanged: (Boolean) -> Unit,
 )
 
 private data class ConfigMaterialPaletteExpansionState(
@@ -148,118 +133,6 @@ private data class ConfigThemeAppearanceBrandThemeExpansionState(
     val isLabyrinthOfMutabilityBrandThemeExpanded: Boolean,
     val onLabyrinthOfMutabilityBrandThemeExpandedChanged: (Boolean) -> Unit,
 )
-
-internal enum class DuplicateImportMode {
-    Brand,
-    Material,
-}
-
-internal data class CustomBrandThemeBatchImportPreview(
-    val mode: DuplicateImportMode,
-    val importedSettings: List<CustomBrandThemeSettings>,
-    val duplicateCount: Int,
-) {
-    val totalCount: Int
-        get() = importedSettings.size
-
-    val newCount: Int
-        get() = totalCount - duplicateCount
-}
-
-private class ConfigThemeAppearanceDialogState(
-    showCustomThemeDialogState: MutableState<Boolean>,
-    showCustomMaterialThemeDialogState: MutableState<Boolean>,
-    customThemeDialogPresetIdState: MutableState<String?>,
-    showCustomThemeImportDialogState: MutableState<Boolean>,
-    showCustomMaterialThemeImportDialogState: MutableState<Boolean>,
-    showCustomThemeExportDialogState: MutableState<Boolean>,
-    pendingBatchImportState: MutableState<CustomBrandThemeBatchImportPreview?>,
-    duplicateImportModeState: MutableState<DuplicateImportMode?>,
-    duplicateImportCandidateState: MutableState<CustomBrandThemeSettings?>,
-    duplicateImportPresetIdState: MutableState<String?>,
-) {
-    var showCustomThemeDialog by showCustomThemeDialogState
-    var showCustomMaterialThemeDialog by showCustomMaterialThemeDialogState
-    var customThemeDialogPresetId by customThemeDialogPresetIdState
-    var showCustomThemeImportDialog by showCustomThemeImportDialogState
-    var showCustomMaterialThemeImportDialog by showCustomMaterialThemeImportDialogState
-    var showCustomThemeExportDialog by showCustomThemeExportDialogState
-    var pendingBatchImport by pendingBatchImportState
-    var duplicateImportMode by duplicateImportModeState
-    var duplicateImportCandidate by duplicateImportCandidateState
-    var duplicateImportPresetId by duplicateImportPresetIdState
-
-    fun openCreateCustomBrandTheme() {
-        customThemeDialogPresetId = null
-        showCustomThemeDialog = true
-    }
-
-    fun openEditCustomBrandTheme(presetId: String?) {
-        customThemeDialogPresetId = presetId
-        showCustomThemeDialog = true
-    }
-
-    fun dismissCustomThemeDialog() {
-        showCustomThemeDialog = false
-        customThemeDialogPresetId = null
-    }
-
-    fun openCustomMaterialThemeDialog() {
-        showCustomMaterialThemeDialog = true
-    }
-
-    fun dismissCustomMaterialThemeDialog() {
-        showCustomMaterialThemeDialog = false
-    }
-
-    fun openCustomThemeImportDialog() {
-        showCustomThemeImportDialog = true
-    }
-
-    fun dismissCustomThemeImportDialog() {
-        showCustomThemeImportDialog = false
-    }
-
-    fun openCustomThemeExportDialog() {
-        showCustomThemeExportDialog = true
-    }
-
-    fun dismissCustomThemeExportDialog() {
-        showCustomThemeExportDialog = false
-    }
-
-    fun openCustomMaterialThemeImportDialog() {
-        showCustomMaterialThemeImportDialog = true
-    }
-
-    fun dismissCustomMaterialThemeImportDialog() {
-        showCustomMaterialThemeImportDialog = false
-    }
-
-    fun stageBatchImport(preview: CustomBrandThemeBatchImportPreview) {
-        pendingBatchImport = preview
-    }
-
-    fun dismissBatchImportDialog() {
-        pendingBatchImport = null
-    }
-
-    fun stageDuplicateImport(
-        importedSettings: CustomBrandThemeSettings,
-        duplicatePresetId: String,
-        mode: DuplicateImportMode,
-    ) {
-        duplicateImportMode = mode
-        duplicateImportCandidate = importedSettings
-        duplicateImportPresetId = duplicatePresetId
-    }
-
-    fun dismissDuplicateImport() {
-        duplicateImportMode = null
-        duplicateImportCandidate = null
-        duplicateImportPresetId = null
-    }
-}
 
 @Composable
 internal fun ConfigThemeAppearanceSection(
@@ -330,6 +203,7 @@ internal fun ConfigThemeAppearanceSection(
     val copyAllConfigLabel = stringResource(R.string.config_custom_theme_copy_all)
     val addCustomLabel = stringResource(R.string.config_custom_brand_theme_add)
     val importCustomLabel = stringResource(R.string.config_custom_brand_theme_import)
+    val deleteCustomLabel = stringResource(R.string.config_custom_brand_theme_delete)
     val renderState =
         rememberConfigThemeAppearanceSectionRenderState(
             selectedThemeStyle = selectedThemeStyle,
@@ -339,8 +213,10 @@ internal fun ConfigThemeAppearanceSection(
             editCustomMaterialLabel = editCustomMaterialLabel,
             addCustomLabel = addCustomLabel,
             importCustomLabel = importCustomLabel,
+            deleteCustomLabel = deleteCustomLabel,
             onCreateCustomMaterialTheme = onCreateCustomMaterialTheme,
             onCustomMaterialThemesReordered = onCustomMaterialThemesReordered,
+            onCustomMaterialThemeDeleted = onCustomMaterialThemeDeleted,
             onOpenCustomMaterialThemeDialog = dialogState::openCustomMaterialThemeDialog,
             onOpenCustomMaterialThemeImportDialog = dialogState::openCustomMaterialThemeImportDialog,
             onCopyAllCustomMaterialThemes = {
@@ -446,38 +322,20 @@ internal fun ConfigThemeAppearanceSection(
         onCustomMaterialThemeSaved = onCustomMaterialThemeSaved,
         onCustomMaterialThemeDeleted = onCustomMaterialThemeDeleted,
         onSingleMaterialThemeImported = { importedSettings ->
-            val duplicatePresetId =
-                findDuplicateImportedThemePresetId(
-                    existing = customMaterialThemePresets,
-                    imported = importedSettings,
-                    mode = CustomThemeImportMode.Material,
-                )
-            if (duplicatePresetId == null) {
-                onCustomMaterialThemeSaved(importedSettings, null)
-            } else {
-                dialogState.stageDuplicateImport(
-                    importedSettings = importedSettings,
-                    duplicatePresetId = duplicatePresetId,
-                    mode = DuplicateImportMode.Material,
-                )
-            }
+            dialogState.stageSingleImportedTheme(
+                existing = customMaterialThemePresets,
+                imported = importedSettings,
+                mode = DuplicateImportMode.Material,
+                onSave = onCustomMaterialThemeSaved,
+            )
         },
         onSingleThemeImported = { importedSettings ->
-            val duplicatePresetId =
-                findDuplicateImportedThemePresetId(
-                    existing = customBrandThemePresets,
-                    imported = importedSettings,
-                    mode = CustomThemeImportMode.DualTone,
-                )
-            if (duplicatePresetId == null) {
-                onCustomBrandThemeSaved(importedSettings, null)
-            } else {
-                dialogState.stageDuplicateImport(
-                    importedSettings = importedSettings,
-                    duplicatePresetId = duplicatePresetId,
-                    mode = DuplicateImportMode.Brand,
-                )
-            }
+            dialogState.stageSingleImportedTheme(
+                existing = customBrandThemePresets,
+                imported = importedSettings,
+                mode = DuplicateImportMode.Brand,
+                onSave = onCustomBrandThemeSaved,
+            )
         },
         onBatchMaterialThemesImported = { importedSettings ->
             val preview =
@@ -509,24 +367,31 @@ internal fun ConfigThemeAppearanceSection(
         clipboard = clipboard,
         coroutineScope = coroutineScope,
         onConfirmBatchImport = { preview ->
-            when (preview.mode) {
-                DuplicateImportMode.Brand -> onCustomBrandThemesImported(preview.importedSettings)
-                DuplicateImportMode.Material -> onCustomMaterialThemesImported(preview.importedSettings)
-            }
+            confirmBatchThemeImport(
+                preview = preview,
+                onBrandImport = onCustomBrandThemesImported,
+                onMaterialImport = onCustomMaterialThemesImported,
+            )
             dialogState.dismissBatchImportDialog()
         },
         onConfirmDuplicateOverwrite = { settings, presetId, mode ->
-            when (mode) {
-                DuplicateImportMode.Brand -> onCustomBrandThemeSaved(settings, presetId)
-                DuplicateImportMode.Material -> onCustomMaterialThemeSaved(settings, presetId)
-            }
+            saveImportedTheme(
+                settings = settings,
+                presetId = presetId,
+                mode = mode,
+                onBrandSave = onCustomBrandThemeSaved,
+                onMaterialSave = onCustomMaterialThemeSaved,
+            )
             dialogState.dismissDuplicateImport()
         },
         onConfirmDuplicateAddCopy = { settings, mode ->
-            when (mode) {
-                DuplicateImportMode.Brand -> onCustomBrandThemeSaved(settings, null)
-                DuplicateImportMode.Material -> onCustomMaterialThemeSaved(settings, null)
-            }
+            saveImportedTheme(
+                settings = settings,
+                presetId = null,
+                mode = mode,
+                onBrandSave = onCustomBrandThemeSaved,
+                onMaterialSave = onCustomMaterialThemeSaved,
+            )
             dialogState.dismissDuplicateImport()
         },
     )
@@ -581,6 +446,13 @@ internal fun ConfigThemeAppearanceSection(
                     copySelectedBrandThemeConfig = copySelectedBrandThemeConfig,
                     copyAllCustomBrandThemeConfigs = copyAllCustomBrandThemeConfigs,
                     onReorderCustomBrandThemes = onCustomBrandThemesReordered,
+                    onDeleteCustomBrandTheme = { option ->
+                        customBrandThemePresets
+                            .firstOrNull { preset -> option.id == customBrandThemeOptionId(preset.presetId) }
+                            ?.presetId
+                            ?.let(onCustomBrandThemeDeleted)
+                    },
+                    canDeleteCustomBrandTheme = { _: BrandThemeOption -> customBrandThemePresets.size > 1 },
                     onOpenCreateCustomBrandTheme = dialogState::openCreateCustomBrandTheme,
                     onOpenEditCustomBrandTheme = { option ->
                         dialogState.openEditCustomBrandTheme(
@@ -597,45 +469,6 @@ internal fun ConfigThemeAppearanceSection(
 }
 
 @Composable
-private fun rememberConfigThemeAppearanceDialogState(): ConfigThemeAppearanceDialogState {
-    val showCustomThemeDialog = rememberSaveable { mutableStateOf(false) }
-    val showCustomMaterialThemeDialog = rememberSaveable { mutableStateOf(false) }
-    val customThemeDialogPresetId = rememberSaveable { mutableStateOf<String?>(null) }
-    val showCustomThemeImportDialog = rememberSaveable { mutableStateOf(false) }
-    val showCustomMaterialThemeImportDialog = rememberSaveable { mutableStateOf(false) }
-    val showCustomThemeExportDialog = rememberSaveable { mutableStateOf(false) }
-    val pendingBatchImport = remember { mutableStateOf<CustomBrandThemeBatchImportPreview?>(null) }
-    val duplicateImportMode = remember { mutableStateOf<DuplicateImportMode?>(null) }
-    val duplicateImportCandidate = remember { mutableStateOf<CustomBrandThemeSettings?>(null) }
-    val duplicateImportPresetId = remember { mutableStateOf<String?>(null) }
-    return remember(
-        showCustomThemeDialog,
-        showCustomMaterialThemeDialog,
-        customThemeDialogPresetId,
-        showCustomThemeImportDialog,
-        showCustomMaterialThemeImportDialog,
-        showCustomThemeExportDialog,
-        pendingBatchImport,
-        duplicateImportMode,
-        duplicateImportCandidate,
-        duplicateImportPresetId,
-    ) {
-        ConfigThemeAppearanceDialogState(
-            showCustomThemeDialogState = showCustomThemeDialog,
-            showCustomMaterialThemeDialogState = showCustomMaterialThemeDialog,
-            customThemeDialogPresetIdState = customThemeDialogPresetId,
-            showCustomThemeImportDialogState = showCustomThemeImportDialog,
-            showCustomMaterialThemeImportDialogState = showCustomMaterialThemeImportDialog,
-            showCustomThemeExportDialogState = showCustomThemeExportDialog,
-            pendingBatchImportState = pendingBatchImport,
-            duplicateImportModeState = duplicateImportMode,
-            duplicateImportCandidateState = duplicateImportCandidate,
-            duplicateImportPresetIdState = duplicateImportPresetId,
-        )
-    }
-}
-
-@Composable
 private fun rememberConfigThemeAppearanceSectionRenderState(
     selectedThemeStyle: ThemeStyleOption,
     selectedPalette: PaletteOption,
@@ -644,8 +477,10 @@ private fun rememberConfigThemeAppearanceSectionRenderState(
     editCustomMaterialLabel: String,
     addCustomLabel: String,
     importCustomLabel: String,
+    deleteCustomLabel: String,
     onCreateCustomMaterialTheme: () -> Unit,
     onCustomMaterialThemesReordered: (Int, Int) -> Unit,
+    onCustomMaterialThemeDeleted: (String) -> Unit,
     onOpenCustomMaterialThemeDialog: () -> Unit,
     onOpenCustomMaterialThemeImportDialog: () -> Unit,
     onCopyAllCustomMaterialThemes: () -> Unit,
@@ -655,82 +490,24 @@ private fun rememberConfigThemeAppearanceSectionRenderState(
     customBrandThemePresets: List<CustomBrandThemeSettings>,
 ): ConfigThemeAppearanceSectionRenderState {
     val isBrandStyle = selectedThemeStyle == ThemeStyleOption.BrandDualTone
-    val isCustomMaterialSelected = !isBrandStyle && isCustomMaterialPaletteId(selectedPalette.id)
     val materialPaletteGroups =
-        remember(
-            materialPalettes,
-            customMaterialThemePresets,
-            isCustomMaterialSelected,
-            editCustomMaterialLabel,
-            copyAllConfigLabel,
-        ) {
-            PaletteFamily.entries.mapNotNull { family ->
-                if (family == PaletteFamily.Brand) {
-                    return@mapNotNull null
-                }
-                val options =
-                    when (family) {
-                        PaletteFamily.Custom -> customMaterialThemePresets.map(::customMaterialPalette)
-                        else -> materialPalettes.filter { it.family == family }
-                    }
-                if (options.isEmpty()) {
-                    null
-                } else {
-                    PaletteGroupUi(
-                        family = family,
-                        options = options,
-                        onAddOption =
-                            if (family == PaletteFamily.Custom) {
-                                onCreateCustomMaterialTheme
-                            } else {
-                                null
-                            },
-                        addActionLabel =
-                            if (family == PaletteFamily.Custom) {
-                                addCustomLabel
-                            } else {
-                                null
-                            },
-                        onEditOption =
-                            if (family == PaletteFamily.Custom && isCustomMaterialSelected) {
-                                onOpenCustomMaterialThemeDialog
-                            } else {
-                                null
-                            },
-                        editActionLabel =
-                            if (family == PaletteFamily.Custom && isCustomMaterialSelected) {
-                                editCustomMaterialLabel
-                            } else {
-                                null
-                            },
-                        iconActions =
-                            if (family == PaletteFamily.Custom) {
-                                listOf(
-                                    PaletteGroupIconAction(
-                                        label = importCustomLabel,
-                                        icon = Icons.AutoMirrored.Rounded.Input,
-                                        onClick = onOpenCustomMaterialThemeImportDialog,
-                                    ),
-                                    PaletteGroupIconAction(
-                                        label = copyAllConfigLabel,
-                                        icon = Icons.Rounded.ContentCopy,
-                                        enabled = customMaterialThemePresets.isNotEmpty(),
-                                        onClick = onCopyAllCustomMaterialThemes,
-                                    ),
-                                )
-                            } else {
-                                emptyList()
-                            },
-                        onMoveOption =
-                            if (family == PaletteFamily.Custom) {
-                                onCustomMaterialThemesReordered
-                            } else {
-                                null
-                            },
-                    )
-                }
-            }
-        }
+        rememberMaterialPaletteGroups(
+            isBrandStyle = isBrandStyle,
+            selectedPalette = selectedPalette,
+            materialPalettes = materialPalettes,
+            customMaterialThemePresets = customMaterialThemePresets,
+            editCustomMaterialLabel = editCustomMaterialLabel,
+            addCustomLabel = addCustomLabel,
+            importCustomLabel = importCustomLabel,
+            deleteCustomLabel = deleteCustomLabel,
+            copyAllConfigLabel = copyAllConfigLabel,
+            onCreateCustomMaterialTheme = onCreateCustomMaterialTheme,
+            onCustomMaterialThemesReordered = onCustomMaterialThemesReordered,
+            onCustomMaterialThemeDeleted = onCustomMaterialThemeDeleted,
+            onOpenCustomMaterialThemeDialog = onOpenCustomMaterialThemeDialog,
+            onOpenCustomMaterialThemeImportDialog = onOpenCustomMaterialThemeImportDialog,
+            onCopyAllCustomMaterialThemes = onCopyAllCustomMaterialThemes,
+        )
     val brandThemeGroups = rememberConfigThemeAppearanceBrandThemeGroups(brandThemes)
     val selectedCustomBrandThemePreset =
         remember(selectedBrandTheme.id, customBrandThemePresets) {
@@ -743,6 +520,137 @@ private fun rememberConfigThemeAppearanceSectionRenderState(
         materialPaletteGroups = materialPaletteGroups,
         brandThemeGroups = brandThemeGroups,
         selectedCustomBrandThemePreset = selectedCustomBrandThemePreset,
+    )
+}
+
+@Composable
+private fun rememberMaterialPaletteGroups(
+    isBrandStyle: Boolean,
+    selectedPalette: PaletteOption,
+    materialPalettes: List<PaletteOption>,
+    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    editCustomMaterialLabel: String,
+    addCustomLabel: String,
+    importCustomLabel: String,
+    deleteCustomLabel: String,
+    copyAllConfigLabel: String,
+    onCreateCustomMaterialTheme: () -> Unit,
+    onCustomMaterialThemesReordered: (Int, Int) -> Unit,
+    onCustomMaterialThemeDeleted: (String) -> Unit,
+    onOpenCustomMaterialThemeDialog: () -> Unit,
+    onOpenCustomMaterialThemeImportDialog: () -> Unit,
+    onCopyAllCustomMaterialThemes: () -> Unit,
+): List<PaletteGroupUi> {
+    val isCustomMaterialSelected = !isBrandStyle && isCustomMaterialPaletteId(selectedPalette.id)
+    return remember(
+        materialPalettes,
+        customMaterialThemePresets,
+        isCustomMaterialSelected,
+        editCustomMaterialLabel,
+        addCustomLabel,
+        importCustomLabel,
+        deleteCustomLabel,
+        copyAllConfigLabel,
+        onCreateCustomMaterialTheme,
+        onCustomMaterialThemesReordered,
+        onCustomMaterialThemeDeleted,
+        onOpenCustomMaterialThemeDialog,
+        onOpenCustomMaterialThemeImportDialog,
+        onCopyAllCustomMaterialThemes,
+    ) {
+        PaletteFamily.entries.mapNotNull { family ->
+            materialPaletteGroupOrNull(
+                family = family,
+                materialPalettes = materialPalettes,
+                customMaterialThemePresets = customMaterialThemePresets,
+                isCustomMaterialSelected = isCustomMaterialSelected,
+                editCustomMaterialLabel = editCustomMaterialLabel,
+                addCustomLabel = addCustomLabel,
+                importCustomLabel = importCustomLabel,
+                deleteCustomLabel = deleteCustomLabel,
+                copyAllConfigLabel = copyAllConfigLabel,
+                onCreateCustomMaterialTheme = onCreateCustomMaterialTheme,
+                onCustomMaterialThemesReordered = onCustomMaterialThemesReordered,
+                onCustomMaterialThemeDeleted = onCustomMaterialThemeDeleted,
+                onOpenCustomMaterialThemeDialog = onOpenCustomMaterialThemeDialog,
+                onOpenCustomMaterialThemeImportDialog = onOpenCustomMaterialThemeImportDialog,
+                onCopyAllCustomMaterialThemes = onCopyAllCustomMaterialThemes,
+            )
+        }
+    }
+}
+
+private fun materialPaletteGroupOrNull(
+    family: PaletteFamily,
+    materialPalettes: List<PaletteOption>,
+    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    isCustomMaterialSelected: Boolean,
+    editCustomMaterialLabel: String,
+    addCustomLabel: String,
+    importCustomLabel: String,
+    deleteCustomLabel: String,
+    copyAllConfigLabel: String,
+    onCreateCustomMaterialTheme: () -> Unit,
+    onCustomMaterialThemesReordered: (Int, Int) -> Unit,
+    onCustomMaterialThemeDeleted: (String) -> Unit,
+    onOpenCustomMaterialThemeDialog: () -> Unit,
+    onOpenCustomMaterialThemeImportDialog: () -> Unit,
+    onCopyAllCustomMaterialThemes: () -> Unit,
+): PaletteGroupUi? {
+    if (family == PaletteFamily.Brand) {
+        return null
+    }
+    val options =
+        when (family) {
+            PaletteFamily.Custom -> customMaterialThemePresets.map(::customMaterialPalette)
+            else -> materialPalettes.filter { it.family == family }
+        }
+    if (options.isEmpty()) {
+        return null
+    }
+    if (family != PaletteFamily.Custom) {
+        return PaletteGroupUi(family = family, options = options)
+    }
+    return PaletteGroupUi(
+        family = family,
+        options = options,
+        onAddOption = onCreateCustomMaterialTheme,
+        addActionLabel = addCustomLabel,
+        onEditOption =
+            if (isCustomMaterialSelected) {
+                onOpenCustomMaterialThemeDialog
+            } else {
+                null
+            },
+        editActionLabel =
+            if (isCustomMaterialSelected) {
+                editCustomMaterialLabel
+            } else {
+                null
+            },
+        iconActions =
+            listOf(
+                PaletteGroupIconAction(
+                    label = importCustomLabel,
+                    icon = Icons.AutoMirrored.Rounded.Input,
+                    onClick = onOpenCustomMaterialThemeImportDialog,
+                ),
+                PaletteGroupIconAction(
+                    label = copyAllConfigLabel,
+                    icon = Icons.Rounded.ContentCopy,
+                    enabled = customMaterialThemePresets.isNotEmpty(),
+                    onClick = onCopyAllCustomMaterialThemes,
+                ),
+            ),
+        onMoveOption = onCustomMaterialThemesReordered,
+        deleteActionLabel = deleteCustomLabel,
+        onDeleteOption = { option ->
+            customMaterialThemePresets
+                .firstOrNull { preset -> option.id == customMaterialPaletteId(preset.presetId) }
+                ?.presetId
+                ?.let(onCustomMaterialThemeDeleted)
+        },
+        canDeleteOption = { customMaterialThemePresets.size > 1 },
     )
 }
 
@@ -792,145 +700,6 @@ private fun AutoExpandSelectedBrandThemeSection(
 }
 
 @Composable
-private fun ConfigThemeAppearanceDialogHost(
-    dialogState: ConfigThemeAppearanceDialogState,
-    selectedThemeMode: ThemeModeOption,
-    customBrandThemePresets: List<CustomBrandThemeSettings>,
-    onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
-    onCustomBrandThemeDeleted: (String) -> Unit,
-    customMaterialThemePresets: List<CustomBrandThemeSettings>,
-    customMaterialThemeSettings: CustomBrandThemeSettings,
-    onCustomMaterialThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
-    onCustomMaterialThemeDeleted: (String) -> Unit,
-    onSingleMaterialThemeImported: (CustomBrandThemeSettings) -> Unit,
-    onSingleThemeImported: (CustomBrandThemeSettings) -> Unit,
-    onBatchMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
-    onBatchThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
-    selectedCustomBrandThemePreset: CustomBrandThemeSettings?,
-    clipboard: Clipboard,
-    coroutineScope: kotlinx.coroutines.CoroutineScope,
-    onConfirmBatchImport: (CustomBrandThemeBatchImportPreview) -> Unit,
-    onConfirmDuplicateOverwrite: (CustomBrandThemeSettings, String, DuplicateImportMode) -> Unit,
-    onConfirmDuplicateAddCopy: (CustomBrandThemeSettings, DuplicateImportMode) -> Unit,
-) {
-    if (dialogState.showCustomThemeDialog) {
-        val editingSettings =
-            dialogState.customThemeDialogPresetId?.let { presetId ->
-                customBrandThemePresets.firstOrNull { it.presetId == presetId }
-            }
-        CustomBrandThemeDialog(
-            initialSettings = editingSettings ?: customBrandThemePresets.firstOrNull() ?: DefaultCustomBrandThemeSettings,
-            isCreatingNew = editingSettings == null,
-            canDelete = editingSettings != null && customBrandThemePresets.size > 1,
-            selectedThemeMode = selectedThemeMode,
-            onDismiss = dialogState::dismissCustomThemeDialog,
-            onSave = { settings ->
-                onCustomBrandThemeSaved(settings, dialogState.customThemeDialogPresetId)
-                dialogState.dismissCustomThemeDialog()
-            },
-            onDelete = {
-                val presetId = dialogState.customThemeDialogPresetId ?: return@CustomBrandThemeDialog
-                onCustomBrandThemeDeleted(presetId)
-                dialogState.dismissCustomThemeDialog()
-            },
-        )
-    }
-    if (dialogState.showCustomMaterialThemeDialog) {
-        CustomBrandThemeDialog(
-            initialSettings = customMaterialThemeSettings,
-            isCreatingNew = false,
-            canDelete = customMaterialThemePresets.size > 1,
-            mode = CustomBrandThemeDialogMode.MaterialSingleColor,
-            selectedThemeMode = selectedThemeMode,
-            onDismiss = dialogState::dismissCustomMaterialThemeDialog,
-            onSave = { settings ->
-                onCustomMaterialThemeSaved(settings, customMaterialThemeSettings.presetId)
-                dialogState.dismissCustomMaterialThemeDialog()
-            },
-            onDelete = {
-                onCustomMaterialThemeDeleted(customMaterialThemeSettings.presetId)
-                dialogState.dismissCustomMaterialThemeDialog()
-            },
-        )
-    }
-    if (dialogState.showCustomThemeImportDialog) {
-        CustomBrandThemeImportDialog(
-            onDismiss = dialogState::dismissCustomThemeImportDialog,
-            onImport = { importedSettings ->
-                if (importedSettings.size == 1) {
-                    onSingleThemeImported(importedSettings.single())
-                } else {
-                    onBatchThemesImported(importedSettings)
-                }
-                dialogState.dismissCustomThemeImportDialog()
-            },
-        )
-    }
-    if (dialogState.showCustomMaterialThemeImportDialog) {
-        CustomMaterialThemeImportDialog(
-            onDismiss = dialogState::dismissCustomMaterialThemeImportDialog,
-            onImport = { importedSettings ->
-                if (importedSettings.size == 1) {
-                    onSingleMaterialThemeImported(importedSettings.single())
-                } else {
-                    onBatchMaterialThemesImported(importedSettings)
-                }
-                dialogState.dismissCustomMaterialThemeImportDialog()
-            },
-        )
-    }
-    if (dialogState.showCustomThemeExportDialog) {
-        CustomBrandThemeExportDialog(
-            selectedConfigText = selectedCustomBrandThemePreset?.toConfigText().orEmpty(),
-            allConfigText = customBrandThemePresets.toBatchConfigText(),
-            canExportSelected = selectedCustomBrandThemePreset != null,
-            clipboard = clipboard,
-            coroutineScope = coroutineScope,
-            onDismiss = dialogState::dismissCustomThemeExportDialog,
-        )
-    }
-    dialogState.pendingBatchImport?.let { preview ->
-        CustomBrandThemeBatchImportConfirmDialog(
-            preview = preview,
-            onDismiss = dialogState::dismissBatchImportDialog,
-            onImport = { onConfirmBatchImport(preview) },
-        )
-    }
-    val duplicateImportMode = dialogState.duplicateImportMode
-    val duplicateImportCandidate = dialogState.duplicateImportCandidate
-    val duplicateImportPresetId = dialogState.duplicateImportPresetId
-    if (duplicateImportMode != null && duplicateImportCandidate != null && duplicateImportPresetId != null) {
-        AlertDialog(
-            onDismissRequest = dialogState::dismissDuplicateImport,
-            title = { Text(text = stringResource(R.string.config_custom_brand_theme_import_duplicate_title)) },
-            text = { Text(text = stringResource(R.string.config_custom_brand_theme_import_duplicate_message)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onConfirmDuplicateOverwrite(
-                            duplicateImportCandidate,
-                            duplicateImportPresetId,
-                            duplicateImportMode,
-                        )
-                    },
-                ) {
-                    Text(text = stringResource(R.string.config_custom_brand_theme_import_overwrite))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        onConfirmDuplicateAddCopy(duplicateImportCandidate, duplicateImportMode)
-                    },
-                ) {
-                    Text(text = stringResource(R.string.config_custom_brand_theme_import_add_copy))
-                }
-            },
-        )
-    }
-}
-
-@Composable
 private fun ConfigThemeAppearanceExpandedContent(
     accentTokens: AppThemeAccentTokens,
     selectedThemeStyle: ThemeStyleOption,
@@ -955,6 +724,8 @@ private fun ConfigThemeAppearanceExpandedContent(
     copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit,
     copyAllCustomBrandThemeConfigs: () -> Unit,
     onReorderCustomBrandThemes: (Int, Int) -> Unit,
+    onDeleteCustomBrandTheme: (BrandThemeOption) -> Unit,
+    canDeleteCustomBrandTheme: (BrandThemeOption) -> Boolean,
     onOpenCreateCustomBrandTheme: () -> Unit,
     onOpenEditCustomBrandTheme: (BrandThemeOption) -> Unit,
     onOpenImportCustomBrandTheme: () -> Unit,
@@ -1015,6 +786,8 @@ private fun ConfigThemeAppearanceExpandedContent(
             copySelectedBrandThemeConfig = copySelectedBrandThemeConfig,
             copyAllCustomBrandThemeConfigs = copyAllCustomBrandThemeConfigs,
             onReorderCustomBrandThemes = onReorderCustomBrandThemes,
+            onDeleteCustomBrandTheme = onDeleteCustomBrandTheme,
+            canDeleteCustomBrandTheme = canDeleteCustomBrandTheme,
             onOpenCreateCustomBrandTheme = onOpenCreateCustomBrandTheme,
             onOpenEditCustomBrandTheme = onOpenEditCustomBrandTheme,
             onOpenImportCustomBrandTheme = onOpenImportCustomBrandTheme,
@@ -1176,6 +949,8 @@ private fun ConfigThemeAppearanceBrandContent(
     copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit,
     copyAllCustomBrandThemeConfigs: () -> Unit,
     onReorderCustomBrandThemes: (Int, Int) -> Unit,
+    onDeleteCustomBrandTheme: (BrandThemeOption) -> Unit,
+    canDeleteCustomBrandTheme: (BrandThemeOption) -> Boolean,
     onOpenCreateCustomBrandTheme: () -> Unit,
     onOpenEditCustomBrandTheme: (BrandThemeOption) -> Unit,
     onOpenImportCustomBrandTheme: () -> Unit,
@@ -1251,76 +1026,72 @@ private fun ConfigThemeAppearanceBrandContent(
                         ),
                     ),
                 stackHeaderActions = true,
+                deleteActionLabel = stringResource(R.string.config_custom_brand_theme_delete),
+                onDeleteBrandTheme = onDeleteCustomBrandTheme,
+                canDeleteBrandTheme = canDeleteCustomBrandTheme,
             )
-            BrandThemeSection(
-                accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_sacred_machine),
-                options = brandThemeGroups.sacredMachineThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isSacredMachineBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onSacredMachineBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                copyConfigLabel = copyConfigLabel,
-                onCopyConfig = copySelectedBrandThemeConfig,
-            )
-            BrandThemeSection(
-                accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_ancient_dynasty),
-                options = brandThemeGroups.ancientDynastyThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isAncientDynastyBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onAncientDynastyBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                copyConfigLabel = copyConfigLabel,
-                onCopyConfig = copySelectedBrandThemeConfig,
-            )
-            BrandThemeSection(
-                accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_scarlet_carnage),
-                options = brandThemeGroups.scarletCarnageThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isScarletCarnageBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onScarletCarnageBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                copyConfigLabel = copyConfigLabel,
-                onCopyConfig = copySelectedBrandThemeConfig,
-            )
-            BrandThemeSection(
-                accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_labyrinth_of_mutability),
-                options = brandThemeGroups.labyrinthOfMutabilityThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isLabyrinthOfMutabilityBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onLabyrinthOfMutabilityBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                copyConfigLabel = copyConfigLabel,
-                onCopyConfig = copySelectedBrandThemeConfig,
-            )
-            BrandThemeSection(
-                accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_immortal_rot),
-                options = brandThemeGroups.immortalRotThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isImmortalRotBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onImmortalRotBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                copyConfigLabel = copyConfigLabel,
-                onCopyConfig = copySelectedBrandThemeConfig,
-            )
-            BrandThemeSection(
-                accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_exquisite_fall),
-                options = brandThemeGroups.exquisiteFallThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isExquisiteFallBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onExquisiteFallBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                copyConfigLabel = copyConfigLabel,
-                onCopyConfig = copySelectedBrandThemeConfig,
-            )
+            brandBuiltInThemeSections(
+                groups = brandThemeGroups,
+                expansionState = brandThemeExpansionState,
+            ).forEach { section ->
+                BrandThemeSection(
+                    accentTokens = accentTokens,
+                    title = stringResource(section.titleResId),
+                    options = section.options,
+                    selectedBrandTheme = selectedBrandTheme,
+                    expanded = section.expanded,
+                    onExpandedChanged = section.onExpandedChanged,
+                    onBrandThemeSelected = onBrandThemeSelected,
+                    copyConfigLabel = copyConfigLabel,
+                    onCopyConfig = copySelectedBrandThemeConfig,
+                )
+            }
         }
     }
 }
+
+private fun brandBuiltInThemeSections(
+    groups: ConfigThemeAppearanceBrandThemeGroups,
+    expansionState: ConfigThemeAppearanceBrandThemeExpansionState,
+): List<BrandThemeBuiltInSectionUi> =
+    listOf(
+        BrandThemeBuiltInSectionUi(
+            titleResId = R.string.config_dual_tone_group_sacred_machine,
+            options = groups.sacredMachineThemes,
+            expanded = expansionState.isSacredMachineBrandThemeExpanded,
+            onExpandedChanged = expansionState.onSacredMachineBrandThemeExpandedChanged,
+        ),
+        BrandThemeBuiltInSectionUi(
+            titleResId = R.string.config_dual_tone_group_ancient_dynasty,
+            options = groups.ancientDynastyThemes,
+            expanded = expansionState.isAncientDynastyBrandThemeExpanded,
+            onExpandedChanged = expansionState.onAncientDynastyBrandThemeExpandedChanged,
+        ),
+        BrandThemeBuiltInSectionUi(
+            titleResId = R.string.config_dual_tone_group_scarlet_carnage,
+            options = groups.scarletCarnageThemes,
+            expanded = expansionState.isScarletCarnageBrandThemeExpanded,
+            onExpandedChanged = expansionState.onScarletCarnageBrandThemeExpandedChanged,
+        ),
+        BrandThemeBuiltInSectionUi(
+            titleResId = R.string.config_dual_tone_group_labyrinth_of_mutability,
+            options = groups.labyrinthOfMutabilityThemes,
+            expanded = expansionState.isLabyrinthOfMutabilityBrandThemeExpanded,
+            onExpandedChanged = expansionState.onLabyrinthOfMutabilityBrandThemeExpandedChanged,
+        ),
+        BrandThemeBuiltInSectionUi(
+            titleResId = R.string.config_dual_tone_group_immortal_rot,
+            options = groups.immortalRotThemes,
+            expanded = expansionState.isImmortalRotBrandThemeExpanded,
+            onExpandedChanged = expansionState.onImmortalRotBrandThemeExpandedChanged,
+        ),
+        BrandThemeBuiltInSectionUi(
+            titleResId = R.string.config_dual_tone_group_exquisite_fall,
+            options = groups.exquisiteFallThemes,
+            expanded = expansionState.isExquisiteFallBrandThemeExpanded,
+            onExpandedChanged = expansionState.onExquisiteFallBrandThemeExpandedChanged,
+        ),
+    )
 
 private fun ConfigThemeAppearanceBrandThemeExpansionState.ensureSelectedGroupExpanded(groupTitleResId: Int) {
     when (groupTitleResId) {
@@ -1353,338 +1124,6 @@ private fun ConfigThemeAppearanceBrandThemeExpansionState.ensureSelectedGroupExp
                 onLabyrinthOfMutabilityBrandThemeExpandedChanged(true)
             }
     }
-}
-
-@Composable
-private fun CustomMaterialThemeImportDialog(
-    onDismiss: () -> Unit,
-    onImport: (List<CustomBrandThemeSettings>) -> Unit,
-) {
-    var configText by rememberSaveable { mutableStateOf("") }
-    var showError by rememberSaveable { mutableStateOf(false) }
-    val parseResult = remember(configText) { parseCustomMaterialThemeImportText(configText) }
-    val context = LocalContext.current
-    val errorMessage =
-        if (showError && parseResult is CustomBrandThemeImportParseResult.Invalid) {
-            formatCustomThemeImportErrorMessage(context, parseResult.error)
-        } else {
-            null
-        }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.config_custom_material_theme_import_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(text = stringResource(R.string.config_custom_material_theme_import_description))
-                OutlinedTextField(
-                    value = configText,
-                    onValueChange = {
-                        configText = it
-                        showError = false
-                    },
-                    minLines = 6,
-                    maxLines = 10,
-                    label = { Text(text = stringResource(R.string.config_custom_material_theme_import_config_label)) },
-                    isError = showError,
-                    supportingText = {
-                        if (errorMessage != null) {
-                            Text(text = errorMessage)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    when (parseResult) {
-                        is CustomBrandThemeImportParseResult.Valid -> onImport(parseResult.settings)
-                        is CustomBrandThemeImportParseResult.Invalid -> showError = true
-                    }
-                },
-            ) {
-                Text(text = stringResource(R.string.config_custom_material_theme_import))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.common_cancel))
-            }
-        },
-    )
-}
-
-@Composable
-private fun CustomBrandThemeImportDialog(
-    onDismiss: () -> Unit,
-    onImport: (List<CustomBrandThemeSettings>) -> Unit,
-) {
-    var configText by rememberSaveable { mutableStateOf("") }
-    var showError by rememberSaveable { mutableStateOf(false) }
-    val parseResult = remember(configText) { parseCustomBrandThemeImportText(configText) }
-    val context = LocalContext.current
-    val errorMessage =
-        if (showError && parseResult is CustomBrandThemeImportParseResult.Invalid) {
-            formatCustomThemeImportErrorMessage(context, parseResult.error)
-        } else {
-            null
-        }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.config_custom_brand_theme_import_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(text = stringResource(R.string.config_custom_brand_theme_import_description))
-                OutlinedTextField(
-                    value = configText,
-                    onValueChange = {
-                        configText = it
-                        showError = false
-                    },
-                    minLines = 6,
-                    maxLines = 10,
-                    label = { Text(text = stringResource(R.string.config_custom_brand_theme_import_config_label)) },
-                    isError = showError,
-                    supportingText = {
-                        if (errorMessage != null) {
-                            Text(text = errorMessage)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    when (parseResult) {
-                        is CustomBrandThemeImportParseResult.Valid -> onImport(parseResult.settings)
-                        is CustomBrandThemeImportParseResult.Invalid -> showError = true
-                    }
-                },
-            ) {
-                Text(text = stringResource(R.string.config_custom_brand_theme_import))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.common_cancel))
-            }
-        },
-    )
-}
-
-internal fun formatCustomThemeImportErrorMessage(
-    context: Context,
-    error: CustomThemeImportError,
-): String {
-    fun fieldLabel(field: String): String =
-        when (field.lowercase()) {
-            "name" -> context.getString(R.string.config_custom_theme_import_field_name)
-            "primary" -> context.getString(R.string.config_custom_theme_import_field_primary)
-            "secondary" -> context.getString(R.string.config_custom_theme_import_field_secondary)
-            "outline" -> context.getString(R.string.config_custom_theme_import_field_outline)
-            else -> field
-        }
-
-    return when (error) {
-        CustomThemeImportError.EmptyInput ->
-            context.getString(R.string.config_custom_theme_import_error_empty)
-        is CustomThemeImportError.MalformedLine ->
-            context.getString(R.string.config_custom_theme_import_error_malformed_line, error.lineNumber)
-        is CustomThemeImportError.UnknownField ->
-            context.getString(
-                R.string.config_custom_theme_import_error_unknown_field,
-                error.blockIndex,
-                error.field,
-            )
-        is CustomThemeImportError.DuplicateField ->
-            context.getString(
-                R.string.config_custom_theme_import_error_duplicate_field,
-                error.blockIndex,
-                fieldLabel(error.field),
-            )
-        is CustomThemeImportError.MissingField ->
-            context.getString(
-                R.string.config_custom_theme_import_error_missing_field,
-                error.blockIndex,
-                fieldLabel(error.field),
-            )
-        is CustomThemeImportError.InvalidHex ->
-            context.getString(
-                R.string.config_custom_theme_import_error_invalid_hex,
-                error.blockIndex,
-                fieldLabel(error.field),
-                error.value,
-            )
-        is CustomThemeImportError.WrongImportMode ->
-            when (error.detectedMode) {
-                com.bag.audioandroid.ui.model.CustomThemeImportMode.DualTone ->
-                    context.getString(
-                        R.string.config_custom_theme_import_error_wrong_target_dual_tone,
-                        error.blockIndex,
-                    )
-                com.bag.audioandroid.ui.model.CustomThemeImportMode.Material ->
-                    context.getString(
-                        R.string.config_custom_theme_import_error_wrong_target_material,
-                        error.blockIndex,
-                    )
-            }
-    }
-}
-
-@Composable
-private fun CustomBrandThemeExportDialog(
-    selectedConfigText: String,
-    allConfigText: String,
-    canExportSelected: Boolean,
-    clipboard: Clipboard,
-    coroutineScope: kotlinx.coroutines.CoroutineScope,
-    onDismiss: () -> Unit,
-) {
-    var exportScope by rememberSaveable {
-        mutableStateOf(
-            if (canExportSelected) {
-                CustomBrandThemeExportScope.Selected
-            } else {
-                CustomBrandThemeExportScope.All
-            },
-        )
-    }
-    val effectiveExportScope =
-        if (exportScope == CustomBrandThemeExportScope.Selected && !canExportSelected) {
-            CustomBrandThemeExportScope.All
-        } else {
-            exportScope
-        }
-    val configText =
-        when (effectiveExportScope) {
-            CustomBrandThemeExportScope.Selected -> selectedConfigText
-            CustomBrandThemeExportScope.All -> allConfigText
-        }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.config_custom_brand_theme_export_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(text = stringResource(R.string.config_custom_brand_theme_export_description))
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    CustomBrandThemeExportScope.entries.forEachIndexed { index, scope ->
-                        SegmentedButton(
-                            selected = effectiveExportScope == scope,
-                            onClick = { exportScope = scope },
-                            shape =
-                                SegmentedButtonDefaults.itemShape(
-                                    index = index,
-                                    count = CustomBrandThemeExportScope.entries.size,
-                                ),
-                            enabled = scope != CustomBrandThemeExportScope.Selected || canExportSelected,
-                            colors = appSegmentedButtonColors(),
-                        ) {
-                            Text(text = stringResource(scope.labelResId))
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = configText,
-                    onValueChange = {},
-                    readOnly = true,
-                    minLines = 8,
-                    maxLines = 12,
-                    label = { Text(text = stringResource(R.string.config_custom_brand_theme_import_config_label)) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    coroutineScope.launch {
-                        clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("FlipBits custom theme config", configText)))
-                        onDismiss()
-                    }
-                },
-            ) {
-                Text(text = stringResource(R.string.config_custom_brand_theme_copy_config))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.common_cancel))
-            }
-        },
-    )
-}
-
-private enum class CustomBrandThemeExportScope(
-    val labelResId: Int,
-) {
-    Selected(R.string.config_custom_brand_theme_export_scope_selected),
-    All(R.string.config_custom_brand_theme_export_scope_all),
-}
-
-@Composable
-private fun CustomBrandThemeBatchImportConfirmDialog(
-    preview: CustomBrandThemeBatchImportPreview,
-    onDismiss: () -> Unit,
-    onImport: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.config_custom_brand_theme_batch_import_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text =
-                        stringResource(
-                            R.string.config_custom_brand_theme_batch_import_summary,
-                            preview.totalCount,
-                            preview.newCount,
-                            preview.duplicateCount,
-                        ),
-                )
-                Text(text = stringResource(R.string.config_custom_brand_theme_batch_import_duplicate_note))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                enabled = preview.importedSettings.isNotEmpty(),
-                onClick = onImport,
-            ) {
-                Text(text = stringResource(R.string.config_custom_brand_theme_import))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.common_cancel))
-            }
-        },
-    )
-}
-
-internal fun buildCustomBrandThemeBatchImportPreview(
-    existing: List<CustomBrandThemeSettings>,
-    imported: List<CustomBrandThemeSettings>,
-    mode: DuplicateImportMode,
-): CustomBrandThemeBatchImportPreview {
-    val duplicateCount =
-        imported.count { importedSettings ->
-            findDuplicateImportedThemePresetId(
-                existing = existing,
-                imported = importedSettings,
-                mode =
-                    when (mode) {
-                        DuplicateImportMode.Brand -> CustomThemeImportMode.DualTone
-                        DuplicateImportMode.Material -> CustomThemeImportMode.Material
-                    },
-            ) != null
-        }
-    return CustomBrandThemeBatchImportPreview(
-        mode = mode,
-        importedSettings = imported,
-        duplicateCount = duplicateCount,
-    )
 }
 
 private fun androidx.compose.ui.graphics.Color.toHexString(): String {

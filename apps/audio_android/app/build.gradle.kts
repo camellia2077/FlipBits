@@ -142,6 +142,14 @@ android {
             isJniDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
         }
+        create("diagnosticRelease") {
+            initWith(getByName("release"))
+            // Temporary release-like diagnostics build: keep non-debuggable
+            // release runtime behavior, but use debug signing for local install.
+            isDebuggable = false
+            isJniDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

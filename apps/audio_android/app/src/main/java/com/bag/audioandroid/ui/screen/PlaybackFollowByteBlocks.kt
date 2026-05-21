@@ -76,6 +76,7 @@ internal fun MorseLetterBlock(
             isActive = isActive,
             isPast = isPast,
             activeBitIndex = activeBitIndex,
+            activeBitCount = 1,
             isActiveBitTone = isActiveBitTone,
             focusColor = focusColor,
             onFocusColor = onFocusColor,
@@ -131,26 +132,21 @@ internal fun PlaybackHexByteBlock(
     isActive: Boolean,
     isPast: Boolean,
     activeBitIndex: Int,
+    activeBitCount: Int,
     isActiveBitTone: Boolean,
     focusColor: Color,
     onFocusColor: Color,
     inactiveColor: Color,
 ) {
     val nibbles = hexNibbleGroups(group)
-    val currentNibbleIndex =
-        if (isActive && activeBitIndex >= 4 && nibbles.size > 1) {
-            1
-        } else {
-            0
-        }.coerceAtMost(nibbles.lastIndex.coerceAtLeast(0))
     val binaryText = nibbles.joinToString(separator = "") { it.binary }
     PlaybackHexByteVisualBlock(
         hexText = group.uppercase(),
         binaryText = binaryText,
         isActive = isActive,
         isPast = isPast,
-        activeNibbleIndex = if (isActive) currentNibbleIndex else -1,
         activeBitIndex = if (isActive) activeBitIndex else -1,
+        activeBitCount = if (isActive) activeBitCount else 0,
         isActiveBitTone = isActiveBitTone,
         focusColor = focusColor,
         onFocusColor = onFocusColor,
@@ -164,8 +160,8 @@ private fun PlaybackHexByteVisualBlock(
     binaryText: String,
     isActive: Boolean,
     isPast: Boolean,
-    activeNibbleIndex: Int,
     activeBitIndex: Int,
+    activeBitCount: Int,
     isActiveBitTone: Boolean,
     focusColor: Color,
     onFocusColor: Color,
@@ -174,18 +170,26 @@ private fun PlaybackHexByteVisualBlock(
     val annotatedHexText =
         buildAnnotatedString {
             hexText.forEachIndexed { nibbleIndex, hexChar ->
-                val isCurrentNibble = isActive && isActiveBitTone && nibbleIndex == activeNibbleIndex
+                val nibbleBitStart = nibbleIndex * 4
+                val isCurrentNibble =
+                    isActive &&
+                        isCurrentActiveRange(
+                            indexStart = nibbleBitStart,
+                            indexCount = 4,
+                            activeIndex = activeBitIndex,
+                            activeCount = activeBitCount,
+                            isActiveTone = isActiveBitTone,
+                        )
                 val isHistoryNibble =
                     isPast ||
                         (
                             isActive &&
-                                activeNibbleIndex >= 0 &&
-                                (
-                                    if (isActiveBitTone) {
-                                        nibbleIndex < activeNibbleIndex
-                                    } else {
-                                        nibbleIndex <= activeNibbleIndex
-                                    }
+                                isHistoryRange(
+                                    indexStart = nibbleBitStart,
+                                    indexCount = 4,
+                                    activeIndex = activeBitIndex,
+                                    activeCount = activeBitCount,
+                                    isActiveTone = isActiveBitTone,
                                 )
                         )
                 val (textColor, backgroundColor, weight) =
@@ -202,18 +206,23 @@ private fun PlaybackHexByteVisualBlock(
     val annotatedBinaryText =
         buildAnnotatedString {
             binaryText.forEachIndexed { bitIndex, bitChar ->
-                val isCurrentBit = isActive && isActiveBitTone && bitIndex == activeBitIndex
+                val isCurrentBit =
+                    isActive &&
+                        isCurrentActiveIndex(
+                            index = bitIndex,
+                            activeIndex = activeBitIndex,
+                            activeCount = activeBitCount,
+                            isActiveTone = isActiveBitTone,
+                        )
                 val isHistoryBit =
                     isPast ||
                         (
                             isActive &&
-                                activeBitIndex >= 0 &&
-                                (
-                                    if (isActiveBitTone) {
-                                        bitIndex < activeBitIndex
-                                    } else {
-                                        bitIndex <= activeBitIndex
-                                    }
+                                isHistoryIndex(
+                                    index = bitIndex,
+                                    activeIndex = activeBitIndex,
+                                    activeCount = activeBitCount,
+                                    isActiveTone = isActiveBitTone,
                                 )
                         )
                 val (textColor, backgroundColor, weight) =
@@ -262,6 +271,7 @@ internal fun PlaybackByteBlock(
     isActive: Boolean,
     isPast: Boolean,
     activeBitIndex: Int,
+    activeBitCount: Int,
     isActiveBitTone: Boolean,
     tokenIndex: Int = -1,
     tokenText: String = "_",
@@ -280,6 +290,7 @@ internal fun PlaybackByteBlock(
             group = group,
             isActive = isActive,
             activeBitIndex = activeBitIndex,
+            activeBitCount = activeBitCount,
             isActiveBitTone = isActiveBitTone,
             tokenIndex = tokenIndex,
             tokenText = tokenText,
@@ -295,13 +306,20 @@ internal fun PlaybackByteBlock(
                 when (mode) {
                     PlaybackFollowViewMode.Binary -> {
                         group.forEachIndexed { bitIndex, bitChar ->
-                            val isCurrentBit = isActiveBitTone && bitIndex == activeBitIndex
+                            val isCurrentBit =
+                                isCurrentActiveIndex(
+                                    index = bitIndex,
+                                    activeIndex = activeBitIndex,
+                                    activeCount = activeBitCount,
+                                    isActiveTone = isActiveBitTone,
+                                )
                             val isHistoryBit =
-                                if (isActiveBitTone) {
-                                    bitIndex < activeBitIndex
-                                } else {
-                                    bitIndex <= activeBitIndex
-                                }
+                                isHistoryIndex(
+                                    index = bitIndex,
+                                    activeIndex = activeBitIndex,
+                                    activeCount = activeBitCount,
+                                    isActiveTone = isActiveBitTone,
+                                )
 
                             val (textColor, bgColor, weight) =
                                 when {
@@ -316,15 +334,24 @@ internal fun PlaybackByteBlock(
                         }
                     }
                     PlaybackFollowViewMode.Hex -> {
-                        val currentNibbleIndex = if (activeBitIndex >= 0) activeBitIndex / 4 else -1
                         group.forEachIndexed { nibbleIndex, hexChar ->
-                            val isCurrentNibble = isActiveBitTone && nibbleIndex == currentNibbleIndex
+                            val nibbleBitStart = nibbleIndex * 4
+                            val isCurrentNibble =
+                                isCurrentActiveRange(
+                                    indexStart = nibbleBitStart,
+                                    indexCount = 4,
+                                    activeIndex = activeBitIndex,
+                                    activeCount = activeBitCount,
+                                    isActiveTone = isActiveBitTone,
+                                )
                             val isHistoryNibble =
-                                if (isActiveBitTone) {
-                                    nibbleIndex < currentNibbleIndex
-                                } else {
-                                    nibbleIndex <= currentNibbleIndex
-                                }
+                                isHistoryRange(
+                                    indexStart = nibbleBitStart,
+                                    indexCount = 4,
+                                    activeIndex = activeBitIndex,
+                                    activeCount = activeBitCount,
+                                    isActiveTone = isActiveBitTone,
+                                )
 
                             val (textColor, bgColor, weight) =
                                 when {
@@ -460,6 +487,68 @@ private fun MorsePatternVisual(
     }
 }
 
+private fun isCurrentActiveIndex(
+    index: Int,
+    activeIndex: Int,
+    activeCount: Int,
+    isActiveTone: Boolean,
+): Boolean =
+    isActiveTone &&
+        activeIndex >= 0 &&
+        index >= activeIndex &&
+        index < activeIndex + activeCount.coerceAtLeast(1)
+
+private fun isHistoryIndex(
+    index: Int,
+    activeIndex: Int,
+    activeCount: Int,
+    isActiveTone: Boolean,
+): Boolean {
+    if (activeIndex < 0) {
+        return false
+    }
+    val activeEndExclusive = activeIndex + activeCount.coerceAtLeast(1)
+    return if (isActiveTone) {
+        index < activeIndex
+    } else {
+        index < activeEndExclusive
+    }
+}
+
+private fun isCurrentActiveRange(
+    indexStart: Int,
+    indexCount: Int,
+    activeIndex: Int,
+    activeCount: Int,
+    isActiveTone: Boolean,
+): Boolean {
+    if (!isActiveTone || activeIndex < 0) {
+        return false
+    }
+    val indexEndExclusive = indexStart + indexCount.coerceAtLeast(1)
+    val activeEndExclusive = activeIndex + activeCount.coerceAtLeast(1)
+    return indexStart < activeEndExclusive && indexEndExclusive > activeIndex
+}
+
+private fun isHistoryRange(
+    indexStart: Int,
+    indexCount: Int,
+    activeIndex: Int,
+    activeCount: Int,
+    isActiveTone: Boolean,
+): Boolean {
+    if (activeIndex < 0) {
+        return false
+    }
+    val indexEndExclusive = indexStart + indexCount.coerceAtLeast(1)
+    val activeEndExclusive = activeIndex + activeCount.coerceAtLeast(1)
+    return if (isActiveTone) {
+        indexEndExclusive <= activeIndex
+    } else {
+        indexStart < activeEndExclusive
+    }
+}
+
 internal val MorseDotWidth = 6.dp
 internal val MorseDashWidth = 16.dp
 internal val MorseElementGap = 4.dp
@@ -477,6 +566,7 @@ private object PlaybackFollowBinaryRenderTrace {
         group: String,
         isActive: Boolean,
         activeBitIndex: Int,
+        activeBitCount: Int,
         isActiveBitTone: Boolean,
         tokenIndex: Int,
         tokenText: String,
@@ -507,7 +597,7 @@ private object PlaybackFollowBinaryRenderTrace {
                 "reason=token-binary-render-playback " +
                     "sample=$displayedSamples token=$tokenIndex tokenText=${tokenText.logSafe()} " +
                     "tokenViewMode=binary byteIndexWithinToken=$byteIndexWithinToken globalByteOffset=$globalByteOffset " +
-                    "renderedBitIndexWithinByte=$activeBitIndex renderedGlobalBitOffset=$renderedGlobalBit " +
+                    "renderedBitIndexWithinByte=$activeBitIndex renderedBitCount=$activeBitCount renderedGlobalBitOffset=$renderedGlobalBit " +
                     "renderedBitValue=$renderedBitValue toneActive=$isActiveBitTone " +
                     "playbackGlobalBit=$playbackGlobalBit playbackCurrentBitValue=$playbackBitValue " +
                     "playbackMinusRenderedBit=${playbackGlobalBit - renderedGlobalBit}",

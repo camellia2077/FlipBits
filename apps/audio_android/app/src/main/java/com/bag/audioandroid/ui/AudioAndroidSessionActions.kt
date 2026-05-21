@@ -154,8 +154,16 @@ internal class AudioAndroidSessionActions(
         exportActions.onExportAudio()
     }
 
-    fun onOpenSavedAudioSheet() {
-        editingActions.onOpenSavedAudioSheet()
+    fun onShareCurrentGeneratedAudio() {
+        exportActions.onShareCurrentGeneratedAudio()
+    }
+
+    fun onOpenSavedAudioSheetFromDock() {
+        editingActions.onOpenSavedAudioSheetFromDock()
+    }
+
+    fun onOpenSavedAudioSheetFromPlayerDetail() {
+        editingActions.onOpenSavedAudioSheetFromPlayerDetail()
     }
 
     fun onCloseSavedAudioSheet() {

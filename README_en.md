@@ -52,7 +52,7 @@
 ## Download / Install
 The Android APK will be published via GitHub Releases.
 
-Under the current reference build, the installation package is approximately `6.19 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
+Under the current reference build, the installation package is approximately `6.24 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
 
 For user-facing Android release notes, see:
 - [`docs/presentation/android/CHANGELOG.md`](docs/presentation/android/CHANGELOG.md)

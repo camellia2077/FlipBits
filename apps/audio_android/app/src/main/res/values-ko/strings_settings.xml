@@ -234,7 +234,7 @@
     <string name="config_demo_mode_subtitle">녹화를 위해 탭 피드백과 키 동작 힌트를 표시합니다.</string>
     <string name="config_custom_brand_theme_import_title">사용자 지정 dual-tone 가져오기</string>
     <string name="config_custom_brand_theme_import">가져오기</string>
-    <string name="config_custom_brand_theme_copy_config">설정 복사</string>
+    <string name="config_custom_brand_theme_copy_config">복사</string>
     <string name="config_custom_theme_copy_all">모든 색상 복사</string>
     <string name="config_custom_brand_theme_import_description">FlipBits 사용자 지정 테마 설정을 붙여넣으세요.</string>
     <string name="config_custom_brand_theme_import_config_label">테마 설정</string>

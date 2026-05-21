@@ -1,5 +1,6 @@
 package com.bag.audioandroid.audio
 
+import com.bag.audioandroid.util.safeDebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,8 +42,22 @@ class AudioPlaybackCoordinator(
         onFinished: (String, PlaybackResult) -> Unit,
         onFailed: (String) -> Unit,
     ) {
+        if (activePlaybackRequestId != null) {
+            safeDebugLog(
+                PlaybackCoordinatorDiagTag,
+                "startPlaybackPreempt source=$sourceKey activeSource=${activePlaybackKey.orEmpty()} " +
+                    "activeRequestId=${activePlaybackRequestId ?: -1L}",
+            )
+            stopPlayback()
+        }
         val playbackHandle = audioPlayer.prepareForNewPlayback()
         val requestId = beginPlayback(sourceKey)
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "startPlayback requestId=$requestId source=$sourceKey handle=${playbackHandle.debugHandleId()} " +
+                "total=$totalSamples fileBacked=${!pcmFilePath.isNullOrBlank()} sampleRate=$sampleRateHz " +
+                "speed=$playbackSpeed start=$startSampleIndex",
+        )
         onStarted()
         scope.launch(Dispatchers.IO) {
             try {
@@ -74,15 +89,33 @@ class AudioPlaybackCoordinator(
                         }
                     }
                 if (!isPlaybackActive(requestId, sourceKey)) {
+                    safeDebugLog(
+                        PlaybackCoordinatorDiagTag,
+                        "finishIgnored requestId=$requestId source=$sourceKey handle=${playbackHandle.debugHandleId()} result=$result",
+                    )
                     return@launch
                 }
                 clearActivePlayback(requestId)
+                safeDebugLog(
+                    PlaybackCoordinatorDiagTag,
+                    "finish requestId=$requestId source=$sourceKey handle=${playbackHandle.debugHandleId()} result=$result",
+                )
                 onFinished(sourceKey, result)
-            } catch (_: Exception) {
+            } catch (error: Exception) {
                 if (!isPlaybackActive(requestId, sourceKey)) {
+                    safeDebugLog(
+                        PlaybackCoordinatorDiagTag,
+                        "failureIgnored requestId=$requestId source=$sourceKey handle=${playbackHandle.debugHandleId()} " +
+                            "error=${error::class.java.simpleName}",
+                    )
                     return@launch
                 }
                 clearActivePlayback(requestId)
+                safeDebugLog(
+                    PlaybackCoordinatorDiagTag,
+                    "failure requestId=$requestId source=$sourceKey handle=${playbackHandle.debugHandleId()} " +
+                        "error=${error::class.java.simpleName} message=${error.message.orEmpty()}",
+                )
                 onFailed(sourceKey)
             }
         }
@@ -90,18 +123,34 @@ class AudioPlaybackCoordinator(
 
     fun pausePlayback(sourceKey: String): Boolean {
         if (!isPlaybackActiveForSource(sourceKey) || playbackPaused) {
+            safeDebugLog(
+                PlaybackCoordinatorDiagTag,
+                "pauseRejected source=$sourceKey active=$activePlaybackKey paused=$playbackPaused requestId=${activePlaybackRequestId ?: -1L}",
+            )
             return false
         }
         playbackPaused = true
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "pause source=$sourceKey requestId=${activePlaybackRequestId ?: -1L}",
+        )
         audioPlayer.pause()
         return true
     }
 
     fun resumePlayback(sourceKey: String): Boolean {
         if (!isPlaybackActiveForSource(sourceKey) || !playbackPaused) {
+            safeDebugLog(
+                PlaybackCoordinatorDiagTag,
+                "resumeRejected source=$sourceKey active=$activePlaybackKey paused=$playbackPaused requestId=${activePlaybackRequestId ?: -1L}",
+            )
             return false
         }
         playbackPaused = false
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "resume source=$sourceKey requestId=${activePlaybackRequestId ?: -1L}",
+        )
         audioPlayer.resume()
         return true
     }
@@ -111,8 +160,16 @@ class AudioPlaybackCoordinator(
         playbackSpeed: Float,
     ): Boolean {
         if (activePlaybackKey != sourceKey) {
+            safeDebugLog(
+                PlaybackCoordinatorDiagTag,
+                "setSpeedRejected source=$sourceKey active=$activePlaybackKey requestId=${activePlaybackRequestId ?: -1L} speed=$playbackSpeed",
+            )
             return false
         }
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "setSpeed source=$sourceKey requestId=${activePlaybackRequestId ?: -1L} speed=$playbackSpeed",
+        )
         return audioPlayer.setPlaybackSpeed(playbackSpeed)
     }
 
@@ -164,18 +221,31 @@ class AudioPlaybackCoordinator(
 
     fun stopPlayback(onStopped: (String) -> Unit = {}) {
         val playbackKey = activePlaybackKey ?: return
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "stopPlayback source=$playbackKey requestId=${activePlaybackRequestId ?: -1L} paused=$playbackPaused",
+        )
         clearActivePlayback()
         audioPlayer.stop()
         onStopped(playbackKey)
     }
 
     fun release() {
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "release source=${activePlaybackKey.orEmpty()} requestId=${activePlaybackRequestId ?: -1L}",
+        )
         clearActivePlayback()
         audioPlayer.stop()
     }
 
     private fun beginPlayback(sourceKey: String): Long {
         val requestId = playbackRequestIds.incrementAndGet()
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "beginPlayback source=$sourceKey requestId=$requestId previousSource=${activePlaybackKey.orEmpty()} " +
+                "previousRequestId=${activePlaybackRequestId ?: -1L}",
+        )
         activePlaybackRequestId = requestId
         activePlaybackKey = sourceKey
         playbackPaused = false
@@ -184,6 +254,11 @@ class AudioPlaybackCoordinator(
 
     private fun clearActivePlayback(requestId: Long? = null) {
         if (requestId == null || activePlaybackRequestId == requestId) {
+            safeDebugLog(
+                PlaybackCoordinatorDiagTag,
+                "clearActivePlayback requestId=${requestId ?: -1L} activeSource=${activePlaybackKey.orEmpty()} " +
+                    "activeRequestId=${activePlaybackRequestId ?: -1L} paused=$playbackPaused",
+            )
             activePlaybackRequestId = null
             activePlaybackKey = null
             playbackPaused = false
@@ -195,3 +270,7 @@ class AudioPlaybackCoordinator(
         sourceKey: String,
     ): Boolean = activePlaybackRequestId == requestId && activePlaybackKey == sourceKey
 }
+
+private const val PlaybackCoordinatorDiagTag = "PlaybackCoordDiag"
+
+private fun AudioPlayer.PlaybackHandle.debugHandleId(): String = Integer.toHexString(System.identityHashCode(this))

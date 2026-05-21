@@ -223,7 +223,7 @@
     <string name="config_demo_mode_subtitle">Zeigt Tipp-Feedback und Aktionshinweise für Aufnahmen.</string>
     <string name="config_custom_brand_theme_import_title">Benutzerdefinierten dual-tone importieren</string>
     <string name="config_custom_brand_theme_import">Importieren</string>
-    <string name="config_custom_brand_theme_copy_config">Konfiguration kopieren</string>
+    <string name="config_custom_brand_theme_copy_config">Kopieren</string>
     <string name="config_custom_theme_copy_all">Alle Farben kopieren</string>
     <string name="config_custom_brand_theme_import_description">Füge eine FlipBits-Konfiguration für ein benutzerdefiniertes Theme ein.</string>
     <string name="config_custom_brand_theme_import_config_label">Theme-Konfiguration</string>

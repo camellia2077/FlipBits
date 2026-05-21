@@ -15,7 +15,9 @@ import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.PlaybackPhase
 import com.bag.audioandroid.ui.state.PlaybackUiState
+import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,6 +82,7 @@ class AudioSavedAudioSelectionActionsAsyncTest {
                     playbackRuntimeGateway = AsyncTestPlaybackRuntimeGateway(),
                     savedAudioRepository = repository,
                     stopPlayback = {},
+                    playCurrentFromStart = { false },
                     setCurrentStatusText = {},
                     generatedAudioCacheGateway = AsyncTestGeneratedAudioCacheGateway(),
                     savedAudioDecodeCacheGateway = AsyncTestSavedAudioDecodeCacheGateway(),
@@ -107,6 +110,135 @@ class AudioSavedAudioSelectionActionsAsyncTest {
             assertEquals(hydratedContent.waveformPcm.toList(), hydrated.waveformPcm.toList())
             assertEquals(hydratedContent.pcmFilePath, hydrated.pcmFilePath)
             assertEquals(hydratedContent.metadata?.pcmSampleCount, hydrated.metadata?.pcmSampleCount)
+        }
+
+    @Test
+    fun `prepare saved audio selection stops previous song before switching item`() =
+        runTest {
+            val previousItem =
+                SavedAudioItem(
+                    itemId = "saved-prev",
+                    displayName = "prev.wav",
+                    uriString = "content://saved/prev",
+                    modeWireName = TransportModeOption.Pro.wireName,
+                    durationMs = 2_000L,
+                    savedAtEpochSeconds = 1L,
+                    sampleRateHz = 44_100,
+                )
+            val nextItem =
+                SavedAudioItem(
+                    itemId = "saved-next",
+                    displayName = "next.wav",
+                    uriString = "content://saved/next",
+                    modeWireName = TransportModeOption.Pro.wireName,
+                    durationMs = 2_000L,
+                    savedAtEpochSeconds = 2L,
+                    sampleRateHz = 44_100,
+                )
+            var stopPlaybackCalls = 0
+            val uiState =
+                MutableStateFlow(
+                    AudioAppUiState(
+                        savedAudioItems = listOf(previousItem, nextItem),
+                        currentPlaybackSource =
+                            com.bag.audioandroid.ui.model.AudioPlaybackSource
+                                .Saved(previousItem.itemId),
+                        selectedSavedAudio =
+                            SavedAudioPlaybackSelection(
+                                item = previousItem,
+                                pcm = shortArrayOf(1, 2, 3),
+                                waveformPcm = shortArrayOf(1, 2),
+                                pcmFilePath = "prev.pcm16",
+                                sampleRateHz = 44_100,
+                                playback = PlaybackUiState(phase = PlaybackPhase.Playing, totalSamples = 3, sampleRateHz = 44_100),
+                            ),
+                    ),
+                )
+            val actions =
+                AudioSavedAudioSelectionActions(
+                    uiState = uiState,
+                    scope = this,
+                    playbackRuntimeGateway = AsyncTestPlaybackRuntimeGateway(),
+                    savedAudioRepository =
+                        AsyncTestSavedAudioRepository(
+                            listItems = listOf(previousItem, nextItem),
+                            loadBlock = {
+                                SavedAudioContent(
+                                    item = nextItem,
+                                    pcm = shortArrayOf(9, 8, 7),
+                                    waveformPcm = shortArrayOf(9, 8),
+                                    pcmFilePath = "next.pcm16",
+                                    sampleRateHz = 44_100,
+                                )
+                            },
+                        ),
+                    stopPlayback = { stopPlaybackCalls += 1 },
+                    playCurrentFromStart = { false },
+                    setCurrentStatusText = {},
+                    generatedAudioCacheGateway = AsyncTestGeneratedAudioCacheGateway(),
+                    savedAudioDecodeCacheGateway = AsyncTestSavedAudioDecodeCacheGateway(),
+                    workerDispatcher = StandardTestDispatcher(testScheduler),
+                )
+
+            assertTrue(actions.prepareSavedAudioSelection(nextItem.itemId))
+
+            assertEquals(1, stopPlaybackCalls)
+            assertEquals(
+                nextItem.itemId,
+                uiState.value.selectedSavedAudio
+                    ?.item
+                    ?.itemId,
+            )
+            assertFalse(uiState.value.selectedSavedAudio?.isLoadingContent ?: true)
+        }
+
+    @Test
+    fun `prepare saved audio selection for playback triggers one explicit follow up after sync load`() =
+        runTest {
+            val nextItem =
+                SavedAudioItem(
+                    itemId = "saved-next",
+                    displayName = "next.wav",
+                    uriString = "content://saved/next",
+                    modeWireName = TransportModeOption.Pro.wireName,
+                    durationMs = 2_000L,
+                    savedAtEpochSeconds = 2L,
+                    sampleRateHz = 44_100,
+                )
+            var playCurrentFromStartCalls = 0
+            val uiState = MutableStateFlow(AudioAppUiState(savedAudioItems = listOf(nextItem)))
+            val actions =
+                AudioSavedAudioSelectionActions(
+                    uiState = uiState,
+                    scope = this,
+                    playbackRuntimeGateway = AsyncTestPlaybackRuntimeGateway(),
+                    savedAudioRepository =
+                        AsyncTestSavedAudioRepository(
+                            listItems = listOf(nextItem),
+                            loadBlock = {
+                                SavedAudioContent(
+                                    item = nextItem,
+                                    pcm = shortArrayOf(9, 8, 7),
+                                    waveformPcm = shortArrayOf(9, 8),
+                                    pcmFilePath = "next.pcm16",
+                                    sampleRateHz = 44_100,
+                                )
+                            },
+                        ),
+                    stopPlayback = {},
+                    playCurrentFromStart = {
+                        playCurrentFromStartCalls += 1
+                        true
+                    },
+                    setCurrentStatusText = {},
+                    generatedAudioCacheGateway = AsyncTestGeneratedAudioCacheGateway(),
+                    savedAudioDecodeCacheGateway = AsyncTestSavedAudioDecodeCacheGateway(),
+                    workerDispatcher = StandardTestDispatcher(testScheduler),
+                )
+
+            assertTrue(actions.prepareSavedAudioSelectionForPlayback(nextItem.itemId))
+
+            assertEquals(1, playCurrentFromStartCalls)
         }
 }
 

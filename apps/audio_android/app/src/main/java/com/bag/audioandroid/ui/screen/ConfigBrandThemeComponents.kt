@@ -28,23 +28,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
@@ -72,6 +66,9 @@ internal fun BrandThemeSection(
     stackHeaderActions: Boolean = false,
     copyConfigIconOnly: Boolean = false,
     editSelectedOnly: Boolean = false,
+    deleteActionLabel: String? = null,
+    onDeleteBrandTheme: ((BrandThemeOption) -> Unit)? = null,
+    canDeleteBrandTheme: ((BrandThemeOption) -> Boolean)? = null,
 ) {
     if (options.isEmpty()) {
         return
@@ -84,19 +81,8 @@ internal fun BrandThemeSection(
         } else {
             selectedOption?.let(::listOf) ?: emptyList()
         }
-    val visibleOptionIds = visibleOptions.map { it.id }
     val showCollapsedSelectionActions = selectedOption != null
     val showHeaderActions = expanded || showCollapsedSelectionActions
-    val dragState =
-        rememberReorderDragState(
-            itemIds = visibleOptionIds,
-            estimatedRowHeightPx = EstimatedBrandThemeRowHeightPx,
-            rowSpacingPx = BrandThemeRowSpacingPx,
-            thresholdFraction = ReorderSwapThresholdFraction,
-        )
-    val currentOptions by rememberUpdatedState(options)
-    val currentOnMoveOption by rememberUpdatedState(newValue = onMoveOption)
-    val hapticFeedback = LocalHapticFeedback.current
     val expandContentDescription =
         if (expanded) {
             stringResource(R.string.config_palette_collapse)
@@ -234,54 +220,44 @@ internal fun BrandThemeSection(
             }
         }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(BrandThemeRowSpacing),
-        ) {
-            visibleOptions.forEachIndexed { index, option ->
-                key(option.id) {
-                    Box(
-                        modifier = Modifier.zIndex(dragState.zIndexFor(option.id)),
-                    ) {
-                        BrandThemeRow(
-                            accentTokens = accentTokens,
-                            option = option,
-                            selected = option.id == selectedBrandTheme.id,
-                            onClick = { onBrandThemeSelected(option) },
-                            onEdit = onEditBrandTheme?.let { callback -> { callback(option) } },
-                            copyConfigLabel = copyConfigLabel,
-                            onCopyConfig = onCopyConfig?.let { callback -> { callback(option) } },
-                            copyConfigIconOnly = copyConfigIconOnly,
-                            editSelectedOnly = editSelectedOnly,
-                            modifier =
-                                Modifier
-                                    .onGloballyPositioned { coordinates ->
-                                        dragState.onItemMeasured(
-                                            itemId = option.id,
-                                            heightPx = coordinates.size.height.toFloat(),
-                                        )
-                                    }.then(
-                                        if (onMoveOption != null && expanded && options.size > 1) {
-                                            Modifier
-                                                .reorderableLongPressDrag(
-                                                    enabled = true,
-                                                    itemId = option.id,
-                                                    itemIds = currentOptions.map { it.id },
-                                                    dragState = dragState,
-                                                    hapticFeedback = hapticFeedback,
-                                                    onMove = currentOnMoveOption,
-                                                )
-                                        } else {
-                                            Modifier
-                                        },
-                                    ),
-                            dragOffsetY = dragState.dragOffsetFor(option.id),
-                        )
-                        if (expanded && dragState.shouldShowPreviewBefore(index)) {
-                            ReorderDropIndicator(accentTokens = accentTokens)
-                        }
-                    }
-                }
-            }
+        ConfigThemeReorderableSwipeRows(
+            items = visibleOptions,
+            itemId = BrandThemeOption::id,
+            rowSpacing = BrandThemeRowSpacing,
+            estimatedRowHeightPx = EstimatedBrandThemeRowHeightPx,
+            rowSpacingPx = BrandThemeRowSpacingPx,
+            reorderThresholdFraction = ReorderSwapThresholdFraction,
+            reorderEnabled = expanded && onMoveOption != null,
+            onMove = onMoveOption,
+            deleteSpec = { option ->
+                ConfigThemeSwipeDeleteSpec(
+                    enabled =
+                        deleteActionLabel != null &&
+                            onDeleteBrandTheme != null &&
+                            canDeleteBrandTheme?.invoke(option) == true,
+                    deleteLabel = deleteActionLabel.orEmpty(),
+                    actionLaneWidthDp = BrandThemeDeleteActionLaneWidth,
+                    actionContainerColor = option.secondaryColor,
+                    actionContentColor = option.colorScheme.onSecondary,
+                    onDelete = { onDeleteBrandTheme?.invoke(option) },
+                )
+            },
+            showDropIndicator = { expanded },
+            dropIndicator = { ReorderDropIndicator(accentTokens = accentTokens) },
+        ) { option, rowModifier, dragOffsetY ->
+            BrandThemeRow(
+                accentTokens = accentTokens,
+                option = option,
+                selected = option.id == selectedBrandTheme.id,
+                onClick = { onBrandThemeSelected(option) },
+                onEdit = onEditBrandTheme?.let { callback -> { callback(option) } },
+                copyConfigLabel = copyConfigLabel,
+                onCopyConfig = onCopyConfig?.let { callback -> { callback(option) } },
+                copyConfigIconOnly = copyConfigIconOnly,
+                editSelectedOnly = editSelectedOnly,
+                modifier = rowModifier,
+                dragOffsetY = dragOffsetY,
+            )
         }
     }
 }
@@ -466,5 +442,6 @@ internal fun BrandThemePreview(
 
 private const val ReorderSwapThresholdFraction = 0.42f
 private val BrandThemeRowSpacing = 8.dp
+private val BrandThemeDeleteActionLaneWidth = 112.dp
 private const val BrandThemeRowSpacingPx = 8f
 private const val EstimatedBrandThemeRowHeightPx = 64f

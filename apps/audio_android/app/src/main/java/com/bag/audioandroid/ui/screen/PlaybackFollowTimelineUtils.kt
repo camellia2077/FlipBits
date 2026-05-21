@@ -124,8 +124,10 @@ internal fun activeBitPositionWithinByte(
                 entry.bitOffset < byteBitEnd
         }
     if (activeBitGroup != null) {
+        val bitIndexWithinByte = (activeBitGroup.bitOffset - byteBitStart).coerceIn(0, 7)
         return ActiveBitPosition(
-            bitIndexWithinByte = (activeBitGroup.bitOffset - byteBitStart).coerceIn(0, 7),
+            bitIndexWithinByte = bitIndexWithinByte,
+            bitCountWithinByte = activeBitGroup.bitCount.coerceIn(1, 8 - bitIndexWithinByte),
             isToneActive = true,
         )
     }
@@ -141,19 +143,22 @@ internal fun activeBitPositionWithinByte(
             }.maxByOrNull { it.startSample + it.sampleCount }
             ?: return ActiveBitPosition.Inactive
 
+    val completedBitIndexWithinByte =
+        (completedBitGroup.bitOffset + completedBitGroup.bitCount - 1 - byteBitStart)
+            .coerceIn(0, 7)
     return ActiveBitPosition(
-        bitIndexWithinByte =
-            (completedBitGroup.bitOffset + completedBitGroup.bitCount - 1 - byteBitStart)
-                .coerceIn(0, 7),
+        bitIndexWithinByte = completedBitIndexWithinByte,
+        bitCountWithinByte = 1,
         isToneActive = false,
     )
 }
 
 internal data class ActiveBitPosition(
     val bitIndexWithinByte: Int,
+    val bitCountWithinByte: Int,
     val isToneActive: Boolean,
 ) {
     companion object {
-        val Inactive = ActiveBitPosition(bitIndexWithinByte = -1, isToneActive = false)
+        val Inactive = ActiveBitPosition(bitIndexWithinByte = -1, bitCountWithinByte = 0, isToneActive = false)
     }
 }

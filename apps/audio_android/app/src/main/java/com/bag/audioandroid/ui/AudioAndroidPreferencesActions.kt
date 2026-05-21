@@ -11,6 +11,7 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
+import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.findDuplicateImportedThemePresetId
@@ -401,6 +402,19 @@ internal class AudioAndroidPreferencesActions(
         uiState.update { it.copy(selectedMorseSpeed = speed) }
         scope.launch {
             appSettingsRepository.setSelectedMorseSpeedStyleId(speed.id)
+        }
+    }
+
+    fun onSampleInputLengthSelected(length: SampleInputLengthOption) {
+        uiState.update { state ->
+            if (state.selectedSampleInputLength == length) {
+                state
+            } else {
+                state.copy(selectedSampleInputLength = length)
+            }
+        }
+        scope.launch {
+            appSettingsRepository.setSelectedSampleInputLengthId(length.id)
         }
     }
 

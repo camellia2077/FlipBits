@@ -1,8 +1,8 @@
-# Agent Guide: Responsibility Risk JSON
+# Agent Guide: Responsibility Risk Reports
 
 ## Purpose
 
-This document explains how an agent should interpret the Python responsibility-risk JSON fields written to files such as:
+This document explains how an agent should interpret responsibility-risk JSON and Markdown fields written to files such as:
 
 - [scan_py.json](/C:/code/FlipBits/tools/scripts/loc/logs/scan_py.json)
 - [scan_py_responsibility_test.json](/C:/code/FlipBits/tools/scripts/loc/logs/scan_py_responsibility_test.json)
@@ -22,8 +22,11 @@ When an agent reads one matched file entry, use this order:
 2. `summary`
 3. `dominant_risks`
 4. `suggestion`
-5. `lines`
-6. the detailed counts
+5. `next_action`
+6. Markdown-only `stop_signal`
+7. Markdown-only `Suggested Extraction Candidates`
+8. `lines`
+9. the detailed counts
 
 This order matters.
 
@@ -31,6 +34,9 @@ This order matters.
 - `summary` tells you the mixed-responsibility shape in plain language
 - `dominant_risks` tells you which category is driving the warning
 - `suggestion` gives a safe first split direction
+- `next_action` gives a conservative first move
+- `stop_signal` tells you whether to continue, pause, or manually review
+- `Suggested Extraction Candidates` turns hotspots into possible boundaries with validation hints
 - `lines` keeps the file-size signal visible without letting it dominate the diagnosis
 - the counts are supporting evidence only
 
@@ -98,6 +104,31 @@ This order matters.
 - `command_layer_leak_hits`
   - Specific to files under `commands/`.
   - Higher values suggest the commands layer still contains too much core logic.
+
+## Markdown Agent Sections
+
+Detailed Markdown reports include extra sections intended for agents:
+
+- `False Positive Notes`
+  - Explains why a file may still be flagged even when further splitting is not useful.
+  - Example: Compose files naturally contain `remember` and mode branches.
+
+- `Responsibility Clusters`
+  - Groups hotspots into likely ownership areas such as `dialog_import_export`, `canvas_visual_runtime`, `state_orchestration`, or `follow_annotation_ui`.
+  - Use this to choose a coherent boundary rather than moving isolated functions randomly.
+
+- `Suggested Extraction Candidates`
+  - Lists candidate owner, line range, suggested file boundary, risk, and validation.
+  - Treat this as a shortlist, not an instruction to apply every row.
+
+- `stop_signal`
+  - `continue` means one small extraction is probably still worthwhile.
+  - `pause` means the file may still score high, but further splitting should wait for a named behavior change.
+  - `review manually` means the report lacks a clear low-risk boundary.
+
+- `validation_hints`
+  - Suggests the smallest useful compile/test command after the extraction.
+  - Prefer these hints before running broad checks.
 
 ## Dominant Risk Categories
 
@@ -180,6 +211,8 @@ Bad behavior:
 - trying to reduce `rule_helper_count` mechanically without clarifying ownership
 - moving random functions only because the count is high
 - overfitting a refactor to make numbers smaller
+- ignoring a `pause` stop signal just because the file still has score 5
+- applying every suggested extraction candidate in one turn
 
 Good behavior:
 
@@ -194,8 +227,11 @@ Good behavior:
 3. Read the target source file.
 4. Confirm whether the warning is real.
 5. Use `suggestion` as the first split hypothesis.
-6. Refactor around ownership boundaries, not metric minimization.
-7. Re-run the scanner afterward to confirm the file became clearer, but do not chase perfect numbers.
+6. Check `stop_signal`.
+7. If it says `continue`, choose one extraction candidate with a clear boundary.
+8. Refactor around ownership boundaries, not metric minimization.
+9. Run the validation hint.
+10. Re-run the scanner afterward to confirm the file became clearer, but do not chase perfect numbers.
 
 ## Example Interpretation
 

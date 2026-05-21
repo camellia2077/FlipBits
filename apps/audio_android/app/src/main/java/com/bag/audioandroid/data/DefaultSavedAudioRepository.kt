@@ -72,6 +72,11 @@ class DefaultSavedAudioRepository(
 
     override fun shareSavedAudio(item: SavedAudioItem): Boolean = audioShareGateway.shareSavedAudio(item)
 
+    override fun shareAudio(
+        displayName: String,
+        uriString: String,
+    ): Boolean = audioShareGateway.shareAudio(displayName, uriString)
+
     override fun readLibraryMetadata(): SavedAudioLibraryMetadata = libraryMetadataStore.readMetadata()
 
     override fun createSavedAudioFolder(name: String): SavedAudioFolderMutationResult = libraryMetadataStore.createFolder(name)

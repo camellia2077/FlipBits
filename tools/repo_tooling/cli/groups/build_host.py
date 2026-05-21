@@ -16,6 +16,10 @@ def register_build_host_commands(subparsers: argparse._SubParsersAction[argparse
         help="CMake generator to use. Defaults to Ninja. The only supported root-host generator is Ninja.",
     )
     configure_parser.add_argument(
+        "--compiler",
+        help="C++ compiler to pass to CMake. Defaults to CXX when set; otherwise lets CMake discover the compiler.",
+    )
+    configure_parser.add_argument(
         "--build-type",
         choices=["Debug", "Release"],
         help="Single-config CMake build type to write into the cache.",
@@ -34,6 +38,10 @@ def register_build_host_commands(subparsers: argparse._SubParsersAction[argparse
         "--generator",
         default=DEFAULT_GENERATOR,
         help="CMake generator to use if auto-configuring. The only supported root-host generator is Ninja.",
+    )
+    build_parser_cmd.add_argument(
+        "--compiler",
+        help="C++ compiler to pass to CMake when auto-configuring. Defaults to CXX when set; otherwise lets CMake discover the compiler.",
     )
     build_parser_cmd.add_argument(
         "--target",

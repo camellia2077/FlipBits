@@ -45,6 +45,7 @@ import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 internal fun PlaybackDataFollowSection(
     followData: PayloadFollowViewData,
     displayedSamples: Int,
+    isPlaying: Boolean,
     transportMode: TransportModeOption?,
     onTokenStripHeightDpChanged: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -129,6 +130,7 @@ internal fun PlaybackDataFollowSection(
             followData = followData,
             presentationState = presentationState,
             displayedSamples = displayedSamples,
+            isPlaying = isPlaying,
             transportMode = transportMode,
             onMeasuredHeightDpChanged = onTokenStripHeightDpChanged,
         )
@@ -230,6 +232,12 @@ private fun PlaybackFollowTokenizerSheet(
                                     presentationState.activeBitIndexWithinByte
                                 } else {
                                     -1
+                                },
+                            activeBitCountWithinByte =
+                                if (index == presentationState.activeTextIndex) {
+                                    presentationState.activeBitCountWithinByte
+                                } else {
+                                    0
                                 },
                             isActiveBitTone =
                                 index == presentationState.activeTextIndex &&

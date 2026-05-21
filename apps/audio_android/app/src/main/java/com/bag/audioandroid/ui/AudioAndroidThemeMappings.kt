@@ -3,6 +3,8 @@ package com.bag.audioandroid.ui
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -30,6 +32,16 @@ internal data class PlayerChromeColors(
     val disabledAction: Color,
     val annotationChipContainer: Color,
     val annotationChipContent: Color,
+)
+
+@Immutable
+internal data class SavedAudioPickerColors(
+    val sheetContainer: Color,
+    val sheetContent: Color,
+    val titleColor: Color,
+    val supportingTextColor: Color,
+    val selectedItemColors: ListItemColors,
+    val unselectedItemColors: ListItemColors,
 )
 
 /**
@@ -110,6 +122,31 @@ internal fun playerChromeColors(): PlayerChromeColors =
         annotationChipContainer = appThemeVisualTokens().annotationChipContainerColor,
         annotationChipContent = appThemeVisualTokens().annotationChipContentColor,
     )
+
+@Composable
+internal fun savedAudioPickerColors(): SavedAudioPickerColors {
+    val visualTokens = appThemeVisualTokens()
+    val accentTokens = appThemeAccentTokens()
+    val sheetContentColor = visualTokens.modalContentColor
+    return SavedAudioPickerColors(
+        sheetContainer = visualTokens.modalContainerColor,
+        sheetContent = sheetContentColor,
+        titleColor = sheetContentColor,
+        supportingTextColor = sheetContentColor.copy(alpha = 0.72f),
+        selectedItemColors =
+            ListItemDefaults.colors(
+                containerColor = visualTokens.selectionSelectedContainerColor,
+                headlineColor = accentTokens.selectionLabelAccentTint,
+                supportingColor = accentTokens.selectionLabelAccentTint.copy(alpha = 0.78f),
+            ),
+        unselectedItemColors =
+            ListItemDefaults.colors(
+                containerColor = visualTokens.selectionUnselectedContainerColor,
+                headlineColor = sheetContentColor.copy(alpha = 0.86f),
+                supportingColor = sheetContentColor.copy(alpha = 0.64f),
+            ),
+    )
+}
 
 @Composable
 internal fun utilityActionIconButtonColors(): IconButtonColors {

@@ -43,6 +43,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = PayloadFollowViewData.Empty,
                 displayedSamples = 0,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -56,6 +57,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -72,6 +74,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -108,6 +111,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
                 initialAnnotationMode = PlaybackFollowViewMode.Binary,
             )
@@ -123,6 +127,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -138,6 +143,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Mini,
                 initialAnnotationMode = PlaybackFollowViewMode.Binary,
             )
@@ -161,6 +167,7 @@ class PlaybackDataFollowSectionTest {
                 PlaybackDataFollowSection(
                     followData = sampleFollowData(),
                     displayedSamples = 0,
+                    isPlaying = false,
                     transportMode = TransportModeOption.Flash,
                 )
             }
@@ -191,6 +198,7 @@ class PlaybackDataFollowSectionTest {
                 PlaybackDataFollowSection(
                     followData = ukrainianFollowData(),
                     displayedSamples = 0,
+                    isPlaying = false,
                     transportMode = TransportModeOption.Flash,
                 )
             }
@@ -214,6 +222,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
                 onSeekToSample = { seekTarget = it },
             )
@@ -230,6 +239,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = sampleFollowData(),
                 displayedSamples = 7,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -248,6 +258,7 @@ class PlaybackDataFollowSectionTest {
             PlaybackDataFollowSection(
                 followData = longTokenizerFollowData(),
                 displayedSamples = 41,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -272,6 +283,7 @@ class PlaybackDataFollowSectionTest {
                         textFollowAvailable = true,
                     ),
                 displayedSamples = 0,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }
@@ -289,6 +301,7 @@ class PlaybackDataFollowSectionTest {
                         textFollowAvailable = false,
                     ),
                 displayedSamples = 0,
+                isPlaying = false,
                 transportMode = TransportModeOption.Flash,
             )
         }

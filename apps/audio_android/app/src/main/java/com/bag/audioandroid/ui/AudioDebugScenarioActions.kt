@@ -263,7 +263,7 @@ internal class AudioDebugScenarioActions(
         safeLogD(
             SAVED_AUDIO_AUTOMATION_TAG,
             "openDetail requestId=${scenario.requestId} itemId=${target.itemId} " +
-                "elapsedMs=$openDetailMs detailVisible=${uiState.value.showPlayerDetailSheet}",
+                "elapsedMs=$openDetailMs detailVisible=${uiState.value.isExpandedPlayerVisible}",
         )
     }
 

@@ -16,6 +16,7 @@
     <string name="audio_action_previous_track">Brano precedente</string>
     <string name="audio_action_next_track">Brano successivo</string>
     <string name="audio_action_open_audio_info">Informazioni</string>
+    <string name="audio_action_collapse_player_detail">Comprimi il lettore</string>
     <string name="audio_action_normal_playback">Normale</string>
     <string name="audio_action_shuffle_playback">Casuale</string>
     <string name="audio_action_repeat_one">Ripeti uno</string>
@@ -26,6 +27,7 @@
     <string name="audio_action_clear_result">Cancella risultato</string>
     <string name="audio_action_clear_result_busy">Cancellazione…</string>
     <string name="audio_action_export">Salva</string>
+    <string name="audio_action_already_saved_to_library">Già salvato nella libreria</string>
     <string name="audio_action_export_to_file">Esporta in un file</string>
     <string name="audio_action_playback_speed_short">Velocità</string>
     <string name="audio_action_open_playback_speed_menu">Apri il menu della velocità di riproduzione</string>

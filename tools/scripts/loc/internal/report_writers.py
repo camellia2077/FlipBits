@@ -6,8 +6,10 @@ from pathlib import Path
 from .report_formatter import (
     FormattedAnchor,
     FormattedEntry,
+    FormattedExtractionCandidate,
     FormattedHotspot,
     FormattedPathSection,
+    FormattedResponsibilityCluster,
     FormattedScanReport,
     ReportFormatter,
 )
@@ -107,9 +109,13 @@ class MarkdownReportWriter:
         lines = [header, divider]
         for entry in entries:
             value_by_key = {key: value for key, value in entry.columns}
-            row = "| " + " | ".join(f"`{value_by_key.get(key, '-')}`" for key in all_keys) + " |"
+            row = "| " + " | ".join(f"`{self._md_cell(value_by_key.get(key, '-'))}`" for key in all_keys) + " |"
             lines.append(row)
         return lines
+
+    @staticmethod
+    def _md_cell(value: object) -> str:
+        return str(value).replace("|", "\\|").replace("\n", " ")
 
     @staticmethod
     def _render_agent_notes(entry: FormattedEntry) -> str:
@@ -124,6 +130,20 @@ class MarkdownReportWriter:
             lines.append(f"- next_action: {entry.next_action}")
         if entry.evidence:
             lines.append(f"- evidence: {entry.evidence}")
+        if entry.stop_signal:
+            lines.append(f"- stop_signal: {entry.stop_signal}")
+        if entry.validation_hints:
+            lines.append(f"- validation_hints: {'; '.join(entry.validation_hints)}")
+        if entry.false_positive_notes:
+            lines.extend(["", "##### False Positive Notes", ""])
+            for note in entry.false_positive_notes:
+                lines.append(f"- {note}")
+        if entry.responsibility_clusters:
+            lines.extend(["", "##### Responsibility Clusters", ""])
+            lines.extend(MarkdownReportWriter._render_clusters_table(entry.responsibility_clusters))
+        if entry.extraction_candidates:
+            lines.extend(["", "##### Suggested Extraction Candidates", ""])
+            lines.extend(MarkdownReportWriter._render_extraction_candidates_table(entry.extraction_candidates))
         if entry.function_hotspots:
             lines.extend(["", "##### Function Hotspots", ""])
             lines.extend(MarkdownReportWriter._render_hotspots_table(entry.function_hotspots))
@@ -147,9 +167,52 @@ class MarkdownReportWriter:
                         f"`{item.kind}`",
                         f"`{item.score}`",
                         f"`{item.lines}`",
-                        item.summary,
-                        ", ".join(item.risks) if item.risks else "-",
-                        " | ".join(item.evidence) if item.evidence else "-",
+                        MarkdownReportWriter._md_cell(item.summary),
+                        MarkdownReportWriter._md_cell(", ".join(item.risks) if item.risks else "-"),
+                        MarkdownReportWriter._md_cell("; ".join(item.evidence) if item.evidence else "-"),
+                    ]
+                )
+                + " |"
+            )
+        return lines
+
+    @staticmethod
+    def _render_clusters_table(items: tuple[FormattedResponsibilityCluster, ...]) -> list[str]:
+        lines = [
+            "| Cluster | Owners | Why It Matters |",
+            "| --- | --- | --- |",
+        ]
+        for item in items:
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        f"`{item.name}`",
+                        ", ".join(f"`{owner}`" for owner in item.owners) if item.owners else "-",
+                        MarkdownReportWriter._md_cell(item.reason),
+                    ]
+                )
+                + " |"
+            )
+        return lines
+
+    @staticmethod
+    def _render_extraction_candidates_table(items: tuple[FormattedExtractionCandidate, ...]) -> list[str]:
+        lines = [
+            "| Candidate | Lines | Suggested Boundary | Reason | Risk | Validation |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+        for item in items:
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        f"`{item.name}`",
+                        f"`{item.lines}`",
+                        f"`{item.suggested_boundary}`",
+                        MarkdownReportWriter._md_cell(item.reason),
+                        MarkdownReportWriter._md_cell(item.risk),
+                        MarkdownReportWriter._md_cell(item.validation),
                     ]
                 )
                 + " |"
@@ -164,6 +227,6 @@ class MarkdownReportWriter:
         ]
         for item in items:
             lines.append(
-                f"| `{item.line}` | `{item.label}` | {item.issue} | `{item.evidence}` |"
+                f"| `{item.line}` | `{item.label}` | {MarkdownReportWriter._md_cell(item.issue)} | `{MarkdownReportWriter._md_cell(item.evidence)}` |"
             )
         return lines

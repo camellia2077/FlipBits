@@ -58,6 +58,7 @@ internal fun PlaybackFollowAnnotationRows(
     isActive: Boolean,
     activeByteIndexWithinToken: Int,
     activeBitIndexWithinByte: Int,
+    activeBitCountWithinByte: Int,
     isActiveBitTone: Boolean,
     tokenIndex: Int,
     displayedSamples: Int,
@@ -92,6 +93,7 @@ internal fun PlaybackFollowAnnotationRows(
                     isActive = isActive,
                     activeByteIndexWithinToken = activeByteIndexWithinToken,
                     activeBitIndexWithinByte = activeBitIndexWithinByte,
+                    activeBitCountWithinByte = activeBitCountWithinByte,
                     isActiveBitTone = isActiveBitTone,
                 )
             }
@@ -115,6 +117,7 @@ internal fun PlaybackFollowAnnotationRows(
                     isActive = isActive,
                     activeByteIndexWithinToken = activeByteIndexWithinToken,
                     activeBitIndexWithinByte = activeBitIndexWithinByte,
+                    activeBitCountWithinByte = activeBitCountWithinByte,
                     isActiveBitTone = isActiveBitTone,
                 )
             }
@@ -253,6 +256,7 @@ private fun PlaybackBinaryFollowAnnotationContent(
     isActive: Boolean,
     activeByteIndexWithinToken: Int,
     activeBitIndexWithinByte: Int,
+    activeBitCountWithinByte: Int,
     isActiveBitTone: Boolean,
 ) {
     Column(
@@ -279,6 +283,7 @@ private fun PlaybackBinaryFollowAnnotationContent(
                         isActive = isActiveByte,
                         isPast = isActive && byteIndex < activeByteIndexWithinToken,
                         activeBitIndex = if (isActiveByte) activeBitIndexWithinByte else -1,
+                        activeBitCount = if (isActiveByte) activeBitCountWithinByte else 0,
                         isActiveBitTone = isActiveBitTone,
                         tokenIndex = tokenIndex,
                         tokenText = token,
@@ -313,6 +318,7 @@ private fun PlaybackHexFollowAnnotationContent(
     isActive: Boolean,
     activeByteIndexWithinToken: Int,
     activeBitIndexWithinByte: Int,
+    activeBitCountWithinByte: Int,
     isActiveBitTone: Boolean,
 ) {
     Column(
@@ -338,6 +344,7 @@ private fun PlaybackHexFollowAnnotationContent(
                         isActive = isActiveByte,
                         isPast = isActive && byteIndex < activeByteIndexWithinToken,
                         activeBitIndex = if (isActiveByte) activeBitIndexWithinByte else -1,
+                        activeBitCount = if (isActiveByte) activeBitCountWithinByte else 0,
                         isActiveBitTone = isActiveBitTone,
                         focusColor = focusColor,
                         onFocusColor = onFocusColor,

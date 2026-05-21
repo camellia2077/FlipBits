@@ -7,7 +7,9 @@ import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
+import com.bag.audioandroid.ui.state.PlayerShellEvent
 import com.bag.audioandroid.ui.state.SampleInputShuffleState
+import com.bag.audioandroid.ui.state.reduce
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlin.random.Random
@@ -90,19 +92,41 @@ internal class AudioSessionEditingActions(
             it.copy(
                 transportMode = mode,
                 currentPlaybackSource = AudioPlaybackSource.Generated(mode),
-                showSavedAudioSheet = false,
-                showPlayerDetailSheet = false,
+                playerShellState = it.playerShellState.reduce(PlayerShellEvent.CollapseExpandedPlayer),
             )
         }
     }
 
-    fun onOpenSavedAudioSheet() {
+    fun onOpenSavedAudioSheetFromDock() {
         refreshSavedAudioItems()
-        uiState.update { it.copy(showSavedAudioSheet = true, showPlayerDetailSheet = false) }
+        uiState.update {
+            it.copy(
+                playerShellState =
+                    it.playerShellState.reduce(
+                        PlayerShellEvent.OpenQueue(preferExpandedSurface = false),
+                    ),
+            )
+        }
+    }
+
+    fun onOpenSavedAudioSheetFromPlayerDetail() {
+        refreshSavedAudioItems()
+        uiState.update {
+            it.copy(
+                playerShellState =
+                    it.playerShellState.reduce(
+                        PlayerShellEvent.OpenQueue(preferExpandedSurface = true),
+                    ),
+            )
+        }
     }
 
     fun onCloseSavedAudioSheet() {
-        uiState.update { it.copy(showSavedAudioSheet = false) }
+        uiState.update { state ->
+            state.copy(
+                playerShellState = state.playerShellState.reduce(PlayerShellEvent.CloseQueue),
+            )
+        }
     }
 
     private fun nextSampleSelection(

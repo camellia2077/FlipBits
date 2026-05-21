@@ -32,6 +32,7 @@ import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.QueueSheetValue
 import com.bag.audioandroid.ui.theme.BrandDualToneThemes
 import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
@@ -39,6 +40,7 @@ import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.customBrandTheme
 import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.util.safeDebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -111,6 +113,7 @@ class AudioAndroidViewModel(
             playbackRuntimeGateway = playbackRuntimeGateway,
             savedAudioRepository = savedAudioRepository,
             stopPlayback = playbackActions::stopPlayback,
+            playCurrentFromStart = playbackActions::playCurrentFromStart,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
             savedAudioDecodeCacheGateway = savedAudioDecodeCacheGateway,
             workerDispatcher = Dispatchers.IO,
@@ -399,6 +402,10 @@ class AudioAndroidViewModel(
         preferencesActions.onMorseSpeedStyleSelected(speed)
     }
 
+    fun onSampleInputLengthSelected(length: SampleInputLengthOption) {
+        preferencesActions.onSampleInputLengthSelected(length)
+    }
+
     fun onDemoModeEnabledChanged(enabled: Boolean) {
         preferencesActions.onDemoModeEnabledChanged(enabled)
     }
@@ -554,6 +561,11 @@ class AudioAndroidViewModel(
     }
 
     fun onSkipToPreviousTrack() {
+        safeDebugLog(
+            SavedAudioPlaybackDiagTag,
+            "skipPrevious requested currentSource=${uiStateFlow.value.currentPlaybackSource} " +
+                "selectedSaved=${uiStateFlow.value.selectedSavedAudio?.item?.itemId.orEmpty()}",
+        )
         skipToAdjacentSavedTrack { state, currentSource ->
             playbackSequenceNavigator.previousSavedSource(
                 savedAudioItems = state.savedAudioItems,
@@ -563,6 +575,11 @@ class AudioAndroidViewModel(
     }
 
     fun onSkipToNextTrack() {
+        safeDebugLog(
+            SavedAudioPlaybackDiagTag,
+            "skipNext requested currentSource=${uiStateFlow.value.currentPlaybackSource} " +
+                "selectedSaved=${uiStateFlow.value.selectedSavedAudio?.item?.itemId.orEmpty()}",
+        )
         skipToAdjacentSavedTrack { state, currentSource ->
             playbackSequenceNavigator.nextSavedSource(
                 savedAudioItems = state.savedAudioItems,
@@ -607,8 +624,16 @@ class AudioAndroidViewModel(
         sessionActions.onExportAudio()
     }
 
+    fun onShareCurrentGeneratedAudio() {
+        sessionActions.onShareCurrentGeneratedAudio()
+    }
+
     fun onRequestExportGeneratedAudioToDocument() {
         documentExportActions.onRequestGeneratedAudioExportToDocument()
+    }
+
+    fun onRequestExportCurrentSavedAudioToDocument() {
+        uiStateFlow.value.currentSavedAudioItem?.let(documentExportActions::onRequestSavedAudioExportToDocument)
     }
 
     fun onDocumentExportPicked(uriString: String?) {
@@ -624,12 +649,20 @@ class AudioAndroidViewModel(
         super.onCleared()
     }
 
-    fun onOpenSavedAudioSheet() {
-        sessionActions.onOpenSavedAudioSheet()
+    fun onOpenSavedAudioSheetFromDock() {
+        sessionActions.onOpenSavedAudioSheetFromDock()
+    }
+
+    fun onOpenSavedAudioSheetFromPlayerDetail() {
+        sessionActions.onOpenSavedAudioSheetFromPlayerDetail()
     }
 
     fun onCloseSavedAudioSheet() {
         sessionActions.onCloseSavedAudioSheet()
+    }
+
+    fun onQueueSheetValueChanged(value: QueueSheetValue) {
+        navigationActions.onQueueSheetValueChanged(value)
     }
 
     fun onSavedAudioSelected(itemId: String) {
@@ -715,9 +748,8 @@ class AudioAndroidViewModel(
             is AudioPlaybackSource.Generated -> playbackActions.playCurrentFromStart()
             is AudioPlaybackSource.Saved -> {
                 if (nextSource.itemId != uiStateFlow.value.currentSavedAudioItem?.itemId &&
-                    !libraryActions.prepareSavedAudioSelection(
+                    !libraryActions.prepareSavedAudioSelectionForPlayback(
                         itemId = nextSource.itemId,
-                        onLoaded = playbackActions::playCurrentFromStart,
                     )
                 ) {
                     return false
@@ -735,19 +767,23 @@ class AudioAndroidViewModel(
         val currentState = uiStateFlow.value
         val currentSource = currentState.currentPlaybackSource
         val targetSource = resolveTarget(currentState, currentSource) as? AudioPlaybackSource.Saved ?: return
-        if (!libraryActions.prepareSavedAudioSelection(targetSource.itemId, onLoaded = playbackActions::playCurrentFromStart)) {
+        safeDebugLog(
+            SavedAudioPlaybackDiagTag,
+            "skipResolved from=$currentSource to=$targetSource selectedSaved=${currentState.selectedSavedAudio?.item?.itemId.orEmpty()}",
+        )
+        if (!libraryActions.prepareSavedAudioSelectionForPlayback(targetSource.itemId)) {
+            safeDebugLog(
+                SavedAudioPlaybackDiagTag,
+                "skipPrepareFailed target=$targetSource currentSource=${uiStateFlow.value.currentPlaybackSource}",
+            )
             return
-        }
-        if (targetSource.itemId == uiStateFlow.value.currentSavedAudioItem?.itemId &&
-            uiStateFlow.value.selectedSavedAudio?.isLoadingContent == false
-        ) {
-            playbackActions.playCurrentFromStart()
         }
     }
 
     private companion object {
         const val SAMPLE_RATE_HZ = 44100
         const val FRAME_SAMPLES = 2205
+        const val SavedAudioPlaybackDiagTag = "SavedAudioDiag"
     }
 }
 
@@ -782,6 +818,9 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
         val selectedMaterialPaletteIdLight = appSettingsRepository.selectedMaterialPaletteIdLight.first()
         val selectedMaterialPaletteIdDark = appSettingsRepository.selectedMaterialPaletteIdDark.first()
         val isMaterialDarkThemeActive = selectedThemeMode == ThemeModeOption.Dark
+        val selectedSampleInputLength =
+            SampleInputLengthOption.fromId(appSettingsRepository.selectedSampleInputLengthId.first())
+                ?: SampleInputLengthOption.Short
         val selectedPaletteId =
             if (isMaterialDarkThemeActive) {
                 selectedMaterialPaletteIdDark ?: selectedMaterialPaletteIdLight ?: appSettingsRepository.selectedPaletteId.first()
@@ -808,6 +847,7 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
             selectedThemeStyle = selectedThemeStyle,
             selectedThemeMode = selectedThemeMode,
             isMaterialDarkThemeActive = isMaterialDarkThemeActive,
+            selectedSampleInputLength = selectedSampleInputLength,
         )
     }
 

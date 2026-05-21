@@ -221,7 +221,7 @@
     <string name="config_demo_mode_subtitle">録画向けにタップの視覚フィードバックと操作ヒントを表示します。</string>
     <string name="config_custom_brand_theme_import_title">カスタム dual-tone をインポート</string>
     <string name="config_custom_brand_theme_import">インポート</string>
-    <string name="config_custom_brand_theme_copy_config">設定をコピー</string>
+    <string name="config_custom_brand_theme_copy_config">コピー</string>
     <string name="config_custom_theme_copy_all">すべての色をコピー</string>
     <string name="config_custom_brand_theme_import_description">FlipBits カスタムテーマ設定を貼り付けます。</string>
     <string name="config_custom_brand_theme_import_config_label">テーマ設定</string>

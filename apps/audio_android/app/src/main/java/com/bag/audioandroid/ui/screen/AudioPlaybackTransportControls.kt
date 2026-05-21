@@ -9,13 +9,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
+import com.bag.audioandroid.ui.PlayerDetailBottomActions
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
@@ -29,7 +33,6 @@ internal fun AudioPlaybackTransportControls(
     playbackSpeed: Float,
     canSkipPrevious: Boolean,
     canSkipNext: Boolean,
-    canExportGeneratedAudio: Boolean,
     transportMode: TransportModeOption,
     durationMs: Long,
     totalSamples: Int,
@@ -44,11 +47,10 @@ internal fun AudioPlaybackTransportControls(
     onSkipToNextTrack: () -> Unit,
     onPlaybackSequenceModeSelected: (PlaybackSequenceMode) -> Unit,
     onPlaybackSpeedSelected: (Float) -> Unit,
-    onExportGeneratedAudio: () -> Unit,
-    onExportGeneratedAudioToDocument: () -> Unit,
-    onOpenSavedAudioSheet: () -> Unit,
+    bottomActions: PlayerDetailBottomActions,
     modifier: Modifier = Modifier,
 ) {
+    val density = LocalDensity.current
     val playerColors = playerChromeColors()
     var showAudioInfo by remember { mutableStateOf(false) }
     var showSpeedAdjustment by remember { mutableStateOf(false) }
@@ -265,8 +267,16 @@ internal fun AudioPlaybackTransportControls(
         }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    debugPlayerBottomDockLayout(
+                        "transportControls",
+                        "heightDp=${coordinates.toPlaybackVerticalSlice().heightDp(density)} columnSpacingDp=4.0",
+                    )
+                },
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         AudioPlaybackPrimaryControlsRow(
             isPlaying = isPlaying,
@@ -277,7 +287,7 @@ internal fun AudioPlaybackTransportControls(
             onSkipToPreviousTrack = onSkipToPreviousTrack,
             onSkipToNextTrack = onSkipToNextTrack,
             onPlaybackSequenceModeSelected = onPlaybackSequenceModeSelected,
-            onOpenSavedAudioSheet = onOpenSavedAudioSheet,
+            onOpenSavedAudioSheet = bottomActions.onOpenSavedAudioSheet,
             colors = playerColors,
         )
         AudioPlaybackSecondaryActionsRow(
@@ -289,9 +299,7 @@ internal fun AudioPlaybackTransportControls(
             },
             onToggleSpeedAdjustment = { showSpeedAdjustment = !showSpeedAdjustment },
             onPlaybackSpeedSelected = onPlaybackSpeedSelected,
-            onExportGeneratedAudio = onExportGeneratedAudio,
-            onExportGeneratedAudioToDocument = onExportGeneratedAudioToDocument,
-            canExportGeneratedAudio = canExportGeneratedAudio,
+            bottomActions = bottomActions,
             contentColor = playerColors.neutralAction,
         )
     }
@@ -300,6 +308,19 @@ internal fun AudioPlaybackTransportControls(
             model = audioInfoDialogModel,
             onDismiss = { showAudioInfo = false },
         )
+    }
+}
+
+private fun debugPlayerBottomDockLayout(
+    label: String,
+    message: String,
+) {
+    if (!BuildConfig.DEBUG) {
+        return
+    }
+    try {
+        android.util.Log.d("PlayerBottomDockLayout", "$label $message")
+    } catch (_: RuntimeException) {
     }
 }
 

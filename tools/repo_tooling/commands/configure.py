@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
-from ..constants import DEFAULT_CXX_COMPILER, ROOT_DIR
+from ..constants import ROOT_DIR
 from ..paths import cmake_cache_exists, resolve_build_dir
 from ..process import run
 
@@ -28,16 +29,34 @@ def _compiler_matches(configured: str | None, desired: str) -> bool:
     return configured_name == desired_name or configured.lower() == desired.lower()
 
 
+def _normalize_cxx_compiler(raw: str | None) -> str | None:
+    if raw is None:
+        return None
+    compiler = raw.strip()
+    if not compiler or compiler.lower() == "none":
+        return None
+    return compiler
+
+
+def _desired_cxx_compiler(args: argparse.Namespace) -> str | None:
+    compiler = getattr(args, "compiler", None)
+    if isinstance(compiler, str):
+        normalized = _normalize_cxx_compiler(compiler)
+        if normalized:
+            return normalized
+    return _normalize_cxx_compiler(os.environ.get("CXX"))
+
+
 def cmd_configure(args: argparse.Namespace) -> None:
     build_dir = resolve_build_dir(args.build_dir)
     build_dir.parent.mkdir(parents=True, exist_ok=True)
-    desired_compiler = getattr(args, "compiler", DEFAULT_CXX_COMPILER)
+    desired_compiler = _desired_cxx_compiler(args)
     env = getattr(args, "env", None)
     configured_compiler = _configured_cxx_compiler(build_dir) if cmake_cache_exists(build_dir) else None
     command = [
         "cmake",
     ]
-    if configured_compiler and not _compiler_matches(configured_compiler, desired_compiler):
+    if desired_compiler and configured_compiler and not _compiler_matches(configured_compiler, desired_compiler):
         command.append("--fresh")
     command.extend([
         "-S",
@@ -47,7 +66,8 @@ def cmd_configure(args: argparse.Namespace) -> None:
         "-G",
         args.generator,
     ])
-    command.append(f"-DCMAKE_CXX_COMPILER={desired_compiler}")
+    if desired_compiler:
+        command.append(f"-DCMAKE_CXX_COMPILER={desired_compiler}")
     command.append("-DCMAKE_EXPORT_COMPILE_COMMANDS=ON")
     build_type = getattr(args, "build_type", None)
     if build_type:

@@ -1,20 +1,10 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
-import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.state.FlashVisualWindowState
-import kotlin.math.abs
 
 internal data class FlashSignalVisualizerRenderState(
     val buckets: List<FskEnergyBucket>,
@@ -40,7 +30,6 @@ internal data class FlashSignalVisualizerRenderState(
 )
 
 private data class FlashSignalTimelineStrategy(
-    val shouldUseTimelineFallback: Boolean,
     val fallbackTimelineFrame: FlashSignalFixedTimelineFrame?,
     val fixedTimelineFrame: FlashSignalFixedTimelineFrame?,
     val usesFallbackTimeline: Boolean,
@@ -54,6 +43,11 @@ private data class FlashSignalPlaybackReadoutState(
     val visualFollowAnalysisDisplayedSamplePosition: Float,
     val bitReadoutSource: FlashBitReadoutSource?,
     val bitReadoutFrame: FlashBitReadoutFrame?,
+)
+
+private data class FlashSignalBitReadoutState(
+    val source: FlashBitReadoutSource?,
+    val frame: FlashBitReadoutFrame?,
 )
 
 private data class FlashSignalAnalysisInputs(
@@ -70,12 +64,6 @@ private data class FlashSignalRenderContext(
     val displayedSamplePosition: Float,
     val followDisplayedSamplePosition: Float,
     val windowedTimelineFrame: FlashSignalFixedTimelineFrame?,
-)
-
-private data class FlashSignalVisualStyleContext(
-    val activeWindowBucketCount: Int,
-    val toneFrequencyScale: ToneFrequencyScale,
-    val toneCarrierLayout: ToneCarrierLayout,
 )
 
 @Composable
@@ -186,30 +174,53 @@ internal fun rememberFlashSignalVisualizerRenderState(
         flashVisualWindow,
         timelineStrategy.visualTotalSamples,
     ) {
-        FlashSignalVisualizerRenderState(
-            buckets = bucketFrame.buckets,
-            toneSpectrumBuckets = toneSpectrumBuckets,
-            toneFrequencyScale = visualStyle.toneFrequencyScale,
-            toneCarrierLayout = visualStyle.toneCarrierLayout,
+        buildFlashSignalVisualizerRenderState(
             bucketFrame = bucketFrame,
-            fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
-            visualSegments = timelineStrategy.visualSegments,
-            playbackSampleState = playbackReadoutState.playbackSampleState,
+            toneSpectrumBuckets = toneSpectrumBuckets,
+            visualStyle = visualStyle,
+            timelineStrategy = timelineStrategy,
+            playbackReadoutState = playbackReadoutState,
             followData = followData,
-            bitReadoutSource = playbackReadoutState.bitReadoutSource,
-            bitReadoutFrame = playbackReadoutState.bitReadoutFrame,
-            bitReadoutSample = playbackReadoutState.visualFollowDisplayedSamplePosition,
-            activeWindowBucketCount = visualStyle.activeWindowBucketCount,
             primitiveEstimate = primitiveEstimate,
-            usesFallbackTimeline = timelineStrategy.usesFallbackTimeline,
-            enableViewportEdgeFade = flashVoicingStyle != FlashVoicingStyleOption.Litany,
-            traceWindowSamples = flashVisualWindow.endSampleExclusive - flashVisualWindow.startSample,
-            traceWindowStartSample = flashVisualWindow.startSample,
-            traceWindowEndSample = flashVisualWindow.endSampleExclusive,
-            totalSamples = timelineStrategy.visualTotalSamples,
+            flashVoicingStyle = flashVoicingStyle,
+            flashVisualWindow = flashVisualWindow,
         )
     }
 }
+
+private fun buildFlashSignalVisualizerRenderState(
+    bucketFrame: FlashSignalBucketFrame,
+    toneSpectrumBuckets: List<ToneSpectrumBucket>,
+    visualStyle: FlashSignalVisualStyleContext,
+    timelineStrategy: FlashSignalTimelineStrategy,
+    playbackReadoutState: FlashSignalPlaybackReadoutState,
+    followData: PayloadFollowViewData?,
+    primitiveEstimate: Int,
+    flashVoicingStyle: FlashVoicingStyleOption?,
+    flashVisualWindow: FlashVisualWindowState,
+): FlashSignalVisualizerRenderState =
+    FlashSignalVisualizerRenderState(
+        buckets = bucketFrame.buckets,
+        toneSpectrumBuckets = toneSpectrumBuckets,
+        toneFrequencyScale = visualStyle.toneFrequencyScale,
+        toneCarrierLayout = visualStyle.toneCarrierLayout,
+        bucketFrame = bucketFrame,
+        fixedTimelineFrame = timelineStrategy.fixedTimelineFrame,
+        visualSegments = timelineStrategy.visualSegments,
+        playbackSampleState = playbackReadoutState.playbackSampleState,
+        followData = followData,
+        bitReadoutSource = playbackReadoutState.bitReadoutSource,
+        bitReadoutFrame = playbackReadoutState.bitReadoutFrame,
+        bitReadoutSample = playbackReadoutState.visualFollowDisplayedSamplePosition,
+        activeWindowBucketCount = visualStyle.activeWindowBucketCount,
+        primitiveEstimate = primitiveEstimate,
+        usesFallbackTimeline = timelineStrategy.usesFallbackTimeline,
+        enableViewportEdgeFade = flashVoicingStyle != FlashVoicingStyleOption.Litany,
+        traceWindowSamples = flashVisualWindow.endSampleExclusive - flashVisualWindow.startSample,
+        traceWindowStartSample = flashVisualWindow.startSample,
+        traceWindowEndSample = flashVisualWindow.endSampleExclusive,
+        totalSamples = timelineStrategy.visualTotalSamples,
+    )
 
 @Composable
 private fun rememberFlashSignalRenderContext(
@@ -274,33 +285,6 @@ private fun rememberFlashSignalAnalysisInputs(
 }
 
 @Composable
-private fun rememberFlashSignalVisualStyleContext(flashVoicingStyle: FlashVoicingStyleOption?): FlashSignalVisualStyleContext {
-    val activeWindowBucketCount =
-        remember(flashVoicingStyle) {
-            flashSignalActiveWindowBucketCount(flashVoicingStyle)
-        }
-    val toneFrequencyScale =
-        remember(flashVoicingStyle) {
-            toneFrequencyScaleForStyle(flashVoicingStyle)
-        }
-    val toneCarrierLayout =
-        remember(flashVoicingStyle) {
-            toneCarrierLayoutForStyle(flashVoicingStyle)
-        }
-    return remember(
-        activeWindowBucketCount,
-        toneFrequencyScale,
-        toneCarrierLayout,
-    ) {
-        FlashSignalVisualStyleContext(
-            activeWindowBucketCount = activeWindowBucketCount,
-            toneFrequencyScale = toneFrequencyScale,
-            toneCarrierLayout = toneCarrierLayout,
-        )
-    }
-}
-
-@Composable
 private fun rememberFlashSignalPlaybackReadoutState(
     sharedPlaybackSampleState: FlashVisualPlaybackSampleState?,
     displayedSamplePosition: Float,
@@ -317,46 +301,94 @@ private fun rememberFlashSignalPlaybackReadoutState(
     val playbackSampleState =
         sharedPlaybackSampleState
             ?: rememberFlashVisualPlaybackSampleState(
-                rawSample = if (isScrubbing) displayedSamplePosition else followDisplayedSamplePosition,
+                rawSample =
+                    flashVisualPlaybackRawSample(
+                        displayedSamplePosition = displayedSamplePosition,
+                        followDisplayedSamplePosition = followDisplayedSamplePosition,
+                        isScrubbing = isScrubbing,
+                    ),
                 isPlaying = isPlaying && !isScrubbing,
                 snapWhenNotPlaying = isScrubbing,
+                isScrubbing = isScrubbing,
                 playbackSpeed = playbackSpeed,
                 sampleRateHz = sampleRateHz,
                 totalSamples = visualTotalSamples,
             )
     val visualFollowDisplayedSamplePosition = playbackSampleState.displayedSample
     val visualFollowAnalysisDisplayedSamplePosition =
-        remember(visualFollowDisplayedSamplePosition, followAnalysisSampleStep, followTimelineTotalSamples) {
-            quantizeVisualizationDisplayedSamples(
-                displayedSamples = visualFollowDisplayedSamplePosition,
-                sampleStep = followAnalysisSampleStep,
-                totalSamples = followTimelineTotalSamples,
-            )
-        }
-    val bitReadoutSource =
-        remember(followData) {
-            followData?.toFlashBitReadoutSource()
-        }
-    val bitReadoutFrame =
-        bitReadoutSource?.let { source ->
-            flashBitReadoutFrame(
-                source = source,
-                sample = visualFollowDisplayedSamplePosition,
-            )
-        }
+        rememberVisualFollowAnalysisSample(
+            visualFollowDisplayedSamplePosition = visualFollowDisplayedSamplePosition,
+            followAnalysisSampleStep = followAnalysisSampleStep,
+            followTimelineTotalSamples = followTimelineTotalSamples,
+        )
+    val bitReadoutState =
+        rememberFlashSignalBitReadoutState(
+            followData = followData,
+            visualFollowDisplayedSamplePosition = visualFollowDisplayedSamplePosition,
+        )
     return remember(
         playbackSampleState,
         visualFollowDisplayedSamplePosition,
         visualFollowAnalysisDisplayedSamplePosition,
-        bitReadoutSource,
-        bitReadoutFrame,
+        bitReadoutState,
     ) {
         FlashSignalPlaybackReadoutState(
             playbackSampleState = playbackSampleState,
             visualFollowDisplayedSamplePosition = visualFollowDisplayedSamplePosition,
             visualFollowAnalysisDisplayedSamplePosition = visualFollowAnalysisDisplayedSamplePosition,
-            bitReadoutSource = bitReadoutSource,
-            bitReadoutFrame = bitReadoutFrame,
+            bitReadoutSource = bitReadoutState.source,
+            bitReadoutFrame = bitReadoutState.frame,
+        )
+    }
+}
+
+private fun flashVisualPlaybackRawSample(
+    displayedSamplePosition: Float,
+    followDisplayedSamplePosition: Float,
+    isScrubbing: Boolean,
+): Float =
+    if (isScrubbing) {
+        displayedSamplePosition
+    } else {
+        followDisplayedSamplePosition
+    }
+
+@Composable
+private fun rememberVisualFollowAnalysisSample(
+    visualFollowDisplayedSamplePosition: Float,
+    followAnalysisSampleStep: Int,
+    followTimelineTotalSamples: Int,
+): Float =
+    remember(visualFollowDisplayedSamplePosition, followAnalysisSampleStep, followTimelineTotalSamples) {
+        quantizeVisualizationDisplayedSamples(
+            displayedSamples = visualFollowDisplayedSamplePosition,
+            sampleStep = followAnalysisSampleStep,
+            totalSamples = followTimelineTotalSamples,
+        )
+    }
+
+@Composable
+private fun rememberFlashSignalBitReadoutState(
+    followData: PayloadFollowViewData?,
+    visualFollowDisplayedSamplePosition: Float,
+): FlashSignalBitReadoutState {
+    val source =
+        remember(followData) {
+            followData?.toFlashBitReadoutSource()
+        }
+    val frame =
+        remember(source, visualFollowDisplayedSamplePosition) {
+            source?.let { source ->
+                flashBitReadoutFrame(
+                    source = source,
+                    sample = visualFollowDisplayedSamplePosition,
+                )
+            }
+        }
+    return remember(source, frame) {
+        FlashSignalBitReadoutState(
+            source = source,
+            frame = frame,
         )
     }
 }
@@ -372,29 +404,24 @@ private fun rememberFlashSignalTimelineStrategy(
     val hasWindowedTimelineFrame = windowedTimelineFrame != null && !isScrubbing
     val shouldUseTimelineFallback =
         remember(mode, hasWindowedTimelineFrame, bucketSource.stableTimelineKey(), isScrubbing) {
-            when (mode) {
-                FlashSignalVisualizationMode.Pulse -> !hasWindowedTimelineFrame
-                FlashSignalVisualizationMode.Lanes,
-                FlashSignalVisualizationMode.Pitch,
-                -> true
-                FlashSignalVisualizationMode.Hz -> true
-            }
+            shouldUseFallbackTimeline(
+                mode = mode,
+                hasWindowedTimelineFrame = hasWindowedTimelineFrame,
+            )
         }
     val fallbackTimelineFrame =
         remember(bucketSource.stableTimelineKey(), shouldUseTimelineFallback) {
             if (!shouldUseTimelineFallback) {
                 return@remember null
             }
-            (bucketSource as? FlashSignalBucketSource.FollowTimeline)
-                ?.followData
-                ?.toFixedTimelineFrameOrNull()
+            fallbackTimelineFrameOrNull(bucketSource)
         }
     val fixedTimelineFrame =
-        if (isScrubbing) {
-            fallbackTimelineFrame ?: windowedTimelineFrame
-        } else {
-            windowedTimelineFrame ?: fallbackTimelineFrame
-        }
+        selectedFixedTimelineFrame(
+            windowedTimelineFrame = windowedTimelineFrame,
+            fallbackTimelineFrame = fallbackTimelineFrame,
+            isScrubbing = isScrubbing,
+        )
     val usesFallbackTimeline = fallbackTimelineFrame != null && fixedTimelineFrame === fallbackTimelineFrame
     val visualSegments =
         flashVisualSegmentsForMode(
@@ -405,7 +432,6 @@ private fun rememberFlashSignalTimelineStrategy(
         )
     val visualTotalSamples = fixedTimelineFrame?.totalSamples ?: followTimelineTotalSamples
     return remember(
-        shouldUseTimelineFallback,
         fallbackTimelineFrame,
         fixedTimelineFrame,
         usesFallbackTimeline,
@@ -413,7 +439,6 @@ private fun rememberFlashSignalTimelineStrategy(
         visualTotalSamples,
     ) {
         FlashSignalTimelineStrategy(
-            shouldUseTimelineFallback = shouldUseTimelineFallback,
             fallbackTimelineFrame = fallbackTimelineFrame,
             fixedTimelineFrame = fixedTimelineFrame,
             usesFallbackTimeline = usesFallbackTimeline,
@@ -422,6 +447,34 @@ private fun rememberFlashSignalTimelineStrategy(
         )
     }
 }
+
+private fun shouldUseFallbackTimeline(
+    mode: FlashSignalVisualizationMode,
+    hasWindowedTimelineFrame: Boolean,
+): Boolean =
+    when (mode) {
+        FlashSignalVisualizationMode.Pulse -> !hasWindowedTimelineFrame
+        FlashSignalVisualizationMode.Lanes,
+        FlashSignalVisualizationMode.Pitch,
+        FlashSignalVisualizationMode.Hz,
+        -> true
+    }
+
+private fun fallbackTimelineFrameOrNull(bucketSource: FlashSignalBucketSource): FlashSignalFixedTimelineFrame? =
+    (bucketSource as? FlashSignalBucketSource.FollowTimeline)
+        ?.followData
+        ?.toFixedTimelineFrameOrNull()
+
+private fun selectedFixedTimelineFrame(
+    windowedTimelineFrame: FlashSignalFixedTimelineFrame?,
+    fallbackTimelineFrame: FlashSignalFixedTimelineFrame?,
+    isScrubbing: Boolean,
+): FlashSignalFixedTimelineFrame? =
+    if (isScrubbing) {
+        fallbackTimelineFrame ?: windowedTimelineFrame
+    } else {
+        windowedTimelineFrame ?: fallbackTimelineFrame
+    }
 
 @Composable
 private fun rememberFlashSignalBucketFrame(
@@ -620,83 +673,6 @@ internal fun flashVisualSegmentsForMode(
     }
 }
 
-internal data class FlashSignalCanvasRuntimeState(
-    val pulseTapeState: FlashPulseTapeState?,
-    val laneActiveBitState: FlashLaneActiveBitState?,
-    val tokenAlignmentState: FlashTokenAlignmentState?,
-    val telemetryState: FlashSignalCanvasTelemetryState,
-)
-
-internal data class FlashSignalCanvasTelemetryState(
-    val currentReadoutBit: Int?,
-    val currentReadoutBitValue: Char?,
-    val revealedBitOffset: Int,
-    val currentVisualBit: Int?,
-    val currentRawBit: Int?,
-)
-
-@Composable
-internal fun rememberFlashSignalCanvasRuntimeState(
-    followDisplayedSamplePosition: Float,
-    rawSample: Float,
-    followData: PayloadFollowViewData?,
-    bitReadoutSource: FlashBitReadoutSource?,
-    bitReadoutFrame: FlashBitReadoutFrame?,
-): FlashSignalCanvasRuntimeState {
-    val pulseTapeState =
-        remember(bitReadoutSource, followDisplayedSamplePosition) {
-            bitReadoutSource?.let { source ->
-                flashPulseTapeState(
-                    source = source,
-                    sample = followDisplayedSamplePosition,
-                )
-            }
-        }
-    val laneActiveBitState =
-        remember(bitReadoutSource, followDisplayedSamplePosition) {
-            bitReadoutSource?.let { source ->
-                flashLaneActiveBitState(
-                    entries = source.entries,
-                    bitByOffset = source.bitByOffset,
-                    sample = followDisplayedSamplePosition,
-                )
-            }
-        }
-    val tokenAlignmentState =
-        remember(followData, followDisplayedSamplePosition) {
-            followData?.let { data ->
-                flashTokenAlignmentState(
-                    followData = data,
-                    displayedSamples = followDisplayedSamplePosition.toInt(),
-                )
-            }
-        }
-    val telemetryState =
-        remember(bitReadoutFrame, bitReadoutSource, followDisplayedSamplePosition, rawSample) {
-            val currentReadoutBit = bitReadoutFrame?.currentBitOffset
-            FlashSignalCanvasTelemetryState(
-                currentReadoutBit = currentReadoutBit,
-                currentReadoutBitValue = currentReadoutBit?.let { bitReadoutSource?.bitByOffset?.get(it) },
-                revealedBitOffset = bitReadoutFrame?.revealedBitOffset ?: -1,
-                currentVisualBit = bitReadoutSource?.currentBitOffsetAtSample(followDisplayedSamplePosition),
-                currentRawBit = bitReadoutSource?.currentBitOffsetAtSample(rawSample),
-            )
-        }
-    return remember(
-        pulseTapeState,
-        laneActiveBitState,
-        tokenAlignmentState,
-        telemetryState,
-    ) {
-        FlashSignalCanvasRuntimeState(
-            pulseTapeState = pulseTapeState,
-            laneActiveBitState = laneActiveBitState,
-            tokenAlignmentState = tokenAlignmentState,
-            telemetryState = telemetryState,
-        )
-    }
-}
-
 private data class FlashSignalBucketSourceCacheKey(
     val source: String,
     val identity: Int,
@@ -795,143 +771,6 @@ private class FlashSignalAnalysisCache {
     }
 }
 
-internal data class FlashVisualPlaybackSampleState(
-    val rawSample: Float,
-    val displayedSample: Float,
-)
-
-@Composable
-internal fun rememberFlashVisualPlaybackSampleState(
-    rawSample: Float,
-    isPlaying: Boolean,
-    snapWhenNotPlaying: Boolean = false,
-    holdVisualPositionOnPause: Boolean = false,
-    playbackSpeed: Float,
-    sampleRateHz: Int,
-    totalSamples: Int,
-): FlashVisualPlaybackSampleState {
-    var visualSample by remember { mutableFloatStateOf(rawSample) }
-    var previousIsPlaying by remember { mutableStateOf(isPlaying) }
-    var pausedHoldRawSample by remember { mutableStateOf<Float?>(null) }
-    var pausedHoldDisplayedSample by remember { mutableStateOf<Float?>(null) }
-    val clampedRawSample = rawSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
-    val safeSpeed = playbackSpeed.coerceIn(0.1f, 4f)
-    val latestAnchorSample by rememberUpdatedState(rawSample)
-    val latestTotalSamples by rememberUpdatedState(totalSamples)
-    if (!isPlaying || sampleRateHz <= 0 || totalSamples <= 0) {
-        val justPaused = previousIsPlaying && !isPlaying
-        val holdRawSample = pausedHoldRawSample
-        val holdDisplayedSample = pausedHoldDisplayedSample
-        val pausedHoldCanApply =
-            holdVisualPositionOnPause &&
-                (
-                    justPaused ||
-                        (
-                            holdRawSample != null &&
-                                holdDisplayedSample != null &&
-                                abs(clampedRawSample - holdRawSample) <= 0.5f
-                        )
-                )
-        if (pausedHoldCanApply) {
-            val displayedSample =
-                (
-                    if (justPaused) {
-                        visualSample
-                    } else {
-                        holdDisplayedSample ?: visualSample
-                    }
-                ).coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
-            SideEffect {
-                visualSample = displayedSample
-                pausedHoldRawSample = clampedRawSample
-                pausedHoldDisplayedSample = displayedSample
-                previousIsPlaying = false
-            }
-            return FlashVisualPlaybackSampleState(
-                rawSample = rawSample,
-                displayedSample = displayedSample,
-            )
-        }
-        val shouldSnapToRaw =
-            snapWhenNotPlaying ||
-                sampleRateHz <= 0 ||
-                abs(clampedRawSample - visualSample) > sampleRateHz * PauseSnapDriftThresholdSeconds
-        val displayedSample =
-            if (shouldSnapToRaw) {
-                clampedRawSample
-            } else {
-                visualSample.coerceIn(0f, totalSamples.coerceAtLeast(1).toFloat())
-            }
-        if (shouldSnapToRaw) {
-            SideEffect {
-                visualSample = clampedRawSample
-                pausedHoldDisplayedSample = null
-                pausedHoldRawSample = null
-                previousIsPlaying = false
-            }
-        } else {
-            SideEffect {
-                pausedHoldDisplayedSample = null
-                pausedHoldRawSample = null
-                previousIsPlaying = false
-            }
-        }
-        return FlashVisualPlaybackSampleState(
-            rawSample = rawSample,
-            displayedSample = displayedSample,
-        )
-    }
-    LaunchedEffect(safeSpeed, sampleRateHz, totalSamples) {
-        previousIsPlaying = true
-        pausedHoldRawSample = null
-        pausedHoldDisplayedSample = null
-        FlashVisualPerfTrace.recordSmoothReset(
-            anchorSample = latestAnchorSample,
-            previousSmoothSample = visualSample,
-            sampleRateHz = sampleRateHz,
-        )
-        val maxSample = latestTotalSamples.toFloat()
-        val initialAnchor = latestAnchorSample.coerceIn(0f, maxSample)
-        val forwardAnchorThreshold = sampleRateHz * PlaybackResumeForwardAnchorThresholdSeconds
-        val shouldSnapBackwardToAnchor = initialAnchor + 0.5f < visualSample
-        val shouldSnapForwardToAnchor = initialAnchor - visualSample > forwardAnchorThreshold
-        visualSample =
-            if (shouldSnapBackwardToAnchor || shouldSnapForwardToAnchor) {
-                initialAnchor
-            } else {
-                visualSample.coerceIn(0f, maxSample)
-            }
-        var frameAnchorNanos = withFrameNanos { it }
-        var frameAnchorSample = visualSample
-        while (true) {
-            val frameNanos = withFrameNanos { it }
-            val elapsedSeconds = (frameNanos - frameAnchorNanos).toDouble() / 1_000_000_000.0
-            val currentMaxSample = latestTotalSamples.toFloat()
-            val anchor = latestAnchorSample.coerceIn(0f, currentMaxSample)
-            val nextSample =
-                frameAnchorSample +
-                    (elapsedSeconds * sampleRateHz.toDouble() * safeSpeed.toDouble()).toFloat()
-            val predictedSample = nextSample.coerceIn(0f, currentMaxSample)
-            visualSample =
-                if (abs(anchor - predictedSample) > sampleRateHz * 0.35f) {
-                    frameAnchorNanos = frameNanos
-                    frameAnchorSample = anchor
-                    anchor
-                } else {
-                    predictedSample
-                }
-            if (visualSample >= currentMaxSample) {
-                frameAnchorNanos = frameNanos
-                frameAnchorSample = visualSample
-            }
-        }
-    }
-    return FlashVisualPlaybackSampleState(
-        rawSample = rawSample,
-        displayedSample = visualSample,
-    )
-}
-
 internal data class FlashSignalBucketFrame(
     val buckets: List<FskEnergyBucket>,
     val displayedSamplePosition: Float,
@@ -947,238 +786,4 @@ internal data class FlashSignalBucketFrame(
     }
 }
 
-internal data class FlashBitReadoutFrame(
-    val currentGroupStartIndex: Int,
-    val currentBitOffset: Int?,
-    val revealedBitOffset: Int,
-    val previousCells: List<FlashBitReadoutCell>,
-    val currentCells: List<FlashBitReadoutCell>,
-)
-
-internal data class FlashBitReadoutCell(
-    val bit: Char?,
-    val isCurrent: Boolean,
-)
-
-internal data class FlashPulseTapeState(
-    val cells: List<FlashPulseCellState>,
-    val currentBitProgress: Float,
-)
-
-internal data class FlashPulseCellState(
-    val bit: Char?,
-    val isActive: Boolean,
-    val isRevealed: Boolean,
-)
-
-internal data class FlashBitReadoutSource(
-    val entries: List<PayloadFollowBinaryGroupTimelineEntry>,
-    val bitByOffset: Map<Int, Char>,
-)
-
-internal fun PayloadFollowViewData.toFlashBitReadoutSource(): FlashBitReadoutSource? {
-    if (!followAvailable || binaryGroupTimeline.isEmpty() || binaryTokens.isEmpty()) {
-        return null
-    }
-    return FlashBitReadoutSource(
-        entries = binaryGroupTimeline,
-        bitByOffset = binaryBitsByOffset(),
-    )
-}
-
-internal fun flashBitReadoutFrame(
-    followData: PayloadFollowViewData,
-    sample: Float,
-): FlashBitReadoutFrame? {
-    val source = followData.toFlashBitReadoutSource() ?: return null
-    return flashBitReadoutFrame(source = source, sample = sample)
-}
-
-internal fun flashBitReadoutFrame(
-    source: FlashBitReadoutSource,
-    sample: Float,
-): FlashBitReadoutFrame? {
-    if (source.entries.isEmpty() || source.bitByOffset.isEmpty()) {
-        return null
-    }
-    val playbackState = flashTimelinePlaybackState(entries = source.entries, sample = sample)
-    val currentGroupStartIndex = (playbackState.revealedBitOffset.coerceAtLeast(0) / FlashBitReadoutGroupSize) * FlashBitReadoutGroupSize
-    val previousGroupStartIndex = currentGroupStartIndex - FlashBitReadoutGroupSize
-    return FlashBitReadoutFrame(
-        currentGroupStartIndex = currentGroupStartIndex,
-        currentBitOffset = playbackState.currentBitOffset,
-        revealedBitOffset = playbackState.revealedBitOffset,
-        previousCells =
-            buildFlashBitReadoutCells(
-                bitByOffset = source.bitByOffset,
-                groupStartIndex = previousGroupStartIndex,
-                revealThroughIndex = previousGroupStartIndex + FlashBitReadoutGroupSize - 1,
-                currentBitOffset = null,
-            ),
-        currentCells =
-            buildFlashBitReadoutCells(
-                bitByOffset = source.bitByOffset,
-                groupStartIndex = currentGroupStartIndex,
-                revealThroughIndex = playbackState.revealedBitOffset,
-                currentBitOffset = playbackState.currentBitOffset,
-            ),
-    )
-}
-
-internal fun flashPulseTapeState(
-    source: FlashBitReadoutSource,
-    sample: Float,
-): FlashPulseTapeState? {
-    if (source.entries.isEmpty() || source.bitByOffset.isEmpty()) {
-        return null
-    }
-    val playbackState = flashTimelinePlaybackState(entries = source.entries, sample = sample)
-    val anchorBitOffset = playbackState.currentBitOffset ?: playbackState.revealedBitOffset.takeIf { it >= 0 } ?: return null
-    val halfWindow = FlashPulseVisibleCellCount / 2
-    return FlashPulseTapeState(
-        cells =
-            List(FlashPulseVisibleCellCount) { index ->
-                val bitOffset = anchorBitOffset + index - halfWindow
-                FlashPulseCellState(
-                    bit = source.bitByOffset[bitOffset],
-                    isActive = playbackState.currentBitOffset == bitOffset,
-                    isRevealed = bitOffset <= playbackState.revealedBitOffset,
-                )
-            },
-        currentBitProgress = playbackState.currentBitProgress,
-    )
-}
-
-private fun buildFlashBitReadoutCells(
-    bitByOffset: Map<Int, Char>,
-    groupStartIndex: Int,
-    revealThroughIndex: Int,
-    currentBitOffset: Int?,
-): List<FlashBitReadoutCell> =
-    List(FlashBitReadoutGroupSize) { slot ->
-        val bitOffset = groupStartIndex + slot
-        FlashBitReadoutCell(
-            bit =
-                if (bitOffset >= 0 && bitOffset <= revealThroughIndex) {
-                    bitByOffset[bitOffset]
-                } else {
-                    null
-                },
-            isCurrent = currentBitOffset == bitOffset,
-        )
-    }
-
-private data class FlashTimelinePlaybackState(
-    val currentBitOffset: Int?,
-    val revealedBitOffset: Int,
-    val currentBitProgress: Float,
-)
-
-private fun flashTimelinePlaybackState(
-    entries: List<PayloadFollowBinaryGroupTimelineEntry>,
-    sample: Float,
-): FlashTimelinePlaybackState {
-    var low = 0
-    var high = entries.lastIndex
-    var previousRevealedBitOffset = -1
-    while (low <= high) {
-        val mid = (low + high) ushr 1
-        val entry = entries[mid]
-        val entryEndSample = entry.startSample + entry.sampleCount
-        when {
-            sample < entry.startSample -> high = mid - 1
-            sample >= entryEndSample -> {
-                previousRevealedBitOffset = entry.lastBitOffset
-                low = mid + 1
-            }
-            else -> {
-                val bitProgress = entry.bitProgressAtSample(sample)
-                val currentBitOffset =
-                    entry.bitOffset + bitProgress.toInt().coerceIn(0, entry.bitCount.coerceAtLeast(1) - 1)
-                return FlashTimelinePlaybackState(
-                    currentBitOffset = currentBitOffset,
-                    revealedBitOffset = currentBitOffset,
-                    currentBitProgress = bitProgress - bitProgress.toInt(),
-                )
-            }
-        }
-    }
-    return FlashTimelinePlaybackState(
-        currentBitOffset = null,
-        revealedBitOffset = previousRevealedBitOffset,
-        currentBitProgress = 0f,
-    )
-}
-
-internal fun FlashBitReadoutSource.currentBitOffsetAtSample(sample: Float): Int? =
-    flashTimelinePlaybackState(entries = entries, sample = sample).currentBitOffset
-
-internal fun FlashBitReadoutFrame.currentBitsText(): String = currentCells.joinToString(separator = "") { it.bit?.toString() ?: "_" }
-
-internal fun FlashBitReadoutFrame.previousBitsText(): String = previousCells.joinToString(separator = "") { it.bit?.toString() ?: "_" }
-
-private val PayloadFollowBinaryGroupTimelineEntry.lastBitOffset: Int
-    get() = bitOffset + bitCount - 1
-
-internal fun PayloadFollowBinaryGroupTimelineEntry.bitProgressAtSample(sample: Float): Float {
-    if (bitCount <= 1 || sampleCount <= 0) {
-        return 0f
-    }
-    val progress = ((sample - startSample.toFloat()) / sampleCount.toFloat()).coerceIn(0f, 0.9999f)
-    return progress * bitCount.toFloat()
-}
-
-private fun PayloadFollowViewData.binaryBitsByOffset(): Map<Int, Char> {
-    val bitsByOffset = LinkedHashMap<Int, Char>()
-    binaryGroupTimeline.forEach { entry ->
-        val bits = binaryTokens.getOrNull(entry.groupIndex).orEmpty().filter { it == '0' || it == '1' }
-        repeat(entry.bitCount.coerceAtLeast(0)) { bitIndex ->
-            val tokenBitIndex =
-                if (bits.length == entry.bitCount) {
-                    bitIndex
-                } else {
-                    (entry.bitOffset + bitIndex).floorMod(bits.length)
-                }
-            bits.getOrNull(tokenBitIndex)?.let { bit ->
-                bitsByOffset[entry.bitOffset + bitIndex] = bit
-            }
-        }
-    }
-    return bitsByOffset
-}
-
-private fun Int.floorMod(divisor: Int): Int =
-    if (divisor <= 0) {
-        0
-    } else {
-        ((this % divisor) + divisor) % divisor
-    }
-
-private const val PlaybackResumeForwardAnchorThresholdSeconds = 0.08f
-
-internal fun flashVisualPrimitiveEstimate(
-    mode: FlashSignalVisualizationMode,
-    drawableSegments: Int,
-    buckets: Int,
-    hasFixedTimeline: Boolean,
-): Int =
-    if (hasFixedTimeline) {
-        when (mode) {
-            FlashSignalVisualizationMode.Lanes -> drawableSegments * 2
-            FlashSignalVisualizationMode.Pitch -> drawableSegments
-            FlashSignalVisualizationMode.Hz -> drawableSegments
-            FlashSignalVisualizationMode.Pulse -> FlashPulseVisibleCellCount
-        }
-    } else {
-        when (mode) {
-            FlashSignalVisualizationMode.Lanes -> buckets * 2
-            FlashSignalVisualizationMode.Pitch -> buckets * 2
-            FlashSignalVisualizationMode.Hz -> buckets
-            FlashSignalVisualizationMode.Pulse -> FlashPulseVisibleCellCount
-        }
-    }
-
 private const val FlashSignalAnalysisCacheMaxEntries = 12
-private const val FlashBitReadoutGroupSize = 8
-private const val PauseSnapDriftThresholdSeconds = 0.35f
-internal const val FlashPulseVisibleCellCount = 13

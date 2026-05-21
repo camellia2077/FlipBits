@@ -223,7 +223,7 @@
     <string name="config_demo_mode_subtitle">Monstra signum tactus et monita ad capturam.</string>
     <string name="config_custom_brand_theme_import_title">Importare dual-tone custom</string>
     <string name="config_custom_brand_theme_import">Importare</string>
-    <string name="config_custom_brand_theme_copy_config">Configurationem imitari</string>
+    <string name="config_custom_brand_theme_copy_config">Imitari</string>
     <string name="config_custom_theme_copy_all">Omnes Colores Exscribere</string>
     <string name="config_custom_brand_theme_import_description">Configurationem thematis FlipBits custom insere.</string>
     <string name="config_custom_brand_theme_import_config_label">Configuratio thematis</string>

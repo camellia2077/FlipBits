@@ -13,13 +13,22 @@ class AndroidIntentAudioShareGateway(
     private val appContext: Context,
 ) : AudioShareGateway {
     override fun shareSavedAudio(item: SavedAudioItem): Boolean =
+        shareAudio(
+            displayName = item.displayName,
+            uriString = item.uriString,
+        )
+
+    override fun shareAudio(
+        displayName: String,
+        uriString: String,
+    ): Boolean =
         runCatching {
-            val uri = Uri.parse(item.uriString)
+            val uri = Uri.parse(uriString)
             val shareIntent =
                 Intent(Intent.ACTION_SEND).apply {
                     type = "audio/wav"
                     putExtra(Intent.EXTRA_STREAM, uri)
-                    clipData = ClipData.newRawUri(item.displayName, uri)
+                    clipData = ClipData.newRawUri(displayName, uri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             val chooserIntent =

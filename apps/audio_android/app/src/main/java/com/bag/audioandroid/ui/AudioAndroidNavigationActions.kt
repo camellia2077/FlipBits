@@ -4,7 +4,10 @@ import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
+import com.bag.audioandroid.ui.state.PlayerShellEvent
+import com.bag.audioandroid.ui.state.QueueSheetValue
 import com.bag.audioandroid.ui.state.SnackbarMessage
+import com.bag.audioandroid.ui.state.reduce
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -48,11 +51,30 @@ internal class AudioAndroidNavigationActions(
     }
 
     fun onOpenPlayerDetailSheet() {
-        uiState.update { it.copy(showPlayerDetailSheet = true, showSavedAudioSheet = false) }
+        uiState.update { state ->
+            state.copy(
+                playerShellState = state.playerShellState.reduce(PlayerShellEvent.OpenExpandedPlayer),
+            )
+        }
     }
 
     fun onClosePlayerDetailSheet() {
-        uiState.update { it.copy(showPlayerDetailSheet = false) }
+        uiState.update { state ->
+            state.copy(
+                playerShellState = state.playerShellState.reduce(PlayerShellEvent.CollapseExpandedPlayer),
+            )
+        }
+    }
+
+    fun onQueueSheetValueChanged(value: QueueSheetValue) {
+        uiState.update { state ->
+            state.copy(
+                playerShellState =
+                    state.playerShellState.reduce(
+                        PlayerShellEvent.SetQueueValue(value = value),
+                    ),
+            )
+        }
     }
 
     fun onSnackbarMessageShown(messageId: Long) {

@@ -16,6 +16,7 @@
     <string name="audio_action_previous_track">Praecedens</string>
     <string name="audio_action_next_track">Proximum</string>
     <string name="audio_action_open_audio_info">Notitia</string>
+    <string name="audio_action_collapse_player_detail">Contrahe lectorem</string>
     <string name="audio_action_normal_playback">Normalis</string>
     <string name="audio_action_shuffle_playback">Casus</string>
     <string name="audio_action_repeat_one">Repete unum</string>
@@ -26,6 +27,7 @@
     <string name="audio_action_clear_result">Purga Data</string>
     <string name="audio_action_clear_result_busy">Purgatio…</string>
     <string name="audio_action_export">Consecrare</string>
+    <string name="audio_action_already_saved_to_library">Iam in bibliotheca conservatum</string>
     <string name="audio_action_export_to_file">Edicere in Archivum Electum</string>
     <string name="audio_action_playback_speed_short">Celeritas</string>
     <string name="audio_action_open_playback_speed_menu">Aperi menu celeritatis lusionis</string>

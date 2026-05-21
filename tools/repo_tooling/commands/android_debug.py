@@ -74,9 +74,12 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
         capture.string_extra(extras, "wb.sample.length", args.sample_length)
         capture.string_extra(extras, "wb.sample.id", args.sample_id)
         capture.float_extra(extras, "wb.playback.speed", args.playback_speed)
+        capture.bool_extra(extras, "wb.visual.perf_overlay", args.perf_overlay)
         capture.bool_extra(extras, "wb.encode", not args.no_encode)
         capture.bool_extra(extras, "wb.play", not args.no_play)
         capture.long_extra(extras, "wb.play.ms", play_ms)
+        capture.string_extra(extras, "wb.play.end", args.play_end)
+        capture.string_extra(extras, "wb.play.script", args.play_script)
         capture.capture_common(
             output_dir=_output_dir(args, f"flash-{args.scenario}-{args.style}"),
             wait_ms=args.wait_ms,
