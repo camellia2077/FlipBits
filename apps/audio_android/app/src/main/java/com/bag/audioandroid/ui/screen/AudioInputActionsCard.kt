@@ -13,7 +13,6 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -107,11 +106,7 @@ internal fun AudioInputActionsCard(
         )
     }
 
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 0.dp,
-        modifier = modifier.fillMaxWidth(),
-    ) {
+    AudioSectionContainer(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -161,14 +156,9 @@ internal fun AudioInputActionsCard(
                     InputEncodingStatusSection(
                         transportMode = transportMode,
                         analysis = inputEncodingAnalysis,
+                        inputText = inputText,
                     )
                 }
-
-                Text(
-                    text = stringResource(R.string.audio_input_editor_inline_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
 
                 AudioEncodeStatusSection(
                     encodeProgress = encodeProgress,

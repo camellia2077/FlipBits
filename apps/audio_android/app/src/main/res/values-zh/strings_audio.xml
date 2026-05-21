@@ -86,10 +86,10 @@
     <string name="audio_flash_voicing_style_title">发声风格</string>
     <string name="audio_action_select_flash_voicing_style">选择发声风格</string>
     <string name="audio_flash_voicing_style_sheet_title">发声风格</string>
-    <string name="audio_mini_speed_style_title">速度风格</string>
-    <string name="audio_action_select_mini_speed_style">选择速度风格</string>
-    <string name="audio_mini_speed_style_hint">应用于下次生成的音频。已生成的音频将保留其创建时的风格。</string>
-    <string name="audio_mini_speed_style_sheet_title">速度风格</string>
+    <string name="audio_mini_speed_style_title">Morse 速度</string>
+    <string name="audio_action_select_mini_speed_style">选择 Morse 速度</string>
+    <string name="audio_mini_speed_style_hint">应用于下次生成的音频。已生成的音频会保留创建时使用的 Morse 速度。</string>
+    <string name="audio_mini_speed_style_sheet_title">Morse 速度</string>
     <string name="audio_saved_audio_sheet_title">已保存的音频</string>
     <string name="audio_saved_audio_empty">暂无已保存的音频。</string>
     <string name="audio_mini_player_generated_title">%1$s 生成音频</string>
@@ -183,9 +183,9 @@
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra 模式使用 UTF-8 文本。</string>
     <string name="audio_transport_mini_hint">mini 使用兼容 Morse 的 ASCII 文本。</string>
-    <string name="audio_morse_speed_slow">慢速</string>
-    <string name="audio_morse_speed_standard">标准</string>
-    <string name="audio_morse_speed_fast">快速</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">规范化 Morse：%1$s</string>
     <string name="audio_morse_unsupported_characters">不支持的 Morse 字符：%1$s</string>
     <string name="audio_transport_ultra_example">守灯人解开了古老星图的封印</string>

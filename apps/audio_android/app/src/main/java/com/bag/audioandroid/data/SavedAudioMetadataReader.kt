@@ -45,7 +45,7 @@ internal class SavedAudioMetadataReader(
                     ?.let(::parseCreatedAtEpochSeconds)
                     ?: row.dateAddedEpochSeconds.coerceAtLeast(0L),
             flashVoicingStyle = metadata?.flashVoicingStyle,
-            miniSpeedStyle = metadata?.miniSpeedStyle ?: MorseSpeedOption.fromFrameSamples(metadata?.frameSamples ?: 2205),
+            miniSpeedStyle = metadata?.miniSpeedStyle ?: metadata.miniSpeedFromFrameSamples(),
             sampleRateHz = metadata?.sampleRateHz?.takeIf { it > 0 },
             inputSourceKind = metadata?.inputSourceKind,
             fileSizeBytes = row.sizeBytes.takeIf { it >= 0L },
@@ -78,7 +78,7 @@ internal class SavedAudioMetadataReader(
                     ?.let(::parseCreatedAtEpochSeconds)
                     ?: Instant.now().epochSecond,
             flashVoicingStyle = metadata?.flashVoicingStyle,
-            miniSpeedStyle = metadata?.miniSpeedStyle ?: MorseSpeedOption.fromFrameSamples(metadata?.frameSamples ?: sampleRateHz),
+            miniSpeedStyle = metadata?.miniSpeedStyle ?: metadata.miniSpeedFromFrameSamples(),
             sampleRateHz = metadata?.sampleRateHz?.takeIf { it > 0 } ?: sampleRateHz,
             inputSourceKind = metadata?.inputSourceKind,
             fileSizeBytes = fileSizeBytes?.takeIf { it >= 0L },
@@ -87,6 +87,13 @@ internal class SavedAudioMetadataReader(
 
     private fun parseCreatedAtEpochSeconds(createdAtIsoUtc: String): Long? =
         runCatching { Instant.parse(createdAtIsoUtc).epochSecond }.getOrNull()
+
+    private fun GeneratedAudioMetadata?.miniSpeedFromFrameSamples(): MorseSpeedOption =
+        this
+            ?.frameSamples
+            ?.takeIf { it > 0 }
+            ?.let(MorseSpeedOption::fromFrameSamples)
+            ?: MorseSpeedOption.default
 
     private companion object {
         const val MetadataHeaderReadLimitBytes = 4096

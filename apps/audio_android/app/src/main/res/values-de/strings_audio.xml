@@ -73,10 +73,10 @@
     <string name="audio_flash_voicing_style_title">Stimmstil</string>
     <string name="audio_action_select_flash_voicing_style">Stimmstil auswählen</string>
     <string name="audio_flash_voicing_style_sheet_title">Stimmstil</string>
-    <string name="audio_mini_speed_style_title">Geschwindigkeitsstil</string>
-    <string name="audio_action_select_mini_speed_style">Geschwindigkeitsstil auswählen</string>
-    <string name="audio_mini_speed_style_hint">Gilt für das nächste erstellte Audio. Bereits erzeugtes Audio behält den Stil, mit dem es erstellt wurde.</string>
-    <string name="audio_mini_speed_style_sheet_title">Geschwindigkeitsstil</string>
+    <string name="audio_mini_speed_style_title">Morse-Geschwindigkeit</string>
+    <string name="audio_action_select_mini_speed_style">Morse-Geschwindigkeit auswählen</string>
+    <string name="audio_mini_speed_style_hint">Gilt für das nächste erstellte Audio. Bereits erzeugtes Audio behält die Morse-Geschwindigkeit, mit der es erstellt wurde.</string>
+    <string name="audio_mini_speed_style_sheet_title">Morse-Geschwindigkeit</string>
     <string name="audio_saved_audio_sheet_title">Gespeichertes Audio</string>
     <string name="audio_saved_audio_empty">Noch kein Audio gespeichert.</string>
     <string name="audio_mini_player_generated_title">Erstelltes %1$s-Audio</string>
@@ -162,9 +162,9 @@
     <string name="audio_transport_pro_example">GLOCKEN MARKIEREN DIE ERSTE WACHE</string>
     <string name="audio_transport_ultra_hint">ultra verwendet UTF-8-Text.</string>
     <string name="audio_transport_mini_hint">mini verwendet Morse-kompatiblen ASCII-Text.</string>
-    <string name="audio_morse_speed_slow">Langsam</string>
-    <string name="audio_morse_speed_standard">Standard</string>
-    <string name="audio_morse_speed_fast">Schnell</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">Normalisiertes Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">Nicht unterstützte Morse-Zeichen: %1$s</string>
     <string name="audio_transport_ultra_example">Die Hüter der Lampen entsiegeln die alte Sternenkarte</string>

@@ -175,10 +175,11 @@ internal fun computeCompactLyricsVisibleLineCount(
             val maxPossibleLines =
                 (((targetHeightDp + spacingDp) / (lineHeightDp + spacingDp)).toInt()).coerceAtLeast(4)
             val visualLineCap =
-                if (transportMode == TransportModeOption.Mini) {
-                    7
-                } else {
-                    5
+                when (transportMode) {
+                    TransportModeOption.Mini,
+                    TransportModeOption.Ultra,
+                    -> 7
+                    else -> 5
                 }
             maxPossibleLines.coerceAtMost(visualLineCap)
         }
@@ -216,27 +217,11 @@ internal fun lyricsPreviewVisibleLineCount(
         when (transportMode) {
             TransportModeOption.Mini -> 2
             TransportModeOption.Flash ->
-                if (applyBonusLine) {
-                    if (!prefersWrappedLines && stripHeight < 200f) {
-                        2
-                    } else {
-                        1
-                    }
-                } else {
-                    0
-                }
+                if (applyBonusLine) 1 else 0
             TransportModeOption.Pro,
             TransportModeOption.Ultra,
             ->
-                if (applyBonusLine) {
-                    if (!prefersWrappedLines && stripHeight < 200f) {
-                        2
-                    } else {
-                        1
-                    }
-                } else {
-                    0
-                }
+                if (applyBonusLine) 1 else 0
             else -> if (applyBonusLine) 1 else 0
         }
     return baseCount + transportBonus

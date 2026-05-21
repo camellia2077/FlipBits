@@ -73,10 +73,10 @@
     <string name="audio_flash_voicing_style_title">Vox Style</string>
     <string name="audio_action_select_flash_voicing_style">Elige Vox Style</string>
     <string name="audio_flash_voicing_style_sheet_title">Vox Style</string>
-    <string name="audio_mini_speed_style_title">Celeritatis Stilus</string>
-    <string name="audio_action_select_mini_speed_style">Elige Celeritatis Stilum</string>
-    <string name="audio_mini_speed_style_hint">Applicatur ad proximam vocem invocatam. Voces iam creatae ritum pristinum servant.</string>
-    <string name="audio_mini_speed_style_sheet_title">Celeritatis Stilus</string>
+    <string name="audio_mini_speed_style_title">Celeritas Morse</string>
+    <string name="audio_action_select_mini_speed_style">Elige Celeritatem Morse</string>
+    <string name="audio_mini_speed_style_hint">Applicatur ad proximam vocem invocatam. Voces iam creatae celeritatem Morse pristinam servant.</string>
+    <string name="audio_mini_speed_style_sheet_title">Celeritas Morse</string>
     <string name="audio_saved_audio_sheet_title">Reliquiae vocis</string>
     <string name="audio_saved_audio_empty">Nulla vox consecrata adhuc.</string>
     <string name="audio_mini_player_generated_title">Audio %1$s creata</string>
@@ -162,9 +162,9 @@
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra textu UTF-8 utitur.</string>
     <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
-    <string name="audio_morse_speed_slow">Lente</string>
-    <string name="audio_morse_speed_standard">Ritus</string>
-    <string name="audio_morse_speed_fast">Celeriter</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">Morse ordinatus: %1$s</string>
     <string name="audio_morse_unsupported_characters">Characteres Morse non recepti: %1$s</string>
     <string name="audio_transport_ultra_example">Custodes lucernarum veterem chartam stellarum resignant</string>

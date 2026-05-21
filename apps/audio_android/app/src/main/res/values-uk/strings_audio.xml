@@ -73,10 +73,10 @@
     <string name="audio_flash_voicing_style_title">Стиль голосу</string>
     <string name="audio_action_select_flash_voicing_style">Вибрати стиль голосу</string>
     <string name="audio_flash_voicing_style_sheet_title">Стиль голосу</string>
-    <string name="audio_mini_speed_style_title">Стиль швидкості</string>
-    <string name="audio_action_select_mini_speed_style">Вибрати стиль швидкості</string>
-    <string name="audio_mini_speed_style_hint">Застосовується до наступного згенерованого аудіо. Уже згенероване аудіо зберігає стиль, з яким його було створено.</string>
-    <string name="audio_mini_speed_style_sheet_title">Стиль швидкості</string>
+    <string name="audio_mini_speed_style_title">Швидкість Morse</string>
+    <string name="audio_action_select_mini_speed_style">Вибрати швидкість Morse</string>
+    <string name="audio_mini_speed_style_hint">Застосовується до наступного згенерованого аудіо. Уже згенероване аудіо зберігає швидкість Morse, з якою його було створено.</string>
+    <string name="audio_mini_speed_style_sheet_title">Швидкість Morse</string>
     <string name="audio_saved_audio_sheet_title">Збережене аудіо</string>
     <string name="audio_saved_audio_empty">Збереженого аудіо ще немає.</string>
     <string name="audio_mini_player_generated_title">Згенероване аудіо %1$s</string>
@@ -162,9 +162,9 @@
     <string name="audio_transport_pro_example">DZVONY SPOVISHCHAIUT PERSHU VARTU</string>
     <string name="audio_transport_ultra_hint">ultra використовує текст UTF-8.</string>
     <string name="audio_transport_mini_hint">mini використовує ASCII-текст, сумісний із Morse.</string>
-    <string name="audio_morse_speed_slow">Повільно</string>
-    <string name="audio_morse_speed_standard">Стандарт</string>
-    <string name="audio_morse_speed_fast">Швидко</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">Нормалізований Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">Непідтримувані символи Morse: %1$s</string>
     <string name="audio_transport_ultra_example">Вартові ламп розгортають стару зоряну карту</string>

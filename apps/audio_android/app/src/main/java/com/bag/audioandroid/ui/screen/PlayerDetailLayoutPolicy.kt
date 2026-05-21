@@ -75,9 +75,12 @@ internal fun rememberPlayerDetailLayoutPolicyState(
             }
             return@LaunchedEffect
         }
-        // Lock the recovered lyrics height after the first stable Flash+Visual measurement.
-        // Continuously re-applying tiny layout deltas causes visible vertical jitter.
-        if (appliedExtraLyricsRecoveryHeight == 0.dp && desiredExtraLyricsRecoveryHeight > 0.dp) {
+        // Lock recovery after stable Visual measurements, but allow monotonic growth
+        // when the first value came from a stale pre-Visual layout during mode switch.
+        if (
+            desiredExtraLyricsRecoveryHeight > 0.dp &&
+            desiredExtraLyricsRecoveryHeight > appliedExtraLyricsRecoveryHeight + PlayerDetailLyricsRecoveryUpdateThreshold
+        ) {
             appliedExtraLyricsRecoveryHeight = desiredExtraLyricsRecoveryHeight
         }
     }
@@ -100,7 +103,11 @@ internal fun rememberPlayerDetailLayoutPolicyState(
 }
 
 internal fun TransportModeOption.shouldRecoverVisualLyrics(playbackDisplayMode: PlaybackDisplayMode): Boolean =
-    (this == TransportModeOption.Flash || this == TransportModeOption.Mini) &&
+    (
+        this == TransportModeOption.Flash ||
+            this == TransportModeOption.Mini ||
+            this == TransportModeOption.Ultra
+    ) &&
         playbackDisplayMode == PlaybackDisplayMode.Visual
 
 internal fun TransportModeOption.shouldApplyTokensBonusLine(playbackDisplayMode: PlaybackDisplayMode): Boolean =
@@ -115,6 +122,8 @@ internal val PlayerDetailHorizontalPadding = 24.dp
 internal val PlayerDetailLyricsRecoveryPreservedGap = 16.dp
 internal val PlayerDetailLyricsRecoveryCap = 96.dp
 internal val PlayerDetailMiniVisualLyricsRecoveryCap = 120.dp
+internal val PlayerDetailUltraVisualLyricsRecoveryCap = 144.dp
+private val PlayerDetailLyricsRecoveryUpdateThreshold = 8.dp
 internal val PlayerDetailLyricsPreviewBonusPreservedGap = 16.dp
 internal val PlayerDetailLyricsPreviewBonusLineCost = 60.dp
 
@@ -158,6 +167,7 @@ internal fun computeRecoveredLyricsHeight(
         val recoveryCap =
             when (transportMode) {
                 TransportModeOption.Mini -> PlayerDetailMiniVisualLyricsRecoveryCap
+                TransportModeOption.Ultra -> PlayerDetailUltraVisualLyricsRecoveryCap
                 else -> PlayerDetailLyricsRecoveryCap
             }
         (effectiveBaseGap - PlayerDetailLyricsRecoveryPreservedGap)

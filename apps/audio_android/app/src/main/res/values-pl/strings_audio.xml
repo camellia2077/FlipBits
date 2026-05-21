@@ -73,10 +73,10 @@
     <string name="audio_flash_voicing_style_title">Styl głosu</string>
     <string name="audio_action_select_flash_voicing_style">Wybierz styl głosu</string>
     <string name="audio_flash_voicing_style_sheet_title">Styl głosu</string>
-    <string name="audio_mini_speed_style_title">Styl szybkości</string>
-    <string name="audio_action_select_mini_speed_style">Wybierz styl szybkości</string>
-    <string name="audio_mini_speed_style_hint">Dotyczy kolejnego wygenerowanego audio. Już wygenerowane audio zachowuje styl, z którym zostało utworzone.</string>
-    <string name="audio_mini_speed_style_sheet_title">Styl szybkości</string>
+    <string name="audio_mini_speed_style_title">Prędkość Morse</string>
+    <string name="audio_action_select_mini_speed_style">Wybierz prędkość Morse</string>
+    <string name="audio_mini_speed_style_hint">Dotyczy kolejnego wygenerowanego audio. Już wygenerowane audio zachowuje prędkość Morse, z którą zostało utworzone.</string>
+    <string name="audio_mini_speed_style_sheet_title">Prędkość Morse</string>
     <string name="audio_saved_audio_sheet_title">Zapisane audio</string>
     <string name="audio_saved_audio_empty">Nie ma jeszcze zapisanego audio.</string>
     <string name="audio_mini_player_generated_title">Wygenerowane audio %1$s</string>
@@ -162,9 +162,9 @@
     <string name="audio_transport_pro_example">DZWONY OZNACZAJA PIERWSZA WARTE</string>
     <string name="audio_transport_ultra_hint">ultra uzywa tekstu UTF-8.</string>
     <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
-    <string name="audio_morse_speed_slow">Wolno</string>
-    <string name="audio_morse_speed_standard">Standard</string>
-    <string name="audio_morse_speed_fast">Szybko</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">Znormalizowany Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">Nieobsługiwane znaki Morse: %1$s</string>
     <string name="audio_transport_ultra_example">Strażnicy lamp odpieczętowują starą mapę gwiazd</string>

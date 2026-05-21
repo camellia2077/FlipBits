@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
@@ -424,6 +425,28 @@ class PlayerDetailSheetContentTest {
                 playbackDisplayMode = PlaybackDisplayMode.Lyrics,
                 displayedSamples = 10_000,
                 visualDisplayedSamples = 409,
+            ),
+        )
+    }
+
+    @Test
+    fun `ultra visual recovers lyrics preview gap like signal visuals`() {
+        assertEquals(true, TransportModeOption.Ultra.shouldRecoverVisualLyrics(PlaybackDisplayMode.Visual))
+        assertEquals(false, TransportModeOption.Ultra.shouldRecoverVisualLyrics(PlaybackDisplayMode.Lyrics))
+        assertEquals(false, TransportModeOption.Pro.shouldRecoverVisualLyrics(PlaybackDisplayMode.Visual))
+    }
+
+    @Test
+    fun `ultra visual can use recovered gap for more lyrics preview lines`() {
+        assertEquals(
+            7,
+            computeCompactLyricsVisibleLineCount(
+                transportMode = TransportModeOption.Ultra,
+                playbackDisplayMode = PlaybackDisplayMode.Visual,
+                prefersWrappedLines = false,
+                effectiveExtraLyricsRecoveryHeight = 144.dp,
+                tokenStripHeightDp = null,
+                applyLyricsPreviewBonusLine = false,
             ),
         )
     }

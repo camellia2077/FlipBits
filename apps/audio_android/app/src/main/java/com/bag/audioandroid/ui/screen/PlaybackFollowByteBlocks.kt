@@ -597,7 +597,8 @@ private object PlaybackFollowBinaryRenderTrace {
                 "reason=token-binary-render-playback " +
                     "sample=$displayedSamples token=$tokenIndex tokenText=${tokenText.logSafe()} " +
                     "tokenViewMode=binary byteIndexWithinToken=$byteIndexWithinToken globalByteOffset=$globalByteOffset " +
-                    "renderedBitIndexWithinByte=$activeBitIndex renderedBitCount=$activeBitCount renderedGlobalBitOffset=$renderedGlobalBit " +
+                    "renderedBitIndexWithinByte=$activeBitIndex renderedBitCount=$activeBitCount " +
+                    "renderedGlobalBitOffset=$renderedGlobalBit " +
                     "renderedBitValue=$renderedBitValue toneActive=$isActiveBitTone " +
                     "playbackGlobalBit=$playbackGlobalBit playbackCurrentBitValue=$playbackBitValue " +
                     "playbackMinusRenderedBit=${playbackGlobalBit - renderedGlobalBit}",

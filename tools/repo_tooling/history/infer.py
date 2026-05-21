@@ -4,6 +4,8 @@ import re
 from datetime import date
 from pathlib import Path
 
+from ..constants import ROOT_DIR
+from ..process import run_capture
 from .collect import (
     apply_scopes,
     collect_changed_paths,
@@ -15,142 +17,328 @@ from .collect import (
 from .model import BucketSummary, CandidateTopic, ChangedPath, HistoryPrepResult, RelevantSummary, VersionHint
 
 
-def candidate_topic_for_bucket(bucket: str, items: list[ChangedPath]) -> CandidateTopic | None:
+def _has_any_path(paths: set[str], fragments: list[str]) -> bool:
+    return any(any(fragment in path for fragment in fragments) for path in paths)
+
+
+def _changed_diff_text(items: list[ChangedPath]) -> str:
+    tracked_paths = [item.path for item in items if item.status != "??"]
+    texts: list[str] = []
+    if tracked_paths:
+        result = run_capture(["git", "diff", "--unified=0", "--", *tracked_paths], cwd=ROOT_DIR, echo=False)
+        if result.returncode == 0:
+            texts.append(result.stdout)
+    for item in items:
+        if item.status != "??":
+            continue
+        path = ROOT_DIR / item.path
+        if path.is_file() and path.stat().st_size <= 200_000:
+            try:
+                texts.append(path.read_text(encoding="utf-8", errors="replace"))
+            except OSError:
+                continue
+    return "\n".join(texts)
+
+
+def _has_any_diff(diff_text: str, tokens: list[str]) -> bool:
+    return any(token in diff_text for token in tokens)
+
+
+def _topic(
+    *,
+    bucket: str,
+    title: str,
+    reason: str,
+    recommendation: str = "history-worthy",
+    key_facts: list[str] | None = None,
+    representative_files: list[str] | None = None,
+) -> CandidateTopic:
+    return CandidateTopic(
+        title=title,
+        reason=reason,
+        bucket=bucket,
+        recommendation=recommendation,
+        key_facts=key_facts or [],
+        representative_files=representative_files or [],
+    )
+
+
+def candidate_topics_for_bucket(bucket: str, items: list[ChangedPath]) -> list[CandidateTopic]:
     paths = {item.path for item in items}
+    diff_text = _changed_diff_text(items)
 
     if bucket == "android-app":
+        topics: list[CandidateTopic] = []
+        if _has_any_path(paths, ["MorseCode.kt", "MorseSpeedOptionTest.kt"]) or _has_any_diff(
+            diff_text, ["Wpm10", "Wpm15", "Wpm20", "translateMorseNotation"]
+        ):
+            facts: list[str] = []
+            if _has_any_diff(diff_text, ["Wpm10", "Wpm15", "Wpm20"]):
+                facts.append("Mini Morse speed presets changed from named styles to explicit `10 WPM` / `15 WPM` / `20 WPM` values.")
+            if "translateMorseNotation" in diff_text:
+                facts.append("Mini input can translate Morse notation pasted into the text field.")
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Mini Morse speed and notation tools",
+                    reason="Detected Morse speed/model changes or Mini-only Morse notation translation UI.",
+                    key_facts=facts,
+                    representative_files=[path for path in paths if "Morse" in path][:4],
+                )
+            )
+
+        if _has_any_path(paths, ["UltraFrame", "UltraSymbolStepVisualizer.kt", "SymbolEnvelopeVisualizationAnalysis.kt"]) or _has_any_diff(
+            diff_text, ["UltraFrameSection", "ultraFrameTimeline", "carrierFrequencyHz"]
+        ):
+            facts = []
+            if "ultraFrameTimeline" in diff_text:
+                facts.append("Android domain/JNI now carries Ultra full-frame symbol timeline data.")
+            if "UltraFrameSection" in diff_text:
+                facts.append("Ultra visual can distinguish preamble, sync, header, payload, and CRC sections.")
+            if "debugUltraVisualLayout" in diff_text:
+                facts.append("Debug builds expose `UltraVisualLayout` logs for visual layout inspection.")
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Ultra full-frame visual timeline",
+                    reason="Detected Ultra frame timeline, JNI/domain DTO, or visualizer changes.",
+                    key_facts=facts,
+                    representative_files=[path for path in paths if "Ultra" in path or "SymbolEnvelope" in path or "PayloadFollow" in path][:5],
+                )
+            )
+
+        if _has_any_path(paths, ["AppSettingsRepository.kt", "TransportModeOption.kt"]) and _has_any_diff(
+            diff_text, ["SelectedTransportModeId", "setSelectedTransportModeId", "fromWireName"]
+        ):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Transport mode persistence",
+                    reason="Detected DataStore and transport-mode selection persistence changes.",
+                    key_facts=["Transport mode selection is stored and restored instead of always starting from the default mode."],
+                    representative_files=[path for path in paths if "AppSettingsRepository" in path or "TransportModeOption" in path],
+                )
+            )
+
+        if _has_any_path(paths, ["AudioSectionContainer.kt", "AppThemeVisualTokens.kt"]) or _has_any_diff(
+            diff_text, ["AudioSectionContainer", "minimumSeparatedBlend", "groupContainerColor"]
+        ):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Audio page grouped section containers",
+                    reason="Detected Audio page grouping surfaces or theme token contrast changes.",
+                    key_facts=[
+                        "Input/result sections use a shared lightweight container.",
+                        "Dual-tone group container color gets a minimum visual-difference fallback against the background.",
+                    ],
+                    representative_files=[path for path in paths if "AudioSectionContainer" in path or "AppThemeVisualTokens" in path],
+                )
+            )
+
+        if _has_any_path(paths, ["app/src/main/cpp/", "native_package/private_include/"]) and _has_any_diff(
+            diff_text, ["ultra_frame_timeline", "bag_ultra_frame_symbol_entry"]
+        ):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Android native DTO support for Ultra frame data",
+                    reason="Detected JNI/native-package bridge updates that support higher-level Ultra visual changes.",
+                    recommendation="supporting implementation",
+                    key_facts=["Native bridge copies Ultra frame timeline buffers into Android domain objects."],
+                    representative_files=[path for path in paths if "cpp/" in path or "native_package/" in path][:5],
+                )
+            )
+
+        if any(path.startswith("apps/audio_android/.kotlin/") for path in paths):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Android local Kotlin cache",
+                    reason="Detected local Kotlin cache output; this is normally not release-history content.",
+                    recommendation="probably skip",
+                    representative_files=[path for path in paths if path.startswith("apps/audio_android/.kotlin/")][:3],
+                )
+            )
+
+        if topics:
+            return topics
         if any(path.endswith("app/src/main/cpp/audio_io_jni.cpp") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="android formal audio I/O boundary",
                 reason="Detected Android JNI audio I/O changes that likely switch or reshape the app-facing WAV/metadata boundary.",
-                bucket=bucket,
-            )
+            )]
         if any(path.endswith("data/NativePlaybackRuntimeGateway.kt") for path in paths) or any(
             "NativePlaybackRuntimeBridge" in path for path in paths
         ):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="android playback runtime integration",
                 reason="Detected Android playback runtime bridge/gateway changes for progress, scrub, or playback-state transitions.",
-                bucket=bucket,
-            )
+            )]
         if any(path.endswith("app/build.gradle.kts") for path in paths) or any(path.endswith("gradle.properties") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="android gradle root and release tooling",
                 reason="Detected Android Gradle root, wrapper, or version-source changes under apps/audio_android.",
-                bucket=bucket,
-            )
+            )]
         if any(path.endswith("domain/DecodedAudioData.kt") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="android wav and metadata status split",
                 reason="Detected Android decoded-audio domain changes that likely separate WAV status from metadata status.",
-                bucket=bucket,
-            )
-        return CandidateTopic(
+            )]
+        return [_topic(
+            bucket=bucket,
             title="android presentation workflow updates",
             reason="Detected Android app, domain, or native boundary changes under apps/audio_android.",
-            bucket=bucket,
-        )
+        )]
 
     if bucket == "cli-app":
         if any(path.endswith("src/commands.rs") for path in paths) or any(path.endswith("src/main.rs") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="rust cli command surface updates",
                 reason="Detected Rust CLI command parsing or top-level command-surface changes.",
-                bucket=bucket,
-            )
+            )]
         if any(path.endswith("src/bag_api.rs") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="rust cli bag_api integration",
                 reason="Detected Rust CLI bag_api FFI or encode/decode pipeline changes.",
-                bucket=bucket,
-            )
+            )]
         if any(path.endswith("src/audio_io_api.rs") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="rust cli wav and metadata integration",
                 reason="Detected Rust CLI audio_io_api usage changes around WAV or metadata handling.",
-                bucket=bucket,
-            )
+            )]
         if any(path.endswith("Cargo.toml") for path in paths) or any(path.endswith("Cargo.lock") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="rust cli cargo and build workflow",
                 reason="Detected Cargo manifest or Rust build workflow changes for the CLI presentation layer.",
-                bucket=bucket,
-            )
-        return CandidateTopic(
+            )]
+        return [_topic(
+            bucket=bucket,
             title="rust cli presentation updates",
             reason="Detected Rust CLI source or build changes under apps/audio_cli.",
-            bucket=bucket,
-        )
+        )]
 
     if bucket == "libs/audio_io":
         if any(path.endswith("include/audio_io_api.h") for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="audio_io formal C ABI",
                 reason="Detected `audio_io_api.h` changes under the audio I/O library boundary.",
-                bucket=bucket,
-            )
-        return CandidateTopic(
+            )]
+        return [_topic(
+            bucket=bucket,
             title="audio_io library contract updates",
             reason="Detected library-side audio I/O changes and/or tests.",
-            bucket=bucket,
-        )
+        )]
 
     if bucket == "libs/audio_api":
+        topics = []
+        if _has_any_diff(diff_text, ["bag_ultra_frame_symbol_entry", "ultra_frame_timeline", "BAG_ULTRA_FRAME_SECTION"]):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="bag_api Ultra frame follow contract",
+                    reason="Detected public C API fields for Ultra frame timeline data.",
+                    key_facts=[
+                        "`bag_payload_follow_data` exposes an Ultra frame timeline buffer/count/status set.",
+                        "Encode result layout reports `ultra_frame_timeline_count` for two-pass allocation.",
+                    ],
+                    representative_files=[path for path in paths if "bag_api" in path][:4],
+                )
+            )
+        if topics:
+            return topics
         if any("/tests/" in path for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="bag_api contract and test coverage",
                 reason="Detected `bag_api` boundary changes together with library-side tests.",
-                bucket=bucket,
-            )
-        return CandidateTopic(
+            )]
+        return [_topic(
+            bucket=bucket,
             title="bag_api boundary updates",
             reason="Detected public API and implementation changes in `libs/audio_api`.",
-            bucket=bucket,
-        )
+        )]
 
     if bucket == "libs/audio_runtime":
-        return CandidateTopic(
+        return [_topic(
+            bucket=bucket,
             title="audio_runtime state and test coverage",
             reason="Detected runtime library and runtime test changes.",
-            bucket=bucket,
-        )
+        )]
 
     if bucket == "libs/audio_core":
+        topics = []
+        if _has_any_diff(diff_text, ["EncodePayloadToFrame", "DecodeFrameToPayload", "kCleanFrameV1Preamble", "Crc16CcittFalse"]):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Ultra clean frame codec",
+                    reason="Detected Ultra frame encode/decode and validation logic.",
+                    key_facts=[
+                        "Ultra payloads are wrapped in a frame with preamble, sync, version, flags, payload length, and CRC.",
+                        "Decode validates the frame before returning payload bytes.",
+                    ],
+                    representative_files=[path for path in paths if "ultra" in path][:4],
+                )
+            )
+        if _has_any_diff(diff_text, ["BuildUltraFrameTimeline", "payload_begin_sample", "carrier_freq_hz"]):
+            topics.append(
+                _topic(
+                    bucket=bucket,
+                    title="Ultra frame-aware follow timeline",
+                    reason="Detected follow timeline updates that align payload and visual data with framed Ultra audio.",
+                    key_facts=[
+                        "Payload begin/sample counts account for Ultra frame prefix and CRC.",
+                        "Binary group entries carry Ultra carrier frequency for each payload nibble.",
+                    ],
+                    representative_files=[path for path in paths if "follow_payload" in path or "common/types" in path][:4],
+                )
+            )
+        if topics:
+            return topics
         if any("voicing_internal_" in path for path in paths):
-            return CandidateTopic(
+            return [_topic(
+                bucket=bucket,
                 title="flash voicing internal split",
                 reason="Detected `flash voicing` implementation split into internal support/texture/shell units.",
-                bucket=bucket,
-            )
-        return CandidateTopic(
+            )]
+        return [_topic(
+            bucket=bucket,
             title="audio_core module and implementation updates",
             reason="Detected core library source/module changes.",
-            bucket=bucket,
-        )
+        )]
 
     if bucket == "tests":
-        return CandidateTopic(
+        return [_topic(
+            bucket=bucket,
             title="cross-lib and product smoke regression coverage",
             reason="Detected root-level integration or smoke test changes.",
-            bucket=bucket,
-        )
+            recommendation="supporting implementation",
+        )]
 
     if bucket == "tools":
-        return CandidateTopic(
+        return [_topic(
+            bucket=bucket,
             title="developer workflow tooling updates",
             reason="Detected `tools/run.py` or helper workflow changes.",
-            bucket=bucket,
-        )
+        )]
 
-    return None
+    return []
 
 
 def collect_candidate_topics(grouped_paths: dict[str, list[ChangedPath]]) -> list[CandidateTopic]:
     topics: list[CandidateTopic] = []
     for bucket, items in grouped_paths.items():
-        topic = candidate_topic_for_bucket(bucket, items)
-        if topic is not None:
-            topics.append(topic)
+        topics.extend(candidate_topics_for_bucket(bucket, items))
     return topics
 
 

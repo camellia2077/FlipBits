@@ -1,6 +1,6 @@
 # Android App Architecture
 
-更新时间：2026-03-15
+更新时间：2026-05-21
 
 ## 目的
 - 说明 `apps/audio_android` 的整体职责、目录边界与运行链路。
@@ -139,6 +139,13 @@
   - `ui/`
   - `ui/screen/`
   - `ui/component/`
+- 改 mini player 打开的 detail 页面时，先看：
+  - `docs/design/android/android-player-ui.md`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/PlayerScaffold.kt`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/PlayerSurfaceHost.kt`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/screen/PlayerDetailSheet.kt`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/screen/PlayerDetailLayoutPolicy.kt`
+  - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/screen/PlaybackDisplaySection.kt`
 
 ### 改状态流转 / 交互逻辑
 - 先看：

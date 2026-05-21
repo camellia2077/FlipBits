@@ -136,8 +136,12 @@
 - 导出 WAV、文件元数据、媒体库识别：
   - `MediaStoreAudioExportGateway.kt` -> `MediaStoreSavedAudioLibraryGateway.kt` -> `NativeAudioIoGateway.kt` / `audio_io_jni.cpp` -> `libs/audio_io/`
 - 播放区 UI：
-  - `PlayerDetailSheet.kt` -> `AudioPlaybackProgressSection.kt` -> `AudioPlaybackTransportControls.kt`
+  - 先读 `docs/design/android/android-player-ui.md` 的 detail page code map。
+  - `PlayerScaffold.kt` -> `PlayerSurfaceHost.kt` -> `PlayerDetailSheet.kt`
+  - display 区：`AudioPlaybackDisplayBlock.kt` -> `PlaybackDisplaySection.kt` -> `PlaybackDisplayLayoutModel.kt`
+  - bottom dock：`AudioPlaybackTimelineBlock.kt` -> `AudioPlaybackTransportControls.kt`
 - mini / flash / pro / ultra 可视化：
+  - 如果入口来自 mini player 打开的 detail 页面，先按上面的“播放区 UI”定位 detail shell / display / dock。
   - `AudioFlashSignalVisualizer.kt` -> `FlashSignalVisualizationAnalysis.kt` -> `FlashSignalVisualizationDrawing.kt`
   - `MorseTimelineVisualizer.kt` 负责 `mini` 的 dot/dash block timeline；silence gap 保持空白，不画成 tone。
 - Flash Visual 卡顿、跳动、长音频性能或 bit 密度问题：
@@ -147,12 +151,12 @@
   - `BrandThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
 - Audio 页输入卡、随机样例、示例文本：
   - `AudioInputActionsCard.kt` -> `AudioSessionEditingActions.kt` -> `SampleInputSessionUpdater.kt` -> `AndroidSampleInputTextProvider.kt`
-  - `mini` 输入辅助由 `ui/model/MorseCode.kt` 提供 normalization、unsupported character 提示、dot/dash 预览与 `Slow / Standard / Fast` speed preset。
+  - `mini` 输入辅助由 `ui/model/MorseCode.kt` 提供 normalization、unsupported character 提示、dot/dash 预览与 `10 WPM / 15 WPM / 20 WPM` speed preset。
 - XML 文案与本地化资源：
   - `app/src/main/res/values/strings_*.xml` -> `app/src/main/res/values-*/strings*.xml` -> `app/src/main/res/values*/audio_samples_*.xml`
 - 媒体库导入、重命名、删除、分享：
   - `AudioSavedAudioMutationActions.kt` -> `MediaStoreSavedAudioLibraryGateway.kt`
-- 底部抽屉摘要与已保存音频信息：
+- Detail 页面摘要与已保存音频信息：
   - `PlayerDetailSummarySection.kt` -> `PlayerDetailSavedInfoSection.kt`
 
 ## 说明

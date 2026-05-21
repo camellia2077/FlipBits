@@ -14,6 +14,7 @@ import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.findDuplicateImportedThemePresetId
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.withMaterialDarkThemeActive
@@ -402,6 +403,12 @@ internal class AudioAndroidPreferencesActions(
         uiState.update { it.copy(selectedMorseSpeed = speed) }
         scope.launch {
             appSettingsRepository.setSelectedMorseSpeedStyleId(speed.id)
+        }
+    }
+
+    fun onTransportModeSelected(mode: TransportModeOption) {
+        scope.launch {
+            appSettingsRepository.setSelectedTransportModeId(mode.wireName)
         }
     }
 

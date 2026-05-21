@@ -86,10 +86,10 @@
     <string name="audio_flash_voicing_style_title">음성 스타일</string>
     <string name="audio_action_select_flash_voicing_style">음성 스타일 선택</string>
     <string name="audio_flash_voicing_style_sheet_title">음성 스타일</string>
-    <string name="audio_mini_speed_style_title">속도 스타일</string>
-    <string name="audio_action_select_mini_speed_style">속도 스타일 선택</string>
-    <string name="audio_mini_speed_style_hint">다음에 생성될 오디오에 적용됩니다. 이미 생성된 오디오는 생성 당시의 스타일을 유지합니다.</string>
-    <string name="audio_mini_speed_style_sheet_title">속도 스타일</string>
+    <string name="audio_mini_speed_style_title">Morse 속도</string>
+    <string name="audio_action_select_mini_speed_style">Morse 속도 선택</string>
+    <string name="audio_mini_speed_style_hint">다음에 생성될 오디오에 적용됩니다. 이미 생성된 오디오는 생성 당시의 Morse 속도를 유지합니다.</string>
+    <string name="audio_mini_speed_style_sheet_title">Morse 속도</string>
     <string name="audio_saved_audio_sheet_title">저장된 오디오</string>
     <string name="audio_saved_audio_empty">아직 저장된 오디오가 없습니다.</string>
     <string name="audio_mini_player_generated_title">%1$s 생성된 오디오</string>
@@ -183,9 +183,9 @@
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra는 UTF-8 텍스트를 사용합니다.</string>
     <string name="audio_transport_mini_hint">mini는 Morse 호환 ASCII 텍스트를 사용합니다.</string>
-    <string name="audio_morse_speed_slow">느림</string>
-    <string name="audio_morse_speed_standard">표준</string>
-    <string name="audio_morse_speed_fast">빠름</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">정규화된 Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">지원되지 않는 Morse 문자: %1$s</string>
     <string name="audio_transport_ultra_example">등지기들이 오래된 성문을 엽니다</string>

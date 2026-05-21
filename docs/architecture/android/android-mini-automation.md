@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document describes the debug-only Mini scenario used for real-device adb capture. The current goal is observability only: gather precise Visual/Lyrics timing data for Mini slow, standard, and fast generated playback before changing sync behavior.
+This document describes the debug-only Mini scenario used for real-device adb capture. The current goal is observability only: gather precise Visual/Lyrics timing data for Mini `10 WPM`, `15 WPM`, and `20 WPM` generated playback.
 
 For the full Android automation matrix across JVM tests, instrumentation, and adb debug scenarios, see `docs/architecture/android/android-automation-coverage.md`.
 
@@ -10,9 +10,9 @@ For the full Android automation matrix across JVM tests, instrumentation, and ad
 
 Covered:
 
-- Fast-regression input text: `mini sync test`
+- Regression input text: `mini sync test`
 - Scenario kind: `ui`
-- Mini Morse speeds: `slow`, `standard`, `fast`
+- Mini Morse speeds: `wpm10`, `wpm15`, `wpm20`
 - Player detail display pages: `lyrics`, `visual`
 - Visual perf overlay toggle through adb scenario extras
 - UI scenario actions driven through the normal ViewModel path:
@@ -56,31 +56,31 @@ python tools/run.py android install-debug-fresh
 Single-speed UI scenario:
 
 ```powershell
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed wpm15 --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
 ```
 
 Expanded-lyrics UI scenario:
 
 ```powershell
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --ez wb.lyrics.expand true --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed wpm15 --ez wb.lyrics.expand true --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
 ```
 
 Visual-page lyrics layout scenario:
 
 ```powershell
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed wpm15 --es wb.display visual --ez wb.encode true --ez wb.play true --el wb.play.ms 6000
 ```
 
 Visual-page perf-overlay scenario:
 
 ```powershell
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed wpm15 --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
 ```
 
 Visual-page horizontal Morse scenario:
 
 ```powershell
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --es wb.morse.visual horizontal --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed wpm15 --es wb.display visual --es wb.morse.visual horizontal --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
 ```
 
 Supported extras:
@@ -95,7 +95,7 @@ Supported extras:
   - Accepted values follow app locale tags such as `zh`, `en`, `ru`.
   - Applied before Mini mode selection and before player-detail capture.
 - `wb.mini.speed`
-  - `slow`, `standard`, `fast`
+  - `wpm10`, `wpm15`, `wpm20`
 - `wb.lyrics.expand`
   - `false` by default.
   - When `true`, the debug scenario opens player detail and forces Lyrics into the full scrollable list state.
@@ -148,7 +148,7 @@ All Mini UI adb scenarios reuse the same core flow:
 - Optionally apply `wb.lang` to switch the app language before scenario setup.
 - Select Mini mode.
 - Select the requested Morse speed.
-- Resolve input text from `wb.input` or the fast-regression default.
+- Resolve input text from `wb.input` or the regression default.
 - Encode generated Mini audio.
 - Open player detail.
 - Optionally switch player detail to the requested `wb.display` page.
@@ -226,7 +226,7 @@ python tools/run.py android-debug device-prep
 Recommended log capture:
 
 ```powershell
-python tools/run.py android-debug capture-mini --speed standard --play-ms 6000 --wait-ms 20000
+python tools/run.py android-debug capture-mini --speed wpm15 --play-ms 6000 --wait-ms 20000
 ```
 
 Default `capture-mini` artifacts:
@@ -254,7 +254,7 @@ Recommended manual perf capture:
 
 ```powershell
 adb logcat -c
-adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed standard --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
+adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_MINI_SCENARIO --es wb.scenario ui --es wb.mini.speed wpm15 --es wb.display visual --ez wb.visual.perf_overlay true --ez wb.encode true --ez wb.play true --el wb.play.ms 10000
 adb logcat -d MiniVisualPerf:D MiniAlignmentPerf:D MiniAutomation:D *:S
 ```
 
@@ -299,7 +299,7 @@ Layout-measurement success:
 All-speed fast sweep:
 
 ```powershell
-$speeds = @("slow", "standard", "fast")
+$speeds = @("wpm10", "wpm15", "wpm20")
 foreach ($speed in $speeds) {
     python tools/run.py android-debug capture-mini --speed $speed --play-ms 6000 --wait-ms 20000 --output-dir "temp\android-debug\mini_$speed"
 }

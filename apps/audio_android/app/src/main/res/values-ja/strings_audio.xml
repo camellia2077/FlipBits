@@ -86,10 +86,10 @@
     <string name="audio_flash_voicing_style_title">音声スタイル</string>
     <string name="audio_action_select_flash_voicing_style">音声スタイルを選択</string>
     <string name="audio_flash_voicing_style_sheet_title">音声スタイル</string>
-    <string name="audio_mini_speed_style_title">速度スタイル</string>
-    <string name="audio_action_select_mini_speed_style">速度スタイルを選択</string>
-    <string name="audio_mini_speed_style_hint">次に生成されるオーディオに適用されます。既存の生成済みオーディオは、作成時のスタイルを維持します。</string>
-    <string name="audio_mini_speed_style_sheet_title">速度スタイル</string>
+    <string name="audio_mini_speed_style_title">Morse 速度</string>
+    <string name="audio_action_select_mini_speed_style">Morse 速度を選択</string>
+    <string name="audio_mini_speed_style_hint">次に生成されるオーディオに適用されます。既存の生成済みオーディオは、作成時の Morse 速度を維持します。</string>
+    <string name="audio_mini_speed_style_sheet_title">Morse 速度</string>
     <string name="audio_saved_audio_sheet_title">保存されたオーディオ</string>
     <string name="audio_saved_audio_empty">保存されたオーディオはまだありません。</string>
     <string name="audio_mini_player_generated_title">%1$s 生成オーディオ</string>
@@ -183,9 +183,9 @@
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra モードは UTF-8 テキストを使用します。</string>
     <string name="audio_transport_mini_hint">mini モードは Morse 互換の ASCII テキストを使用します。</string>
-    <string name="audio_morse_speed_slow">低速</string>
-    <string name="audio_morse_speed_standard">標準</string>
-    <string name="audio_morse_speed_fast">高速</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">正規化Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">未対応のMorse文字: %1$s</string>
     <string name="audio_transport_ultra_example">灯守たちは古の星図の封を解く</string>

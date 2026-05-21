@@ -13,6 +13,7 @@ import com.bag.audioandroid.domain.TextFollowLyricLineTimelineEntry
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowRawSegmentViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
 import kotlin.text.Charsets.UTF_8
 
 internal data class SegmentedInputPlan(
@@ -98,12 +99,14 @@ private fun mergeSegmentedFollowData(
     val binaryTokens = ArrayList<String>()
     val byteTimeline = ArrayList<PayloadFollowByteTimelineEntry>()
     val binaryGroupTimeline = ArrayList<PayloadFollowBinaryGroupTimelineEntry>()
+    val ultraFrameTimeline = ArrayList<UltraFrameSymbolTimelineEntry>()
 
     var sampleOffset = firstSampleOffset
     var tokenOffset = 0
     var lineOffset = 0
     var byteOffset = 0
     var groupOffset = 0
+    var frameByteOffset = 0
     var payloadBeginSample = 0
     var payloadSampleCount = 0
     var sawPayloadBegin = false
@@ -188,12 +191,26 @@ private fun mergeSegmentedFollowData(
                     groupIndex = groupOffset + entry.groupIndex,
                 )
             }
+        ultraFrameTimeline +=
+            segment.ultraFrameTimeline.map { entry ->
+                entry.copy(
+                    startSample = sampleOffset + entry.startSample,
+                    frameByteIndex = frameByteOffset + entry.frameByteIndex,
+                    payloadByteIndex =
+                        if (entry.payloadByteIndex >= 0) {
+                            byteOffset + entry.payloadByteIndex
+                        } else {
+                            entry.payloadByteIndex
+                        },
+                )
+            }
 
         sampleOffset += segment.totalPcmSampleCount
         tokenOffset += segment.textTokens.size
         lineOffset += segment.lyricLines.size
         byteOffset += segment.hexTokens.size
         groupOffset += segment.binaryGroupTimeline.size
+        frameByteOffset += (segment.ultraFrameTimeline.maxOfOrNull { it.frameByteIndex } ?: -1) + 1
     }
 
     return PayloadFollowViewData(
@@ -212,6 +229,7 @@ private fun mergeSegmentedFollowData(
         binaryTokens = binaryTokens,
         byteTimeline = byteTimeline,
         binaryGroupTimeline = binaryGroupTimeline,
+        ultraFrameTimeline = ultraFrameTimeline,
         payloadBeginSample = payloadBeginSample,
         payloadSampleCount = payloadSampleCount,
         totalPcmSampleCount = totalPcmSampleCount ?: sampleOffset,

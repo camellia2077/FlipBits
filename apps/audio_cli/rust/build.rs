@@ -27,6 +27,18 @@ fn main() {
                 .join("dev")
         });
     let lib_dir = build_dir.join("lib");
+    println!(
+        "cargo:rerun-if-changed={}",
+        lib_dir.join("libbag_api.a").display()
+    );
+    println!(
+        "cargo:rerun-if-changed={}",
+        lib_dir.join("libaudio_io.a").display()
+    );
+    println!(
+        "cargo:rerun-if-changed={}",
+        lib_dir.join("libbag_core.a").display()
+    );
 
     println!("cargo:rustc-link-search=native={}", lib_dir.display());
     println!("cargo:rustc-link-lib=static=bag_api");

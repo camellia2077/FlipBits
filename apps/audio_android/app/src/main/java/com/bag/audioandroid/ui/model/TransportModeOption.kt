@@ -41,6 +41,6 @@ enum class TransportModeOption(
     ;
 
     companion object {
-        fun fromWireName(wireName: String): TransportModeOption? = entries.firstOrNull { it.wireName == wireName }
+        fun fromWireName(wireName: String?): TransportModeOption? = entries.firstOrNull { it.wireName == wireName?.trim()?.lowercase() }
     }
 }

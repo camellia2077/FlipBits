@@ -135,10 +135,10 @@
     <string name="audio_flash_voicing_style_title">Voicing style</string>
     <string name="audio_action_select_flash_voicing_style">Select voicing style</string>
     <string name="audio_flash_voicing_style_sheet_title">Voicing style</string>
-    <string name="audio_mini_speed_style_title">Speed style</string>
-    <string name="audio_action_select_mini_speed_style">Select speed style</string>
-    <string name="audio_mini_speed_style_hint">Applies to the next generated audio. Existing generated audio keeps the style it was created with.</string>
-    <string name="audio_mini_speed_style_sheet_title">Speed style</string>
+    <string name="audio_mini_speed_style_title">Morse speed</string>
+    <string name="audio_action_select_mini_speed_style">Select Morse speed</string>
+    <string name="audio_mini_speed_style_hint">Applies to the next generated audio. Existing generated audio keeps the Morse speed it was created with.</string>
+    <string name="audio_mini_speed_style_sheet_title">Morse speed</string>
     <!-- CONTEXT: Title for the bottom sheet/dialog that lets the user pick from saved audio items. -->
     <string name="audio_saved_audio_sheet_title">Saved audio</string>
     <!-- CONTEXT: Empty-state text inside the saved-audio picker sheet when the library has no saved audio. -->
@@ -309,12 +309,12 @@
     <string name="audio_transport_ultra_hint">ultra uses UTF-8 text.</string>
     <!-- CONTEXT: Short helper text shown under the input field when mini mode is selected. "mini" is the fixed mode name and should stay in English. -->
     <string name="audio_transport_mini_hint">mini uses Morse-compatible ASCII text.</string>
-    <!-- CONTEXT: Morse speed preset label. Keep short for a segmented control. -->
-    <string name="audio_morse_speed_slow">Slow</string>
-    <!-- CONTEXT: Morse speed preset label. Keep short for a segmented control. -->
-    <string name="audio_morse_speed_standard">Standard</string>
-    <!-- CONTEXT: Morse speed preset label. Keep short for a segmented control. -->
-    <string name="audio_morse_speed_fast">Fast</string>
+    <!-- CONTEXT: Morse speed preset label. Keep WPM as the protocol speed unit. -->
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <!-- CONTEXT: Morse speed preset label. Keep WPM as the protocol speed unit. -->
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <!-- CONTEXT: Morse speed preset label. Keep WPM as the protocol speed unit. -->
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <!-- CONTEXT: Mini/Morse input helper. %1$s is the normalized Morse-compatible text preview. -->
     <string name="audio_morse_normalized_preview">Normalized Morse: %1$s</string>
     <!-- CONTEXT: Mini/Morse input helper. %1$s is the list of unsupported characters typed by the user. -->

@@ -160,7 +160,7 @@ fun brandThemeVisualTokens(
         // the accent lane. This avoids turning every settings row into a tinted accent chip.
         selectionSelectedContainerColor = blend(base, accent, 0.08f),
         selectionUnselectedContainerColor = Color.Transparent,
-        groupContainerColor = blend(base, accent, 0.06f),
+        groupContainerColor = minimumSeparatedBlend(base, accent, listOf(0.06f, 0.10f, 0.14f)),
         supportSurfaceColor = blend(base, onSurface, 0.07f),
         supportStrongSurfaceColor = blend(base, accent, 0.12f),
         inputContainerColor = blend(base, accent, 0.08f),
@@ -190,3 +190,28 @@ private fun blend(
     to: Color,
     ratio: Float,
 ): Color = lerp(from, to, ratio.coerceIn(0f, 1f))
+
+private fun minimumSeparatedBlend(
+    base: Color,
+    accent: Color,
+    ratios: List<Float>,
+): Color {
+    val fallback = blend(base, accent, ratios.lastOrNull() ?: 0f)
+    return ratios
+        .asSequence()
+        .map { ratio -> blend(base, accent, ratio) }
+        .firstOrNull { color -> colorDistance(base, color) >= MinimumGroupContainerColorDistance }
+        ?: fallback
+}
+
+private fun colorDistance(
+    first: Color,
+    second: Color,
+): Float {
+    val red = first.red - second.red
+    val green = first.green - second.green
+    val blue = first.blue - second.blue
+    return kotlin.math.sqrt(red * red + green * green + blue * blue)
+}
+
+private const val MinimumGroupContainerColorDistance = 0.05f

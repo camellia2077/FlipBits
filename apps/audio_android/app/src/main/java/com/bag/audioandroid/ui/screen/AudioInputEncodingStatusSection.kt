@@ -28,20 +28,38 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.AudioInputEncodingAnalysis
 import com.bag.audioandroid.ui.model.TransportModeOption
+import com.bag.audioandroid.ui.model.translateMorseNotation
 
 @Composable
 internal fun InputEncodingStatusSection(
     transportMode: TransportModeOption,
     analysis: AudioInputEncodingAnalysis,
+    inputText: String,
 ) {
     var isMiniMorseExpanded by rememberSaveable { mutableStateOf(true) }
+    val morseTranslation =
+        if (transportMode == TransportModeOption.Mini) {
+            translateMorseNotation(inputText)
+        } else {
+            null
+        }
+    val showMorseTranslation =
+        morseTranslation?.isValid == true && morseTranslation.text.isNotBlank()
+    val showMorsePreview =
+        transportMode == TransportModeOption.Mini &&
+            !analysis.isBlockingInvalid &&
+            analysis.morseNotation.isNotBlank() &&
+            !showMorseTranslation
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         InputEncodingMessage(
             transportMode = transportMode,
             analysis = analysis,
             modifier = Modifier.fillMaxWidth(),
         )
-        if (transportMode == TransportModeOption.Mini && !analysis.isBlockingInvalid && analysis.morseNotation.isNotBlank()) {
+        if (showMorseTranslation) {
+            MiniInputMorseTranslationRow(text = morseTranslation.text)
+        }
+        if (showMorsePreview) {
             MiniInputMorseDisclosureRow(
                 expanded = isMiniMorseExpanded,
                 onExpandedChanged = { isMiniMorseExpanded = it },
@@ -59,6 +77,30 @@ internal fun InputEncodingStatusSection(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun MiniInputMorseTranslationRow(text: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().testTag("mini-input-morse-translation"),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.audio_decode_view_text),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        SelectionContainer {
+            Text(
+                text = text,
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                    ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
 }

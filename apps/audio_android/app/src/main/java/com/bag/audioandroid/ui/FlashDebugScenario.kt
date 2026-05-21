@@ -554,12 +554,7 @@ private fun String?.toSeekFractions(): List<Float> =
         }?.distinct()
         .orEmpty()
 
-private fun String?.toMorseSpeedOption(): MorseSpeedOption =
-    when (this?.lowercase()) {
-        "slow" -> MorseSpeedOption.Slow
-        "fast" -> MorseSpeedOption.Fast
-        else -> MorseSpeedOption.Standard
-    }
+private fun String?.toMorseSpeedOption(): MorseSpeedOption = MorseSpeedOption.fromId(this)
 
 private fun String?.toMiniMorseVisualizationMode(): MiniMorseVisualizationMode =
     when (this?.trim()?.lowercase()) {

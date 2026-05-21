@@ -1,11 +1,12 @@
 # `mini` Mode Design
 
-更新时间：2026-05-04
+更新时间：2026-05-21
 
 ## 定位
 - `mini` 是独立的 Morse code 文本音频模式。
 - 它不是 `pro` 的更强版本，也不是 `flash` 的简化版，而是面向“点 / 划 / 静音间隔”这种经典电报码听感的并列 transport。
 - 当前目标是清晰、可解释、可视化友好的 Morse 表达，不承诺录音环境 decode、抗噪同步搜索或纠错。
+- `mini` 的 speed preset 是 Morse 速度参数，不是风格化 style；它不引入闪光灯、马达或其它非音频输出媒介。
 
 ## 输入规范
 - 支持：
@@ -44,11 +45,18 @@
 - `mini` 的静音是协议语义的一部分，不是装饰层；visual 和 follow 都应该把 silence 留空，而不是画成 tone。
 
 ## Speed Preset
-- Android 当前提供三种 speed preset，通过改变 `frame_samples` 控制 unit 长度：
-  - `Slow`: `1.5x`
-  - `Standard`: `1.0x`
-  - `Fast`: `0.5x`
+- `mini` 提供三种 Morse WPM speed preset，通过改变 `frame_samples` 控制 dot unit 长度。
+- WPM 使用常见 PARIS 口径：`dot duration ms = 1200 / WPM`。
+- 这三档是协议速度，不是播放倍速，也不是 UI style。
+
+| Preset | Dot unit | `frame_samples` at `44100 Hz` | 设计目的 |
+| --- | ---: | ---: | --- |
+| `10 WPM` | `120 ms` | `5292` | 入门、清晰、最容易听懂 |
+| `15 WPM` | `80 ms` | `3528` | 常见练习速度，建议作为默认档 |
+| `20 WPM` | `60 ms` | `2646` | 较快但仍然保留 Morse 可听性和可视化清晰度 |
+
 - WAV metadata 会保存实际使用的 `frame_samples`，这样保存后的音频重新加载时仍能按当时的 Morse speed 对齐播放、visual 与 decode。
+- decode 应按 PCM timing 和 Morse tone/silence 结构解析，不依赖 metadata、follow data 或 UI speed label 直接给出文本。
 
 ## Follow / Visual
 - `BuildPayloadFollowData` 对 `mini` 发布两层 timeline：

@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 
+@Suppress("LargeClass")
 class AudioAndroidViewModel(
     audioCodecGateway: AudioCodecGateway,
     audioIoGateway: AudioIoGateway,
@@ -517,6 +518,7 @@ class AudioAndroidViewModel(
 
     fun onTransportModeSelected(mode: TransportModeOption) {
         sessionActions.onTransportModeSelected(mode)
+        preferencesActions.onTransportModeSelected(mode)
     }
 
     fun onEncode() {
@@ -821,6 +823,9 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
         val selectedSampleInputLength =
             SampleInputLengthOption.fromId(appSettingsRepository.selectedSampleInputLengthId.first())
                 ?: SampleInputLengthOption.Short
+        val selectedTransportMode =
+            TransportModeOption.fromWireName(appSettingsRepository.selectedTransportModeId.first())
+                ?: TransportModeOption.Flash
         val selectedPaletteId =
             if (isMaterialDarkThemeActive) {
                 selectedMaterialPaletteIdDark ?: selectedMaterialPaletteIdLight ?: appSettingsRepository.selectedPaletteId.first()
@@ -848,6 +853,8 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
             selectedThemeMode = selectedThemeMode,
             isMaterialDarkThemeActive = isMaterialDarkThemeActive,
             selectedSampleInputLength = selectedSampleInputLength,
+            transportMode = selectedTransportMode,
+            currentPlaybackSource = AudioPlaybackSource.Generated(selectedTransportMode),
         )
     }
 

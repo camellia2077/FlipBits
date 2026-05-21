@@ -32,6 +32,7 @@ class AudioInputEncodingStatusSectionTest {
                         unsupportedCharacters = emptyList(),
                         morseNotation = ".- -...",
                     ),
+                inputText = "AB",
             )
         }
 
@@ -43,5 +44,25 @@ class AudioInputEncodingStatusSectionTest {
 
         composeRule.onNodeWithTag("mini-input-morse-disclosure").performClick()
         composeRule.onAllNodesWithTag("mini-input-morse-preview").assertCountEquals(1)
+    }
+
+    @Test
+    fun `mini morse notation input shows translated text`() {
+        composeRule.setContent {
+            InputEncodingStatusSection(
+                transportMode = TransportModeOption.Mini,
+                analysis =
+                    AudioInputEncodingAnalysis(
+                        isBlockingInvalid = false,
+                        unsupportedCharacters = emptyList(),
+                        morseNotation = ".-.-.- .-.-.- .-.-.- / -....- -....- -....-",
+                    ),
+                inputText = "... --- ... / .----",
+            )
+        }
+
+        composeRule.onNodeWithTag("mini-input-morse-translation").assertIsDisplayed()
+        composeRule.onNodeWithText("SOS 1").assertIsDisplayed()
+        composeRule.onAllNodesWithTag("mini-input-morse-preview").assertCountEquals(0)
     }
 }

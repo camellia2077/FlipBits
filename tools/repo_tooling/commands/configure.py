@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 from pathlib import Path
 
 from ..constants import ROOT_DIR
@@ -38,13 +39,20 @@ def _normalize_cxx_compiler(raw: str | None) -> str | None:
     return compiler
 
 
+def _is_invalid_configured_cxx_compiler(configured: str | None) -> bool:
+    return configured is not None and _normalize_cxx_compiler(configured) is None
+
+
 def _desired_cxx_compiler(args: argparse.Namespace) -> str | None:
     compiler = getattr(args, "compiler", None)
     if isinstance(compiler, str):
         normalized = _normalize_cxx_compiler(compiler)
         if normalized:
             return normalized
-    return _normalize_cxx_compiler(os.environ.get("CXX"))
+    env_compiler = _normalize_cxx_compiler(os.environ.get("CXX"))
+    if env_compiler:
+        return env_compiler
+    return _normalize_cxx_compiler(shutil.which("clang++"))
 
 
 def cmd_configure(args: argparse.Namespace) -> None:
@@ -56,7 +64,9 @@ def cmd_configure(args: argparse.Namespace) -> None:
     command = [
         "cmake",
     ]
-    if desired_compiler and configured_compiler and not _compiler_matches(configured_compiler, desired_compiler):
+    if _is_invalid_configured_cxx_compiler(configured_compiler) or (
+        desired_compiler and configured_compiler and not _compiler_matches(configured_compiler, desired_compiler)
+    ):
         command.append("--fresh")
     command.extend([
         "-S",

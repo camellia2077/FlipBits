@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
@@ -21,6 +21,9 @@ class CandidateTopic:
     title: str
     reason: str
     bucket: str
+    recommendation: str = "history-worthy"
+    key_facts: list[str] = field(default_factory=list)
+    representative_files: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

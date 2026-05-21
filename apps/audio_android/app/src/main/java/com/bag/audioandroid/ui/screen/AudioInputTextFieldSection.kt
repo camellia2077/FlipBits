@@ -55,6 +55,11 @@ internal fun AudioInputTextFieldSection(
                     byteCount = inputMetrics.byteCount,
                     onOpenInputRules = onOpenInputRules,
                 )
+                Text(
+                    text = stringResource(R.string.audio_input_editor_inline_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         },
         minLines = 2,

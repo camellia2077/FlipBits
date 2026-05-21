@@ -113,6 +113,28 @@ class DecodedPayloadContentTest {
     }
 
     @Test
+    fun `mini morse result translates morse notation to text`() {
+        composeRule.setContent {
+            DecodedPayloadContent(
+                accentTokens = appThemeAccentTokens(),
+                decodedPayload =
+                    DecodedPayloadViewData(
+                        text = "... --- ... / .----",
+                        rawBytesHex = "2E 2E 2E 20 2D 2D 2D 20 2E 2E 2E 20 2F 20 2E 2D 2D 2D 2D",
+                        rawBitsBinary = "",
+                        textDecodeStatusCode = BagDecodeContentCodes.STATUS_OK,
+                        rawPayloadAvailable = true,
+                    ),
+                emptyTextResId = com.bag.audioandroid.R.string.audio_result_empty,
+                transportMode = TransportModeOption.Mini,
+            )
+        }
+
+        composeRule.onNodeWithText(string(R.string.audio_follow_view_morse)).performClick()
+        composeRule.onNodeWithText("SOS 1").assertIsDisplayed()
+    }
+
+    @Test
     fun `non mini mode keeps morse result hidden`() {
         composeRule.setContent {
             DecodedPayloadContent(

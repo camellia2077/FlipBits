@@ -34,6 +34,32 @@ class AudioInputEncodingAnalysisTest {
     }
 
     @Test
+    fun `morse notation translates letters and slash separated words`() {
+        val translation = translateMorseNotation("... --- ... / .----")
+
+        assertTrue(translation.isValid)
+        assertEquals("SOS 1", translation.text)
+        assertEquals(emptyList<String>(), translation.invalidPatterns)
+    }
+
+    @Test
+    fun `morse notation treats three spaces as a word separator`() {
+        val translation = translateMorseNotation(".... ..   - .... . .-. .")
+
+        assertTrue(translation.isValid)
+        assertEquals("HI THERE", translation.text)
+    }
+
+    @Test
+    fun `morse notation ignores normal text`() {
+        val translation = translateMorseNotation("SOS")
+
+        assertFalse(translation.isMorseLike)
+        assertFalse(translation.isValid)
+        assertEquals("", translation.text)
+    }
+
+    @Test
     fun `mini blocks unsupported characters`() {
         val analysis = analyzeAudioInputEncoding(TransportModeOption.Mini, "你好")
 

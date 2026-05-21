@@ -36,6 +36,7 @@ import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.appSegmentedButtonColors
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.analyzeMorseText
+import com.bag.audioandroid.ui.model.translateMorseNotation
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 
 private enum class DecodedPayloadTab {
@@ -191,18 +192,35 @@ internal fun DecodedPayloadContent(
                         }
 
                         DecodedPayloadTab.Morse -> {
-                            val morseText =
+                            val translatedMorse =
                                 if (decodedPayload.hasTextResult) {
-                                    analyzeMorseText(decodedPayload.text).morseNotation
+                                    translateMorseNotation(decodedPayload.text)
                                 } else {
-                                    ""
+                                    null
                                 }
+                            val morseText =
+                                when {
+                                    translatedMorse?.isValid == true && translatedMorse.text.isNotBlank() ->
+                                        decodedPayload.text
+                                    decodedPayload.hasTextResult -> analyzeMorseText(decodedPayload.text).morseNotation
+                                    else -> ""
+                                }
+                            DecodedPayloadBodyLabel(text = stringResource(R.string.audio_follow_view_morse))
                             Text(
                                 text = morseText.ifBlank { stringResource(emptyTextResId) },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.fillMaxWidth(),
                             )
+                            if (translatedMorse?.isValid == true && translatedMorse.text.isNotBlank()) {
+                                DecodedPayloadBodyLabel(text = stringResource(R.string.audio_decode_view_text))
+                                Text(
+                                    text = translatedMorse.text,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
                         }
 
                         DecodedPayloadTab.Raw -> {
@@ -241,4 +259,14 @@ internal fun DecodedPayloadContent(
             }
         }
     }
+}
+
+@Composable
+private fun DecodedPayloadBodyLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }

@@ -17,10 +17,11 @@ from repo_tooling.commands import configure as configure_command
 
 
 class HostBuildToolTests(unittest.TestCase):
-    def test_configure_omits_compiler_when_not_configured(self) -> None:
+    def test_configure_omits_compiler_when_not_configured_and_clang_is_missing(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             with (
                 patch.dict("os.environ", {"CXX": ""}),
+                patch.object(configure_command.shutil, "which", return_value=None),
                 patch.object(configure_command, "run") as mock_run,
             ):
                 configure_command.cmd_configure(
@@ -34,10 +35,30 @@ class HostBuildToolTests(unittest.TestCase):
             command = mock_run.call_args.args[0]
             self.assertFalse(any(item.startswith("-DCMAKE_CXX_COMPILER=") for item in command))
 
+    def test_configure_prefers_path_clang_when_compiler_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with (
+                patch.dict("os.environ", {"CXX": ""}),
+                patch.object(configure_command.shutil, "which", return_value="toolchain-clang++"),
+                patch.object(configure_command, "run") as mock_run,
+            ):
+                configure_command.cmd_configure(
+                    argparse.Namespace(
+                        build_dir=temp_dir,
+                        generator="Ninja",
+                        compiler=None,
+                    ),
+                )
+
+            command = mock_run.call_args.args[0]
+            self.assertIn("-DCMAKE_CXX_COMPILER=toolchain-clang++", command)
+            self.assertNotIn("-DCMAKE_CXX_COMPILER=None", command)
+
     def test_configure_respects_cxx_environment_when_compiler_missing(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             with (
                 patch.dict("os.environ", {"CXX": "custom-clang++"}),
+                patch.object(configure_command.shutil, "which", return_value="toolchain-clang++"),
                 patch.object(configure_command, "run") as mock_run,
             ):
                 configure_command.cmd_configure(
@@ -56,6 +77,7 @@ class HostBuildToolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             with (
                 patch.dict("os.environ", {"CXX": ""}),
+                patch.object(configure_command.shutil, "which", return_value=None),
                 patch.object(configure_command, "run") as mock_run,
             ):
                 configure_command.cmd_configure(
@@ -69,10 +91,34 @@ class HostBuildToolTests(unittest.TestCase):
             command = mock_run.call_args.args[0]
             self.assertFalse(any(item.startswith("-DCMAKE_CXX_COMPILER=") for item in command))
 
+    def test_configure_refreshes_stale_none_compiler_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            Path(temp_dir, "CMakeCache.txt").write_text(
+                "CMAKE_CXX_COMPILER:FILEPATH=None\n",
+                encoding="utf-8",
+            )
+            with (
+                patch.dict("os.environ", {"CXX": ""}),
+                patch.object(configure_command.shutil, "which", return_value=None),
+                patch.object(configure_command, "run") as mock_run,
+            ):
+                configure_command.cmd_configure(
+                    argparse.Namespace(
+                        build_dir=temp_dir,
+                        generator="Ninja",
+                        compiler=None,
+                    ),
+                )
+
+            command = mock_run.call_args.args[0]
+            self.assertIn("--fresh", command)
+            self.assertFalse(any(item.startswith("-DCMAKE_CXX_COMPILER=") for item in command))
+
     def test_build_auto_configure_does_not_forward_none_compiler_literal(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             with (
                 patch.dict("os.environ", {"CXX": ""}),
+                patch.object(configure_command.shutil, "which", return_value=None),
                 patch.object(build_command, "cmake_cache_exists", return_value=False),
                 patch.object(configure_command, "cmake_cache_exists", return_value=False),
                 patch.object(configure_command, "run") as mock_configure_run,

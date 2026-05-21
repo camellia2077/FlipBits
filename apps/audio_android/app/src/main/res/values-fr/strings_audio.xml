@@ -73,10 +73,10 @@
     <string name="audio_flash_voicing_style_title">Style vocal</string>
     <string name="audio_action_select_flash_voicing_style">Choisir le style vocal</string>
     <string name="audio_flash_voicing_style_sheet_title">Style vocal</string>
-    <string name="audio_mini_speed_style_title">Style de vitesse</string>
-    <string name="audio_action_select_mini_speed_style">Choisir le style de vitesse</string>
-    <string name="audio_mini_speed_style_hint">S’applique au prochain audio généré. Les audios déjà générés conservent le style utilisé lors de leur création.</string>
-    <string name="audio_mini_speed_style_sheet_title">Style de vitesse</string>
+    <string name="audio_mini_speed_style_title">Vitesse Morse</string>
+    <string name="audio_action_select_mini_speed_style">Choisir la vitesse Morse</string>
+    <string name="audio_mini_speed_style_hint">S’applique au prochain audio généré. Les audios déjà générés conservent la vitesse Morse utilisée lors de leur création.</string>
+    <string name="audio_mini_speed_style_sheet_title">Vitesse Morse</string>
     <string name="audio_saved_audio_sheet_title">Audio enregistré</string>
     <string name="audio_saved_audio_empty">Aucun audio enregistré pour le moment.</string>
     <string name="audio_mini_player_generated_title">Audio %1$s généré</string>
@@ -162,9 +162,9 @@
     <string name="audio_transport_pro_example">LES CLOCHES MARQUENT LA PREMIERE GARDE</string>
     <string name="audio_transport_ultra_hint">ultra utilise du texte UTF-8.</string>
     <string name="audio_transport_mini_hint">mini utilise un texte ASCII compatible Morse.</string>
-    <string name="audio_morse_speed_slow">Lent</string>
-    <string name="audio_morse_speed_standard">Standard</string>
-    <string name="audio_morse_speed_fast">Rapide</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">Morse normalisé : %1$s</string>
     <string name="audio_morse_unsupported_characters">Caractères Morse non pris en charge : %1$s</string>
     <string name="audio_transport_ultra_example">Les gardiens des lampes descellent l’ancienne carte stellaire</string>

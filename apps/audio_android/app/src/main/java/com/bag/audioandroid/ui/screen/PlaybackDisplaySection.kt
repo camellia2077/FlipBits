@@ -128,7 +128,7 @@ internal fun PlaybackDisplaySection(
             visualSample = displayedSamples,
             lyricsSample = visualDisplayedSamples,
             frameSamples = frameSamples,
-            speed = MorseSpeedOption.fromFrameSamples(frameSamples).name.lowercase(),
+            speed = MorseSpeedOption.fromFrameSamples(frameSamples).id,
         )
     }
     val resolvedTokenStripHeightDp =

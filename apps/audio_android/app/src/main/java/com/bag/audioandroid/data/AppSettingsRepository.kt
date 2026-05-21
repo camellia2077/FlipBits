@@ -48,6 +48,16 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SelectedMorseSpeedStyleId] }
 
+    val selectedTransportModeId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedTransportModeId] }
+
     val selectedSampleInputLengthId: Flow<String?> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -408,6 +418,12 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setSelectedTransportModeId(modeId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedTransportModeId] = modeId
+        }
+    }
+
     suspend fun setSelectedSampleInputLengthId(lengthId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedSampleInputLengthId] = lengthId
@@ -616,6 +632,7 @@ class AppSettingsRepository(
         val SelectedPaletteId: Preferences.Key<String> = stringPreferencesKey("palette_id")
         val SelectedFlashVoicingStyleId: Preferences.Key<String> = stringPreferencesKey("flash_voicing_style")
         val SelectedMorseSpeedStyleId: Preferences.Key<String> = stringPreferencesKey("mini_speed_style")
+        val SelectedTransportModeId: Preferences.Key<String> = stringPreferencesKey("transport_mode")
         val SelectedSampleInputLengthId: Preferences.Key<String> = stringPreferencesKey("sample_input_length")
         val FlashVoicingEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("flash_voicing_enabled")
         val SelectedThemeModeId: Preferences.Key<String> = stringPreferencesKey("theme_mode")

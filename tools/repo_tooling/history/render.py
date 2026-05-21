@@ -6,6 +6,10 @@ from dataclasses import asdict
 from .model import HistoryPrepResult
 
 
+def _topics_by_recommendation(result: HistoryPrepResult, recommendation: str) -> list:
+    return [topic for topic in result.candidate_topics if topic.recommendation == recommendation]
+
+
 def render_draft_entry(result: HistoryPrepResult) -> list[str]:
     lines: list[str] = []
     lines.append("## Draft Entry")
@@ -37,9 +41,24 @@ def render_relevant_summary_markdown(result: HistoryPrepResult) -> list[str]:
     if result.candidate_topics:
         lines.append("- Candidate history topics:")
         for topic in result.candidate_topics:
-            lines.append(f"  - `{topic.title}`: {topic.reason}")
+            lines.append(f"  - `{topic.title}` [{topic.recommendation}]: {topic.reason}")
+            if topic.key_facts:
+                for fact in topic.key_facts:
+                    lines.append(f"    - fact: {fact}")
     else:
         lines.append("- No candidate topics were inferred from the current filtered changes.")
+
+    if result.candidate_topics:
+        lines.append("- Writing triage:")
+        triage_labels = [
+            ("history-worthy", "Likely history-worthy"),
+            ("supporting implementation", "Supporting implementation"),
+            ("probably skip", "Probably skip"),
+        ]
+        for recommendation, label in triage_labels:
+            topics = _topics_by_recommendation(result, recommendation)
+            if topics:
+                lines.append(f"  - {label}: {', '.join(f'`{topic.title}`' for topic in topics)}")
 
     if result.buckets:
         lines.append("- Relevant buckets:")
@@ -50,6 +69,15 @@ def render_relevant_summary_markdown(result: HistoryPrepResult) -> list[str]:
     if result.representative_files:
         lines.append("- Representative files:")
         for path in result.representative_files:
+            lines.append(f"  - `{path}`")
+    topic_files = [
+        path
+        for topic in result.candidate_topics
+        for path in topic.representative_files
+    ]
+    if topic_files:
+        lines.append("- Topic representative files:")
+        for path in dict.fromkeys(topic_files):
             lines.append(f"  - `{path}`")
     lines.append("")
     return lines
@@ -112,7 +140,9 @@ def render_plain(result: HistoryPrepResult, relevant_only: bool) -> str:
     lines.append("candidate_topics:")
     if result.candidate_topics:
         for topic in result.candidate_topics:
-            lines.append(f"- {topic.title} | bucket={topic.bucket} | {topic.reason}")
+            lines.append(f"- {topic.title} | bucket={topic.bucket} | recommendation={topic.recommendation} | {topic.reason}")
+            for fact in topic.key_facts:
+                lines.append(f"  fact: {fact}")
     else:
         lines.append("- none")
     lines.append("")

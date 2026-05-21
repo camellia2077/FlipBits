@@ -10,16 +10,16 @@ description: Agent 专用发布历史工作流
 
 1. 运行 `python tools/run.py history prep --format markdown`。
 2. 若目标文件已知，优先同时加 `--scope <repo-path>` 和 `--target <history-file.md>`，例如 `python tools/run.py history prep --format markdown --scope libs --target docs/libs/v0.6/0.6.1.md`。
-3. 读取 `Release Hints`、`Relevant Summary`、`Draft Entry`。
+3. 读取 `Release Hints`、`Relevant Summary`、`Writing triage`、topic `fact`、`Draft Entry`。
 4. 基于草稿重写，不直接原样落盘。
 5. 删除无关分类、合并噪音、清理 `TODO(agent)`。
 6. 运行 `python tools/run.py history validate <history-file.md>`；失败先修结构再修措辞。
 
 ## Tool Boundaries
 
-`history prep` 负责：收集 `git status`、归类变更、扫描现有版本口径、生成草稿（支持 `--scope`/`--target`/`--out-dir`/`--split-by bucket`，格式 `markdown|plain|json`）。
+`history prep` 负责：收集 `git status`、归类变更、扫描现有版本口径、识别常见语义 topic、输出写入/支撑/跳过建议、提取少量关键事实、生成草稿（支持 `--scope`/`--target`/`--out-dir`/`--split-by bucket`，格式 `markdown|plain|json`）。
 
-`history prep` 不负责：价值判断、语义归类、最终文案。
+`history prep` 不负责：替 agent 做最终价值判断或最终文案。topic、triage 和 fact 是提效线索，不是必须照抄的发布记录。
 
 `--target` 只用于推断目标 history 版本号，不会自动过滤改动范围；`--scope` 才负责把 `git status` 限定到指定目录。`--scope` 支持 repo 相对路径和 repo 内绝对路径。
 
@@ -48,6 +48,8 @@ description: Agent 专用发布历史工作流
 - 同类改动合并表达，不抄文件清单。
 - 涉及迁移/版本/配置/构建口径变化时，写清旧口径与新口径。
 - `history prep` 提示与真实改动冲突时，以已落盘内容和实际改动为准。
+- 优先把 `history-worthy` topic 改写成 history 条目；`supporting implementation` 通常并入上层用户能力或工程边界；`probably skip` 默认不写，除非它实际代表交付内容。
+- topic `fact` 用来减少重复读 diff，但仍需和目标 history 范围核对，避免把 libs、Android、tools 的内容串写到同一个 history。
 - Android history 优先按“用户能力 + 前端边界 + 工程入口”归纳。
 
 ## Usage Note

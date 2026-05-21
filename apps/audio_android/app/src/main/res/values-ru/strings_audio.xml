@@ -73,10 +73,10 @@
     <string name="audio_flash_voicing_style_title">Стиль озвучивания</string>
     <string name="audio_action_select_flash_voicing_style">Выбрать стиль озвучивания</string>
     <string name="audio_flash_voicing_style_sheet_title">Стиль озвучивания</string>
-    <string name="audio_mini_speed_style_title">Стиль скорости</string>
-    <string name="audio_action_select_mini_speed_style">Выбрать стиль скорости</string>
-    <string name="audio_mini_speed_style_hint">Применяется к следующему созданному аудио. Уже созданные аудио сохраняют стиль, с которым были созданы.</string>
-    <string name="audio_mini_speed_style_sheet_title">Стиль скорости</string>
+    <string name="audio_mini_speed_style_title">Скорость Morse</string>
+    <string name="audio_action_select_mini_speed_style">Выбрать скорость Morse</string>
+    <string name="audio_mini_speed_style_hint">Применяется к следующему созданному аудио. Уже созданные аудио сохраняют скорость Morse, с которой были созданы.</string>
+    <string name="audio_mini_speed_style_sheet_title">Скорость Morse</string>
     <string name="audio_saved_audio_sheet_title">Сохранённое аудио</string>
     <string name="audio_saved_audio_empty">Пока нет сохранённого аудио.</string>
     <string name="audio_mini_player_generated_title">Созданное аудио %1$s</string>
@@ -164,9 +164,9 @@
     <string name="audio_transport_pro_example">BELLS MARK THE FIRST WATCH</string>
     <string name="audio_transport_ultra_hint">ultra использует текст UTF-8.</string>
     <string name="audio_transport_mini_hint">mini использует ASCII-текст, совместимый с Morse.</string>
-    <string name="audio_morse_speed_slow">Медленно</string>
-    <string name="audio_morse_speed_standard">Стандарт</string>
-    <string name="audio_morse_speed_fast">Быстро</string>
+    <string name="audio_morse_speed_wpm10">10 WPM</string>
+    <string name="audio_morse_speed_wpm15">15 WPM</string>
+    <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_normalized_preview">Нормализованный Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">Неподдерживаемые символы Morse: %1$s</string>
     <string name="audio_transport_ultra_example">Хранители ламп снимают печать со старой звёздной карты</string>
