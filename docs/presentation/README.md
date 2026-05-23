@@ -1,6 +1,6 @@
 # Presentation Changelog
 
-本目录记录表现层（`audio_cli`、`audio_android`）版本更新说明。
+本目录记录表现层（`audio_cli`、`audio_android`、`audio_web`）版本更新说明。
 
 ## audio_cli
 
@@ -17,3 +17,7 @@
 - [v0.2.0](./android/v0.2/0.2.0.md)
 - [v0.1.1](./android/v0.1/0.1.1.md)
 - [v0.1.0](./android/v0.1/0.1.0.md)
+
+## audio_web
+
+- [v0.1.0](./web/2026-05-22.md)

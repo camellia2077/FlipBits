@@ -1,0 +1,50 @@
+export const LOCALE = 'la';
+
+export const MESSAGES = {
+    htmlLang: "la",
+    languageLabel: "Lingua",
+    "about.title": "De FlipBits",
+    "about.copy": [
+      "FlipBits textum in sonum codificatum atque audibilem convertit. Applicatio Android una cum sono etiam progressionem playback, undam sonoram, cursum codificationis textus, atque materiam binariam post singula verba vel litteras synchronice ostendit; haec autem pagina tantum brevis demonstratio est, ut diversi modi audiri possint.",
+      "`flash` modus consulto ad voluptatem spectat: mutatis low / high bit Hz, mora uniuscuiusque bit, atque intervallis inter bit, varios affectus vocis humanae imitatur, nulla fere habita ratione efficacitatis transmissionis aut firmitatis contra perturbationes.",
+      "Sonus ex omnibus modis genitus in applicatione Android decodificari potest; ad plenam experientiam ex Releases APK Android deprime. Si FlipBits tibi placet, stellam ei da apud https://github.com/camellia2077/FlipBits.",
+    ],
+    "sample.addEmoji": "Add emoji",
+    inputTextLabel: "Textus initus",
+    inputPlaceholder: "exempli gratia: github",
+    inputHintByMode: {
+      mini: "Solum ASCII. Sustinet A-Z, 0-9, notas Morse communes atque space / tab / CR / LF.",
+      flash: "Quemlibet textum accipit.",
+      pro: "Solus textus ASCII accipitur.",
+      ultra: "Textum UTF-8 accipit.",
+    },
+    modeLabel: "Mode",
+    "mode.summaryTitle": "Mode Overview",
+    flashStyleLabel: "Flash Style",
+    miniSpeedLabel: "Morse Speed",
+    generateButton: "Audio genera",
+    downloadLink: "WAV deprome",
+    progressLabel: "Progressus",
+    progressPhase: {
+      preparing: "Praeparatio",
+      rendering: "PCM generatur",
+      postprocessing: "Post tractatio",
+      finalizing: "Perfectio",
+    },
+    "result.summaryTitle": "Summa exitus",
+    "result.mode": "Mode",
+    "result.profile": "Figura",
+    "result.duration": "Duratio",
+    "result.sampleRate": "Frequentia exemplorum",
+    "loading.pending": "Encoder WebAssembly exspectatur.",
+    "loading.ready": "Encoder WebAssembly onustus est. Audio iam generari potest.",
+    "loading.missing": "Modulus WASM nondum paratus est. Prius exsequere python apps/audio_web/tools/build_wasm.py ut effecta site/wasm/ generentur.",
+    "validation.emptyText": "Textum insere.",
+    "validation.missingExport": "Modulus WASM onustus est, sed encodeTextToPcm16(...) nondum exportatur.",
+    "validation.miniAsciiOnly": "Modus mini solum initum ASCII accipit; characteres non ASCII remoti sunt.",
+    "encoding.inProgress": "Audio generatur...",
+    "encoding.success": ({ sampleCount }) => `Perfectum. ${sampleCount} exempla PCM generata sunt.`,
+    "encoding.failure": ({ message }) => `Generatio defecit: ${message}`,
+};
+
+

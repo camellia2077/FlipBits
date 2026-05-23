@@ -1,0 +1,50 @@
+export const LOCALE = 'uk';
+
+export const MESSAGES = {
+    htmlLang: "uk",
+    languageLabel: "Мова",
+    "about.title": "Про FlipBits",
+    "about.copy": [
+      "FlipBits перетворює текст на чутний закодований аудіосигнал. Android-застосунок також синхронно показує відтворення, хвильову форму, процес кодування тексту та двійковий вміст, що стоїть за кожним символом або словом; ця сторінка потрібна лише для швидкого попереднього прослуховування того, як звучать різні режими.",
+      "`flash` — це навмисно розважальний режим: він змінює Hz для low / high bit, тривалість бітів і паузи між ними, щоб імітувати різні емоційні інтонації мовлення, майже не зважаючи на ефективність передавання та стійкість до шуму.",
+      "Звук, створений у всіх режимах, можна декодувати в Android-застосунку; для повного досвіду завантажте Android APK з Releases. Якщо вам подобається FlipBits, поставте йому зірку на https://github.com/camellia2077/FlipBits.",
+    ],
+    "sample.addEmoji": "Add emoji",
+    inputTextLabel: "Вхідний текст",
+    inputPlaceholder: "наприклад: github",
+    inputHintByMode: {
+      mini: "Лише ASCII. Підтримуються A-Z, 0-9, типова пунктуація Морзе та space / tab / CR / LF.",
+      flash: "Приймає довільний текст.",
+      pro: "Лише ввід ASCII.",
+      ultra: "Приймає текст UTF-8.",
+    },
+    modeLabel: "Mode",
+    "mode.summaryTitle": "Mode Overview",
+    flashStyleLabel: "Flash Style",
+    miniSpeedLabel: "Morse Speed",
+    generateButton: "Згенерувати аудіо",
+    downloadLink: "Завантажити WAV",
+    progressLabel: "Прогрес",
+    progressPhase: {
+      preparing: "Підготовка",
+      rendering: "Генерація PCM",
+      postprocessing: "Післяобробка",
+      finalizing: "Завершення",
+    },
+    "result.summaryTitle": "Підсумок результату",
+    "result.mode": "Mode",
+    "result.profile": "Профіль",
+    "result.duration": "Тривалість",
+    "result.sampleRate": "Частота дискретизації",
+    "loading.pending": "Очікування завантаження кодувальника WebAssembly.",
+    "loading.ready": "Кодувальник WebAssembly завантажено. Тепер можна генерувати аудіо.",
+    "loading.missing": "Модуль WASM ще не готовий. Спочатку запустіть python apps/audio_web/tools/build_wasm.py, щоб створити артефакти site/wasm/.",
+    "validation.emptyText": "Введіть текст.",
+    "validation.missingExport": "Модуль WASM завантажено, але encodeTextToPcm16(...) ще не експортовано.",
+    "validation.miniAsciiOnly": "Режим mini приймає лише символи ASCII; усі інші символи було видалено.",
+    "encoding.inProgress": "Генерація аудіо...",
+    "encoding.success": ({ sampleCount }) => `Готово. Згенеровано ${sampleCount} PCM-відліків.`,
+    "encoding.failure": ({ message }) => `Помилка генерації: ${message}`,
+};
+
+

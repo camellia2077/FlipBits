@@ -1,0 +1,50 @@
+export const LOCALE = 'ru';
+
+export const MESSAGES = {
+    htmlLang: "ru",
+    languageLabel: "Язык",
+    "about.title": "О FlipBits",
+    "about.copy": [
+      "FlipBits превращает текст в слышимый закодированный звук. Android-приложение также синхронно показывает воспроизведение, форму волны, процесс текстового кодирования и двоичное содержимое, стоящее за каждым символом или словом; эта страница нужна только для быстрого предпросмотра того, как звучат разные режимы.",
+      "`flash` — намеренно развлекательный режим: он меняет Hz low / high bit, длительность битов и интервалы между ними, чтобы имитировать разные эмоциональные интонации речи, почти не заботясь об эффективности передачи и шумоустойчивости.",
+      "Аудио, созданное во всех режимах, можно декодировать в Android-приложении; для полного опыта скачайте Android APK из Releases. Если вам нравится FlipBits, поставьте ему звезду на https://github.com/camellia2077/FlipBits.",
+    ],
+    "sample.addEmoji": "Add emoji",
+    inputTextLabel: "Входной текст",
+    inputPlaceholder: "например: github",
+    inputHintByMode: {
+      mini: "Только ASCII. Поддерживаются A-Z, 0-9, стандартная пунктуация Морзе и space / tab / CR / LF.",
+      flash: "Принимает любой текст.",
+      pro: "Только ввод ASCII.",
+      ultra: "Принимает текст UTF-8.",
+    },
+    modeLabel: "Mode",
+    "mode.summaryTitle": "Mode Overview",
+    flashStyleLabel: "Flash Style",
+    miniSpeedLabel: "Morse Speed",
+    generateButton: "Сгенерировать аудио",
+    downloadLink: "Скачать WAV",
+    progressLabel: "Прогресс",
+    progressPhase: {
+      preparing: "Подготовка",
+      rendering: "Генерация PCM",
+      postprocessing: "Постобработка",
+      finalizing: "Завершение",
+    },
+    "result.summaryTitle": "Сводка результата",
+    "result.mode": "Mode",
+    "result.profile": "Профиль",
+    "result.duration": "Длительность",
+    "result.sampleRate": "Частота дискретизации",
+    "loading.pending": "Ожидание кодировщика WebAssembly.",
+    "loading.ready": "Кодировщик WebAssembly загружен. Можно генерировать аудио.",
+    "loading.missing": "Модуль WASM ещё не готов. Сначала запустите python apps/audio_web/tools/build_wasm.py, чтобы создать артефакты site/wasm/.",
+    "validation.emptyText": "Введите текст.",
+    "validation.missingExport": "Модуль WASM загружен, но encodeTextToPcm16(...) ещё не экспортирован.",
+    "validation.miniAsciiOnly": "Режим mini принимает только ASCII; не-ASCII символы были удалены.",
+    "encoding.inProgress": "Генерация аудио...",
+    "encoding.success": ({ sampleCount }) => `Готово. Сгенерировано ${sampleCount} PCM-отсчётов.`,
+    "encoding.failure": ({ message }) => `Ошибка генерации: ${message}`,
+};
+
+

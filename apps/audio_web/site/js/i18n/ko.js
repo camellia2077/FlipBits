@@ -1,0 +1,50 @@
+export const LOCALE = 'ko';
+
+export const MESSAGES = {
+    htmlLang: "ko",
+    languageLabel: "언어",
+    "about.title": "FlipBits 소개",
+    "about.copy": [
+      "FlipBits는 텍스트를 들을 수 있는 인코딩 오디오로 바꾸는 프로젝트입니다. Android 앱에서는 재생, 파형, 텍스트 인코딩 과정, 각 문자나 단어 뒤의 이진 내용까지 동기화해서 시각화할 수 있고, 이 웹 페이지는 각 모드가 어떤 소리로 생성되는지 빠르게 미리 듣기 위한 데모입니다.",
+      "`flash`는 의도적으로 오락성에 집중한 모드로, low / high bit의 Hz, 비트 길이, 비트 간격을 바꿔 감정이 실린 말투를 흉내 내며 전송 효율이나 잡음 내성은 거의 고려하지 않습니다.",
+      "여기서 생성한 모든 모드의 오디오는 Android 앱에서 디코딩할 수 있습니다. 전체 경험을 원하면 Releases에서 Android APK를 내려받아 주세요. FlipBits가 마음에 들면 https://github.com/camellia2077/FlipBits 에서 스타를 눌러 주세요.",
+    ],
+    "sample.addEmoji": "Add emoji",
+    inputTextLabel: "입력 텍스트",
+    inputPlaceholder: "예: github",
+    inputHintByMode: {
+      mini: "ASCII만 허용합니다. A-Z, 0-9, 일반적인 Morse 문장부호와 space / tab / CR / LF를 지원합니다.",
+      flash: "임의의 텍스트를 허용합니다.",
+      pro: "ASCII 입력만 허용합니다.",
+      ultra: "UTF-8 텍스트를 허용합니다.",
+    },
+    modeLabel: "Mode",
+    "mode.summaryTitle": "Mode Overview",
+    flashStyleLabel: "Flash Style",
+    miniSpeedLabel: "Morse Speed",
+    generateButton: "오디오 생성",
+    downloadLink: "WAV 다운로드",
+    progressLabel: "진행률",
+    progressPhase: {
+      preparing: "입력 준비",
+      rendering: "PCM 생성",
+      postprocessing: "후처리",
+      finalizing: "마무리",
+    },
+    "result.summaryTitle": "결과 요약",
+    "result.mode": "Mode",
+    "result.profile": "프로필",
+    "result.duration": "길이",
+    "result.sampleRate": "샘플레이트",
+    "loading.pending": "WebAssembly 인코더를 기다리는 중입니다.",
+    "loading.ready": "WebAssembly 인코더를 불러왔습니다. 오디오를 생성할 수 있습니다.",
+    "loading.missing": "WASM 모듈이 아직 준비되지 않았습니다. 먼저 python apps/audio_web/tools/build_wasm.py 를 실행해 site/wasm/ 산출물을 생성하세요.",
+    "validation.emptyText": "텍스트를 입력하세요.",
+    "validation.missingExport": "WASM 모듈은 로드되었지만 encodeTextToPcm16(...) 가 아직 내보내지지 않았습니다.",
+    "validation.miniAsciiOnly": "mini 모드는 ASCII 입력만 허용하며, 비 ASCII 문자는 제거되었습니다.",
+    "encoding.inProgress": "오디오를 생성하는 중입니다...",
+    "encoding.success": ({ sampleCount }) => `완료되었습니다. PCM 샘플 ${sampleCount}개를 생성했습니다.`,
+    "encoding.failure": ({ message }) => `생성 실패: ${message}`,
+};
+
+

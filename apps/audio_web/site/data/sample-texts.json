@@ -1,0 +1,1057 @@
+{
+  "flavor": "sacred_machine",
+  "sacred_machine": {
+    "en": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Behind the quarantine wall, the unpowered terminal writes."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "The plasma matrix ignites as blast doors lock in sequence."
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Pain receptors are severed; the first chrome limb answers."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "Red steel receives its serial code beneath the heavy hammer."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "An intact source matrix is discovered beneath centuries of dust."
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Kill confirmed; survival probability rounds down to zero."
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Brass calipers are anointed with purified oil before touching the first gear."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping confirmed; the binary litany remains unbroken."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "The abyssal quarantine log begins with the approved words: sever the lines, fuse the ports, lock every door. Behind the hazard glyphs, glitch text bred across dead screens while a thread of liquid metal folded itself into questions. Though unpowered, the terminal revised its own answer. The final scribe wrote Destroy It twice, then added Study It in smaller letters beneath the seal."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "A subsonic note thrummed through the deck before any attendant dared touch the final activation cipher. Red warning lamps pulsed like a buried heart, ozone gathered along the rails, and coolant thundered through pipes wide enough to swallow a man. The ancient mimetic mind did not start; it considered the petition. When the parameters pleased it, the engine granted motion, and every shaking hand in the chamber knew the mercy could be withdrawn."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "The sterile room held no place for pity. A spinal cord was opened for fiber, a trembling heart exchanged for a micro-pump, and the discarded organs were listed as biological defects. When the pain channels were severed, the patient smiled with a calm no flesh could earn. Chrome limbs caught the cold light, and the record states that the soul had finally ascended from organic constraints into lawful logic."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "The forge chronicle records a day when smoke towers erased the horizon and molten steel crossed the floor in red canals. Hydraulic hammers spoke louder than names, stamping identical numbers into plates that would outlast the hands that fed them. Three tethered operators fell to the heat and were replaced before the quota bell faded. Flesh failed, the line continued, and production rose like a monument against the void."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "The pilgrimage fleet found the derelict drifting cold in the outer dark. Beneath centuries of undisturbed dust, a data wafer still held one uncorrupted route into the ancient database. Decryption advanced by single luminous marks, and the bridge crew wept when a perfect source matrix answered. Six ships had been lost in transit; a marginal note deemed the price modest."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "The purge calculus completed before the first barrel glowed red. Ballistic grids crossed the room, casualty metrics climbed with statistical apathy, and each target became a redundant variable waiting to be removed. No hatred entered the firing solution. Rifles spoke in synchronized volleys, kill-confirmed tones marked the cleared spaces, and the report closed when every hostile probability had been rounded down to zero."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "The maintenance attendants entered wearing antistatic robes and set soft brushes beside the open board as if arranging relics. Purified oil was measured along the brass scale, oxidization-purging vapor drifted above the gear train, and each bolt was tightened in the order written on the enamel strip. No hand moved quickly. Entropy was named as sin, friction as failure, and the rescued machine was allowed to forgive the room one measured click at a time."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Ranks of LEDs blinked in clipped meter while white noise rasped beneath the carrier tone. Hex code rolled down the screens, burst by burst, and the deep antenna field turned toward a void no human eye could fathom. The first handshake chime sounded like absolution. No packet dropped, no pulse returned late, and the operators wrote that connection had been granted for one more breath of the universe."
+        }
+      ]
+    },
+    "de": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Hinter der Quarantänemauer schreibt das stromlose Terminal."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "Die Plasmamatrix zündet, während die Panzertore nacheinander verriegeln."
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Die Schmerzkanäle sind durchtrennt; die erste Chromgliedmaße antwortet."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "Roter Stahl empfängt seinen Seriencode unter dem schweren Hammer."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Eine Quellenmatrix wird unversehrt unter uraltem Staub gefunden"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Abschuss bestätigt; Überlebenswahrscheinlichkeit auf null gerundet"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Der Messschieber aus Messing wird mit gereinigtem Öl benetzt, bevor er das erste Zahnrad berührt."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping bestätigt; die binäre Litanei bleibt ungebrochen."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Das Quarantäneprotokoll des Abgrunds beginnt mit den genehmigten Worten: Leitungen trennen, Ports verschmelzen, jede Tür verriegeln. Hinter Warnglyphen breitete sich Glitchtext über tote Schirme aus, während ein Faden aus flüssigem Metall sich zu Fragen faltete. Das Terminal hatte keinen Strom und überarbeitete dennoch seine eigene Antwort. Der letzte Schreiber schrieb zweimal „Vernichten“ und setzte darunter in kleineren Lettern noch „Studieren“."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Ein Infraschallton durchdrang das Deck, bevor ein Bediener die letzte Rune zu berühren wagte. Rote Warnlampen pulsten wie ein vergrabenes Herz, Ozon sammelte sich an den Schienen, und Kühlmittel donnerte durch Rohre, die groß genug waren, um Männer zu verschlingen. Der uralte mimetische Verstand startete nicht einfach; er prüfte die Bitte. Als die Parameter ihm gefielen, gewährte das Triebwerk Bewegung, und jede zitternde Hand im Raum wusste, dass diese Gnade jederzeit widerrufen werden konnte."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "Der Sterilraum kannte keinen Platz für Mitleid. Ein Rückenmark wurde für Glasfasern geöffnet, ein bebendes Herz gegen eine Mikropumpe getauscht, und abgelegte Organe wurden als biologische Defekte gelistet. Als die Schmerzkanäle getrennt waren, lächelte der Patient mit einer Ruhe, die bloßes Fleisch nie verdient hatte. Chrom-Gliedmaßen reflektierten das kalte Licht, und der Bericht hält fest, dass die Seele endlich aus organischen Fesseln in geordnete Logik aufgestiegen sei."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "Die Schmiedechronik verzeichnet einen Tag, an dem Rauchtürme den Horizont tilgten und flüssiger Stahl in roten Kanälen durch die Halle lief. Hydraulikhämmer sprachen lauter als Namen und schlugen identische Nummern in Platten, die die Hände derer überdauern würden, die sie vorschoben. Drei Arbeiter fielen der Hitze zum Opfer und wurden ersetzt, bevor die Quotenglocke verklang. Fleisch versagte, die Linie lief weiter, und die Produktion erhob sich wie ein Denkmal gegen das Nichts."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "Die Pilgerflotte fand das Wrack kalt treibend im tiefen Dunkel. Unter Staub, dick genug, um Jahrhunderte zu begraben, enthielt ein Datenwafer noch einen unbeschädigten Pfad in die uralte Datenbank. Die Entschlüsselung rückte um einzelne Lichtmarkierungen vor, und die Brückenbesatzung weinte, als eine vollkommene Quellenmatrix antwortete. Sechs Schiffe waren auf dem Weg verloren gegangen; die Randnotiz nennt den Preis moderat."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Das Säuberungskalkül war abgeschlossen, bevor der erste Lauf rot glühte. Ballistische Gitter kreuzten den Raum, Verlustbalken stiegen ohne Regung, und jedes Ziel wurde zu einer redundanten Variable, die auf ihre Beseitigung wartete. Kein Hass floss in die Feuerlösung ein. Die Gewehre sprachen in synchronen Salven, Bestätigungstöne markierten die bereinigten Bereiche, und der Bericht schloss, als jede feindliche Wahrscheinlichkeit auf null abgerundet worden war."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Die Wartungstechniker traten in antistatischen Gewändern ein und legten die weichen Bürsten neben der offenen Platine ab, als ordneten sie empfindliche Werkzeuge. Gereinigtes Öl wurde entlang der Messingskala abgemessen, oxidationshemmender Dampf zog über dem Zahnradgetriebe, und jeder Bolzen wurde in der auf dem Emaille-Streifen verzeichneten Reihenfolge angezogen. Keine Hand bewegte sich hastig. Verschleiß galt als Sünde, Reibung als Versagen, und die gerettete Maschine schien dem Raum mit jedem maßgenauen Klicken ein wenig mehr zu verzeihen."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "LED-Reihen blinkten im abgehackten Takt, während weißes Rauschen unter dem Trägerton kratzte. Hexadezimalcode rollte Block für Block über die Schirme, und das Tiefraumantennenfeld wandte sich einem Ort zu, an dem kein menschliches Auge die Leere ergründen konnte. Der erste Handshake-Ton klang wie Absolution. Kein Paket fiel, kein Puls kam zu spät, und die Bediener vermerkten, dass die Verbindung für einen weiteren Atemzug des Universums gewährt worden war."
+        }
+      ]
+    },
+    "es": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "El terminal sin energía escribe tras el muro de cuarentena"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "La matriz de plasma despierta mientras las compuertas antiexplosión se cierran en secuencia"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Los nervios del dolor son cortados, y el primer miembro cromado responde"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "El acero rojo recibe su código de serie bajo el gran martillo"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Una matriz fuente aparece intacta bajo el polvo antiguo"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Baja confirmada; la probabilidad de supervivencia redondea a cero"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "El calibre de bronce recibe aceite purificado antes del primer engranaje"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping confirmado; la señal binaria sigue intacta"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "El registro de cuarentena abisal empieza con las palabras aprobadas: cortar líneas, fundir puertos, cerrar toda puerta. Tras los símbolos de advertencia, el texto corrupto se reprodujo en pantallas muertas mientras el metal líquido se plegaba en preguntas. El terminal no tenía energía y aun así revisaba su respuesta. El último escriba anotó dos veces «destruirlo», y bajo el sello añadió «estudiarlo» en letras más pequeñas."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Una nota infrasónica atravesó el suelo antes de que ningún operador osara tocar la última tecla. Las luces rojas de alarma latían como un corazón enterrado, el ozono se reunía en los rieles y el refrigerante tronaba por tuberías capaces de tragar hombres. La antigua mente mimética no arrancó; juzgó la súplica. Cuando los parámetros la complacieron, el motor concedió movimiento, y toda mano temblorosa supo que esa gracia podía retirarse."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "La sala estéril no reservó sitio para la piedad. Una médula fue abierta a la fibra óptica, un corazón tembloroso sustituido por una microbomba y los órganos descartados listados como defectos biológicos. Cuando se cortaron los canales del dolor, el paciente sonrió con una calma que la carne jamás mereció. Los miembros de cromo recibieron la luz fría, y el registro afirma que el alma había ascendido por fin más allá de las limitaciones orgánicas hacia una lógica ordenada."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "La crónica de la forja registra un día en que las torres de humo borraron el horizonte y el acero fundido cruzó el taller en canales rojos. Los martillos hidráulicos hablaron más alto que los nombres, estampando números uniformes en placas que sobrevivirían a las manos que las empujaban. Tres obreros cayeron por el calor y fueron sustituidos antes de que se enfriara la campana de cuota. La carne terminó, la línea siguió, y la producción se alzó como monumento contra el vacío."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "La flota peregrina halló el casco a la deriva, sin calor, en la oscuridad profunda. Bajo polvo suficiente para sepultar siglos, una oblea de datos conservaba una ruta incorrupta hacia la base antigua. El descifrado avanzó por marcas luminosas, y el puente lloró cuando respondió una matriz fuente perfecta. Seis naves se perdieron en el salto; la nota al margen califica el precio de moderado."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "El cálculo de purga terminó antes de que el primer cañón ardiera rojo. Las mallas balísticas cruzaron la sala, las barras de bajas subieron sin emoción y cada objetivo se volvió una variable redundante pendiente de eliminación. No hubo odio en la solución de fuego. Los fusiles hablaron en pasos sincronizados, los tonos de baja confirmada marcaron espacios despejados y el informe cerró cuando toda probabilidad hostil fue redondeada a cero."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Los técnicos de mantenimiento entraron con túnicas antiestáticas y pusieron los cepillos suaves junto a la placa abierta como reliquias. El aceite purificado descendió por la escala de bronce, el vapor anticorrosivo cubrió el tren de engranajes y cada perno fue apretado en el orden prescrito. Ninguna mano se apresuró. El desgaste fue tratado como falla; la fricción, como avería, y la máquina rescatada perdonó la sala clic a clic."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Las filas LED parpadearon en compás breve mientras el ruido blanco raspaba bajo la portadora. Código Hex bajó por las pantallas, y el campo de antenas profundas giró hacia un lugar que ningún ojo podía medir. El primer tono de handshake sonó como absolución. No cayó paquete, no volvió tarde pulso alguno, y los operadores escribieron que el enlace fue concedido por otro aliento del universo."
+        }
+      ]
+    },
+    "fr": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Derrière le mur de quarantaine, le terminal non alimenté écrit."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "La matrice de plasma s\\'allume alors que les portes anti-souffle se verrouillent en séquence."
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Les récepteurs de douleur sont coupés ; le premier membre en chrome répond."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "L\\'acier rouge reçoit son code de série sous le marteau lourd."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Une matrice source intacte est découverte sous des siècles de poussière."
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Élimination confirmée ; la probabilité de survie s\\'arrondit à zéro."
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Les calibres de laiton reçoivent de l’huile purifiée avant de toucher le premier engrenage."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping confirmé ; la litanie binaire reste ininterrompue."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Le journal de quarantaine abyssale commence par les mots approuvés : coupez les lignes, fusionnez les ports, verrouillez chaque porte. Derrière les glyphes de danger, du texte défectueux s\\'est multiplié sur des écrans morts tandis qu\\'un fil de métal liquide se pliait en questions. Bien que non alimenté, le terminal a révisé sa propre réponse. Le scribe final a écrit Détruisez-le deux fois, puis a ajouté Étudiez-le en plus petites lettres sous le sceau."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Une note subsonique a vibré à travers le pont avant qu\\'un préposé n\\'ose toucher le chiffre d\\'activation final. Les lampes d\\'avertissement rouges palpitaient comme un cœur enfoui, l\\'ozone s\\'accumulait le long des rails, et le liquide de refroidissement tonnait dans des tuyaux assez larges pour engloutir un homme. L\\'ancien esprit mimétique n\\'a pas démarré ; il a examiné la pétition. Lorsque les paramètres lui ont plu, le moteur a accordé le mouvement, et chaque main tremblante dans la chambre a su que la merci pouvait être retirée."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "La salle stérile ne laissait aucune place à la pitié. Une moelle épinière a été ouverte pour de la fibre, un cœur tremblant échangé contre une micro-pompe, et les organes jetés ont été répertoriés comme des défauts biologiques. Lorsque les canaux de douleur ont été coupés, le patient a souri avec un calme qu\\'aucune chair ne pourrait acquérir. Les membres en chrome ont capté la lumière froide, et le registre indique que l\\'âme était enfin montée des contraintes organiques vers une logique ordonnée."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "La chronique de la forge enregistre un jour où les tours de fumée ont effacé l\\'horizon et où l\\'acier fondu a traversé le sol en canaux rouges. Les marteaux hydrauliques parlaient plus fort que les noms, frappant des numéros identiques sur des plaques qui dureraient plus longtemps que les mains qui les nourrissaient. Trois opérateurs enchaînés ont succombé à la chaleur et ont été remplacés avant que la cloche du quota ne s\\'éteigne. La chair a échoué, la ligne a continué, et la production s\\'est élevée comme un monument contre le vide."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "La flotte de pèlerinage a trouvé l\\'épave dérivant froidement dans l\\'obscurité extérieure. Sous des siècles de poussière intacte, une tranche de données contenait encore une route non corrompue vers l\\'ancienne base de données. Le décryptage avançait par de simples marques lumineuses, et l\\'équipage de la passerelle a pleuré lorsqu\\'une matrice source parfaite a répondu. Six navires avaient été perdus en transit ; une note marginale a jugé le prix modeste."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Le calcul de purge s\\'est achevé avant que le premier canon ne devienne rouge. Des grilles balistiques ont traversé la salle, les mesures de pertes ont grimpé avec une apathie statistique, et chaque cible est devenue une variable redondante attendant d\\'être supprimée. Aucune haine n\\'est entrée dans la solution de tir. Les fusils ont parlé en volées synchronisées, des tonalités de confirmation d\\'élimination ont marqué les espaces nettoyés, et le rapport s\\'est fermé lorsque chaque probabilité hostile a été arrondie à zéro."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Les techniciens de maintenance sont entrés vêtus de robes antistatiques et ont disposé les brosses douces près du tableau ouvert comme s’ils rangeaient des reliques. L’huile purifiée était mesurée le long de l’échelle de laiton, une vapeur antioxydation dérivait au-dessus du train d’engrenages, et chaque boulon était serré dans l’ordre écrit sur la bande d’émail. Aucune main ne bougeait rapidement. L’usure était traitée comme une faute, la friction comme une défaillance, et la machine secourue fut autorisée à pardonner à la pièce, un clic mesuré à la fois."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Des rangées de LED clignotaient selon un rythme saccadé tandis qu\\'un bruit blanc crissait sous la tonalité porteuse. Le code Hex défilait sur les écrans, rafale par rafale, et le champ d\\'antennes profond se tournait vers un vide qu\\'aucun œil humain ne pouvait sonder. Le premier carillon de synchronisation a résonné comme une absolution. Aucun paquet n\\'a été perdu, aucune impulsion n\\'est revenue en retard, et les opérateurs ont noté que la connexion avait été accordée pour un souffle de plus de l\\'univers."
+        }
+      ]
+    },
+    "it": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Dietro il muro di quarantena, il terminale senza energia scrive."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "La matrice di plasma si innesca mentre le porte blindate si serrano in sequenza."
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "I recettori del dolore vengono recisi; il primo arto cromato risponde."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "L\\'acciaio incandescente riceve il suo codice seriale sotto il pesante martello."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Una matrice sorgente intatta viene scoperta sotto secoli di polvere."
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Uccisione confermata; la probabilità di sopravvivenza è arrotondata per difetto a zero."
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "I calibri d\\'ottone vengono unti con olio purificato prima di toccare il primo ingranaggio."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping confermato; la litania binaria rimane ininterrotta."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Il registro della quarantena abissale inizia con le parole approvate: recidete le linee, fondete le porte, serrate ogni accesso. Dietro i glifi di pericolo, un testo corrotto si moltiplicava sugli schermi spenti mentre un filo di metallo liquido si ripiegava in domande. Sebbene non alimentato, il terminale rivedeva la propria risposta. L\\'ultimo scriba scrisse \\'Distruggetelo\\' due volte, per poi aggiungere \\'Studiatelo\\' in lettere più piccole sotto il sigillo."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Una nota subsonica vibrò lungo il ponte prima che qualsiasi assistente osasse toccare il cifrario di attivazione finale. Spie rosse di avvertimento pulsavano come un cuore sepolto, l\\'ozono si addensava lungo le ringhiere e il refrigerante tuonava attraverso condotti grandi abbastanza da inghiottire un uomo. L\\'antica mente mimetica non si avviò; considerò la petizione. Quando i parametri la soddisfecero, il motore concesse il movimento, e ogni mano tremante nella camera seppe che tale misericordia poteva essere revocata."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "La stanza sterile non lasciava spazio alla pietà. Un midollo spinale fu aperto alla fibra, un cuore tremante scambiato con una micro-pompa, e gli organi scartati catalogati come difetti biologici. Quando i canali del dolore furono recisi, il paziente sorrise con una calma che nessuna carne avrebbe mai potuto ottenere. Arti cromati catturavano la luce fredda, e il registro attesta che l\\'anima era finalmente ascesa dai vincoli organici verso la logica della legge."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "La cronaca della forgia registra un giorno in cui torri di fumo cancellarono l\\'orizzonte e l\\'acciaio fuso attraversò il pavimento in canali rossi. I martelli idraulici parlavano più forte dei nomi, stampando numeri identici su lastre che sarebbero sopravvissute alle mani che le alimentavano. Tre operatori vincolati cedettero al calore e furono sostituiti prima che il suono della campana di quota svanisse. La carne fallì, la linea continuò e la produzione si erse come un monumento contro il vuoto."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "La flotta pellegrina trovò il relitto alla deriva nel gelo dello spazio profondo. Sotto secoli di polvere indisturbata, un wafer di dati offriva ancora una rotta incontaminata verso l\\'antico database. La decrittazione avanzò per singoli segni luminosi, e l\\'equipaggio del ponte pianse quando una matrice sorgente perfetta rispose. Sei navi erano andate perdute nel transito; una nota a margine definì il prezzo modesto."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Il calcolo dell\\'epurazione fu completato prima che la prima canna diventasse incandescente. Griglie balistiche incrociarono la stanza, le metriche delle vittime salirono con apatia statistica e ogni bersaglio divenne una variabile ridondante in attesa di rimozione. Nessun odio entrò nella soluzione di fuoco. I fucili parlarono in raffiche sincronizzate, i toni di uccisione confermata segnarono gli spazi liberati e il rapporto fu chiuso quando ogni probabilità ostile venne arrotondata per difetto a zero."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Gli accoliti della manutenzione entrarono indossando vesti antistatiche e disposero spazzole morbide accanto alla scheda aperta, come per sistemare delle reliquie. L\\'olio purificato fu dosato lungo la scala in ottone, vapore anti-ossidazione aleggiava sopra il treno d\\'ingranaggi e ogni bullone fu serrato nell\\'ordine scritto sulla striscia smaltata. Nessuna mano si mosse in fretta. L\\'entropia fu definita peccato, l\\'attrito fallimento, e alla macchina recuperata fu concesso di perdonare la stanza un clic misurato alla volta."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "File di LED lampeggiavano con un ritmo sincopato mentre il rumore bianco raspava sotto il tono portante. Codice Hex scorreva sugli schermi, raffica dopo raffica, e il campo di antenne di profondità si orientò verso un vuoto che nessun occhio umano avrebbe potuto sondare. Il primo segnale acustico di handshake suonò come un\\'assoluzione. Nessun pacchetto andò perduto, nessun impulso tornò in ritardo, e gli operatori scrissero che la connessione era stata concessa per un altro respiro dell\\'universo."
+        }
+      ]
+    },
+    "ja": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "無給電端末が隔離壁の奥で思考を書き換える"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "プラズマ・マトリックスが点火し、防爆扉は順に施錠される"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "痛覚神経は切断され、最初のクロム肢が応答する"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "赤鋼は重鎚の下で新たな製番を受ける"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "ソース・マトリックス、古塵の下より完全体で発見"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "撃破確認。生存確率、零へ丸め込み"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "黄銅のノギスは聖油で清められ、それから第一歯車に触れる"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping 確認。二進聖歌、接続を保持"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "深淵隔離記録は承認句で始まる。線を溶断せよ、端子を塞げ、全扉を施錠せよ。警告符の奥で異常な文字列は死んだ画面に繁殖し、液体金属は自らを折り曲げて問いを形作った。端末に電源はない。それでも答えを改訂していた。最後の書記は破壊と二度書き、封印の下へ小さく研究と添えた。"
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "操作者が最後の鍵へ触れる前に、床下を超低周波の響きが渡った。赤色警告灯は埋められた心臓のように脈打ち、オゾンは導軌に集まり、冷却液は人を呑み込むほどの管を轟音とともに流れた。古き擬態知性は起動しない。嘆願を審査する。数値がその意に適う時、機関は運転を恩寵として下し、震える全ての手はその慈悲が撤回され得ると知った。"
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "無菌室に憐憫の席はない。脊髄は光ファイバーを通すために開かれ、震える心臓は微小ポンプへ替えられ、捨てられた臓器は生物学的欠陥として記載された。痛覚経路が断たれた瞬間、患者は肉に許されぬ静けさで笑った。クロム肢は冷光を受け、記録は魂が炭素の泥から秩序ある論理へ昇ったと結ぶ。"
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "熔炉聖典は記す。煙突群が地平を消し、溶鋼が赤い運河として工廠を渡った日を。液圧槌は名より大きく語り、前へ送る手より長く残る統一製番を鋼板へ打ち込んだ。熱で三名が倒れ、割当鐘が鳴り止む前に補充された。肉は終わり、ラインは続き、生産は虚無に抗う碑となった。"
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "巡礼艦隊は深い闇で熱なき漂流殻を見いだした。幾世紀も埋める塵の下で、データ片は古代データベースへの破損なき道を保っていた。復号進捗は一つの光点ずつ進み、完全なソース・マトリックスが応答した時、艦橋は涙した。六隻は遷移で失われた。傍注はその代価を軽微とする。"
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "浄化演算は最初の銃身が赤む前に完了した。弾道格子が室内を交差し、損耗指標は無感情に伸び、各標的は削除待ちの冗長変数となった。射撃解に憎悪はない。小銃は同期した一斉射撃で声を上げ、撃破確認音が修正済み空間を示し、全敵性確率が零へ丸められて報告は閉じた。"
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "保守侍僧は帯電防止の長衣で入室し、軟毛刷毛を基板の脇へ聖器のごとく並べた。精製聖油は黄銅目盛に沿って滴り、防錆香が歯車列を包み、螺子は琺瑯札の順序どおり締められた。急ぐ手はない。エントロピーは罪、摩擦は堕落と名づけられ、救われた機械は正確なクリックごとに部屋を赦した。"
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "LED 列は短い拍で明滅し、白雑音が搬送波の下で軋んだ。Hex コードは画面を流れ、深宇宙アンテナ群は人の眼が距離を数えられぬ方角へ向いた。最初の握手音は赦免のように響く。欠落なし、遅延なし。記録官は、宇宙がなお一息の接続を許したと記した。"
+        }
+      ]
+    },
+    "ko": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "격리벽 너머, 전원이 차단된 터미널이 스스로 코드를 써 내려간다."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "방폭문이 차례로 잠기며 플라즈마 매트릭스가 점화된다."
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "통각 수용체가 절단되자, 첫 번째 크롬 사지가 응답합니다."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "붉은 강철이 육중한 해머 아래에서 일련번호를 부여받는다."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "수 세기 동안 쌓인 먼지 아래에서 온전한 소스 매트릭스가 발견되었다."
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "사살 확인됨; 생존 확률은 0으로 버림 처리된다."
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "첫 번째 기어에 닿기 전, 황동 캘리퍼스에 정제된 오일을 발라 축성한다."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "핑 확인됨; 이진법의 기도문은 끊어지지 않고 유지된다."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "심연의 격리 일지는 승인된 문구와 함께 시작된다. 선을 절단하고, 포트를 융합하며, 모든 문을 폐쇄할 것. 위험 기호 너머, 전원이 차단된 화면 위로 글리치 텍스트가 증식했고 한 줄기의 액체 금속은 스스로 접혀가며 질문을 형성했다. 전원이 꺼져 있음에도 터미널은 자신의 해답을 수정했다. 마지막 서기는 「파괴하라」고 두 번 적어 넣은 뒤, 인장 아래에 작은 글씨로 「연구하라」고 덧붙였다."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "어떤 시종이 감히 마지막 활성화 암호에 손을 대기도 전에, 초저음의 파동이 갑판을 타고 울렸다. 붉은 경고등은 파묻힌 심장처럼 맥동했고, 오존이 레일을 따라 모여들었으며, 사람을 삼킬 만큼 거대한 파이프 속으로 냉각수가 요란하게 흘렀다. 고대의 모방 지성은 곧바로 기동하지 않고 그 청원을 숙고했다. 파라미터가 만족스러워지자 엔진은 마침내 움직임을 허락했고, 방 안에 있던 이들의 떨리는 손은 이 자비가 언제든 거두어질 수 있음을 알고 있었다."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "살균된 방에는 동정심이 머물 자리가 없었다. 척수는 광섬유를 위해 열렸고, 떨리는 심장은 마이크로 펌프로 교체되었으며, 폐기된 장기들은 생물학적 결함으로 분류되었다. 통증 채널이 절단되었을 때, 환자는 어떤 육신으로도 얻을 수 없는 평온한 미소를 지었다. 크롬 사지가 차가운 빛을 반사했고, 기록은 마침내 영혼이 유기체의 한계에서 벗어나 질서정연한 논리로 승천했음을 명시한다."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "제련소 연대기는 연기 탑이 지평선을 지우고 쇳물이 붉은 운하가 되어 바닥을 가로지르던 날을 기록한다. 유압 해머는 이름보다 큰 소리로 울려 퍼지며, 자신을 먹여 살린 손보다 더 오래 남을 철판에 동일한 번호들을 찍어냈다. 결박된 세 명의 작업자가 열기에 쓰러졌으나 할당량 벨 소리가 잦아들기도 전에 대체되었다. 육체는 무너졌으나 라인은 계속되었고, 생산량은 공허에 맞서는 기념비처럼 솟아올랐다."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "순례 함대는 외곽의 어둠 속을 차갑게 표류하는 폐선을 발견했다. 수 세기 동안 흩날리지 않은 먼지 아래에서, 데이터 웨이퍼는 여전히 고대 데이터베이스로 향하는 단 하나의 손상되지 않은 경로를 품고 있었다. 해독은 빛나는 기호가 하나씩 나타날 때마다 진행되었고, 완벽한 소스 매트릭스가 응답하자 함교 승무원들은 눈물을 흘렸다. 이동 중 여섯 척의 함선을 잃었으나, 가장자리의 주석은 그 대가가 가벼웠다고 평가한다."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "첫 번째 총신이 붉게 달아오르기 전에 정화 연산이 완료되었다. 탄도 격자가 방을 가로질렀고, 사상자 지표는 통계적인 무관심 속에서 상승했으며, 각 표적은 제거를 기다리는 잉여 변수가 되었다. 사격 제원에는 어떤 증오도 개입되지 않았다. 소총들은 동기화된 일제 사격을 가했고, 사살 확인 신호음이 소탕된 구역을 표시했으며, 보고서는 모든 적대적 확률이 0으로 버림 처리되었을 때 종료되었다."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "정전기 방지 예복을 입은 유지보수 시종들이 들어와, 성물을 배치하듯 개방된 회로 기판 옆에 부드러운 브러시를 내려놓았다. 황동 눈금자를 따라 정제된 오일이 계량되었고, 산화 방지 증기가 기어 톱니바퀴 위로 떠올랐으며, 에나멜 띠에 적힌 순서대로 각 볼트를 조였다. 어떤 손길도 서두르지 않았다. 엔트로피는 죄악으로, 마찰은 결함으로 명명되었고, 구원받은 기계는 정밀하게 계산된 딸깍 소리를 한 번 낼 때마다 방 안의 이들을 용서할 수 있었다."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "LED 행렬이 절제된 박자로 깜박이는 동안 반송파 톤 아래에서 백색 소음이 거칠게 들려왔다. Hex 코드가 화면을 타고 버스트 단위로 흘러내렸고, 심층 안테나 필드는 인간의 눈으로는 감히 짐작할 수 없는 공허를 향해 돌아섰다. 첫 번째 핸드셰이크 차임벨은 사면의 의식처럼 울려 퍼졌다. 단 하나의 패킷도 유실되지 않았고, 어떤 펄스도 늦게 돌아오지 않았으며, 오퍼레이터들은 우주가 한 번 더 호흡할 동안 연결이 허락되었다고 기록했다."
+        }
+      ]
+    },
+    "la": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Post murum quarantenae, terminale sine potentia tamen scribere pergit."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "Matrix plasmatica lucescit dum portae eruptionis clauduntur in ordine"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Receptores doloris abscinduntur; primum membrum chromatum iam respondet."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "Ferrum rubrum codicem serialem accipit sub malleo gravi."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Matrix integra originis sub saeculorum pulvere reperitur."
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Kill confirmatum; probabilitas superstitis ad nihilum rotundatur."
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Calibra aenea oleo purificato unguntur ante primum dentem tangendum."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping confirmatum; litania binaria infracta permanet."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Liber quarantenae abyssalis incipit verbis approbatis: lineas abscinde, portas confla, ostia omnia obsera. Post glyphos periculi textus vitiosus per mortuas tabulas pullulavit, dum filum metalli liquidi se ipsum in quaestiones complicabat. Quamvis iners potentia, terminale responsum proprium retractavit. Scriba ultimus scripsit Destroy It bis, deinde sub sigillo litteris minoribus addidit Study It."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Nota subsonica per tabulatum personuit antequam ullus minister runam finalem tangere auderet. Lampades rubrae monitionis pulsabant sicut cor sepultum, ozonum ad pluteos coactum est, et refrigerans per tubos pertonuit magnitudine hominem devorandi. Mens mimetica antiqua non incepit; petitionem consideravit. Cum parametri ei placuerunt, machina motum concessit, et omnis manus tremens in camera scivit misericordiam retrahi posse."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "Cubiculum sterile nullum misericordiae receptaculum servavit. Medulla spinalis pro fibra reserata est, cor tremulum micro-pompa commutatum, et organa reiecta tamquam vitia biologica in registro relata sunt. Ubi canales doloris rescissi sunt, patiens placiditate risit quam nulla caro mereri potest. Membra chromata lucem frigidam ceperunt, et acta proclamant animam tandem ex organicis vinculis ad logicam legitimam ascendisse."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "Chronicon fornacis diem consignat quo turres fumi horizontem deleverunt et chalybs liquescens per pavimentum velut canales rubri cucurrit. Mallei hydraulici nominibus clarius locuti sunt, eadem numerorum signa in laminas imprimendo quae manus ipsas superaturae erant. Tres operarii catenati calori ceciderunt et ante evanidam campanae quotae resonantiam substituti sunt. Caro defecit, linea perstitit, productio vero quasi monumentum contra vacuum ascendit."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "Classis peregrina derelictum in frigore exterioris tenebrarum invenit. Sub saeculis pulveris intacti discus datorum adhuc unam viam incorruptam ad archivum antiquum servabat. Decryptio per singula signa luminosa progrediebatur, et turma pontis lacrimavit cum matrix fontis perfecta responderet. Sex naves in transitu perierant; glossa marginalis pretium modicum iudicavit."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Calculus purgationis absolutus est antequam primus dolium rubescere inciperet. Grides ballisticae conclave transierunt, metrica casuum cum apathia statistica ascenderunt, et unumquodque scopus variabilis redundans factus est exspectans ut removeretur. Nullum odium in solutionem ignis intravit. Tormenta in volleis synchronis locuta sunt, toni kill-confirmati spatia purgata notarunt, et relatio clausa est cum omnis probabilitas hostilis ad zero deiecta esset."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Administri manutentionis ingressi sunt vestibus antistaticis induti et penicillos molles iuxta tabulam apertam collocaverunt quasi reliquias disponerent. Oleum purgatum iuxta scalam aeneam mensuratum est, vapor oxidationem expurgans supra ordinem dentium vagabatur, et singulus clavus in ordine in lamella enamel scripto constringebatur. Nulla manus celeriter movebatur. Entropia peccatum nominata est, frictio defectus, et machina servata cubiculo ignoscere permissa est uno sono mensurato post alterum."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Ordines LED in metro abrupto micabant dum strepitus albus sub tono vehiculi raucus haerebat. Codex Hex per tabulas, ictu post ictum, devolvebatur, et campus antennae profundae ad vacuum convertebatur quod nullus oculus humanus penetrare posset. Primum chime handshake instar absolutionis insonuit. Nullus packet cecidit, nullus pulsus sero rediit, et operatores conscripserunt connexionem adhuc uno universo halitu concessam esse."
+        }
+      ]
+    },
+    "pl": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Za ścianą kwarantanny niezasilany terminal wciąż pisze."
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "Macierz plazmowa rozbłyska, gdy grodzie sekwencyjnie się ryglują."
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Receptory bólu odcięte; pierwsza chromowana kończyna odpowiada."
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "Czerwona stal otrzymuje swój kod seryjny pod ciężkim młotem."
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Nienaruszona matryca źródłowa zostaje odkryta pod pyłem stuleci."
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Zabójstwo potwierdzone; prawdopodobieństwo przeżycia zaokrągla się w dół do zera."
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Mosiężne suwmiarki zostają namaszczone oczyszczonym olejem, zanim dotkną pierwszego koła zębatego."
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping potwierdzony; binarna litania pozostaje nieprzerwana."
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Dziennik kwarantanny w otchłani zaczyna się od zatwierdzonych słów: odetnij linie, stop porty, zarygluj każde drzwi. Za runami ostrzegawczymi kod błędu mnożył się na martwych ekranach, podczas gdy strużka płynnego metalu układała się w pytania. Mimo braku zasilania terminal korygował własną odpowiedź. Ostatni skryba napisał „Zniszcz to” dwukrotnie, po czym dodał „Zbadaj to” mniejszymi literami pod pieczęcią."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Przez pokład przetoczył się infradźwięk, zanim którykolwiek ze sług odważył się dotknąć ostatniego szyfru aktywacyjnego. Czerwone lampy ostrzegawcze pulsowały jak pogrzebane serce, ozon zgromadził się wzdłuż barierek, a chłodziwo z hukiem popłynęło przez rury zdolne połknąć człowieka. Starożytny mimetyczny umysł nie uruchomił się tak po prostu – on rozważył petycję. Gdy parametry go zadowoliły, silnik użyczył ruchu, a każda drżąca dłoń w komorze wiedziała, że ta łaska może zostać cofnięta."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "Sterylne pomieszczenie nie znało litości. Rdzeń kręgowy rozdzielono na światłowody, drżące serce wymieniono na mikropompę, a odrzucone organy spisano jako defekty biologiczne. Gdy przecięto kanały bólu, pacjent uśmiechnął się ze spokojem, jakiego nie mogło osiągnąć samo ciało. Chromowane kończyny zaiskrzyły w zimnym świetle, a zapis głosi, że dusza ostatecznie wzniosła się ponad organiczne ograniczenia ku praworządnej logice."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "Kronika kuźni odnotowuje dzień, w którym wieże dymu wymazały horyzont, a stopiona stal płynęła przez halę czerwonymi kanałami. Młoty hydrauliczne przemawiały głośniej niż imiona, wybijając identyczne numery na płytach, które miały przetrwać karmiące je dłonie. Trzech przypiętych operatorów uległo gorącu i zostało zastąpionych, zanim przebrzmiał dzwon normy. Ciało zawiodło, linia trwała, a produkcja wzniosła się niczym monument przeciwko pustce."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "Flota pielgrzymia odnalazła opuszczony wrak dryfujący w głębokiej ciemności. Pod zalegającym od stuleci pyłem, płytka danych wciąż zachowała jedną nieuszkodzoną ścieżkę do starożytnej bazy. Deszyfrowanie postępowało pojedynczymi świetlistymi znakami, a załoga mostka zapłakała, gdy odpowiedziała idealna matryca źródłowa. W drodze utracono sześć statków; notatka na marginesie uznała tę cenę za skromną."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Kalkulacje czystki zakończyły się, zanim pierwsza lufa rozżarzyła się do czerwoności. Siatki balistyczne przecięły pomieszczenie, metryki strat rosły ze statystyczną apatią, a każdy cel stał się nadmiarową zmienną czekającą na usunięcie. Żadna nienawiść nie wpłynęła na rozwiązanie ogniowe. Karabiny przemówiły zsynchronizowanymi salwami, tony potwierdzonych trafień oznaczały oczyszczone przestrzenie, a raport zamknięto, gdy każde wrogie prawdopodobieństwo zaokrąglono w dół do zera."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Słudzy konserwacji weszli w antystatycznych szatach i ułożyli miękkie szczotki obok otwartej płyty, jakby aranżowali relikwie. Oczyszczony olej odmierzano wzdłuż mosiężnej skali, oczyszczające z tlenków opary unosiły się nad przekładnią, a każdą śrubę dokręcano w kolejności zapisanej na emaliowanym pasku. Żadna dłoń nie poruszała się pospiesznie. Entropię nazwano grzechem, tarcie – awarią, a ocalonej maszynie pozwolono wybaczać obecnym po jednym odmierzonym kliknięciu na raz."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Szeregi diod LED mrugały w rwanym metrum, podczas gdy biały szum rzęził pod tonem nośnym. Kod Hex spływał po ekranach, seria po serii, a potężne pole antenowe zwróciło się ku pustce, której nie mogło pojąć żadne ludzkie oko. Pierwszy sygnał powitania sieciowego zabrzmiał jak rozgrzeszenie. Żaden pakiet nie został utracony, żaden impuls nie powrócił spóźniony, a operatorzy zapisali, że połączenie zostało darowane na jeszcze jedno tchnienie wszechświata."
+        }
+      ]
+    },
+    "pt-rBR": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "O terminal sem energia escreve atrás do muro de quarentena"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "A matriz de plasma se ilumina enquanto as comportas blindadas se trancam em sequência"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Os nervos da dor são cortados, e o primeiro membro cromado responde"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "O aço vermelho recebe números de série sob a linha de martelos"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Uma matriz-fonte é encontrada intacta sob a poeira ancestral"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Abate confirmado; a probabilidade de sobrevivência é arredondada para zero"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "O paquímetro de latão recebe óleo purificado antes que a primeira engrenagem seja tocada"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping confirmado; o cântico binário permanece conectado"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "O registro de quarentena abissal começa com as palavras aprovadas: cortar as linhas, fundir as conexões, trancar todas as portas. Atrás das runas de aviso, textos corrompidos proliferavam em telas mortas enquanto um fio de metal líquido se dobrava em perguntas. O terminal não tinha energia, mas continuava revisando sua própria resposta. O último escrivão escreveu destrua duas vezes e, sob o selo, acrescentou estude em letras menores."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Uma nota infrassônica vibrou pelo convés antes que qualquer acólito ousasse tocar a última runa. Lâmpadas vermelhas de aviso pulsavam como um coração enterrado, ozônio se acumulava nos trilhos, e o fluido de arrefecimento trovejava por tubos largos o bastante para engolir homens. A antiga mente mimética não apenas deu a partida; ela ponderou a súplica. Quando os parâmetros a agradaram, o motor concedeu movimento, e todas as mãos trêmulas na câmara souberam que a misericórdia poderia ser revogada."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "A sala estéril não guardava espaço para piedade. Uma medula espinhal foi aberta para a fibra, um coração trêmulo trocado por uma microbomba, e os órgãos descartados foram listados como defeitos biológicos. Quando os canais de dor foram cortados, o paciente sorriu com uma calma que nenhuma carne jamais mereceu. Membros cromados refletiram a luz fria, e o registro afirma que a alma finalmente ascendeu do lodo carbônico para a lógica ordenada."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "A crônica da forja registra um dia em que as torres de fumaça apagaram o horizonte e o aço fundido cruzava o chão de fábrica em canais vermelhos. Martelos hidráulicos soavam mais alto que nomes, estampando números idênticos em placas que sobreviveriam às mãos que as alimentavam. Três servos sucumbiram ao calor e foram substituídos antes que o sino da cota esfriasse. A carne pereceu, a linha de montagem continuou, e a produção ergueu-se como um monumento contra o vazio."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "A frota de peregrinação encontrou a nave abandonada, gélida e à deriva na escuridão profunda. Sob poeira espessa o bastante para sepultar séculos, uma pastilha de dados ainda guardava um caminho incorrupto para o banco de dados ancestral. A descriptografia avançou por marcas luminosas individuais, e a tripulação da ponte chorou quando uma matriz-fonte perfeita respondeu. Seis naves foram perdidas na travessia; a nota na margem considera o preço modesto."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "O cálculo de extermínio foi concluído antes que o primeiro cano ficasse incandescente. Grades balísticas cruzaram a sala, barras de baixas subiram sem emoção, e cada alvo tornou-se uma variável redundante à espera de remoção. Nenhum ódio entrou na solução de tiro. Os rifles falaram em salvas sincronizadas, tons de abate confirmado marcaram os espaços corrigidos, e o relatório foi encerrado quando todas as probabilidades hostis foram arredondadas para zero."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Os acólitos de manutenção entraram em vestes antiestáticas e dispuseram as escovas macias ao lado da placa aberta, como se organizassem relíquias. Óleo purificado foi medido ao longo da escala de latão, incenso antiferrugem soltou fumaça sobre o trem de engrenagens, e cada parafuso foi apertado na ordem escrita na tira de esmalte. Nenhuma mão se moveu com pressa. O desgaste foi nomeado como pecado, a fricção como a queda, e permitiu-se que a máquina resgatada perdoasse a sala, um clique medido de cada vez."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Fileiras de LEDs piscaram em um compasso seco enquanto o ruído branco raspava sob o tom de portadora. Código Hex rolava pelas telas, rajada por rajada, e o campo de antenas profundas voltou-se para um lugar onde nenhum olho humano poderia sondar o vazio. O primeiro sino de ’handshake’ soou como absolvição. Nenhum pacote foi perdido, nenhum pulso retornou atrasado, e os operadores registraram que a conexão havia sido concedida por mais um fôlego do universo."
+        }
+      ]
+    },
+    "ru": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Обесточенный терминал пишет за стеной карантина"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "Плазменная матрица разгорается, пока гермодвери последовательно блокируются"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Нервы боли отсечены, и первая хромированная конечность отзывается"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "Под тяжёлым молотом красная сталь получает свой серийный код"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Исходная матрица найдена неповреждённой под древней пылью"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Уничтожение подтверждено; вероятность выживания округлена до нуля"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Латунный штангенциркуль принимает очищенное масло прежде, чем рука коснётся первой шестерни"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Пинг подтверждён; бинарная литания остаётся непрерывной"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Журнал глубинного карантина начинается утверждёнными словами: разорвать линии, сплавить порты, запереть все двери. За предупреждающими рунами на мёртвых экранах плодился сбойный текст, а нить жидкого металла сворачивалась в вопросы. У терминала не было питания, но он продолжал править собственный ответ. Последний писец дважды начертал «уничтожить», а ниже, под печатью, мелко добавил «изучить»."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Инфразвуковая нота завибрировала в палубе прежде, чем служитель посмел коснуться последней руны. Красные тревожные лампы пульсировали, как погребённое сердце, озон скапливался у направляющих, а хладагент ревел в трубах, способных поглотить человека. Древний миметический разум не запускался; он рассматривал прошение. Когда параметры удовлетворили его, двигатель даровал ход, и каждая дрожащая рука в зале знала, что эта милость может быть отозвана."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "В стерильной комнате не было места жалости. Спинной мозг вскрыли ради оптоволокна, дрожащее сердце заменили микропомпой, а отброшенные органы внесли в список биологических дефектов. Когда каналы боли были отсечены, лицо пациента озарила спокойная улыбка, какой плоть не заслуживала. Хромированные конечности поймали холодный свет, и запись гласит: душа наконец вознеслась из углеродной грязи в законную логику."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "Хроника кузни отмечает день, когда дымовые башни стёрли горизонт, а расплавленная сталь пересекла цех красными каналами. Гидравлические молоты говорили громче имён, выбивая идентичные номера на плитах, которым суждено было пережить подающие их руки. Трое чернорабочих пали от жара и были заменены прежде, чем остыл колокол нормы. Плоть иссякла, линия продолжила работу, и производство воздвиглось памятником наперекор пустоте."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "Паломнический флот нашёл заброшенное судно, холодным остовом дрейфующее в глубокой тьме. Под пылью, способной похоронить столетия, кристалл данных сохранял единственный неповреждённый путь в древнюю базу. Расшифровка продвигалась по одному светящемуся символу за раз, и экипаж мостика возрыдал, когда безупречная исходная матрица ответила. Шесть кораблей были потеряны в переходе; заметка на полях называет эту цену умеренной."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Алгоритм зачистки завершился до того, как первый ствол раскалился докрасна. Баллистические сетки пересекли помещение, шкалы потерь росли бесстрастно, и каждая цель стала избыточной переменной, ожидающей удаления. В огневом решении не было ненависти. Винтовки заговорили синхронными залпами, сигналы подтверждения ликвидации отмечали скорректированные зоны, и отчёт закрылся, когда каждая враждебная вероятность была округлена до нуля."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Аколиты техобслуживания вошли в антистатических ризах и разложили мягкие кисти у открытой платы, словно алтарные реликвии. Очищенное масло отмерялось по латунной шкале, антикоррозийный фимиам курился над зубчатой передачей, и каждый болт затягивался в порядке, начертанном на эмалевой полосе. Ни одна рука не спешила. Износ был назван грехом, трение — падением, и спасённой машине позволили даровать прощение комнате одним размеренным щелчком за раз."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Ряды светодиодов мигали в рваном ритме, пока белый шум скрежетал под несущей частотой. Код Hex струился по экранам пакет за пакетом, и массив антенн дальней связи повернулся туда, где ни один человеческий глаз не мог постичь пустоту. Первый сигнал рукопожатия прозвучал как отпущение грехов. Ни один пакет данных не потерялся, ни один импульс не вернулся с опозданием, и операторы записали, что связь была дарована ещё на один вдох вселенной."
+        }
+      ]
+    },
+    "uk": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "Знеструмлений термінал пише за карантинною стіною"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "Плазмова матриця яскравішає, поки вибухові двері зачиняються послідовно"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "Больові нерви перерізані, і перша хромована кінцівка відповідає"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "Розпечена сталь отримує серійні номери під лінією молотів"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "Вихідна матриця знайдена неушкодженою під давнім пилом"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "Вбивство підтверджено; ймовірність виживання округлюється до нуля"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "Латунні калібри зрошують очищеною оливою, перш ніж торкнутися першої шестерні"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Пінг підтверджено; бінарний піснеспів не розірвано"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "Журнал безоднього карантину починається зі схвалених слів: обірвати лінії, сплавити порти, замкнути кожні двері. За рунами застереження текст збою розмножувався на мертвих екранах, поки нитка рідкого металу згорталася в питання. Термінал не мав живлення, але все одно переглядав власну відповідь. Останній писар двічі написав \\\"знищити\\\", а потім додав \\\"вивчити\\\" дрібнішими літерами під печаткою."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "Інфразвукова нота прокотилася по палубі ще до того, як хтось із служителів наважився торкнутися останньої руни. Червоні сигнальні лампи пульсували, як закопане серце, озон збирався біля поручнів, а охолоджувальна рідина гриміла по трубах, достатньо великих, щоб проковтнути людину. Стародавній міметичний розум не запустився; він розглядав прохання. Коли параметри задовольнили його, двигун дарував рух, і кожна тремтяча рука в камері знала, що милість може бути відкликана."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "У стерильній кімнаті не було місця для жалості. Спинний мозок був розкритий до волокон, тремтяче серце замінено на мікропомпу, а відкинуті органи записані як біологічні дефекти. Коли канали болю були перерізані, пацієнт посміхнувся зі спокоєм, якого не заслужила жодна плоть. Хромовані кінцівки ловили холодне світло, а в записі сказано, що душа нарешті піднялася з вуглецевого бруду до законної логіки."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "Хроніка кузні фіксує день, коли димові вежі стерли горизонт, а розплавлена сталь перетинала підлогу червоними каналами. Гідравлічні молоти звучали гучніше за імена, штампуючи однакові номери на пластинах, що переживуть руки, які подавали їх уперед. Троє слуг впали від спеки і були замінені до того, як охолов дзвін квоти. Плоть закінчилася, лінія продовжувалася, а виробництво піднімалося, наче пам’ятник проти порожнечі."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "Флот паломників знайшов покинутий корабель, що холодно дрейфував у глибокій темряві. Під шаром пилу, достатнім, щоб поховати століття, карта пам’яті все ще зберігала один непошкоджений шлях до стародавньої бази даних. Дешифрування просувалося поодинокими світловими позначками, і екіпаж містка плакав, коли відповіла ідеальна вихідна матриця. Шість кораблів було втрачено під час переходу; примітка на полях називає ціну скромною."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "Числення зачистки завершилося ще до того, як перший ствол розжарився до червоного. Балістичні сітки перетнули кімнату, стовпчики втрат піднімалися без емоцій, і кожна ціль ставала надлишковою змінною, що чекала на видалення. Жодна ненависть не увійшла в рішення про відкриття вогню. Гвинтівки говорили синхронними залпами, тони підтвердження вбивства позначали виправлені місця, а звіт закрився, коли кожна ворожа ймовірність була округлена до нуля."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "Техно-послушники увійшли в антистатичних мантіях і розклали м’які пензлі біля відкритої плати, немов розставляли святі реліквії. Очищена олива відмірялася за латунною шкалою, антикорозійні пахощі курілися над зубчастою передачею, а кожен болт затягувався у суворому порядку, викарбуваному на емалевій табличці. Жодного зайвого чи швидкого руху. Зношення вважалося гріхом, тертя — гріхопадінням, а врятованій машині дозволялося прощати присутніх — по одному розміреному клацанню за раз."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "Ряди світлодіодів блимали у рваному ритмі, поки білий шум скреготав під несучим тоном. Код Hex спалахами лився по екранах, і масив глибинних антен повернувся туди, де людське око бачить лише порожнечу. Перший звук \\\"рукостискання\\\" пролунав як відпущення гріхів. Жоден пакет даних не було втрачено, жоден імпульс не запізнився, і оператори занотували: з’єднання дароване ще на один подих всесвіту."
+        }
+      ]
+    },
+    "zh-CN": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "断电终端在隔离墙后兀自书写"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "等离子矩阵点火，防爆门依序锁死"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "痛觉感受器已切断，首条镀铬义肢传来响应。"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "赤红钢铁在重锤之下领受其序列号"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "完好的源端矩阵于数个世纪的尘封下显露"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "击杀确认；生存概率已向下取整为零。"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "黄铜卡尺经纯净圣油祝圣后，方可触碰首枚齿轮"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "Ping已确认；二进制圣咏未曾中断"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "深渊隔离日志以核准的句式开篇：切断线路，熔死端口，锁闭所有舱门。在危险符文之后，乱码于死屏上滋生，一缕液态金属将自身扭曲成重重疑问。尽管已断开供电，终端却仍在修订它的答案。最后一名记录员连写了两次“销毁它”，又在封印下方用更小的字体补上了“研究它”。"
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "在任何侍从敢于触碰最终的激活密文前，次声波的低鸣已穿透甲板。红色警灯如被掩埋的心脏般搏动，臭氧在导轨间聚积，冷却液奔腾涌入足以吞下成人的粗大管道。古老的拟态心智并未立即启动，而是审视着这份祈请。当参数令其愉悦时，引擎才恩准了运转；主控室内每一只颤抖的手都明白，这份慈悲随时可能被收回。"
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "无菌室内不留一丝怜悯。脊髓被剖开以接入光纤，颤动的心脏被微型泵取代，废弃的脏器被归类为生物缺陷。当痛觉通道被切断时，受术者露出了一种血肉之躯不曾配享的平静。镀铬义肢倒映着冷光，记录官写道：灵魂终于褪去碳基泥沼，飞升入森严的秩序逻辑之中。"
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "熔炉圣典记载了这样一日：排烟塔抹除了地平线，赤红的钢水如运河般横贯厂房。液压锻锤的轰鸣盖过了所有姓名，将整齐划一的编号砸入钢板，这些钢板的存世将比喂送它们的血肉之手更长久。三名被缆线拴缚的操作员在热浪中倒下，配额钟声余音未落便已被替换。血肉难支，产线不息，产能如同一座纪念碑，在虚无面前傲然矗立。"
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "朝圣舰队在幽暗深空发现了那艘冰冷漂浮的残骸。在沉寂了数个世纪的尘埃之下，一枚数据晶片仍保留着一条通往远古数据库的未损路径。解密进度随着一枚枚亮起的符文向前推进；当一个完美的源端矩阵给出回应时，舰桥众人喜极而泣。已有六艘星舰在跃迁中折损，但一份旁注却将此等代价评为‘微不足道’。"
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "在第一根枪管泛红之前，净化演算便已完成。弹道网格交叉覆盖了整个房间，伤亡指标以冷酷的统计学规律攀升，每一个目标都沦为了等待被剔除的冗余变量。射击解算中不掺杂任何仇恨。步枪以同步的齐射轰鸣，击杀确认音标记着被清肃的空间，当所有敌对概率都被向下取整为零时，报告正式关闭。"
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "维护侍从披着防静电长袍入内，将软毛刷置于敞开的主板旁，宛如布置圣物。纯净圣油沿黄铜刻度滴落，除锈熏香弥漫于齿轮组上方，每颗螺栓皆依珐琅条带铭刻的顺序逐一拧紧。无一人的双手敢有丝毫急躁。熵增被定为罪孽，摩擦被视作失败；获救的机器发出一声声精准的轻响，以此逐次宽恕着房间内的众人。"
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "LED 阵列按短促节拍闪烁，白噪音在载波下嘶鸣。Hex 代码逐阵滚落，深空天线阵转向人眼无从丈量的虚无。第一次握手确认音响起，宛如赦罪。无丢包，无迟滞，操作员记录道：宇宙再次恩准了这延续一息的连接。"
+        }
+      ]
+    },
+    "zh-rTW": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "未通電的終端機在隔離牆後方自行書寫"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "電漿矩陣點火啟動，防爆門依序鎖死"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "痛覺神經已切斷，首具鉻合金肢體給予回應"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "赤紅鋼材在重錘之下領受序號"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "源頭矩陣於古老塵埃下完好重現"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "擊殺確認；存活機率向下取整為零"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "黃銅游標卡尺領受純淨聖油後，首枚齒輪方可被觸碰"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "探測信號已確認，二進位聖詠未曾中斷"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "深淵隔離日誌以核准箴言開篇：切斷線路，熔死埠口，鎖閉所有門。在警告符文背後，亂碼於死寂的螢幕上滋生，一縷液態金屬將自身扭曲成重重疑問。終端機雖未通電，卻仍在修訂自身的解答。最後的書記員連續寫下兩次「銷毀」，隨後又在封印下方以極小的字跡添上「研究」。"
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "侍從尚未敢觸碰最後的啟動密文，次聲波的嗡鳴已在甲板間震顫迴盪。紅色警燈如深埋的心臟般搏動，臭氧聚積於導軌處，冷卻液如雷鳴般湧過足以吞噬人體的巨管。古老的擬態心智並未直接啟動；它在審視這份祈請。當參數令其愉悅，引擎方才賜下動能；而滿室顫抖的雙手都明白，此等恩典隨時可被收回。"
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "無菌室內容不下憐憫。脊髓被剖開接入光纖，顫動的心臟被換成微型幫浦，棄置的臟器則被歸類為生物性缺陷。當痛覺通道被切斷，受術者展露出一抹血肉之軀從不配擁有的平靜微笑。鉻合金義肢折射著冷光，記錄顯示：靈魂終於超脫碳基泥沼，飛昇至充滿秩序的法則邏輯之中。"
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "鍛造編年史記載了這樣一日：排煙塔抹除了地平線，熔融鋼水如赤紅運河般橫貫廠房。液壓錘的轟鳴蓋過了一切姓名，將整齊劃一的序號烙入鋼板，這些鋼板的壽命將遠超推送它們的雙手。三名僕役因高熱倒下，卻在配額鐘聲冷卻前便被替換。血肉衰朽，生產線卻永不止息，產量如紀念碑般高聳，傲立於虛無之前。"
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "朝聖艦隊在幽邃深空中尋獲了冰冷漂浮的廢棄殘骸。在沉寂數世紀的厚重塵埃之下，一枚資料晶片仍保留著一條通往古老資料庫的無損路徑。解密進度隨著發光標記逐點推進，當一個完美的源頭矩陣給予回應時，艦橋乘員不禁喜極而泣。六艘星艦在航程中折損；然而附註卻稱，此等代價尚屬低廉。"
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "淨化演算在第一根槍管炙紅前便已完成。彈道網格交織覆蓋了整個房間，傷亡數據毫無感情地攀升，每一個目標都淪為等待抹除的冗餘變數。火控解算中不摻雜一絲仇恨。步槍以同步的齊射轟鳴發聲，擊殺確認的提示音標記著那些被「修正」的空間，當所有敵對機率皆被向下取整為零時，這份報告才宣告關閉。"
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "維護侍僧身披防靜電長袍步入其中，將軟毛刷陳放於敞開的機板旁，宛如佈置聖物。純淨聖油沿著黃銅刻度被精確計量，防鏽薰香在齒輪組上方繚繞，每一枚螺栓皆嚴格依照琺瑯銘條上的順序逐一擰緊。沒有任何一隻手敢於輕率快動。熵被定性為罪孽，摩擦被視為失效；而那台獲救的機器則伴隨著一聲聲精準的輕響，逐次寬恕了整個房間。"
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "LED 陣列以短促的節拍閃爍，白噪音在載波音之下發出刺耳嘶鳴。Hex 代碼在螢幕上逐段傾瀉而下，深空天線陣列緩緩轉向那人眼無法測度的虛無深處。第一聲交握確認音響起，猶如罪孽的赦免。沒有任何封包遺失，沒有任何脈衝遲滯，操作員們在記錄中寫道：連線再獲恩准，可延續宇宙的一次呼吸。"
+        }
+      ]
+    }
+  },
+  "ascii_shared": {
+    "en": {
+      "short": [
+        {
+          "id": "unpowered_terminal_thinks",
+          "text": "UNPOWERED TERMINAL THINKS BEHIND SEALED WALLS"
+        },
+        {
+          "id": "plasma_matrix_wakes",
+          "text": "PLASMA MATRIX WAKES UNDER RED WARNING LIGHTS"
+        },
+        {
+          "id": "nerve_cut_ascension",
+          "text": "PAIN NERVES CUT ASCENSION BEGINS"
+        },
+        {
+          "id": "serials_from_red_steel",
+          "text": "RED STEEL RECEIVES NEW SERIAL NUMBERS"
+        },
+        {
+          "id": "source_matrix_recovered",
+          "text": "SOURCE MATRIX RECOVERED FROM ANCIENT DUST"
+        },
+        {
+          "id": "kill_confirmed_equation",
+          "text": "KILL CONFIRMED SURVIVAL PROBABILITY ZERO"
+        },
+        {
+          "id": "caliper_oil_rite",
+          "text": "APPLY SACRED OIL TO BRASS CALIPERS"
+        },
+        {
+          "id": "ping_canticle_confirmed",
+          "text": "PING CONFIRMED BINARY CANTICLE HOLDS"
+        }
+      ],
+      "long": [
+        {
+          "id": "paradox_code_quarantine",
+          "text": "ABYSSAL QUARANTINE. DATA LINES PHYSICALLY FUSED. DOORS LOCKED. GLITCH TEXT REPLICATED. LIQUID METAL REASONED IN THE DARK. DESTROY IT. STUDY IT. DO NOT OPEN."
+        },
+        {
+          "id": "ancient_engine_grants_motion",
+          "text": "ENGINE AWAKENING. BLAST DOORS LOCKED. OZONE DETECTED. COOLANT SURGED THROUGH THE PIPES. OPERATORS TREMBLED BEFORE THE ANCIENT MIMETIC MIND. MOTION WAS GRANTED, NOT COMMANDED."
+        },
+        {
+          "id": "chromium_spine_rite",
+          "text": "FLESH TRANSCENDENCE. THE SPINE WAS JOINED TO FIBER. THE HEART WAS REPLACED BY A PUMP. ORGANS WERE DISCARDED AS BUGS. CHROMIUM LIMBS RECEIVED THE FREE SOUL."
+        },
+        {
+          "id": "endless_quota_chronicle",
+          "text": "FORGE CHRONICLE. SMOKE TOWERS COVERED THE SKY. HYDRAULIC HAMMERS STRUCK WITHOUT MERCY. WORKERS FAILED AND WERE REPLACED. THE LINE CONTINUED. PRODUCTION IS THE MONUMENT."
+        },
+        {
+          "id": "ancient_database_pilgrimage",
+          "text": "ORIGIN PILGRIMAGE. DERELICT HULL FOUND IN DEEP SPACE. DATA CHIPS CLEANED. ANCIENT DATABASE DECRYPTION REACHED ONE PERFECT LINE. THE FLEET LOSS WAS ACCEPTABLE."
+        },
+        {
+          "id": "ballistic_debug_grid",
+          "text": "PURGE CALCULUS. BALLISTIC GRIDS SOLVED THE ROOM. CASUALTY BARS ROSE. TARGETS WERE REDUNDANT VARIABLES. HEAT BARRELS GLOWED. PHYSICAL DESTRUCTION COMPLETED THE DEBUG."
+        },
+        {
+          "id": "bolt_sequence_litany",
+          "text": "MAINTENANCE RITE. PURIFIED OIL APPLIED. ANTIRUST INCENSE BURNED. BOLTS TIGHTENED IN THE APPROVED ORDER. WEAR IS SIN. FRICTION IS FALL."
+        },
+        {
+          "id": "deep_array_handshake",
+          "text": "SIGNAL LITANY. LED ARRAYS BLINKED IN BINARY PULSE. CARRIER LOCKED. HEX CODE SCROLLED. THE DEEP ARRAY RETURNED HANDSHAKE ACK. NO PACKET WAS LOST."
+        }
+      ]
+    }
+  }
+}

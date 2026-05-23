@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlipBits</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero-card">
+        <div class="hero-header">
+          <div class="brand-lockup">
+            <h1>FlipBits</h1>
+            <img
+              class="brand-icon"
+              src="./assets/flipbits-icon.svg"
+              alt="FlipBits icon"
+            />
+          </div>
+          <label class="field field-inline" for="language-select">
+            <span id="language-label">语言</span>
+            <select id="language-select">
+              <option value="de">Deutsch</option>
+              <option value="en" selected>English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="it">Italiano</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+              <option value="la">High Gothic (Latina)</option>
+              <option value="pl">Polski</option>
+              <option value="pt-rBR">Português (Brasil)</option>
+              <option value="ru">Русский</option>
+              <option value="uk">Українська</option>
+              <option value="zh-CN">中文</option>
+              <option value="zh-rTW">繁體中文</option>
+            </select>
+          </label>
+        </div>
+        <section class="about-section">
+          <h2 id="about-title">About FlipBits</h2>
+          <div id="about-copy" class="about-copy"></div>
+        </section>
+      </section>
+
+      <section class="panel">
+        <label class="field">
+          <div class="field-header">
+            <div class="field-header-row">
+              <span id="input-text-label">输入文本</span>
+              <div class="sample-tools">
+                <label class="field field-inline sample-length-field" for="sample-length-select">
+                  <span id="sample-length-label">Sample Length</span>
+                  <select id="sample-length-select">
+                    <option value="short" selected>Short</option>
+                    <option value="long">Long</option>
+                  </select>
+                </label>
+                <label
+                  class="sample-toggle-field"
+                  id="sample-add-emoji-field"
+                  for="sample-add-emoji-toggle"
+                >
+                  <input id="sample-add-emoji-toggle" type="checkbox" checked />
+                  <span id="sample-add-emoji-label">Add Emoji</span>
+                </label>
+                <button id="random-sample-button" class="secondary-button dice-button" type="button">
+                  <span class="dice-button-face" aria-hidden="true">
+                    <span class="dice-pip pip-top-left"></span>
+                    <span class="dice-pip pip-center"></span>
+                    <span class="dice-pip pip-bottom-right"></span>
+                  </span>
+                  <span id="random-sample-button-text">Random Sample</span>
+                </button>
+              </div>
+            </div>
+            <span id="input-hint" class="field-hint"></span>
+          </div>
+          <textarea
+            id="input-text"
+            rows="8"
+            placeholder="例如：github"
+          >github</textarea>
+        </label>
+
+        <div class="grid">
+          <label class="field">
+            <span id="mode-label">Mode</span>
+            <select id="mode-select">
+              <option value="mini">mini: Morse code</option>
+              <option value="flash" selected>flash: Bit-by-bit BFSK</option>
+              <option value="pro">pro: DTMF-like dual-tone mapping</option>
+              <option value="ultra">ultra: 16-FSK</option>
+            </select>
+          </label>
+
+          <label class="field" id="flash-style-field">
+            <span id="flash-style-label">Flash Style</span>
+            <select id="flash-style-select">
+              <option value="standard" selected>standard</option>
+              <option value="litany">litany</option>
+              <option value="hostility">hostility</option>
+              <option value="collapse">collapse</option>
+              <option value="zeal">zeal</option>
+              <option value="void">void</option>
+            </select>
+          </label>
+
+          <label class="field" id="mini-speed-field" hidden>
+            <span id="mini-speed-label">Morse Speed</span>
+            <select id="mini-speed-select">
+              <option value="wpm10">10 WPM</option>
+              <option value="wpm15" selected>15 WPM</option>
+              <option value="wpm20">20 WPM</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="mode-summary">
+          <h2 id="mode-summary-title">Mode Overview</h2>
+          <p id="mode-summary-copy" class="mode-summary-copy"></p>
+        </section>
+
+        <div class="actions">
+          <button id="generate-button" type="button">生成音频</button>
+          <a id="download-link" class="download-link is-disabled" download="flipbits-demo.wav">
+            下载 WAV
+          </a>
+        </div>
+
+        <p id="status" class="status" aria-live="polite">
+          正在等待 WebAssembly 编码器接入。
+        </p>
+
+        <section id="progress-section" class="progress-section" hidden>
+          <div class="progress-header">
+            <span id="progress-label">生成进度</span>
+            <span id="progress-value"></span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+        </section>
+
+        <section id="result-summary" class="result-summary" hidden>
+          <h2 id="result-summary-title">Result Summary</h2>
+          <div class="result-grid">
+            <div class="result-item">
+              <span id="result-mode-label" class="result-label">Mode</span>
+              <span id="result-mode-value" class="result-value"></span>
+            </div>
+            <div class="result-item">
+              <span id="result-profile-label" class="result-label">Profile</span>
+              <span id="result-profile-value" class="result-value"></span>
+            </div>
+            <div class="result-item">
+              <span id="result-duration-label" class="result-label">Duration</span>
+              <span id="result-duration-value" class="result-value"></span>
+            </div>
+            <div class="result-item">
+              <span id="result-sample-rate-label" class="result-label">Sample Rate</span>
+              <span id="result-sample-rate-value" class="result-value"></span>
+            </div>
+          </div>
+        </section>
+
+        <audio id="player" class="player" controls></audio>
+      </section>
+    </main>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

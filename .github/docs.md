@@ -10,8 +10,20 @@
   - Android Debug 组装 CI
 - `workflows/ci-android-quality.yml`
   - Android Kotlin 质量 CI
+- `workflows/deploy-pages-demo.yml`
+  - 构建并部署 `apps/audio_web/site` 到 GitHub Pages
 
 ## 说明
 
 - 当前 CI 职责地图、触发范围与修改口径统一看：
   - `C:\code\FlipBits\docs\tools\ci-workflow.md`
+
+## Pages 约定
+
+- `audio_web` 的 Pages 准备逻辑尽量写在 Python 入口里：
+  - `C:\code\WaveBits\apps\audio_web\tools\prepare_pages_site.py`
+- workflow 只负责：
+  - checkout
+  - setup Python / emsdk
+  - 调用 Python 入口
+  - 上传并部署 Pages artifact

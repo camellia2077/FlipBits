@@ -1,0 +1,56 @@
+name: Deploy Pages Demo
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/audio_web/**"
+      - "libs/audio_api/**"
+      - "libs/audio_core/**"
+      - ".github/workflows/deploy-pages-demo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-demo
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 4.0.10
+
+      - name: Prepare Pages site
+        run: python apps/audio_web/tools/prepare_pages_site.py
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/audio_web/site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

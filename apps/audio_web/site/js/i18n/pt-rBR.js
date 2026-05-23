@@ -1,0 +1,50 @@
+export const LOCALE = 'pt-rBR';
+
+export const MESSAGES = {
+    htmlLang: "pt-BR",
+    languageLabel: "Idioma",
+    "about.title": "Sobre o FlipBits",
+    "about.copy": [
+      "O FlipBits transforma texto em áudio codificado e audível. O app Android também visualiza em sincronia a reprodução, a forma de onda, o processo de codificação do texto e o conteúdo binário por trás de cada caractere ou palavra; esta página serve apenas como uma prévia rápida de como os diferentes modos soam.",
+      "`flash` é um modo deliberadamente voltado ao entretenimento: ele altera os Hz de low / high bit, a duração dos bits e o espaçamento entre eles para imitar diferentes tons emocionais de fala, sem priorizar eficiência de transmissão nem resistência a ruído.",
+      "O áudio gerado em todos os modos pode ser decodificado no app Android; para a experiência completa, baixe o APK Android em Releases. Se você gostar do FlipBits, deixe uma estrela em https://github.com/camellia2077/FlipBits.",
+    ],
+    "sample.addEmoji": "Add emoji",
+    inputTextLabel: "Texto de entrada",
+    inputPlaceholder: "ex.: github",
+    inputHintByMode: {
+      mini: "Somente ASCII. Suporta A-Z, 0-9, pontuação Morse comum e space / tab / CR / LF.",
+      flash: "Aceita qualquer texto.",
+      pro: "Somente entrada ASCII.",
+      ultra: "Aceita texto UTF-8.",
+    },
+    modeLabel: "Mode",
+    "mode.summaryTitle": "Mode Overview",
+    flashStyleLabel: "Flash Style",
+    miniSpeedLabel: "Morse Speed",
+    generateButton: "Gerar áudio",
+    downloadLink: "Baixar WAV",
+    progressLabel: "Progresso",
+    progressPhase: {
+      preparing: "Preparando entrada",
+      rendering: "Gerando PCM",
+      postprocessing: "Pós-processando",
+      finalizing: "Finalizando",
+    },
+    "result.summaryTitle": "Resumo do resultado",
+    "result.mode": "Mode",
+    "result.profile": "Perfil",
+    "result.duration": "Duração",
+    "result.sampleRate": "Taxa de amostragem",
+    "loading.pending": "Aguardando o codificador WebAssembly.",
+    "loading.ready": "Codificador WebAssembly carregado. Pronto para gerar áudio.",
+    "loading.missing": "O módulo WASM ainda não está pronto. Execute primeiro python apps/audio_web/tools/build_wasm.py para gerar os artefatos em site/wasm/.",
+    "validation.emptyText": "Digite um texto.",
+    "validation.missingExport": "O módulo WASM foi carregado, mas encodeTextToPcm16(...) ainda não foi exportado.",
+    "validation.miniAsciiOnly": "O modo mini aceita apenas texto ASCII; os caracteres não ASCII foram removidos.",
+    "encoding.inProgress": "Gerando áudio...",
+    "encoding.success": ({ sampleCount }) => `Concluído. ${sampleCount} amostras PCM geradas.`,
+    "encoding.failure": ({ message }) => `Falha na geração: ${message}`,
+};
+
+

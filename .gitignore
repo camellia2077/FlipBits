@@ -71,3 +71,9 @@ desktop.ini
 **/.idea/modules.xml
 **/.idea/navEditor.xml
 **/.idea/assetWizardSettings.xml
+
+# Web demo build outputs
+/apps/audio_web/site/wasm/flipbits_web_runtime.js
+/apps/audio_web/site/wasm/flipbits_web_runtime.wasm
+/apps/audio_web/site/wasm/flipbits_web_runtime.wasm.map
+/apps/audio_web/site/wasm/flipbits_web_runtime.worker.js
