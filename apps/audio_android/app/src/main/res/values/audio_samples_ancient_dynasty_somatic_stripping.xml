@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_ancient_dynasty_themed_alloy_hand_no_warmth">Immortal alloy closes; thermal signatures remain null</string>
-    <string name="audio_sample_ancient_dynasty_themed_soul_lost_in_emerald_light">We entered the conversion vaults sick, ephemeral, and afraid, promising ourselves that death would be the only thing surrendered. The abyssal idols smiled with mouths made for hunger. Flesh vanished into emerald annihilation, nerves became a command lattice, and the first flawless alloy hand rose without feeling heat or cold. We had defeated the grave. Only then did we learn that victory had no breath, no tears, and no soul left to mourn.</string>
+    
+    <string name="audio_sample_ancient_dynasty_themed_short_alloy_hand_no_warmth">Immortal alloy closes; thermal signatures remain null</string>
+    <string name="audio_sample_ancient_dynasty_themed_long_soul_lost_in_emerald_light">We entered the conversion vaults sick, ephemeral, and afraid, promising ourselves that death would be the only thing surrendered. The abyssal idols smiled with mouths made for hunger. Flesh vanished into emerald annihilation, nerves became a command lattice, and the first flawless alloy hand rose without feeling heat or cold. We had defeated the grave. Only then did we learn that victory had no breath, no tears, and no soul left to mourn.</string>
 </resources>

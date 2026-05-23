@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_immortal_rot_themed_fever_shared_as_bread">Come closer. The fever is warm enough for us all.</string>
-    <string name="audio_sample_immortal_rot_themed_kind_contagion_gathers_family">The smiling caretaker anointed each captive brow with golden pus, bidding them welcome. Around him, the sick embraced, coughing red into one another\'s sleeves and laughing through cracked blisters—for no one had to shiver alone anymore. Even the gentle dead carried new arrivals carefully through the marsh. To loving ears, their cries sounded like joy finally finding a home.</string>
+    
+    <string name="audio_sample_immortal_rot_themed_short_fever_shared_as_bread">Come closer. The fever is warm enough for us all.</string>
+    <string name="audio_sample_immortal_rot_themed_long_kind_contagion_gathers_family">The smiling caretaker anointed each captive brow with golden pus, bidding them welcome. Around him, the sick embraced, coughing red into one another\'s sleeves and laughing through cracked blisters—for no one had to shiver alone anymore. Even the gentle dead carried new arrivals carefully through the marsh. To loving ears, their cries sounded like joy finally finding a home.</string>
 </resources>

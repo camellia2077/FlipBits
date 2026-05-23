@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_sacred_machine_themed_serials_from_red_steel">Ferrum rubrum codicem serialem accipit sub malleo gravi.</string>
-    <string name="audio_sample_sacred_machine_themed_endless_quota_chronicle">Chronicon fornacis diem consignat quo turres fumi horizontem deleverunt et chalybs liquescens per pavimentum velut canales rubri cucurrit. Mallei hydraulici nominibus clarius locuti sunt, eadem numerorum signa in laminas imprimendo quae manus ipsas superaturae erant. Tres operarii catenati calori ceciderunt et ante evanidam campanae quotae resonantiam substituti sunt. Caro defecit, linea perstitit, productio vero quasi monumentum contra vacuum ascendit.</string>
+    <string name="audio_sample_sacred_machine_themed_short_serials_from_red_steel">Ferrum rubrum codicem serialem accipit sub malleo gravi.</string>
+    <string name="audio_sample_sacred_machine_themed_long_endless_quota_chronicle">Chronicon fornacis diem consignat quo turres fumi horizontem deleverunt et chalybs liquescens per pavimentum velut canales rubri cucurrit. Mallei hydraulici nominibus clarius locuti sunt, eadem numerorum signa in laminas imprimendo quae manus ipsas superaturae erant. Tres operarii catenati calori ceciderunt et ante evanidam campanae quotae resonantiam substituti sunt. Caro defecit, linea perstitit, productio vero quasi monumentum contra vacuum ascendit.</string>
 </resources>

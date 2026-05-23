@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_sacred_machine_themed_source_matrix_recovered">Matrix integra originis sub saeculorum pulvere reperitur.</string>
-    <string name="audio_sample_sacred_machine_themed_ancient_database_pilgrimage">Classis peregrina derelictum in frigore exterioris tenebrarum invenit. Sub saeculis pulveris intacti discus datorum adhuc unam viam incorruptam ad archivum antiquum servabat. Decryptio per singula signa luminosa progrediebatur, et turma pontis lacrimavit cum matrix fontis perfecta responderet. Sex naves in transitu perierant; glossa marginalis pretium modicum iudicavit.</string>
+    <string name="audio_sample_sacred_machine_themed_short_source_matrix_recovered">Matrix integra originis sub saeculorum pulvere reperitur.</string>
+    <string name="audio_sample_sacred_machine_themed_long_ancient_database_pilgrimage">Classis peregrina derelictum in frigore exterioris tenebrarum invenit. Sub saeculis pulveris intacti discus datorum adhuc unam viam incorruptam ad archivum antiquum servabat. Decryptio per singula signa luminosa progrediebatur, et turma pontis lacrimavit cum matrix fontis perfecta responderet. Sex naves in transitu perierant; glossa marginalis pretium modicum iudicavit.</string>
 </resources>

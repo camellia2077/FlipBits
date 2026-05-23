@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_exquisite_fall_themed_crown_too_heavy">Tantum ego existo; mundus est umbra mea</string>
-    <string name="audio_sample_exquisite_fall_themed_dream_throne_commands_all">Aula decem milium faucibus respondet; subditi atque hostes in ordinibus geminis genibus subsidunt, et thronus ex calvariis rivalium, ferro confracto, laude sine fine surgit. Quodcumque imperatur, lex efficitur antequam echo moriatur. Realitas foris lacerata ac supplex exspectat; cur illi servias, si somnium ipsum immaculate regnat? Corona gravis est, quia pretium eius humilitas fuit, atque illud pretium hilariter persolutum est.</string>
+    <string name="audio_sample_exquisite_fall_themed_short_crown_too_heavy">Tantum ego existo; mundus est umbra mea</string>
+    <string name="audio_sample_exquisite_fall_themed_long_dream_throne_commands_all">Aula decem milium faucibus respondet; subditi atque hostes in ordinibus geminis genibus subsidunt, et thronus ex calvariis rivalium, ferro confracto, laude sine fine surgit. Quodcumque imperatur, lex efficitur antequam echo moriatur. Realitas foris lacerata ac supplex exspectat; cur illi servias, si somnium ipsum immaculate regnat? Corona gravis est, quia pretium eius humilitas fuit, atque illud pretium hilariter persolutum est.</string>
 </resources>

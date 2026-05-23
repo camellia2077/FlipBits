@@ -15,6 +15,17 @@ Tool definition for commands and JSON contracts lives in [tools/repo_tooling/and
 
 ## Process
 
+Before editing or adding sample resources, keep the resource key contract stable:
+
+- key format: `audio_sample_<flavor>_<family>_<length>_<slug>`
+- `length`: `short | long`
+- `family`:
+  - `themed` for `flash` / `ultra` themed prose
+  - `ascii` for `pro` / `mini` shared ASCII prose
+- `short/long` is explicit data and must not be inferred from XML order
+- Android sample catalog and `apps/audio_web/tools/export_sample_texts.py`
+  both depend on this contract
+
 1. Identify the sample XML file, such as `audio_samples_sacred_machine_*.xml`.
 2. Run `key-alignment` when localized keys may be missing:
 

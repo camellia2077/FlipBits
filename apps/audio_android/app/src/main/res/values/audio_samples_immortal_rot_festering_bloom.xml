@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_immortal_rot_themed_mushrooms_from_empty_eyes">From empty eyes, bright mushrooms sprout like a grateful spring</string>
-    <string name="audio_sample_immortal_rot_themed_harvest_beneath_the_flowers">How generous the fallen field has become. Yellow-green spores roll through the mist, fat white grubs turn the soil, and the great slime mold beats softly under the blossoms like a borrowed heart. Beneath the sweet flowers lie the old bodies, no longer wasted, no longer alone. Every rib is a cradle, every wound a seedbed, and every quiet soldier a banquet for a million smaller lives.</string>
+    
+    <string name="audio_sample_immortal_rot_themed_short_mushrooms_from_empty_eyes">From empty eyes, bright mushrooms sprout like a grateful spring</string>
+    <string name="audio_sample_immortal_rot_themed_long_harvest_beneath_the_flowers">How generous the fallen field has become. Yellow-green spores roll through the mist, fat white grubs turn the soil, and the great slime mold beats softly under the blossoms like a borrowed heart. Beneath the sweet flowers lie the old bodies, no longer wasted, no longer alone. Every rib is a cradle, every wound a seedbed, and every quiet soldier a banquet for a million smaller lives.</string>
 </resources>

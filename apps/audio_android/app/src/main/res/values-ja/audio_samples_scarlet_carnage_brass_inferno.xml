@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_scarlet_carnage_themed_brass_gears_drink_blood">黄銅の歯車が軋む。赤き供物を油として。</string>
-    <string name="audio_sample_scarlet_carnage_themed_war_engine_eats_the_sky">平和とは、槌と槌の間に漏れる腐った息でしかない。灰に覆われた地殻では、黄銅の飢えが血の河をかき回す。鉄の軍団が行進し、世界を平らに踏み砕く。巨大な機械は鋼を骨髄へ、肉を金属へと接合する。煤の柱は赤い天空が星を忘れるほどに高く昇る。それに命令を下せるほど高い玉座はなく、見逃されるほど小さな魂もない。戦争機械はその両方を刈り取るのだ。</string>
-    <string name="audio_sample_scarlet_carnage_themed_furnace_never_sleeps">殺戮の炉が冷めることはない。その炎は倒れし者の残骸をくべて焚き付けられ、新たな殺戮の武器を鍛え上げるべく永遠に燃え続ける。</string>
-    <string name="audio_sample_scarlet_carnage_themed_eternal_conflict_fuel">世界は煤の墓所であり、黒煙の帳に首を絞められている。重歩兵が果てしない波のように行進し、鋼のブーツで大地を粉砕する。巨大な機械は、倒れし者の血を油として駆動し続ける。征服などなく、あるのはただ戦役のみ。宇宙の歯車は闘争という供物を要求し、我々はその炎を燃やすための石炭にすぎない。</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_brass_gears_drink_blood">黄銅の歯車が軋む。赤き供物を油として。</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_war_engine_eats_the_sky">平和とは、槌と槌の間に漏れる腐った息でしかない。灰に覆われた地殻では、黄銅の飢えが血の河をかき回す。鉄の軍団が行進し、世界を平らに踏み砕く。巨大な機械は鋼を骨髄へ、肉を金属へと接合する。煤の柱は赤い天空が星を忘れるほどに高く昇る。それに命令を下せるほど高い玉座はなく、見逃されるほど小さな魂もない。戦争機械はその両方を刈り取るのだ。</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_furnace_never_sleeps">殺戮の炉が冷めることはない。その炎は倒れし者の残骸をくべて焚き付けられ、新たな殺戮の武器を鍛え上げるべく永遠に燃え続ける。</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_eternal_conflict_fuel">世界は煤の墓所であり、黒煙の帳に首を絞められている。重歩兵が果てしない波のように行進し、鋼のブーツで大地を粉砕する。巨大な機械は、倒れし者の血を油として駆動し続ける。征服などなく、あるのはただ戦役のみ。宇宙の歯車は闘争という供物を要求し、我々はその炎を燃やすための石炭にすぎない。</string>
 </resources>

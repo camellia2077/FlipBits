@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_scarlet_carnage_themed_red_mist_bites_back">Augen platzen. Blut kocht. Kiefer reißen.</string>
-    <string name="audio_sample_scarlet_carnage_themed_reason_breaks_blood_runs">Kein Denken. Keine Pause. Die Kehle reißt auf und brüllt trotzdem weiter. Ketten schweißen die Klinge ans Handgelenk. Blut dampft in einem roten Nebel. Ein Arm ist abgetrennt. Dem Körper ist es gleich. Er stürzt sich nach vorn. Er beißt. Er schmeckt Eisen. Vernunft war ein Käfig. Wut ist der Schlüssel. Spreng ihn auf. Schlag zu. Spalte. Zerfleische.</string>
-    <string name="audio_sample_scarlet_carnage_themed_iron_tastes_sweet">Eisen schmeckt süß. Die rostige Kette singt. Jeder Hieb wird zum Chor des Untergangs, der sich durch Rüstung und Fleisch frisst, bis nur noch roter Nebel bleibt.</string>
-    <string name="audio_sample_scarlet_carnage_themed_pure_rage_burns">Die Stimmbänder reißen vom Brüllen. Der Ton bricht nicht ab. Eine schwere Klinge ist ans Handgelenk geschweißt. Sie bleibt, selbst im Tod. Haut verbrennt. Blut wird zu Nebel. Denken heißt zögern. Zögern heißt sterben. Der Käfig der Vernunft zersplittert. Nur die Wut bleibt. Zerstöre. Vernichte. Zerbrich sie alle.</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_red_mist_bites_back">Augen platzen. Blut kocht. Kiefer reißen.</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_reason_breaks_blood_runs">Kein Denken. Keine Pause. Die Kehle reißt auf und brüllt trotzdem weiter. Ketten schweißen die Klinge ans Handgelenk. Blut dampft in einem roten Nebel. Ein Arm ist abgetrennt. Dem Körper ist es gleich. Er stürzt sich nach vorn. Er beißt. Er schmeckt Eisen. Vernunft war ein Käfig. Wut ist der Schlüssel. Spreng ihn auf. Schlag zu. Spalte. Zerfleische.</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_iron_tastes_sweet">Eisen schmeckt süß. Die rostige Kette singt. Jeder Hieb wird zum Chor des Untergangs, der sich durch Rüstung und Fleisch frisst, bis nur noch roter Nebel bleibt.</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_pure_rage_burns">Die Stimmbänder reißen vom Brüllen. Der Ton bricht nicht ab. Eine schwere Klinge ist ans Handgelenk geschweißt. Sie bleibt, selbst im Tod. Haut verbrennt. Blut wird zu Nebel. Denken heißt zögern. Zögern heißt sterben. Der Käfig der Vernunft zersplittert. Nur die Wut bleibt. Zerstöre. Vernichte. Zerbrich sie alle.</string>
 </resources>

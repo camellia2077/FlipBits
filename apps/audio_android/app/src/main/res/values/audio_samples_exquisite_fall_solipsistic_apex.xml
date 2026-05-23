@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_exquisite_fall_themed_crown_too_heavy">The crown breaks the neck, yet the ruler smiles beneath its weight.</string>
-    <string name="audio_sample_exquisite_fall_themed_dream_throne_commands_all">The hall answers with ten thousand throats. Subjects and enemies kneel in identical rows, and the throne rises from rival skulls, shattered steel, and endless praise. Every command becomes law before its echo dies. Reality waits outside, torn and pleading, but why serve it when the dream is flawless? The crown is heavy because humility was its price, and that price was gladly paid.</string>
+    
+    <string name="audio_sample_exquisite_fall_themed_short_crown_too_heavy">The crown breaks the neck, yet the ruler smiles beneath its weight.</string>
+    <string name="audio_sample_exquisite_fall_themed_long_dream_throne_commands_all">The hall answers with ten thousand throats. Subjects and enemies kneel in identical rows, and the throne rises from rival skulls, shattered steel, and endless praise. Every command becomes law before its echo dies. Reality waits outside, torn and pleading, but why serve it when the dream is flawless? The crown is heavy because humility was its price, and that price was gladly paid.</string>
 </resources>

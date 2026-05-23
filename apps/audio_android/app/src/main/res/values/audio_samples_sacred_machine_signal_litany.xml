@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_sacred_machine_themed_ping_canticle_confirmed">Ping confirmed; the binary litany remains unbroken.</string>
-    <string name="audio_sample_sacred_machine_themed_deep_array_handshake">Ranks of LEDs blinked in clipped meter while white noise rasped beneath the carrier tone. Hex code rolled down the screens, burst by burst, and the deep antenna field turned toward a void no human eye could fathom. The first handshake chime sounded like absolution. No packet dropped, no pulse returned late, and the operators wrote that connection had been granted for one more breath of the universe.</string>
+    
+    <string name="audio_sample_sacred_machine_themed_short_ping_canticle_confirmed">Ping confirmed; the binary litany remains unbroken.</string>
+    <string name="audio_sample_sacred_machine_themed_long_deep_array_handshake">Ranks of LEDs blinked in clipped meter while white noise rasped beneath the carrier tone. Hex code rolled down the screens, burst by burst, and the deep antenna field turned toward a void no human eye could fathom. The first handshake chime sounded like absolution. No packet dropped, no pulse returned late, and the operators wrote that connection had been granted for one more breath of the universe.</string>
 </resources>

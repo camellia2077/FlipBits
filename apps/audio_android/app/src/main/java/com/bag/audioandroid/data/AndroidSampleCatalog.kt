@@ -8,10 +8,14 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 
 internal data class AndroidSampleCatalogEntry(
     val id: String,
+    val length: SampleInputLengthOption,
     @param:StringRes val resId: Int,
 )
 
 internal object AndroidSampleCatalog {
+    // Sample resources follow the explicit key contract
+    // audio_sample_<flavor>_<family>_<length>_<slug>.
+    // `length` is modeled here as data and must not be inferred from XML order.
     // Keep the static sample catalog separate from the runtime provider so
     // content growth does not obscure selection and localization behavior.
     fun sampleEntries(
@@ -47,10 +51,11 @@ internal object AndroidSampleCatalog {
     ): List<AndroidSampleCatalogEntry> =
         CatalogDefinitions.ancientDynastySampleCatalog
             .asSequence()
-            .filter { definition -> length == null || length in definition.allowedLengths }
+            .filter { definition -> length == null || length == definition.length }
             .map { definition ->
                 AndroidSampleCatalogEntry(
                     id = definition.id,
+                    length = definition.length,
                     resId = definition.resIdFor(mode),
                 )
             }.toList()
@@ -61,10 +66,11 @@ internal object AndroidSampleCatalog {
     ): List<AndroidSampleCatalogEntry> =
         CatalogDefinitions.sacredMachineSampleCatalog
             .asSequence()
-            .filter { definition -> length == null || length in definition.allowedLengths }
+            .filter { definition -> length == null || length == definition.length }
             .map { definition ->
                 AndroidSampleCatalogEntry(
                     id = definition.id,
+                    length = definition.length,
                     resId = definition.resIdFor(mode),
                 )
             }.toList()
@@ -75,10 +81,11 @@ internal object AndroidSampleCatalog {
     ): List<AndroidSampleCatalogEntry> =
         CatalogDefinitions.immortalRotSampleCatalog
             .asSequence()
-            .filter { definition -> length == null || length in definition.allowedLengths }
+            .filter { definition -> length == null || length == definition.length }
             .map { definition ->
                 AndroidSampleCatalogEntry(
                     id = definition.id,
+                    length = definition.length,
                     resId = definition.resIdFor(mode),
                 )
             }.toList()
@@ -89,10 +96,11 @@ internal object AndroidSampleCatalog {
     ): List<AndroidSampleCatalogEntry> =
         CatalogDefinitions.scarletCarnageSampleCatalog
             .asSequence()
-            .filter { definition -> length == null || length in definition.allowedLengths }
+            .filter { definition -> length == null || length == definition.length }
             .map { definition ->
                 AndroidSampleCatalogEntry(
                     id = definition.id,
+                    length = definition.length,
                     resId = definition.resIdFor(mode),
                 )
             }.toList()
@@ -103,10 +111,11 @@ internal object AndroidSampleCatalog {
     ): List<AndroidSampleCatalogEntry> =
         CatalogDefinitions.exquisiteFallSampleCatalog
             .asSequence()
-            .filter { definition -> length == null || length in definition.allowedLengths }
+            .filter { definition -> length == null || length == definition.length }
             .map { definition ->
                 AndroidSampleCatalogEntry(
                     id = definition.id,
+                    length = definition.length,
                     resId = definition.resIdFor(mode),
                 )
             }.toList()
@@ -117,10 +126,11 @@ internal object AndroidSampleCatalog {
     ): List<AndroidSampleCatalogEntry> =
         CatalogDefinitions.labyrinthOfMutabilitySampleCatalog
             .asSequence()
-            .filter { definition -> length == null || length in definition.allowedLengths }
+            .filter { definition -> length == null || length == definition.length }
             .map { definition ->
                 AndroidSampleCatalogEntry(
                     id = definition.id,
+                    length = definition.length,
                     resId = definition.resIdFor(mode),
                 )
             }.toList()
@@ -177,10 +187,10 @@ internal object AndroidSampleCatalog {
     private data class SacredMachineSampleDefinition(
         val id: String,
         val themeCategory: SacredMachineThemeCategory,
-        val allowedLengths: Set<SampleInputLengthOption>,
+        val length: SampleInputLengthOption,
         @param:StringRes val themedResId: Int,
-        // Pro samples now resolve through the shared audio_samples_pro_ascii_shared.xml
-        // baseline, so the ASCII resource name is no longer tied to a localized theme file.
+        // Pro/Mini samples resolve through the shared ASCII baseline and keep the
+        // same explicit short/long semantics as the themed resource keys.
         @param:StringRes val asciiResId: Int,
     ) {
         fun resIdFor(mode: TransportModeOption): Int =
@@ -193,7 +203,7 @@ internal object AndroidSampleCatalog {
     private data class AncientDynastySampleDefinition(
         val id: String,
         val themeCategory: AncientDynastyThemeCategory,
-        val allowedLengths: Set<SampleInputLengthOption>,
+        val length: SampleInputLengthOption,
         @param:StringRes val themedResId: Int,
         @param:StringRes val asciiResId: Int,
     ) {
@@ -207,7 +217,7 @@ internal object AndroidSampleCatalog {
     private data class ImmortalRotSampleDefinition(
         val id: String,
         val themeCategory: ImmortalRotThemeCategory,
-        val allowedLengths: Set<SampleInputLengthOption>,
+        val length: SampleInputLengthOption,
         @param:StringRes val themedResId: Int,
         @param:StringRes val asciiResId: Int,
     ) {
@@ -221,7 +231,7 @@ internal object AndroidSampleCatalog {
     private data class ScarletCarnageSampleDefinition(
         val id: String,
         val themeCategory: ScarletCarnageThemeCategory,
-        val allowedLengths: Set<SampleInputLengthOption>,
+        val length: SampleInputLengthOption,
         @param:StringRes val themedResId: Int,
         @param:StringRes val asciiResId: Int,
     ) {
@@ -235,7 +245,7 @@ internal object AndroidSampleCatalog {
     private data class ExquisiteFallSampleDefinition(
         val id: String,
         val themeCategory: ExquisiteFallThemeCategory,
-        val allowedLengths: Set<SampleInputLengthOption>,
+        val length: SampleInputLengthOption,
         @param:StringRes val themedResId: Int,
         @param:StringRes val asciiResId: Int,
     ) {
@@ -249,7 +259,7 @@ internal object AndroidSampleCatalog {
     private data class LabyrinthOfMutabilitySampleDefinition(
         val id: String,
         val themeCategory: LabyrinthOfMutabilityThemeCategory,
-        val allowedLengths: Set<SampleInputLengthOption>,
+        val length: SampleInputLengthOption,
         @param:StringRes val themedResId: Int,
         @param:StringRes val asciiResId: Int,
     ) {
@@ -266,114 +276,114 @@ internal object AndroidSampleCatalog {
                 SacredMachineSampleDefinition(
                     id = "caliper_oil_rite",
                     themeCategory = SacredMachineThemeCategory.RiteOfMaintenance,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_caliper_oil_rite,
-                    asciiResId = R.string.audio_sample_pro_ascii_caliper_oil_rite,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_caliper_oil_rite,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_caliper_oil_rite,
                 ),
                 SacredMachineSampleDefinition(
                     id = "bolt_sequence_litany",
                     themeCategory = SacredMachineThemeCategory.RiteOfMaintenance,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_bolt_sequence_litany,
-                    asciiResId = R.string.audio_sample_pro_ascii_bolt_sequence_litany,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_bolt_sequence_litany,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_bolt_sequence_litany,
                 ),
                 SacredMachineSampleDefinition(
                     id = "plasma_matrix_wakes",
                     themeCategory = SacredMachineThemeCategory.EngineAwakening,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_plasma_matrix_wakes,
-                    asciiResId = R.string.audio_sample_pro_ascii_plasma_matrix_wakes,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_plasma_matrix_wakes,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_plasma_matrix_wakes,
                 ),
                 SacredMachineSampleDefinition(
                     id = "ancient_engine_grants_motion",
                     themeCategory = SacredMachineThemeCategory.EngineAwakening,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_ancient_engine_grants_motion,
-                    asciiResId = R.string.audio_sample_pro_ascii_ancient_engine_grants_motion,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_ancient_engine_grants_motion,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_ancient_engine_grants_motion,
                 ),
                 SacredMachineSampleDefinition(
                     id = "ping_canticle_confirmed",
                     themeCategory = SacredMachineThemeCategory.SignalLitany,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_ping_canticle_confirmed,
-                    asciiResId = R.string.audio_sample_pro_ascii_ping_canticle_confirmed,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_ping_canticle_confirmed,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_ping_canticle_confirmed,
                 ),
                 SacredMachineSampleDefinition(
                     id = "deep_array_handshake",
                     themeCategory = SacredMachineThemeCategory.SignalLitany,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_deep_array_handshake,
-                    asciiResId = R.string.audio_sample_pro_ascii_deep_array_handshake,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_deep_array_handshake,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_deep_array_handshake,
                 ),
                 SacredMachineSampleDefinition(
                     id = "serials_from_red_steel",
                     themeCategory = SacredMachineThemeCategory.ForgeChronicle,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_serials_from_red_steel,
-                    asciiResId = R.string.audio_sample_pro_ascii_serials_from_red_steel,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_serials_from_red_steel,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_serials_from_red_steel,
                 ),
                 SacredMachineSampleDefinition(
                     id = "endless_quota_chronicle",
                     themeCategory = SacredMachineThemeCategory.ForgeChronicle,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_endless_quota_chronicle,
-                    asciiResId = R.string.audio_sample_pro_ascii_endless_quota_chronicle,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_endless_quota_chronicle,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_endless_quota_chronicle,
                 ),
                 SacredMachineSampleDefinition(
                     id = "nerve_cut_ascension",
                     themeCategory = SacredMachineThemeCategory.FleshTranscendence,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_nerve_cut_ascension,
-                    asciiResId = R.string.audio_sample_pro_ascii_nerve_cut_ascension,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_nerve_cut_ascension,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_nerve_cut_ascension,
                 ),
                 SacredMachineSampleDefinition(
                     id = "chromium_spine_rite",
                     themeCategory = SacredMachineThemeCategory.FleshTranscendence,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_chromium_spine_rite,
-                    asciiResId = R.string.audio_sample_pro_ascii_chromium_spine_rite,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_chromium_spine_rite,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_chromium_spine_rite,
                 ),
                 SacredMachineSampleDefinition(
                     id = "source_matrix_recovered",
                     themeCategory = SacredMachineThemeCategory.OriginPilgrimage,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_source_matrix_recovered,
-                    asciiResId = R.string.audio_sample_pro_ascii_source_matrix_recovered,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_source_matrix_recovered,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_source_matrix_recovered,
                 ),
                 SacredMachineSampleDefinition(
                     id = "ancient_database_pilgrimage",
                     themeCategory = SacredMachineThemeCategory.OriginPilgrimage,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_ancient_database_pilgrimage,
-                    asciiResId = R.string.audio_sample_pro_ascii_ancient_database_pilgrimage,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_ancient_database_pilgrimage,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_ancient_database_pilgrimage,
                 ),
                 SacredMachineSampleDefinition(
                     id = "unpowered_terminal_thinks",
                     themeCategory = SacredMachineThemeCategory.AbyssalQuarantine,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_unpowered_terminal_thinks,
-                    asciiResId = R.string.audio_sample_pro_ascii_unpowered_terminal_thinks,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_unpowered_terminal_thinks,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_unpowered_terminal_thinks,
                 ),
                 SacredMachineSampleDefinition(
                     id = "paradox_code_quarantine",
                     themeCategory = SacredMachineThemeCategory.AbyssalQuarantine,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_paradox_code_quarantine,
-                    asciiResId = R.string.audio_sample_pro_ascii_paradox_code_quarantine,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_paradox_code_quarantine,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_paradox_code_quarantine,
                 ),
                 SacredMachineSampleDefinition(
                     id = "kill_confirmed_equation",
                     themeCategory = SacredMachineThemeCategory.PurgeCalculus,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_kill_confirmed_equation,
-                    asciiResId = R.string.audio_sample_pro_ascii_kill_confirmed_equation,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_short_kill_confirmed_equation,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_kill_confirmed_equation,
                 ),
                 SacredMachineSampleDefinition(
                     id = "ballistic_debug_grid",
                     themeCategory = SacredMachineThemeCategory.PurgeCalculus,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_sacred_machine_themed_ballistic_debug_grid,
-                    asciiResId = R.string.audio_sample_pro_ascii_ballistic_debug_grid,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_sacred_machine_themed_long_ballistic_debug_grid,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_ballistic_debug_grid,
                 ),
             )
 
@@ -382,72 +392,72 @@ internal object AndroidSampleCatalog {
                 AncientDynastySampleDefinition(
                     id = "alloy_hand_no_warmth",
                     themeCategory = AncientDynastyThemeCategory.SomaticStripping,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_alloy_hand_no_warmth,
-                    asciiResId = R.string.audio_sample_pro_ascii_alloy_hand_no_warmth,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_short_alloy_hand_no_warmth,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_alloy_hand_no_warmth,
                 ),
                 AncientDynastySampleDefinition(
                     id = "soul_lost_in_emerald_light",
                     themeCategory = AncientDynastyThemeCategory.SomaticStripping,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_soul_lost_in_emerald_light,
-                    asciiResId = R.string.audio_sample_pro_ascii_soul_lost_in_emerald_light,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_long_soul_lost_in_emerald_light,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_soul_lost_in_emerald_light,
                 ),
                 AncientDynastySampleDefinition(
                     id = "aeonic_ash_stirs",
                     themeCategory = AncientDynastyThemeCategory.AeonicSleepAwakening,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_aeonic_ash_stirs,
-                    asciiResId = R.string.audio_sample_pro_ascii_aeonic_ash_stirs,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_short_aeonic_ash_stirs,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_aeonic_ash_stirs,
                 ),
                 AncientDynastySampleDefinition(
                     id = "obsidian_obelisks_rise",
                     themeCategory = AncientDynastyThemeCategory.AeonicSleepAwakening,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_obsidian_obelisks_rise,
-                    asciiResId = R.string.audio_sample_pro_ascii_obsidian_obelisks_rise,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_long_obsidian_obelisks_rise,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_obsidian_obelisks_rise,
                 ),
                 AncientDynastySampleDefinition(
                     id = "molecular_law_unthreads_flesh",
                     themeCategory = AncientDynastyThemeCategory.AbsoluteMaterialism,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_molecular_law_unthreads_flesh,
-                    asciiResId = R.string.audio_sample_pro_ascii_molecular_law_unthreads_flesh,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_short_molecular_law_unthreads_flesh,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_molecular_law_unthreads_flesh,
                 ),
                 AncientDynastySampleDefinition(
                     id = "false_gods_reduced_to_batteries",
                     themeCategory = AncientDynastyThemeCategory.AbsoluteMaterialism,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_false_gods_reduced_to_batteries,
-                    asciiResId = R.string.audio_sample_pro_ascii_false_gods_reduced_to_batteries,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_long_false_gods_reduced_to_batteries,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_false_gods_reduced_to_batteries,
                 ),
                 AncientDynastySampleDefinition(
                     id = "rusted_throne_bad_memory",
                     themeCategory = AncientDynastyThemeCategory.MindDecayAristocracy,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_rusted_throne_bad_memory,
-                    asciiResId = R.string.audio_sample_pro_ascii_rusted_throne_bad_memory,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_short_rusted_throne_bad_memory,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_rusted_throne_bad_memory,
                 ),
                 AncientDynastySampleDefinition(
                     id = "court_debates_dead_realm",
                     themeCategory = AncientDynastyThemeCategory.MindDecayAristocracy,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_court_debates_dead_realm,
-                    asciiResId = R.string.audio_sample_pro_ascii_court_debates_dead_realm,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_long_court_debates_dead_realm,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_court_debates_dead_realm,
                 ),
                 AncientDynastySampleDefinition(
                     id = "red_eyes_wear_skin",
                     themeCategory = AncientDynastyThemeCategory.CurseExtremeAlienation,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_red_eyes_wear_skin,
-                    asciiResId = R.string.audio_sample_pro_ascii_red_eyes_wear_skin,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_short_red_eyes_wear_skin,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_red_eyes_wear_skin,
                 ),
                 AncientDynastySampleDefinition(
                     id = "extinction_logic_harvests_life",
                     themeCategory = AncientDynastyThemeCategory.CurseExtremeAlienation,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_ancient_dynasty_themed_extinction_logic_harvests_life,
-                    asciiResId = R.string.audio_sample_pro_ascii_extinction_logic_harvests_life,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_ancient_dynasty_themed_long_extinction_logic_harvests_life,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_extinction_logic_harvests_life,
                 ),
             )
 
@@ -456,58 +466,58 @@ internal object AndroidSampleCatalog {
                 ImmortalRotSampleDefinition(
                     id = "mushrooms_from_empty_eyes",
                     themeCategory = ImmortalRotThemeCategory.FesteringBloom,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_mushrooms_from_empty_eyes,
-                    asciiResId = R.string.audio_sample_pro_ascii_mushrooms_from_empty_eyes,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_short_mushrooms_from_empty_eyes,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_mushrooms_from_empty_eyes,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "harvest_beneath_the_flowers",
                     themeCategory = ImmortalRotThemeCategory.FesteringBloom,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_harvest_beneath_the_flowers,
-                    asciiResId = R.string.audio_sample_pro_ascii_harvest_beneath_the_flowers,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_long_harvest_beneath_the_flowers,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_harvest_beneath_the_flowers,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "fever_shared_as_bread",
                     themeCategory = ImmortalRotThemeCategory.BenevolentContagion,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_fever_shared_as_bread,
-                    asciiResId = R.string.audio_sample_pro_ascii_fever_shared_as_bread,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_short_fever_shared_as_bread,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_fever_shared_as_bread,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "kind_contagion_gathers_family",
                     themeCategory = ImmortalRotThemeCategory.BenevolentContagion,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_kind_contagion_gathers_family,
-                    asciiResId = R.string.audio_sample_pro_ascii_kind_contagion_gathers_family,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_long_kind_contagion_gathers_family,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_kind_contagion_gathers_family,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "warm_mire_stillness",
                     themeCategory = ImmortalRotThemeCategory.LethargicEmbrace,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_warm_mire_stillness,
-                    asciiResId = R.string.audio_sample_pro_ascii_warm_mire_stillness,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_short_warm_mire_stillness,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_warm_mire_stillness,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "shield_sinks_from_hand",
                     themeCategory = ImmortalRotThemeCategory.LethargicEmbrace,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_shield_sinks_from_hand,
-                    asciiResId = R.string.audio_sample_pro_ascii_shield_sinks_from_hand,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_long_shield_sinks_from_hand,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_shield_sinks_from_hand,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "rust_bell_in_fog",
                     themeCategory = ImmortalRotThemeCategory.EntropicChime,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_rust_bell_in_fog,
-                    asciiResId = R.string.audio_sample_pro_ascii_rust_bell_in_fog,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_short_rust_bell_in_fog,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_rust_bell_in_fog,
                 ),
                 ImmortalRotSampleDefinition(
                     id = "patient_rain_takes_the_wall",
                     themeCategory = ImmortalRotThemeCategory.EntropicChime,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_immortal_rot_themed_patient_rain_takes_the_wall,
-                    asciiResId = R.string.audio_sample_pro_ascii_patient_rain_takes_the_wall,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_immortal_rot_themed_long_patient_rain_takes_the_wall,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_patient_rain_takes_the_wall,
                 ),
             )
 
@@ -516,58 +526,58 @@ internal object AndroidSampleCatalog {
                 ScarletCarnageSampleDefinition(
                     id = "red_mist_bites_back",
                     themeCategory = ScarletCarnageThemeCategory.CrimsonFrenzy,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_red_mist_bites_back,
-                    asciiResId = R.string.audio_sample_pro_ascii_red_mist_bites_back,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_short_red_mist_bites_back,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_red_mist_bites_back,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "reason_breaks_blood_runs",
                     themeCategory = ScarletCarnageThemeCategory.CrimsonFrenzy,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_reason_breaks_blood_runs,
-                    asciiResId = R.string.audio_sample_pro_ascii_reason_breaks_blood_runs,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_long_reason_breaks_blood_runs,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_reason_breaks_blood_runs,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "skull_step_receives",
                     themeCategory = ScarletCarnageThemeCategory.OssuaryTribute,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_skull_step_receives,
-                    asciiResId = R.string.audio_sample_pro_ascii_skull_step_receives,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_short_skull_step_receives,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_skull_step_receives,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "red_river_pays_the_stair",
                     themeCategory = ScarletCarnageThemeCategory.OssuaryTribute,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_red_river_pays_the_stair,
-                    asciiResId = R.string.audio_sample_pro_ascii_red_river_pays_the_stair,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_long_red_river_pays_the_stair,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_red_river_pays_the_stair,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "black_iron_answers_magic",
                     themeCategory = ScarletCarnageThemeCategory.IronCredo,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_black_iron_answers_magic,
-                    asciiResId = R.string.audio_sample_pro_ascii_black_iron_answers_magic,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_short_black_iron_answers_magic,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_black_iron_answers_magic,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "face_to_face_truth",
                     themeCategory = ScarletCarnageThemeCategory.IronCredo,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_face_to_face_truth,
-                    asciiResId = R.string.audio_sample_pro_ascii_face_to_face_truth,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_long_face_to_face_truth,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_face_to_face_truth,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "brass_gears_drink_blood",
                     themeCategory = ScarletCarnageThemeCategory.BrassInferno,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_brass_gears_drink_blood,
-                    asciiResId = R.string.audio_sample_pro_ascii_brass_gears_drink_blood,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_short_brass_gears_drink_blood,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_brass_gears_drink_blood,
                 ),
                 ScarletCarnageSampleDefinition(
                     id = "war_engine_eats_the_sky",
                     themeCategory = ScarletCarnageThemeCategory.BrassInferno,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_scarlet_carnage_themed_war_engine_eats_the_sky,
-                    asciiResId = R.string.audio_sample_pro_ascii_war_engine_eats_the_sky,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_scarlet_carnage_themed_long_war_engine_eats_the_sky,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_war_engine_eats_the_sky,
                 ),
             )
 
@@ -576,86 +586,86 @@ internal object AndroidSampleCatalog {
                 ExquisiteFallSampleDefinition(
                     id = "gold_dust_inhaled",
                     themeCategory = ExquisiteFallThemeCategory.TrapOfAccumulation,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_gold_dust_inhaled,
-                    asciiResId = R.string.audio_sample_pro_ascii_gold_dust_inhaled,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_short_gold_dust_inhaled,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_gold_dust_inhaled,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "vault_without_enough",
                     themeCategory = ExquisiteFallThemeCategory.TrapOfAccumulation,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_vault_without_enough,
-                    asciiResId = R.string.audio_sample_pro_ascii_vault_without_enough,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_long_vault_without_enough,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_vault_without_enough,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "sweet_meat_never_ends",
                     themeCategory = ExquisiteFallThemeCategory.VoidOfConsumption,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_sweet_meat_never_ends,
-                    asciiResId = R.string.audio_sample_pro_ascii_sweet_meat_never_ends,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_short_sweet_meat_never_ends,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_sweet_meat_never_ends,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "banquet_eats_the_tongue",
                     themeCategory = ExquisiteFallThemeCategory.VoidOfConsumption,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_banquet_eats_the_tongue,
-                    asciiResId = R.string.audio_sample_pro_ascii_banquet_eats_the_tongue,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_long_banquet_eats_the_tongue,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_banquet_eats_the_tongue,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "velvet_barbs_kiss",
                     themeCategory = ExquisiteFallThemeCategory.DissolutionOfEgo,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_velvet_barbs_kiss,
-                    asciiResId = R.string.audio_sample_pro_ascii_velvet_barbs_kiss,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_short_velvet_barbs_kiss,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_velvet_barbs_kiss,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "self_dissolves_in_touch",
                     themeCategory = ExquisiteFallThemeCategory.DissolutionOfEgo,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_self_dissolves_in_touch,
-                    asciiResId = R.string.audio_sample_pro_ascii_self_dissolves_in_touch,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_long_self_dissolves_in_touch,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_self_dissolves_in_touch,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "crown_too_heavy",
                     themeCategory = ExquisiteFallThemeCategory.SolipsisticApex,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_crown_too_heavy,
-                    asciiResId = R.string.audio_sample_pro_ascii_crown_too_heavy,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_short_crown_too_heavy,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_crown_too_heavy,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "dream_throne_commands_all",
                     themeCategory = ExquisiteFallThemeCategory.SolipsisticApex,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_dream_throne_commands_all,
-                    asciiResId = R.string.audio_sample_pro_ascii_dream_throne_commands_all,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_long_dream_throne_commands_all,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_dream_throne_commands_all,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "mirror_keeps_perfection",
                     themeCategory = ExquisiteFallThemeCategory.TyrannyOfPerfection,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_mirror_keeps_perfection,
-                    asciiResId = R.string.audio_sample_pro_ascii_mirror_keeps_perfection,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_short_mirror_keeps_perfection,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_mirror_keeps_perfection,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "statue_of_self_praise",
                     themeCategory = ExquisiteFallThemeCategory.TyrannyOfPerfection,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_statue_of_self_praise,
-                    asciiResId = R.string.audio_sample_pro_ascii_statue_of_self_praise,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_long_statue_of_self_praise,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_statue_of_self_praise,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "soft_moss_says_enough",
                     themeCategory = ExquisiteFallThemeCategory.SeductionOfStandard,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_soft_moss_says_enough,
-                    asciiResId = R.string.audio_sample_pro_ascii_soft_moss_says_enough,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_short_soft_moss_says_enough,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_soft_moss_says_enough,
                 ),
                 ExquisiteFallSampleDefinition(
                     id = "lullaby_closes_the_eyes",
                     themeCategory = ExquisiteFallThemeCategory.SeductionOfStandard,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_exquisite_fall_themed_lullaby_closes_the_eyes,
-                    asciiResId = R.string.audio_sample_pro_ascii_lullaby_closes_the_eyes,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_exquisite_fall_themed_long_lullaby_closes_the_eyes,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_lullaby_closes_the_eyes,
                 ),
             )
 
@@ -664,58 +674,58 @@ internal object AndroidSampleCatalog {
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "thread_pulls_the_hero",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.FractalConspiracy,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_thread_pulls_the_hero,
-                    asciiResId = R.string.audio_sample_pro_ascii_thread_pulls_the_hero,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_short_thread_pulls_the_hero,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_thread_pulls_the_hero,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "final_trap_needs_rebellion",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.FractalConspiracy,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_final_trap_needs_rebellion,
-                    asciiResId = R.string.audio_sample_pro_ascii_final_trap_needs_rebellion,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_long_final_trap_needs_rebellion,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_final_trap_needs_rebellion,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "cold_fire_folds_space",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.ParadoxArcanum,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_cold_fire_folds_space,
-                    asciiResId = R.string.audio_sample_pro_ascii_cold_fire_folds_space,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_short_cold_fire_folds_space,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_cold_fire_folds_space,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "laws_unwrite_themselves",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.ParadoxArcanum,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_laws_unwrite_themselves,
-                    asciiResId = R.string.audio_sample_pro_ascii_laws_unwrite_themselves,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_long_laws_unwrite_themselves,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_laws_unwrite_themselves,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "new_eye_blesses_spine",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.KaleidoscopeFlesh,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_new_eye_blesses_spine,
-                    asciiResId = R.string.audio_sample_pro_ascii_new_eye_blesses_spine,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_short_new_eye_blesses_spine,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_new_eye_blesses_spine,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "flesh_refuses_one_shape",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.KaleidoscopeFlesh,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_flesh_refuses_one_shape,
-                    asciiResId = R.string.audio_sample_pro_ascii_flesh_refuses_one_shape,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_long_flesh_refuses_one_shape,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_flesh_refuses_one_shape,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "library_bleeds_prophecy",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.AbyssalArchives,
-                    allowedLengths = setOf(SampleInputLengthOption.Short),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_library_bleeds_prophecy,
-                    asciiResId = R.string.audio_sample_pro_ascii_library_bleeds_prophecy,
+                    length = SampleInputLengthOption.Short,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_short_library_bleeds_prophecy,
+                    asciiResId = R.string.audio_sample_pro_ascii_short_library_bleeds_prophecy,
                 ),
                 LabyrinthOfMutabilitySampleDefinition(
                     id = "truth_crushes_the_seer",
                     themeCategory = LabyrinthOfMutabilityThemeCategory.AbyssalArchives,
-                    allowedLengths = setOf(SampleInputLengthOption.Long),
-                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_truth_crushes_the_seer,
-                    asciiResId = R.string.audio_sample_pro_ascii_truth_crushes_the_seer,
+                    length = SampleInputLengthOption.Long,
+                    themedResId = R.string.audio_sample_labyrinth_of_mutability_themed_long_truth_crushes_the_seer,
+                    asciiResId = R.string.audio_sample_pro_ascii_long_truth_crushes_the_seer,
                 ),
             )
     }

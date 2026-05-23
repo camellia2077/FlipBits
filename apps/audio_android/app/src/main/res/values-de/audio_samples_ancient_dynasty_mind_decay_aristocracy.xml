@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_ancient_dynasty_themed_rusted_throne_bad_memory">Der von Entropie gezeichnete Thron empfängt ein weiteres Dekret aus zersplitterter Erinnerung.</string>
-    <string name="audio_sample_ancient_dynasty_themed_court_debates_dead_realm">Skelettartige Metallphalanxen stehen stumm, während die Adligen über eine Grenze streiten, die schon vor dem Äonenschlaf verschwunden ist. Legierungsmäntel hängen prächtig und starr an Körpern, die ihr Gewicht nicht mehr spüren. Der Herrscher wiederholt einen Ehrentitel für einen Höfling, dessen Ich bei der Übertragung ausgelöscht wurde, und der Rat protokolliert einstimmige Zustimmung. Unsterbliche Maschinerie bewahrt die Dynastie perfekt, bis auf die Verstände, die bereits in ihr verrotten.</string>
+    <string name="audio_sample_ancient_dynasty_themed_short_rusted_throne_bad_memory">Der von Entropie gezeichnete Thron empfängt ein weiteres Dekret aus zersplitterter Erinnerung.</string>
+    <string name="audio_sample_ancient_dynasty_themed_long_court_debates_dead_realm">Skelettartige Metallphalanxen stehen stumm, während die Adligen über eine Grenze streiten, die schon vor dem Äonenschlaf verschwunden ist. Legierungsmäntel hängen prächtig und starr an Körpern, die ihr Gewicht nicht mehr spüren. Der Herrscher wiederholt einen Ehrentitel für einen Höfling, dessen Ich bei der Übertragung ausgelöscht wurde, und der Rat protokolliert einstimmige Zustimmung. Unsterbliche Maschinerie bewahrt die Dynastie perfekt, bis auf die Verstände, die bereits in ihr verrotten.</string>
 </resources>

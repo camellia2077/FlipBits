@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_exquisite_fall_themed_soft_moss_says_enough">The moss cradles every ache, whispering that you have done enough.</string>
-    <string name="audio_sample_exquisite_fall_themed_lullaby_closes_the_eyes">The meadow is warm with a holy light. Moss receives the body as if it had studied every burden. Vines take the weapon gently, not as chains, but as permission to let it fall. A lullaby washes over every scar and declares each struggle finished. There are no commands here. Only kindness. Rest for a moment. Let your eyes close. Let them forget how to open.</string>
+    
+    <string name="audio_sample_exquisite_fall_themed_short_soft_moss_says_enough">The moss cradles every ache, whispering that you have done enough.</string>
+    <string name="audio_sample_exquisite_fall_themed_long_lullaby_closes_the_eyes">The meadow is warm with a holy light. Moss receives the body as if it had studied every burden. Vines take the weapon gently, not as chains, but as permission to let it fall. A lullaby washes over every scar and declares each struggle finished. There are no commands here. Only kindness. Rest for a moment. Let your eyes close. Let them forget how to open.</string>
 </resources>

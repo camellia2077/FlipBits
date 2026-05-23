@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_sacred_machine_themed_caliper_oil_rite">Les calibres de laiton reçoivent de l’huile purifiée avant de toucher le premier engrenage.</string>
-    <string name="audio_sample_sacred_machine_themed_bolt_sequence_litany">Les techniciens de maintenance sont entrés vêtus de robes antistatiques et ont disposé les brosses douces près du tableau ouvert comme s’ils rangeaient des reliques. L’huile purifiée était mesurée le long de l’échelle de laiton, une vapeur antioxydation dérivait au-dessus du train d’engrenages, et chaque boulon était serré dans l’ordre écrit sur la bande d’émail. Aucune main ne bougeait rapidement. L’usure était traitée comme une faute, la friction comme une défaillance, et la machine secourue fut autorisée à pardonner à la pièce, un clic mesuré à la fois.</string>
+    <string name="audio_sample_sacred_machine_themed_short_caliper_oil_rite">Les calibres de laiton reçoivent de l’huile purifiée avant de toucher le premier engrenage.</string>
+    <string name="audio_sample_sacred_machine_themed_long_bolt_sequence_litany">Les techniciens de maintenance sont entrés vêtus de robes antistatiques et ont disposé les brosses douces près du tableau ouvert comme s’ils rangeaient des reliques. L’huile purifiée était mesurée le long de l’échelle de laiton, une vapeur antioxydation dérivait au-dessus du train d’engrenages, et chaque boulon était serré dans l’ordre écrit sur la bande d’émail. Aucune main ne bougeait rapidement. L’usure était traitée comme une faute, la friction comme une défaillance, et la machine secourue fut autorisée à pardonner à la pièce, un clic mesuré à la fois.</string>
 </resources>

@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_ancient_dynasty_themed_molecular_law_unthreads_flesh">Molecular bonds severed; organic matter eradicated.</string>
-    <string name="audio_sample_ancient_dynasty_themed_false_gods_reduced_to_batteries">Do not speak to us of miracles. Space folds because its seams have been measured. Time is severed because its grain has been mapped. A fragment of the treacherous idol screams inside a labyrinth of folded dimensions, powering the engine that disproves its divinity. Your mystics call the unknown sacred; our savants call it unfinished physics. At the end of science stands not wonder, but command.</string>
+    
+    <string name="audio_sample_ancient_dynasty_themed_short_molecular_law_unthreads_flesh">Molecular bonds severed; organic matter eradicated.</string>
+    <string name="audio_sample_ancient_dynasty_themed_long_false_gods_reduced_to_batteries">Do not speak to us of miracles. Space folds because its seams have been measured. Time is severed because its grain has been mapped. A fragment of the treacherous idol screams inside a labyrinth of folded dimensions, powering the engine that disproves its divinity. Your mystics call the unknown sacred; our savants call it unfinished physics. At the end of science stands not wonder, but command.</string>
 </resources>

@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_ancient_dynasty_themed_red_eyes_wear_skin">Crimson lenses flicker beneath wet hides draped across metallic frames</string>
-    <string name="audio_sample_ancient_dynasty_themed_extinction_logic_harvests_life">The curse did not end at immortality. Some crawl toward the living with stolen hides dripping from their frames, desperate to imitate the warmth they cannot feel. Others have replaced limbs with annihilation matrices, and pity with the calculus of extinction. Some envy every heartbeat; others hate that heartbeats even exist. Between them lies the final mercy of the dynasty: all organic life reduced to silence.</string>
+    
+    <string name="audio_sample_ancient_dynasty_themed_short_red_eyes_wear_skin">Crimson lenses flicker beneath wet hides draped across metallic frames</string>
+    <string name="audio_sample_ancient_dynasty_themed_long_extinction_logic_harvests_life">The curse did not end at immortality. Some crawl toward the living with stolen hides dripping from their frames, desperate to imitate the warmth they cannot feel. Others have replaced limbs with annihilation matrices, and pity with the calculus of extinction. Some envy every heartbeat; others hate that heartbeats even exist. Between them lies the final mercy of the dynasty: all organic life reduced to silence.</string>
 </resources>

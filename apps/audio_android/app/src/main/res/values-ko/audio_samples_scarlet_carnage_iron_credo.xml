@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_scarlet_carnage_themed_black_iron_answers_magic">수정 지팡이가 산산조각 난다. 오직 맨주먹뿐이다.</string>
-    <string name="audio_sample_scarlet_carnage_themed_face_to_face_truth">주문도, 숨겨진 칼날도, 언덕에서의 사격도 없다. 철과 황동이 화염 속을 걸어간다. 고개는 꼿꼿이 세운 채로. 거리가 좁혀진다. 지팡이가 부서진다. 방패는 맨손에 찢겨 나간다. 강철이 강철과 맞부딪친다. 불꽃만이 유일한 진실을 말한다: 대면하여, 눈과 눈을 맞추고, 철 아래의 뼈를 마주하는 것이다.</string>
-    <string name="audio_sample_scarlet_carnage_themed_metal_crushes_magic">철은 마법을 짓뭉갠다. 진실한 것은 오직 일격뿐이다. 힘의 언어는 멈추지 않는 강철의 무게 아래서 산산이 부서지고, 끝내 남는 것은 살육의 일격이 가진 잔혹한 정직함뿐이다.</string>
-    <string name="audio_sample_scarlet_carnage_themed_iron_splits_bone">수호막은 종잇장처럼 접히고 룬은 먼지로 으깨진다. 저들은 속임수와 주술 뒤에 숨지만, 철갑은 물러서지 않는다. 불길 속을 가로질러 걸어가고 비겁함 따위는 아랑곳하지 않는다. 칼날이 떨어지는 순간 거짓은 끝난다. 철이 뼈를 가를 때 어떤 마법도 너를 구하지 못한다. 이것만이 유일하게 정직한 죽음이다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_black_iron_answers_magic">수정 지팡이가 산산조각 난다. 오직 맨주먹뿐이다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_face_to_face_truth">주문도, 숨겨진 칼날도, 언덕에서의 사격도 없다. 철과 황동이 화염 속을 걸어간다. 고개는 꼿꼿이 세운 채로. 거리가 좁혀진다. 지팡이가 부서진다. 방패는 맨손에 찢겨 나간다. 강철이 강철과 맞부딪친다. 불꽃만이 유일한 진실을 말한다: 대면하여, 눈과 눈을 맞추고, 철 아래의 뼈를 마주하는 것이다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_metal_crushes_magic">철은 마법을 짓뭉갠다. 진실한 것은 오직 일격뿐이다. 힘의 언어는 멈추지 않는 강철의 무게 아래서 산산이 부서지고, 끝내 남는 것은 살육의 일격이 가진 잔혹한 정직함뿐이다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_iron_splits_bone">수호막은 종잇장처럼 접히고 룬은 먼지로 으깨진다. 저들은 속임수와 주술 뒤에 숨지만, 철갑은 물러서지 않는다. 불길 속을 가로질러 걸어가고 비겁함 따위는 아랑곳하지 않는다. 칼날이 떨어지는 순간 거짓은 끝난다. 철이 뼈를 가를 때 어떤 마법도 너를 구하지 못한다. 이것만이 유일하게 정직한 죽음이다.</string>
 </resources>
-
-

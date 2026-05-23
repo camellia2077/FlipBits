@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_sacred_machine_themed_caliper_oil_rite">Brass calipers are anointed with purified oil before touching the first gear.</string>
-    <string name="audio_sample_sacred_machine_themed_bolt_sequence_litany">The maintenance attendants entered wearing antistatic robes and set soft brushes beside the open board as if arranging relics. Purified oil was measured along the brass scale, oxidization-purging vapor drifted above the gear train, and each bolt was tightened in the order written on the enamel strip. No hand moved quickly. Entropy was named as sin, friction as failure, and the rescued machine was allowed to forgive the room one measured click at a time.</string>
+    
+    <string name="audio_sample_sacred_machine_themed_short_caliper_oil_rite">Brass calipers are anointed with purified oil before touching the first gear.</string>
+    <string name="audio_sample_sacred_machine_themed_long_bolt_sequence_litany">The maintenance attendants entered wearing antistatic robes and set soft brushes beside the open board as if arranging relics. Purified oil was measured along the brass scale, oxidization-purging vapor drifted above the gear train, and each bolt was tightened in the order written on the enamel strip. No hand moved quickly. Entropy was named as sin, friction as failure, and the rescued machine was allowed to forgive the room one measured click at a time.</string>
 </resources>

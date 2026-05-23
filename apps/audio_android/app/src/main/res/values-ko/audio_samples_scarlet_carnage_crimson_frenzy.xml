@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_scarlet_carnage_themed_red_mist_bites_back">눈이 터지고, 피가 끓어오르며, 턱이 찢어진다.</string>
-    <string name="audio_sample_scarlet_carnage_themed_reason_breaks_blood_runs">생각도, 멈춤도 없다. 목구멍이 터져 나가도 여전히 포효한다. 사슬이 날붙이를 손목에 용접한다. 피가 붉은 안개가 되어 증발한다. 팔 하나가 사라졌지만 신체는 신경 쓰지 않는다. 달려들고, 물어뜯고, 철의 맛을 본다. 이성은 감옥이었고 분노는 열쇠다. 감옥을 부수라. 타격하고, 가르고, 찢어버리라.</string>
-    <string name="audio_sample_scarlet_carnage_themed_iron_tastes_sweet">철의 맛은 달콤하다. 녹슨 사슬은 노래한다. 휘두를 때마다 파멸의 합창이 터져 갑옷과 살점을 함께 찢고, 끝내 붉은 안개만 남긴다.</string>
-    <string name="audio_sample_scarlet_carnage_themed_pure_rage_burns">포효에 목이 찢어져도 소리는 멈추지 않는다. 무거운 칼날은 손목에 용접된 채 죽어서도 붙어 있다. 살갗은 타들고 피는 안개로 변한다. 생각하면 머뭇거리고, 머뭇거리면 죽는다. 제정신의 감옥이 산산이 부서지고 오직 분노만 남는다. 파괴하라. 절멸하라. 모조리 부숴라.</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_red_mist_bites_back">눈이 터지고, 피가 끓어오르며, 턱이 찢어진다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_reason_breaks_blood_runs">생각도, 멈춤도 없다. 목구멍이 터져 나가도 여전히 포효한다. 사슬이 날붙이를 손목에 용접한다. 피가 붉은 안개가 되어 증발한다. 팔 하나가 사라졌지만 신체는 신경 쓰지 않는다. 달려들고, 물어뜯고, 철의 맛을 본다. 이성은 감옥이었고 분노는 열쇠다. 감옥을 부수라. 타격하고, 가르고, 찢어버리라.</string>
+    <string name="audio_sample_scarlet_carnage_themed_short_iron_tastes_sweet">철의 맛은 달콤하다. 녹슨 사슬은 노래한다. 휘두를 때마다 파멸의 합창이 터져 갑옷과 살점을 함께 찢고, 끝내 붉은 안개만 남긴다.</string>
+    <string name="audio_sample_scarlet_carnage_themed_long_pure_rage_burns">포효에 목이 찢어져도 소리는 멈추지 않는다. 무거운 칼날은 손목에 용접된 채 죽어서도 붙어 있다. 살갗은 타들고 피는 안개로 변한다. 생각하면 머뭇거리고, 머뭇거리면 죽는다. 제정신의 감옥이 산산이 부서지고 오직 분노만 남는다. 파괴하라. 절멸하라. 모조리 부숴라.</string>
 </resources>
-
-

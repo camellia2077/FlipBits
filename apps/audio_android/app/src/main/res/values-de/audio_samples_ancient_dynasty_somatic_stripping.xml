@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_ancient_dynasty_themed_alloy_hand_no_warmth">Die Hand aus unsterblicher Legierung schließt sich; jede Wärmespur bleibt null.</string>
-    <string name="audio_sample_ancient_dynasty_themed_soul_lost_in_emerald_light">Wir betraten die Umwandlungskammern krank, vergänglich und ängstlich, und versprachen uns selbst, dass der Tod das Einzige sein würde, das wir aufgeben. Die Idole des Abgrunds lächelten mit Mündern, die für den Hunger geschaffen waren. Fleisch verschwand in smaragdgrüner Auslöschung, Nerven wurden zu einem Befehlsgitter, und die erste makellose Legierungshand erhob sich, ohne Hitze oder Kälte zu spüren. Wir hatten das Grab besiegt. Erst dann begriffen wir, dass dem Sieg weder Atem noch Tränen geblieben waren und keine Seele, die ihn hätte betrauern können.</string>
+    <string name="audio_sample_ancient_dynasty_themed_short_alloy_hand_no_warmth">Die Hand aus unsterblicher Legierung schließt sich; jede Wärmespur bleibt null.</string>
+    <string name="audio_sample_ancient_dynasty_themed_long_soul_lost_in_emerald_light">Wir betraten die Umwandlungskammern krank, vergänglich und ängstlich, und versprachen uns selbst, dass der Tod das Einzige sein würde, das wir aufgeben. Die Idole des Abgrunds lächelten mit Mündern, die für den Hunger geschaffen waren. Fleisch verschwand in smaragdgrüner Auslöschung, Nerven wurden zu einem Befehlsgitter, und die erste makellose Legierungshand erhob sich, ohne Hitze oder Kälte zu spüren. Wir hatten das Grab besiegt. Erst dann begriffen wir, dass dem Sieg weder Atem noch Tränen geblieben waren und keine Seele, die ihn hätte betrauern können.</string>
 </resources>

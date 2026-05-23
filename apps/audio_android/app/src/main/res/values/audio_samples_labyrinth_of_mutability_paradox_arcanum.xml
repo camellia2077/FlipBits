@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_labyrinth_of_mutability_themed_cold_fire_folds_space">Iridescent fire freezes the hand as space folds behind it.</string>
-    <string name="audio_sample_labyrinth_of_mutability_themed_laws_unwrite_themselves">The parchment crawls. Letters shed their meanings and sprout new limbs. A cold flame burns upward and downward at once, ruins float in broken orbit, and the hourglass remembers tomorrow before yesterday. Natural law was only a timid contract signed by frightened minds. Tear the curtain. Laugh at the code beneath it. Reality is most honest when it is being rewritten.</string>
+    
+    <string name="audio_sample_labyrinth_of_mutability_themed_short_cold_fire_folds_space">Iridescent fire freezes the hand as space folds behind it.</string>
+    <string name="audio_sample_labyrinth_of_mutability_themed_long_laws_unwrite_themselves">The parchment crawls. Letters shed their meanings and sprout new limbs. A cold flame burns upward and downward at once, ruins float in broken orbit, and the hourglass remembers tomorrow before yesterday. Natural law was only a timid contract signed by frightened minds. Tear the curtain. Laugh at the code beneath it. Reality is most honest when it is being rewritten.</string>
 </resources>

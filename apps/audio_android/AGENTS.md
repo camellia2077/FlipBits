@@ -49,6 +49,9 @@
 - 改动语言切换、随机样例或默认文案时，还要检查：
   - `data/AndroidSampleInputTextProvider.kt`
   - `ui/SampleInputSessionUpdater.kt`
+- 如果要了解 sample text 的命名规则、`short/long` 语义、key alignment、
+  Web 导出依赖或具体处理流程，统一去看：
+  - `.agent/workflows/translations/android-sample-text.md`
 - For dual-tone lineup/theme color/sample changes, also check:
   - `docs/design/android/android-dual-tone-theme.md`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`

@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_immortal_rot_themed_warm_mire_stillness">The warm mire softly closes, and cries for help fade into silence</string>
-    <string name="audio_sample_immortal_rot_themed_shield_sinks_from_hand">Breathe slowly now. The shield is heavy because it has served enough, and the severed arm aches only until you understand it is finally free. Rust stills the weapon, fog thickens in the lungs, and every order to stand sounds farther away than sleep. Let the mud hold what you cannot carry. When the will to fight loosens, despair becomes the softest bed in the world.</string>
+    
+    <string name="audio_sample_immortal_rot_themed_short_warm_mire_stillness">The warm mire softly closes, and cries for help fade into silence</string>
+    <string name="audio_sample_immortal_rot_themed_long_shield_sinks_from_hand">Breathe slowly now. The shield is heavy because it has served enough, and the severed arm aches only until you understand it is finally free. Rust stills the weapon, fog thickens in the lungs, and every order to stand sounds farther away than sleep. Let the mud hold what you cannot carry. When the will to fight loosens, despair becomes the softest bed in the world.</string>
 </resources>

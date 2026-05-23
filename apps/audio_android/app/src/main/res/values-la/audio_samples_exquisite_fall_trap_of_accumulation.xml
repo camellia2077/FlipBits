@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="audio_sample_exquisite_fall_themed_gold_dust_inhaled">Accumulatio vacui in cellis aureis</string>
-    <string name="audio_sample_exquisite_fall_themed_vault_without_enough">Nummi in acervos febricitantes cumulantur et lumen aegrotum super cryptam spargunt; adamantes e laqueari quasi pluvia cadunt. Manus ossea candida sub armillis nimis gravibus frangitur, dum collector adhuc vivens ab apicibus digitorum in aurum vertitur. Per pulverem micantem anhelat. Cubicula, coronas, nomina, claves possidet, et tamen sola cogitatio residua est cruciatus non omnia possidendi.</string>
+    <string name="audio_sample_exquisite_fall_themed_short_gold_dust_inhaled">Accumulatio vacui in cellis aureis</string>
+    <string name="audio_sample_exquisite_fall_themed_long_vault_without_enough">Nummi in acervos febricitantes cumulantur et lumen aegrotum super cryptam spargunt; adamantes e laqueari quasi pluvia cadunt. Manus ossea candida sub armillis nimis gravibus frangitur, dum collector adhuc vivens ab apicibus digitorum in aurum vertitur. Per pulverem micantem anhelat. Cubicula, coronas, nomina, claves possidet, et tamen sola cogitatio residua est cruciatus non omnia possidendi.</string>
 </resources>

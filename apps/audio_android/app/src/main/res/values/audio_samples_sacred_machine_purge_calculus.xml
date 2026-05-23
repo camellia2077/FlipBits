@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- CONTEXT: This file contains localized themed sample text for flash/ultra. Shared Pro ASCII protocol samples live in audio_samples_pro_ascii_shared.xml and are not localized. -->
-    <string name="audio_sample_sacred_machine_themed_kill_confirmed_equation">Kill confirmed; survival probability rounds down to zero.</string>
-    <string name="audio_sample_sacred_machine_themed_ballistic_debug_grid">The purge calculus completed before the first barrel glowed red. Ballistic grids crossed the room, casualty metrics climbed with statistical apathy, and each target became a redundant variable waiting to be removed. No hatred entered the firing solution. Rifles spoke in synchronized volleys, kill-confirmed tones marked the cleared spaces, and the report closed when every hostile probability had been rounded down to zero.</string>
+    
+    <string name="audio_sample_sacred_machine_themed_short_kill_confirmed_equation">Kill confirmed; survival probability rounds down to zero.</string>
+    <string name="audio_sample_sacred_machine_themed_long_ballistic_debug_grid">The purge calculus completed before the first barrel glowed red. Ballistic grids crossed the room, casualty metrics climbed with statistical apathy, and each target became a redundant variable waiting to be removed. No hatred entered the firing solution. Rifles spoke in synchronized volleys, kill-confirmed tones marked the cleared spaces, and the report closed when every hostile probability had been rounded down to zero.</string>
 </resources>
