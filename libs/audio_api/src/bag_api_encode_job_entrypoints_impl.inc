@@ -1,3 +1,4 @@
+#if FLIPBITS_ENABLE_ASYNC_ENCODE_JOB
 bag_error_code bag_start_encode_text_job(const bag_encoder_config* config,
                                          const char* text,
                                          bag_encode_job** out_job) {
@@ -147,6 +148,66 @@ void bag_destroy_encode_text_job(bag_encode_job* job) {
   JoinEncodeJobWorker(job);
   delete job;
 }
+#else
+bag_error_code bag_start_encode_text_job(const bag_encoder_config* config,
+                                         const char* text,
+                                         bag_encode_job** out_job) {
+  if (out_job != nullptr) {
+    *out_job = nullptr;
+  }
+  return (config == nullptr || text == nullptr || out_job == nullptr)
+             ? BAG_INVALID_ARGUMENT
+             : BAG_NOT_IMPLEMENTED;
+}
+
+bag_error_code bag_poll_encode_text_job(const bag_encode_job* job,
+                                        bag_encode_job_progress* out_progress) {
+  if (job == nullptr || out_progress == nullptr) {
+    return BAG_INVALID_ARGUMENT;
+  }
+  out_progress->state = BAG_ENCODE_JOB_FAILED;
+  out_progress->phase = BAG_ENCODE_JOB_PHASE_FINALIZING;
+  out_progress->progress_0_to_1 = 0.0f;
+  out_progress->terminal_code = BAG_NOT_IMPLEMENTED;
+  return BAG_NOT_IMPLEMENTED;
+}
+
+bag_error_code bag_cancel_encode_text_job(bag_encode_job* job) {
+  return job == nullptr ? BAG_INVALID_ARGUMENT : BAG_NOT_IMPLEMENTED;
+}
+
+bag_error_code bag_take_encode_text_job_result(const bag_encode_job* job,
+                                               bag_pcm16_result* out_result) {
+  if (job == nullptr || out_result == nullptr) {
+    return BAG_INVALID_ARGUMENT;
+  }
+  out_result->samples = nullptr;
+  out_result->sample_count = 0;
+  return BAG_NOT_IMPLEMENTED;
+}
+
+bag_error_code bag_peek_encode_text_job_result_layout(
+    const bag_encode_job* job, bag_encode_result_layout* out_layout) {
+  if (job == nullptr || out_layout == nullptr) {
+    return BAG_INVALID_ARGUMENT;
+  }
+  *out_layout = {};
+  return BAG_NOT_IMPLEMENTED;
+}
+
+bag_error_code bag_take_encode_text_job_result_with_follow(
+    const bag_encode_job* job, bag_encode_result* out_result) {
+  if (job == nullptr || out_result == nullptr) {
+    return BAG_INVALID_ARGUMENT;
+  }
+  ClearApiEncodeResult(out_result);
+  return BAG_NOT_IMPLEMENTED;
+}
+
+void bag_destroy_encode_text_job(bag_encode_job* job) {
+  (void)job;
+}
+#endif
 
 void bag_free_pcm16_result(bag_pcm16_result* result) {
   if (result == nullptr) {

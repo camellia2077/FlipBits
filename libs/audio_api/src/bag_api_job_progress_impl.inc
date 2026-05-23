@@ -1,3 +1,4 @@
+#if FLIPBITS_ENABLE_ASYNC_ENCODE_JOB
 void UpdateMonotonicProgress(std::atomic<float>* progress_0_to_1,
                              float candidate) {
   if (progress_0_to_1 == nullptr) {
@@ -26,3 +27,24 @@ bool ShouldCancelEncodeJob(void* user_data) {
   auto* job = static_cast<bag_encode_job*>(user_data);
   return job != nullptr && job->cancel_requested.load();
 }
+#else
+void UpdateMonotonicProgress(std::atomic<float>* progress_0_to_1,
+                             float candidate) {
+  if (progress_0_to_1 == nullptr) {
+    return;
+  }
+  progress_0_to_1->store(std::clamp(candidate, 0.0f, 1.0f));
+}
+
+void OnEncodeJobProgress(void* user_data, bag::EncodeProgressPhase phase,
+                         float progress_0_to_1) {
+  (void)user_data;
+  (void)phase;
+  (void)progress_0_to_1;
+}
+
+bool ShouldCancelEncodeJob(void* user_data) {
+  (void)user_data;
+  return false;
+}
+#endif

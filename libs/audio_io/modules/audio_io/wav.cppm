@@ -1,8 +1,14 @@
 module;
 
+#include "bag/common/build_features.h"
+
 export module audio_io.wav;
 
+#if FLIPBITS_HAS_STD_MODULE_PROVIDER
 import std;
+#else
+#include "bag/common/std_compat.h"
+#endif
 
 export namespace audio_io {
 

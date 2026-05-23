@@ -16,6 +16,7 @@ project(BinaryAudioGeneratorCpp LANGUAGES CXX)
 option(FLIPBITS_BUILD_TESTS "Build native test executables under Test/." ON)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/flipbits_core_version.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/flipbits_toolchain_capabilities.cmake")
 set(FLIPBITS_CORE_GENERATED_INCLUDE_DIR "${PROJECT_BINARY_DIR}/generated/include")
 
 if(POLICY CMP0155)

@@ -1,3 +1,4 @@
+#if FLIPBITS_ENABLE_ASYNC_ENCODE_JOB
 void ClearEncodeJobResult(bag_encode_job* job) {
   if (job == nullptr) {
     return;
@@ -93,3 +94,8 @@ void RunEncodeTextJobWorker(bag_encode_job* job) {
     CompleteEncodeJobFailure(job, BAG_INTERNAL, BAG_ENCODE_JOB_FAILED);
   }
 }
+#else
+bag_error_code EnsureEncodeJobFollowResult(bag_encode_job* job) {
+  return job == nullptr ? BAG_INVALID_ARGUMENT : BAG_NOT_IMPLEMENTED;
+}
+#endif

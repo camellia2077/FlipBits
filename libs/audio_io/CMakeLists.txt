@@ -11,6 +11,9 @@ target_compile_features(audio_io PUBLIC cxx_std_17)
 target_include_directories(audio_io
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../audio_core/include
+        ${FLIPBITS_CORE_GENERATED_INCLUDE_DIR}
 )
 target_link_libraries(audio_io
     PUBLIC
@@ -32,7 +35,7 @@ target_sources(
 )
 
 target_compile_features(audio_io PRIVATE cxx_std_23)
-set_property(TARGET audio_io PROPERTY CXX_MODULE_STD ON)
+flipbits_apply_toolchain_capabilities(audio_io)
 
 if(BUILD_TESTING)
     flipbits_add_host_test(test_unit

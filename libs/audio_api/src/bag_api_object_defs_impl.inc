@@ -3,6 +3,9 @@ struct bag_decoder {
 };
 
 struct bag_encode_job {
+#if !FLIPBITS_ENABLE_ASYNC_ENCODE_JOB
+  int unavailable = 0;
+#else
   bag::CoreConfig core_config;
   std::string text;
   mutable std::mutex result_mutex;
@@ -18,4 +21,5 @@ struct bag_encode_job {
   // std::thread + cancel_requested because the actual Android NDK/libc++
   // environment is not consistently reliable for std::jthread/stop_token.
   std::thread worker;
+#endif
 };

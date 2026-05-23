@@ -1,6 +1,6 @@
 # FlipBits Host Module Topology
 
-更新时间：2026-03-15
+更新时间：2026-05-22
 
 ## 目标
 - 说明 host 默认 modules 路径下的层级拓扑。
@@ -110,7 +110,9 @@
  - `wav_io.h` / `audio_io.wav` 对外同时暴露两类能力：
    - `wav bytes <-> mono PCM16`
    - `path <-> WAV 文件`
-- `wav.cppm` 与 `wav_impl.cpp` 的当前 host 路径已纳入 host-side `import std;` required baseline
+- `wav.cppm` 与 `wav_impl.cpp` 现在走和 `audio_core` / `bag_api` 相同的 capability-aware 标准库入口：
+  - `FLIPBITS_HAS_STD_MODULE_PROVIDER=ON` 时走 `import std;`
+  - `FLIPBITS_HAS_STD_MODULE_PROVIDER=OFF` 时走 include-based fallback
 - `wav_io.cpp` 继续保留为稳定 header boundary wrapper，不强收进当前 import-std baseline
 - `wav_io_backend.cpp` 继续保持 include-based，因为它是 backend owner 与 `sndfile.h` include token 的唯一批准位置
 - `sndfile` third-party C 边界不进入 exported module interface，也不进入 `wav_io.h`
@@ -142,21 +144,24 @@
   - `libs/audio_core/modules/bag/transport/compat/frame_codec.cppm`
   - `libs/audio_core/modules/bag/transport/facade.cppm`
   - `libs/audio_core/modules/bag/pipeline/pipeline.cppm`
-- 上述 promoted interfaces 已全部收成 `import-std-only`，不再保留 fallback include guard。
+- 上述 promoted interfaces 当前都通过统一 capability contract 管理标准库入口：
+  - `FLIPBITS_HAS_STD_MODULE_PROVIDER=ON` 时走 `import std;`
+  - `FLIPBITS_HAS_STD_MODULE_PROVIDER=OFF` 时走 `bag/common/std_compat.h`
+- Root host 因为正式要求 provider 成立，所以在这条主线上仍表现为 `import-std-only`。
 - 在 promoted set 全部收口后，当前只保留以下受控形态：
-  - core module implementation single-path
-    - `module;` + `import std;` + `module bag.*;`
+  - core module implementation capability-aware
+    - `module;` + capability header + (`import std;` | include-based fallback) + `module bag.*;`
     - 用于 `libs/audio_core/src/*.cpp`
-  - `audio_io.wav` module interface single-path
-    - `module;` + `export module ...;` + `import std;`
+  - `audio_io.wav` module interface capability-aware
+    - `module;` + capability header + `export module ...;` + (`import std;` | include-based fallback)
     - 当前只用于 `libs/audio_io/modules/audio_io/wav.cppm`
-  - boundary-host single-path
-    - 非-module boundary host 直接使用 `import std;`，同时保持稳定 boundary include / import 关系
+  - boundary-host capability-aware
+    - 非-module boundary host 通过 capability contract 选择 `import std;` 或 include-based fallback，同时保持稳定 boundary include / import 关系
     - 当前只用于 `libs/audio_api/src/bag_api.cpp`
-  - backend-bridge exception
-    - 保留 include-based backend header 与 global fragment backend declaration，同时在命名模块实现面直接使用 `import std;`
+  - backend-bridge capability-aware exception
+    - 保留 include-based backend header 与 global fragment backend declaration，同时在命名模块实现面通过 capability contract 选择标准库入口
     - 当前只用于 `libs/audio_io/modules/audio_io/wav_impl.cpp`
-- 除以上 required baseline 形态外，不接受新的 host `import std;` 口径。
+- 除以上 capability-aware baseline 形态外，不接受新的标准库入口口径。
 
 ## 当前不能直接走 modules 的目标
 - Android native `externalNativeBuild`

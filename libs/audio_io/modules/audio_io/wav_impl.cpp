@@ -1,5 +1,7 @@
 module;
 
+#include "bag/common/build_features.h"
+
 #include <cstdint>
 #include <filesystem>
 #include <vector>
@@ -8,7 +10,11 @@ module;
 
 module audio_io.wav;
 
+#if FLIPBITS_HAS_STD_MODULE_PROVIDER
 import std;
+#else
+#include "bag/common/std_compat.h"
+#endif
 
 namespace audio_io {
 

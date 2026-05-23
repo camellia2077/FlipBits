@@ -8,10 +8,9 @@ from ...errors import ToolError
 
 _PHASE17_BOUNDARY_RULES: dict[Path, tuple[str, ...]] = {
     ROOT_DIR / "libs" / "audio_api" / "CMakeLists.txt": (
-        "CXX_MODULE_STD ON",
+        "flipbits_apply_toolchain_capabilities(bag_api)",
     ),
     ROOT_DIR / "libs" / "audio_api" / "src" / "bag_api.cpp": (
-        "import std;",
         "import bag.transport.facade;",
         '#include "bag_api_impl.inc"',
     ),

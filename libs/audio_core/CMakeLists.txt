@@ -2,6 +2,11 @@ set(bag_core_sources)
 
 file(MAKE_DIRECTORY "${FLIPBITS_CORE_GENERATED_INCLUDE_DIR}/bag/common")
 configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/bag/common/build_features_generated.h.in"
+    "${FLIPBITS_CORE_GENERATED_INCLUDE_DIR}/bag/common/build_features_generated.h"
+    @ONLY
+)
+configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/include/bag/common/version_generated.h.in"
     "${FLIPBITS_CORE_GENERATED_INCLUDE_DIR}/bag/common/version_generated.h"
     @ONLY
@@ -70,4 +75,4 @@ target_sources(
 )
 
 target_compile_features(bag_core PRIVATE cxx_std_23)
-set_property(TARGET bag_core PROPERTY CXX_MODULE_STD ON)
+flipbits_apply_toolchain_capabilities(bag_core)

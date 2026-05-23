@@ -1,6 +1,6 @@
 # FlipBits 文档索引
 
-更新时间：2026-04-30
+更新时间：2026-05-22
 
 ## 先看这里
 - 修改 `libs/` 下的共享库代码前，优先阅读：
@@ -38,6 +38,11 @@
 ## 持续门禁与追踪
 - 构建命令速记：
   - `docs/notes/build-commands.md`
+- 仓库级 toolchain capability contract：
+  - `docs/notes/toolchain-capabilities.md`
+  - 改 `audio_core / audio_api / audio_io` 的标准库入口时，先以这份 contract 为准，不要直接新增平台特判
+  - 对应固定回归清单：
+    - `docs/notes/toolchain-capability-regression-checklist.md`
 - Android `import std;` 当前工具链状态：
   - `1/2`
   - `docs/notes/android-import-std-toolchain-status.md`
