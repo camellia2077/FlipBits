@@ -73,7 +73,7 @@ DATA_DICT = {
     },
     "Litany": {
         "name_en": "Litany",
-        "name_zh": "热忱",
+        "name_zh": "崇高",
         "vals": build_metrics(
             transmission_speed=1, encoding_efficiency=3, transmission_stability=10,
             compatibility=1, parsing_difficulty=1, electronic_feel=9,
@@ -129,27 +129,27 @@ DATA_DICT = {
     },
 
     # Mini Morse — 三种速度档位，各自独立出图
-    "Mini Slow": {
-        "name_en": "Mini Slow",
-        "name_zh": "Mini Slow",
+    "Mini 10 WPM": {
+        "name_en": "Mini 10 WPM",
+        "name_zh": "Mini 10 WPM",
         "vals": build_metrics(
             transmission_speed=1, encoding_efficiency=1, transmission_stability=16,
             compatibility=16, parsing_difficulty=2, electronic_feel=12,
             emotional_richness=1, sense_of_ritual=16
         ),
     },
-    "Mini Standard": {
-        "name_en": "Mini Standard",
-        "name_zh": "Mini Standard",
+    "Mini 15 WPM": {
+        "name_en": "Mini 15 WPM",
+        "name_zh": "Mini 15 WPM",
         "vals": build_metrics(
             transmission_speed=2, encoding_efficiency=1, transmission_stability=14,
             compatibility=16, parsing_difficulty=4, electronic_feel=15,
             emotional_richness=1, sense_of_ritual=16
         ),
     },
-    "Mini Fast": {
-        "name_en": "Mini Fast",
-        "name_zh": "Mini Fast",
+    "Mini 20 WPM": {
+        "name_en": "Mini 20 WPM",
+        "name_zh": "Mini 20 WPM",
         "vals": build_metrics(
             transmission_speed=3, encoding_efficiency=1, transmission_stability=12,
             compatibility=16, parsing_difficulty=7, electronic_feel=16,

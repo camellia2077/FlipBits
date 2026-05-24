@@ -40,3 +40,11 @@ export const ENCODE_PROGRESS_PHASES = {
   2: "postprocessing",
   3: "finalizing",
 };
+
+export const ENCODE_OPERATION_STATES = {
+  queued: 0,
+  running: 1,
+  succeeded: 2,
+  failed: 3,
+  cancelled: 4,
+};

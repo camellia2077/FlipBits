@@ -37,6 +37,9 @@
 
 ## Hard Rules
 
+- 现在 `apps/audio_android` 与 `libs/` 都默认允许不兼容重构；如果 `libs` 已提供新 contract，Android presentation / JNI / native bridge 必须直接切到新 contract，不要保留旧 API 名称、旧 DTO、旧 polling 协议或兼容分支。
+- 尤其是 encode lifecycle：如果 `libs/audio_api` 或 `audio_core` 已从旧 `encode job` 迁到 `encode operation`，Android 侧应同步删除 `job` 命名与旧调用，不要继续保留“先新后旧 fallback”的双轨层。
+
 - 优先按职责找入口，不要默认从最大文件开始搜。
 - 动画卡顿、跳动、闪烁或长音频 visual 性能问题，不要先靠猜测重构；先读 `docs/architecture/android/android-flash-visual.md`，再用 debug-only `FlashVisualPerf` 指标和 adb 日志确认瓶颈层级。
 - Android 真机自动化先从 `docs/architecture/android/android-automation-agent-index.md` 选分支，不要在 `AGENTS.md` 里平铺展开所有自动化专题。

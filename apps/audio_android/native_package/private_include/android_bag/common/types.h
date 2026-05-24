@@ -3,10 +3,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "android_bag/common/config.h"
+#include "android_bag/common/error_code.h"
 
 namespace bag {
 
@@ -195,6 +197,46 @@ struct EncodedPcmFollowResult {
     std::vector<std::int16_t> pcm;
     PayloadFollowData follow_data;
     TextFollowData text_follow_data;
+};
+
+struct EncodePumpBudget {
+    std::uint64_t max_work_units = 0;
+    std::uint32_t max_wall_time_ms = 0;
+};
+
+struct EncodeWorkPlan {
+    std::uint64_t preparing_input_work_units = 0;
+    std::uint64_t rendering_pcm_work_units = 0;
+    std::uint64_t postprocessing_work_units = 0;
+    std::uint64_t finalizing_work_units = 0;
+    std::uint64_t total_work_units = 0;
+    std::size_t estimated_pcm_sample_count = 0;
+    std::size_t payload_byte_count = 0;
+    std::size_t segment_count = 1;
+};
+
+enum class EncodeOperationState {
+    kQueued = 0,
+    kRunning = 1,
+    kSucceeded = 2,
+    kFailed = 3,
+    kCancelled = 4,
+};
+
+struct EncodeProgressSnapshot {
+    EncodeOperationState state = EncodeOperationState::kQueued;
+    EncodeProgressPhase phase = EncodeProgressPhase::kPreparingInput;
+    float overall_progress_0_to_1 = 0.0f;
+    float phase_progress_0_to_1 = 0.0f;
+    std::uint64_t completed_work_units = 0;
+    std::uint64_t total_work_units = 0;
+    std::uint64_t phase_completed_work_units = 0;
+    std::uint64_t phase_total_work_units = 0;
+    ErrorCode terminal_code = ErrorCode::kNotReady;
+    std::size_t estimated_pcm_sample_count = 0;
+    std::size_t payload_byte_count = 0;
+    std::size_t segment_count = 1;
+    std::size_t current_segment_index = 0;
 };
 
 enum class DecodeContentStatus {

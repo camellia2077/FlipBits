@@ -1,9 +1,10 @@
 package com.bag.audioandroid.ui.state
 
 import com.bag.audioandroid.R
-import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
+import com.bag.audioandroid.domain.EncodeOperationSnapshot
+import com.bag.audioandroid.domain.EncodeOperationWorkPlan
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.WavAudioInfo
@@ -38,8 +39,8 @@ data class ModeAudioSessionState(
     val flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     val statusText: UiText = UiText.Resource(R.string.status_ready_to_encode),
     val isCodecBusy: Boolean = false,
-    val encodeProgress: Float? = null,
-    val encodePhase: AudioEncodePhase? = null,
+    val encodeOperationSnapshot: EncodeOperationSnapshot? = null,
+    val encodeOperationWorkPlan: EncodeOperationWorkPlan? = null,
     val isEncodeCancelling: Boolean = false,
     val playback: PlaybackUiState = PlaybackUiState(),
     val playbackSpeed: Float = PlaybackSpeedOption.default.speed,

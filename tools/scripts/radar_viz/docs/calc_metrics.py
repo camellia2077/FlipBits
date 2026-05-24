@@ -2,7 +2,7 @@ import math
 import json
 import os
 
-# 核心物理参数录入 (基于 WaveBits 设计文档)
+# 核心物理参数录入 (基于 FlipBits 设计文档)
 # 字段说明:
 # - fs: frame_samples 倍率 (衡量单个符号持续时间)
 # - bps: bit per symbol (物理层调制效率)

@@ -20,6 +20,29 @@ struct DualToneConfig {
     double amplitude = 0.8;
 };
 
+struct SymbolRenderProgress {
+    std::size_t completed_work = 0;
+    std::size_t total_work = 0;
+    bool finished = false;
+};
+
+class SymbolRenderer {
+ public:
+    SymbolRenderer(std::uint8_t symbol,
+                   std::size_t write_offset,
+                   const DualToneConfig& config,
+                   std::vector<std::int16_t>* out_pcm);
+    ~SymbolRenderer();
+
+    std::size_t TotalWork() const;
+    bool Finished() const;
+    SymbolRenderProgress Pump(std::size_t work_budget);
+
+ private:
+    class Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
 DualToneConfig MakeDualToneConfig(const CoreConfig& config);
 
 ErrorCode EncodeSymbolsToPcm16(const std::vector<std::uint8_t>& symbols,

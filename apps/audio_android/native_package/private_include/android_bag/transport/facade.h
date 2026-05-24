@@ -14,6 +14,18 @@
 
 namespace bag {
 
+class IEncodeOperation {
+ public:
+    virtual ~IEncodeOperation() = default;
+
+    virtual ErrorCode Run() = 0;
+    virtual ErrorCode Pump(const EncodePumpBudget& budget, bool* out_did_progress) = 0;
+    virtual ErrorCode Cancel() = 0;
+    virtual EncodeWorkPlan WorkPlan() const = 0;
+    virtual EncodeProgressSnapshot Snapshot() const = 0;
+    virtual ErrorCode TakeResult(EncodedPcmFollowResult* out_result) = 0;
+};
+
 enum class TransportValidationIssue {
     kOk = 0,
     kInvalidSampleRate = 1,
@@ -47,6 +59,8 @@ ErrorCode BuildEncodeFollowData(const CoreConfig& config,
                                 const std::string& text,
                                 PayloadFollowData* out_follow_data,
                                 TextFollowData* out_text_follow_data);
+std::unique_ptr<IEncodeOperation> CreateEncodeOperation(const CoreConfig& config,
+                                                        const std::string& text);
 std::unique_ptr<ITransportDecoder> CreateTransportDecoder(const CoreConfig& config);
 
 }  // namespace bag

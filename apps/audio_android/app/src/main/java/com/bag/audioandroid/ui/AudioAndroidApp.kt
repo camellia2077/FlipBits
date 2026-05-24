@@ -135,8 +135,7 @@ fun AudioAndroidApp(
     LaunchedEffect(
         encodeProgressDebugScenario?.requestId,
         encodeProgressDebugSession?.isCodecBusy,
-        encodeProgressDebugSession?.encodeProgress,
-        encodeProgressDebugSession?.encodePhase,
+        encodeProgressDebugSession?.encodeOperationSnapshot,
         encodeProgressDebugSession?.isEncodeCancelling,
         encodeProgressDebugSession?.generatedContentRevision,
         encodeProgressDebugSession?.generatedAudioMetadata?.pcmSampleCount,
@@ -168,13 +167,13 @@ fun AudioAndroidApp(
                 session = session,
                 tick = tick,
             )
-            if (session.isCodecBusy || session.encodeProgress != null) {
+            if (session.isCodecBusy || session.encodeOperationSnapshot != null) {
                 sawBusy = true
             }
             if (!scenario.encode) {
                 break
             }
-            if (sawBusy && !session.isCodecBusy && session.encodeProgress == null) {
+            if (sawBusy && !session.isCodecBusy && session.encodeOperationSnapshot == null) {
                 break
             }
             tick += 1
@@ -713,17 +712,18 @@ private fun logEncodeProgressDebugSnapshot(
     session: ModeAudioSessionState,
     tick: Int? = null,
 ) {
-    val progress = session.encodeProgress
+    val snapshot = session.encodeOperationSnapshot
+    val progress = snapshot?.overallProgress0To1?.coerceIn(0f, 1f)
+    val phase = snapshot?.phase
     val isEncodingBusy = session.isCodecBusy && progress != null
-    val clampedProgress = (progress ?: 0f).coerceIn(0f, 1f)
-    val percent = (clampedProgress * 100f).roundToInt()
+    val percent = ((progress ?: 0f) * 100f).roundToInt()
     val tickPart = tick?.let { " tick=$it" }.orEmpty()
     Log.d(
         ENCODE_PROGRESS_AUTOMATION_TAG,
         "$kind requestId=${scenario.requestId}$tickPart " +
             "mode=${scenario.mode.wireName} busy=${session.isCodecBusy} " +
-            "barVisible=$isEncodingBusy labelVisible=${isEncodingBusy && session.encodePhase != null} " +
-            "phase=${session.encodePhase?.name ?: "none"} " +
+            "barVisible=$isEncodingBusy labelVisible=${isEncodingBusy && phase != null} " +
+            "phase=${phase?.name ?: "none"} " +
             "progress=${progress ?: -1f} percent=$percent " +
             "cancelling=${session.isEncodeCancelling} " +
             "revision=${session.generatedContentRevision} " +

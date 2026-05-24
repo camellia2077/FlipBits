@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
-import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.ui.component.ActionButton
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
@@ -35,7 +34,6 @@ import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.analyzeAudioInputEncoding
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
-import kotlin.math.roundToInt
 
 private data class AudioInputActionSelectorState(
     val showFlashVoicingSelector: Boolean,
@@ -55,8 +53,7 @@ internal fun AudioInputActionsCard(
     selectedThemeStyle: ThemeStyleOption,
     transportMode: TransportModeOption,
     isCodecBusy: Boolean,
-    encodeProgress: Float?,
-    encodePhase: AudioEncodePhase?,
+    encodeProgressDisplay: EncodeProgressDisplayModel?,
     isEncodeCancelling: Boolean,
     isFlashVoicingEnabled: Boolean,
     selectedFlashVoicingStyle: FlashVoicingStyleOption,
@@ -86,14 +83,14 @@ internal fun AudioInputActionsCard(
         remember(
             transportMode,
             isCodecBusy,
-            encodeProgress,
+            encodeProgressDisplay,
             inputText,
             inputEncodingAnalysis.isBlockingInvalid,
         ) {
             audioInputActionRenderState(
                 transportMode = transportMode,
                 isCodecBusy = isCodecBusy,
-                encodeProgress = encodeProgress,
+                encodeProgressDisplay = encodeProgressDisplay,
                 inputText = inputText,
                 isBlockingInvalid = inputEncodingAnalysis.isBlockingInvalid,
             )
@@ -161,14 +158,13 @@ internal fun AudioInputActionsCard(
                 }
 
                 AudioEncodeStatusSection(
-                    encodeProgress = encodeProgress,
-                    encodePhase = encodePhase,
+                    encodeProgressDisplay = encodeProgressDisplay,
                     isEncodingBusy = renderState.isEncodingBusy,
                 )
 
                 if (renderState.isEncodingBusy) {
                     BusyAudioEncodeActionRow(
-                        encodeProgress = requireNotNull(encodeProgress),
+                        encodeProgressDisplay = requireNotNull(encodeProgressDisplay),
                         isEncodeCancelling = isEncodeCancelling,
                         onCancelEncode = onCancelEncode,
                         accentBorderColor = accentTokens.selectionBorderAccentTint,
@@ -189,11 +185,11 @@ internal fun AudioInputActionsCard(
 private fun audioInputActionRenderState(
     transportMode: TransportModeOption,
     isCodecBusy: Boolean,
-    encodeProgress: Float?,
+    encodeProgressDisplay: EncodeProgressDisplayModel?,
     inputText: String,
     isBlockingInvalid: Boolean,
 ): AudioInputActionRenderState {
-    val isEncodingBusy = isCodecBusy && encodeProgress != null
+    val isEncodingBusy = isCodecBusy && encodeProgressDisplay != null
     return AudioInputActionRenderState(
         isEncodingBusy = isEncodingBusy,
         canEncodeInput = !isBlockingInvalid,
@@ -209,7 +205,7 @@ private fun audioInputActionRenderState(
 
 @Composable
 private fun BusyAudioEncodeActionRow(
-    encodeProgress: Float,
+    encodeProgressDisplay: EncodeProgressDisplayModel,
     isEncodeCancelling: Boolean,
     onCancelEncode: () -> Unit,
     accentBorderColor: androidx.compose.ui.graphics.Color,
@@ -218,9 +214,8 @@ private fun BusyAudioEncodeActionRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        val encodePercent = (encodeProgress.coerceIn(0f, 1f) * 100f).roundToInt()
         ActionButton(
-            text = stringResource(R.string.audio_action_encode_busy_progress, encodePercent),
+            text = stringResource(R.string.audio_action_encode_busy_progress, encodeProgressDisplay.percent),
             onClick = {},
             enabled = false,
             borderColor = accentBorderColor,

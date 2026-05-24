@@ -3,6 +3,7 @@ export const LOCALE = 'en';
 export const MESSAGES = {
     htmlLang: "en",
     languageLabel: "Language",
+    "hero.copy": "Turn text into playable encoded audio first. Then explore how each mode sounds and what the project is optimizing for.",
     "about.title": "About FlipBits",
     "about.copy": [
       "FlipBits turns text into audible encoded audio. The Android app also visualizes playback, waveforms, text encoding, and the binary content behind each character or word in sync; this page is only a quick preview of how the different modes sound.",
@@ -49,7 +50,7 @@ export const MESSAGES = {
     "loading.ready": "WebAssembly encoder loaded. Ready to generate audio.",
     "loading.missing": "WASM module is not ready yet. Run python apps/audio_web/tools/build_wasm.py to generate the site/wasm/ artifacts first.",
     "validation.emptyText": "Enter some text.",
-    "validation.missingExport": "The WASM module loaded, but encodeTextToPcm16(...) is not exported yet.",
+    "validation.missingExport": "The WASM module loaded, but beginEncodeOperation(...) is not exported yet.",
     "validation.miniAsciiOnly": "mini mode only accepts ASCII input; non-ASCII characters were removed.",
     "sample.randomized": "A random sample text was loaded.",
     "sample.unavailable": ({ message }) => `Sample text is unavailable: ${message}`,

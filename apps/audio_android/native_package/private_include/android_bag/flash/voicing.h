@@ -32,6 +32,30 @@ struct FlashVoicingResult {
     FlashVoicingDescriptor descriptor;
 };
 
+struct FlashVoicingStepProgress {
+    std::size_t completed_work = 0;
+    std::size_t total_work = 0;
+    bool finished = false;
+};
+
+class FlashVoicingStepper {
+ public:
+    FlashVoicingStepper(const std::vector<std::int16_t>& clean_payload_pcm,
+                        const FlashPayloadLayout& payload_layout,
+                        FlashVoicingFlavor flavor,
+                        const FlashVoicingConfig& config = {});
+    ~FlashVoicingStepper();
+
+    const FlashVoicingResult& Result() const;
+    std::size_t TotalWork() const;
+    bool Finished() const;
+    FlashVoicingStepProgress Pump(std::size_t work_budget);
+
+ private:
+    class Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
 FlashVoicingDescriptor DescribeVoicingOutput(std::size_t total_sample_count,
                                              const FlashVoicingConfig& config = {});
 

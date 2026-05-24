@@ -9,6 +9,7 @@ import com.bag.audioandroid.domain.AudioIoWavCodes
 import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
+import com.bag.audioandroid.domain.EncodeOperationSnapshot
 import com.bag.audioandroid.domain.EncodeProgressUpdate
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
@@ -103,7 +104,7 @@ internal class AudioSessionEncodeActions(
     fun onCancelEncode() {
         val mode = uiState.value.transportMode
         val session = uiState.value.sessions.getValue(mode)
-        if (!session.isCodecBusy || session.encodeProgress == null || session.isEncodeCancelling) {
+        if (!session.isCodecBusy || session.encodeOperationSnapshot == null || session.isEncodeCancelling) {
             return
         }
 
@@ -329,12 +330,6 @@ private class EncodeRunner(
             ) {
                 is EncodeAudioResult.Success -> {
                     val flashSignalInfo = describeFlashSignalForRequest(request)
-                    val flashVisualTimelineSegments =
-                        if (request.mode == TransportModeOption.Flash) {
-                            buildFlashSignalToneSegments(gatewayResult.followData)
-                        } else {
-                            emptyList()
-                        }
                     safeLogE(
                         LONG_AUDIO_LOG_TAG,
                         "execute:singleSuccess mode=${request.mode.wireName} payloadBytes=$payloadByteCount samples=${gatewayResult.pcm.size}",
@@ -343,7 +338,6 @@ private class EncodeRunner(
                         pcm = gatewayResult.pcm,
                         segmentCount = 1,
                         flashSignalInfo = flashSignalInfo,
-                        flashVisualTimelineSegments = flashVisualTimelineSegments,
                     )
                 }
                 EncodeAudioResult.Cancelled -> EncodeResult.Cancelled
@@ -492,7 +486,6 @@ private class EncodeRunner(
                 modeWireName = request.mode.wireName,
                 previewPointCount = LONG_AUDIO_WAVEFORM_PREVIEW_POINTS,
             )
-        val flashVisualTimelineSegments = ArrayList<FlashSignalToneSegment>()
 
         try {
             segmentation.segments.forEachIndexed { index, segmentText ->
@@ -524,38 +517,36 @@ private class EncodeRunner(
                             request.flashPreset.signalProfileValue,
                             request.flashPreset.voicingFlavorValue,
                             onProgress = { update ->
-                                val segmentProgress = update.progress0To1.coerceIn(0f, 1f)
+                                val segmentProgress = update.snapshot.overallProgress0To1.coerceIn(0f, 1f)
+                                val aggregatePhase =
+                                    aggregateSegmentedEncodePhase(
+                                        segmentIndex = index,
+                                        segmentCount = segmentation.segmentCount,
+                                        segmentPhase = update.phase,
+                                        segmentProgress0To1 = segmentProgress,
+                                    )
+                                val aggregateProgress =
+                                    ((index.toFloat() + segmentProgress) / totalSegments)
+                                        .coerceIn(0f, 1f)
                                 onProgress(
                                     request.mode,
                                     update.copy(
-                                        phase =
-                                            aggregateSegmentedEncodePhase(
-                                                segmentIndex = index,
-                                                segmentCount = segmentation.segmentCount,
-                                                segmentPhase = update.phase,
-                                                segmentProgress0To1 = segmentProgress,
+                                        phase = aggregatePhase,
+                                        progress0To1 = aggregateProgress,
+                                        snapshot =
+                                            update.snapshot.copy(
+                                                phase = aggregatePhase,
+                                                overallProgress0To1 = aggregateProgress,
+                                                segmentCount = segmentation.segmentCount.toLong(),
+                                                currentSegmentIndex = index.toLong(),
                                             ),
-                                        progress0To1 =
-                                            ((index.toFloat() + segmentProgress) / totalSegments)
-                                                .coerceIn(0f, 1f),
                                     ),
                                 )
                             },
                         )
                 ) {
                     is EncodeAudioResult.Success -> {
-                        val segmentStartSample = audioAssembler.totalPcmSamples
                         audioAssembler.appendSegment(gatewayResult.pcm)
-                        if (request.mode == TransportModeOption.Flash) {
-                            flashVisualTimelineSegments +=
-                                buildFlashSignalToneSegments(gatewayResult.followData)
-                                    .map { segment ->
-                                        segment.copy(
-                                            startSample = segment.startSample + segmentStartSample,
-                                            endSample = segment.endSample + segmentStartSample,
-                                        )
-                                    }
-                        }
                         safeLogE(
                             LONG_AUDIO_LOG_TAG,
                             "encodeSegmented:segmentSuccess mode=${request.mode.wireName} index=${index + 1}/${segmentation.segmentCount} segmentSamples=${gatewayResult.pcm.size} totalSamples=${audioAssembler.totalPcmSamples}",
@@ -616,7 +607,6 @@ private class EncodeRunner(
                     request,
                     text = segmentation.segments.firstOrNull() ?: request.encodeText,
                 ),
-            flashVisualTimelineSegments = flashVisualTimelineSegments,
         )
     }
 
@@ -693,8 +683,8 @@ private class EncodeStateReducer(
         sessionStateStore.updateSession(request.mode) {
             it.copy(
                 isCodecBusy = true,
-                encodeProgress = 0f,
-                encodePhase = AudioEncodePhase.PreparingInput,
+                encodeOperationSnapshot = EncodeOperationSnapshot.Initial,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
                 statusText =
                     uiTextMapper.encodePhaseStatus(
@@ -709,7 +699,6 @@ private class EncodeStateReducer(
         sessionStateStore.updateSession(mode) {
             it.copy(
                 isEncodeCancelling = true,
-                encodePhase = it.encodePhase,
                 statusText =
                     UiText.Resource(
                         R.string.status_mode_audio_canceling,
@@ -723,18 +712,26 @@ private class EncodeStateReducer(
         mode: TransportModeOption,
         update: EncodeProgressUpdate,
     ) {
-        val clampedProgress = update.progress0To1.coerceIn(0f, 1f)
+        val clampedProgress = update.snapshot.overallProgress0To1.coerceIn(0f, 1f)
+        val clampedSnapshot =
+            update.snapshot.copy(
+                overallProgress0To1 = clampedProgress,
+                phaseProgress0To1 = update.snapshot.phaseProgress0To1.coerceIn(0f, 1f),
+            )
         sessionStateStore.updateSession(mode) { session ->
             if (session.isEncodeCancelling) {
                 return@updateSession session
             }
-            if (session.encodePhase == update.phase) {
-                session.copy(encodeProgress = clampedProgress)
+            if (session.encodeOperationSnapshot?.phase == clampedSnapshot.phase) {
+                session.copy(
+                    encodeOperationSnapshot = clampedSnapshot,
+                    encodeOperationWorkPlan = update.workPlan,
+                )
             } else {
                 session.copy(
-                    encodeProgress = clampedProgress,
-                    encodePhase = update.phase,
-                    statusText = uiTextMapper.encodePhaseStatus(mode.wireName, update.phase),
+                    encodeOperationSnapshot = clampedSnapshot,
+                    encodeOperationWorkPlan = update.workPlan,
+                    statusText = uiTextMapper.encodePhaseStatus(mode.wireName, clampedSnapshot.phase),
                 )
             }
         }
@@ -764,8 +761,8 @@ private class EncodeStateReducer(
         sessionStateStore.updateSession(mode) {
             it.copy(
                 isCodecBusy = false,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
                 statusText =
                     UiText.Resource(
@@ -805,8 +802,8 @@ private class EncodeStateReducer(
                 flashVisualWindow = FlashVisualWindowState(),
                 statusText = uiTextMapper.validationIssue(validationIssue),
                 isCodecBusy = false,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
                 playback = playbackRuntimeGateway.cleared(),
             )
@@ -845,8 +842,8 @@ private class EncodeStateReducer(
                 flashVisualWindow = FlashVisualWindowState(),
                 statusText = uiTextMapper.errorCode(errorCode),
                 isCodecBusy = false,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
                 playback = playbackRuntimeGateway.cleared(),
             )
@@ -937,10 +934,10 @@ private class EncodeStateReducer(
                         } else {
                             listOf(request.mode.wireName, result.pcmSampleCount)
                         },
-                    ),
+                ),
                 isCodecBusy = false,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
                 playback = playbackRuntimeGateway.load(result.pcmSampleCount, sampleRateHz),
             )

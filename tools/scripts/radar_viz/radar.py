@@ -35,6 +35,7 @@ class RadarChart:
     def __init__(self, vals):
         """初始化极坐标系并缓存会话状态。"""
         self.fig, self.ax = plt.subplots(figsize=config.FIG_SIZE_RADAR, subplot_kw=dict(polar=True))
+        self._apply_axes_scale()
 
         n = len(config.LABELS_EN)
         angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
@@ -190,6 +191,15 @@ class RadarChart:
                     else config_fonts.FONT_IBM_PLEX_REGULAR)
 
         return FontProperties(fname=path, size=size)
+
+    def _apply_axes_scale(self):
+        """缩放雷达图区本体，不改变 figure 导出的背景尺寸。"""
+        scale = float(config.RADAR_AXES_SCALE)
+        if not 0 < scale <= 1:
+            raise ValueError("config.RADAR_AXES_SCALE must be within (0, 1].")
+
+        margin = (1.0 - scale) / 2.0
+        self.ax.set_position([margin, margin, scale, scale])
 
     @staticmethod
     def _shift_polar(angle, radius, offset, direction='perpendicular'):

@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import com.bag.audioandroid.domain.AudioEncodePhase
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
@@ -33,8 +32,7 @@ fun AudioTabScreen(
     selectedThemeStyle: ThemeStyleOption,
     transportMode: TransportModeOption,
     isCodecBusy: Boolean,
-    encodeProgress: Float?,
-    encodePhase: AudioEncodePhase?,
+    encodeProgressDisplay: EncodeProgressDisplayModel?,
     isEncodeCancelling: Boolean,
     onTransportModeSelected: (TransportModeOption) -> Unit,
     isFlashVoicingEnabled: Boolean,
@@ -59,7 +57,7 @@ fun AudioTabScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val isEncodingBusy = isCodecBusy && encodeProgress != null
+    val isEncodingBusy = isCodecBusy && encodeProgressDisplay != null
     val isDecodingBusy = isCodecBusy && !isEncodingBusy
     var showInputEditor by rememberSaveable { mutableStateOf(false) }
     var inputCardExpanded by rememberSaveable(transportMode) { mutableStateOf(true) }
@@ -112,8 +110,7 @@ fun AudioTabScreen(
                 selectedThemeStyle = selectedThemeStyle,
                 transportMode = transportMode,
                 isCodecBusy = isCodecBusy,
-                encodeProgress = encodeProgress,
-                encodePhase = encodePhase,
+                encodeProgressDisplay = encodeProgressDisplay,
                 isEncodeCancelling = isEncodeCancelling,
                 isFlashVoicingEnabled = isFlashVoicingEnabled,
                 selectedFlashVoicingStyle = selectedFlashVoicingStyle,

@@ -40,7 +40,7 @@ export const MESSAGES = {
     "loading.ready": "WebAssembly 인코더를 불러왔습니다. 오디오를 생성할 수 있습니다.",
     "loading.missing": "WASM 모듈이 아직 준비되지 않았습니다. 먼저 python apps/audio_web/tools/build_wasm.py 를 실행해 site/wasm/ 산출물을 생성하세요.",
     "validation.emptyText": "텍스트를 입력하세요.",
-    "validation.missingExport": "WASM 모듈은 로드되었지만 encodeTextToPcm16(...) 가 아직 내보내지지 않았습니다.",
+    "validation.missingExport": "WASM 모듈은 로드되었지만 beginEncodeOperation(...) 가 아직 내보내지지 않았습니다.",
     "validation.miniAsciiOnly": "mini 모드는 ASCII 입력만 허용하며, 비 ASCII 문자는 제거되었습니다.",
     "encoding.inProgress": "오디오를 생성하는 중입니다...",
     "encoding.success": ({ sampleCount }) => `완료되었습니다. PCM 샘플 ${sampleCount}개를 생성했습니다.`,

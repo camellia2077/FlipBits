@@ -49,7 +49,7 @@ export const MESSAGES = {
     "loading.ready": "WebAssembly 編碼器已載入，可以開始產生音訊。",
     "loading.missing": "WASM 模組尚未就緒。請先執行 python apps/audio_web/tools/build_wasm.py 產生 site/wasm/ 產物。",
     "validation.emptyText": "請輸入文字。",
-    "validation.missingExport": "WASM 模組已載入，但尚未匯出 encodeTextToPcm16(...)。",
+    "validation.missingExport": "WASM 模組已載入，但尚未匯出 beginEncodeOperation(...)。",
     "validation.miniAsciiOnly": "mini 模式只允許 ASCII 輸入；非 ASCII 字元已被移除。",
     "sample.randomized": "已載入一條隨機樣本文字。",
     "sample.unavailable": ({ message }) => `樣本文字無法使用：${message}`,

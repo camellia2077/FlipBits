@@ -3,6 +3,7 @@ export const LOCALE = 'zh-CN';
 export const MESSAGES = {
     htmlLang: "zh-CN",
     languageLabel: "语言",
+    "hero.copy": "先把文本变成可播放的编码音频，再去理解不同 mode 的声音风格，以及这个项目真正强调的侧重点。",
     "about.title": "关于 FlipBits",
     "about.copy": [
       "FlipBits 会把文本编码成可听见的音频。Android 版本还会把音频播放、波形、文本编码过程，以及每个字或单词对应的二进制内容同步可视化；这个网页只是用来预览不同模式生成出来的声音效果。",
@@ -49,7 +50,7 @@ export const MESSAGES = {
     "loading.ready": "WebAssembly 编码器已加载，可以开始生成音频。",
     "loading.missing": "WASM 模块尚未就绪。先运行 python apps/audio_web/tools/build_wasm.py 生成 site/wasm/ 产物。",
     "validation.emptyText": "请输入文本。",
-    "validation.missingExport": "WASM 模块已加载，但还没有导出 encodeTextToPcm16(...)。",
+    "validation.missingExport": "WASM 模块已加载，但还没有导出 beginEncodeOperation(...)。",
     "validation.miniAsciiOnly": "mini 模式只允许 ASCII 输入；非 ASCII 字符已被移除。",
     "sample.randomized": "已填入一条随机样本文本。",
     "sample.unavailable": ({ message }) => `样本文本不可用：${message}`,

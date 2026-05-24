@@ -9,15 +9,6 @@ object NativeBagBridge {
         System.loadLibrary("audio_android_jni")
     }
 
-    external fun nativeEncodeTextToPcm(
-        text: String,
-        sampleRateHz: Int,
-        frameSamples: Int,
-        mode: Int,
-        flashSignalProfile: Int,
-        flashVoicingFlavor: Int,
-    ): ShortArray
-
     external fun nativeValidateEncodeRequest(
         text: String,
         sampleRateHz: Int,
@@ -27,7 +18,7 @@ object NativeBagBridge {
         flashVoicingFlavor: Int,
     ): Int
 
-    external fun nativeStartEncodeTextJob(
+    external fun nativeCreateEncodeOperation(
         text: String,
         sampleRateHz: Int,
         frameSamples: Int,
@@ -36,9 +27,17 @@ object NativeBagBridge {
         flashVoicingFlavor: Int,
     ): Long
 
-    external fun nativePollEncodeTextJob(handle: Long): FloatArray
+    external fun nativePumpEncodeOperation(
+        handle: Long,
+        maxWorkUnits: Int,
+        maxWallTimeMs: Int,
+    ): Int
 
-    external fun nativeTakeEncodeTextJobResult(handle: Long): EncodedAudioPayloadResult
+    external fun nativeGetEncodeOperationWorkPlan(handle: Long): DoubleArray
+
+    external fun nativePollEncodeOperation(handle: Long): DoubleArray
+
+    external fun nativeTakeEncodeOperationResult(handle: Long): EncodedAudioPayloadResult
 
     external fun nativeBuildEncodeFollowData(
         text: String,
@@ -57,9 +56,9 @@ object NativeBagBridge {
         flashVoicingFlavor: Int,
     ): FlashSignalInfo
 
-    external fun nativeCancelEncodeTextJob(handle: Long): Int
+    external fun nativeCancelEncodeOperation(handle: Long): Int
 
-    external fun nativeDestroyEncodeTextJob(handle: Long)
+    external fun nativeDestroyEncodeOperation(handle: Long)
 
     external fun nativeDecodeGeneratedPcm(
         pcm: ShortArray,

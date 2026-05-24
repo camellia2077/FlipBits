@@ -11,6 +11,8 @@ import com.bag.audioandroid.domain.DecodedAudioData
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.EncodeAudioResult
+import com.bag.audioandroid.domain.EncodeOperationSnapshot
+import com.bag.audioandroid.domain.EncodeOperationState
 import com.bag.audioandroid.domain.EncodeProgressUpdate
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
@@ -101,8 +103,8 @@ class AudioSessionCodecProgressTest {
 
             val session = fixture.uiState.value.currentSession
             assertTrue(session.isCodecBusy)
-            assertEquals(0.35f, session.encodeProgress)
-            assertEquals(AudioEncodePhase.PreparingInput, session.encodePhase)
+            assertEquals(0.35f, session.encodeOperationSnapshot?.overallProgress0To1)
+            assertEquals(AudioEncodePhase.PreparingInput, session.encodeOperationSnapshot?.phase)
             assertResId(session.statusText, R.string.status_mode_audio_generating_preparing_input)
 
             completion.complete(EncodeAudioResult.Success(shortArrayOf(1, 2, 3)))
@@ -130,8 +132,48 @@ class AudioSessionCodecProgressTest {
             advanceUntilIdle()
 
             val session = fixture.uiState.value.currentSession
-            assertEquals(AudioEncodePhase.RenderingPcm, session.encodePhase)
-            assertEquals(0.40f, session.encodeProgress)
+            assertEquals(AudioEncodePhase.RenderingPcm, session.encodeOperationSnapshot?.phase)
+            assertEquals(0.40f, session.encodeOperationSnapshot?.overallProgress0To1)
+            assertResId(session.statusText, R.string.status_mode_audio_generating_rendering_pcm)
+
+            completion.complete(EncodeAudioResult.Success(shortArrayOf(1, 2, 3)))
+            advanceUntilIdle()
+        }
+
+    @Test
+    fun `display progress and phase are derived from operation snapshot`() =
+        runTest {
+            val completion = CompletableDeferred<EncodeAudioResult>()
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeBlock = { onProgress ->
+                                onProgress(
+                                    EncodeProgressUpdate(
+                                        phase = AudioEncodePhase.PreparingInput,
+                                        progress0To1 = 0.05f,
+                                        snapshot =
+                                            EncodeOperationSnapshot.Initial.copy(
+                                                state = EncodeOperationState.Running,
+                                                phase = AudioEncodePhase.RenderingPcm,
+                                                overallProgress0To1 = 0.62f,
+                                                phaseProgress0To1 = 0.44f,
+                                            ),
+                                    ),
+                                )
+                                completion.await()
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val session = fixture.uiState.value.currentSession
+            assertEquals(AudioEncodePhase.RenderingPcm, session.encodeOperationSnapshot?.phase)
+            assertEquals(0.62f, session.encodeOperationSnapshot?.overallProgress0To1)
             assertResId(session.statusText, R.string.status_mode_audio_generating_rendering_pcm)
 
             completion.complete(EncodeAudioResult.Success(shortArrayOf(1, 2, 3)))
@@ -153,7 +195,7 @@ class AudioSessionCodecProgressTest {
             advanceUntilIdle()
             val cancelledSession = cancelledFixture.uiState.value.currentSession
             assertFalse(cancelledSession.isCodecBusy)
-            assertEquals(null, cancelledSession.encodePhase)
+            assertEquals(null, cancelledSession.encodeOperationSnapshot)
             assertResId(cancelledSession.statusText, R.string.status_mode_audio_cancelled)
 
             val failedFixture =
@@ -168,14 +210,14 @@ class AudioSessionCodecProgressTest {
             advanceUntilIdle()
             val failedSession = failedFixture.uiState.value.currentSession
             assertFalse(failedSession.isCodecBusy)
-            assertEquals(null, failedSession.encodePhase)
+            assertEquals(null, failedSession.encodeOperationSnapshot)
             assertResId(failedSession.statusText, R.string.error_not_implemented)
 
             val successFixture =
                 createFixture(
                     gateway =
                         FakeAudioCodecGateway(
-                            encodeResult = EncodeAudioResult.Success(shortArrayOf(5, 6, 7), followData = DefaultFollowData),
+                            encodeResult = EncodeAudioResult.Success(shortArrayOf(5, 6, 7)),
                             flashSignalInfo =
                                 FlashSignalInfo(
                                     lowCarrierHz = "300",
@@ -192,7 +234,7 @@ class AudioSessionCodecProgressTest {
             advanceUntilIdle()
             val successSession = successFixture.uiState.value.currentSession
             assertFalse(successSession.isCodecBusy)
-            assertEquals(null, successSession.encodePhase)
+            assertEquals(null, successSession.encodeOperationSnapshot)
             assertEquals(
                 listOf(5.toShort(), 6.toShort(), 7.toShort()),
                 successSession.generatedPcm.toList(),
@@ -289,7 +331,7 @@ class AudioSessionCodecFailureStateTest {
                         FakeAudioCodecGateway(
                             encodeBlock = { _ ->
                                 if (encodeCount++ == 0) {
-                                    EncodeAudioResult.Success(shortArrayOf(1, 2, 3), followData = DefaultFollowData)
+                                    EncodeAudioResult.Success(shortArrayOf(1, 2, 3))
                                 } else {
                                     EncodeAudioResult.Failed(BagApiCodes.ERROR_ENCODED_AUDIO_TOO_LARGE)
                                 }
@@ -386,7 +428,6 @@ class AudioSessionCodecFailureStateTest {
                                 encodeResult =
                                     EncodeAudioResult.Success(
                                         pcm = encodedPcm,
-                                        followData = DefaultFollowData,
                                     ),
                                 decodeBlock = { pcm, nativeMode ->
                                     assertEquals(mode.nativeValue, nativeMode)
@@ -563,11 +604,15 @@ class AudioSessionCodecSegmentationTest {
             val collectionJob =
                 launch {
                     fixture.uiState.collect { state ->
-                        state.sessions.getValue(TransportModeOption.Ultra).encodePhase?.let { phase ->
-                            if (observedPhases.lastOrNull() != phase) {
-                                observedPhases += phase
+                        state.sessions
+                            .getValue(TransportModeOption.Ultra)
+                            .encodeOperationSnapshot
+                            ?.phase
+                            ?.let { phase ->
+                                if (observedPhases.lastOrNull() != phase) {
+                                    observedPhases += phase
+                                }
                             }
-                        }
                     }
                 }
 
@@ -921,7 +966,7 @@ class AudioSessionCodecMiniNormalizationTest {
                             },
                             encodeTextBlock = { text, _ ->
                                 encodedTexts += text
-                                EncodeAudioResult.Success(shortArrayOf(1, 2, 3), followData = DefaultFollowData)
+                                EncodeAudioResult.Success(shortArrayOf(1, 2, 3))
                             },
                         ),
                     testScope = this,
@@ -991,7 +1036,6 @@ private class FakeAudioCodecGateway(
     private val encodeResult: EncodeAudioResult =
         EncodeAudioResult.Success(
             shortArrayOf(1, 2),
-            followData = DefaultFollowData,
         ),
     private val encodeBlock: (suspend ((EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,
     private val encodeTextBlock: (suspend (String, (EncodeProgressUpdate) -> Unit) -> EncodeAudioResult)? = null,

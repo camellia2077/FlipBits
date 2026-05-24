@@ -40,7 +40,7 @@ export const MESSAGES = {
     "loading.ready": "Encoder WebAssembly onustus est. Audio iam generari potest.",
     "loading.missing": "Modulus WASM nondum paratus est. Prius exsequere python apps/audio_web/tools/build_wasm.py ut effecta site/wasm/ generentur.",
     "validation.emptyText": "Textum insere.",
-    "validation.missingExport": "Modulus WASM onustus est, sed encodeTextToPcm16(...) nondum exportatur.",
+    "validation.missingExport": "Modulus WASM onustus est, sed beginEncodeOperation(...) nondum exportatur.",
     "validation.miniAsciiOnly": "Modus mini solum initum ASCII accipit; characteres non ASCII remoti sunt.",
     "encoding.inProgress": "Audio generatur...",
     "encoding.success": ({ sampleCount }) => `Perfectum. ${sampleCount} exempla PCM generata sunt.`,

@@ -18,6 +18,29 @@ struct MorseToneConfig {
     double amplitude = 0.75;
 };
 
+struct ToneUnitRenderProgress {
+    std::size_t completed_work = 0;
+    std::size_t total_work = 0;
+    bool finished = false;
+};
+
+class ToneUnitRenderer {
+ public:
+    ToneUnitRenderer(const std::vector<std::uint8_t>& payload,
+                     std::size_t payload_index,
+                     const MorseToneConfig& config,
+                     std::vector<std::int16_t>* out_pcm);
+    ~ToneUnitRenderer();
+
+    std::size_t TotalWork() const;
+    bool Finished() const;
+    ToneUnitRenderProgress Pump(std::size_t work_budget);
+
+ private:
+    class Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
 MorseToneConfig MakeMorseToneConfig(const CoreConfig& config);
 
 ErrorCode EncodePayloadToPcm16(const std::vector<std::uint8_t>& payload,

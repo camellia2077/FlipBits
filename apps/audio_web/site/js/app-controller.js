@@ -17,8 +17,7 @@ export class AppController {
     this.bindEvents();
     this.ui.setLocale("en");
     this.sampleView.setLocale("en");
-    syncModeFields(this.elements, this.ui);
-    this.sampleController.syncMode(this.elements.modeSelect.value);
+    void this.applyMode(this.elements.modeSelect.value);
     this.ui.setStatusKey("loading.pending");
     this.sampleView.setControlsEnabled(false);
     this.sampleController.bindEvents();
@@ -35,12 +34,37 @@ export class AppController {
     });
 
     this.elements.modeSelect.addEventListener("change", () => {
-      syncModeFields(this.elements, this.ui);
-      this.sampleController.syncMode(this.elements.modeSelect.value);
-      void this.sampleController.refreshSampleText();
-      if (sanitizeModeText(this.elements)) {
-        this.ui.setStatusKey("validation.miniAsciiOnly");
+      void this.applyMode(this.elements.modeSelect.value);
+    });
+
+    this.elements.modeCards?.addEventListener("click", (event) => {
+      const origin = event.target instanceof Node
+        ? event.target
+        : null;
+      const card = origin?.nodeType === Node.ELEMENT_NODE
+        ? origin.closest("[data-mode-card]")
+        : origin?.parentElement?.closest("[data-mode-card]");
+      if (!(card instanceof HTMLElement)) {
+        return;
       }
+      void this.applyMode(card.dataset.modeCard);
+    });
+
+    this.elements.modeCards?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+      const origin = event.target instanceof Node
+        ? event.target
+        : null;
+      const card = origin?.nodeType === Node.ELEMENT_NODE
+        ? origin.closest("[data-mode-card]")
+        : origin?.parentElement?.closest("[data-mode-card]");
+      if (!(card instanceof HTMLElement)) {
+        return;
+      }
+      event.preventDefault();
+      void this.applyMode(card.dataset.modeCard);
     });
 
     this.elements.inputText.addEventListener("input", () => {
@@ -86,6 +110,23 @@ export class AppController {
     this.elements.player.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  async applyMode(mode) {
+    if (!mode) {
+      return;
+    }
+
+    if (this.elements.modeSelect.value !== mode) {
+      this.elements.modeSelect.value = mode;
+    }
+
+    syncModeFields(this.elements, this.ui, mode);
+    this.sampleController.syncMode(mode);
+    await this.sampleController.refreshSampleText();
+    if (sanitizeModeText(this.elements)) {
+      this.ui.setStatusKey("validation.miniAsciiOnly");
+    }
+  }
+
   async generateAudio() {
     const request = readEncodeRequest(this.elements);
     if (!request.text.trim()) {
@@ -104,8 +145,8 @@ export class AppController {
 
     try {
       const result = await this.encoderClient.encode(request, {
-        onProgress: (phase, progress) => {
-          this.ui.setProgress(phase, progress);
+        onProgress: (snapshot, workPlan) => {
+          this.ui.setProgress(snapshot, workPlan);
         },
       });
       const samples = Int16Array.from(result.samples);
@@ -115,7 +156,6 @@ export class AppController {
       );
       this.currentAudioUrl = URL.createObjectURL(wavBlob);
       this.ui.setDownloadUrl(this.currentAudioUrl);
-      this.ui.setProgress(3, 1);
       this.ui.setResultSummary(
         buildResultSummaryViewModel(request, result, samples.length),
       );

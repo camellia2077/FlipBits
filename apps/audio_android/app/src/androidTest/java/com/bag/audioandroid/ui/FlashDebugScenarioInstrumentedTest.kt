@@ -23,29 +23,32 @@ class FlashDebugScenarioInstrumentedTest(
 
     @Test
     fun debugScenarioCreatesPlayableFlashVisualFromFixedText() {
-        ActivityScenario
-            .launch<MainActivity>(
+        val scenario =
+            ActivityScenario.launch<MainActivity>(
                 Intent(Intent.ACTION_MAIN)
                     .setClassName("com.bag.audioandroid", MainActivity::class.java.name)
                     .setAction(FlashDebugScenario.Action)
                     .putExtra(FlashDebugScenario.ExtraText, FlashDebugScenario.DefaultText)
                     .putExtra(FlashDebugScenario.ExtraStyle, style.id)
-                    .putExtra(FlashDebugScenario.ExtraVisual, FlashSignalVisualizationMode.ToneTracks.name)
+                    .putExtra(FlashDebugScenario.ExtraVisual, FlashSignalVisualizationMode.Lanes.name)
                     .putExtra(FlashDebugScenario.ExtraEncode, true)
                     .putExtra(FlashDebugScenario.ExtraPlay, true)
                     .putExtra(FlashDebugScenario.ExtraPlayDurationMs, 6_000L),
-            ).use {
-                composeRule.waitUntil(timeoutMillis = 90_000) {
-                    composeRule
-                        .onAllNodesWithTag("player-detail-sheet-content")
-                        .fetchSemanticsNodes()
-                        .isNotEmpty()
-                }
-                composeRule.onNodeWithTag("player-detail-sheet-content").assertIsDisplayed()
-                composeRule.onNodeWithTag("playback-display-section").assertIsDisplayed()
-                composeRule.onNodeWithTag("flash-visualization-mode-switcher").assertIsDisplayed()
-                composeRule.onNodeWithTag("flash-visualization-mode-tonetracks").assertIsDisplayed()
+            )
+        try {
+            composeRule.waitUntil(timeoutMillis = 90_000) {
+                composeRule
+                    .onAllNodesWithTag("player-detail-sheet-content")
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
             }
+            composeRule.onNodeWithTag("player-detail-sheet-content").assertIsDisplayed()
+            composeRule.onNodeWithTag("playback-display-section").assertIsDisplayed()
+            composeRule.onNodeWithTag("flash-visualization-mode-switcher").assertIsDisplayed()
+            composeRule.onNodeWithTag("flash-visualization-mode-lanes").assertIsDisplayed()
+        } finally {
+            scenario.close()
+        }
     }
 
     companion object {

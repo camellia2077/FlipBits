@@ -49,7 +49,7 @@ export class EncoderClient {
     }
 
     if (message.type === "progress") {
-      pendingRequest.callbacks.onProgress?.(message.phase, message.progress);
+      pendingRequest.callbacks.onProgress?.(message.snapshot, message.workPlan);
       return;
     }
 

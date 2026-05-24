@@ -4,40 +4,6 @@
 
 namespace jni_bridge {
 
-jshortArray NativeEncodeTextToPcm(
-    JNIEnv* env,
-    jstring text,
-    jint sample_rate_hz,
-    jint frame_samples,
-    jint mode,
-    jint flash_signal_profile,
-    jint flash_voicing_flavor) {
-    const std::string input = JStringToStdString(env, text);
-    if (input.empty()) {
-        return env->NewShortArray(0);
-    }
-
-    bag_encoder_config config =
-        MakeEncoderConfig(sample_rate_hz, frame_samples, flash_signal_profile, flash_voicing_flavor);
-    config.mode = static_cast<bag_transport_mode>(mode);
-    bag_pcm16_result pcm{};
-    // Android keeps reusing the stable bag_api encode path. Any formal flash
-    // voicing stays internal to core instead of widening JNI/Kotlin surfaces.
-    if (bag_encode_text(&config, input.c_str(), &pcm) != BAG_OK) {
-        return env->NewShortArray(0);
-    }
-
-    jshortArray out = env->NewShortArray(static_cast<jsize>(pcm.sample_count));
-    if (out != nullptr && pcm.sample_count > 0) {
-        env->SetShortArrayRegion(
-            out, 0, static_cast<jsize>(pcm.sample_count), reinterpret_cast<const jshort*>(pcm.samples));
-    }
-    bag_free_pcm16_result(&pcm);
-    if (out == nullptr) {
-        return out;
-    }
-    return out;
-}
 jint NativeValidateEncodeRequest(
     JNIEnv* env,
     jstring text,
@@ -63,7 +29,7 @@ jobject NativeBuildEncodeFollowData(
     jint flash_voicing_flavor) {
     const std::string input = JStringToStdString(env, text);
     if (input.empty()) {
-        return NewEmptyEncodedAudioPayloadResult(env);
+        return NewEmptyEncodeFollowHydrationPayloadResult(env);
     }
 
     bag_encoder_config config =
@@ -120,10 +86,10 @@ jobject NativeBuildEncodeFollowData(
     result.follow_data.ultra_frame_timeline_buffer = ultra_frame_entries.data();
     result.follow_data.ultra_frame_timeline_buffer_count = ultra_frame_entries.size();
     if (bag_build_encode_follow_data(&config, input.c_str(), &result) != BAG_OK) {
-        return NewEmptyEncodedAudioPayloadResult(env);
+        return NewEmptyEncodeFollowHydrationPayloadResult(env);
     }
 
-    return NewEncodedAudioPayloadResultFromEncodeResult(env, result);
+    return NewEncodeFollowHydrationPayloadResultFromEncodeResult(env, result);
 }
 
 jobject NativeDescribeFlashSignal(
@@ -162,11 +128,11 @@ jobject NativeDescribeFlashSignal(
     }
     return NewFlashSignalInfo(
         env,
-        CopyApiString(low_buffer.data(), info.low_carrier_hz_size),
-        CopyApiString(high_buffer.data(), info.high_carrier_hz_size),
-        CopyApiString(bit_buffer.data(), info.bit_duration_samples_size),
-        CopyApiString(silence_buffer.data(), info.payload_silence_size),
-        CopyApiString(decode_buffer.data(), info.decode_path_size),
+        CopyApiString(low_buffer.data(), info.low_carrier_hz_size, low_buffer.size()),
+        CopyApiString(high_buffer.data(), info.high_carrier_hz_size, high_buffer.size()),
+        CopyApiString(bit_buffer.data(), info.bit_duration_samples_size, bit_buffer.size()),
+        CopyApiString(silence_buffer.data(), info.payload_silence_size, silence_buffer.size()),
+        CopyApiString(decode_buffer.data(), info.decode_path_size, decode_buffer.size()),
         JNI_TRUE);
 }
 jobject NativeDecodeGeneratedPcm(
@@ -289,14 +255,27 @@ jobject NativeDecodeGeneratedPcm(
     byte_entries.resize(result.follow_data.byte_timeline_count);
     binary_entries.resize(result.follow_data.binary_group_timeline_count);
     ultra_frame_entries.resize(result.follow_data.ultra_frame_timeline_count);
-    const std::string text(text_buffer.data(), result.text_size);
-    const std::string text_tokens(text_tokens_buffer.data(), result.text_follow_data.text_tokens_size);
-    const std::string text_character_text(
-        text_character_text_buffer.data(),
-        result.text_follow_data.text_character_text_size);
-    const std::string lyric_lines(lyric_lines_buffer.data(), result.text_follow_data.lyric_lines_size);
-    const std::string raw_bytes_hex(raw_bytes_hex_buffer.data(), result.raw_bytes_hex_size);
-    const std::string raw_bits_binary(raw_bits_binary_buffer.data(), result.raw_bits_binary_size);
+    const std::string text =
+        CopyApiString(text_buffer.data(), result.text_size, text_buffer.size());
+    const std::string text_tokens =
+        CopyApiString(
+            text_tokens_buffer.data(),
+            result.text_follow_data.text_tokens_size,
+            text_tokens_buffer.size());
+    const std::string text_character_text =
+        CopyApiString(
+            text_character_text_buffer.data(),
+            result.text_follow_data.text_character_text_size,
+            text_character_text_buffer.size());
+    const std::string lyric_lines =
+        CopyApiString(
+            lyric_lines_buffer.data(),
+            result.text_follow_data.lyric_lines_size,
+            lyric_lines_buffer.size());
+    const std::string raw_bytes_hex =
+        CopyApiString(raw_bytes_hex_buffer.data(), result.raw_bytes_hex_size, raw_bytes_hex_buffer.size());
+    const std::string raw_bits_binary =
+        CopyApiString(raw_bits_binary_buffer.data(), result.raw_bits_binary_size, raw_bits_binary_buffer.size());
     jobject decoded_payload = NewDecodedPayloadViewData(
         env,
         text,

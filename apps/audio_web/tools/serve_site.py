@@ -6,6 +6,14 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
+class NoCacheStaticHandler(SimpleHTTPRequestHandler):
+    def end_headers(self) -> None:
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Serve the audio_web static site locally.")
     parser.add_argument(
@@ -20,7 +28,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     site_dir = Path(__file__).resolve().parents[1] / "site"
-    handler = partial(SimpleHTTPRequestHandler, directory=str(site_dir))
+    handler = partial(NoCacheStaticHandler, directory=str(site_dir))
     server = ThreadingHTTPServer(("127.0.0.1", args.port), handler)
 
     print(f"Serving {site_dir} at http://127.0.0.1:{args.port}")

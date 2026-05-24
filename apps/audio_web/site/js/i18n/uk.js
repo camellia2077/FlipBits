@@ -40,7 +40,7 @@ export const MESSAGES = {
     "loading.ready": "Кодувальник WebAssembly завантажено. Тепер можна генерувати аудіо.",
     "loading.missing": "Модуль WASM ще не готовий. Спочатку запустіть python apps/audio_web/tools/build_wasm.py, щоб створити артефакти site/wasm/.",
     "validation.emptyText": "Введіть текст.",
-    "validation.missingExport": "Модуль WASM завантажено, але encodeTextToPcm16(...) ще не експортовано.",
+    "validation.missingExport": "Модуль WASM завантажено, але beginEncodeOperation(...) ще не експортовано.",
     "validation.miniAsciiOnly": "Режим mini приймає лише символи ASCII; усі інші символи було видалено.",
     "encoding.inProgress": "Генерація аудіо...",
     "encoding.success": ({ sampleCount }) => `Готово. Згенеровано ${sampleCount} PCM-відліків.`,

@@ -32,6 +32,7 @@ import com.bag.audioandroid.ui.screen.AudioTabScreen
 import com.bag.audioandroid.ui.screen.ConfigTabScreen
 import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
+import com.bag.audioandroid.ui.screen.toEncodeProgressDisplayModel
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
 import com.bag.audioandroid.ui.screen.MiniPlayerBar
 import com.bag.audioandroid.ui.screen.PlaybackFollowViewMode
@@ -435,8 +436,7 @@ internal fun AudioAndroidMainScaffold(
                     selectedThemeStyle = uiState.selectedThemeStyle,
                     transportMode = uiState.transportMode,
                     isCodecBusy = uiState.audioTabCodecBusy,
-                    encodeProgress = uiState.currentSession.encodeProgress,
-                    encodePhase = uiState.currentSession.encodePhase,
+                    encodeProgressDisplay = uiState.currentSession.encodeOperationSnapshot.toEncodeProgressDisplayModel(),
                     isEncodeCancelling = uiState.currentSession.isEncodeCancelling,
                     onTransportModeSelected = viewModel::onTransportModeSelected,
                     isFlashVoicingEnabled = uiState.isFlashVoicingEnabled,

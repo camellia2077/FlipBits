@@ -35,6 +35,7 @@ export class UiController {
     document.documentElement.lang = copy.htmlLang;
     this.elements.languageSelect.value = this.currentLocale;
     this.elements.languageLabel.textContent = copy.languageLabel;
+    this.elements.heroCopy.textContent = getTranslation(this.currentLocale, "hero.copy");
     this.elements.aboutTitle.textContent = getTranslation(this.currentLocale, "about.title");
     this.renderAboutCopy();
     this.elements.inputTextLabel.textContent = copy.inputTextLabel;
@@ -51,6 +52,7 @@ export class UiController {
     this.elements.resultProfileLabel.textContent = getTranslation(this.currentLocale, "result.profile");
     this.elements.resultDurationLabel.textContent = getTranslation(this.currentLocale, "result.duration");
     this.elements.resultSampleRateLabel.textContent = getTranslation(this.currentLocale, "result.sampleRate");
+    this.renderModeCards();
     this.renderStatus();
     this.renderProgress();
     this.renderResultSummary();
@@ -83,6 +85,33 @@ export class UiController {
       this.currentLocale,
       `mode.summary.${mode}`,
     );
+    this.renderModeCards(mode);
+  }
+
+  renderModeCards(activeMode = null) {
+    const mode = activeMode ?? this.elements.modeSelect?.value ?? "flash";
+    this.elements.modeCards?.setAttribute("data-active-mode", mode);
+    this.elements.modeCardCopyMini.textContent = getTranslation(
+      this.currentLocale,
+      "mode.summary.mini",
+    );
+    this.elements.modeCardCopyFlash.textContent = getTranslation(
+      this.currentLocale,
+      "mode.summary.flash",
+    );
+    this.elements.modeCardCopyPro.textContent = getTranslation(
+      this.currentLocale,
+      "mode.summary.pro",
+    );
+    this.elements.modeCardCopyUltra.textContent = getTranslation(
+      this.currentLocale,
+      "mode.summary.ultra",
+    );
+
+    this.elements.modeCardMini.classList.toggle("is-active", mode === "mini");
+    this.elements.modeCardFlash.classList.toggle("is-active", mode === "flash");
+    this.elements.modeCardPro.classList.toggle("is-active", mode === "pro");
+    this.elements.modeCardUltra.classList.toggle("is-active", mode === "ultra");
   }
 
   setStatusKey(key, params = {}) {
@@ -114,10 +143,25 @@ export class UiController {
     this.elements.downloadLink.classList.remove("is-disabled");
   }
 
-  setProgress(phaseCode, progressValue) {
+  setProgress(snapshot, workPlan) {
+    const overallRatio = Number.isFinite(snapshot?.overallProgress)
+      ? Math.max(0, Math.min(1, snapshot.overallProgress))
+      : 0;
     this.currentProgress = {
-      phase: ENCODE_PROGRESS_PHASES[phaseCode] ?? "preparing",
-      ratio: Math.max(0, Math.min(1, progressValue)),
+      phase: ENCODE_PROGRESS_PHASES[snapshot?.phase] ?? "preparing",
+      ratio: overallRatio,
+      phaseRatio: Number.isFinite(snapshot?.phaseProgress)
+        ? Math.max(0, Math.min(1, snapshot.phaseProgress))
+        : 0,
+      completedWorkUnits: Math.max(0, snapshot?.completedWorkUnits ?? 0),
+      totalWorkUnits: Math.max(0, snapshot?.totalWorkUnits ?? 0),
+      phaseCompletedWorkUnits: Math.max(
+        0,
+        snapshot?.phaseCompletedWorkUnits ?? 0,
+      ),
+      phaseTotalWorkUnits: Math.max(0, snapshot?.phaseTotalWorkUnits ?? 0),
+      state: snapshot?.state ?? 0,
+      workPlan: workPlan ?? null,
     };
     this.renderProgress();
   }

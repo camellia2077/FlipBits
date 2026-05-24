@@ -486,8 +486,8 @@ private class DecodeStateReducer(
         sessionStateStore.updateCurrentSession {
             it.copy(
                 isCodecBusy = true,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 statusText =
                     UiText.Resource(
                         R.string.status_mode_audio_decoding,
@@ -576,8 +576,8 @@ private class DecodeStateReducer(
                 followData = decoded.followData,
                 statusText = status,
                 isCodecBusy = false,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
             )
         }
@@ -617,8 +617,8 @@ private class DecodeStateReducer(
             it.copy(
                 statusText = statusText,
                 isCodecBusy = false,
-                encodeProgress = null,
-                encodePhase = null,
+                encodeOperationSnapshot = null,
+                encodeOperationWorkPlan = null,
                 isEncodeCancelling = false,
             )
         }

@@ -17,12 +17,11 @@ import com.bag.audioandroid.domain.AudioEncodePhase
 
 @Composable
 internal fun AudioEncodeStatusSection(
-    encodeProgress: Float?,
-    encodePhase: AudioEncodePhase?,
+    encodeProgressDisplay: EncodeProgressDisplayModel?,
     isEncodingBusy: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val clampedProgress = (encodeProgress ?: 0f).coerceIn(0f, 1f)
+    val progress = encodeProgressDisplay?.progress0To1 ?: 0f
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -34,7 +33,7 @@ internal fun AudioEncodeStatusSection(
             contentAlignment = Alignment.Center,
         ) {
             AudioEncodeGlyph(
-                encodeProgress = clampedProgress,
+                encodeProgress = progress,
                 isEncodingBusy = isEncodingBusy,
             )
         }
@@ -43,7 +42,7 @@ internal fun AudioEncodeStatusSection(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                encodePhase?.let { phase ->
+                encodeProgressDisplay?.phase?.let { phase ->
                     Text(
                         text = stringResource(phase.labelResId),
                         style = MaterialTheme.typography.bodySmall,
@@ -51,7 +50,7 @@ internal fun AudioEncodeStatusSection(
                     )
                 }
                 LinearProgressIndicator(
-                    progress = { clampedProgress },
+                    progress = { progress },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

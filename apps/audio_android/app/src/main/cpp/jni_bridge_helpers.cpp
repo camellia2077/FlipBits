@@ -6,6 +6,24 @@
 
 namespace jni_bridge {
 
+template <typename T>
+std::vector<T> CopyApiEntries(const T* buffer,
+                              std::size_t count,
+                              std::size_t buffer_count) {
+    if (buffer == nullptr || count == 0 || buffer_count == 0) {
+        return {};
+    }
+    const std::size_t safe_count = std::min(count, buffer_count);
+    return std::vector<T>(buffer, buffer + safe_count);
+}
+
+template <typename T>
+void DeleteLocalRefIfNotNull(JNIEnv* env, T ref) {
+    if (env != nullptr && ref != nullptr) {
+        env->DeleteLocalRef(ref);
+    }
+}
+
 std::string JStringToStdString(JNIEnv* env, jstring value) {
     if (value == nullptr) {
         return {};
@@ -61,27 +79,56 @@ bag_decoder_config MakeDecoderConfig(int sample_rate_hz,
     return config;
 }
 
-bag_encode_job* HandleToEncodeJob(jlong handle) {
-    return reinterpret_cast<bag_encode_job*>(static_cast<intptr_t>(handle));
+bag_encode_operation* HandleToEncodeOperation(jlong handle) {
+    return reinterpret_cast<bag_encode_operation*>(static_cast<intptr_t>(handle));
 }
 
-jfloatArray NewEncodeJobProgressArray(JNIEnv* env,
-                                      bag_encode_job_state state,
-                                      bag_encode_job_phase phase,
-                                      float progress_0_to_1,
-                                      bag_error_code terminal_code) {
-    jfloatArray out = env->NewFloatArray(4);
+jdoubleArray NewEncodeOperationSnapshotArray(
+    JNIEnv* env,
+    const bag_encode_operation_progress& progress) {
+    jdoubleArray out = env->NewDoubleArray(13);
     if (out == nullptr) {
         return nullptr;
     }
 
-    const jfloat values[4] = {
-        static_cast<jfloat>(state),
-        static_cast<jfloat>(phase),
-        progress_0_to_1,
-        static_cast<jfloat>(terminal_code),
+    const jdouble values[13] = {
+        static_cast<jdouble>(progress.state),
+        static_cast<jdouble>(progress.phase),
+        static_cast<jdouble>(progress.overall_progress_0_to_1),
+        static_cast<jdouble>(progress.phase_progress_0_to_1),
+        static_cast<jdouble>(progress.completed_work_units),
+        static_cast<jdouble>(progress.total_work_units),
+        static_cast<jdouble>(progress.phase_completed_work_units),
+        static_cast<jdouble>(progress.phase_total_work_units),
+        static_cast<jdouble>(progress.terminal_code),
+        static_cast<jdouble>(progress.estimated_pcm_sample_count),
+        static_cast<jdouble>(progress.payload_byte_count),
+        static_cast<jdouble>(progress.segment_count),
+        static_cast<jdouble>(progress.current_segment_index),
     };
-    env->SetFloatArrayRegion(out, 0, 4, values);
+    env->SetDoubleArrayRegion(out, 0, 13, values);
+    return out;
+}
+
+jdoubleArray NewEncodeOperationWorkPlanArray(
+    JNIEnv* env,
+    const bag_encode_operation_work_plan& work_plan) {
+    jdoubleArray out = env->NewDoubleArray(8);
+    if (out == nullptr) {
+        return nullptr;
+    }
+
+    const jdouble values[8] = {
+        static_cast<jdouble>(work_plan.preparing_input_work_units),
+        static_cast<jdouble>(work_plan.rendering_pcm_work_units),
+        static_cast<jdouble>(work_plan.postprocessing_work_units),
+        static_cast<jdouble>(work_plan.finalizing_work_units),
+        static_cast<jdouble>(work_plan.total_work_units),
+        static_cast<jdouble>(work_plan.estimated_pcm_sample_count),
+        static_cast<jdouble>(work_plan.payload_byte_count),
+        static_cast<jdouble>(work_plan.segment_count),
+    };
+    env->SetDoubleArrayRegion(out, 0, 8, values);
     return out;
 }
 
@@ -147,7 +194,9 @@ jobject NewArrayList(JNIEnv* env, jint initial_capacity) {
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(list_class, ctor, initial_capacity);
+    jobject list = env->NewObject(list_class, ctor, initial_capacity);
+    DeleteLocalRefIfNotNull(env, list_class);
+    return list;
 }
 
 bool AddToList(JNIEnv* env, jobject list, jobject item) {
@@ -162,17 +211,60 @@ bool AddToList(JNIEnv* env, jobject list, jobject item) {
     if (add == nullptr) {
         return false;
     }
-    return env->CallBooleanMethod(list, add, item) == JNI_TRUE;
+    const bool ok = env->CallBooleanMethod(list, add, item) == JNI_TRUE;
+    DeleteLocalRefIfNotNull(env, list_class);
+    return ok;
+}
+
+struct ArrayListMethods {
+    jclass list_class = nullptr;
+    jmethodID ctor = nullptr;
+    jmethodID add = nullptr;
+};
+
+ArrayListMethods ResolveArrayListMethods(JNIEnv* env) {
+    ArrayListMethods methods{};
+    methods.list_class = FindClassOrNull(env, "java/util/ArrayList");
+    if (methods.list_class == nullptr) {
+        return methods;
+    }
+    methods.ctor = env->GetMethodID(methods.list_class, "<init>", "(I)V");
+    methods.add = env->GetMethodID(methods.list_class, "add", "(Ljava/lang/Object;)Z");
+    if (methods.ctor == nullptr || methods.add == nullptr) {
+        DeleteLocalRefIfNotNull(env, methods.list_class);
+        return {};
+    }
+    return methods;
+}
+
+jobject NewArrayList(JNIEnv* env, jint initial_capacity, const ArrayListMethods& methods) {
+    if (methods.list_class == nullptr || methods.ctor == nullptr) {
+        return nullptr;
+    }
+    jobject list = env->NewObject(methods.list_class, methods.ctor, initial_capacity);
+    DeleteLocalRefIfNotNull(env, methods.list_class);
+    return list;
+}
+
+bool AddToList(JNIEnv* env, jobject list, const ArrayListMethods& methods, jobject item) {
+    if (list == nullptr || item == nullptr || methods.add == nullptr) {
+        return false;
+    }
+    return env->CallBooleanMethod(list, methods.add, item) == JNI_TRUE;
 }
 
 jobject NewStringList(JNIEnv* env, const std::vector<std::string>& values) {
-    jobject list = NewArrayList(env, static_cast<jint>(values.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(values.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& value : values) {
         jstring item = env->NewStringUTF(value.c_str());
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -190,12 +282,14 @@ jobject NewPayloadFollowByteEntry(JNIEnv* env, const bag_payload_follow_byte_ent
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.start_sample),
         static_cast<jint>(entry.sample_count),
         static_cast<jint>(entry.byte_index));
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewPayloadFollowBinaryGroupEntry(
@@ -210,7 +304,7 @@ jobject NewPayloadFollowBinaryGroupEntry(
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.start_sample),
@@ -219,6 +313,8 @@ jobject NewPayloadFollowBinaryGroupEntry(
         static_cast<jint>(entry.bit_offset),
         static_cast<jint>(entry.bit_count),
         static_cast<jfloat>(entry.carrier_freq_hz));
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jint SizeToJIntOrMinusOne(std::size_t value) {
@@ -240,7 +336,7 @@ jobject NewUltraFrameSymbolEntry(
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.start_sample),
@@ -252,6 +348,8 @@ jobject NewUltraFrameSymbolEntry(
         static_cast<jint>(entry.section),
         entry.is_payload != 0 ? JNI_TRUE : JNI_FALSE,
         SizeToJIntOrMinusOne(entry.payload_byte_index));
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowTimelineEntry(JNIEnv* env, const bag_text_follow_token_entry& entry) {
@@ -264,12 +362,14 @@ jobject NewTextFollowTimelineEntry(JNIEnv* env, const bag_text_follow_token_entr
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.start_sample),
         static_cast<jint>(entry.sample_count),
         static_cast<jint>(entry.token_index));
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowCharacterViewData(JNIEnv* env,
@@ -294,7 +394,7 @@ jobject NewTextFollowCharacterViewData(JNIEnv* env,
             text_character_text.substr(entry.text_offset, clamped_text_size);
     }
     jstring text_value = env->NewStringUTF(character_text.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.token_index),
@@ -305,6 +405,9 @@ jobject NewTextFollowCharacterViewData(JNIEnv* env,
         static_cast<jint>(entry.sample_count),
         static_cast<jint>(entry.kind),
         text_value);
+    DeleteLocalRefIfNotNull(env, text_value);
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowRawSegmentViewData(JNIEnv* env,
@@ -349,7 +452,7 @@ jobject NewTextFollowRawSegmentViewData(JNIEnv* env,
 
     jstring hex_value = env->NewStringUTF(hex_text.c_str());
     jstring binary_value = env->NewStringUTF(binary_text.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.token_index),
@@ -359,6 +462,10 @@ jobject NewTextFollowRawSegmentViewData(JNIEnv* env,
         static_cast<jint>(entry.byte_count),
         hex_value,
         binary_value);
+    DeleteLocalRefIfNotNull(env, hex_value);
+    DeleteLocalRefIfNotNull(env, binary_value);
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowRawDisplayUnitViewData(
@@ -408,7 +515,7 @@ jobject NewTextFollowRawDisplayUnitViewData(
 
     jstring hex_value = env->NewStringUTF(hex_text.c_str());
     jstring binary_value = env->NewStringUTF(binary_text.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.token_index),
@@ -424,6 +531,10 @@ jobject NewTextFollowRawDisplayUnitViewData(
         entry.is_character_end != 0 ? JNI_TRUE : JNI_FALSE,
         hex_value,
         binary_value);
+    DeleteLocalRefIfNotNull(env, hex_value);
+    DeleteLocalRefIfNotNull(env, binary_value);
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowLyricLineTimelineEntry(JNIEnv* env,
@@ -437,12 +548,14 @@ jobject NewTextFollowLyricLineTimelineEntry(JNIEnv* env,
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.start_sample),
         static_cast<jint>(entry.sample_count),
         static_cast<jint>(entry.line_index));
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowLineTokenRangeViewData(
@@ -457,12 +570,14 @@ jobject NewTextFollowLineTokenRangeViewData(
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.line_index),
         static_cast<jint>(entry.token_begin_index),
         static_cast<jint>(entry.token_count));
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewTextFollowLineRawSegmentViewData(JNIEnv* env,
@@ -508,7 +623,7 @@ jobject NewTextFollowLineRawSegmentViewData(JNIEnv* env,
 
     jstring hex_value = env->NewStringUTF(hex_text.c_str());
     jstring binary_value = env->NewStringUTF(binary_text.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         entry_class,
         ctor,
         static_cast<jint>(entry.line_index),
@@ -518,17 +633,25 @@ jobject NewTextFollowLineRawSegmentViewData(JNIEnv* env,
         static_cast<jint>(entry.byte_count),
         hex_value,
         binary_value);
+    DeleteLocalRefIfNotNull(env, hex_value);
+    DeleteLocalRefIfNotNull(env, binary_value);
+    DeleteLocalRefIfNotNull(env, entry_class);
+    return out;
 }
 
 jobject NewByteTimelineList(JNIEnv* env,
                             const std::vector<bag_payload_follow_byte_entry>& entries) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewPayloadFollowByteEntry(env, entry);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -539,13 +662,17 @@ jobject NewByteTimelineList(JNIEnv* env,
 jobject NewBinaryTimelineList(
     JNIEnv* env,
     const std::vector<bag_payload_follow_binary_group_entry>& entries) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewPayloadFollowBinaryGroupEntry(env, entry);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -556,13 +683,17 @@ jobject NewBinaryTimelineList(
 jobject NewUltraFrameTimelineList(
     JNIEnv* env,
     const std::vector<bag_ultra_frame_symbol_entry>& entries) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewUltraFrameSymbolEntry(env, entry);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -572,13 +703,17 @@ jobject NewUltraFrameTimelineList(
 
 jobject NewTextTimelineList(JNIEnv* env,
                             const std::vector<bag_text_follow_token_entry>& entries) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewTextFollowTimelineEntry(env, entry);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -589,14 +724,18 @@ jobject NewTextTimelineList(JNIEnv* env,
 jobject NewTextCharacterList(JNIEnv* env,
                              const std::vector<bag_text_follow_character_entry>& entries,
                              const std::string& text_character_text) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item =
             NewTextFollowCharacterViewData(env, entry, text_character_text);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -608,13 +747,17 @@ jobject NewTextRawSegmentList(JNIEnv* env,
                               const std::vector<bag_text_follow_raw_segment_entry>& entries,
                               const std::vector<std::string>& hex_tokens,
                               const std::string& compact_bits) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewTextFollowRawSegmentViewData(env, entry, hex_tokens, compact_bits);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -627,13 +770,17 @@ jobject NewTextRawDisplayUnitList(
     const std::vector<bag_text_follow_raw_display_unit_entry>& entries,
     const std::vector<std::string>& hex_tokens,
     const std::string& compact_bits) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewTextFollowRawDisplayUnitViewData(env, entry, hex_tokens, compact_bits);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -643,13 +790,17 @@ jobject NewTextRawDisplayUnitList(
 
 jobject NewLyricLineTimelineList(JNIEnv* env,
                                  const std::vector<bag_text_follow_lyric_line_entry>& entries) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewTextFollowLyricLineTimelineEntry(env, entry);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -660,13 +811,17 @@ jobject NewLyricLineTimelineList(JNIEnv* env,
 jobject NewLineTokenRangeList(
     JNIEnv* env,
     const std::vector<bag_text_follow_line_token_range_entry>& entries) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewTextFollowLineTokenRangeViewData(env, entry);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -678,13 +833,17 @@ jobject NewLineRawSegmentList(JNIEnv* env,
                               const std::vector<bag_text_follow_line_raw_segment_entry>& entries,
                               const std::vector<std::string>& hex_tokens,
                               const std::string& compact_bits) {
-    jobject list = NewArrayList(env, static_cast<jint>(entries.size()));
+    const ArrayListMethods methods = ResolveArrayListMethods(env);
+    if (methods.list_class == nullptr || methods.ctor == nullptr || methods.add == nullptr) {
+        return nullptr;
+    }
+    jobject list = NewArrayList(env, static_cast<jint>(entries.size()), methods);
     if (list == nullptr) {
         return nullptr;
     }
     for (const auto& entry : entries) {
         jobject item = NewTextFollowLineRawSegmentViewData(env, entry, hex_tokens, compact_bits);
-        if (item == nullptr || !AddToList(env, list, item)) {
+        if (item == nullptr || !AddToList(env, list, methods, item)) {
             return nullptr;
         }
         env->DeleteLocalRef(item);
@@ -772,9 +931,10 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         hex_list == nullptr || binary_list == nullptr ||
         byte_timeline_list == nullptr || binary_timeline_list == nullptr ||
         ultra_frame_timeline_list == nullptr) {
+        DeleteLocalRefIfNotNull(env, result_class);
         return nullptr;
     }
-    return env->NewObject(
+    jobject out = env->NewObject(
         result_class,
         ctor,
         text_list,
@@ -797,6 +957,22 @@ jobject NewPayloadFollowViewData(JNIEnv* env,
         total_pcm_sample_count,
         follow_available,
         ultra_frame_timeline_list);
+    DeleteLocalRefIfNotNull(env, text_list);
+    DeleteLocalRefIfNotNull(env, text_timeline_list);
+    DeleteLocalRefIfNotNull(env, text_character_list);
+    DeleteLocalRefIfNotNull(env, text_raw_segment_list);
+    DeleteLocalRefIfNotNull(env, text_raw_display_unit_list);
+    DeleteLocalRefIfNotNull(env, lyric_line_list);
+    DeleteLocalRefIfNotNull(env, lyric_line_timeline_list);
+    DeleteLocalRefIfNotNull(env, line_token_range_list);
+    DeleteLocalRefIfNotNull(env, line_raw_segment_list);
+    DeleteLocalRefIfNotNull(env, hex_list);
+    DeleteLocalRefIfNotNull(env, binary_list);
+    DeleteLocalRefIfNotNull(env, byte_timeline_list);
+    DeleteLocalRefIfNotNull(env, binary_timeline_list);
+    DeleteLocalRefIfNotNull(env, ultra_frame_timeline_list);
+    DeleteLocalRefIfNotNull(env, result_class);
+    return out;
 }
 
 jobject NewDecodedPayloadViewData(JNIEnv* env,
@@ -817,7 +993,7 @@ jobject NewDecodedPayloadViewData(JNIEnv* env,
     jstring text_value = env->NewStringUTF(text.c_str());
     jstring raw_bytes_hex_value = env->NewStringUTF(raw_bytes_hex.c_str());
     jstring raw_bits_binary_value = env->NewStringUTF(raw_bits_binary.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         result_class,
         ctor,
         text_value,
@@ -825,6 +1001,11 @@ jobject NewDecodedPayloadViewData(JNIEnv* env,
         raw_bits_binary_value,
         text_decode_status_code,
         raw_payload_available);
+    DeleteLocalRefIfNotNull(env, text_value);
+    DeleteLocalRefIfNotNull(env, raw_bytes_hex_value);
+    DeleteLocalRefIfNotNull(env, raw_bits_binary_value);
+    DeleteLocalRefIfNotNull(env, result_class);
+    return out;
 }
 
 jobject NewDecodedAudioPayloadResult(JNIEnv* env,
@@ -842,7 +1023,9 @@ jobject NewDecodedAudioPayloadResult(JNIEnv* env,
     if (ctor == nullptr) {
         return nullptr;
     }
-    return env->NewObject(result_class, ctor, decoded_payload, follow_data);
+    jobject out = env->NewObject(result_class, ctor, decoded_payload, follow_data);
+    DeleteLocalRefIfNotNull(env, result_class);
+    return out;
 }
 
 jobject NewEncodedAudioPayloadResult(JNIEnv* env,
@@ -865,7 +1048,7 @@ jobject NewEncodedAudioPayloadResult(JNIEnv* env,
     }
     jstring raw_bytes_hex_value = env->NewStringUTF(raw_bytes_hex.c_str());
     jstring raw_bits_binary_value = env->NewStringUTF(raw_bits_binary.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         result_class,
         ctor,
         pcm,
@@ -873,6 +1056,14 @@ jobject NewEncodedAudioPayloadResult(JNIEnv* env,
         raw_bits_binary_value,
         follow_data,
         terminal_code);
+    if (raw_bytes_hex_value != nullptr) {
+        env->DeleteLocalRef(raw_bytes_hex_value);
+    }
+    if (raw_bits_binary_value != nullptr) {
+        env->DeleteLocalRef(raw_bits_binary_value);
+    }
+    DeleteLocalRefIfNotNull(env, result_class);
+    return out;
 }
 
 jobject NewFlashSignalInfo(JNIEnv* env,
@@ -899,7 +1090,7 @@ jobject NewFlashSignalInfo(JNIEnv* env,
     jstring bit_value = env->NewStringUTF(bit_duration_samples.c_str());
     jstring silence_value = env->NewStringUTF(payload_silence.c_str());
     jstring decode_value = env->NewStringUTF(decode_path.c_str());
-    return env->NewObject(
+    jobject out = env->NewObject(
         result_class,
         ctor,
         low_value,
@@ -908,9 +1099,19 @@ jobject NewFlashSignalInfo(JNIEnv* env,
         silence_value,
         decode_value,
         available);
+    DeleteLocalRefIfNotNull(env, low_value);
+    DeleteLocalRefIfNotNull(env, high_value);
+    DeleteLocalRefIfNotNull(env, bit_value);
+    DeleteLocalRefIfNotNull(env, silence_value);
+    DeleteLocalRefIfNotNull(env, decode_value);
+    DeleteLocalRefIfNotNull(env, result_class);
+    return out;
 }
 
 jshortArray NewShortArrayFromPcmResult(JNIEnv* env, const bag_pcm16_result& result) {
+    if (result.sample_count > 0 && result.samples == nullptr) {
+        return env->NewShortArray(0);
+    }
     jshortArray out = env->NewShortArray(static_cast<jsize>(result.sample_count));
     if (out != nullptr && result.sample_count > 0) {
         env->SetShortArrayRegion(
@@ -931,13 +1132,18 @@ jobject NewEmptyDecodedAudioPayloadResult(JNIEnv* env,
     jobject decoded_payload = NewDecodedPayloadViewData(
         env, "", "", "", text_decode_status_code, raw_payload_available);
     jobject follow_data = NewEmptyPayloadFollowViewData(env);
-    return NewDecodedAudioPayloadResult(env, decoded_payload, follow_data);
+    jobject out = NewDecodedAudioPayloadResult(env, decoded_payload, follow_data);
+    DeleteLocalRefIfNotNull(env, decoded_payload);
+    DeleteLocalRefIfNotNull(env, follow_data);
+    return out;
 }
 
-jobject NewEmptyEncodedAudioPayloadResult(JNIEnv* env, jint terminal_code) {
+jobject NewEmptyEncodedPayloadResult(JNIEnv* env, jint terminal_code) {
     jshortArray empty_pcm = env->NewShortArray(0);
     jobject follow_data = NewEmptyPayloadFollowViewData(env);
-    return NewEncodedAudioPayloadResult(env, empty_pcm, "", "", follow_data, terminal_code);
+    jobject out = NewEncodedAudioPayloadResult(env, empty_pcm, "", "", follow_data, terminal_code);
+    DeleteLocalRefIfNotNull(env, follow_data);
+    return out;
 }
 
 std::string CopyApiString(const char* buffer, std::size_t size) {
@@ -947,86 +1153,105 @@ std::string CopyApiString(const char* buffer, std::size_t size) {
     return std::string(buffer, size);
 }
 
-jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
-                                                     const bag_encode_result& result) {
-    const std::string text_tokens = CopyApiString(
-        result.text_follow_data.text_tokens_buffer,
-        result.text_follow_data.text_tokens_size);
-    const std::string text_character_text = CopyApiString(
-        result.text_follow_data.text_character_text_buffer,
-        result.text_follow_data.text_character_text_size);
-    const std::string lyric_lines = CopyApiString(
-        result.text_follow_data.lyric_lines_buffer,
-        result.text_follow_data.lyric_lines_size);
-    const std::string raw_bytes_hex =
-        CopyApiString(result.raw_bytes_hex_buffer, result.raw_bytes_hex_size);
-    const std::string raw_bits_binary = CopyApiString(
-        result.raw_bits_binary_buffer, result.raw_bits_binary_size);
-    std::vector<bag_text_follow_token_entry> text_entries(
-        result.text_follow_data.text_token_timeline_count);
-    std::vector<bag_text_follow_character_entry> text_characters(
-        result.text_follow_data.text_characters_count);
-    std::vector<bag_text_follow_raw_segment_entry> text_raw_segments(
-        result.text_follow_data.token_raw_segments_count);
-    std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units(
-        result.text_follow_data.token_raw_display_units_count);
-    std::vector<bag_text_follow_lyric_line_entry> line_entries(
-        result.text_follow_data.lyric_line_timeline_count);
-    std::vector<bag_text_follow_line_token_range_entry> line_token_ranges(
-        result.text_follow_data.line_token_ranges_count);
-    std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments(
-        result.text_follow_data.line_raw_segments_count);
-    std::vector<bag_payload_follow_byte_entry> byte_entries(
-        result.follow_data.byte_timeline_count);
-    std::vector<bag_payload_follow_binary_group_entry> binary_entries(
-        result.follow_data.binary_group_timeline_count);
-    std::vector<bag_ultra_frame_symbol_entry> ultra_frame_entries(
-        result.follow_data.ultra_frame_timeline_count);
-    if (!text_entries.empty()) {
-        std::copy_n(result.text_follow_data.text_token_timeline_buffer,
-                    text_entries.size(), text_entries.begin());
+std::string CopyApiString(const char* buffer, std::size_t size, std::size_t buffer_size) {
+    if (buffer == nullptr || size == 0 || buffer_size == 0) {
+        return {};
     }
-    if (!text_raw_segments.empty()) {
-        std::copy_n(result.text_follow_data.token_raw_segments_buffer,
-                    text_raw_segments.size(), text_raw_segments.begin());
-    }
-    if (!text_characters.empty()) {
-        std::copy_n(result.text_follow_data.text_characters_buffer,
-                    text_characters.size(), text_characters.begin());
-    }
-    if (!text_raw_display_units.empty()) {
-        std::copy_n(result.text_follow_data.token_raw_display_units_buffer,
-                    text_raw_display_units.size(),
-                    text_raw_display_units.begin());
-    }
-    if (!line_entries.empty()) {
-        std::copy_n(result.text_follow_data.lyric_line_timeline_buffer,
-                    line_entries.size(), line_entries.begin());
-    }
-    if (!line_token_ranges.empty()) {
-        std::copy_n(result.text_follow_data.line_token_ranges_buffer,
-                    line_token_ranges.size(), line_token_ranges.begin());
-    }
-    if (!line_raw_segments.empty()) {
-        std::copy_n(result.text_follow_data.line_raw_segments_buffer,
-                    line_raw_segments.size(), line_raw_segments.begin());
-    }
-    if (!byte_entries.empty()) {
-        std::copy_n(result.follow_data.byte_timeline_buffer, byte_entries.size(),
-                    byte_entries.begin());
-    }
-    if (!binary_entries.empty()) {
-        std::copy_n(result.follow_data.binary_group_timeline_buffer,
-                    binary_entries.size(), binary_entries.begin());
-    }
-    if (!ultra_frame_entries.empty()) {
-        std::copy_n(result.follow_data.ultra_frame_timeline_buffer,
-                    ultra_frame_entries.size(), ultra_frame_entries.begin());
-    }
+    return std::string(buffer, std::min(size, buffer_size));
+}
+
+jobject NewEncodeOperationPcmPayloadResultFromEncodeResult(
+    JNIEnv* env,
+    const bag_encode_result& result) {
     bag_pcm16_result pcm_result{};
     pcm_result.samples = result.samples;
     pcm_result.sample_count = result.sample_count;
     jshortArray pcm = NewShortArrayFromPcmResult(env, pcm_result);
+    jobject follow_data = NewEmptyPayloadFollowViewData(env);
+    jobject out = NewEncodedAudioPayloadResult(env, pcm, "", "", follow_data, kBagErrorOk);
+    DeleteLocalRefIfNotNull(env, follow_data);
+    return out;
+}
+
+jobject NewEmptyEncodeOperationPcmPayloadResult(JNIEnv* env, jint terminal_code) {
+    return NewEmptyEncodedPayloadResult(env, terminal_code);
+}
+
+jobject NewEncodeFollowHydrationPayloadResultFromEncodeResult(
+    JNIEnv* env,
+    const bag_encode_result& result) {
+    const std::string text_tokens = CopyApiString(
+        result.text_follow_data.text_tokens_buffer,
+        result.text_follow_data.text_tokens_size,
+        result.text_follow_data.text_tokens_buffer_size);
+    const std::string text_character_text = CopyApiString(
+        result.text_follow_data.text_character_text_buffer,
+        result.text_follow_data.text_character_text_size,
+        result.text_follow_data.text_character_text_buffer_size);
+    const std::string lyric_lines = CopyApiString(
+        result.text_follow_data.lyric_lines_buffer,
+        result.text_follow_data.lyric_lines_size,
+        result.text_follow_data.lyric_lines_buffer_size);
+    const std::string raw_bytes_hex =
+        CopyApiString(
+            result.raw_bytes_hex_buffer,
+            result.raw_bytes_hex_size,
+            result.raw_bytes_hex_buffer_size);
+    const std::string raw_bits_binary = CopyApiString(
+        result.raw_bits_binary_buffer,
+        result.raw_bits_binary_size,
+        result.raw_bits_binary_buffer_size);
+    const std::vector<bag_text_follow_token_entry> text_entries =
+        CopyApiEntries(
+            result.text_follow_data.text_token_timeline_buffer,
+            result.text_follow_data.text_token_timeline_count,
+            result.text_follow_data.text_token_timeline_buffer_count);
+    const std::vector<bag_text_follow_character_entry> text_characters =
+        CopyApiEntries(
+            result.text_follow_data.text_characters_buffer,
+            result.text_follow_data.text_characters_count,
+            result.text_follow_data.text_characters_buffer_count);
+    const std::vector<bag_text_follow_raw_segment_entry> text_raw_segments =
+        CopyApiEntries(
+            result.text_follow_data.token_raw_segments_buffer,
+            result.text_follow_data.token_raw_segments_count,
+            result.text_follow_data.token_raw_segments_buffer_count);
+    const std::vector<bag_text_follow_raw_display_unit_entry> text_raw_display_units =
+        CopyApiEntries(
+            result.text_follow_data.token_raw_display_units_buffer,
+            result.text_follow_data.token_raw_display_units_count,
+            result.text_follow_data.token_raw_display_units_buffer_count);
+    const std::vector<bag_text_follow_lyric_line_entry> line_entries =
+        CopyApiEntries(
+            result.text_follow_data.lyric_line_timeline_buffer,
+            result.text_follow_data.lyric_line_timeline_count,
+            result.text_follow_data.lyric_line_timeline_buffer_count);
+    const std::vector<bag_text_follow_line_token_range_entry> line_token_ranges =
+        CopyApiEntries(
+            result.text_follow_data.line_token_ranges_buffer,
+            result.text_follow_data.line_token_ranges_count,
+            result.text_follow_data.line_token_ranges_buffer_count);
+    const std::vector<bag_text_follow_line_raw_segment_entry> line_raw_segments =
+        CopyApiEntries(
+            result.text_follow_data.line_raw_segments_buffer,
+            result.text_follow_data.line_raw_segments_count,
+            result.text_follow_data.line_raw_segments_buffer_count);
+    const std::vector<bag_payload_follow_byte_entry> byte_entries =
+        CopyApiEntries(
+            result.follow_data.byte_timeline_buffer,
+            result.follow_data.byte_timeline_count,
+            result.follow_data.byte_timeline_buffer_count);
+    const std::vector<bag_payload_follow_binary_group_entry> binary_entries =
+        CopyApiEntries(
+            result.follow_data.binary_group_timeline_buffer,
+            result.follow_data.binary_group_timeline_count,
+            result.follow_data.binary_group_timeline_buffer_count);
+    const std::vector<bag_ultra_frame_symbol_entry> ultra_frame_entries =
+        CopyApiEntries(
+            result.follow_data.ultra_frame_timeline_buffer,
+            result.follow_data.ultra_frame_timeline_count,
+            result.follow_data.ultra_frame_timeline_buffer_count);
+    jshortArray empty_pcm = env->NewShortArray(0);
     jobject follow_data = NewPayloadFollowViewData(
         env,
         text_tokens,
@@ -1054,13 +1279,14 @@ jobject NewEncodedAudioPayloadResultFromEncodeResult(JNIEnv* env,
         static_cast<jint>(result.follow_data.payload_sample_count),
         static_cast<jint>(result.follow_data.total_pcm_sample_count),
         result.follow_data.available != 0 ? JNI_TRUE : JNI_FALSE);
-    return NewEncodedAudioPayloadResult(
-        env,
-        pcm,
-        raw_bytes_hex,
-        raw_bits_binary,
-        follow_data,
-        kBagErrorOk);
+    jobject out =
+        NewEncodedAudioPayloadResult(env, empty_pcm, "", "", follow_data, kBagErrorOk);
+    DeleteLocalRefIfNotNull(env, follow_data);
+    return out;
+}
+
+jobject NewEmptyEncodeFollowHydrationPayloadResult(JNIEnv* env, jint terminal_code) {
+    return NewEmptyEncodedPayloadResult(env, terminal_code);
 }
 
 bool IsPcmSampleCountWithinJvmLimit(std::size_t sample_count) {

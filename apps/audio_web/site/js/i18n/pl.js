@@ -40,7 +40,7 @@ export const MESSAGES = {
     "loading.ready": "Enkoder WebAssembly został załadowany. Można generować audio.",
     "loading.missing": "Moduł WASM nie jest jeszcze gotowy. Najpierw uruchom python apps/audio_web/tools/build_wasm.py, aby wygenerować artefakty site/wasm/.",
     "validation.emptyText": "Wpisz tekst.",
-    "validation.missingExport": "Moduł WASM został załadowany, ale encodeTextToPcm16(...) nie zostało jeszcze wyeksportowane.",
+    "validation.missingExport": "Moduł WASM został załadowany, ale beginEncodeOperation(...) nie zostało jeszcze wyeksportowane.",
     "validation.miniAsciiOnly": "Tryb mini akceptuje tylko ASCII; znaki spoza ASCII zostały usunięte.",
     "encoding.inProgress": "Generowanie audio...",
     "encoding.success": ({ sampleCount }) => `Gotowe. Wygenerowano ${sampleCount} próbek PCM.`,

@@ -1,6 +1,6 @@
 # Rust Unsafe Usage Guide
 
-This directory contains tools for scanning and auditing `unsafe` usage in the WaveBits codebase.
+This directory contains tools for scanning and auditing `unsafe` usage in the FlipBits codebase.
 
 ## Objective
 

@@ -55,7 +55,7 @@ from config import (
 
 
 # 1. 雷达图本体 (Radar Chart)
-SIZE_RADAR_LABEL_ZH = 38    # 中文维度标签大小
+SIZE_RADAR_LABEL_ZH = 64    # 中文维度标签大小
 
 # --- 中文版微调 (Chinese Offsets) ---
 # 值增大：远离圆心；值减小：靠近圆心

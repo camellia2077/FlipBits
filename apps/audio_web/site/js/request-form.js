@@ -6,8 +6,7 @@ function setFieldVisibility(field, visible) {
   field.style.display = visible ? "" : "none";
 }
 
-export function syncModeFields(elements, ui) {
-  const mode = elements.modeSelect.value;
+export function syncModeFields(elements, ui, mode = elements.modeSelect.value) {
   setFieldVisibility(elements.flashStyleField, mode === "flash");
   setFieldVisibility(elements.miniSpeedField, mode === "mini");
   ui.setInputHint(mode);

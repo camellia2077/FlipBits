@@ -1,3 +1,8 @@
+#include <algorithm>
+#include <atomic>
+#include <cmath>
+#include <mutex>
+
 #include "android_bag/flash/codec.h"
 #include "android_bag/flash/phy_clean.h"
 #include "android_bag/mini/codec.h"
