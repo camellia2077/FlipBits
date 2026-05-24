@@ -259,6 +259,75 @@ Mfsk16Config MakeMfsk16Config(const CoreConfig& config) {
   return out;
 }
 
+class SymbolRenderer::Impl {
+ public:
+  Impl(std::uint8_t symbol, std::size_t write_offset,
+       const Mfsk16Config& config, std::vector<int16_t>* out_pcm)
+      : symbol_(symbol),
+        write_offset_(write_offset),
+        config_(config),
+        out_pcm_(out_pcm) {
+    if (out_pcm_ == nullptr || !IsValidConfig(config_) || symbol_ > 0x0F) {
+      throw std::invalid_argument("Invalid ultra symbol renderer state.");
+    }
+    const std::size_t total_work =
+        static_cast<std::size_t>(std::max(config_.symbol_samples, 0));
+    if (write_offset_ + total_work > out_pcm_->size()) {
+      throw std::invalid_argument("Ultra symbol renderer exceeds PCM bounds.");
+    }
+  }
+
+  std::size_t TotalWork() const {
+    return static_cast<std::size_t>(std::max(config_.symbol_samples, 0));
+  }
+
+  bool Finished() const { return sample_index_ >= TotalWork(); }
+
+  SymbolRenderProgress Pump(std::size_t work_budget) {
+    const std::size_t normalized_budget =
+        std::max(work_budget, static_cast<std::size_t>(1));
+    constexpr double kPi = 3.14159265358979323846;
+    const double omega = 2.0 * kPi * config_.freqs_hz[symbol_];
+    std::size_t advanced = 0;
+    while (!Finished() && advanced < normalized_budget) {
+      const double time = static_cast<double>(sample_index_) /
+                          static_cast<double>(config_.sample_rate_hz);
+      const double sample = config_.amplitude * std::sin(omega * time);
+      (*out_pcm_)[write_offset_ + sample_index_] = static_cast<int16_t>(
+          std::lround(std::clamp(sample, -1.0, 1.0) * 32767.0));
+      ++sample_index_;
+      ++advanced;
+    }
+    return SymbolRenderProgress{
+        .completed_work = sample_index_,
+        .total_work = TotalWork(),
+        .finished = Finished(),
+    };
+  }
+
+ private:
+  std::uint8_t symbol_ = 0;
+  std::size_t write_offset_ = 0;
+  Mfsk16Config config_{};
+  std::vector<int16_t>* out_pcm_ = nullptr;
+  std::size_t sample_index_ = 0;
+};
+
+SymbolRenderer::SymbolRenderer(std::uint8_t symbol, std::size_t write_offset,
+                               const Mfsk16Config& config,
+                               std::vector<int16_t>* out_pcm)
+    : impl_(std::make_unique<Impl>(symbol, write_offset, config, out_pcm)) {}
+
+SymbolRenderer::~SymbolRenderer() = default;
+
+std::size_t SymbolRenderer::TotalWork() const { return impl_->TotalWork(); }
+
+bool SymbolRenderer::Finished() const { return impl_->Finished(); }
+
+SymbolRenderProgress SymbolRenderer::Pump(std::size_t work_budget) {
+  return impl_->Pump(work_budget);
+}
+
 ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
                                const Mfsk16Config& config,
                                std::vector<int16_t>* out_pcm,
@@ -280,7 +349,6 @@ ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
   }
 
   out_pcm->resize(total_samples);
-  const SymbolTemplateBank templates = BuildSymbolTemplateBank(config);
   std::size_t rendered_samples = 0;
   std::size_t last_reported_samples = 0;
   std::size_t write_offset = 0;
@@ -293,12 +361,20 @@ ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
     if (symbol > 0x0F) {
       return ErrorCode::kInvalidArgument;
     }
-
-    const auto& template_pcm = templates[static_cast<std::size_t>(symbol)];
-    std::copy(template_pcm.begin(), template_pcm.end(),
-              out_pcm->begin() + static_cast<std::ptrdiff_t>(write_offset));
-    write_offset += template_pcm.size();
-    rendered_samples += template_pcm.size();
+    SymbolRenderer renderer(symbol, write_offset, config, out_pcm);
+    while (!renderer.Finished()) {
+      if (ShouldCancelEncode(progress_sink)) {
+        out_pcm->clear();
+        return ErrorCode::kCancelled;
+      }
+      const SymbolRenderProgress progress = renderer.Pump(kProgressReportStrideSamples);
+      rendered_samples = write_offset + progress.completed_work;
+      MaybeReportCompletedSampleProgress(
+          progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin,
+          progress_end, rendered_samples, total_samples, &last_reported_samples,
+          progress.finished);
+    }
+    write_offset += renderer.TotalWork();
     MaybeReportCompletedSampleProgress(
         progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin,
         progress_end, rendered_samples, total_samples, &last_reported_samples,

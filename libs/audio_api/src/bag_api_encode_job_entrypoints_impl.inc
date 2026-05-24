@@ -18,12 +18,22 @@ bag_error_code bag_start_encode_text_job(const bag_encoder_config* config,
       return BAG_INTERNAL;
     }
 
-    job->core_config = ToCoreConfig(
+    const bag::CoreConfig core_config = ToCoreConfig(
         config->sample_rate_hz, config->frame_samples,
         config->enable_diagnostics, config->mode, config->flash_signal_profile,
         config->flash_voicing_flavor, config->reserved);
-    job->text = text;
-    job->worker = std::thread([job]() { RunEncodeTextJobWorker(job); });
+    job->operation = bag::CreateEncodeOperation(core_config, text);
+    if (!job->operation) {
+      delete job;
+      return BAG_INTERNAL;
+    }
+    bool did_progress = false;
+    const bag::ErrorCode pump_code =
+        job->operation->Pump({}, &did_progress);
+    if (pump_code != bag::ErrorCode::kOk) {
+      delete job;
+      return ToApiCode(pump_code);
+    }
     *out_job = job;
     return BAG_OK;
   } catch (...) {
@@ -35,117 +45,110 @@ bag_error_code bag_start_encode_text_job(const bag_encoder_config* config,
 
 bag_error_code bag_poll_encode_text_job(const bag_encode_job* job,
                                         bag_encode_job_progress* out_progress) {
-  if (job == nullptr || out_progress == nullptr) {
+  if (job == nullptr || !job->operation || out_progress == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
 
-  out_progress->state = job->state.load();
-  out_progress->phase = job->phase.load();
-  out_progress->progress_0_to_1 =
-      std::clamp(job->progress_0_to_1.load(), 0.0f, 1.0f);
-  out_progress->terminal_code = job->terminal_code.load();
-  return BAG_OK;
+  try {
+    bool did_progress = false;
+    const bag::ErrorCode pump_code = const_cast<bag::IEncodeOperation*>(
+                                         job->operation.get())
+                                         ->Pump({}, &did_progress);
+    if (pump_code != bag::ErrorCode::kOk) {
+      return ToApiCode(pump_code);
+    }
+    const bag::EncodeProgressSnapshot snapshot = job->operation->Snapshot();
+    out_progress->state = ToApiOperationState(snapshot.state);
+    out_progress->phase = ToApiJobPhase(snapshot.phase);
+    out_progress->progress_0_to_1 = snapshot.overall_progress_0_to_1;
+    out_progress->terminal_code = ToApiCode(snapshot.terminal_code);
+    return BAG_OK;
+  } catch (...) {
+    return BAG_INTERNAL;
+  }
 }
 
 bag_error_code bag_cancel_encode_text_job(bag_encode_job* job) {
-  if (job == nullptr) {
+  if (job == nullptr || !job->operation) {
     return BAG_INVALID_ARGUMENT;
   }
-
-  job->cancel_requested.store(true);
-  return BAG_OK;
+  try {
+    return ToApiCode(job->operation->Cancel());
+  } catch (...) {
+    return BAG_INTERNAL;
+  }
 }
 
 bag_error_code bag_take_encode_text_job_result(const bag_encode_job* job,
                                                bag_pcm16_result* out_result) {
-  if (job == nullptr || out_result == nullptr) {
+  if (job == nullptr || !job->operation || out_result == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
 
-  const bag_encode_job_state state = job->state.load();
-  if (state == BAG_ENCODE_JOB_SUCCEEDED) {
-    const std::lock_guard lock(job->result_mutex);
-    return CopyPcmToApiResult(job->result.pcm, out_result);
+  try {
+    bag::EncodedPcmFollowResult result{};
+    const bag::ErrorCode code = job->operation->TakeResult(&result);
+    if (code != bag::ErrorCode::kOk) {
+      out_result->samples = nullptr;
+      out_result->sample_count = 0;
+      return ToApiCode(code);
+    }
+    return CopyPcmToApiResult(result.pcm, out_result);
+  } catch (...) {
+    out_result->samples = nullptr;
+    out_result->sample_count = 0;
+    return BAG_INTERNAL;
   }
-
-  out_result->samples = nullptr;
-  out_result->sample_count = 0;
-  if (state == BAG_ENCODE_JOB_CANCELLED) {
-    return BAG_CANCELLED;
-  }
-  if (state == BAG_ENCODE_JOB_FAILED) {
-    const bag_error_code terminal_code = job->terminal_code.load();
-    return terminal_code == BAG_NOT_READY ? BAG_INTERNAL : terminal_code;
-  }
-  return BAG_NOT_READY;
 }
 
 bag_error_code bag_peek_encode_text_job_result_layout(
     const bag_encode_job* job, bag_encode_result_layout* out_layout) {
-  if (job == nullptr || out_layout == nullptr) {
+  if (job == nullptr || !job->operation || out_layout == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
 
-  const bag_encode_job_state state = job->state.load();
-  if (state == BAG_ENCODE_JOB_SUCCEEDED) {
-    const bag_error_code follow_code =
-        EnsureEncodeJobFollowResult(const_cast<bag_encode_job*>(job));
-    if (follow_code != BAG_OK) {
+  try {
+    bag::EncodedPcmFollowResult result{};
+    const bag::ErrorCode code = job->operation->TakeResult(&result);
+    if (code != bag::ErrorCode::kOk) {
       *out_layout = {};
-      return follow_code;
+      return ToApiCode(code);
     }
-    const std::lock_guard lock(job->result_mutex);
-    FillEncodeResultLayout(job->result, out_layout);
+    FillEncodeResultLayout(result, out_layout);
     return BAG_OK;
+  } catch (...) {
+    *out_layout = {};
+    return BAG_INTERNAL;
   }
-
-  *out_layout = {};
-  if (state == BAG_ENCODE_JOB_CANCELLED) {
-    return BAG_CANCELLED;
-  }
-  if (state == BAG_ENCODE_JOB_FAILED) {
-    const bag_error_code terminal_code = job->terminal_code.load();
-    return terminal_code == BAG_NOT_READY ? BAG_INTERNAL : terminal_code;
-  }
-  return BAG_NOT_READY;
 }
 
 bag_error_code bag_take_encode_text_job_result_with_follow(
     const bag_encode_job* job, bag_encode_result* out_result) {
-  if (job == nullptr || out_result == nullptr) {
+  if (job == nullptr || !job->operation || out_result == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
 
-  const bag_encode_job_state state = job->state.load();
-  if (state == BAG_ENCODE_JOB_SUCCEEDED) {
-    const bag_error_code follow_code =
-        EnsureEncodeJobFollowResult(const_cast<bag_encode_job*>(job));
-    if (follow_code != BAG_OK) {
+  try {
+    bag::EncodedPcmFollowResult result{};
+    const bag::ErrorCode code = job->operation->TakeResult(&result);
+    if (code != bag::ErrorCode::kOk) {
       ClearApiEncodeResult(out_result);
-      return follow_code;
+      return ToApiCode(code);
     }
-    const std::lock_guard lock(job->result_mutex);
-    return CopyStructuredEncodeResultToApi(job->result, out_result);
+    return CopyStructuredEncodeResultToApi(result, out_result);
+  } catch (...) {
+    ClearApiEncodeResult(out_result);
+    return BAG_INTERNAL;
   }
-
-  ClearApiEncodeResult(out_result);
-  if (state == BAG_ENCODE_JOB_CANCELLED) {
-    return BAG_CANCELLED;
-  }
-  if (state == BAG_ENCODE_JOB_FAILED) {
-    const bag_error_code terminal_code = job->terminal_code.load();
-    return terminal_code == BAG_NOT_READY ? BAG_INTERNAL : terminal_code;
-  }
-  return BAG_NOT_READY;
 }
 
 void bag_destroy_encode_text_job(bag_encode_job* job) {
   if (job == nullptr) {
     return;
   }
-
-  job->cancel_requested.store(true);
-  JoinEncodeJobWorker(job);
+  if (job->operation) {
+    job->operation->Cancel();
+  }
   delete job;
 }
 #else

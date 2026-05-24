@@ -44,6 +44,7 @@
 - 当前边界：
   - `bag_api.h` 继续保持 C ABI
   - `bag_api.cpp` 的主仓实现已切到 modules-only host 形态
+  - 生成进度的权威契约是 encode operation snapshot/work-plan/pump，详见 `docs/architecture/encode-operation-contract.md`
 
 ### `libs/audio_io`
 - 作用：WAV 读写边界，统一承接 `wav bytes <-> mono PCM16` 与 `path <-> WAV 文件`。
@@ -245,6 +246,11 @@
 - 先看：
   - `libs/audio_api/include/bag_api.h`
   - `libs/audio_api/src/bag_api.cpp`
+- 如果涉及生成进度 / operation pump / Android 或 Web 生成显示：
+  - `docs/architecture/encode-operation-contract.md`
+  - `libs/audio_api/src/bag_api_encode_operation_entrypoints_impl.inc`
+  - `libs/audio_api/src/bag_api_encode_result_copy_impl.inc`
+  - `libs/audio_api/tests/api_async_tests.cpp`
 - 然后按平台看：
   - `apps/audio_cli/windows/src/main.cpp`
   - `apps/audio_android/app/src/main/cpp/jni_bridge.cpp`

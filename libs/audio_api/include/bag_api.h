@@ -59,6 +59,7 @@ typedef enum bag_validation_issue {
 
 typedef struct bag_decoder bag_decoder;
 typedef struct bag_encode_job bag_encode_job;
+typedef struct bag_encode_operation bag_encode_operation;
 
 typedef struct bag_encoder_config {
   int sample_rate_hz;
@@ -134,6 +135,11 @@ typedef struct bag_ultra_frame_symbol_entry {
   size_t payload_byte_index;
 } bag_ultra_frame_symbol_entry;
 
+// Follow-data arrays use caller-owned buffers. The *_count fields report the
+// total available entries for sizing/probing even when the matching *_buffer is
+// null or too small. Consumers may read entries only when the matching status is
+// BAG_DECODE_CONTENT_STATUS_OK; otherwise the buffer contents are absent or
+// partial and must not be inferred from *_count alone.
 typedef struct bag_payload_follow_data {
   bag_payload_follow_byte_entry* byte_timeline_buffer;
   size_t byte_timeline_buffer_count;
@@ -225,6 +231,10 @@ typedef struct bag_text_follow_line_raw_segment_entry {
   size_t byte_count;
 } bag_text_follow_line_raw_segment_entry;
 
+// Text follow strings and arrays use caller-owned buffers. The *_size and
+// *_count fields are the total required sizes/counts for sizing/probing. A
+// non-zero size/count does not guarantee a readable buffer; consumers must
+// check the corresponding status before reading each string or array.
 typedef struct bag_text_follow_data {
   char* text_tokens_buffer;
   size_t text_tokens_buffer_size;
@@ -295,6 +305,11 @@ typedef struct bag_pcm16_result {
   size_t sample_count;
 } bag_pcm16_result;
 
+// Encode results combine owned PCM output with optional caller-owned raw/follow
+// buffers. `samples` is allocated by the API on success and must be released via
+// bag_free_encode_result. Raw/follow buffers are never allocated by the API;
+// their *_size and *_count fields may be non-zero as sizing probes even when the
+// matching status is unavailable or buffer-too-small.
 typedef struct bag_encode_result {
   int16_t* samples;
   size_t sample_count;
@@ -357,6 +372,9 @@ typedef struct bag_encode_result_layout {
   int text_follow_available;
 } bag_encode_result_layout;
 
+// Stable lifecycle values shared by encode operation snapshots and legacy job
+// progress. Keep the numeric assignments fixed so Android/Web bindings can map
+// them without introducing a second lifecycle table.
 typedef enum bag_encode_job_state {
   BAG_ENCODE_JOB_QUEUED = 0,
   BAG_ENCODE_JOB_RUNNING = 1,
@@ -372,12 +390,55 @@ typedef enum bag_encode_job_phase {
   BAG_ENCODE_JOB_PHASE_FINALIZING = 3
 } bag_encode_job_phase;
 
+// Legacy async-job progress snapshot. It shares the same stable lifecycle codes
+// as the operation snapshot below, but only exposes the lighter progress shape
+// needed by the job API.
 typedef struct bag_encode_job_progress {
   bag_encode_job_state state;
   bag_encode_job_phase phase;
   float progress_0_to_1;
   bag_error_code terminal_code;
 } bag_encode_job_progress;
+
+// Public encode-generation snapshot. This mirrors
+// `libs/audio_core::EncodeProgressSnapshot` and is the source of truth for
+// state, phase, work completion, and terminal code while an encode operation is
+// running.
+typedef struct bag_encode_operation_progress {
+  bag_encode_job_state state;
+  bag_encode_job_phase phase;
+  float overall_progress_0_to_1;
+  float phase_progress_0_to_1;
+  uint64_t completed_work_units;
+  uint64_t total_work_units;
+  uint64_t phase_completed_work_units;
+  uint64_t phase_total_work_units;
+  bag_error_code terminal_code;
+  size_t estimated_pcm_sample_count;
+  size_t payload_byte_count;
+  size_t segment_count;
+  size_t current_segment_index;
+} bag_encode_operation_progress;
+
+// Public encode-generation work plan. This mirrors
+// `libs/audio_core::EncodeWorkPlan` and is the static forecast for an encode
+// operation. Consumers should read this directly instead of recomputing their
+// own phase buckets or percent math.
+typedef struct bag_encode_operation_work_plan {
+  uint64_t preparing_input_work_units;
+  uint64_t rendering_pcm_work_units;
+  uint64_t postprocessing_work_units;
+  uint64_t finalizing_work_units;
+  uint64_t total_work_units;
+  size_t estimated_pcm_sample_count;
+  size_t payload_byte_count;
+  size_t segment_count;
+} bag_encode_operation_work_plan;
+
+typedef struct bag_encode_operation_pump_budget {
+  uint64_t max_work_units;
+  uint32_t max_wall_time_ms;
+} bag_encode_operation_pump_budget;
 
 const char* bag_transport_mode_name(bag_transport_mode mode);
 int bag_try_parse_transport_mode(const char* raw_mode,
@@ -397,6 +458,29 @@ bag_error_code bag_encode_text_with_follow(const bag_encoder_config* config,
 bag_error_code bag_build_encode_follow_data(
     const bag_encoder_config* config, const char* text,
     bag_encode_result* out_result);
+bag_error_code bag_create_encode_operation(const bag_encoder_config* config,
+                                           const char* text,
+                                           bag_encode_operation** out_operation);
+bag_error_code bag_run_encode_operation(bag_encode_operation* operation);
+bag_error_code bag_cancel_encode_operation(bag_encode_operation* operation);
+bag_error_code bag_get_encode_operation_work_plan(
+    const bag_encode_operation* operation,
+    bag_encode_operation_work_plan* out_work_plan);
+bag_error_code bag_pump_encode_operation(
+    bag_encode_operation* operation,
+    bag_encode_operation_pump_budget budget,
+    int* out_did_progress);
+bag_error_code bag_poll_encode_operation(
+    const bag_encode_operation* operation,
+    bag_encode_operation_progress* out_progress);
+// Returns the operation terminal PCM result. Follow/raw sizes and counts may be
+// populated as probes, but follow/raw payload buffers are optional and are not
+// required for operation completion. Use bag_build_encode_follow_data when a
+// presentation needs hydrated follow/raw timeline data.
+bag_error_code bag_take_encode_operation_result(
+    const bag_encode_operation* operation,
+    bag_encode_result* out_result);
+void bag_destroy_encode_operation(bag_encode_operation* operation);
 bag_error_code bag_describe_flash_signal(const bag_encoder_config* config,
                                          const char* text,
                                          bag_flash_signal_info* out_info);

@@ -22,6 +22,27 @@
 - `bag_api` 入口看 `libs/audio_api/src/bag_api.cpp`
 - 稳定边界与兼容层说明看 `docs/architecture/compatibility-layer-inventory.md`
 
+如果是改生成进度 / Android 或 Web 生成显示：
+- 当前权威契约是 encode operation，而不是 legacy async job：
+  - `bag_create_encode_operation`
+  - `bag_get_encode_operation_work_plan`
+  - `bag_pump_encode_operation`
+  - `bag_poll_encode_operation`
+  - `bag_take_encode_operation_result`
+  - `bag_destroy_encode_operation`
+- `bag_encode_operation_progress` 是生成过程 snapshot，映射 `audio_core` 的 `EncodeProgressSnapshot`。
+- `bag_encode_operation_work_plan` 是静态工作计划，映射 `audio_core` 的 `EncodeWorkPlan`。
+- Android 和 Web 应直接消费 operation snapshot / work-plan / pump / terminal result，不要各自重新推导 phase、percent 或工作量。
+- `bag_take_encode_operation_result` 只用于终态结果。需要 follow/raw/timeline 展示数据时，使用 `bag_build_encode_follow_data` 单独 hydration。
+- legacy `bag_start_encode_text_job` / `bag_poll_encode_text_job` 仍存在于兼容层，但不应作为新进度 UI 或新平台 bridge 的事实来源。
+- 相关入口：
+  - `libs/audio_api/include/bag_api.h`
+  - `libs/audio_api/src/bag_api_encode_operation_entrypoints_impl.inc`
+  - `libs/audio_api/src/bag_api_encode_result_copy_impl.inc`
+  - `libs/audio_api/tests/api_async_tests.cpp`
+  - `libs/audio_core/include/bag/interface/common/types.h`
+  - `libs/audio_core/src/transport/transport_impl.inc`
+
 如果是改 WAV / I/O：
 - 文件地图看 `docs/architecture/repo-map.md`
 - roundtrip 与 metadata 测试口径看 `docs/testing.md`
@@ -32,3 +53,8 @@
 
 如果是改测试或验证命令：
 - 优先看 `docs/testing.md`
+
+生成进度契约改动的最低验证建议：
+- `python tools/run.py test-lib audio_api --build-dir build/dev`
+- `python tools/run.py android test-debug`
+- 如果改到 Android/JNI/Web bridge，再按对应应用说明补充 assemble 或前端检查。

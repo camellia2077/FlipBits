@@ -73,3 +73,19 @@ bag_validation_issue ToApiValidationIssue(bag::TransportValidationIssue issue) {
       return BAG_VALIDATION_INVALID_MODE;
   }
 }
+
+bag_encode_job_state ToApiOperationState(bag::EncodeOperationState state) {
+  switch (state) {
+    case bag::EncodeOperationState::kQueued:
+      return BAG_ENCODE_JOB_QUEUED;
+    case bag::EncodeOperationState::kRunning:
+      return BAG_ENCODE_JOB_RUNNING;
+    case bag::EncodeOperationState::kSucceeded:
+      return BAG_ENCODE_JOB_SUCCEEDED;
+    case bag::EncodeOperationState::kFailed:
+      return BAG_ENCODE_JOB_FAILED;
+    case bag::EncodeOperationState::kCancelled:
+    default:
+      return BAG_ENCODE_JOB_CANCELLED;
+  }
+}

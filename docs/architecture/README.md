@@ -14,6 +14,8 @@
   - host 默认 modules 拓扑、compatibility layer、以及当前不能直接走 modules 的目标说明。
 - `docs/architecture/compatibility-layer-inventory.md`
   - compatibility header 分级、长期边界头、消费端 allowed surface 盘点。
+- `docs/architecture/encode-operation-contract.md`
+  - `libs` encode operation 的 snapshot / work-plan / pump / terminal result 契约，Android/Web 生成进度显示的权威数据来源。
 
 ## 子目录
 

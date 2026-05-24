@@ -62,6 +62,50 @@ void FillEncodeResultLayout(const bag::EncodedPcmFollowResult& result,
   out_layout->text_follow_available = result.text_follow_data.available ? 1 : 0;
 }
 
+void FillEncodeOperationProgress(
+    const bag::EncodeProgressSnapshot& snapshot,
+    bag_encode_operation_progress* out_progress) {
+  if (out_progress == nullptr) {
+    return;
+  }
+  out_progress->state = ToApiOperationState(snapshot.state);
+  out_progress->phase = ToApiJobPhase(snapshot.phase);
+  out_progress->overall_progress_0_to_1 =
+      std::clamp(snapshot.overall_progress_0_to_1, 0.0f, 1.0f);
+  out_progress->phase_progress_0_to_1 =
+      std::clamp(snapshot.phase_progress_0_to_1, 0.0f, 1.0f);
+  out_progress->completed_work_units = snapshot.completed_work_units;
+  out_progress->total_work_units = snapshot.total_work_units;
+  out_progress->phase_completed_work_units =
+      snapshot.phase_completed_work_units;
+  out_progress->phase_total_work_units = snapshot.phase_total_work_units;
+  out_progress->terminal_code = ToApiCode(snapshot.terminal_code);
+  out_progress->estimated_pcm_sample_count =
+      snapshot.estimated_pcm_sample_count;
+  out_progress->payload_byte_count = snapshot.payload_byte_count;
+  out_progress->segment_count = snapshot.segment_count;
+  out_progress->current_segment_index = snapshot.current_segment_index;
+}
+
+void FillEncodeOperationWorkPlan(const bag::EncodeWorkPlan& work_plan,
+                                 bag_encode_operation_work_plan* out_work_plan) {
+  if (out_work_plan == nullptr) {
+    return;
+  }
+  out_work_plan->preparing_input_work_units =
+      work_plan.preparing_input_work_units;
+  out_work_plan->rendering_pcm_work_units =
+      work_plan.rendering_pcm_work_units;
+  out_work_plan->postprocessing_work_units =
+      work_plan.postprocessing_work_units;
+  out_work_plan->finalizing_work_units = work_plan.finalizing_work_units;
+  out_work_plan->total_work_units = work_plan.total_work_units;
+  out_work_plan->estimated_pcm_sample_count =
+      work_plan.estimated_pcm_sample_count;
+  out_work_plan->payload_byte_count = work_plan.payload_byte_count;
+  out_work_plan->segment_count = work_plan.segment_count;
+}
+
 bag_error_code CopyStructuredEncodeResultToApi(
     const bag::EncodedPcmFollowResult& result, bag_encode_result* out_result) {
   if (out_result == nullptr) {

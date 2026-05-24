@@ -6,6 +6,8 @@ This document describes the debug-only adb scenario for capturing how the Audio 
 
 For the full Android automation matrix across JVM tests, instrumentation, and adb debug scenarios, see `docs/architecture/android/android-automation-coverage.md`.
 
+For the shared libs progress contract behind this UI, see `docs/architecture/encode-operation-contract.md`. Android progress display should be derived from `bag_encode_operation_progress` via the JNI operation snapshot/work-plan path, not from a separate Android-only phase or percent model.
+
 ## Current Coverage
 
 Covered:
@@ -158,3 +160,4 @@ python tools/run.py android-debug encode-progress-summary temp\android-debug\<ca
 - Do not use coordinate taps or accessibility automation for encode progress checks.
 - Prefer `wb.sample.length long` plus `wb.repeat` over manual long shell-escaped text when the built-in sample corpus is sufficient.
 - If the progress UI changes its phase labels or visibility conditions, update the log fields and summary script together.
+- If snapshot/work-plan fields or operation pump semantics change in `libs`, update `docs/architecture/encode-operation-contract.md` and re-run the relevant Android capture matrix.

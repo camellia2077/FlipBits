@@ -162,6 +162,80 @@ std::vector<int16_t> RenderToneChunk(std::size_t sample_count,
   return pcm;
 }
 
+}  // namespace
+
+class FlashChunkRenderer::Impl {
+ public:
+  Impl(const FlashPayloadChunk& chunk, const BfskConfig& config,
+       std::vector<int16_t>* out_pcm)
+      : chunk_(chunk), config_(config), out_pcm_(out_pcm) {
+    if (out_pcm_ == nullptr) {
+      throw std::invalid_argument("Flash chunk renderer requires PCM output.");
+    }
+    if (chunk_.sample_offset + chunk_.sample_count > out_pcm_->size()) {
+      throw std::invalid_argument("Payload layout chunk exceeds PCM bounds.");
+    }
+    if (chunk_.kind == FlashPayloadSegmentKind::kBit &&
+        (chunk_.carrier_freq_hz <= 0.0 || config_.sample_rate_hz <= 0)) {
+      throw std::invalid_argument("Invalid BFSK config.");
+    }
+  }
+
+  std::size_t TotalWork() const { return chunk_.sample_count; }
+  bool Finished() const { return sample_index_ >= chunk_.sample_count; }
+
+  FlashChunkRenderProgress Pump(std::size_t work_budget) {
+    const std::size_t normalized_budget =
+        std::max(work_budget, static_cast<std::size_t>(1));
+    std::size_t advanced = 0;
+    while (!Finished() && advanced < normalized_budget) {
+      const std::size_t write_index = chunk_.sample_offset + sample_index_;
+      if (chunk_.kind == FlashPayloadSegmentKind::kSilence) {
+        (*out_pcm_)[write_index] = 0;
+      } else {
+        constexpr double kPi = 3.14159265358979323846;
+        const double omega = 2.0 * kPi * chunk_.carrier_freq_hz;
+        const double time = static_cast<double>(sample_index_) /
+                            static_cast<double>(config_.sample_rate_hz);
+        const double sample = config_.amplitude * std::sin(omega * time);
+        const double clamped = std::clamp(sample, -1.0, 1.0);
+        (*out_pcm_)[write_index] =
+            static_cast<int16_t>(std::lround(clamped * 32767.0));
+      }
+      ++sample_index_;
+      ++advanced;
+    }
+    return FlashChunkRenderProgress{
+        .completed_work = sample_index_,
+        .total_work = chunk_.sample_count,
+        .finished = Finished(),
+    };
+  }
+
+ private:
+  FlashPayloadChunk chunk_{};
+  BfskConfig config_{};
+  std::vector<int16_t>* out_pcm_ = nullptr;
+  std::size_t sample_index_ = 0;
+};
+
+FlashChunkRenderer::FlashChunkRenderer(const FlashPayloadChunk& chunk,
+                                       const BfskConfig& config,
+                                       std::vector<int16_t>* out_pcm)
+    : impl_(std::make_unique<Impl>(chunk, config, out_pcm)) {}
+
+FlashChunkRenderer::~FlashChunkRenderer() = default;
+
+std::size_t FlashChunkRenderer::TotalWork() const { return impl_->TotalWork(); }
+
+bool FlashChunkRenderer::Finished() const { return impl_->Finished(); }
+
+FlashChunkRenderProgress FlashChunkRenderer::Pump(std::size_t work_budget) {
+  return impl_->Pump(work_budget);
+}
+
+namespace {
+
 std::vector<uint8_t> BitsToBytes(const std::vector<int>& bits) {
   std::vector<uint8_t> bytes;
   bytes.reserve(bits.size() / 8);
@@ -817,24 +891,20 @@ std::vector<int16_t> EncodePayloadLayoutToPcm16(
        ++chunk_index) {
     const FlashPayloadChunk& chunk = layout.chunks[chunk_index];
     ThrowIfEncodeCancelled(progress_sink);
-    if (chunk.sample_offset + chunk.sample_count > pcm.size()) {
-      throw std::invalid_argument("Payload layout chunk exceeds PCM bounds.");
+    FlashChunkRenderer renderer(chunk, config, &pcm);
+    while (!renderer.Finished()) {
+      ThrowIfEncodeCancelled(progress_sink);
+      const FlashChunkRenderProgress progress =
+          renderer.Pump(kProgressReportStrideSamples);
+      rendered_samples = chunk.sample_offset + progress.completed_work;
+      if (rendered_samples > total_samples) {
+        rendered_samples = total_samples;
+      }
+      MaybeReportCompletedSampleProgress(
+          progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin,
+          progress_end, rendered_samples, total_samples, &last_reported_samples,
+          progress.finished);
     }
-    if (chunk.kind == FlashPayloadSegmentKind::kSilence) {
-      std::fill_n(pcm.begin() + static_cast<std::ptrdiff_t>(chunk.sample_offset),
-                  chunk.sample_count, static_cast<int16_t>(0));
-      rendered_samples += chunk.sample_count;
-    } else {
-      const std::vector<int16_t> template_pcm =
-          RenderToneChunk(chunk.sample_count, chunk.carrier_freq_hz, config);
-      std::copy(template_pcm.begin(), template_pcm.end(),
-                pcm.begin() + static_cast<std::ptrdiff_t>(chunk.sample_offset));
-      rendered_samples += template_pcm.size();
-    }
-    MaybeReportCompletedSampleProgress(
-        progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin,
-        progress_end, rendered_samples, total_samples, &last_reported_samples,
-        true);
   }
   ReportEncodeProgress(progress_sink, EncodeProgressPhase::kRenderingPcm,
                        progress_end);

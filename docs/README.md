@@ -69,6 +69,7 @@
   - 再看 `docs/architecture/repo-map.md`
 - 改 `bag_api`
   - 先看 `docs/architecture/repo-map.md`
+  - 若涉及生成进度、operation pump、snapshot 或 work-plan，再看 `docs/architecture/encode-operation-contract.md`
   - 再看 `docs/core.md`
 - 改 WAV 读写或 I/O
   - 先看 `docs/architecture/repo-map.md`

@@ -214,6 +214,126 @@ MorseToneConfig MakeMorseToneConfig(const CoreConfig& config) {
   return out;
 }
 
+class ToneUnitRenderer::Impl {
+ public:
+  Impl(const std::vector<uint8_t>& payload, std::size_t payload_index,
+       const MorseToneConfig& config, std::vector<int16_t>* out_pcm)
+      : payload_(payload),
+        payload_index_(payload_index),
+        config_(config),
+        out_pcm_(out_pcm) {
+    if (out_pcm_ == nullptr || !IsValidConfig(config_) ||
+        payload_index_ >= payload_.size()) {
+      throw std::invalid_argument("Invalid mini tone renderer state.");
+    }
+    BuildSegments();
+  }
+
+  std::size_t TotalWork() const { return total_work_; }
+  bool Finished() const { return completed_work_ >= total_work_; }
+
+  ToneUnitRenderProgress Pump(std::size_t work_budget) {
+    const std::size_t normalized_budget =
+        std::max(work_budget, static_cast<std::size_t>(1));
+    std::size_t advanced = 0;
+    while (!Finished() && advanced < normalized_budget) {
+      if (segment_index_ >= segments_.size()) {
+        break;
+      }
+      const Segment& segment = segments_[segment_index_];
+      const std::size_t write_index = start_offset_ + completed_work_;
+      if (!segment.is_tone) {
+        (*out_pcm_)[write_index] = 0;
+      } else {
+        constexpr double kPi = 3.14159265358979323846;
+        const double omega = 2.0 * kPi * config_.tone_freq_hz;
+        const double time = static_cast<double>(segment_sample_index_) /
+                            static_cast<double>(config_.sample_rate_hz);
+        const double sample = config_.amplitude * std::sin(omega * time);
+        (*out_pcm_)[write_index] = static_cast<int16_t>(
+            std::lround(std::clamp(sample, -1.0, 1.0) * 32767.0));
+      }
+      ++segment_sample_index_;
+      ++completed_work_;
+      ++advanced;
+      if (segment_sample_index_ >= segment.sample_count) {
+        ++segment_index_;
+        segment_sample_index_ = 0;
+      }
+    }
+    return ToneUnitRenderProgress{
+        .completed_work = completed_work_,
+        .total_work = total_work_,
+        .finished = Finished(),
+    };
+  }
+
+ private:
+  struct Segment {
+    bool is_tone = false;
+    std::size_t sample_count = 0;
+  };
+
+  void AppendSegment(bool is_tone, std::size_t unit_count) {
+    if (unit_count == 0) {
+      return;
+    }
+    const std::size_t sample_count =
+        unit_count * static_cast<std::size_t>(config_.unit_samples);
+    segments_.push_back(Segment{.is_tone = is_tone, .sample_count = sample_count});
+    total_work_ += sample_count;
+  }
+
+  void BuildSegments() {
+    start_offset_ = out_pcm_->size();
+    const char ch = static_cast<char>(payload_[payload_index_]);
+    if (ch == ' ') {
+      AppendSegment(false, kMorseWordGapUnits);
+    } else {
+      const std::string_view pattern = MorsePatternForChar(ch);
+      if (pattern.empty()) {
+        throw std::invalid_argument("Invalid mini Morse symbol.");
+      }
+      for (std::size_t index = 0; index < pattern.size(); ++index) {
+        AppendSegment(true,
+                      pattern[index] == '-' ? kMorseDashUnits : kMorseDotUnits);
+        if (index + 1 < pattern.size()) {
+          AppendSegment(false, kMorseElementGapUnits);
+        }
+      }
+      AppendSegment(false, MorseTrailingGapUnits(payload_, payload_index_));
+    }
+    out_pcm_->resize(start_offset_ + total_work_);
+  }
+
+  const std::vector<uint8_t>& payload_;
+  std::size_t payload_index_ = 0;
+  MorseToneConfig config_{};
+  std::vector<int16_t>* out_pcm_ = nullptr;
+  std::vector<Segment> segments_;
+  std::size_t start_offset_ = 0;
+  std::size_t total_work_ = 0;
+  std::size_t completed_work_ = 0;
+  std::size_t segment_index_ = 0;
+  std::size_t segment_sample_index_ = 0;
+};
+
+ToneUnitRenderer::ToneUnitRenderer(const std::vector<uint8_t>& payload,
+                                   std::size_t payload_index,
+                                   const MorseToneConfig& config,
+                                   std::vector<int16_t>* out_pcm)
+    : impl_(std::make_unique<Impl>(payload, payload_index, config, out_pcm)) {}
+
+ToneUnitRenderer::~ToneUnitRenderer() = default;
+
+std::size_t ToneUnitRenderer::TotalWork() const { return impl_->TotalWork(); }
+
+bool ToneUnitRenderer::Finished() const { return impl_->Finished(); }
+
+ToneUnitRenderProgress ToneUnitRenderer::Pump(std::size_t work_budget) {
+  return impl_->Pump(work_budget);
+}
+
 ErrorCode EncodePayloadToPcm16(const std::vector<uint8_t>& payload,
                                const MorseToneConfig& config,
                                std::vector<int16_t>* out_pcm,
@@ -237,30 +357,30 @@ ErrorCode EncodePayloadToPcm16(const std::vector<uint8_t>& payload,
       out_pcm->clear();
       return ErrorCode::kCancelled;
     }
-    const char ch = static_cast<char>(payload[byte_index]);
-    if (ch == ' ') {
-      AppendSilenceUnits(kMorseWordGapUnits, config, out_pcm);
-    } else {
-      const std::string_view pattern = MorsePatternForChar(ch);
-      if (pattern.empty()) {
-        return ErrorCode::kInvalidArgument;
-      }
-      for (std::size_t index = 0; index < pattern.size(); ++index) {
-        AppendToneUnits(pattern[index] == '-' ? kMorseDashUnits : kMorseDotUnits,
-                        config, out_pcm);
-        if (index + 1 < pattern.size()) {
-          AppendSilenceUnits(kMorseElementGapUnits, config, out_pcm);
+    try {
+      ToneUnitRenderer renderer(payload, byte_index, config, out_pcm);
+      const std::size_t chunk_start_offset =
+          out_pcm->size() - renderer.TotalWork();
+      while (!renderer.Finished()) {
+        if (ShouldCancelEncode(progress_sink)) {
+          out_pcm->clear();
+          return ErrorCode::kCancelled;
+        }
+        const ToneUnitRenderProgress progress =
+            renderer.Pump(kProgressReportStrideSamples);
+        const std::size_t rendered_samples =
+            chunk_start_offset + progress.completed_work;
+        if (rendered_samples - last_reported_samples >=
+                kProgressReportStrideSamples ||
+            progress.finished) {
+          ReportSampleProgress(progress_sink, progress_begin, progress_end,
+                               rendered_samples, total_samples);
+          last_reported_samples = rendered_samples;
         }
       }
-      AppendSilenceUnits(MorseTrailingGapUnits(payload, byte_index), config,
-                         out_pcm);
-    }
-    if (out_pcm->size() - last_reported_samples >=
-            kProgressReportStrideSamples ||
-        byte_index + 1 == payload.size()) {
-      ReportSampleProgress(progress_sink, progress_begin, progress_end,
-                           out_pcm->size(), total_samples);
-      last_reported_samples = out_pcm->size();
+    } catch (const std::invalid_argument&) {
+      out_pcm->clear();
+      return ErrorCode::kInvalidArgument;
     }
   }
 

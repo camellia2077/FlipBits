@@ -47,6 +47,27 @@ struct FlashPayloadLayout {
   std::size_t payload_sample_count = 0;
 };
 
+struct FlashChunkRenderProgress {
+  std::size_t completed_work = 0;
+  std::size_t total_work = 0;
+  bool finished = false;
+};
+
+class FlashChunkRenderer {
+ public:
+  FlashChunkRenderer(const FlashPayloadChunk& chunk, const BfskConfig& config,
+                     std::vector<std::int16_t>* out_pcm);
+  ~FlashChunkRenderer();
+
+  std::size_t TotalWork() const;
+  bool Finished() const;
+  FlashChunkRenderProgress Pump(std::size_t work_budget);
+
+ private:
+  class Impl;
+  std::unique_ptr<Impl> impl_;
+};
+
 BfskConfig MakeBfskConfig(const CoreConfig& config);
 BfskConfig MakeBfskConfigForSignalProfile(const CoreConfig& config,
                                           FlashSignalProfile signal_profile);

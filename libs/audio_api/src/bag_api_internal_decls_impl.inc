@@ -30,6 +30,11 @@ bag_decode_content_status CopyJoinedCharacterTextsToApi(
     std::size_t buffer_size);
 void FillEncodeResultLayout(const bag::EncodedPcmFollowResult& result,
                             bag_encode_result_layout* out_layout);
+void FillEncodeOperationProgress(
+    const bag::EncodeProgressSnapshot& snapshot,
+    bag_encode_operation_progress* out_progress);
+void FillEncodeOperationWorkPlan(const bag::EncodeWorkPlan& work_plan,
+                                 bag_encode_operation_work_plan* out_work_plan);
 bag_error_code BuildEncodeFollowDataResult(const bag::CoreConfig& core_config,
                                            const std::string& text,
                                            bag::EncodedPcmFollowResult* result);

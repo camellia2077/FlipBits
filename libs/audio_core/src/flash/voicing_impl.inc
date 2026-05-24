@@ -167,6 +167,381 @@ std::vector<int16_t> TrimToPayloadPcm(
       voiced_pcm.begin() + static_cast<std::ptrdiff_t>(payload_end));
 }
 
+class FlashVoicingStepper::Impl {
+ public:
+  Impl(const std::vector<int16_t>& clean_payload_pcm,
+       const FlashPayloadLayout& payload_layout,
+       FlashVoicingFlavor flavor,
+       const FlashVoicingConfig& config)
+      : clean_payload_pcm_(clean_payload_pcm),
+        payload_layout_(payload_layout),
+        flavor_(flavor),
+        config_(config),
+        sanitized_(SanitizeVoicingConfig(config)),
+        style_traits_(MakeFlavorTraits(flavor)),
+        use_layered_timbre_(ShouldApplyLayeredTimbre(config)),
+        use_chant_drone_(style_traits_.chant_drone_gain > 0.0),
+        use_mechanical_throat_(style_traits_.mechanical_throat_gain > 0.0),
+        use_standard_low_voice_(use_layered_timbre_ &&
+                                style_traits_.standard_low_voice_gain > 0.0),
+        use_hostility_edge_(style_traits_.hostility_edge_gain > 0.0),
+        descriptor_(DescribeVoicingOutput(
+            clean_payload_pcm.size() + LeadingNonpayloadSamples(config) +
+                TrailingNonpayloadSamples(config),
+            config)),
+        spectral_texture_enabled_(ShouldApplySpectralTexture(config)),
+        spectral_texture_work_(spectral_texture_enabled_
+                                   ? descriptor_.leading_nonpayload_samples +
+                                         descriptor_.payload_sample_count +
+                                         descriptor_.trailing_nonpayload_samples
+                                   : static_cast<std::size_t>(0)),
+        total_postprocess_work_(descriptor_.leading_nonpayload_samples +
+                                descriptor_.payload_sample_count +
+                                descriptor_.trailing_nonpayload_samples +
+                                spectral_texture_work_) {
+    ValidatePayloadLayout(clean_payload_pcm_, payload_layout_);
+    result_.pcm.resize(descriptor_.leading_nonpayload_samples +
+                           descriptor_.payload_sample_count +
+                           descriptor_.trailing_nonpayload_samples,
+                       0);
+    result_.descriptor = descriptor_;
+    spectral_low_alpha_ =
+        spectral_texture_enabled_
+            ? ComputeOnePoleAlpha(240.0, sanitized_.sample_rate_hz)
+            : 0.0;
+    spectral_band_alpha_ =
+        spectral_texture_enabled_
+            ? ComputeOnePoleAlpha(2200.0, sanitized_.sample_rate_hz)
+            : 0.0;
+  }
+
+  FlashVoicingStepProgress Pump(std::size_t work_budget) {
+    const std::size_t normalized_budget =
+        std::max(work_budget, static_cast<std::size_t>(1));
+    std::size_t advanced = 0;
+    while (!finished_ && advanced < normalized_budget) {
+      if (stage_ == Stage::kPreamble) {
+        PumpPreamble();
+      } else if (stage_ == Stage::kPayload) {
+        PumpPayload();
+      } else if (stage_ == Stage::kEpilogue) {
+        PumpEpilogue();
+      } else if (stage_ == Stage::kSpectralTexture) {
+        PumpSpectralTexture();
+      } else {
+        finished_ = true;
+      }
+      ++advanced;
+    }
+    return FlashVoicingStepProgress{
+        .completed_work = completed_postprocess_work_,
+        .total_work = total_postprocess_work_,
+        .finished = finished_,
+    };
+  }
+
+  const FlashVoicingResult& Result() const { return result_; }
+  std::size_t TotalWork() const { return total_postprocess_work_; }
+  bool Finished() const { return finished_; }
+
+ private:
+  enum class Stage {
+    kPreamble = 0,
+    kPayload = 1,
+    kEpilogue = 2,
+    kSpectralTexture = 3,
+    kDone = 4,
+  };
+
+  void AdvanceStageIfNeeded() {
+    if (stage_ == Stage::kPreamble &&
+        preamble_index_ >= descriptor_.leading_nonpayload_samples) {
+      stage_ = Stage::kPayload;
+      chunk_index_ = 0;
+      chunk_local_index_ = 0;
+    }
+    if (stage_ == Stage::kPayload && chunk_index_ >= payload_layout_.chunks.size()) {
+      stage_ = Stage::kEpilogue;
+      epilogue_index_ = 0;
+    }
+    if (stage_ == Stage::kEpilogue &&
+        epilogue_index_ >= descriptor_.trailing_nonpayload_samples) {
+      stage_ = spectral_texture_enabled_ ? Stage::kSpectralTexture : Stage::kDone;
+      spectral_index_ = 0;
+    }
+    if (stage_ == Stage::kSpectralTexture &&
+        spectral_index_ >= result_.pcm.size()) {
+      stage_ = Stage::kDone;
+      finished_ = true;
+    }
+    if (stage_ == Stage::kDone) {
+      finished_ = true;
+    }
+  }
+
+  void PumpPreamble() {
+    if (preamble_index_ >= descriptor_.leading_nonpayload_samples) {
+      AdvanceStageIfNeeded();
+      return;
+    }
+    const double sample = RenderFixedPreambleSample(
+        preamble_index_, descriptor_.leading_nonpayload_samples, style_traits_,
+        sanitized_.sample_rate_hz);
+    result_.pcm[preamble_index_] =
+        static_cast<int16_t>(std::lround(sample * kPcmScale));
+    ++preamble_index_;
+    ++completed_postprocess_work_;
+    AdvanceStageIfNeeded();
+  }
+
+  void PrepareChunkState(const FlashPayloadChunk& chunk) {
+    std::tie(chunk_attack_count_, chunk_release_count_) =
+        FitAttackReleaseCounts(
+            chunk.sample_count,
+            RatioToCount(sanitized_.attack_ratio, chunk.sample_count),
+            RatioToCount(
+                sanitized_.release_ratio *
+                    style_traits_.payload_release_scale,
+                chunk.sample_count));
+    chunk_click_window_ = ComputeClickWindow(chunk.sample_count);
+    chunk_litany_text_pause_weight_ =
+        ComputeLitanyTextPauseWeight(payload_layout_, chunk_index_);
+    chunk_collapse_hesitation_weight_ =
+        ComputeCollapseHesitationWeight(chunk, chunk_index_, style_traits_);
+  }
+
+  void PumpPayload() {
+    if (chunk_index_ >= payload_layout_.chunks.size()) {
+      AdvanceStageIfNeeded();
+      return;
+    }
+
+    const FlashPayloadChunk& chunk = payload_layout_.chunks[chunk_index_];
+    if (chunk_local_index_ == 0) {
+      PrepareChunkState(chunk);
+    }
+
+    const std::size_t payload_sample_index = chunk.sample_offset + chunk_local_index_;
+    const std::size_t sample_index =
+        descriptor_.leading_nonpayload_samples + payload_sample_index;
+
+    if (chunk.kind == FlashPayloadSegmentKind::kSilence) {
+      result_.pcm[sample_index] = 0;
+    } else {
+      const double clean_sample =
+          static_cast<double>(clean_payload_pcm_[payload_sample_index]) /
+          kPcmScale;
+      const double base_envelope = ComputeEnvelope(
+          chunk_local_index_, chunk.sample_count, chunk_attack_count_,
+          chunk_release_count_);
+      const double envelope =
+          base_envelope +
+          style_traits_.payload_envelope_floor * (1.0 - base_envelope);
+      const double phrase_articulation = ComputeLitanyPhraseArticulation(
+          chunk_index_, chunk_local_index_, chunk.sample_count, style_traits_);
+      const double litany_text_articulation =
+          ComputeLitanyTextPauseArticulation(chunk_litany_text_pause_weight_,
+                                             chunk_local_index_,
+                                             chunk.sample_count,
+                                             style_traits_);
+      const double collapse_hesitation_articulation =
+          ComputeCollapseHesitationArticulation(
+              chunk_collapse_hesitation_weight_, chunk_local_index_,
+              chunk.sample_count, style_traits_);
+      const double payload_articulation = phrase_articulation *
+                                          litany_text_articulation *
+                                          collapse_hesitation_articulation;
+      const double harmonic_mix =
+          envelope * payload_articulation *
+              ComputeHarmonicSample(sanitized_.second_harmonic_gain, 2,
+                                    chunk.carrier_freq_hz, chunk_local_index_,
+                                    sanitized_.sample_rate_hz) +
+          envelope * payload_articulation *
+              ComputeHarmonicSample(sanitized_.third_harmonic_gain, 3,
+                                    chunk.carrier_freq_hz, chunk_local_index_,
+                                    sanitized_.sample_rate_hz);
+      const double metallic_layer =
+          use_layered_timbre_ ? envelope * payload_articulation *
+                                   ComputeSecondaryMetallicLayer(
+                                       chunk.carrier_freq_hz, chunk_local_index_,
+                                       sanitized_.sample_rate_hz) *
+                                   style_traits_.metallic_layer_gain_scale
+                             : 0.0;
+      const double chant_resonance =
+          use_layered_timbre_
+              ? envelope * payload_articulation * ComputeChantResonanceLayer(
+                               chunk.carrier_freq_hz, payload_sample_index,
+                               sanitized_.sample_rate_hz,
+                               style_traits_.chant_resonance_gain)
+              : 0.0;
+      const double chant_drone =
+          use_chant_drone_
+              ? envelope * payload_articulation *
+                    ComputeChantDroneLayer(payload_sample_index,
+                                           sanitized_.sample_rate_hz,
+                                           style_traits_.chant_drone_gain)
+              : 0.0;
+      const double mechanical_throat =
+          use_mechanical_throat_
+              ? envelope * payload_articulation *
+                    ComputeMechanicalThroatLayer(
+                        payload_sample_index, sanitized_.sample_rate_hz,
+                        style_traits_.mechanical_throat_gain)
+              : 0.0;
+      const double standard_low_voice =
+          use_standard_low_voice_
+              ? envelope * payload_articulation *
+                    ComputeStandardLowVoiceLayer(payload_sample_index,
+                                               sanitized_.sample_rate_hz,
+                                               style_traits_)
+              : 0.0;
+      const double hostility_edge =
+          use_hostility_edge_
+              ? envelope * payload_articulation *
+                    ComputeHostilityEdgeLayer(chunk.carrier_freq_hz,
+                                              chunk_local_index_,
+                                              sanitized_.sample_rate_hz,
+                                              style_traits_.hostility_edge_gain)
+              : 0.0;
+      const double boundary_click =
+          ComputeBoundaryClick(sanitized_.boundary_click_gain, style_traits_,
+                               chunk_index_, chunk_local_index_,
+                               chunk_click_window_);
+      const double tremolo =
+          use_layered_timbre_
+              ? ComputePayloadTremolo(payload_sample_index,
+                                      sanitized_.sample_rate_hz, style_traits_)
+              : 1.0;
+      const double collapse_tremor =
+          ComputeCollapseTremor(payload_sample_index, sanitized_.sample_rate_hz,
+                                style_traits_);
+      const double chant_swell = ComputeChantSwellGain(
+          payload_sample_index, sanitized_.sample_rate_hz, style_traits_);
+      const double mixed_sample =
+          (clean_sample * envelope * payload_articulation + harmonic_mix +
+           metallic_layer + chant_resonance + chant_drone +
+           mechanical_throat + standard_low_voice + hostility_edge) *
+              tremolo * collapse_tremor * chant_swell +
+          boundary_click;
+      const double voiced_sample = std::clamp(
+          ApplyPayloadSoftClip(mixed_sample, style_traits_), -1.0, 1.0);
+      result_.pcm[sample_index] =
+          static_cast<int16_t>(std::lround(voiced_sample * kPcmScale));
+    }
+
+    ++chunk_local_index_;
+    ++completed_postprocess_work_;
+    if (chunk_local_index_ >= chunk.sample_count) {
+      ++chunk_index_;
+      chunk_local_index_ = 0;
+    }
+    AdvanceStageIfNeeded();
+  }
+
+  void PumpEpilogue() {
+    if (epilogue_index_ >= descriptor_.trailing_nonpayload_samples) {
+      AdvanceStageIfNeeded();
+      return;
+    }
+    const double sample = RenderFixedEpilogueSample(
+        epilogue_index_, descriptor_.trailing_nonpayload_samples, style_traits_,
+        sanitized_.sample_rate_hz);
+    const std::size_t sample_index = descriptor_.leading_nonpayload_samples +
+                                     descriptor_.payload_sample_count +
+                                     epilogue_index_;
+    result_.pcm[sample_index] =
+        static_cast<int16_t>(std::lround(sample * kPcmScale));
+    ++epilogue_index_;
+    ++completed_postprocess_work_;
+    AdvanceStageIfNeeded();
+  }
+
+  void PumpSpectralTexture() {
+    if (spectral_index_ >= result_.pcm.size()) {
+      AdvanceStageIfNeeded();
+      return;
+    }
+    const double dry =
+        static_cast<double>(result_.pcm[spectral_index_]) / kPcmScale;
+    spectral_low_state_ += spectral_low_alpha_ * (dry - spectral_low_state_);
+    const double band_input = dry - spectral_low_state_;
+    spectral_band_state_ +=
+        spectral_band_alpha_ * (band_input - spectral_band_state_);
+    const double bandpassed = spectral_band_state_;
+    const double saturated = SoftClipSample(dry, kSpectralSoftClipDrive);
+    const double textured =
+        dry *
+            (1.0 - kSpectralBandMix * style_traits_.spectral_band_mix_scale -
+             kSpectralSoftClipMix * style_traits_.spectral_softclip_mix_scale) +
+        bandpassed * (kSpectralBandMix * style_traits_.spectral_band_mix_scale) +
+        saturated *
+            (kSpectralSoftClipMix *
+             style_traits_.spectral_softclip_mix_scale);
+    result_.pcm[spectral_index_] = static_cast<int16_t>(
+        std::lround(std::clamp(textured, -1.0, 1.0) * kPcmScale));
+    ++spectral_index_;
+    ++completed_postprocess_work_;
+    AdvanceStageIfNeeded();
+  }
+
+  const std::vector<int16_t>& clean_payload_pcm_;
+  const FlashPayloadLayout& payload_layout_;
+  FlashVoicingFlavor flavor_;
+  FlashVoicingConfig config_;
+  SanitizedVoicingConfig sanitized_{};
+  VoicingStyleTraits style_traits_{};
+  bool use_layered_timbre_ = false;
+  bool use_chant_drone_ = false;
+  bool use_mechanical_throat_ = false;
+  bool use_standard_low_voice_ = false;
+  bool use_hostility_edge_ = false;
+  FlashVoicingDescriptor descriptor_{};
+  bool spectral_texture_enabled_ = false;
+  std::size_t spectral_texture_work_ = 0;
+  std::size_t total_postprocess_work_ = 0;
+  FlashVoicingResult result_{};
+  Stage stage_ = Stage::kPreamble;
+  bool finished_ = false;
+  std::size_t completed_postprocess_work_ = 0;
+  std::size_t preamble_index_ = 0;
+  std::size_t chunk_index_ = 0;
+  std::size_t chunk_local_index_ = 0;
+  std::size_t epilogue_index_ = 0;
+  std::size_t spectral_index_ = 0;
+  std::size_t chunk_attack_count_ = 0;
+  std::size_t chunk_release_count_ = 0;
+  std::size_t chunk_click_window_ = 0;
+  double chunk_litany_text_pause_weight_ = 0.0;
+  double chunk_collapse_hesitation_weight_ = 0.0;
+  double spectral_low_alpha_ = 0.0;
+  double spectral_band_alpha_ = 0.0;
+  double spectral_low_state_ = 0.0;
+  double spectral_band_state_ = 0.0;
+};
+
+FlashVoicingStepper::FlashVoicingStepper(
+    const std::vector<int16_t>& clean_payload_pcm,
+    const FlashPayloadLayout& payload_layout, FlashVoicingFlavor flavor,
+    const FlashVoicingConfig& config)
+    : impl_(std::make_unique<Impl>(clean_payload_pcm, payload_layout, flavor,
+                                   config)) {}
+
+FlashVoicingStepper::~FlashVoicingStepper() = default;
+
+const FlashVoicingResult& FlashVoicingStepper::Result() const {
+  return impl_->Result();
+}
+
+std::size_t FlashVoicingStepper::TotalWork() const {
+  return impl_->TotalWork();
+}
+
+bool FlashVoicingStepper::Finished() const { return impl_->Finished(); }
+
+FlashVoicingStepProgress FlashVoicingStepper::Pump(std::size_t work_budget) {
+  return impl_->Pump(work_budget);
+}
+
 FlashVoicingResult ApplyVoicingToPayload(
     const std::vector<int16_t>& clean_payload_pcm,
     const FlashPayloadLayout& payload_layout, const FlashVoicingConfig& config,
@@ -182,249 +557,30 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
     const FlashPayloadLayout& payload_layout, FlashVoicingFlavor flavor,
     const FlashVoicingConfig& config, const EncodeProgressSink* progress_sink,
     float progress_begin, float progress_end) {
-  ValidatePayloadLayout(clean_payload_pcm, payload_layout);
-  const SanitizedVoicingConfig sanitized = SanitizeVoicingConfig(config);
-  const VoicingStyleTraits style_traits = MakeFlavorTraits(flavor);
-  const bool use_layered_timbre = ShouldApplyLayeredTimbre(config);
-  const bool use_chant_drone = style_traits.chant_drone_gain > 0.0;
-  const bool use_mechanical_throat =
-      style_traits.mechanical_throat_gain > 0.0;
-  const bool use_standard_low_voice =
-      use_layered_timbre && style_traits.standard_low_voice_gain > 0.0;
-  const bool use_hostility_edge = style_traits.hostility_edge_gain > 0.0;
-  const FlashVoicingDescriptor descriptor = DescribeVoicingOutput(
-      clean_payload_pcm.size() + LeadingNonpayloadSamples(config) +
-          TrailingNonpayloadSamples(config),
-      config);
-
-  FlashVoicingResult result{};
-  result.pcm.resize(descriptor.leading_nonpayload_samples +
-                        descriptor.payload_sample_count +
-                        descriptor.trailing_nonpayload_samples,
-                    0);
-
-  const std::size_t spectral_texture_work = ShouldApplySpectralTexture(config)
-                                                ? result.pcm.size()
-                                                : static_cast<std::size_t>(0);
-  const std::size_t total_postprocess_work =
-      descriptor.leading_nonpayload_samples + descriptor.payload_sample_count +
-      descriptor.trailing_nonpayload_samples + spectral_texture_work;
-
+  FlashVoicingStepper stepper(clean_payload_pcm, payload_layout, flavor, config);
+  const std::size_t total_postprocess_work = stepper.TotalWork();
   ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing,
                        progress_begin);
   ThrowIfEncodeCancelled(progress_sink);
   if (total_postprocess_work == 0) {
     ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing,
                          progress_end);
-    result.descriptor = descriptor;
-    return result;
+    return stepper.Result();
   }
 
-  std::size_t completed_postprocess_work = 0;
   std::size_t last_reported_postprocess_work = 0;
-  for (size_t local_index = 0;
-       local_index < descriptor.leading_nonpayload_samples; ++local_index) {
-    if (local_index > 0 && local_index % kProgressReportStrideSamples == 0) {
-      ThrowIfEncodeCancelled(progress_sink);
-    }
-    const double sample = RenderFixedPreambleSample(
-        local_index, descriptor.leading_nonpayload_samples, style_traits,
-        sanitized.sample_rate_hz);
-    result.pcm[local_index] =
-        static_cast<int16_t>(std::lround(sample * kPcmScale));
-    ++completed_postprocess_work;
-    MaybeReportCompletedSampleProgress(
-        progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-        progress_end, completed_postprocess_work, total_postprocess_work,
-        &last_reported_postprocess_work);
-  }
-  MaybeReportCompletedSampleProgress(
-      progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-      progress_end, completed_postprocess_work, total_postprocess_work,
-      &last_reported_postprocess_work, true);
-
-  for (size_t chunk_index = 0; chunk_index < payload_layout.chunks.size();
-       ++chunk_index) {
+  while (!stepper.Finished()) {
     ThrowIfEncodeCancelled(progress_sink);
-    const FlashPayloadChunk& chunk = payload_layout.chunks[chunk_index];
-    auto [attack_count, release_count] = FitAttackReleaseCounts(
-        chunk.sample_count,
-        RatioToCount(sanitized.attack_ratio, chunk.sample_count),
-        RatioToCount(
-            sanitized.release_ratio * style_traits.payload_release_scale,
-            chunk.sample_count));
-    const size_t click_window = ComputeClickWindow(chunk.sample_count);
-    const double litany_text_pause_weight =
-        ComputeLitanyTextPauseWeight(payload_layout, chunk_index);
-    const double collapse_hesitation_weight =
-        ComputeCollapseHesitationWeight(chunk, chunk_index, style_traits);
-
-    if (chunk.kind == FlashPayloadSegmentKind::kSilence) {
-      for (size_t local_index = 0; local_index < chunk.sample_count;
-           ++local_index) {
-        const size_t sample_index = descriptor.leading_nonpayload_samples +
-                                    chunk.sample_offset + local_index;
-        result.pcm[sample_index] = 0;
-        ++completed_postprocess_work;
-        MaybeReportCompletedSampleProgress(
-            progress_sink, EncodeProgressPhase::kPostprocessing,
-            progress_begin, progress_end, completed_postprocess_work,
-            total_postprocess_work, &last_reported_postprocess_work);
-      }
-      MaybeReportCompletedSampleProgress(
-          progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-          progress_end, completed_postprocess_work, total_postprocess_work,
-          &last_reported_postprocess_work, true);
-      continue;
-    }
-
-    for (size_t local_index = 0; local_index < chunk.sample_count;
-         ++local_index) {
-      const size_t payload_sample_index = chunk.sample_offset + local_index;
-      const size_t sample_index =
-          descriptor.leading_nonpayload_samples + payload_sample_index;
-      const double clean_sample =
-          static_cast<double>(clean_payload_pcm[payload_sample_index]) /
-          kPcmScale;
-      const double base_envelope = ComputeEnvelope(
-          local_index, chunk.sample_count, attack_count, release_count);
-      const double envelope =
-          base_envelope +
-          style_traits.payload_envelope_floor * (1.0 - base_envelope);
-      const double phrase_articulation = ComputeLitanyPhraseArticulation(
-          chunk_index, local_index, chunk.sample_count, style_traits);
-      const double litany_text_articulation =
-          ComputeLitanyTextPauseArticulation(litany_text_pause_weight,
-                                             local_index, chunk.sample_count,
-                                             style_traits);
-      const double collapse_hesitation_articulation =
-          ComputeCollapseHesitationArticulation(collapse_hesitation_weight,
-                                                local_index, chunk.sample_count,
-                                                style_traits);
-      const double payload_articulation = phrase_articulation *
-                                          litany_text_articulation *
-                                          collapse_hesitation_articulation;
-      const double harmonic_mix =
-          envelope * payload_articulation *
-              ComputeHarmonicSample(sanitized.second_harmonic_gain, 2,
-                                    chunk.carrier_freq_hz, local_index,
-                                    sanitized.sample_rate_hz) +
-          envelope * payload_articulation *
-              ComputeHarmonicSample(sanitized.third_harmonic_gain, 3,
-                                    chunk.carrier_freq_hz, local_index,
-                                    sanitized.sample_rate_hz);
-      const double metallic_layer =
-          use_layered_timbre ? envelope * payload_articulation *
-                                   ComputeSecondaryMetallicLayer(
-                                       chunk.carrier_freq_hz, local_index,
-                                       sanitized.sample_rate_hz) *
-                                   style_traits.metallic_layer_gain_scale
-                             : 0.0;
-      const double chant_resonance =
-          use_layered_timbre
-              ? envelope * payload_articulation * ComputeChantResonanceLayer(
-                               chunk.carrier_freq_hz, payload_sample_index,
-                               sanitized.sample_rate_hz,
-                               style_traits.chant_resonance_gain)
-              : 0.0;
-      const double chant_drone =
-          use_chant_drone
-              ? envelope * payload_articulation *
-                    ComputeChantDroneLayer(payload_sample_index,
-                                           sanitized.sample_rate_hz,
-                                           style_traits.chant_drone_gain)
-              : 0.0;
-      const double mechanical_throat =
-          use_mechanical_throat
-              ? envelope * payload_articulation *
-                    ComputeMechanicalThroatLayer(
-                        payload_sample_index, sanitized.sample_rate_hz,
-                        style_traits.mechanical_throat_gain)
-              : 0.0;
-      const double standard_low_voice =
-          use_standard_low_voice
-              ? envelope * payload_articulation *
-                    ComputeStandardLowVoiceLayer(payload_sample_index,
-                                               sanitized.sample_rate_hz,
-                                               style_traits)
-              : 0.0;
-      const double hostility_edge =
-          use_hostility_edge
-              ? envelope * payload_articulation *
-                    ComputeHostilityEdgeLayer(chunk.carrier_freq_hz, local_index,
-                                            sanitized.sample_rate_hz,
-                                            style_traits.hostility_edge_gain)
-              : 0.0;
-      const double boundary_click =
-          ComputeBoundaryClick(sanitized.boundary_click_gain, style_traits,
-                               chunk_index, local_index, click_window);
-      const double tremolo =
-          use_layered_timbre
-              ? ComputePayloadTremolo(payload_sample_index,
-                                      sanitized.sample_rate_hz, style_traits)
-              : 1.0;
-      const double collapse_tremor =
-          ComputeCollapseTremor(payload_sample_index, sanitized.sample_rate_hz,
-                                style_traits);
-      const double chant_swell = ComputeChantSwellGain(
-          payload_sample_index, sanitized.sample_rate_hz, style_traits);
-
-      const double mixed_sample =
-          (clean_sample * envelope * payload_articulation + harmonic_mix +
-           metallic_layer + chant_resonance + chant_drone +
-           mechanical_throat + standard_low_voice + hostility_edge) *
-              tremolo * collapse_tremor * chant_swell +
-          boundary_click;
-      const double voiced_sample = std::clamp(
-          ApplyPayloadSoftClip(mixed_sample, style_traits), -1.0, 1.0);
-      result.pcm[sample_index] =
-          static_cast<int16_t>(std::lround(voiced_sample * kPcmScale));
-      ++completed_postprocess_work;
-      MaybeReportCompletedSampleProgress(
-          progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-          progress_end, completed_postprocess_work, total_postprocess_work,
-          &last_reported_postprocess_work);
-    }
+    const FlashVoicingStepProgress progress =
+        stepper.Pump(kProgressReportStrideSamples);
     MaybeReportCompletedSampleProgress(
         progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-        progress_end, completed_postprocess_work, total_postprocess_work,
-        &last_reported_postprocess_work, true);
-  }
-
-  for (size_t local_index = 0;
-       local_index < descriptor.trailing_nonpayload_samples; ++local_index) {
-    if (local_index > 0 && local_index % kProgressReportStrideSamples == 0) {
-      ThrowIfEncodeCancelled(progress_sink);
-    }
-    const double sample = RenderFixedEpilogueSample(
-        local_index, descriptor.trailing_nonpayload_samples, style_traits,
-        sanitized.sample_rate_hz);
-    const size_t sample_index = descriptor.leading_nonpayload_samples +
-                                descriptor.payload_sample_count + local_index;
-    result.pcm[sample_index] =
-        static_cast<int16_t>(std::lround(sample * kPcmScale));
-    ++completed_postprocess_work;
-    MaybeReportCompletedSampleProgress(
-        progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-        progress_end, completed_postprocess_work, total_postprocess_work,
-        &last_reported_postprocess_work);
-  }
-  MaybeReportCompletedSampleProgress(
-      progress_sink, EncodeProgressPhase::kPostprocessing, progress_begin,
-      progress_end, completed_postprocess_work, total_postprocess_work,
-      &last_reported_postprocess_work, true);
-
-  result.descriptor = descriptor;
-  ThrowIfEncodeCancelled(progress_sink);
-  if (ShouldApplySpectralTexture(config)) {
-    ApplySpectralTexture(&result.pcm, sanitized.sample_rate_hz, style_traits,
-                         progress_sink, progress_begin, progress_end,
-                         completed_postprocess_work, total_postprocess_work);
-    completed_postprocess_work += spectral_texture_work;
+        progress_end, progress.completed_work, total_postprocess_work,
+        &last_reported_postprocess_work, progress.finished);
   }
   ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing,
                        progress_end);
-  return result;
+  return stepper.Result();
 }
 
 }  // namespace bag::flash
