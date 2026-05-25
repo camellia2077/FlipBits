@@ -11,13 +11,15 @@ const ui = new UiController(elements);
 const sampleView = new SampleView(elements);
 const encoderClient = new EncoderClient();
 const sampleTextService = new SampleTextService();
+let appController = null;
 const sampleController = new SampleController({
   elements,
   ui,
   sampleTextService,
   sampleView,
+  getCurrentMode: () => appController?.getCurrentMode() ?? "flash",
 });
-const appController = new AppController({
+appController = new AppController({
   elements,
   ui,
   encoderClient,

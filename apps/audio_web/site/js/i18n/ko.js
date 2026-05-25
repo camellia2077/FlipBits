@@ -3,6 +3,7 @@ export const LOCALE = 'ko';
 export const MESSAGES = {
     htmlLang: "ko",
     languageLabel: "언어",
+    "hero.copy": "이 웹 데모는 텍스트 입력과 오디오 생성만 제공합니다. 시각화 기능은 Android APK를 다운로드해 확인하세요. Repo 또는 Android APK를 클릭하면 해당 페이지로 이동합니다.",
     "about.title": "FlipBits 소개",
     "about.copy": [
       "FlipBits는 텍스트를 들을 수 있는 인코딩 오디오로 바꾸는 프로젝트입니다. Android 앱에서는 재생, 파형, 텍스트 인코딩 과정, 각 문자나 단어 뒤의 이진 내용까지 동기화해서 시각화할 수 있고, 이 웹 페이지는 각 모드가 어떤 소리로 생성되는지 빠르게 미리 듣기 위한 데모입니다.",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "여기서 생성한 모든 모드의 오디오는 Android 앱에서 디코딩할 수 있습니다. 전체 경험을 원하면 Releases에서 Android APK를 내려받아 주세요. FlipBits가 마음에 들면 https://github.com/camellia2077/FlipBits 에서 스타를 눌러 주세요.",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "무작위 텍스트",
     inputTextLabel: "입력 텍스트",
     inputPlaceholder: "예: github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "UTF-8 텍스트를 허용합니다.",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "모드 개요",
+    "mode.summary.mini": "Morse code 비프음으로 점과 선의 리듬이 뚜렷합니다. 짧은 텍스트와 읽기 쉬운 속도에 적합합니다.",
+    "mode.summary.flash": "bit 단위 펄스로 가장 강한 개성을 냅니다. 전송 자체가 어떻게 들리는지 확인하기 좋습니다.",
+    "mode.summary.pro": "전화 키패드와 비슷한 이중 톤입니다. flash보다 더 압축적이고 기호 구조를 비교하기 쉽습니다.",
+    "mode.summary.ultra": "고밀도 16-FSK 톤으로 더 빠르고 짧은 오디오를 만듭니다. 압축적인 전송에 적합합니다.",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "오디오 생성",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "샘플레이트",
     "loading.pending": "WebAssembly 인코더를 기다리는 중입니다.",
     "loading.ready": "WebAssembly 인코더를 불러왔습니다. 오디오를 생성할 수 있습니다.",
-    "loading.missing": "WASM 모듈이 아직 준비되지 않았습니다. 먼저 python apps/audio_web/tools/build_wasm.py 를 실행해 site/wasm/ 산출물을 생성하세요.",
+    "loading.missing": "WASM 모듈이 아직 준비되지 않았습니다. 먼저 python tools/run.py web build-wasm 를 실행해 site/wasm/ 산출물을 생성하세요.",
     "validation.emptyText": "텍스트를 입력하세요.",
     "validation.missingExport": "WASM 모듈은 로드되었지만 beginEncodeOperation(...) 가 아직 내보내지지 않았습니다.",
     "validation.miniAsciiOnly": "mini 모드는 ASCII 입력만 허용하며, 비 ASCII 문자는 제거되었습니다.",

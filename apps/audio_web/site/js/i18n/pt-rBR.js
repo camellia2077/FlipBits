@@ -3,6 +3,7 @@ export const LOCALE = 'pt-rBR';
 export const MESSAGES = {
     htmlLang: "pt-BR",
     languageLabel: "Idioma",
+    "hero.copy": "Esta demo web cobre apenas entrada de texto e geração de áudio. Baixe o APK Android para ver a visualização. Clique em Repo ou Android APK para abrir a página correspondente.",
     "about.title": "Sobre o FlipBits",
     "about.copy": [
       "O FlipBits transforma texto em áudio codificado e audível. O app Android também visualiza em sincronia a reprodução, a forma de onda, o processo de codificação do texto e o conteúdo binário por trás de cada caractere ou palavra; esta página serve apenas como uma prévia rápida de como os diferentes modos soam.",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "O áudio gerado em todos os modos pode ser decodificado no app Android; para a experiência completa, baixe o APK Android em Releases. Se você gostar do FlipBits, deixe uma estrela em https://github.com/camellia2077/FlipBits.",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "Texto aleatorio",
     inputTextLabel: "Texto de entrada",
     inputPlaceholder: "ex.: github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "Aceita texto UTF-8.",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "Visão geral dos modos",
+    "mode.summary.mini": "Bipes Morse code com ritmo claro de pontos e traços. Ideal para texto curto e cadência legível.",
+    "mode.summary.flash": "Pulsos bit a bit com a personalidade mais forte. Ideal para ouvir a transmissão em si.",
+    "mode.summary.pro": "Tons duplos parecidos com teclado telefônico. Mais compacto que flash e mais fácil para comparar estruturas de símbolos.",
+    "mode.summary.ultra": "Tons 16-FSK densos para áudio mais rápido e curto. Ideal para transmissão compacta.",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "Gerar áudio",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "Taxa de amostragem",
     "loading.pending": "Aguardando o codificador WebAssembly.",
     "loading.ready": "Codificador WebAssembly carregado. Pronto para gerar áudio.",
-    "loading.missing": "O módulo WASM ainda não está pronto. Execute primeiro python apps/audio_web/tools/build_wasm.py para gerar os artefatos em site/wasm/.",
+    "loading.missing": "O módulo WASM ainda não está pronto. Execute primeiro python tools/run.py web build-wasm para gerar os artefatos em site/wasm/.",
     "validation.emptyText": "Digite um texto.",
     "validation.missingExport": "O módulo WASM foi carregado, mas beginEncodeOperation(...) ainda não foi exportado.",
     "validation.miniAsciiOnly": "O modo mini aceita apenas texto ASCII; os caracteres não ASCII foram removidos.",

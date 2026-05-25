@@ -3,6 +3,7 @@ export const LOCALE = 'ru';
 export const MESSAGES = {
     htmlLang: "ru",
     languageLabel: "Язык",
+    "hero.copy": "Эта веб-демо показывает только ввод текста и генерацию аудио. Для визуализации скачайте Android APK. Нажмите Repo или Android APK, чтобы открыть соответствующую страницу.",
     "about.title": "О FlipBits",
     "about.copy": [
       "FlipBits превращает текст в слышимый закодированный звук. Android-приложение также синхронно показывает воспроизведение, форму волны, процесс текстового кодирования и двоичное содержимое, стоящее за каждым символом или словом; эта страница нужна только для быстрого предпросмотра того, как звучат разные режимы.",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "Аудио, созданное во всех режимах, можно декодировать в Android-приложении; для полного опыта скачайте Android APK из Releases. Если вам нравится FlipBits, поставьте ему звезду на https://github.com/camellia2077/FlipBits.",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "Случайный текст",
     inputTextLabel: "Входной текст",
     inputPlaceholder: "например: github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "Принимает текст UTF-8.",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "Обзор режимов",
+    "mode.summary.mini": "Сигналы Morse code с четким ритмом точек и тире. Подходит для короткого текста и читаемого темпа.",
+    "mode.summary.flash": "Импульсы bit за bit с самым выраженным характером. Подходит, чтобы услышать саму передачу.",
+    "mode.summary.pro": "Двойные тоны, похожие на телефонную клавиатуру. Компактнее, чем flash, и удобнее для сравнения структуры символов.",
+    "mode.summary.ultra": "Плотные тоны 16-FSK для более быстрого и короткого аудио. Подходит для компактной передачи.",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "Сгенерировать аудио",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "Частота дискретизации",
     "loading.pending": "Ожидание кодировщика WebAssembly.",
     "loading.ready": "Кодировщик WebAssembly загружен. Можно генерировать аудио.",
-    "loading.missing": "Модуль WASM ещё не готов. Сначала запустите python apps/audio_web/tools/build_wasm.py, чтобы создать артефакты site/wasm/.",
+    "loading.missing": "Модуль WASM ещё не готов. Сначала запустите python tools/run.py web build-wasm, чтобы создать артефакты site/wasm/.",
     "validation.emptyText": "Введите текст.",
     "validation.missingExport": "Модуль WASM загружен, но beginEncodeOperation(...) ещё не экспортирован.",
     "validation.miniAsciiOnly": "Режим mini принимает только ASCII; не-ASCII символы были удалены.",

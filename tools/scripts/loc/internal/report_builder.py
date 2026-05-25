@@ -222,9 +222,21 @@ class ReportBuilder:
         is_directory: bool = False,
     ) -> Path:
         root_folder = self._root_folder_name(root_path)
-        file_stem = self._safe_segment(target_path.stem)
+        file_stem = self._detail_file_stem(root_path=root_path, target_path=target_path)
         file_name = "_dir_scan.json" if is_directory else f"{file_stem}_scan.json"
         return Path(root_folder) / priority / file_name
+
+    def _detail_file_stem(self, *, root_path: Path, target_path: Path) -> str:
+        try:
+            relative_target = target_path.resolve().relative_to(root_path.resolve())
+        except ValueError:
+            relative_target = target_path
+        parts = list(relative_target.parts)
+        if not parts:
+            return self._safe_segment(target_path.stem)
+        parts[-1] = Path(parts[-1]).stem
+        meaningful_parts = [self._safe_segment(part) for part in parts if part not in {"", "."}]
+        return "__".join(meaningful_parts) if meaningful_parts else self._safe_segment(target_path.stem)
 
     def _root_folder_name(self, root_path: Path) -> str:
         if self.lang == "kt":

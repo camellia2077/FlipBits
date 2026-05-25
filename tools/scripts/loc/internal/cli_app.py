@@ -96,6 +96,7 @@ class LocCliApplication:
         JsonReportWriter.write_scan_report(log_path, report)
         markdown_writer.write_scan_report(log_path.with_suffix(".md"), report)
         logs_root = log_path.parent
+        self._clear_artifact_detail_logs(logs_root=logs_root, artifacts=artifacts)
         detail_md_by_path: dict[str, str] = {}
         for artifact in artifacts:
             json_path = logs_root / artifact.relative_output_path
@@ -133,6 +134,18 @@ class LocCliApplication:
         detail_dir = logs_root / ("kotlin" if lang == "kt" else lang)
         if detail_dir.exists():
             shutil.rmtree(detail_dir)
+
+    @staticmethod
+    def _clear_artifact_detail_logs(*, logs_root: Path, artifacts) -> None:
+        root_names = {
+            artifact.relative_output_path.parts[0]
+            for artifact in artifacts
+            if artifact.relative_output_path.parts
+        }
+        for root_name in root_names:
+            detail_dir = logs_root / root_name
+            if detail_dir.exists():
+                shutil.rmtree(detail_dir)
 
     @staticmethod
     def parse_args() -> argparse.Namespace:

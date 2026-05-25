@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .report_models import DetailReport, DirectoryFileMatch, LineFileMatch, PathScanResult, ScanReport
 from .responsibility_analyzers import ResponsibilityRiskResult
-from .responsibility_metrics import ResponsibilityAnchor, ResponsibilityFunctionHotspot
+from .responsibility_metrics import ResponsibilityAnchor, ResponsibilityFunctionHotspot, ResponsibilityMoveSet
 
 
 @dataclass(frozen=True)
@@ -21,6 +21,7 @@ class FormattedEntry:
     anchors: tuple["FormattedAnchor", ...] = ()
     responsibility_clusters: tuple["FormattedResponsibilityCluster", ...] = ()
     extraction_candidates: tuple["FormattedExtractionCandidate", ...] = ()
+    move_sets: tuple["FormattedMoveSet", ...] = ()
     stop_signal: str | None = None
     validation_hints: tuple[str, ...] = ()
     false_positive_notes: tuple[str, ...] = ()
@@ -59,6 +60,15 @@ class FormattedExtractionCandidate:
     suggested_boundary: str
     reason: str
     risk: str
+    validation: str
+
+
+@dataclass(frozen=True)
+class FormattedMoveSet:
+    name: str
+    target_boundary: str
+    helpers: tuple[str, ...]
+    reason: str
     validation: str
 
 
@@ -199,6 +209,7 @@ class ReportFormatter:
     def _format_responsibility_result(self, item: ResponsibilityRiskResult) -> FormattedEntry:
         hotspots = tuple(self._format_hotspot(hotspot) for hotspot in (item.function_hotspots or []))
         anchors = tuple(self._format_anchor(anchor) for anchor in (item.anchors or []))
+        move_sets = tuple(self._format_move_set(move_set) for move_set in (item.move_sets or []))
         return FormattedEntry(
             title=item.path,
             summary=item.summary,
@@ -210,6 +221,7 @@ class ReportFormatter:
             anchors=anchors,
             responsibility_clusters=self._responsibility_clusters(item, hotspots),
             extraction_candidates=self._extraction_candidates(item, hotspots),
+            move_sets=move_sets,
             stop_signal=self._stop_signal(item, hotspots),
             validation_hints=self._validation_hints(item),
             false_positive_notes=self._false_positive_notes(item),
@@ -240,6 +252,19 @@ class ReportFormatter:
             label=item.label,
             issue=item.issue,
             evidence=item.evidence,
+        )
+
+    @staticmethod
+    def _format_move_set(item: ResponsibilityMoveSet) -> FormattedMoveSet:
+        return FormattedMoveSet(
+            name=item.name,
+            target_boundary=item.target_boundary,
+            helpers=tuple(
+                f"{helper.name} ({helper.start_line}-{helper.end_line})"
+                for helper in item.helpers
+            ),
+            reason=item.reason,
+            validation=item.validation,
         )
 
     def _responsibility_evidence(self, item: ResponsibilityRiskResult) -> str:
@@ -278,6 +303,10 @@ class ReportFormatter:
         item: ResponsibilityRiskResult,
         hotspots: tuple[FormattedHotspot, ...],
     ) -> tuple[FormattedResponsibilityCluster, ...]:
+        if self.lang == "cpp":
+            return self._cpp_responsibility_clusters(item, hotspots)
+        if self.lang == "py":
+            return self._python_responsibility_clusters(item, hotspots)
         if self.lang != "kt":
             return ()
         clusters: dict[str, list[str]] = {}
@@ -297,6 +326,34 @@ class ReportFormatter:
             )
         return tuple(result[:5])
 
+    def _python_responsibility_clusters(
+        self,
+        item: ResponsibilityRiskResult,
+        hotspots: tuple[FormattedHotspot, ...],
+    ) -> tuple[FormattedResponsibilityCluster, ...]:
+        clusters: dict[str, list[str]] = {}
+        for hotspot in hotspots:
+            cluster = self._python_cluster_for_hotspot(item.path, hotspot)
+            clusters.setdefault(cluster, []).append(hotspot.name)
+        if not clusters:
+            normalized = item.path.replace("\\", "/").lower()
+            if "/repo_tooling/commands/" in normalized and item.command_layer_leak_hits > 0:
+                clusters["command_adapter_leak"] = ["command helpers and IO"]
+            elif "/scripts/loc/internal/" in normalized and item.mode_branch_hits > 0:
+                clusters["loc_report_mode_formatting"] = ["scan-mode branches"]
+            elif item.io_kind_count > 0:
+                clusters["tool_io_boundary"] = ["filesystem/process/env helpers"]
+        result: list[FormattedResponsibilityCluster] = []
+        for name, owners in clusters.items():
+            result.append(
+                FormattedResponsibilityCluster(
+                    name=name,
+                    owners=tuple(owners[:4]),
+                    reason=self._python_cluster_reason(name),
+                )
+            )
+        return tuple(result[:5])
+
     def _extraction_candidates(
         self,
         item: ResponsibilityRiskResult,
@@ -304,8 +361,15 @@ class ReportFormatter:
     ) -> tuple[FormattedExtractionCandidate, ...]:
         if self.lang == "kt" and Path(item.path).name.endswith("Dialogs.kt") and item.lines <= 900:
             return ()
+        if self.lang == "cpp" and self._is_test_path(item.path) and item.priority in {"P2", "P3"}:
+            return ()
+        candidate_limit = 3
+        if self.lang == "cpp":
+            max_hotspot_score = max((hotspot.score for hotspot in hotspots), default=0)
+            if item.priority in {"P2", "P3"}:
+                candidate_limit = 1 if max_hotspot_score <= 2 else 2
         candidates: list[FormattedExtractionCandidate] = []
-        for hotspot in hotspots[:3]:
+        for hotspot in hotspots:
             if hotspot.score < 2:
                 continue
             boundary = self._suggested_boundary(item.path, hotspot.name)
@@ -319,6 +383,8 @@ class ReportFormatter:
                     validation=self._candidate_validation(item.path),
                 )
             )
+            if len(candidates) >= candidate_limit:
+                break
         return tuple(candidates)
 
     def _stop_signal(
@@ -326,6 +392,15 @@ class ReportFormatter:
         item: ResponsibilityRiskResult,
         hotspots: tuple[FormattedHotspot, ...],
     ) -> str | None:
+        if self.lang == "cpp":
+            max_hotspot_score = max((hotspot.score for hotspot in hotspots), default=0)
+            if self._is_test_path(item.path) and item.priority in {"P2", "P3"}:
+                return "pause: test files often centralize fixture helpers; split only when a test owner becomes hard to read."
+            if item.priority == "P0" or max_hotspot_score >= 4:
+                return "continue: choose one C++ extraction candidate with a clear owner boundary and keep behavior unchanged."
+            if item.lines <= 650 and max_hotspot_score <= 2:
+                return "pause: remaining C++ hotspots are modest; continue only for a named behavior change."
+            return "review manually: split only where the candidate maps to an existing module or platform boundary."
         if self.lang != "kt":
             return None
         path_name = Path(item.path).name
@@ -353,7 +428,22 @@ class ReportFormatter:
         if self.lang == "py":
             return ("run the focused unit tests for the moved helper module",)
         if self.lang == "cpp":
-            return ("run the focused native build/test for the touched module",)
+            path = item.path.replace("\\", "/")
+            if "apps/audio_android/app/src/main/cpp" in path:
+                return (
+                    "python tools/run.py android assemble-debug",
+                    "python tools/run.py android test-debug when JNI-facing state or DTO shape changes",
+                )
+            if "libs/audio_api" in path:
+                return ("python tools/run.py test-lib audio_api --build-dir build/dev",)
+            if "libs/audio_core" in path:
+                return (
+                    "python tools/run.py test-lib audio_core --build-dir build/dev",
+                    "python tools/run.py test-lib audio_api --build-dir build/dev when C ABI behavior is affected",
+                )
+            if "libs/audio_io" in path:
+                return ("python tools/run.py test-lib audio_io --build-dir build/dev",)
+            return ("python tools/run.py verify --build-dir build/dev --skip-android",)
         return ()
 
     def _false_positive_notes(self, item: ResponsibilityRiskResult) -> tuple[str, ...]:
@@ -365,7 +455,88 @@ class ReportFormatter:
                 notes.append("Mode/style branches are expected in router components; extract only repeated policy or large per-mode bodies.")
             if item.lines < 900 and len(item.role_kinds) <= 1:
                 notes.append("Line count alone is not a reason to split if the file now has one clear responsibility.")
+        if self.lang == "cpp":
+            normalized_path = item.path.replace("\\", "/")
+            if "libs/audio_core/src/" in normalized_path and not self._is_test_path(item.path):
+                notes.append("audio_core host 主线是 module-first；新增职责边界优先使用 module interface + module implementation unit，不要把新边界做成 .inc。")
+                notes.append("同一 owner 下的 Normalize/Build/Decode helpers 优先成组迁移到一个 named module，避免按单个小函数碎拆。")
+            if self._is_test_path(item.path):
+                notes.append("C++ tests often contain compact fixture/build/assert helpers; treat P2 test findings as review prompts, not automatic extraction work.")
+            if item.interop_surface_hits > 0:
+                notes.append("Interop is expected in JNI/C ABI boundary files; split only when marshalling, lifecycle, and domain rules are growing in the same file.")
+            if item.mode_branch_hits > 0:
+                notes.append("Mode branches are expected in transport facades; prefer extracting repeated per-mode bodies over hiding a clear dispatcher.")
+            if item.lines < 650 and not item.function_hotspots:
+                notes.append("Small C++ implementation files can stay intact when no function-level hotspot is found.")
         return tuple(notes)
+
+    @staticmethod
+    def _is_test_path(path: str) -> bool:
+        normalized = path.replace("\\", "/").lower()
+        return "/test/" in normalized or normalized.endswith("/test") or "/tests/" in normalized
+
+    def _cpp_responsibility_clusters(
+        self,
+        item: ResponsibilityRiskResult,
+        hotspots: tuple[FormattedHotspot, ...],
+    ) -> tuple[FormattedResponsibilityCluster, ...]:
+        clusters: dict[str, list[str]] = {}
+        for hotspot in hotspots:
+            cluster = self._cpp_cluster_for_hotspot(item.path, hotspot)
+            clusters.setdefault(cluster, []).append(hotspot.name)
+        if not clusters:
+            if item.interop_surface_hits > 0:
+                clusters["interop_marshalling"] = ["JNI/C ABI surface"]
+            elif item.mode_branch_hits > 0:
+                clusters["mode_dispatch"] = ["mode/style/state branches"]
+            elif item.rule_helper_count > 0:
+                clusters["domain_rules"] = ["rule helpers"]
+        result: list[FormattedResponsibilityCluster] = []
+        for name, owners in clusters.items():
+            result.append(
+                FormattedResponsibilityCluster(
+                    name=name,
+                    owners=tuple(owners[:4]),
+                    reason=self._cpp_cluster_reason(name),
+                )
+            )
+        return tuple(result[:5])
+
+    @staticmethod
+    def _cpp_cluster_for_hotspot(path: str, hotspot: FormattedHotspot) -> str:
+        lower_name = hotspot.name.lower()
+        lower_path = path.replace("\\", "/").lower()
+        if "jni" in lower_path or "interop_surface_breadth" in hotspot.risks:
+            if "list" in lower_name or "entry" in lower_name or "viewdata" in lower_name:
+                return "jni_dto_marshalling"
+            return "interop_marshalling"
+        if "pump" in lower_name or "run" == lower_name or "cancel" in lower_name or "take" in lower_name:
+            return "operation_lifecycle"
+        if "prepare" in lower_name or "render" in lower_name or "postprocess" in lower_name or "finalize" in lower_name:
+            return "operation_stage_steps"
+        if "validate" in lower_name or "config" in lower_name or "morse" in lower_name:
+            return "domain_rules"
+        if "decode" in lower_name:
+            return "decode_flow"
+        if "encode" in lower_name or "build" in lower_name:
+            return "encode_flow"
+        if "mode_branching" in hotspot.risks:
+            return "mode_dispatch"
+        return "cpp_helpers"
+
+    @staticmethod
+    def _cpp_cluster_reason(name: str) -> str:
+        return {
+            "jni_dto_marshalling": "JNI DTO constructors and list builders can usually move behind a focused marshalling boundary",
+            "interop_marshalling": "platform/C ABI glue should stay thin and delegate conversion rules",
+            "operation_lifecycle": "operation state, cancellation, result taking, and terminal transitions form a coherent lifecycle owner",
+            "operation_stage_steps": "prepare/render/postprocess/finalize steps can be extracted behind the operation engine without changing public API",
+            "domain_rules": "validation, config normalization, and mode rules are easier to test when separated from lifecycle code",
+            "decode_flow": "decoder buffering and decode result assembly are separate from encode/render responsibilities",
+            "encode_flow": "encode/build helpers can be isolated from bridge or lifecycle orchestration",
+            "mode_dispatch": "mode routing should stay as a thin dispatcher while per-mode bodies live near their domain",
+            "cpp_helpers": "helper-heavy regions should be moved only when they have a named owner and focused validation",
+        }.get(name, "clustered by C++ hotspot names and risk evidence")
 
     @staticmethod
     def _kotlin_cluster_for_name(name: str) -> str:
@@ -394,6 +565,48 @@ class ReportFormatter:
         }.get(name, "clustered by hotspot names and risk evidence")
 
     @staticmethod
+    def _python_cluster_for_hotspot(path: str, hotspot: FormattedHotspot) -> str:
+        normalized = path.replace("\\", "/").lower()
+        lower = hotspot.name.lower()
+        if "/repo_tooling/commands/" in normalized:
+            if "command_layer_leak" in hotspot.risks or lower.startswith("cmd_"):
+                return "command_adapter_leak"
+            if lower.startswith(("candidate_", "resolve_", "require_", "expected_", "cache_", "reset_")):
+                return "toolchain_resolution"
+            if lower.startswith(("run_", "serve_", "prepare_")) or "io_surface_breadth" in hotspot.risks:
+                return "execution_boundary"
+            return "command_rules"
+        if "/repo_tooling/android_debug/" in normalized:
+            if lower.startswith(("run_adb", "dump_", "start_", "ensure_", "capture_")):
+                return "android_device_io"
+            return "android_debug_rules"
+        if "/scripts/loc/internal/" in normalized:
+            if "formatter" in normalized:
+                return "loc_report_mode_formatting"
+            return "loc_scan_rules"
+        if "io_surface_breadth" in hotspot.risks:
+            return "tool_io_boundary"
+        if "rule_helper_density" in hotspot.risks:
+            return "pure_rule_helpers"
+        return "python_helpers"
+
+    @staticmethod
+    def _python_cluster_reason(name: str) -> str:
+        return {
+            "command_adapter_leak": "command modules should remain thin CLI adapters and delegate rules, paths, and IO execution",
+            "toolchain_resolution": "tool discovery, env lookup, cache paths, and stale-build checks form one testable toolchain boundary",
+            "execution_boundary": "subprocess, local server, and test orchestration should sit behind an explicit IO boundary",
+            "command_rules": "pure rules should move out of commands before changing behavior",
+            "android_device_io": "ADB/device/logcat side effects should be mockable and separate from parsing/reporting",
+            "android_debug_rules": "debug parsing and report rules are easier to test without a connected device",
+            "loc_report_mode_formatting": "LOC report formatting should split by scan mode or rendered section, not isolated tiny helpers",
+            "loc_scan_rules": "scan rules should stay separate from report writing and CLI dispatch",
+            "tool_io_boundary": "filesystem/process/env operations need a named boundary for reliable tests",
+            "pure_rule_helpers": "pure helper packs should move together and gain focused unit coverage",
+            "python_helpers": "helper-heavy regions should move only when they have a named owner and focused validation",
+        }.get(name, "clustered by Python hotspot names and risk evidence")
+
+    @staticmethod
     def _candidate_reason(hotspot: FormattedHotspot) -> str:
         evidence = ", ".join(hotspot.evidence)
         return f"{hotspot.summary}; evidence: {evidence}" if evidence else hotspot.summary
@@ -408,6 +621,21 @@ class ReportFormatter:
 
     @staticmethod
     def _candidate_validation(path: str) -> str:
+        normalized_path = path.replace("\\", "/")
+        if "tools/repo_tooling/commands/web.py" in normalized_path or "tools/repo_tooling/web/" in normalized_path:
+            return "python -m unittest tools.tests.test_web_tools; python tools/run.py web test"
+        if "tools/repo_tooling/android_debug/" in normalized_path:
+            return "python -m unittest tools.tests.test_android_debug"
+        if "tools/scripts/loc/" in normalized_path:
+            return "python tools/scripts/loc/run.py --lang py --responsibility-risk"
+        if "apps/audio_android/app/src/main/cpp" in normalized_path:
+            return "python tools/run.py android assemble-debug"
+        if "libs/audio_api" in normalized_path:
+            return "python tools/run.py test-lib audio_api --build-dir build/dev"
+        if "libs/audio_core" in normalized_path:
+            return "python tools/run.py test-lib audio_core --build-dir build/dev"
+        if "libs/audio_io" in normalized_path:
+            return "python tools/run.py test-lib audio_io --build-dir build/dev"
         path_name = Path(path).name
         if "ConfigThemeAppearance" in path_name:
             return "compileDebugKotlin; if import/export moved, run ConfigThemeAppearanceSectionImportErrorTest"
@@ -419,6 +647,11 @@ class ReportFormatter:
 
     @staticmethod
     def _suggested_boundary(path: str, hotspot_name: str) -> str:
+        suffix = Path(path).suffix
+        if suffix in {".cpp", ".cc", ".cxx", ".inc", ".h", ".hpp", ".cppm"}:
+            return ReportFormatter._suggested_cpp_boundary(path, hotspot_name)
+        if suffix == ".py":
+            return ReportFormatter._suggested_python_boundary(path, hotspot_name)
         stem = Path(path).stem
         lower = hotspot_name.lower()
         if "dialog" in lower or "import" in lower or "export" in lower:
@@ -435,3 +668,82 @@ class ReportFormatter:
         if "annotation" in lower or "token" in lower:
             return f"{stem}Model.kt or {stem}Rows.kt"
         return f"{stem}{hotspot_name}.kt"
+
+    @staticmethod
+    def _suggested_python_boundary(path: str, hotspot_name: str) -> str:
+        normalized = path.replace("\\", "/").lower()
+        lower = hotspot_name.lower()
+        stem = Path(path).stem
+        if "/repo_tooling/commands/" in normalized:
+            domain = stem
+            if lower.startswith(("candidate_", "resolve_", "require_", "expected_", "cache_", "reset_")):
+                return f"repo_tooling/{domain}/toolchain.py or repo_tooling/{domain}/paths.py"
+            if lower.startswith(("run_", "serve_", "prepare_")):
+                return f"repo_tooling/{domain}/build.py, repo_tooling/{domain}/server.py, or repo_tooling/{domain}/tests.py"
+            if lower.startswith(("build_", "read_", "values_", "export_")):
+                return f"repo_tooling/{domain}/rules.py or repo_tooling/{domain}/sample_texts.py"
+            return f"repo_tooling/{domain}/<focused_boundary>.py"
+        if "/repo_tooling/android_debug/" in normalized:
+            if lower.startswith(("run_adb", "dump_", "start_", "ensure_", "capture_")):
+                return "repo_tooling/android_debug/device_io.py"
+            return "repo_tooling/android_debug/reporting.py or repo_tooling/android_debug/<focused_rules>.py"
+        if "/scripts/loc/internal/" in normalized:
+            if "formatter" in normalized:
+                return "scripts/loc/internal/report_formatters/<scan_mode>.py"
+            return "scripts/loc/internal/<focused_boundary>.py"
+        return f"{stem}_{hotspot_name}.py"
+
+    @staticmethod
+    def _suggested_cpp_boundary(path: str, hotspot_name: str) -> str:
+        stem = Path(path).stem
+        lower_path = path.replace("\\", "/").lower()
+        lower_name = hotspot_name.lower()
+        if "jni_bridge_helpers" in lower_path:
+            if "list" in lower_name:
+                return "jni_bridge_list_marshalling.cpp/.h"
+            if "follow" in lower_name or "viewdata" in lower_name or "entry" in lower_name:
+                return "jni_bridge_follow_marshalling.cpp/.h"
+            return "jni_bridge_marshalling.cpp/.h"
+        if "transport" in lower_path and ("transport_impl" in lower_path or "encode_operation" in lower_path):
+            if "pump" in lower_name or "run" == lower_name or "cancel" in lower_name or "take" in lower_name:
+                return "module impl bag.transport.facade -> src/transport/transport_encode_operation.cpp"
+            if "prepare" in lower_name or "render" in lower_name or "postprocess" in lower_name or "finalize" in lower_name:
+                return "module bag.transport.encode_operation_steps -> modules/bag/transport/encode_operation_steps.cppm + src/transport/encode_operation_steps.cpp"
+            if "validate" in lower_name:
+                return "module impl bag.transport.facade -> src/transport/transport_validation.cpp"
+            if "workplan" in lower_name or "work" in lower_name:
+                return "module bag.transport.encode_work_plan -> modules/bag/transport/encode_work_plan.cppm + src/transport/encode_work_plan.cpp"
+            return "module impl bag.transport.facade -> src/transport/transport_encode_operation.cpp"
+        if "flash" in lower_path and "phy_clean" in lower_path:
+            if "normalize" in lower_name or "formal" in lower_name or "budget" in lower_name or "decode" in lower_name:
+                return "module bag.flash.phy_rules -> modules/bag/flash/phy_rules.cppm + src/flash/phy_rules.cpp"
+            if "decoder" in lower_name or "poll" in lower_name:
+                return "module bag.flash.phy_decode -> modules/bag/flash/phy_decode.cppm + src/flash/phy_decode.cpp"
+            return "module impl bag.flash.phy_clean -> src/flash/phy_clean.cpp"
+        if "flash" in lower_path and "signal" in lower_path:
+            if "layout" in lower_name or "payload" in lower_name:
+                return "module bag.flash.signal_layout -> modules/bag/flash/signal_layout.cppm + src/flash/signal_layout.cpp"
+            if "decode" in lower_name:
+                return "module bag.flash.signal_decode -> modules/bag/flash/signal_decode.cppm + src/flash/signal_decode.cpp"
+            if "normalize" in lower_name or "profile" in lower_name or "flavor" in lower_name:
+                return "module bag.flash.signal_rules -> modules/bag/flash/signal_rules.cppm + src/flash/signal_rules.cpp"
+            return "module impl bag.flash.signal -> src/flash/signal.cpp"
+        if "pro" in lower_path and "phy_clean" in lower_path:
+            if "decoder" in lower_name or "poll" in lower_name or "decode" in lower_name:
+                return "module bag.pro.phy_decode -> modules/bag/pro/phy_decode.cppm + src/pro/phy_decode.cpp"
+            if "encode" in lower_name or "render" in lower_name or "symbols" in lower_name:
+                return "module bag.pro.phy_encode -> modules/bag/pro/phy_encode.cppm + src/pro/phy_encode.cpp"
+            return "module bag.pro.phy_rules -> modules/bag/pro/phy_rules.cppm + src/pro/phy_rules.cpp"
+        if "ultra" in lower_path and "phy_clean" in lower_path:
+            if "decoder" in lower_name or "poll" in lower_name or "decode" in lower_name:
+                return "module bag.ultra.phy_decode -> modules/bag/ultra/phy_decode.cppm + src/ultra/phy_decode.cpp"
+            if "encode" in lower_name or "render" in lower_name or "symbols" in lower_name:
+                return "module bag.ultra.phy_encode -> modules/bag/ultra/phy_encode.cppm + src/ultra/phy_encode.cpp"
+            return "module bag.ultra.phy_rules -> modules/bag/ultra/phy_rules.cppm + src/ultra/phy_rules.cpp"
+        if "mini" in lower_path and "phy_clean" in lower_path:
+            if "decoder" in lower_name or "poll" in lower_name or "decode" in lower_name:
+                return "module bag.mini.phy_decode -> modules/bag/mini/phy_decode.cppm + src/mini/phy_decode.cpp"
+            if "renderer" in lower_name or "render" in lower_name or "encodepayload" in lower_name:
+                return "module bag.mini.tone_renderer -> modules/bag/mini/tone_renderer.cppm + src/mini/tone_renderer.cpp"
+            return "module bag.mini.morse_rules -> modules/bag/mini/morse_rules.cppm + src/mini/morse_rules.cpp"
+        return f"module impl near {stem} -> src/.../{stem}_{hotspot_name}.cpp"

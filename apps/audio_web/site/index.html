@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlipBits</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/flipbits-icon.svg" />
     <link rel="stylesheet" href="./styles.css?v=20260523b" />
   </head>
   <body>
@@ -42,7 +43,7 @@
           <div class="hero-intro">
             <p class="eyebrow">Text To Audible Code</p>
             <p id="hero-copy" class="hero-copy">
-              Turn text into playable encoded audio first. Then explore how each mode sounds and what the project is optimizing for.
+              This web demo only covers text input and audio generation. Download the Android APK for visualization. Click Repo or Android APK to open the matching page.
             </p>
             <div class="hero-links">
               <a
@@ -63,200 +64,202 @@
               </a>
             </div>
           </div>
-          <div class="hero-prompt">
-            <span class="hero-prompt-label">Start Here</span>
-            <p class="hero-prompt-copy">
-              Pick a mode, enter text, and generate audio first. The project details live below.
-            </p>
-          </div>
         </div>
       </section>
 
       <section class="panel generator-panel">
-        <div class="generator-layout">
-          <div class="generator-form">
-            <label class="field">
-              <div class="field-header">
-                <div class="field-header-row">
-                  <span id="input-text-label">输入文本</span>
-                  <div class="sample-tools">
-                    <label class="field field-inline sample-length-field" for="sample-length-select">
-                      <span id="sample-length-label">Sample Length</span>
-                      <select id="sample-length-select">
-                        <option value="short" selected>Short</option>
-                        <option value="long">Long</option>
+        <div class="generator-workbench">
+          <section class="workflow-section mode-workflow-section">
+            <div class="section-heading">
+              <div class="mode-heading-copy">
+                <span class="hero-prompt-label">Start Here</span>
+                <h2 id="mode-summary-title">Mode Overview</h2>
+                <p class="workflow-copy">
+                  Pick a mode, enter text, and generate audio first.
+                </p>
+              </div>
+              <p id="mode-summary-copy" class="mode-summary-copy"></p>
+            </div>
+            <div id="mode-cards" class="mode-cards" data-active-mode="flash">
+              <article
+                id="mode-card-mini"
+                class="mode-card"
+                data-mode-card="mini"
+                role="button"
+                tabindex="0"
+              >
+                <span class="mode-card-kicker">mini</span>
+                <p id="mode-card-copy-mini" class="mode-card-copy">
+                  Morse code beeps with a clear dot-dash rhythm. Best for short text and readable pacing.
+                </p>
+              </article>
+              <article
+                id="mode-card-flash"
+                class="mode-card"
+                data-mode-card="flash"
+                role="button"
+                tabindex="0"
+              >
+                <span class="mode-card-kicker">flash</span>
+                <p id="mode-card-copy-flash" class="mode-card-copy">
+                  Bit-by-bit pulses with the strongest personality. Best for hearing the transmission itself.
+                </p>
+              </article>
+              <article
+                id="mode-card-pro"
+                class="mode-card"
+                data-mode-card="pro"
+                role="button"
+                tabindex="0"
+              >
+                <span class="mode-card-kicker">pro</span>
+                <p id="mode-card-copy-pro" class="mode-card-copy">
+                  Telephone-keypad-like dual tones. More compact than flash and easier to compare symbol structure.
+                </p>
+              </article>
+              <article
+                id="mode-card-ultra"
+                class="mode-card"
+                data-mode-card="ultra"
+                role="button"
+                tabindex="0"
+              >
+                <span class="mode-card-kicker">ultra</span>
+                <p id="mode-card-copy-ultra" class="mode-card-copy">
+                  Dense 16-FSK tones for faster, shorter audio. Best when you want compact transmission.
+                </p>
+              </article>
+            </div>
+
+            <div class="generator-layout">
+              <div class="generator-form">
+                <section class="workflow-section mode-options-panel">
+                  <div class="mode-options-grid">
+                    <label class="field" id="flash-style-field">
+                      <span id="flash-style-label">Flash Style</span>
+                      <select id="flash-style-select">
+                        <option value="standard" selected>standard</option>
+                        <option value="litany">litany</option>
+                        <option value="hostility">hostility</option>
+                        <option value="collapse">collapse</option>
+                        <option value="zeal">zeal</option>
+                        <option value="void">void</option>
                       </select>
                     </label>
-                    <label
-                      class="sample-toggle-field"
-                      id="sample-add-emoji-field"
-                      for="sample-add-emoji-toggle"
-                    >
-                      <input id="sample-add-emoji-toggle" type="checkbox" checked />
-                      <span id="sample-add-emoji-label">Add Emoji</span>
+
+                    <label class="field" id="mini-speed-field" hidden>
+                      <span id="mini-speed-label">Morse Speed</span>
+                      <select id="mini-speed-select">
+                        <option value="wpm10">10 WPM</option>
+                        <option value="wpm15" selected>15 WPM</option>
+                        <option value="wpm20">20 WPM</option>
+                      </select>
                     </label>
-                    <button id="random-sample-button" class="secondary-button dice-button" type="button">
-                      <span class="dice-button-face" aria-hidden="true">
-                        <span class="dice-pip pip-top-left"></span>
-                        <span class="dice-pip pip-center"></span>
-                        <span class="dice-pip pip-bottom-right"></span>
-                      </span>
-                      <span id="random-sample-button-text">Random Sample</span>
-                    </button>
                   </div>
-                </div>
-                <span id="input-hint" class="field-hint"></span>
-              </div>
-              <textarea
-                id="input-text"
-                rows="8"
-                placeholder="例如：github"
-              >github</textarea>
-            </label>
+                </section>
 
-            <div class="grid">
-              <label class="field">
-                <span id="mode-label">Mode</span>
-                <select id="mode-select">
-                  <option value="mini">mini: Morse code</option>
-                  <option value="flash" selected>flash: Bit-by-bit BFSK</option>
-                  <option value="pro">pro: DTMF-like dual-tone mapping</option>
-                  <option value="ultra">ultra: 16-FSK</option>
-                </select>
-              </label>
+                <label class="field">
+                  <div class="field-header">
+                    <div class="field-header-row">
+                      <div class="input-title-row">
+                        <span id="input-text-label">输入文本</span>
+                        <span id="input-hint" class="field-hint"></span>
+                      </div>
+                    </div>
+                    <div class="sample-tools">
+                      <fieldset class="sample-length-field" id="sample-length-field">
+                        <span id="sample-length-label">Sample Length</span>
+                        <div class="sample-length-pills" role="radiogroup" aria-labelledby="sample-length-label">
+                          <label class="sample-length-pill">
+                            <input id="sample-length-short" name="sample-length" type="radio" value="short" checked />
+                            <span id="sample-length-short-label">Short</span>
+                          </label>
+                          <label class="sample-length-pill">
+                            <input id="sample-length-long" name="sample-length" type="radio" value="long" />
+                            <span id="sample-length-long-label">Long</span>
+                          </label>
+                        </div>
+                      </fieldset>
+                      <label
+                        class="sample-toggle-field"
+                        id="sample-add-emoji-field"
+                        for="sample-add-emoji-toggle"
+                      >
+                        <input id="sample-add-emoji-toggle" type="checkbox" checked />
+                        <span id="sample-add-emoji-label">Add Emoji</span>
+                      </label>
+                      <button id="random-sample-button" class="secondary-button dice-button" type="button">
+                        <span class="dice-button-face" aria-hidden="true">
+                          <span class="dice-pip pip-top-left"></span>
+                          <span class="dice-pip pip-center"></span>
+                          <span class="dice-pip pip-bottom-right"></span>
+                        </span>
+                        <span id="random-sample-button-text">Random Text</span>
+                      </button>
+                    </div>
+                  </div>
+                  <textarea
+                    id="input-text"
+                    rows="8"
+                    placeholder="例如：github"
+                  >github</textarea>
+                </label>
 
-              <label class="field" id="flash-style-field">
-                <span id="flash-style-label">Flash Style</span>
-                <select id="flash-style-select">
-                  <option value="standard" selected>standard</option>
-                  <option value="litany">litany</option>
-                  <option value="hostility">hostility</option>
-                  <option value="collapse">collapse</option>
-                  <option value="zeal">zeal</option>
-                  <option value="void">void</option>
-                </select>
-              </label>
-
-              <label class="field" id="mini-speed-field" hidden>
-                <span id="mini-speed-label">Morse Speed</span>
-                <select id="mini-speed-select">
-                  <option value="wpm10">10 WPM</option>
-                  <option value="wpm15" selected>15 WPM</option>
-                  <option value="wpm20">20 WPM</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="actions">
-              <button id="generate-button" type="button">生成音频</button>
-            </div>
-          </div>
-
-          <section class="result-stage">
-            <div class="result-stage-header">
-              <h2 class="result-stage-title">Preview</h2>
-              <a id="download-link" class="download-link is-disabled" download="flipbits-demo.wav">
-                下载 WAV
-              </a>
-            </div>
-
-            <p id="status" class="status" aria-live="polite">
-              正在等待 WebAssembly 编码器接入。
-            </p>
-
-            <section id="progress-section" class="progress-section" hidden>
-              <div class="progress-header">
-                <span id="progress-label">生成进度</span>
-                <span id="progress-value"></span>
-              </div>
-              <div class="progress-track" aria-hidden="true">
-                <div id="progress-bar" class="progress-bar"></div>
-              </div>
-            </section>
-
-            <section id="result-summary" class="result-summary" hidden>
-              <h2 id="result-summary-title">Result Summary</h2>
-              <div class="result-grid">
-                <div class="result-item">
-                  <span id="result-mode-label" class="result-label">Mode</span>
-                  <span id="result-mode-value" class="result-value"></span>
-                </div>
-                <div class="result-item">
-                  <span id="result-profile-label" class="result-label">Profile</span>
-                  <span id="result-profile-value" class="result-value"></span>
-                </div>
-                <div class="result-item">
-                  <span id="result-duration-label" class="result-label">Duration</span>
-                  <span id="result-duration-value" class="result-value"></span>
-                </div>
-                <div class="result-item">
-                  <span id="result-sample-rate-label" class="result-label">Sample Rate</span>
-                  <span id="result-sample-rate-value" class="result-value"></span>
+                <div class="actions">
+                  <button id="generate-button" type="button">生成音频</button>
                 </div>
               </div>
-            </section>
 
-            <div class="player-shell">
-              <audio id="player" class="player" controls></audio>
+              <section class="result-stage">
+                <div class="result-stage-header">
+                  <h2 class="result-stage-title">Preview</h2>
+                  <a id="download-link" class="download-link is-disabled" download="flipbits-demo.wav">
+                    下载 WAV
+                  </a>
+                </div>
+
+                <p id="status" class="status" aria-live="polite">
+                  正在等待 WebAssembly 编码器接入。
+                </p>
+
+                <section id="progress-section" class="progress-section" hidden>
+                  <div class="progress-header">
+                    <span id="progress-label">生成进度</span>
+                    <span id="progress-value"></span>
+                  </div>
+                  <div class="progress-track" aria-hidden="true">
+                    <div id="progress-bar" class="progress-bar"></div>
+                  </div>
+                </section>
+
+                <section id="result-summary" class="result-summary" hidden>
+                  <h2 id="result-summary-title">Result Summary</h2>
+                  <div class="result-grid">
+                    <div class="result-item">
+                      <span id="result-mode-label" class="result-label">Mode</span>
+                      <span id="result-mode-value" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                      <span id="result-profile-label" class="result-label">Profile</span>
+                      <span id="result-profile-value" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                      <span id="result-duration-label" class="result-label">Duration</span>
+                      <span id="result-duration-value" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                      <span id="result-sample-rate-label" class="result-label">Sample Rate</span>
+                      <span id="result-sample-rate-value" class="result-value"></span>
+                    </div>
+                  </div>
+                </section>
+
+                <div class="player-shell">
+                  <audio id="player" class="player" controls></audio>
+                </div>
+              </section>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel mode-deck-panel">
-        <div class="section-heading">
-          <h2 id="mode-summary-title">Mode Overview</h2>
-          <p id="mode-summary-copy" class="mode-summary-copy"></p>
-        </div>
-        <div id="mode-cards" class="mode-cards" data-active-mode="flash">
-          <article
-            id="mode-card-mini"
-            class="mode-card"
-            data-mode-card="mini"
-            role="button"
-            tabindex="0"
-          >
-            <span class="mode-card-kicker">mini</span>
-            <p id="mode-card-copy-mini" class="mode-card-copy">
-              Morse-like beeps with a clear dot-dash rhythm. Best for short text and readable pacing.
-            </p>
-          </article>
-          <article
-            id="mode-card-flash"
-            class="mode-card"
-            data-mode-card="flash"
-            role="button"
-            tabindex="0"
-          >
-            <span class="mode-card-kicker">flash</span>
-            <p id="mode-card-copy-flash" class="mode-card-copy">
-              Bit-by-bit pulses with the strongest personality. Best for hearing the transmission itself.
-            </p>
-          </article>
-          <article
-            id="mode-card-pro"
-            class="mode-card"
-            data-mode-card="pro"
-            role="button"
-            tabindex="0"
-          >
-            <span class="mode-card-kicker">pro</span>
-            <p id="mode-card-copy-pro" class="mode-card-copy">
-              Telephone-keypad-like dual tones. More compact than flash and easier to compare symbol structure.
-            </p>
-          </article>
-          <article
-            id="mode-card-ultra"
-            class="mode-card"
-            data-mode-card="ultra"
-            role="button"
-            tabindex="0"
-          >
-            <span class="mode-card-kicker">ultra</span>
-            <p id="mode-card-copy-ultra" class="mode-card-copy">
-              Dense 16-FSK tones for faster, shorter audio. Best when you want compact transmission.
-            </p>
-          </article>
+          </section>
         </div>
       </section>
 
@@ -273,6 +276,24 @@
             <p>
               Audio generated by every mode can be decoded in the Android app; for the full experience, download the Android APK from Releases. If you like FlipBits, please give it a star at https://github.com/camellia2077/FlipBits.
             </p>
+          </div>
+          <div class="about-links">
+            <a
+              class="hero-link-chip"
+              href="https://github.com/camellia2077/FlipBits"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Repo
+            </a>
+            <a
+              class="hero-link-chip"
+              href="https://github.com/camellia2077/FlipBits/releases"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Android APK
+            </a>
           </div>
         </section>
       </section>

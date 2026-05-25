@@ -1,6 +1,9 @@
 import { pcm16ToWavBlob } from "./audio-utils.js";
+import { resolveInitialLocale } from "./browser-locale.js";
 import { readEncodeRequest, sanitizeModeText, syncModeFields } from "./request-form.js";
 import { buildResultSummaryViewModel } from "./result-summary-view-model.js";
+
+const DEFAULT_MODE = "flash";
 
 export class AppController {
   constructor({ elements, ui, encoderClient, sampleController, sampleView }) {
@@ -10,14 +13,16 @@ export class AppController {
     this.sampleController = sampleController;
     this.sampleView = sampleView;
     this.currentAudioUrl = null;
+    this.currentMode = DEFAULT_MODE;
     this.isGenerating = false;
   }
 
   initialize() {
     this.bindEvents();
-    this.ui.setLocale("en");
-    this.sampleView.setLocale("en");
-    void this.applyMode(this.elements.modeSelect.value);
+    const initialLocale = resolveInitialLocale();
+    this.ui.setLocale(initialLocale);
+    this.sampleView.setLocale(initialLocale);
+    void this.applyMode(this.currentMode);
     this.ui.setStatusKey("loading.pending");
     this.sampleView.setControlsEnabled(false);
     this.sampleController.bindEvents();
@@ -29,12 +34,8 @@ export class AppController {
     this.elements.languageSelect.addEventListener("change", (event) => {
       this.ui.setLocale(event.target.value);
       this.sampleView.setLocale(event.target.value);
-      this.ui.setInputHint(this.elements.modeSelect.value);
+      this.ui.setInputHint(this.currentMode);
       void this.sampleController.refreshSampleText();
-    });
-
-    this.elements.modeSelect.addEventListener("change", () => {
-      void this.applyMode(this.elements.modeSelect.value);
     });
 
     this.elements.modeCards?.addEventListener("click", (event) => {
@@ -68,7 +69,7 @@ export class AppController {
     });
 
     this.elements.inputText.addEventListener("input", () => {
-      if (sanitizeModeText(this.elements)) {
+      if (sanitizeModeText(this.elements, this.currentMode)) {
         this.ui.setStatusKey("validation.miniAsciiOnly");
       }
     });
@@ -97,6 +98,10 @@ export class AppController {
     this.sampleController.setInteractiveEnabled(!this.isGenerating);
   }
 
+  getCurrentMode() {
+    return this.currentMode;
+  }
+
   releaseCurrentAudioUrl() {
     if (!this.currentAudioUrl) {
       return;
@@ -115,20 +120,17 @@ export class AppController {
       return;
     }
 
-    if (this.elements.modeSelect.value !== mode) {
-      this.elements.modeSelect.value = mode;
-    }
-
+    this.currentMode = mode;
     syncModeFields(this.elements, this.ui, mode);
     this.sampleController.syncMode(mode);
     await this.sampleController.refreshSampleText();
-    if (sanitizeModeText(this.elements)) {
+    if (sanitizeModeText(this.elements, mode)) {
       this.ui.setStatusKey("validation.miniAsciiOnly");
     }
   }
 
   async generateAudio() {
-    const request = readEncodeRequest(this.elements);
+    const request = readEncodeRequest(this.elements, this.currentMode);
     if (!request.text.trim()) {
       this.ui.setStatusKey("validation.emptyText");
       return;

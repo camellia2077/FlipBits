@@ -40,7 +40,6 @@ export class UiController {
     this.renderAboutCopy();
     this.elements.inputTextLabel.textContent = copy.inputTextLabel;
     this.elements.inputText.placeholder = copy.inputPlaceholder;
-    this.elements.modeLabel.textContent = copy.modeLabel;
     this.elements.modeSummaryTitle.textContent = getTranslation(this.currentLocale, "mode.summaryTitle");
     this.elements.flashStyleLabel.textContent = copy.flashStyleLabel;
     this.elements.miniSpeedLabel.textContent = copy.miniSpeedLabel;
@@ -88,8 +87,8 @@ export class UiController {
     this.renderModeCards(mode);
   }
 
-  renderModeCards(activeMode = null) {
-    const mode = activeMode ?? this.elements.modeSelect?.value ?? "flash";
+  renderModeCards(activeMode = "flash") {
+    const mode = activeMode;
     this.elements.modeCards?.setAttribute("data-active-mode", mode);
     this.elements.modeCardCopyMini.textContent = getTranslation(
       this.currentLocale,

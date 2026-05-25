@@ -7,8 +7,8 @@ export class SampleView {
 
   setLocale(locale) {
     this.elements.sampleLengthLabel.textContent = getTranslation(locale, "sample.lengthLabel");
-    this.elements.sampleLengthSelect.options[0].textContent = getTranslation(locale, "sample.length.short");
-    this.elements.sampleLengthSelect.options[1].textContent = getTranslation(locale, "sample.length.long");
+    this.elements.sampleLengthShortLabel.textContent = getTranslation(locale, "sample.length.short");
+    this.elements.sampleLengthLongLabel.textContent = getTranslation(locale, "sample.length.long");
     this.elements.sampleAddEmojiLabel.textContent = getTranslation(locale, "sample.addEmoji");
     const randomLabel = getTranslation(locale, "sample.randomButton");
     this.elements.randomSampleButtonText.textContent = randomLabel;
@@ -16,7 +16,9 @@ export class SampleView {
   }
 
   setControlsEnabled(enabled) {
-    this.elements.sampleLengthSelect.disabled = !enabled;
+    for (const input of this.elements.sampleLengthInputs) {
+      input.disabled = !enabled;
+    }
     this.elements.sampleAddEmojiToggle.disabled = !enabled;
     this.elements.randomSampleButton.disabled = !enabled;
   }

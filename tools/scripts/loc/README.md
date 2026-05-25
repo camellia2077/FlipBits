@@ -99,9 +99,9 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
     - `lines`
     - 其余计数型证据
   - `lines` 保留，因为大文件信号本身仍然有价值；但它只是结论旁边的体量信号，不应替代风险类型判断
-  - C++ 第一版也是保守启发式：综合文件行数、共享状态/线程原语、顶层符号数量、角色命名种类数、`mode/style/state` 分支数量，以及更贴近桥接/大实现文件的信号：
+  - C++ 版也是保守启发式：综合文件行数、共享状态/线程原语、C++ 符号数量、角色命名种类数、`mode/style/state` 分支数量，以及更贴近桥接/大实现文件的信号：
     - `interop_surface_hits`
-      - 一个文件同时命中的桥接/FFI 面数量，例如 JNI 表面、C ABI 表面、封送 helper
+      - 一个文件同时命中的桥接/FFI 面数量，例如 JNI 表面、C ABI 表面、JNI/C ABI 上下文中的封送 helper
     - `resource_lifecycle_hits`
       - 资源 ownership / 释放 / cancel / destroy / lock 等生命周期信号密度
     - `rule_helper_count`
@@ -214,18 +214,21 @@ tools\scripts\loc\scan_py_over.bat tools
 
 也就是说，console 和 Markdown 现在共享同一套展示语义，不再各自拼一套字段解释。
 
-职责混杂扫描现在按三层信息输出，目标是让 agent 直接定位问题而不是再猜：
+职责混杂扫描现在按四层信息输出，目标是让 agent 直接定位问题而不是再猜：
 
 1. 文件级结论
    - `priority / score / summary / dominant_risks / suggestion / next_action / lines`
 2. 函数级热点
    - `function_hotspots`
    - 指出哪个函数或 composable 更值得先拆，附 `score / lines / summary / risks / evidence`
-3. 行号级锚点
+3. C++ 迁移包
+   - `move_sets`
+   - 把同一 owner 下应该一起移动的 helper 明确列成一组，附目标 module/file、原因和验证命令
+4. 行号级锚点
    - `anchors`
    - 指出哪一行附近出现了关键的 state/effect/mode 分支/绘制分发信号
 
-当前这套三层输出已覆盖：
+当前这套输出已覆盖：
 
 - Kotlin 职责风险扫描
 - Python 职责风险扫描
@@ -235,8 +238,9 @@ tools\scripts\loc\scan_py_over.bat tools
 
 1. 文件级结论
 2. 函数级热点
-3. 行号级锚点
-4. 其余计数型 evidence
+3. C++ `move_sets` 迁移包
+4. 行号级锚点
+5. 其余计数型 evidence
 
 可通过 `--log-file` 覆盖，例如：
 
@@ -296,18 +300,21 @@ C++ 额外字段：
 - 第二行只保留 `summary` 和 `risks`
 - 第三行打印对应明细 Markdown 的绝对路径，方便在 IDE 终端里直接点开
 
-更详细的 `suggestion / next_action / function_hotspots / anchors / evidence` 都保留在 JSON / Markdown 日志里，不再在终端展开。
+更详细的 `suggestion / next_action / function_hotspots / move_sets / anchors / evidence` 都保留在 JSON / Markdown 日志里，不再在终端展开。
 
 Markdown 明细报告还会额外给 agent 可执行的重构辅助信息：
 
 - `stop_signal`
   - 建议继续、暂停或人工复核，避免只为了降低 score 继续拆文件。
-- `validation_hints`
-  - 给出最小验证方向，例如 Kotlin 编译或相关 focused test。
+  - `validation_hints`
+  - 给出最小验证方向，例如 Kotlin 编译、Android JNI build、`audio_api` focused test 或 host verify。
 - `False Positive Notes`
   - 说明 Compose state、mode branch 等可能是框架内正常信号，不应机械追数。
 - `Responsibility Clusters`
   - 把热点按职责聚类，例如 dialog/import/export、Canvas runtime、state orchestration。
+- `Move Sets`
+  - C++ 报告把同一迁移包内的 helper 名称和行号列在一起，例如 JNI follow marshalling、Flash signal layout、WAV metadata parse。
+  - 这比单个 hotspot 更适合指导 module-first 提取：一次只选一个 move set，整体迁移后立刻验证。
 - `Suggested Extraction Candidates`
   - 给出候选 owner、行号、建议边界、风险和验证方式；一次重构通常只选一个候选。
 

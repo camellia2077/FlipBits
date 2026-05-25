@@ -27,9 +27,27 @@ class ResponsibilityAnchor:
 
 
 @dataclass(frozen=True)
+class ResponsibilityMoveSetHelper:
+    name: str
+    kind: str
+    start_line: int
+    end_line: int
+
+
+@dataclass(frozen=True)
+class ResponsibilityMoveSet:
+    name: str
+    target_boundary: str
+    helpers: list[ResponsibilityMoveSetHelper]
+    reason: str
+    validation: str
+
+
+@dataclass(frozen=True)
 class ResponsibilityDetails:
     function_hotspots: list[ResponsibilityFunctionHotspot]
     anchors: list[ResponsibilityAnchor]
+    move_sets: list[ResponsibilityMoveSet]
 
 
 @dataclass(frozen=True)
@@ -87,4 +105,5 @@ def build_responsibility_result(
         "next_action": assessment.next_action,
         "function_hotspots": details.function_hotspots,
         "anchors": details.anchors,
+        "move_sets": details.move_sets,
     }

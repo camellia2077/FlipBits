@@ -18,6 +18,7 @@ from .groups.file_name import register_file_name_group
 from .groups.history import register_history_group
 from .groups.message import register_message_group
 from .groups.verify import register_verify_command
+from .groups.web import register_web_group
 from .groups.windows import register_windows_group
 
 
@@ -34,6 +35,7 @@ def build_parser() -> argparse.ArgumentParser:
             "- Android delivery: `android`\n"
             "- Android debugging: `android-debug`\n"
             "- Android translation: `android-translate`\n"
+            "- Web presentation: `web`\n"
             "- Naming assistance: `file-name`\n"
             "- Release history: `history`\n"
             "- Git message drafts: `message`\n"
@@ -44,6 +46,7 @@ def build_parser() -> argparse.ArgumentParser:
             "- `python tools/run.py file-name <subcommand> --help`\n"
             "- `python tools/run.py history <subcommand> --help`\n"
             "- `python tools/run.py message <subcommand> --help`\n"
+            "- `python tools/run.py web <action> --help`\n"
             "- `python tools/run.py artifact <subcommand> --help`"
         ),
         formatter_class=RAW_FORMATTER,
@@ -58,6 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
     register_android_debug_group(subparsers)
     register_android_translate_group(subparsers)
     register_artifact_group(subparsers)
+    register_web_group(subparsers)
     register_file_name_group(subparsers)
     register_history_group(subparsers)
     register_message_group(subparsers)

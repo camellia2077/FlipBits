@@ -3,6 +3,7 @@ export const LOCALE = 'pl';
 export const MESSAGES = {
     htmlLang: "pl",
     languageLabel: "Język",
+    "hero.copy": "Ta wersja demonstracyjna w przeglądarce obejmuje tylko wpisywanie tekstu i generowanie audio. Wizualizację znajdziesz w Android APK. Kliknij Repo albo Android APK, aby otworzyć odpowiednią stronę.",
     "about.title": "O FlipBits",
     "about.copy": [
       "FlipBits zamienia tekst w słyszalny, zakodowany dźwięk. Aplikacja na Androida synchronizuje też wizualizację odtwarzania, przebiegu fali, procesu kodowania tekstu oraz binarnej zawartości stojącej za każdym znakiem lub słowem; ta strona jest tylko szybkim podglądem tego, jak brzmią różne tryby.",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "Dźwięk wygenerowany w każdym trybie można zdekodować w aplikacji na Androida; pełne doświadczenie znajdziesz po pobraniu APK Androida z Releases. Jeśli podoba Ci się FlipBits, daj mu gwiazdkę na https://github.com/camellia2077/FlipBits.",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "Losowy tekst",
     inputTextLabel: "Tekst wejściowy",
     inputPlaceholder: "np. github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "Akceptuje tekst UTF-8.",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "Przegląd trybów",
+    "mode.summary.mini": "Sygnały Morse code z wyraźnym rytmem kropek i kresek. Dobre dla krótkiego tekstu i czytelnego tempa.",
+    "mode.summary.flash": "Impulsy bit po bicie o najmocniejszym charakterze. Dobre do słuchania samej transmisji.",
+    "mode.summary.pro": "Podwójne tony podobne do klawiatury telefonu. Bardziej kompaktowe niż flash i łatwiejsze do porównywania struktury symboli.",
+    "mode.summary.ultra": "Gęste tony 16-FSK dla szybszego, krótszego audio. Dobre do kompaktowej transmisji.",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "Generuj audio",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "Częstotliwość próbkowania",
     "loading.pending": "Oczekiwanie na enkoder WebAssembly.",
     "loading.ready": "Enkoder WebAssembly został załadowany. Można generować audio.",
-    "loading.missing": "Moduł WASM nie jest jeszcze gotowy. Najpierw uruchom python apps/audio_web/tools/build_wasm.py, aby wygenerować artefakty site/wasm/.",
+    "loading.missing": "Moduł WASM nie jest jeszcze gotowy. Najpierw uruchom python tools/run.py web build-wasm, aby wygenerować artefakty site/wasm/.",
     "validation.emptyText": "Wpisz tekst.",
     "validation.missingExport": "Moduł WASM został załadowany, ale beginEncodeOperation(...) nie zostało jeszcze wyeksportowane.",
     "validation.miniAsciiOnly": "Tryb mini akceptuje tylko ASCII; znaki spoza ASCII zostały usunięte.",

@@ -1,6 +1,30 @@
 # over_inclusive = true：判定逻辑为 大于等于 >=
 # over_inclusive = false：判定逻辑为 严格大于 >
 
+[global]
+excluded_languages = ["md"]
+
+[md]
+display_name = "Markdown"
+default_paths = [
+  ".",
+]
+extensions = [".md", ".markdown"]
+ignore_dirs = [
+  ".git",
+  ".gradle",
+  ".idea",
+  ".kotlin",
+  ".vscode",
+  "build",
+  "__pycache__",
+]
+ignore_prefixes = ["dist", "out"]
+default_over_threshold = 350
+default_under_threshold = 120
+default_dir_over_files = 16
+over_inclusive = false
+
 [cpp]
 display_name = "C++"
 default_paths = [

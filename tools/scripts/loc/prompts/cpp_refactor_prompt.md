@@ -28,9 +28,16 @@
 - 提高 correctness、可验证性和契约清晰度
 
 优先方向：
+- 对 `libs/*` 坚持 module-first：内部 C++ 新职责边界优先使用 named module / `import`，通常落在 `modules/bag/.../*.cppm` + `src/.../*.cpp`
+- module-first 不是 module-only：公共 C ABI、JNI/wasm bridge、平台 adapter、generated include、以及 Android/Web toolchain 不兼容 modules 的路径，仍然需要保留 header/include 或 include fallback
+- 新增 `libs/*` module 边界时，同步考虑 include fallback / build feature switch，确保 Android/Web 在关闭 module 路径时仍可编译
+- 不要为了“全 module”破坏 C 接口、JNI/wasm bridge 或跨平台构建能力；也不要新增 `.inc` 作为新的职责边界
+- 对 Android JNI / app native bridge，可按 `.cpp/.h` 拆编译单元，但仍要围绕 DTO marshalling、list/scalar marshalling、lifecycle、entrypoint 分包
 - 把 bridge/ffi glue 和 core rule/codec 拆开
 - 把 metadata contract、marshalling、platform adapter 分开
 - 把生命周期管理和规则逻辑分开
+- 读取扫描报告时优先看 `Move Sets`，把同一迁移包里的 helpers 成组移动，不要按单个小函数碎拆
+- Move Set 落地后必须复扫：若新文件仍是 P1，再按包内子职责继续拆；若只剩 P2 且风险来自天然边界层 interop，可停止
 - 让“谁负责解析、谁负责转换、谁负责所有权、谁负责对外接口”更清楚
 
 不以这些为目标：

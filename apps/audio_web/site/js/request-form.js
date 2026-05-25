@@ -6,15 +6,15 @@ function setFieldVisibility(field, visible) {
   field.style.display = visible ? "" : "none";
 }
 
-export function syncModeFields(elements, ui, mode = elements.modeSelect.value) {
+export function syncModeFields(elements, ui, mode) {
   setFieldVisibility(elements.flashStyleField, mode === "flash");
   setFieldVisibility(elements.miniSpeedField, mode === "mini");
   ui.setInputHint(mode);
 }
 
-export function sanitizeModeText(elements) {
+export function sanitizeModeText(elements, mode) {
   const sanitized = sanitizeMiniInput(
-    elements.modeSelect.value,
+    mode,
     elements.inputText.value,
   );
   if (!sanitized.changed) {
@@ -25,8 +25,7 @@ export function sanitizeModeText(elements) {
   return true;
 }
 
-export function readEncodeRequest(elements) {
-  const mode = elements.modeSelect.value;
+export function readEncodeRequest(elements, mode) {
   return {
     text: elements.inputText.value,
     mode,

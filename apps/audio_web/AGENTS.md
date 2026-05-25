@@ -55,10 +55,10 @@
   - `src/flipbits_web_bridge.cpp`
   - `C:/code/WaveBits/libs/AGENTS.md`
 - 改 sample 文本导出、Pages 站点准备、本地构建或本地预览入口，先看：
-  - `tools/export_sample_texts.py`
-  - `tools/build_wasm.py`
-  - `tools/prepare_pages_site.py`
-  - `tools/serve_site.py`
+  - `python tools/run.py web export-sample-texts`
+  - `python tools/run.py web build-wasm`
+  - `python tools/run.py web prepare-pages-site`
+  - `python tools/run.py web serve-site`
 
 ## Cross-Project Pointers
 
@@ -71,8 +71,8 @@
 ## Validation
 
 - 改 Web Python 工具后，最小检查优先跑：
-  - `python -m py_compile apps/audio_web/tools/build_wasm.py apps/audio_web/tools/export_sample_texts.py apps/audio_web/tools/prepare_pages_site.py apps/audio_web/tools/serve_site.py`
+  - `python tools/run.py web test`
 - 改前端 JS 后，最小检查优先跑：
-  - `node --check apps/audio_web/site/js/app.js`
+  - `python tools/run.py web test`
 - 需要本地构建 / 预览时，命令统一看：
   - `docs/notes/web/cmd.md`

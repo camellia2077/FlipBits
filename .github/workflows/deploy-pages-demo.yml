@@ -41,7 +41,7 @@ jobs:
           version: 4.0.10
 
       - name: Prepare Pages site
-        run: python apps/audio_web/tools/prepare_pages_site.py
+        run: python tools/run.py web prepare-pages-site
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

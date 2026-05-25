@@ -3,7 +3,7 @@ export const LOCALE = 'en';
 export const MESSAGES = {
     htmlLang: "en",
     languageLabel: "Language",
-    "hero.copy": "Turn text into playable encoded audio first. Then explore how each mode sounds and what the project is optimizing for.",
+    "hero.copy": "This web demo only covers text input and audio generation. Download the Android APK for visualization. Click Repo or Android APK to open the matching page.",
     "about.title": "About FlipBits",
     "about.copy": [
       "FlipBits turns text into audible encoded audio. The Android app also visualizes playback, waveforms, text encoding, and the binary content behind each character or word in sync; this page is only a quick preview of how the different modes sound.",
@@ -16,7 +16,7 @@ export const MESSAGES = {
     "sample.length.short": "Short",
     "sample.length.long": "Long",
     "sample.addEmoji": "Add Emoji",
-    "sample.randomButton": "Random Sample",
+    "sample.randomButton": "Random Text",
     inputHintByMode: {
       mini: "ASCII only. Supports A-Z, 0-9, common Morse punctuation, and space / tab / CR / LF.",
       flash: "Accepts arbitrary text.",
@@ -25,7 +25,7 @@ export const MESSAGES = {
     },
     modeLabel: "Mode",
     "mode.summaryTitle": "Mode Overview",
-    "mode.summary.mini": "Morse-like beeps with a clear dot-dash rhythm. Best for short text and readable pacing.",
+    "mode.summary.mini": "Morse code beeps with a clear dot-dash rhythm. Best for short text and readable pacing.",
     "mode.summary.flash": "Bit-by-bit pulses with the strongest personality. Best for hearing the transmission itself.",
     "mode.summary.pro": "Telephone-keypad-like dual tones. More compact than flash and easier to compare symbol structure.",
     "mode.summary.ultra": "Dense 16-FSK tones for faster, shorter audio. Best when you want compact transmission.",
@@ -48,7 +48,7 @@ export const MESSAGES = {
     "result.sampleRate": "Sample Rate",
     "loading.pending": "Waiting for the WebAssembly encoder.",
     "loading.ready": "WebAssembly encoder loaded. Ready to generate audio.",
-    "loading.missing": "WASM module is not ready yet. Run python apps/audio_web/tools/build_wasm.py to generate the site/wasm/ artifacts first.",
+    "loading.missing": "WASM module is not ready yet. Run python tools/run.py web build-wasm to generate the site/wasm/ artifacts first.",
     "validation.emptyText": "Enter some text.",
     "validation.missingExport": "The WASM module loaded, but beginEncodeOperation(...) is not exported yet.",
     "validation.miniAsciiOnly": "mini mode only accepts ASCII input; non-ASCII characters were removed.",

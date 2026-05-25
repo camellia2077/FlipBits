@@ -5,10 +5,8 @@ from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
 
+from .paths import ANDROID_RES_ROOT, SAMPLE_TEXT_OUTPUT_PATH
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-ANDROID_RES_ROOT = REPO_ROOT / "apps" / "audio_android" / "app" / "src" / "main" / "res"
-OUTPUT_PATH = REPO_ROOT / "apps" / "audio_web" / "site" / "data" / "sample-texts.json"
 
 SACRED_MACHINE_FILES = [
     "audio_samples_sacred_machine_abyssal_quarantine.xml",
@@ -29,9 +27,6 @@ ASCII_KEY_PATTERN = re.compile(
 )
 
 
-# Android sample XML is the source of truth. Keys must follow
-# audio_sample_<flavor>_<family>_<length>_<slug>, and `short` / `long`
-# are parsed from the key contract rather than inferred from entry order.
 def read_string_entries(xml_path: Path) -> list[tuple[str, str]]:
     tree = ET.parse(xml_path)
     root = tree.getroot()
@@ -54,11 +49,14 @@ def values_dir_to_locale(values_dir_name: str) -> str:
     return suffix
 
 
-def build_sacred_machine_payload() -> tuple[dict[str, dict[str, list[dict[str, str]]]], dict[str, str]]:
+def build_sacred_machine_payload(
+    *,
+    android_res_root: Path = ANDROID_RES_ROOT,
+) -> tuple[dict[str, dict[str, list[dict[str, str]]]], dict[str, str]]:
     sacred_machine: dict[str, dict[str, list[dict[str, str]]]] = {}
     suffix_to_length: dict[str, str] = {}
 
-    for values_dir in sorted(ANDROID_RES_ROOT.glob("values*")):
+    for values_dir in sorted(android_res_root.glob("values*")):
         locale = values_dir_to_locale(values_dir.name)
         locale_bucket = {"short": [], "long": []}
 
@@ -82,8 +80,12 @@ def build_sacred_machine_payload() -> tuple[dict[str, dict[str, list[dict[str, s
     return sacred_machine, suffix_to_length
 
 
-def build_ascii_shared_payload(suffix_to_length: dict[str, str]) -> dict[str, dict[str, list[dict[str, str]]]]:
-    shared_path = ANDROID_RES_ROOT / "values" / "audio_samples_pro_ascii_shared.xml"
+def build_ascii_shared_payload(
+    suffix_to_length: dict[str, str],
+    *,
+    android_res_root: Path = ANDROID_RES_ROOT,
+) -> dict[str, dict[str, list[dict[str, str]]]]:
+    shared_path = android_res_root / "values" / "audio_samples_pro_ascii_shared.xml"
     entries = read_string_entries(shared_path)
     ascii_shared = {"en": {"short": [], "long": []}}
 
@@ -100,21 +102,27 @@ def build_ascii_shared_payload(suffix_to_length: dict[str, str]) -> dict[str, di
     return ascii_shared
 
 
-def main() -> None:
-    sacred_machine, suffix_to_length = build_sacred_machine_payload()
-    ascii_shared = build_ascii_shared_payload(suffix_to_length)
-    payload = {
+def build_sample_text_payload(*, android_res_root: Path = ANDROID_RES_ROOT) -> dict[str, object]:
+    sacred_machine, suffix_to_length = build_sacred_machine_payload(android_res_root=android_res_root)
+    ascii_shared = build_ascii_shared_payload(
+        suffix_to_length,
+        android_res_root=android_res_root,
+    )
+    return {
         "flavor": "sacred_machine",
         "sacred_machine": sacred_machine,
         "ascii_shared": ascii_shared,
     }
 
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(
+
+def export_sample_texts(
+    *,
+    android_res_root: Path = ANDROID_RES_ROOT,
+    output_path: Path = SAMPLE_TEXT_OUTPUT_PATH,
+) -> None:
+    payload = build_sample_text_payload(android_res_root=android_res_root)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-
-
-if __name__ == "__main__":
-    main()

@@ -175,10 +175,12 @@ C++ 第一版同样保持保守，目标是先把“超大实现文件 + 桥接/
 
 ### 3. 顶层符号数量
 
-启发式统计顶层：
+启发式统计 C++ 符号：
 
 - `class / struct / enum`
-- 顶层函数定义
+- namespace 内函数定义
+- class / struct 内带函数体的方法
+- `.inc` 文件里的 out-of-line method / helper 定义
 
 设计意图：
 
@@ -227,8 +229,8 @@ C++ 第一版同样保持保守，目标是先把“超大实现文件 + 桥接/
 统计一个文件同时命中的桥接类别数：
 
 - JNI 表面
-- C ABI 表面
-- 封送 / marshalling helper
+- C ABI 表面（例如 `extern "C"`、`*_api.h` 边界或 `bag_*` C entrypoint）
+- 封送 / marshalling helper（仅在 JNI/C ABI 上下文中计入，避免把普通 `To* / Build*` domain helper 误判成 FFI）
 
 对应字段：
 
@@ -260,11 +262,13 @@ C++ 第一版同样保持保守，目标是先把“超大实现文件 + 桥接/
 
 当前职责混杂扫描的边界是：
 
-- 只做文件级预警
+- 先做文件级预警，再给出函数级 hotspot、C++ helper move set 和行号 anchor
 - 不做 AST 级数据流分析
 - 不判断函数是否纯函数
 - 不直接给出“必须拆分”的结论
 - 输出主要用于：
   - 发现可疑大文件
   - 排序拆分优先级
+  - 把同一 owner 下应该成组迁移的 C++ helpers 列成一个迁移包
+  - 给出候选 owner / suggested boundary / validation hint
   - 作为后续人工 review 的入口

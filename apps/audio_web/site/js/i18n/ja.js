@@ -3,6 +3,7 @@ export const LOCALE = 'ja';
 export const MESSAGES = {
     htmlLang: "ja",
     languageLabel: "言語",
+    "hero.copy": "この Web デモはテキスト入力と音声生成だけを扱います。可視化機能は Android APK をダウンロードして確認してください。Repo または Android APK をクリックすると対応するページを開けます。",
     "about.title": "FlipBits について",
     "about.copy": [
       "FlipBits はテキストを可聴のエンコード音声に変換するプロジェクトです。Android 版では再生、波形、文字エンコードの流れ、そして各文字や単語の背後にあるバイナリ内容まで同期して可視化でき、この Web ページは各モードの音の違いを手早く試すためのプレビューにすぎません。",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "ここで生成したすべてのモードの音声は Android アプリ側でデコードできます。完全な体験をしたい場合は Releases から Android APK をダウンロードしてください。FlipBits を気に入っていただけたら、https://github.com/camellia2077/FlipBits でスターをお願いします。",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "ランダムテキスト",
     inputTextLabel: "入力テキスト",
     inputPlaceholder: "例: github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "UTF-8 テキストに対応します。",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "モード概要",
+    "mode.summary.mini": "Morse code のビープ音です。点と線のリズムが明確で、短いテキストや読み取りやすいテンポに向いています。",
+    "mode.summary.flash": "bit ごとのパルスで、もっとも個性が強いモードです。伝送そのものの聞こえ方を確認するのに向いています。",
+    "mode.summary.pro": "電話のキーパッドに近い二重トーンです。flash よりコンパクトで、記号構造を比較しやすくなります。",
+    "mode.summary.ultra": "高密度の 16-FSK トーンで、より速く短い音声になります。コンパクトな伝送に向いています。",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "音声を生成",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "サンプルレート",
     "loading.pending": "WebAssembly エンコーダーの準備を待っています。",
     "loading.ready": "WebAssembly エンコーダーの読み込みが完了しました。音声を生成できます。",
-    "loading.missing": "WASM モジュールの準備ができていません。先に python apps/audio_web/tools/build_wasm.py を実行して site/wasm/ の生成物を作成してください。",
+    "loading.missing": "WASM モジュールの準備ができていません。先に python tools/run.py web build-wasm を実行して site/wasm/ の生成物を作成してください。",
     "validation.emptyText": "テキストを入力してください。",
     "validation.missingExport": "WASM モジュールは読み込まれましたが、beginEncodeOperation(...) がまだエクスポートされていません。",
     "validation.miniAsciiOnly": "mini モードでは ASCII のみ入力できます。非 ASCII 文字は削除されました。",

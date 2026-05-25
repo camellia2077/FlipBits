@@ -122,10 +122,11 @@ def register_build_host_commands(subparsers: argparse._SubParsersAction[argparse
             "Run library-scoped ctest from the library build subdirectory.\n\n"
             "Behavior:\n"
             "- Uses build/<dir>/libs/<library>/ as the ctest root.\n"
-            "- This is the supported way to run runtime/api/unit library tests directly.\n"
+            "- This is the supported way to run core/runtime/api/io library tests directly.\n"
             "- Root-level `ctest -R runtime_tests|api_tests|unit_tests` is no longer the supported workflow.\n\n"
             "Examples:\n"
             "- python tools/run.py test-lib audio_runtime\n"
+            "- python tools/run.py test-lib audio_core --build-dir build/dev\n"
             "- python tools/run.py test-lib audio_api --tests-regex api_tests\n"
             "- python tools/run.py test-lib audio_io --build-dir build/dev"
         ),
@@ -134,7 +135,7 @@ def register_build_host_commands(subparsers: argparse._SubParsersAction[argparse
     add_common_build_dir_argument(test_lib_parser)
     test_lib_parser.add_argument(
         "library",
-        choices=["audio_runtime", "audio_api", "audio_io"],
+        choices=["audio_runtime", "audio_core", "audio_api", "audio_io"],
         help="Library test subtree to run.",
     )
     test_lib_parser.add_argument(

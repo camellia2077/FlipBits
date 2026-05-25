@@ -3,6 +3,7 @@ export const LOCALE = 'de';
 export const MESSAGES = {
     htmlLang: "de",
     languageLabel: "Sprache",
+    "hero.copy": "Diese Web-Demo deckt nur Texteingabe und Audiogenerierung ab. Für die Visualisierung lade bitte das Android-APK herunter. Klicke auf Repo oder Android APK, um die passende Seite zu öffnen.",
     "about.title": "Über FlipBits",
     "about.copy": [
       "FlipBits macht aus Text hörbares, codiertes Audio. Die Android-App visualisiert dazu synchron die Wiedergabe, die Wellenform, den Textkodierungsprozess und die Binärinhalte hinter jedem Zeichen oder Wort; diese Webseite ist nur eine kurze Vorschau darauf, wie die verschiedenen Modi klingen.",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "Audio aus allen Modi kann in der Android-App dekodiert werden; für das vollständige Erlebnis lade bitte das Android-APK aus den Releases herunter. Wenn dir FlipBits gefällt, gib ihm bitte einen Star unter https://github.com/camellia2077/FlipBits.",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "Zufallstext",
     inputTextLabel: "Eingabetext",
     inputPlaceholder: "z. B. github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "Akzeptiert UTF-8-Text.",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "Modusüberblick",
+    "mode.summary.mini": "Morse code Pieptöne mit klarem Punkt-Strich-Rhythmus. Gut für kurzen Text und lesbares Tempo.",
+    "mode.summary.flash": "Bit-für-bit-Impulse mit dem stärksten Charakter. Gut, um die Übertragung selbst zu hören.",
+    "mode.summary.pro": "Zweitöne wie bei einer Telefontastatur. Kompakter als flash und leichter mit Symbolstrukturen zu vergleichen.",
+    "mode.summary.ultra": "Dichte 16-FSK-Töne für schnelleres, kürzeres Audio. Gut für kompakte Übertragung.",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "Audio erzeugen",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "Abtastrate",
     "loading.pending": "Warten auf den WebAssembly-Encoder.",
     "loading.ready": "WebAssembly-Encoder geladen. Audio kann jetzt erzeugt werden.",
-    "loading.missing": "Das WASM-Modul ist noch nicht bereit. Führe zuerst python apps/audio_web/tools/build_wasm.py aus, um die site/wasm/-Artefakte zu erzeugen.",
+    "loading.missing": "Das WASM-Modul ist noch nicht bereit. Führe zuerst python tools/run.py web build-wasm aus, um die site/wasm/-Artefakte zu erzeugen.",
     "validation.emptyText": "Bitte Text eingeben.",
     "validation.missingExport": "Das WASM-Modul wurde geladen, aber beginEncodeOperation(...) wird noch nicht exportiert.",
     "validation.miniAsciiOnly": "Im mini-Modus sind nur ASCII-Eingaben erlaubt; Nicht-ASCII-Zeichen wurden entfernt.",

@@ -8,6 +8,7 @@ from .report_formatter import (
     FormattedEntry,
     FormattedExtractionCandidate,
     FormattedHotspot,
+    FormattedMoveSet,
     FormattedPathSection,
     FormattedResponsibilityCluster,
     FormattedScanReport,
@@ -141,6 +142,9 @@ class MarkdownReportWriter:
         if entry.responsibility_clusters:
             lines.extend(["", "##### Responsibility Clusters", ""])
             lines.extend(MarkdownReportWriter._render_clusters_table(entry.responsibility_clusters))
+        if entry.move_sets:
+            lines.extend(["", "##### Move Sets", ""])
+            lines.extend(MarkdownReportWriter._render_move_sets_table(entry.move_sets))
         if entry.extraction_candidates:
             lines.extend(["", "##### Suggested Extraction Candidates", ""])
             lines.extend(MarkdownReportWriter._render_extraction_candidates_table(entry.extraction_candidates))
@@ -212,6 +216,28 @@ class MarkdownReportWriter:
                         f"`{item.suggested_boundary}`",
                         MarkdownReportWriter._md_cell(item.reason),
                         MarkdownReportWriter._md_cell(item.risk),
+                        MarkdownReportWriter._md_cell(item.validation),
+                    ]
+                )
+                + " |"
+            )
+        return lines
+
+    @staticmethod
+    def _render_move_sets_table(items: tuple[FormattedMoveSet, ...]) -> list[str]:
+        lines = [
+            "| Move Set | Target Boundary | Helpers In Package | Reason | Validation |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+        for item in items:
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        f"`{item.name}`",
+                        f"`{item.target_boundary}`",
+                        MarkdownReportWriter._md_cell(", ".join(item.helpers)),
+                        MarkdownReportWriter._md_cell(item.reason),
                         MarkdownReportWriter._md_cell(item.validation),
                     ]
                 )

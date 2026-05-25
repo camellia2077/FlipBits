@@ -13,11 +13,12 @@ function shuffleEmojiOptions() {
 }
 
 export class SampleController {
-  constructor({ elements, ui, sampleTextService, sampleView }) {
+  constructor({ elements, ui, sampleTextService, sampleView, getCurrentMode }) {
     this.elements = elements;
     this.ui = ui;
     this.sampleTextService = sampleTextService;
     this.sampleView = sampleView;
+    this.getCurrentMode = getCurrentMode;
     this.isReady = false;
   }
 
@@ -26,9 +27,11 @@ export class SampleController {
       void this.randomize();
     });
 
-    this.elements.sampleLengthSelect.addEventListener("change", () => {
-      void this.refreshSampleText();
-    });
+    for (const input of this.elements.sampleLengthInputs) {
+      input.addEventListener("change", () => {
+        void this.refreshSampleText();
+      });
+    }
 
     this.elements.sampleAddEmojiToggle.addEventListener("change", () => {
       void this.refreshSampleText();
@@ -69,14 +72,15 @@ export class SampleController {
 
   async randomize() {
     try {
-      const mode = this.elements.modeSelect.value;
+      const mode = this.getCurrentMode();
+      const length = this.elements.sampleLengthInputs.find((input) => input.checked)?.value ?? "short";
       const sample = await this.sampleTextService.getRandomSample({
         locale: this.ui.getLocale(),
         mode,
-        length: this.elements.sampleLengthSelect.value,
+        length,
       });
       this.elements.inputText.value = this.formatSampleText(sample.text, mode);
-      if (sanitizeModeText(this.elements)) {
+      if (sanitizeModeText(this.elements, mode)) {
         this.ui.setStatusKey("validation.miniAsciiOnly");
         return;
       }

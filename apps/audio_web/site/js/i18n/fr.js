@@ -3,6 +3,7 @@ export const LOCALE = 'fr';
 export const MESSAGES = {
     htmlLang: "fr",
     languageLabel: "Langue",
+    "hero.copy": "Cette démo web couvre seulement la saisie de texte et la génération audio. Télécharge l'APK Android pour la visualisation. Clique sur Repo ou Android APK pour ouvrir la page correspondante.",
     "about.title": "À propos de FlipBits",
     "about.copy": [
       "FlipBits transforme le texte en audio encodé et audible. L'application Android visualise aussi en synchronisation la lecture, la forme d'onde, le processus d'encodage du texte et le contenu binaire derrière chaque caractère ou mot ; cette page n'est qu'un aperçu rapide du son produit par les différents modes.",
@@ -10,6 +11,7 @@ export const MESSAGES = {
       "L'audio généré par tous les modes peut être décodé dans l'application Android ; pour l'expérience complète, télécharge l'APK Android depuis les Releases. Si FlipBits te plaît, tu peux lui donner une étoile sur https://github.com/camellia2077/FlipBits.",
     ],
     "sample.addEmoji": "Add emoji",
+    "sample.randomButton": "Texte aleatoire",
     inputTextLabel: "Texte d'entrée",
     inputPlaceholder: "ex. github",
     inputHintByMode: {
@@ -19,7 +21,11 @@ export const MESSAGES = {
       ultra: "Accepte le texte UTF-8.",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
+    "mode.summaryTitle": "Apercu des modes",
+    "mode.summary.mini": "Bips Morse code avec un rythme point-trait clair. Ideal pour les textes courts et un tempo lisible.",
+    "mode.summary.flash": "Impulsions bit par bit avec le caractere le plus marque. Ideal pour entendre la transmission elle-meme.",
+    "mode.summary.pro": "Doubles tons proches d'un clavier telephonique. Plus compact que flash et plus facile pour comparer la structure des symboles.",
+    "mode.summary.ultra": "Tons 16-FSK denses pour un audio plus rapide et plus court. Ideal pour une transmission compacte.",
     flashStyleLabel: "Flash Style",
     miniSpeedLabel: "Morse Speed",
     generateButton: "Générer l'audio",
@@ -38,7 +44,7 @@ export const MESSAGES = {
     "result.sampleRate": "Fréquence d’échantillonnage",
     "loading.pending": "En attente de l'encodeur WebAssembly.",
     "loading.ready": "Encodeur WebAssembly chargé. L'audio peut être généré.",
-    "loading.missing": "Le module WASM n'est pas encore prêt. Exécute d'abord python apps/audio_web/tools/build_wasm.py pour générer les artefacts de site/wasm/.",
+    "loading.missing": "Le module WASM n'est pas encore prêt. Exécute d'abord python tools/run.py web build-wasm pour générer les artefacts de site/wasm/.",
     "validation.emptyText": "Saisissez du texte.",
     "validation.missingExport": "Le module WASM est chargé, mais beginEncodeOperation(...) n'est pas encore exporté.",
     "validation.miniAsciiOnly": "Le mode mini n'accepte que l'ASCII ; les caractères non ASCII ont été supprimés.",

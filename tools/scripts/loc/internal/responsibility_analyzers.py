@@ -5,7 +5,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .config import LanguageConfig
-from .responsibility_metrics import ResponsibilityAnchor, ResponsibilityFunctionHotspot, build_responsibility_result
+from .responsibility_metrics import (
+    ResponsibilityAnchor,
+    ResponsibilityFunctionHotspot,
+    ResponsibilityMoveSet,
+    build_responsibility_result,
+)
 from .responsibility_plugins import create_responsibility_language_plugin
 
 
@@ -31,6 +36,7 @@ class ResponsibilityRiskResult:
     next_action: str | None = None
     function_hotspots: list[ResponsibilityFunctionHotspot] | None = None
     anchors: list[ResponsibilityAnchor] | None = None
+    move_sets: list[ResponsibilityMoveSet] | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -63,6 +69,24 @@ class ResponsibilityRiskResult:
                     "evidence": item.evidence,
                 }
                 for item in (self.anchors or [])
+            ],
+            "move_sets": [
+                {
+                    "name": item.name,
+                    "target_boundary": item.target_boundary,
+                    "helpers": [
+                        {
+                            "name": helper.name,
+                            "kind": helper.kind,
+                            "start_line": helper.start_line,
+                            "end_line": helper.end_line,
+                        }
+                        for helper in item.helpers
+                    ],
+                    "reason": item.reason,
+                    "validation": item.validation,
+                }
+                for item in (self.move_sets or [])
             ],
             "mode_branch_hits": self.mode_branch_hits,
             "state_signal_hits": self.state_signal_hits,

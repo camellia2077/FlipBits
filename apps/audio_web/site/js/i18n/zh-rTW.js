@@ -3,6 +3,7 @@ export const LOCALE = 'zh-rTW';
 export const MESSAGES = {
     htmlLang: "zh-Hant",
     languageLabel: "語言",
+    "hero.copy": "這個網頁只做文字輸入和音訊生成 demo。視覺化部分請下載 Android APK。點擊 Repo 或 Android APK 可跳轉到對應網頁。",
     "about.title": "關於 FlipBits",
     "about.copy": [
       "FlipBits 會把文字編碼成可聽見的音訊。Android 版本還會把音訊播放、波形、文字編碼過程，以及每個字或單詞對應的二進位內容同步視覺化；這個網頁只是用來預覽不同模式生成出來的聲音效果。",
@@ -15,7 +16,7 @@ export const MESSAGES = {
     "sample.lengthLabel": "樣本文字長度",
     "sample.length.short": "短文本",
     "sample.length.long": "長文本",
-    "sample.randomButton": "隨機樣本",
+    "sample.randomButton": "隨機文字",
     inputHintByMode: {
       mini: "僅限 ASCII。支援 A-Z、0-9、常見 Morse 標點，以及 space / tab / CR / LF。",
       flash: "支援任意文字輸入。",
@@ -23,8 +24,8 @@ export const MESSAGES = {
       ultra: "支援 UTF-8 文字輸入。",
     },
     modeLabel: "Mode",
-    "mode.summaryTitle": "Mode Overview",
-    "mode.summary.mini": "類似 Morse 的短促節奏音，點劃感清楚，適合短文字與可讀節奏。",
+    "mode.summaryTitle": "模式概覽",
+    "mode.summary.mini": "Morse code 蜂鳴音，點劃節奏清楚，適合短文字與可讀節奏。",
     "mode.summary.flash": "逐 bit 的脈衝感最強，最適合直接感受傳輸本身的聲音個性。",
     "mode.summary.pro": "像電話按鍵的雙音結構，比 flash 更緊湊，也更容易對照符號結構。",
     "mode.summary.ultra": "高密度 16-FSK，音訊更短、速度更快，適合想看緊湊傳輸效果時使用。",
@@ -47,7 +48,7 @@ export const MESSAGES = {
     "result.sampleRate": "取樣率",
     "loading.pending": "正在等待 WebAssembly 編碼器接入。",
     "loading.ready": "WebAssembly 編碼器已載入，可以開始產生音訊。",
-    "loading.missing": "WASM 模組尚未就緒。請先執行 python apps/audio_web/tools/build_wasm.py 產生 site/wasm/ 產物。",
+    "loading.missing": "WASM 模組尚未就緒。請先執行 python tools/run.py web build-wasm 產生 site/wasm/ 產物。",
     "validation.emptyText": "請輸入文字。",
     "validation.missingExport": "WASM 模組已載入，但尚未匯出 beginEncodeOperation(...)。",
     "validation.miniAsciiOnly": "mini 模式只允許 ASCII 輸入；非 ASCII 字元已被移除。",

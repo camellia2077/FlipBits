@@ -24,9 +24,10 @@ When an agent reads one matched file entry, use this order:
 4. `suggestion`
 5. `next_action`
 6. Markdown-only `stop_signal`
-7. Markdown-only `Suggested Extraction Candidates`
-8. `lines`
-9. the detailed counts
+7. Markdown/JSON `move_sets`
+8. Markdown-only `Suggested Extraction Candidates`
+9. `lines`
+10. the detailed counts
 
 This order matters.
 
@@ -36,6 +37,7 @@ This order matters.
 - `suggestion` gives a safe first split direction
 - `next_action` gives a conservative first move
 - `stop_signal` tells you whether to continue, pause, or manually review
+- `move_sets` lists helper groups that should move together as one migration package
 - `Suggested Extraction Candidates` turns hotspots into possible boundaries with validation hints
 - `lines` keeps the file-size signal visible without letting it dominate the diagnosis
 - the counts are supporting evidence only
@@ -66,6 +68,11 @@ This order matters.
 - `suggestion`
   - A single direction-oriented recommendation.
   - Treat it as a starting point, not a mandatory transformation.
+
+- `move_sets`
+  - C++ responsibility reports include this structured list when the scanner can group helpers by owner.
+  - Each set names a target boundary, the helper names and line ranges that should move together, the reason, and the validation command.
+  - Prefer this over moving one small helper at a time.
 
 ### Supporting evidence fields
 
@@ -116,6 +123,11 @@ Detailed Markdown reports include extra sections intended for agents:
 - `Responsibility Clusters`
   - Groups hotspots into likely ownership areas such as `dialog_import_export`, `canvas_visual_runtime`, `state_orchestration`, or `follow_annotation_ui`.
   - Use this to choose a coherent boundary rather than moving isolated functions randomly.
+
+- `Move Sets`
+  - Lists concrete migration packages.
+  - Use this when planning C++ module-first extraction: choose one row, move the listed helpers together, then run the validation shown in that row.
+  - For test files, treat this as a fixture-owner hint rather than an automatic split instruction.
 
 - `Suggested Extraction Candidates`
   - Lists candidate owner, line range, suggested file boundary, risk, and validation.

@@ -16,6 +16,7 @@ from .test import cmd_test
 from .test_lib import cmd_test_lib
 from .tidy import cmd_tidy
 from .verify import cmd_verify
+from .web import cmd_web
 from .windows import cmd_windows
 
 __all__ = [
@@ -37,5 +38,6 @@ __all__ = [
     "cmd_test_lib",
     "cmd_tidy",
     "cmd_verify",
+    "cmd_web",
     "cmd_windows",
 ]
