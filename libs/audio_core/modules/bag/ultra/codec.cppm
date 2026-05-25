@@ -10,7 +10,6 @@ import std;
 
 export module bag.ultra.codec;
 
-
 export import bag.common.error_code;
 
 export namespace bag::ultra {

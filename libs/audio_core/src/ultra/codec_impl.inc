@@ -90,9 +90,8 @@ ErrorCode EncodePayloadToFrame(const std::vector<uint8_t>& payload,
   out_frame->push_back(kCleanFrameV1Flags);
   AppendUint32BigEndian(static_cast<std::uint32_t>(payload.size()), out_frame);
   out_frame->insert(out_frame->end(), payload.begin(), payload.end());
-  AppendUint16BigEndian(Crc16CcittFalse(*out_frame, crc_begin,
-                                        out_frame->size()),
-                        out_frame);
+  AppendUint16BigEndian(
+      Crc16CcittFalse(*out_frame, crc_begin, out_frame->size()), out_frame);
   return ErrorCode::kOk;
 }
 
@@ -141,8 +140,9 @@ ErrorCode DecodeFrameToPayload(const std::vector<uint8_t>& frame,
     return ErrorCode::kInvalidArgument;
   }
 
-  out_payload->assign(frame.begin() + static_cast<std::ptrdiff_t>(payload_begin),
-                      frame.begin() + static_cast<std::ptrdiff_t>(crc_offset));
+  out_payload->assign(
+      frame.begin() + static_cast<std::ptrdiff_t>(payload_begin),
+      frame.begin() + static_cast<std::ptrdiff_t>(crc_offset));
   return ErrorCode::kOk;
 }
 

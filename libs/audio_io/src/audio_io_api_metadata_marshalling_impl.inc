@@ -210,8 +210,7 @@ bool ToNativeMetadata(const audio_io_metadata_view* metadata,
       out_metadata->has_flash_voicing_style
           ? ToLibraryFlashStyle(metadata->flash_voicing_style)
           : audio_io::FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
-  out_metadata->has_mini_speed_style =
-      metadata->has_mini_speed_style != 0u;
+  out_metadata->has_mini_speed_style = metadata->has_mini_speed_style != 0u;
   out_metadata->mini_speed_style =
       out_metadata->has_mini_speed_style
           ? ToLibraryMiniSpeedStyle(metadata->mini_speed_style)
@@ -224,7 +223,8 @@ bool ToNativeMetadata(const audio_io_metadata_view* metadata,
   out_metadata->payload_byte_count = metadata->payload_byte_count;
   out_metadata->input_source_kind =
       ToLibraryInputSourceKind(metadata->input_source_kind);
-  out_metadata->segment_count = std::max<std::uint32_t>(1u, metadata->segment_count);
+  out_metadata->segment_count =
+      std::max<std::uint32_t>(1u, metadata->segment_count);
   out_metadata->segment_sample_counts.assign(
       metadata->segment_sample_counts,
       metadata->segment_sample_counts + metadata->segment_sample_count_count);

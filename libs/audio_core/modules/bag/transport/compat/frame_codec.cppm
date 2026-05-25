@@ -10,7 +10,6 @@ import std;
 
 export module bag.transport.compat.frame_codec;
 
-
 export import bag.common.config;
 export import bag.common.error_code;
 

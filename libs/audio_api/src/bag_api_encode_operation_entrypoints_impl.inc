@@ -1,6 +1,6 @@
-bag_error_code bag_create_encode_operation(const bag_encoder_config* config,
-                                           const char* text,
-                                           bag_encode_operation** out_operation) {
+bag_error_code bag_create_encode_operation(
+    const bag_encoder_config* config, const char* text,
+    bag_encode_operation** out_operation) {
   if (config == nullptr || text == nullptr || out_operation == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
@@ -57,11 +57,13 @@ bag_error_code bag_cancel_encode_operation(bag_encode_operation* operation) {
 bag_error_code bag_get_encode_operation_work_plan(
     const bag_encode_operation* operation,
     bag_encode_operation_work_plan* out_work_plan) {
-  if (operation == nullptr || !operation->operation || out_work_plan == nullptr) {
+  if (operation == nullptr || !operation->operation ||
+      out_work_plan == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
   try {
-    FillEncodeOperationWorkPlan(operation->operation->WorkPlan(), out_work_plan);
+    FillEncodeOperationWorkPlan(operation->operation->WorkPlan(),
+                                out_work_plan);
     return BAG_OK;
   } catch (...) {
     *out_work_plan = {};
@@ -70,10 +72,10 @@ bag_error_code bag_get_encode_operation_work_plan(
 }
 
 bag_error_code bag_pump_encode_operation(
-    bag_encode_operation* operation,
-    bag_encode_operation_pump_budget budget,
+    bag_encode_operation* operation, bag_encode_operation_pump_budget budget,
     int* out_did_progress) {
-  if (operation == nullptr || !operation->operation || out_did_progress == nullptr) {
+  if (operation == nullptr || !operation->operation ||
+      out_did_progress == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
   try {
@@ -95,7 +97,8 @@ bag_error_code bag_pump_encode_operation(
 bag_error_code bag_poll_encode_operation(
     const bag_encode_operation* operation,
     bag_encode_operation_progress* out_progress) {
-  if (operation == nullptr || !operation->operation || out_progress == nullptr) {
+  if (operation == nullptr || !operation->operation ||
+      out_progress == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }
   try {
@@ -108,8 +111,7 @@ bag_error_code bag_poll_encode_operation(
 }
 
 bag_error_code bag_take_encode_operation_result(
-    const bag_encode_operation* operation,
-    bag_encode_result* out_result) {
+    const bag_encode_operation* operation, bag_encode_result* out_result) {
   if (operation == nullptr || !operation->operation || out_result == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }

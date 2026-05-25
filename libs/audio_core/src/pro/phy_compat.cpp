@@ -96,7 +96,8 @@ class ProCompatDecoder final : public ITransportDecoder {
     out_result->follow_data = BuildPayloadFollowData(config_, frame.payload);
     out_result->follow_available = out_result->follow_data.available;
     out_result->text.clear();
-    if (DecodePayloadToText(frame.payload, &out_result->text) != ErrorCode::kOk) {
+    if (DecodePayloadToText(frame.payload, &out_result->text) !=
+        ErrorCode::kOk) {
       out_result->text.clear();
       out_result->text_status = DecodeContentStatus::kInvalidTextPayload;
       out_result->text_follow_data = {};

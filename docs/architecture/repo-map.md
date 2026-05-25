@@ -169,12 +169,9 @@
 - `libs/audio_core/include/bag/link/**`
 - `apps/audio_android/native_package/private_include/android_bag/**`
 - `apps/audio_android/native_package/src/*.cpp`
-- 已删除的 `libs/audio_core/include/bag/legacy/**`
-  - 当前只作为历史主题保留在 docs / policy 中，不再是可阅读入口
 - 额外约束：
   - `libs/*/src` 的新实现不应回流主仓 `bag/internal/**` fallback
-  - `bag/legacy/**` 已删除；legacy 路径与 include token 都不应回流
-  - `verify` 的静态门禁会阻止已退休 wrapper / header 回流
+  - `verify` 的静态门禁会阻止旧 wrapper / header 回流
 
 ## 当前不能直接走 modules 的目标
 - Android native：
@@ -310,5 +307,4 @@
 - host 默认 modules 路径是唯一受支持的 host 主路径。
 - `bag/internal/**` 主仓 direct owner 当前为 `0`。
 - 预留接口头通过 `bag/interface/common/*` 保留独立 `C++17` 声明层。
-- `bag/legacy/**` 已删除，且不允许通过路径或 include token 回流。
 - Android 是 `bag_api.h` 的边界消费方；其剩余 native 平台例外被隔离在 `native_package` 私有包装层，并已固定到 Android `C++23` baseline。

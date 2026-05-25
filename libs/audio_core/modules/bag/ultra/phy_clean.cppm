@@ -10,7 +10,6 @@ import std;
 
 export module bag.ultra.phy_clean;
 
-
 export import bag.common.types;
 export import bag.transport.decoder;
 

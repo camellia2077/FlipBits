@@ -372,10 +372,10 @@ bool EndsWithUtf8Bytes(const FlashPayloadLayout& payload_layout,
   if (byte_index < static_cast<std::size_t>(2)) {
     return false;
   }
-  return SourceByteAt(payload_layout, byte_index - static_cast<std::size_t>(2)) ==
-             first &&
-         SourceByteAt(payload_layout, byte_index - static_cast<std::size_t>(1)) ==
-             second &&
+  return SourceByteAt(payload_layout,
+                      byte_index - static_cast<std::size_t>(2)) == first &&
+         SourceByteAt(payload_layout,
+                      byte_index - static_cast<std::size_t>(1)) == second &&
          SourceByteAt(payload_layout, byte_index) == third;
 }
 
@@ -423,8 +423,8 @@ double ComputeLitanyTextPauseWeight(const FlashPayloadLayout& payload_layout,
 }
 
 double ComputeTailDipArticulation(double pause_weight, double tail_begin,
-                                  double min_articulation,
-                                  size_t local_index, size_t sample_count) {
+                                  double min_articulation, size_t local_index,
+                                  size_t sample_count) {
   if (pause_weight <= 0.0 || tail_begin >= 1.0 || sample_count == 0) {
     return 1.0;
   }
@@ -527,13 +527,13 @@ double ComputeLitanyPhraseArticulation(size_t chunk_index, size_t local_index,
     return 1.0;
   }
 
-  const double local = std::clamp(
-      (progress - style_traits.litany_phrase_tail_begin) /
-          (1.0 - style_traits.litany_phrase_tail_begin),
-      0.0, 1.0);
+  const double local =
+      std::clamp((progress - style_traits.litany_phrase_tail_begin) /
+                     (1.0 - style_traits.litany_phrase_tail_begin),
+                 0.0, 1.0);
   const double eased = 0.5 - 0.5 * std::cos(kPi * local);
-  const double depth = style_traits.litany_phrase_dip_depth *
-                       (byte_tail ? 1.0 : 0.66);
+  const double depth =
+      style_traits.litany_phrase_dip_depth * (byte_tail ? 1.0 : 0.66);
   return std::clamp(1.0 - depth * eased, 0.34, 1.0);
 }
 
@@ -559,9 +559,9 @@ std::uint32_t HashCollapseChunk(const FlashPayloadChunk& chunk,
   return value;
 }
 
-double ComputeCollapseHesitationWeight(
-    const FlashPayloadChunk& chunk, std::size_t chunk_index,
-    const VoicingStyleTraits& style_traits) {
+double ComputeCollapseHesitationWeight(const FlashPayloadChunk& chunk,
+                                       std::size_t chunk_index,
+                                       const VoicingStyleTraits& style_traits) {
   if (style_traits.collapse_hesitation_depth <= 0.0 ||
       style_traits.collapse_hesitation_density <= 0.0) {
     return 0.0;
@@ -570,7 +570,8 @@ double ComputeCollapseHesitationWeight(
   const std::uint32_t hash = HashCollapseChunk(chunk, chunk_index);
   const double select =
       static_cast<double>(hash & 0x3FFU) / static_cast<double>(0x3FFU);
-  double density = std::clamp(style_traits.collapse_hesitation_density, 0.0, 1.0);
+  double density =
+      std::clamp(style_traits.collapse_hesitation_density, 0.0, 1.0);
   if (IsByteTailChunk(chunk)) {
     density = std::min(1.0, density + 0.22);
   }
@@ -578,21 +579,21 @@ double ComputeCollapseHesitationWeight(
     return 0.0;
   }
 
-  const double depth_variation = static_cast<double>((hash >> 10U) & 0xFFU) /
-                                 static_cast<double>(0xFFU);
+  const double depth_variation =
+      static_cast<double>((hash >> 10U) & 0xFFU) / static_cast<double>(0xFFU);
   const double byte_tail_boost = IsByteTailChunk(chunk) ? 0.12 : 0.0;
-  return std::clamp(style_traits.collapse_hesitation_depth *
-                        (0.52 + 0.48 * depth_variation) +
-                    byte_tail_boost,
-                    0.0, 0.92);
+  return std::clamp(
+      style_traits.collapse_hesitation_depth * (0.52 + 0.48 * depth_variation) +
+          byte_tail_boost,
+      0.0, 0.92);
 }
 
 double ComputeCollapseHesitationArticulation(
     double hesitation_weight, size_t local_index, size_t sample_count,
     const VoicingStyleTraits& style_traits) {
-  return ComputeTailDipArticulation(
-      hesitation_weight, style_traits.collapse_hesitation_tail_begin, 0.08,
-      local_index, sample_count);
+  return ComputeTailDipArticulation(hesitation_weight,
+                                    style_traits.collapse_hesitation_tail_begin,
+                                    0.08, local_index, sample_count);
 }
 
 VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
@@ -629,10 +630,8 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
               FixedShellCadenceProfile::kLitanyInvocation,
           .epilogue_cadence_profile =
               FixedShellCadenceProfile::kLitanyInvocation,
-          .preamble_timbre_profile =
-              FixedShellTimbreProfile::kLitanyInvocation,
-          .epilogue_timbre_profile =
-              FixedShellTimbreProfile::kLitanyInvocation,
+          .preamble_timbre_profile = FixedShellTimbreProfile::kLitanyInvocation,
+          .epilogue_timbre_profile = FixedShellTimbreProfile::kLitanyInvocation,
           .preamble_phrase_mask_mix = 1.0,
           .epilogue_phrase_mask_mix = 1.0,
           .preamble_terminal_mute_begin = 0.95,
@@ -738,10 +737,8 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .tremolo_freq_hz = 12.6,
           .spectral_band_mix_scale = 0.46,
           .spectral_softclip_mix_scale = 0.32,
-          .preamble_cadence_profile =
-              FixedShellCadenceProfile::kZealRising,
-          .epilogue_cadence_profile =
-              FixedShellCadenceProfile::kZealRising,
+          .preamble_cadence_profile = FixedShellCadenceProfile::kZealRising,
+          .epilogue_cadence_profile = FixedShellCadenceProfile::kZealRising,
           .preamble_timbre_profile = FixedShellTimbreProfile::kZealRising,
           .epilogue_timbre_profile = FixedShellTimbreProfile::kZealRising,
           .preamble_phrase_mask_mix = 1.0,
@@ -779,10 +776,8 @@ VoicingStyleTraits MakeFlavorTraits(FlashVoicingFlavor flavor) {
           .tremolo_freq_hz = 1.6,
           .spectral_band_mix_scale = 0.045,
           .spectral_softclip_mix_scale = 0.03,
-          .preamble_cadence_profile =
-              FixedShellCadenceProfile::kVoidDescent,
-          .epilogue_cadence_profile =
-              FixedShellCadenceProfile::kVoidDescent,
+          .preamble_cadence_profile = FixedShellCadenceProfile::kVoidDescent,
+          .epilogue_cadence_profile = FixedShellCadenceProfile::kVoidDescent,
           .preamble_timbre_profile = FixedShellTimbreProfile::kVoidDescent,
           .epilogue_timbre_profile = FixedShellTimbreProfile::kVoidDescent,
           .preamble_phrase_mask_mix = 1.0,
@@ -919,12 +914,10 @@ double ComputeChantDroneLayer(std::size_t sample_index, int sample_rate_hz,
 
   const double time =
       static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
-  const double breath =
-      0.68 + 0.32 * std::sin(2.0 * kPi * 0.65 * time + 0.35);
-  const double drone =
-      0.56 * std::sin(2.0 * kPi * 60.0 * time + 0.12) +
-      0.29 * std::sin(2.0 * kPi * 120.0 * time + 0.41) +
-      0.15 * std::sin(2.0 * kPi * 180.0 * time + 0.73);
+  const double breath = 0.68 + 0.32 * std::sin(2.0 * kPi * 0.65 * time + 0.35);
+  const double drone = 0.56 * std::sin(2.0 * kPi * 60.0 * time + 0.12) +
+                       0.29 * std::sin(2.0 * kPi * 120.0 * time + 0.41) +
+                       0.15 * std::sin(2.0 * kPi * 180.0 * time + 0.73);
   return gain * breath * drone;
 }
 
@@ -951,17 +944,17 @@ double ComputeMechanicalThroatLayer(std::size_t sample_index,
 
   const double time =
       static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
-  const double throat =
-      0.48 * std::sin(2.0 * kPi * 160.0 * time + 0.27) +
-      0.34 * std::sin(2.0 * kPi * 420.0 * time + 0.61) +
-      0.18 * std::sin(2.0 * kPi * 560.0 * time + 1.04);
+  const double throat = 0.48 * std::sin(2.0 * kPi * 160.0 * time + 0.27) +
+                        0.34 * std::sin(2.0 * kPi * 420.0 * time + 0.61) +
+                        0.18 * std::sin(2.0 * kPi * 560.0 * time + 1.04);
   const double motor_buzz =
       0.62 + 0.38 * std::sin(2.0 * kPi * 18.0 * time + 0.44);
   return gain * motor_buzz * throat;
 }
 
-double ComputeStandardLowVoiceLayer(std::size_t sample_index, int sample_rate_hz,
-                                  const VoicingStyleTraits& style_traits) {
+double ComputeStandardLowVoiceLayer(std::size_t sample_index,
+                                    int sample_rate_hz,
+                                    const VoicingStyleTraits& style_traits) {
   if (style_traits.standard_low_voice_gain <= 0.0 ||
       style_traits.standard_low_voice_freq_hz <= 0.0 || sample_rate_hz <= 0) {
     return 0.0;
@@ -971,15 +964,15 @@ double ComputeStandardLowVoiceLayer(std::size_t sample_index, int sample_rate_hz
       static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
   const double phase =
       2.0 * kPi * style_traits.standard_low_voice_freq_hz * time;
-  const double square_like =
-      (std::sin(phase) + std::sin(3.0 * phase) / 3.0 +
-       std::sin(5.0 * phase) / 5.0) /
-      (1.0 + 1.0 / 3.0 + 1.0 / 5.0);
+  const double square_like = (std::sin(phase) + std::sin(3.0 * phase) / 3.0 +
+                              std::sin(5.0 * phase) / 5.0) /
+                             (1.0 + 1.0 / 3.0 + 1.0 / 5.0);
   return style_traits.standard_low_voice_gain * square_like;
 }
 
-double ComputeHostilityEdgeLayer(double carrier_freq_hz, std::size_t local_index,
-                               int sample_rate_hz, double gain) {
+double ComputeHostilityEdgeLayer(double carrier_freq_hz,
+                                 std::size_t local_index, int sample_rate_hz,
+                                 double gain) {
   if (gain <= 0.0 || carrier_freq_hz <= 0.0 || sample_rate_hz <= 0) {
     return 0.0;
   }
@@ -996,8 +989,8 @@ double ComputeHostilityEdgeLayer(double carrier_freq_hz, std::size_t local_index
   if (fifth_freq_hz < nyquist_hz) {
     layer += 0.24 * std::sin(2.0 * kPi * fifth_freq_hz * time + 0.38);
   }
-  layer += 0.30 * std::copysign(1.0, std::sin(2.0 * kPi * carrier_freq_hz *
-                                               time + 0.18));
+  layer += 0.30 * std::copysign(
+                      1.0, std::sin(2.0 * kPi * carrier_freq_hz * time + 0.18));
   return gain * layer;
 }
 

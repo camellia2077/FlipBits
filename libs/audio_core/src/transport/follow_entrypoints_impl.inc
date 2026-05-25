@@ -46,8 +46,7 @@ TextFollowData BuildTextFollowData(const PayloadFollowData& payload_follow_data,
   for (std::size_t token_index = 0; token_index < token_specs.size();
        ++token_index) {
     const TextTokenSpec& token = token_specs[token_index];
-    if (token.covered_byte_count == 0 ||
-        byte_cursor >= byte_timeline.size() ||
+    if (token.covered_byte_count == 0 || byte_cursor >= byte_timeline.size() ||
         byte_cursor + token.covered_byte_count > byte_timeline.size()) {
       return {};
     }
@@ -131,9 +130,8 @@ TextFollowData BuildTextFollowData(const PayloadFollowData& payload_follow_data,
       for (std::size_t byte_index_within_character = 0;
            byte_index_within_character < byte_count;
            ++byte_index_within_character) {
-        const auto& byte_entry =
-            byte_timeline[byte_cursor + token_byte_index +
-                          byte_index_within_character];
+        const auto& byte_entry = byte_timeline[byte_cursor + token_byte_index +
+                                               byte_index_within_character];
         text_follow_data.token_raw_display_units.push_back(
             TextFollowRawDisplayUnitEntry{
                 .start_sample = byte_entry.start_sample,
@@ -172,10 +170,10 @@ TextFollowData BuildTextFollowData(const PayloadFollowData& payload_follow_data,
     // entries so frontends can keep token text highlighting aligned with the
     // trailing byte span without re-parsing separator semantics on their own.
     for (const auto& separator_slice : separator_character_slices) {
-      if (!append_character_bytes(separator_slice.bytes.size(),
-                                  classify_character_kind(
-                                      separator_slice.code_point),
-                                  separator_slice.bytes)) {
+      if (!append_character_bytes(
+              separator_slice.bytes.size(),
+              classify_character_kind(separator_slice.code_point),
+              separator_slice.bytes)) {
         return {};
       }
     }

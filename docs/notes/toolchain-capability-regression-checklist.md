@@ -11,7 +11,6 @@
 - `cmake/flipbits_toolchain_capabilities.cmake` 相关改动
 - `audio_core / audio_api / audio_io` 的标准库入口改动
 - `FLIPBITS_HAS_STD_MODULE_PROVIDER`
-- `FLIPBITS_ENABLE_ASYNC_ENCODE_JOB`
 
 目标不是只验证单个 target 能否“勉强编过”，而是确认：
 
@@ -119,7 +118,7 @@ python tools/run.py android assemble-staging
 如果改动同时影响 WebAssembly / Pages 演示，再补：
 
 ```powershell
-python apps/audio_web/tools/build_wasm.py
+python tools/run.py web build-wasm
 ```
 
 验证点：

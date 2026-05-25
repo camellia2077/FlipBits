@@ -111,7 +111,8 @@ std::size_t SamplesPerSilenceSlotForSignalProfile(
 bool ShouldCollapseToneRunsWhenSkippingSilence(
     FlashSignalProfile signal_profile) {
   // Litany renders one long voiced bit as multiple silence-slot windows. During
-  // gap-aware decode those adjacent voiced windows must collapse back to one bit.
+  // gap-aware decode those adjacent voiced windows must collapse back to one
+  // bit.
   return signal_profile == FlashSignalProfile::kLitany;
 }
 
@@ -153,8 +154,8 @@ std::vector<int16_t> RenderToneChunk(std::size_t sample_count,
   constexpr double kPi = 3.14159265358979323846;
   const double two_pi_f = 2.0 * kPi * carrier_freq_hz;
   for (std::size_t index = 0; index < sample_count; ++index) {
-    const double time = static_cast<double>(index) /
-                        static_cast<double>(config.sample_rate_hz);
+    const double time =
+        static_cast<double>(index) / static_cast<double>(config.sample_rate_hz);
     const double sample = config.amplitude * std::sin(two_pi_f * time);
     const double clamped = std::max(-1.0, std::min(1.0, sample));
     pcm[index] = static_cast<int16_t>(clamped * 32767.0);
@@ -226,9 +227,13 @@ FlashChunkRenderer::FlashChunkRenderer(const FlashPayloadChunk& chunk,
 
 FlashChunkRenderer::~FlashChunkRenderer() = default;
 
-std::size_t FlashChunkRenderer::TotalWork() const { return impl_->TotalWork(); }
+std::size_t FlashChunkRenderer::TotalWork() const {
+  return impl_->TotalWork();
+}
 
-bool FlashChunkRenderer::Finished() const { return impl_->Finished(); }
+bool FlashChunkRenderer::Finished() const {
+  return impl_->Finished();
+}
 
 FlashChunkRenderProgress FlashChunkRenderer::Pump(std::size_t work_budget) {
   return impl_->Pump(work_budget);
@@ -285,8 +290,9 @@ FlashVoicingFlavor NormalizeSignalVoicingFlavor(FlashVoicingFlavor flavor) {
   }
 }
 
-bool EndsWithUtf8Bytes(const std::vector<uint8_t>& bytes, std::size_t byte_index,
-                       uint8_t first, uint8_t second, uint8_t third);
+bool EndsWithUtf8Bytes(const std::vector<uint8_t>& bytes,
+                       std::size_t byte_index, uint8_t first, uint8_t second,
+                       uint8_t third);
 bool IsLikelyUtf8CodePointBoundaryAfter(const std::vector<uint8_t>& bytes,
                                         std::size_t byte_index);
 
@@ -299,14 +305,12 @@ enum class ZealTimingClass {
 
 ZealTimingClass ZealTimingClassForBitPosition(std::size_t bit_position) {
   static constexpr std::array<ZealTimingClass, 16> kPattern = {
-      ZealTimingClass::kBurst, ZealTimingClass::kBurst,
-      ZealTimingClass::kFast,  ZealTimingClass::kBurst,
-      ZealTimingClass::kDrive, ZealTimingClass::kBurst,
-      ZealTimingClass::kFast,  ZealTimingClass::kHold,
-      ZealTimingClass::kBurst, ZealTimingClass::kBurst,
-      ZealTimingClass::kFast,  ZealTimingClass::kBurst,
-      ZealTimingClass::kHold,  ZealTimingClass::kFast,
-      ZealTimingClass::kBurst, ZealTimingClass::kDrive,
+      ZealTimingClass::kBurst, ZealTimingClass::kBurst, ZealTimingClass::kFast,
+      ZealTimingClass::kBurst, ZealTimingClass::kDrive, ZealTimingClass::kBurst,
+      ZealTimingClass::kFast,  ZealTimingClass::kHold,  ZealTimingClass::kBurst,
+      ZealTimingClass::kBurst, ZealTimingClass::kFast,  ZealTimingClass::kBurst,
+      ZealTimingClass::kHold,  ZealTimingClass::kFast,  ZealTimingClass::kBurst,
+      ZealTimingClass::kDrive,
   };
   return kPattern[bit_position % kPattern.size()];
 }
@@ -365,25 +369,24 @@ double ZealHighCarrierForTimingClass(ZealTimingClass timing_class) {
 }
 
 double HostilityLowCarrierForBit(std::size_t bit_position,
-                               std::size_t byte_index, uint8_t source_byte,
-                               uint8_t bit_index_in_byte) {
+                                 std::size_t byte_index, uint8_t source_byte,
+                                 uint8_t bit_index_in_byte) {
   (void)source_byte;
   static constexpr std::array<double, 8> kJitter = {
       0.0, 58.0, 22.0, 96.0, 44.0, 118.0, 70.0, 34.0,
   };
-  const std::size_t hash_index =
-      (bit_position * static_cast<std::size_t>(5) +
-       byte_index * static_cast<std::size_t>(3) +
-       static_cast<std::size_t>(bit_index_in_byte)) %
-      kJitter.size();
+  const std::size_t hash_index = (bit_position * static_cast<std::size_t>(5) +
+                                  byte_index * static_cast<std::size_t>(3) +
+                                  static_cast<std::size_t>(bit_index_in_byte)) %
+                                 kJitter.size();
   return 500.0 + kJitter[hash_index];
 }
 
 double HostilityHighCarrierForBit(std::size_t bit_position,
-                                std::size_t byte_index, uint8_t source_byte,
-                                uint8_t bit_index_in_byte) {
+                                  std::size_t byte_index, uint8_t source_byte,
+                                  uint8_t bit_index_in_byte) {
   return HostilityLowCarrierForBit(bit_position, byte_index, source_byte,
-                                 bit_index_in_byte) *
+                                   bit_index_in_byte) *
          2.0;
 }
 
@@ -447,8 +450,7 @@ std::size_t VoidSamplesForBit(std::size_t bit_position,
 double VoidLowCarrierForBit(std::size_t bit_position, std::size_t byte_index,
                             uint8_t bit_index_in_byte) {
   static constexpr std::array<double, 10> kSag = {
-      230.0, 222.0, 214.0, 206.0, 198.0,
-      190.0, 184.0, 180.0, 194.0, 208.0,
+      230.0, 222.0, 214.0, 206.0, 198.0, 190.0, 184.0, 180.0, 194.0, 208.0,
   };
   const std::size_t phrase_offset =
       (bit_position + byte_index +
@@ -535,8 +537,9 @@ std::size_t ZealPauseSlotCountAfterByte(const std::vector<uint8_t>& bytes,
   return 0;
 }
 
-bool EndsWithUtf8Bytes(const std::vector<uint8_t>& bytes, std::size_t byte_index,
-                       uint8_t first, uint8_t second, uint8_t third) {
+bool EndsWithUtf8Bytes(const std::vector<uint8_t>& bytes,
+                       std::size_t byte_index, uint8_t first, uint8_t second,
+                       uint8_t third) {
   if (byte_index < static_cast<std::size_t>(2)) {
     return false;
   }
@@ -552,7 +555,8 @@ bool IsUtf8ContinuationByte(uint8_t value) {
 bool IsLikelyUtf8CodePointBoundaryAfter(const std::vector<uint8_t>& bytes,
                                         std::size_t byte_index) {
   return byte_index + static_cast<std::size_t>(1) >= bytes.size() ||
-         !IsUtf8ContinuationByte(bytes[byte_index + static_cast<std::size_t>(1)]);
+         !IsUtf8ContinuationByte(
+             bytes[byte_index + static_cast<std::size_t>(1)]);
 }
 
 std::size_t LitanyPeriodicPauseSlotCountAfterByte(
@@ -647,14 +651,14 @@ std::size_t CollapsePanicBreakSlotCount(std::uint32_t hash) {
                                               : static_cast<std::size_t>(0);
 }
 
-std::size_t CollapsePauseSlotCountAfterBit(
-    const std::vector<uint8_t>& bytes, std::size_t byte_index,
-    uint8_t source_byte, uint8_t bit_index_in_byte) {
-  const std::size_t bit_position =
-      byte_index * static_cast<std::size_t>(8) +
-      static_cast<std::size_t>(bit_index_in_byte);
-  const std::uint32_t hash =
-      HashCollapsePause(byte_index, source_byte, bit_index_in_byte, bit_position);
+std::size_t CollapsePauseSlotCountAfterBit(const std::vector<uint8_t>& bytes,
+                                           std::size_t byte_index,
+                                           uint8_t source_byte,
+                                           uint8_t bit_index_in_byte) {
+  const std::size_t bit_position = byte_index * static_cast<std::size_t>(8) +
+                                   static_cast<std::size_t>(bit_index_in_byte);
+  const std::uint32_t hash = HashCollapsePause(byte_index, source_byte,
+                                               bit_index_in_byte, bit_position);
   const std::size_t panic_break = CollapsePanicBreakSlotCount(hash);
   if (panic_break > 0) {
     return panic_break;
@@ -688,8 +692,7 @@ std::size_t CollapsePauseSlotCountAfterBit(
 
 void AppendSilenceChunk(std::size_t slot_count, std::size_t chunk_size,
                         uint8_t source_byte, uint8_t bit_index_in_byte,
-                        std::size_t byte_index,
-                        FlashPayloadLayout* layout) {
+                        std::size_t byte_index, FlashPayloadLayout* layout) {
   if (layout == nullptr || slot_count == 0 || chunk_size == 0) {
     return;
   }
@@ -809,19 +812,17 @@ FlashPayloadLayout BuildPayloadLayoutForVoicing(
       } else if (normalized_flavor == FlashVoicingFlavor::kHostility) {
         chunk.sample_count = static_cast<size_t>(chunk_size);
         chunk.carrier_freq_hz =
-            bit == 1
-                ? HostilityHighCarrierForBit(bit_position, byte_index, value,
-                                           bit_index_in_byte)
-                : HostilityLowCarrierForBit(bit_position, byte_index, value,
-                                          bit_index_in_byte);
+            bit == 1 ? HostilityHighCarrierForBit(bit_position, byte_index,
+                                                  value, bit_index_in_byte)
+                     : HostilityLowCarrierForBit(bit_position, byte_index,
+                                                 value, bit_index_in_byte);
       } else if (normalized_flavor == FlashVoicingFlavor::kCollapse) {
         chunk.sample_count = static_cast<size_t>(chunk_size);
         chunk.carrier_freq_hz =
-            bit == 1
-                ? CollapseHighCarrierForBit(bit_position, byte_index, value,
-                                            bit_index_in_byte)
-                : CollapseLowCarrierForBit(bit_position, byte_index, value,
-                                           bit_index_in_byte);
+            bit == 1 ? CollapseHighCarrierForBit(bit_position, byte_index,
+                                                 value, bit_index_in_byte)
+                     : CollapseLowCarrierForBit(bit_position, byte_index, value,
+                                                bit_index_in_byte);
       } else if (normalized_flavor == FlashVoicingFlavor::kVoid) {
         chunk.sample_count =
             VoidSamplesForBit(bit_position, bit_index_in_byte, config);
@@ -844,19 +845,17 @@ FlashPayloadLayout BuildPayloadLayoutForVoicing(
                           ? LitanyPauseSlotCountAfterByte(bytes, byte_index)
                           : static_cast<std::size_t>(2);
       } else if (normalized_flavor == FlashVoicingFlavor::kCollapse) {
-        pause_slots = CollapsePauseSlotCountAfterBit(
-            bytes, byte_index, value, bit_index_in_byte);
+        pause_slots = CollapsePauseSlotCountAfterBit(bytes, byte_index, value,
+                                                     bit_index_in_byte);
       } else if (normalized_flavor == FlashVoicingFlavor::kZeal &&
                  bit_index_in_byte == static_cast<uint8_t>(7)) {
         pause_slots = ZealPauseSlotCountAfterByte(bytes, byte_index);
       } else if (normalized_flavor == FlashVoicingFlavor::kVoid) {
-        pause_slots =
-            VoidPauseSlotCountAfterBit(bit_position, byte_index,
-                                       bit_index_in_byte);
+        pause_slots = VoidPauseSlotCountAfterBit(bit_position, byte_index,
+                                                 bit_index_in_byte);
       }
-      AppendSilenceChunk(pause_slots,
-                         config.samples_per_silence_slot,
-                         value, bit_index_in_byte, byte_index, &layout);
+      AppendSilenceChunk(pause_slots, config.samples_per_silence_slot, value,
+                         bit_index_in_byte, byte_index, &layout);
       if (normalized_flavor == FlashVoicingFlavor::kZeal && pause_slots > 0) {
         force_zeal_burst_after_pause = true;
       }
@@ -979,13 +978,13 @@ std::vector<uint8_t> DecodePcm16ToBytesWithPayloadLayout(
     const double bit_carrier_power =
         GoertzelPower(chunk_pcm, static_cast<int>(chunk.sample_count),
                       config.sample_rate_hz, chunk.carrier_freq_hz);
-    const double opposite_carrier_power =
-        GoertzelPower(chunk_pcm, static_cast<int>(chunk.sample_count),
-                      config.sample_rate_hz,
-                      chunk.bit_value == 1 ? chunk.carrier_freq_hz / 2.0
-                                           : chunk.carrier_freq_hz * 2.0);
-    bits.push_back(bit_carrier_power >= opposite_carrier_power ? chunk.bit_value
-                                                               : 1 - chunk.bit_value);
+    const double opposite_carrier_power = GoertzelPower(
+        chunk_pcm, static_cast<int>(chunk.sample_count), config.sample_rate_hz,
+        chunk.bit_value == 1 ? chunk.carrier_freq_hz / 2.0
+                             : chunk.carrier_freq_hz * 2.0);
+    bits.push_back(bit_carrier_power >= opposite_carrier_power
+                       ? chunk.bit_value
+                       : 1 - chunk.bit_value);
     if (bits.size() >= estimated_bit_count) {
       break;
     }
@@ -1042,12 +1041,10 @@ std::vector<uint8_t> DecodePcm16ToBytesSkippingSilenceWithCarrierSchedule(
     const std::size_t byte_index = bit_position / static_cast<std::size_t>(8);
     const uint8_t bit_index_in_byte =
         static_cast<uint8_t>(bit_position % static_cast<std::size_t>(8));
-    const double low_freq =
-        CollapseLowCarrierForBit(bit_position, byte_index, 0U,
-                                 bit_index_in_byte);
-    const double high_freq =
-        CollapseHighCarrierForBit(bit_position, byte_index, 0U,
-                                  bit_index_in_byte);
+    const double low_freq = CollapseLowCarrierForBit(bit_position, byte_index,
+                                                     0U, bit_index_in_byte);
+    const double high_freq = CollapseHighCarrierForBit(bit_position, byte_index,
+                                                       0U, bit_index_in_byte);
     const double low_power =
         GoertzelPower(chunk, bit_chunk_size, config.sample_rate_hz, low_freq);
     const double high_power =
@@ -1134,15 +1131,15 @@ std::vector<uint8_t> DecodeZealPcm16ToBytes(const std::vector<int16_t>& pcm,
                               ZealTimingClass timing_class) {
     const std::size_t sample_count =
         ZealSamplesForTimingClass(timing_class, config);
-    const int window_size = static_cast<int>(
-        std::min(sample_count, pcm.size() - offset));
+    const int window_size =
+        static_cast<int>(std::min(sample_count, pcm.size() - offset));
     const int16_t* chunk = pcm.data() + offset;
-    const double low_power = GoertzelPower(
-        chunk, window_size, config.sample_rate_hz,
-        ZealLowCarrierForTimingClass(timing_class));
-    const double high_power = GoertzelPower(
-        chunk, window_size, config.sample_rate_hz,
-        ZealHighCarrierForTimingClass(timing_class));
+    const double low_power =
+        GoertzelPower(chunk, window_size, config.sample_rate_hz,
+                      ZealLowCarrierForTimingClass(timing_class));
+    const double high_power =
+        GoertzelPower(chunk, window_size, config.sample_rate_hz,
+                      ZealHighCarrierForTimingClass(timing_class));
     return std::pair<double, double>{low_power, high_power};
   };
 

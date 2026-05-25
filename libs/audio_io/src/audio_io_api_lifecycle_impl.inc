@@ -55,7 +55,8 @@ void ResetWavInfo(audio_io_wav_info* info) {
   info->duration_ms = 0;
 }
 
-bool DuplicateOwnedString(const std::string& input, audio_io_owned_string* out) {
+bool DuplicateOwnedString(const std::string& input,
+                          audio_io_owned_string* out) {
   if (out == nullptr) {
     return false;
   }
@@ -75,9 +76,8 @@ bool DuplicateOwnedString(const std::string& input, audio_io_owned_string* out) 
   return true;
 }
 
-bool DuplicateSegmentSampleCounts(
-    const std::vector<std::uint32_t>& input,
-    audio_io_metadata* out_metadata) {
+bool DuplicateSegmentSampleCounts(const std::vector<std::uint32_t>& input,
+                                  audio_io_metadata* out_metadata) {
   if (out_metadata == nullptr) {
     return false;
   }

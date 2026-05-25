@@ -10,7 +10,6 @@ import std;
 
 export module bag.common.config;
 
-
 export namespace bag {
 
 enum class TransportMode : std::uint8_t {

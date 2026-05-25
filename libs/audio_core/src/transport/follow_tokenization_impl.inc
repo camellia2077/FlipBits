@@ -180,8 +180,8 @@ std::vector<TextTokenSpec> TokenizeSegmentForFollow(
     const auto& slice = slices[slice_index];
     if (IsPunctuationCodePoint(slice.code_point)) {
       FlushGroupedTextToken(&grouped_text, &grouped_bytes,
-                            &grouped_display_units,
-                            &grouped_tail_code_point, &tokens);
+                            &grouped_display_units, &grouped_tail_code_point,
+                            &tokens);
       AppendStandaloneSliceToken(slice, &tokens);
       continue;
     }
@@ -215,18 +215,19 @@ std::vector<TextTokenSpec> TokenizeTextForFollow(std::string_view text) {
       return;
     }
     // Tokenization is the first layer of the contract:
-    // - Latin/Cyrillic-like runs stay word-grouped until punctuation/whitespace.
-    // - CJK-containing runs split visible non-punctuation code points per character.
-    // The later character/byte layer must preserve this tokenization instead of
-    // re-deciding it in Android.
+    // - Latin/Cyrillic-like runs stay word-grouped until
+    // punctuation/whitespace.
+    // - CJK-containing runs split visible non-punctuation code points per
+    // character. The later character/byte layer must preserve this tokenization
+    // instead of re-deciding it in Android.
     bool contains_cjk = false;
     for (std::size_t index = segment_begin; index < segment_end; ++index) {
       contains_cjk = contains_cjk || IsCjkCodePoint(slices[index].code_point);
     }
     std::vector<TextTokenSpec> segment_tokens;
-    segment_tokens = TokenizeSegmentForFollow(
-        slices.data() + segment_begin, segment_end - segment_begin,
-        contains_cjk);
+    segment_tokens =
+        TokenizeSegmentForFollow(slices.data() + segment_begin,
+                                 segment_end - segment_begin, contains_cjk);
     if (pending_whitespace_bytes > 0 && !tokens.empty()) {
       // Whitespace is not emitted as its own text token, but it still owns raw
       // payload bytes. Attach those bytes to the preceding token so the
@@ -253,9 +254,9 @@ std::vector<TextTokenSpec> TokenizeTextForFollow(std::string_view text) {
     segment_begin = index + 1;
     pending_whitespace_bytes += slices[index].bytes.size();
     pending_separator.append(slices[index].bytes);
-    pending_contains_newline =
-        pending_contains_newline || slices[index].code_point == 0x0A ||
-        slices[index].code_point == 0x0D;
+    pending_contains_newline = pending_contains_newline ||
+                               slices[index].code_point == 0x0A ||
+                               slices[index].code_point == 0x0D;
   }
   flush_segment(slices.size());
 

@@ -15,11 +15,6 @@
   - `OFF` 时：不能把 `import std;` 当成无条件前提；需要走 include-based fallback。
   - 当前覆盖面：`libs/audio_core`、`libs/audio_api`、`libs/audio_io` 的标准库入口统一走这一个 capability。
 
-- `FLIPBITS_ENABLE_ASYNC_ENCODE_JOB`
-  - 含义：当前 lane 是否支持 `bag_api` 的线程型异步 encode job。
-  - `ON` 时：保留 `bag_start_encode_text_job(...)` 这组异步 ABI 实现。
-  - `OFF` 时：这组 ABI 统一返回 `BAG_NOT_IMPLEMENTED`，同步 encode 入口继续可用。
-
 ## 单一入口
 
 - CMake capability 检测：
@@ -36,7 +31,7 @@
 - WebAssembly / Emscripten
   - 当前支持 named modules graph。
   - 当前不把 `std` module provider 当成正式前提。
-  - 当前不支持 `bag_api` 线程型异步 encode job。
+  - encode generation 走 operation pump。
 
 ## 修改规则
 

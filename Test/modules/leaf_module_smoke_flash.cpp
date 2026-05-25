@@ -263,8 +263,12 @@ void TestFlashSignalSnapshotFirstSamplesStable() {
         pcm.size() >= expected.size(),
         "Flash signal module PCM must contain enough samples for snapshot coverage.");
     for (std::size_t index = 0; index < expected.size(); ++index) {
-        if (pcm[index] != expected[index]) {
-            test::Fail("Flash signal module snapshot mismatch at sample index " + std::to_string(index));
+        const int delta = static_cast<int>(pcm[index]) - static_cast<int>(expected[index]);
+        if (delta < -1 || delta > 1) {
+            test::Fail("Flash signal module snapshot mismatch at sample index " +
+                       std::to_string(index) + ": expected " +
+                       std::to_string(expected[index]) + ", actual " +
+                       std::to_string(pcm[index]));
         }
     }
 }

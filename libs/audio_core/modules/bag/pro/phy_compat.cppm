@@ -10,7 +10,6 @@ import std;
 
 export module bag.pro.phy_compat;
 
-
 export import bag.common.config;
 export import bag.common.error_code;
 export import bag.transport.decoder;

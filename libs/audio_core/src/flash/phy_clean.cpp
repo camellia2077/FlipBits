@@ -11,6 +11,7 @@ import std;
 module bag.flash.phy_clean;
 
 import bag.flash.codec;
+import bag.flash.phy_rules;
 import bag.flash.signal;
 import bag.flash.voicing;
 import bag.transport.follow;

@@ -155,10 +155,9 @@ class MiniDecoder final : public ITransportDecoder {
     out_result->text.clear();
     const ErrorCode text_code =
         DecodePayloadToText(out_result->raw_payload_bytes, &out_result->text);
-    out_result->text_status =
-        text_code == ErrorCode::kOk
-            ? DecodeContentStatus::kOk
-            : DecodeContentStatus::kInvalidTextPayload;
+    out_result->text_status = text_code == ErrorCode::kOk
+                                  ? DecodeContentStatus::kOk
+                                  : DecodeContentStatus::kInvalidTextPayload;
     if (text_code != ErrorCode::kOk) {
       out_result->text.clear();
     }
@@ -280,7 +279,8 @@ class ToneUnitRenderer::Impl {
     }
     const std::size_t sample_count =
         unit_count * static_cast<std::size_t>(config_.unit_samples);
-    segments_.push_back(Segment{.is_tone = is_tone, .sample_count = sample_count});
+    segments_.push_back(
+        Segment{.is_tone = is_tone, .sample_count = sample_count});
     total_work_ += sample_count;
   }
 
@@ -326,9 +326,13 @@ ToneUnitRenderer::ToneUnitRenderer(const std::vector<uint8_t>& payload,
 
 ToneUnitRenderer::~ToneUnitRenderer() = default;
 
-std::size_t ToneUnitRenderer::TotalWork() const { return impl_->TotalWork(); }
+std::size_t ToneUnitRenderer::TotalWork() const {
+  return impl_->TotalWork();
+}
 
-bool ToneUnitRenderer::Finished() const { return impl_->Finished(); }
+bool ToneUnitRenderer::Finished() const {
+  return impl_->Finished();
+}
 
 ToneUnitRenderProgress ToneUnitRenderer::Pump(std::size_t work_budget) {
   return impl_->Pump(work_budget);
@@ -404,11 +408,13 @@ ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
   }
 
   std::vector<bool> tone_units;
-  tone_units.reserve(pcm.size() / static_cast<std::size_t>(config.unit_samples));
+  tone_units.reserve(pcm.size() /
+                     static_cast<std::size_t>(config.unit_samples));
   for (std::size_t offset = 0; offset < pcm.size();
        offset += static_cast<std::size_t>(config.unit_samples)) {
     tone_units.push_back(
-        ChunkRms(pcm, offset, offset + static_cast<std::size_t>(config.unit_samples)) >=
+        ChunkRms(pcm, offset,
+                 offset + static_cast<std::size_t>(config.unit_samples)) >=
         kSilenceRmsThreshold);
   }
 
@@ -468,9 +474,9 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
   }
   ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPreparingInput,
                        0.20f);
-  const ErrorCode encode_code = EncodePayloadToPcm16(
-      payload, MakeMorseToneConfig(config), out_pcm, progress_sink, 0.20f,
-      0.95f);
+  const ErrorCode encode_code =
+      EncodePayloadToPcm16(payload, MakeMorseToneConfig(config), out_pcm,
+                           progress_sink, 0.20f, 0.95f);
   if (encode_code != ErrorCode::kOk) {
     return encode_code;
   }

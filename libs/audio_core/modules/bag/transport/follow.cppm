@@ -10,7 +10,6 @@ import std;
 
 export module bag.transport.follow;
 
-
 export import bag.common.config;
 export import bag.common.types;
 

@@ -67,7 +67,8 @@ bag_error_code bag_poll_decode_result(bag_decoder* decoder,
   out_result->raw_payload_available = result.raw_payload_available ? 1 : 0;
   out_result->raw_bytes_hex_status =
       result.raw_payload_available
-          ? CopyStringToApiBuffer(raw_bytes_hex, out_result->raw_bytes_hex_buffer,
+          ? CopyStringToApiBuffer(raw_bytes_hex,
+                                  out_result->raw_bytes_hex_buffer,
                                   out_result->raw_bytes_hex_buffer_size)
           : BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_result->raw_bits_binary_status =
@@ -77,10 +78,10 @@ bag_error_code bag_poll_decode_result(bag_decoder* decoder,
                                   out_result->raw_bits_binary_buffer_size)
           : BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   CopyFollowDataToApi(result.follow_data, &out_result->follow_data);
-  CopyTextFollowDataToApi(result.text_follow_data, &out_result->text_follow_data);
-  const bag_decode_content_status copied_text_status =
-      CopyStringToApiBuffer(result.text, out_result->text_buffer,
-                            out_result->text_buffer_size);
+  CopyTextFollowDataToApi(result.text_follow_data,
+                          &out_result->text_follow_data);
+  const bag_decode_content_status copied_text_status = CopyStringToApiBuffer(
+      result.text, out_result->text_buffer, out_result->text_buffer_size);
   if (out_result->text_decode_status == BAG_DECODE_CONTENT_STATUS_OK &&
       copied_text_status == BAG_DECODE_CONTENT_STATUS_BUFFER_TOO_SMALL) {
     out_result->text_decode_status = copied_text_status;

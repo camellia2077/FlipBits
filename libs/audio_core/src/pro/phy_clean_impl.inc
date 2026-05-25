@@ -103,8 +103,7 @@ SymbolTemplateBank BuildSymbolTemplateBank(const DualToneConfig& config) {
                           static_cast<double>(config.sample_rate_hz);
       const double low_sample = std::sin(low_omega * time);
       const double high_sample = std::sin(high_omega * time);
-      const double sample =
-          config.amplitude * 0.5 * (low_sample + high_sample);
+      const double sample = config.amplitude * 0.5 * (low_sample + high_sample);
       const double clamped = std::max(-1.0, std::min(1.0, sample));
       pcm[static_cast<std::size_t>(index)] =
           static_cast<int16_t>(std::lround(clamped * 32767.0));
@@ -203,10 +202,9 @@ class ProDecoder final : public ITransportDecoder {
     out_result->text.clear();
     const ErrorCode text_code =
         DecodePayloadToText(out_result->raw_payload_bytes, &out_result->text);
-    out_result->text_status =
-        text_code == ErrorCode::kOk
-            ? DecodeContentStatus::kOk
-            : DecodeContentStatus::kInvalidTextPayload;
+    out_result->text_status = text_code == ErrorCode::kOk
+                                  ? DecodeContentStatus::kOk
+                                  : DecodeContentStatus::kInvalidTextPayload;
     if (text_code != ErrorCode::kOk) {
       out_result->text.clear();
     }
@@ -330,9 +328,13 @@ SymbolRenderer::SymbolRenderer(std::uint8_t symbol, std::size_t write_offset,
 
 SymbolRenderer::~SymbolRenderer() = default;
 
-std::size_t SymbolRenderer::TotalWork() const { return impl_->TotalWork(); }
+std::size_t SymbolRenderer::TotalWork() const {
+  return impl_->TotalWork();
+}
 
-bool SymbolRenderer::Finished() const { return impl_->Finished(); }
+bool SymbolRenderer::Finished() const {
+  return impl_->Finished();
+}
 
 SymbolRenderProgress SymbolRenderer::Pump(std::size_t work_budget) {
   return impl_->Pump(work_budget);
@@ -377,7 +379,8 @@ ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
         out_pcm->clear();
         return ErrorCode::kCancelled;
       }
-      const SymbolRenderProgress progress = renderer.Pump(kProgressReportStrideSamples);
+      const SymbolRenderProgress progress =
+          renderer.Pump(kProgressReportStrideSamples);
       rendered_samples = write_offset + progress.completed_work;
       MaybeReportCompletedSampleProgress(
           progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin,

@@ -10,7 +10,6 @@ import std;
 
 export module bag.fsk.codec;
 
-
 export namespace bag::fsk {
 
 struct FskConfig {

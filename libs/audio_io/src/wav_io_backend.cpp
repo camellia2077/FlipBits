@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "wav_io_bytes_impl.inc"
+#include "wav_metadata_parse_rules.h"
 
 namespace audio_io::detail {
 

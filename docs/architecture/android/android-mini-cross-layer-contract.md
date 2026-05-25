@@ -34,7 +34,7 @@
 - `bag_validate_encode_request()` 的权威语义：
   - `""` -> `BAG_VALIDATION_EMPTY_TEXT`
   - whitespace-only `mini` -> `BAG_VALIDATION_OK`
-- async job 和 sync encode 对同一输入必须给出一致结果。
+- encode operation 和 sync encode 对同一输入必须给出一致结果。
 
 ### `audio_core`
 - `mini` normalization 统一处理 `space / \t / \r / \n`。

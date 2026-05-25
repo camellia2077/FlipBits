@@ -8,7 +8,8 @@ UltraFrameSection UltraFrameSectionForByte(std::size_t frame_byte_index,
     return UltraFrameSection::kPreamble;
   }
   const std::size_t sync_begin = ultra::kCleanFrameV1Preamble.size();
-  const std::size_t version_index = sync_begin + ultra::kCleanFrameV1Sync.size();
+  const std::size_t version_index =
+      sync_begin + ultra::kCleanFrameV1Sync.size();
   const std::size_t flags_index = version_index + 1;
   const std::size_t payload_length_begin = flags_index + 1;
   const std::size_t payload_begin = payload_length_begin + 4;
@@ -45,8 +46,8 @@ std::vector<UltraFrameSymbolEntry> BuildUltraFrameTimeline(
   constexpr std::size_t kPayloadBeginByte = 16;
   for (std::size_t frame_byte_index = 0; frame_byte_index < frame.size();
        ++frame_byte_index) {
-    const UltraFrameSection section = UltraFrameSectionForByte(
-        frame_byte_index, raw_payload_bytes.size());
+    const UltraFrameSection section =
+        UltraFrameSectionForByte(frame_byte_index, raw_payload_bytes.size());
     const bool is_payload = section == UltraFrameSection::kPayload;
     const std::size_t payload_byte_index =
         is_payload ? frame_byte_index - kPayloadBeginByte
@@ -54,8 +55,7 @@ std::vector<UltraFrameSymbolEntry> BuildUltraFrameTimeline(
     for (std::size_t nibble_index = 0; nibble_index < 2; ++nibble_index) {
       const std::uint8_t nibble =
           nibble_index == 0
-              ? static_cast<std::uint8_t>((frame[frame_byte_index] >> 4) &
-                                          0x0F)
+              ? static_cast<std::uint8_t>((frame[frame_byte_index] >> 4) & 0x0F)
               : static_cast<std::uint8_t>(frame[frame_byte_index] & 0x0F);
       const std::size_t symbol_index =
           frame_byte_index * static_cast<std::size_t>(2) + nibble_index;
@@ -65,7 +65,8 @@ std::vector<UltraFrameSymbolEntry> BuildUltraFrameTimeline(
           .frame_byte_index = frame_byte_index,
           .nibble_index_in_byte = nibble_index,
           .nibble_value = static_cast<std::size_t>(nibble),
-          .carrier_freq_hz = kUltraCarrierFreqsHz[static_cast<std::size_t>(nibble)],
+          .carrier_freq_hz =
+              kUltraCarrierFreqsHz[static_cast<std::size_t>(nibble)],
           .section = section,
           .is_payload = is_payload,
           .payload_byte_index = payload_byte_index,
@@ -79,9 +80,8 @@ PayloadFollowData BuildFlashPayloadFollowData(
     const CoreConfig& config,
     const std::vector<std::uint8_t>& raw_payload_bytes) {
   PayloadFollowData follow_data{};
-  const flash::BfskConfig signal_config =
-      flash::MakeBfskConfigForSignalProfile(config,
-                                             config.flash_signal_profile);
+  const flash::BfskConfig signal_config = flash::MakeBfskConfigForSignalProfile(
+      config, config.flash_signal_profile);
   const flash::FlashPayloadLayout payload_layout =
       flash::BuildPayloadLayoutForVoicing(raw_payload_bytes, signal_config,
                                           config.flash_voicing_flavor);
@@ -89,7 +89,8 @@ PayloadFollowData BuildFlashPayloadFollowData(
       flash::MakeFormalVoicingConfigForFlavor(config,
                                               config.flash_voicing_flavor);
   const std::size_t total_pcm_sample_count =
-      payload_layout.payload_sample_count + voicing_config.preamble_sample_count +
+      payload_layout.payload_sample_count +
+      voicing_config.preamble_sample_count +
       voicing_config.epilogue_sample_count;
   const flash::FlashVoicingDescriptor descriptor =
       flash::DescribeVoicingOutput(total_pcm_sample_count, voicing_config);
@@ -123,16 +124,17 @@ PayloadFollowData BuildFlashPayloadFollowData(
       continue;
     }
     follow_data.byte_timeline.push_back(PayloadFollowByteEntry{
-        .start_sample = descriptor.leading_nonpayload_samples +
-                        byte_begin_sample,
+        .start_sample =
+            descriptor.leading_nonpayload_samples + byte_begin_sample,
         .sample_count = byte_end_sample - byte_begin_sample,
         .byte_index = byte_index,
     });
   }
 
   // Flash follow data is intentionally bit-granular. The UI uses bit_offset as
-  // the source of truth for lyrics highlighting and for timeline-driven low/high
-  // visuals; group_index is only the ordinal of this published follow group.
+  // the source of truth for lyrics highlighting and for timeline-driven
+  // low/high visuals; group_index is only the ordinal of this published follow
+  // group.
   std::size_t bit_group_index = 0;
   for (const flash::FlashPayloadChunk& chunk : payload_layout.chunks) {
     if (chunk.kind != flash::FlashPayloadSegmentKind::kBit) {
@@ -171,12 +173,11 @@ PayloadFollowData BuildNibblePayloadFollowData(
                      ultra::kCleanFrameV1Sync.size() + 1 + 1 + 4
                : static_cast<std::size_t>(0);
   const std::size_t frame_byte_count =
-      raw_payload_bytes.size() +
-      (is_ultra ? ultra::kCleanFrameV1FixedByteCount
-                : static_cast<std::size_t>(0));
-  const std::size_t payload_begin_sample =
-      frame_prefix_byte_count * static_cast<std::size_t>(2) *
-      symbol_sample_count;
+      raw_payload_bytes.size() + (is_ultra ? ultra::kCleanFrameV1FixedByteCount
+                                           : static_cast<std::size_t>(0));
+  const std::size_t payload_begin_sample = frame_prefix_byte_count *
+                                           static_cast<std::size_t>(2) *
+                                           symbol_sample_count;
   const std::size_t payload_sample_count = symbol_count * symbol_sample_count;
   const std::size_t total_pcm_sample_count =
       frame_byte_count * static_cast<std::size_t>(2) * symbol_sample_count;
@@ -196,8 +197,9 @@ PayloadFollowData BuildNibblePayloadFollowData(
   for (std::size_t byte_index = 0; byte_index < raw_payload_bytes.size();
        ++byte_index) {
     follow_data.byte_timeline.push_back(PayloadFollowByteEntry{
-        .start_sample = payload_begin_sample +
-            byte_index * static_cast<std::size_t>(2) * symbol_sample_count,
+        .start_sample = payload_begin_sample + byte_index *
+                                                   static_cast<std::size_t>(2) *
+                                                   symbol_sample_count,
         .sample_count = static_cast<std::size_t>(2) * symbol_sample_count,
         .byte_index = byte_index,
     });
@@ -214,7 +216,8 @@ PayloadFollowData BuildNibblePayloadFollowData(
             ? static_cast<std::uint8_t>((payload_byte >> 4) & 0x0F)
             : static_cast<std::uint8_t>(payload_byte & 0x0F);
     follow_data.binary_group_timeline.push_back(PayloadFollowBinaryGroupEntry{
-        .start_sample = payload_begin_sample + group_index * symbol_sample_count,
+        .start_sample =
+            payload_begin_sample + group_index * symbol_sample_count,
         .sample_count = symbol_sample_count,
         .group_index = group_index,
         .bit_offset = group_index * static_cast<std::size_t>(4),
@@ -268,14 +271,13 @@ PayloadFollowData BuildMorsePayloadFollowData(
     if (ch == ' ') {
       sample_cursor += mini_mode::kMorseWordGapUnits * unit_sample_count;
     } else {
-      const std::string_view pattern =
-          mini_mode::MorsePatternForChar(static_cast<char>(
-              raw_payload_bytes[byte_index]));
+      const std::string_view pattern = mini_mode::MorsePatternForChar(
+          static_cast<char>(raw_payload_bytes[byte_index]));
       for (std::size_t pattern_index = 0; pattern_index < pattern.size();
            ++pattern_index) {
-        const std::size_t tone_units =
-            pattern[pattern_index] == '-' ? mini_mode::kMorseDashUnits
-                                          : mini_mode::kMorseDotUnits;
+        const std::size_t tone_units = pattern[pattern_index] == '-'
+                                           ? mini_mode::kMorseDashUnits
+                                           : mini_mode::kMorseDotUnits;
         follow_data.binary_group_timeline.push_back(
             PayloadFollowBinaryGroupEntry{
                 .start_sample = sample_cursor,
@@ -288,8 +290,7 @@ PayloadFollowData BuildMorsePayloadFollowData(
         ++group_index;
         sample_cursor += tone_units * unit_sample_count;
         if (pattern_index + 1 < pattern.size()) {
-          sample_cursor +=
-              mini_mode::kMorseElementGapUnits * unit_sample_count;
+          sample_cursor += mini_mode::kMorseElementGapUnits * unit_sample_count;
         }
       }
       sample_cursor +=

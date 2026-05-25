@@ -51,7 +51,7 @@
 
 ## Work Plan
 
-`bag_encode_operation_work_plan` 是静态工作计划，对应 core 的 `EncodeWorkPlan`。
+`bag_encode_operation_work_plan` 是生成工作计划，对应 core 的 `EncodeWorkPlan`。
 
 它提供：
 
@@ -67,6 +67,7 @@
 消费者规则：
 
 - Android/Web 如需展示总量、阶段工作量或预计输出规模，应直接使用 work-plan。
+- 对可能在准备阶段细化 layout 的 mode，消费者应把最新 work-plan 与 snapshot 作为当前事实来源。
 - 不要在平台层根据文本长度、mode 或采样率重新推导工作量 bucket。
 
 ## Pump
@@ -88,16 +89,6 @@
 - operation completion 不应承担 follow/raw/timeline hydration。
 - 需要 follow/raw/timeline 展示数据时，使用 `bag_build_encode_follow_data`。
 - follow hydration 和 operation terminal result 保持分层，避免把大 DTO 图塞回生成完成路径。
-
-## Legacy Job API
-
-`bag_start_encode_text_job` / `bag_poll_encode_text_job` 仍存在于 legacy async-job 兼容层。
-
-规则：
-
-- 新的 Android/Web 生成进度显示不要基于 legacy job progress。
-- 不要为新消费者新增第二套 job/progress lifecycle。
-- 如果必须维护 legacy job 行为，应把它看成 operation contract 的兼容投影，而不是反向让 operation 跟随 job 语义。
 
 ## 验证
 

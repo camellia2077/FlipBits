@@ -1,4 +1,4 @@
-use crate::bag_api::{EncodeJobPhase, EncodeJobProgress};
+use crate::bag_api::{EncodeOperationPhase, EncodeOperationProgress};
 use crate::TransportMode;
 use std::io::{self, IsTerminal, Write};
 
@@ -15,12 +15,14 @@ impl EncodeProgressBar {
         }
     }
 
-    pub fn update(&mut self, mode: TransportMode, progress: EncodeJobProgress) {
+    pub fn update(&mut self, mode: TransportMode, progress: EncodeOperationProgress) {
         if !self.enabled {
             return;
         }
 
-        let percent = (progress.progress_0_to_1 * 100.0).round().clamp(0.0, 100.0) as usize;
+        let percent = (progress.overall_progress_0_to_1 * 100.0)
+            .round()
+            .clamp(0.0, 100.0) as usize;
         let filled = ((percent * 24) / 100).min(24);
         let bar = format!(
             "{}{}",
@@ -51,31 +53,34 @@ impl EncodeProgressBar {
     }
 }
 
-fn phase_label(phase: EncodeJobPhase) -> &'static str {
+fn phase_label(phase: EncodeOperationPhase) -> &'static str {
     match phase {
-        EncodeJobPhase::PreparingInput => "Preparing input",
-        EncodeJobPhase::RenderingPcm => "Rendering PCM",
-        EncodeJobPhase::Postprocessing => "Post-processing",
-        EncodeJobPhase::Finalizing => "Finalizing",
+        EncodeOperationPhase::PreparingInput => "Preparing input",
+        EncodeOperationPhase::RenderingPcm => "Rendering PCM",
+        EncodeOperationPhase::Postprocessing => "Post-processing",
+        EncodeOperationPhase::Finalizing => "Finalizing",
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::phase_label;
-    use crate::bag_api::EncodeJobPhase;
+    use crate::bag_api::EncodeOperationPhase;
 
     #[test]
     fn phase_labels_are_stable() {
         assert_eq!(
-            phase_label(EncodeJobPhase::PreparingInput),
+            phase_label(EncodeOperationPhase::PreparingInput),
             "Preparing input"
         );
-        assert_eq!(phase_label(EncodeJobPhase::RenderingPcm), "Rendering PCM");
         assert_eq!(
-            phase_label(EncodeJobPhase::Postprocessing),
+            phase_label(EncodeOperationPhase::RenderingPcm),
+            "Rendering PCM"
+        );
+        assert_eq!(
+            phase_label(EncodeOperationPhase::Postprocessing),
             "Post-processing"
         );
-        assert_eq!(phase_label(EncodeJobPhase::Finalizing), "Finalizing");
+        assert_eq!(phase_label(EncodeOperationPhase::Finalizing), "Finalizing");
     }
 }

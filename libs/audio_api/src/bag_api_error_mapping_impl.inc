@@ -33,17 +33,17 @@ bag_decode_content_status ToApiDecodeContentStatus(
   }
 }
 
-bag_encode_job_phase ToApiJobPhase(bag::EncodeProgressPhase phase) {
+bag_encode_operation_phase ToApiOperationPhase(bag::EncodeProgressPhase phase) {
   switch (phase) {
     case bag::EncodeProgressPhase::kPreparingInput:
-      return BAG_ENCODE_JOB_PHASE_PREPARING_INPUT;
+      return BAG_ENCODE_OPERATION_PHASE_PREPARING_INPUT;
     case bag::EncodeProgressPhase::kRenderingPcm:
-      return BAG_ENCODE_JOB_PHASE_RENDERING_PCM;
+      return BAG_ENCODE_OPERATION_PHASE_RENDERING_PCM;
     case bag::EncodeProgressPhase::kPostprocessing:
-      return BAG_ENCODE_JOB_PHASE_POSTPROCESSING;
+      return BAG_ENCODE_OPERATION_PHASE_POSTPROCESSING;
     case bag::EncodeProgressPhase::kFinalizing:
     default:
-      return BAG_ENCODE_JOB_PHASE_FINALIZING;
+      return BAG_ENCODE_OPERATION_PHASE_FINALIZING;
   }
 }
 
@@ -74,18 +74,19 @@ bag_validation_issue ToApiValidationIssue(bag::TransportValidationIssue issue) {
   }
 }
 
-bag_encode_job_state ToApiOperationState(bag::EncodeOperationState state) {
+bag_encode_operation_state ToApiOperationState(
+    bag::EncodeOperationState state) {
   switch (state) {
     case bag::EncodeOperationState::kQueued:
-      return BAG_ENCODE_JOB_QUEUED;
+      return BAG_ENCODE_OPERATION_QUEUED;
     case bag::EncodeOperationState::kRunning:
-      return BAG_ENCODE_JOB_RUNNING;
+      return BAG_ENCODE_OPERATION_RUNNING;
     case bag::EncodeOperationState::kSucceeded:
-      return BAG_ENCODE_JOB_SUCCEEDED;
+      return BAG_ENCODE_OPERATION_SUCCEEDED;
     case bag::EncodeOperationState::kFailed:
-      return BAG_ENCODE_JOB_FAILED;
+      return BAG_ENCODE_OPERATION_FAILED;
     case bag::EncodeOperationState::kCancelled:
     default:
-      return BAG_ENCODE_JOB_CANCELLED;
+      return BAG_ENCODE_OPERATION_CANCELLED;
   }
 }

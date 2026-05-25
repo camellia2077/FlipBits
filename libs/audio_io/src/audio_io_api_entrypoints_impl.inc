@@ -1,7 +1,5 @@
 audio_io_wav_status audio_io_encode_mono_pcm16_wav(
-    int sample_rate_hz,
-    const int16_t* pcm,
-    size_t sample_count,
+    int sample_rate_hz, const int16_t* pcm, size_t sample_count,
     audio_io_byte_buffer* out_wav_bytes) {
   if (out_wav_bytes == nullptr) {
     return AUDIO_IO_WAV_INVALID_ARGUMENT;
@@ -16,9 +14,8 @@ audio_io_wav_status audio_io_encode_mono_pcm16_wav(
 
   try {
     const std::vector<std::int16_t> pcm_samples =
-        sample_count > 0
-            ? std::vector<std::int16_t>(pcm, pcm + sample_count)
-            : std::vector<std::int16_t>{};
+        sample_count > 0 ? std::vector<std::int16_t>(pcm, pcm + sample_count)
+                         : std::vector<std::int16_t>{};
     const auto wav_bytes =
         audio_io::SerializeMonoPcm16Wav(sample_rate_hz, pcm_samples);
     if (wav_bytes.empty()) {
@@ -39,9 +36,7 @@ audio_io_wav_status audio_io_encode_mono_pcm16_wav(
 }
 
 audio_io_wav_status audio_io_encode_mono_pcm16_wav_with_metadata(
-    int sample_rate_hz,
-    const int16_t* pcm,
-    size_t sample_count,
+    int sample_rate_hz, const int16_t* pcm, size_t sample_count,
     const audio_io_metadata_view* metadata,
     audio_io_byte_buffer* out_wav_bytes) {
   if (metadata == nullptr || out_wav_bytes == nullptr) {
@@ -62,9 +57,8 @@ audio_io_wav_status audio_io_encode_mono_pcm16_wav_with_metadata(
     }
 
     const std::vector<std::int16_t> pcm_samples =
-        sample_count > 0
-            ? std::vector<std::int16_t>(pcm, pcm + sample_count)
-            : std::vector<std::int16_t>{};
+        sample_count > 0 ? std::vector<std::int16_t>(pcm, pcm + sample_count)
+                         : std::vector<std::int16_t>{};
     const auto wav_bytes = audio_io::SerializeMonoPcm16WavWithMetadata(
         sample_rate_hz, pcm_samples, native_metadata);
     if (wav_bytes.empty()) {
@@ -85,8 +79,7 @@ audio_io_wav_status audio_io_encode_mono_pcm16_wav_with_metadata(
 }
 
 audio_io_wav_status audio_io_decode_mono_pcm16_wav(
-    const uint8_t* wav_bytes,
-    size_t wav_byte_count,
+    const uint8_t* wav_bytes, size_t wav_byte_count,
     audio_io_decoded_wav* out_result) {
   if (out_result == nullptr) {
     return AUDIO_IO_WAV_INVALID_ARGUMENT;
@@ -108,7 +101,8 @@ audio_io_wav_status audio_io_decode_mono_pcm16_wav(
       out_result->metadata_status = AUDIO_IO_METADATA_INTERNAL;
     }
 
-    const auto parsed_wav = audio_io::ParseMonoPcm16Wav(wav_bytes, wav_byte_count);
+    const auto parsed_wav =
+        audio_io::ParseMonoPcm16Wav(wav_bytes, wav_byte_count);
     if (parsed_wav.status != audio_io::WavPcm16Status::kOk) {
       return ToApiStatus(parsed_wav.status);
     }
@@ -135,10 +129,9 @@ audio_io_wav_status audio_io_decode_mono_pcm16_wav(
   }
 }
 
-audio_io_wav_status audio_io_probe_mono_pcm16_wav(
-    const uint8_t* wav_bytes,
-    size_t wav_byte_count,
-    audio_io_wav_info* out_info) {
+audio_io_wav_status audio_io_probe_mono_pcm16_wav(const uint8_t* wav_bytes,
+                                                  size_t wav_byte_count,
+                                                  audio_io_wav_info* out_info) {
   if (out_info == nullptr) {
     return AUDIO_IO_WAV_INVALID_ARGUMENT;
   }

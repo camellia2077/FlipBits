@@ -1,8 +1,7 @@
 template <typename SourceEntry, typename ApiEntry, typename CopyFn>
-bag_decode_content_status CopyTimelineEntries(const std::vector<SourceEntry>& input,
-                                              ApiEntry* buffer,
-                                              std::size_t buffer_count,
-                                              CopyFn&& copy_entry) {
+bag_decode_content_status CopyTimelineEntries(
+    const std::vector<SourceEntry>& input, ApiEntry* buffer,
+    std::size_t buffer_count, CopyFn&& copy_entry) {
   if (buffer == nullptr) {
     return input.empty() ? BAG_DECODE_CONTENT_STATUS_OK
                          : BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
@@ -12,8 +11,9 @@ bag_decode_content_status CopyTimelineEntries(const std::vector<SourceEntry>& in
   for (std::size_t index = 0; index < copy_count; ++index) {
     copy_entry(input[index], &buffer[index]);
   }
-  return copy_count == input.size() ? BAG_DECODE_CONTENT_STATUS_OK
-                                    : BAG_DECODE_CONTENT_STATUS_BUFFER_TOO_SMALL;
+  return copy_count == input.size()
+             ? BAG_DECODE_CONTENT_STATUS_OK
+             : BAG_DECODE_CONTENT_STATUS_BUFFER_TOO_SMALL;
 }
 
 void CopyFollowDataToApi(const bag::PayloadFollowData& follow_data,
@@ -63,8 +63,7 @@ void CopyFollowDataToApi(const bag::PayloadFollowData& follow_data,
         destination->carrier_freq_hz = source.carrier_freq_hz;
       });
   out_follow->ultra_frame_timeline_status = CopyTimelineEntries(
-      follow_data.ultra_frame_timeline,
-      out_follow->ultra_frame_timeline_buffer,
+      follow_data.ultra_frame_timeline, out_follow->ultra_frame_timeline_buffer,
       out_follow->ultra_frame_timeline_buffer_count,
       [](const bag::UltraFrameSymbolEntry& source,
          bag_ultra_frame_symbol_entry* destination) {
@@ -74,7 +73,8 @@ void CopyFollowDataToApi(const bag::PayloadFollowData& follow_data,
         destination->nibble_index_in_byte = source.nibble_index_in_byte;
         destination->nibble_value = source.nibble_value;
         destination->carrier_freq_hz = source.carrier_freq_hz;
-        destination->section = static_cast<bag_ultra_frame_section>(source.section);
+        destination->section =
+            static_cast<bag_ultra_frame_section>(source.section);
         destination->is_payload = source.is_payload ? 1 : 0;
         destination->payload_byte_index = source.payload_byte_index;
       });
@@ -91,7 +91,8 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
       text_follow_data.text_token_timeline.size();
   out_text_follow->text_character_text_size =
       JoinedCharacterTextsSize(text_follow_data.text_characters);
-  out_text_follow->text_characters_count = text_follow_data.text_characters.size();
+  out_text_follow->text_characters_count =
+      text_follow_data.text_characters.size();
   out_text_follow->token_raw_segments_count =
       text_follow_data.token_raw_segments.size();
   out_text_follow->token_raw_display_units_count =
@@ -127,7 +128,8 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
     return;
   }
 
-  std::vector<std::size_t> token_offsets(text_follow_data.text_tokens.size(), 0);
+  std::vector<std::size_t> token_offsets(text_follow_data.text_tokens.size(),
+                                         0);
   std::vector<std::size_t> token_sizes(text_follow_data.text_tokens.size(), 0);
   std::vector<std::size_t> character_text_offsets(
       text_follow_data.text_characters.size(), 0);
@@ -145,7 +147,8 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
   for (std::size_t index = 0; index < text_follow_data.text_characters.size();
        ++index) {
     character_text_offsets[index] = joined_character_text_size;
-    joined_character_text_size += text_follow_data.text_characters[index].text.size();
+    joined_character_text_size +=
+        text_follow_data.text_characters[index].text.size();
   }
   out_text_follow->text_tokens_size = joined_size;
   out_text_follow->text_tokens_status = CopyJoinedTextTokensToApi(
@@ -170,19 +173,16 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
         destination->start_sample = source.start_sample;
         destination->sample_count = source.sample_count;
         destination->token_index = source.token_index;
-        destination->text_offset =
-            source.token_index < token_offsets.size()
-                ? token_offsets[source.token_index]
-                : static_cast<std::size_t>(0);
-        destination->text_size =
-            source.token_index < token_sizes.size()
-                ? token_sizes[source.token_index]
-                : static_cast<std::size_t>(0);
+        destination->text_offset = source.token_index < token_offsets.size()
+                                       ? token_offsets[source.token_index]
+                                       : static_cast<std::size_t>(0);
+        destination->text_size = source.token_index < token_sizes.size()
+                                     ? token_sizes[source.token_index]
+                                     : static_cast<std::size_t>(0);
       });
   std::size_t character_copy_index = 0;
   out_text_follow->text_characters_status = CopyTimelineEntries(
-      text_follow_data.text_characters,
-      out_text_follow->text_characters_buffer,
+      text_follow_data.text_characters, out_text_follow->text_characters_buffer,
       out_text_follow->text_characters_buffer_count,
       [&](const bag::TextFollowCharacterEntry& source,
           bag_text_follow_character_entry* destination) {
@@ -193,7 +193,8 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
             source.character_index_within_token;
         destination->byte_index_within_token = source.byte_index_within_token;
         destination->byte_count = source.byte_count;
-        destination->kind = static_cast<bag_text_follow_character_kind>(source.kind);
+        destination->kind =
+            static_cast<bag_text_follow_character_kind>(source.kind);
         destination->text_offset =
             character_copy_index < character_text_offsets.size()
                 ? character_text_offsets[character_copy_index]
@@ -201,18 +202,18 @@ void CopyTextFollowDataToApi(const bag::TextFollowData& text_follow_data,
         destination->text_size = source.text.size();
         ++character_copy_index;
       });
-  out_text_follow->token_raw_segments_status = CopyTimelineEntries(
-      text_follow_data.token_raw_segments,
-      out_text_follow->token_raw_segments_buffer,
-      out_text_follow->token_raw_segments_buffer_count,
-      [](const bag::TextFollowRawSegmentEntry& source,
-         bag_text_follow_raw_segment_entry* destination) {
-        destination->start_sample = source.start_sample;
-        destination->sample_count = source.sample_count;
-        destination->token_index = source.token_index;
-        destination->byte_offset = source.byte_offset;
-        destination->byte_count = source.byte_count;
-      });
+  out_text_follow->token_raw_segments_status =
+      CopyTimelineEntries(text_follow_data.token_raw_segments,
+                          out_text_follow->token_raw_segments_buffer,
+                          out_text_follow->token_raw_segments_buffer_count,
+                          [](const bag::TextFollowRawSegmentEntry& source,
+                             bag_text_follow_raw_segment_entry* destination) {
+                            destination->start_sample = source.start_sample;
+                            destination->sample_count = source.sample_count;
+                            destination->token_index = source.token_index;
+                            destination->byte_offset = source.byte_offset;
+                            destination->byte_count = source.byte_count;
+                          });
   out_text_follow->token_raw_display_units_status = CopyTimelineEntries(
       text_follow_data.token_raw_display_units,
       out_text_follow->token_raw_display_units_buffer,

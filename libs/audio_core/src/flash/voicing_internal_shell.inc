@@ -34,8 +34,8 @@ double ComputeLowMetalBellStrike(size_t local_index, int sample_rate_hz,
                                  double strike_time_sec,
                                  double tail_duration_sec, double base_freq_hz,
                                  double gain) {
-  if (sample_rate_hz <= 0 || tail_duration_sec <= 0.0 ||
-      base_freq_hz <= 0.0 || gain <= 0.0) {
+  if (sample_rate_hz <= 0 || tail_duration_sec <= 0.0 || base_freq_hz <= 0.0 ||
+      gain <= 0.0) {
     return 0.0;
   }
 
@@ -48,16 +48,15 @@ double ComputeLowMetalBellStrike(size_t local_index, int sample_rate_hz,
   const double elapsed = time - strike_time_sec;
   const double decay_progress =
       std::clamp(elapsed / tail_duration_sec, 0.0, 1.0);
-  const double tail_envelope = std::exp(-4.15 * decay_progress) *
-                               std::cos(decay_progress * kPi * 0.5);
+  const double tail_envelope =
+      std::exp(-4.15 * decay_progress) * std::cos(decay_progress * kPi * 0.5);
   const double attack_envelope = std::exp(-elapsed * 95.0);
   const double shimmer = 1.0 + 0.055 * std::sin(2.0 * kPi * 4.7 * elapsed) +
                          0.035 * std::sin(2.0 * kPi * 7.3 * elapsed + 0.4);
   const double impact =
-      attack_envelope *
-      (0.74 * std::sin(2.0 * kPi * 820.0 * elapsed) +
-       0.42 * std::sin(2.0 * kPi * 1390.0 * elapsed + 0.31) +
-       0.26 * std::sin(2.0 * kPi * 2110.0 * elapsed + 0.62));
+      attack_envelope * (0.74 * std::sin(2.0 * kPi * 820.0 * elapsed) +
+                         0.42 * std::sin(2.0 * kPi * 1390.0 * elapsed + 0.31) +
+                         0.26 * std::sin(2.0 * kPi * 2110.0 * elapsed + 0.62));
   const double bell =
       0.50 * std::sin(2.0 * kPi * base_freq_hz * elapsed) +
       0.28 * std::sin(2.0 * kPi * base_freq_hz * 1.37 * elapsed + 0.19) +
@@ -254,19 +253,17 @@ double RenderFixedPreambleSample(size_t local_index, size_t sample_count,
       break;
     case FixedShellTimbreProfile::kHostilityEdge: {
       const double hard_gate =
-          0.72 + 0.28 * std::copysign(
-                       1.0, std::sin(2.0 * kPi * 54.0 * time + 0.30));
+          0.72 +
+          0.28 * std::copysign(1.0, std::sin(2.0 * kPi * 54.0 * time + 0.30));
       carrier =
           0.38 * std::sin(2.0 * kPi * 920.0 * time) +
           0.24 * std::sin(2.0 * kPi * 1840.0 * time + 0.18) +
-          0.12 * std::copysign(
-                     1.0, std::sin(2.0 * kPi * 2760.0 * time + 0.27));
-      shell =
-          style_traits.preamble_invocation_shell_mix * hard_gate *
-          (1.08 * ComputeProtocolLeadSweep(local_index, sample_count,
-                                           sample_rate_hz) +
-           1.20 * ComputeProtocolLeadLockPulse(local_index, sample_count,
-                                               sample_rate_hz));
+          0.12 * std::copysign(1.0, std::sin(2.0 * kPi * 2760.0 * time + 0.27));
+      shell = style_traits.preamble_invocation_shell_mix * hard_gate *
+              (1.08 * ComputeProtocolLeadSweep(local_index, sample_count,
+                                               sample_rate_hz) +
+               1.20 * ComputeProtocolLeadLockPulse(local_index, sample_count,
+                                                   sample_rate_hz));
       break;
     }
     case FixedShellTimbreProfile::kLitanyInvocation:
@@ -294,15 +291,13 @@ double RenderFixedPreambleSample(size_t local_index, size_t sample_count,
       const double carrier_hz = 260.0 + (120.0 - 260.0) * sag;
       const double slow_gate =
           0.76 + 0.24 * std::sin(2.0 * kPi * 3.4 * time + 0.20);
-      carrier =
-          slow_gate * (0.26 * std::sin(2.0 * kPi * carrier_hz * time) +
-                       0.08 * std::sin(2.0 * kPi * carrier_hz * 2.0 * time +
-                                        0.24));
-      shell =
-          style_traits.preamble_invocation_shell_mix * 0.48 *
-          (0.60 * ComputeProtocolLeadSweep(local_index, sample_count,
-                                           sample_rate_hz) +
-           ComputeClosureTail(local_index, sample_count, sample_rate_hz));
+      carrier = slow_gate *
+                (0.26 * std::sin(2.0 * kPi * carrier_hz * time) +
+                 0.08 * std::sin(2.0 * kPi * carrier_hz * 2.0 * time + 0.24));
+      shell = style_traits.preamble_invocation_shell_mix * 0.48 *
+              (0.60 * ComputeProtocolLeadSweep(local_index, sample_count,
+                                               sample_rate_hz) +
+               ComputeClosureTail(local_index, sample_count, sample_rate_hz));
       break;
     }
     case FixedShellTimbreProfile::kCollapseFailure: {
@@ -312,10 +307,9 @@ double RenderFixedPreambleSample(size_t local_index, size_t sample_count,
       carrier =
           shiver * (0.30 * std::sin(2.0 * kPi * carrier_hz * time) +
                     0.10 * std::sin(2.0 * kPi * carrier_hz * 1.62 * time));
-      shell =
-          style_traits.preamble_invocation_shell_mix * 0.66 *
-          (ComputeClosurePulse(local_index, sample_count, sample_rate_hz) +
-           ComputeClosureTail(local_index, sample_count, sample_rate_hz));
+      shell = style_traits.preamble_invocation_shell_mix * 0.66 *
+              (ComputeClosurePulse(local_index, sample_count, sample_rate_hz) +
+               ComputeClosureTail(local_index, sample_count, sample_rate_hz));
       break;
     }
     case FixedShellTimbreProfile::kProtocolBoundary:
@@ -381,44 +375,39 @@ double RenderFixedEpilogueSample(size_t local_index, size_t sample_count,
       carrier = 0.30 * std::sin(2.0 * kPi * 240.0 * time) +
                 0.11 * std::sin(2.0 * kPi * 480.0 * time + 0.18) +
                 0.04 * std::sin(2.0 * kPi * 720.0 * time + 0.10);
-      shell =
-          style_traits.epilogue_closure_shell_mix * 0.60 *
-          (ComputeProtocolClosePulse(local_index, sample_count,
-                                     sample_rate_hz) +
-           0.70 * ComputeProtocolAckChirp(local_index, sample_count,
-                                          sample_rate_hz));
+      shell = style_traits.epilogue_closure_shell_mix * 0.60 *
+              (ComputeProtocolClosePulse(local_index, sample_count,
+                                         sample_rate_hz) +
+               0.70 * ComputeProtocolAckChirp(local_index, sample_count,
+                                              sample_rate_hz));
       break;
     case FixedShellTimbreProfile::kHostilityEdge: {
       const double hard_gate =
-          0.68 + 0.32 * std::copysign(
-                       1.0, std::sin(2.0 * kPi * 46.0 * time + 0.18));
+          0.68 +
+          0.32 * std::copysign(1.0, std::sin(2.0 * kPi * 46.0 * time + 0.18));
       carrier =
           0.40 * std::sin(2.0 * kPi * 760.0 * time) +
           0.22 * std::sin(2.0 * kPi * 1520.0 * time + 0.31) +
-          0.12 * std::copysign(
-                     1.0, std::sin(2.0 * kPi * 2280.0 * time + 0.14));
-      shell =
-          style_traits.epilogue_closure_shell_mix * hard_gate *
-          (1.18 * ComputeProtocolClosePulse(local_index, sample_count,
-                                            sample_rate_hz) +
-           1.04 * ComputeProtocolAckChirp(local_index, sample_count,
-                                          sample_rate_hz));
+          0.12 * std::copysign(1.0, std::sin(2.0 * kPi * 2280.0 * time + 0.14));
+      shell = style_traits.epilogue_closure_shell_mix * hard_gate *
+              (1.18 * ComputeProtocolClosePulse(local_index, sample_count,
+                                                sample_rate_hz) +
+               1.04 * ComputeProtocolAckChirp(local_index, sample_count,
+                                              sample_rate_hz));
       break;
     }
     case FixedShellTimbreProfile::kCollapseFailure: {
       const double sag = std::pow(progress, 0.58);
       const double carrier_hz = 280.0 + (82.0 - 280.0) * sag;
-      const double shiver =
-          0.72 + 0.20 * std::sin(2.0 * kPi * 10.5 * time + 0.12) +
-          0.08 * std::sin(2.0 * kPi * 17.0 * time + 0.48);
-      carrier =
-          shiver * (0.36 * std::sin(2.0 * kPi * carrier_hz * time) +
-                    0.10 * std::sin(2.0 * kPi * carrier_hz * 2.0 * time));
-      shell =
-          style_traits.epilogue_closure_shell_mix * 0.54 *
-          (ComputeClosurePulse(local_index, sample_count, sample_rate_hz) +
-           0.64 * ComputeClosureTail(local_index, sample_count,
-                                     sample_rate_hz));
+      const double shiver = 0.72 +
+                            0.20 * std::sin(2.0 * kPi * 10.5 * time + 0.12) +
+                            0.08 * std::sin(2.0 * kPi * 17.0 * time + 0.48);
+      carrier = shiver * (0.36 * std::sin(2.0 * kPi * carrier_hz * time) +
+                          0.10 * std::sin(2.0 * kPi * carrier_hz * 2.0 * time));
+      shell = style_traits.epilogue_closure_shell_mix * 0.54 *
+              (ComputeClosurePulse(local_index, sample_count, sample_rate_hz) +
+               0.64 * ComputeClosureTail(local_index, sample_count,
+                                         sample_rate_hz));
       break;
     }
     case FixedShellTimbreProfile::kLitanyInvocation:
@@ -443,18 +432,16 @@ double RenderFixedEpilogueSample(size_t local_index, size_t sample_count,
     case FixedShellTimbreProfile::kVoidDescent: {
       const double sag = std::pow(progress, 0.52);
       const double carrier_hz = 220.0 + (68.0 - 220.0) * sag;
-      const double slow_gate =
-          0.78 + 0.18 * std::sin(2.0 * kPi * 2.8 * time + 0.40) +
-          0.04 * std::sin(2.0 * kPi * 5.6 * time + 0.10);
-      carrier =
-          slow_gate * (0.32 * std::sin(2.0 * kPi * carrier_hz * time) +
-                       0.08 * std::sin(2.0 * kPi * carrier_hz * 2.0 * time +
-                                        0.16));
-      shell =
-          style_traits.epilogue_closure_shell_mix * 0.58 *
-          (0.42 * ComputeProtocolClosePulse(local_index, sample_count,
-                                            sample_rate_hz) +
-           ComputeClosureTail(local_index, sample_count, sample_rate_hz));
+      const double slow_gate = 0.78 +
+                               0.18 * std::sin(2.0 * kPi * 2.8 * time + 0.40) +
+                               0.04 * std::sin(2.0 * kPi * 5.6 * time + 0.10);
+      carrier = slow_gate *
+                (0.32 * std::sin(2.0 * kPi * carrier_hz * time) +
+                 0.08 * std::sin(2.0 * kPi * carrier_hz * 2.0 * time + 0.16));
+      shell = style_traits.epilogue_closure_shell_mix * 0.58 *
+              (0.42 * ComputeProtocolClosePulse(local_index, sample_count,
+                                                sample_rate_hz) +
+               ComputeClosureTail(local_index, sample_count, sample_rate_hz));
       break;
     }
     case FixedShellTimbreProfile::kProtocolBoundary:

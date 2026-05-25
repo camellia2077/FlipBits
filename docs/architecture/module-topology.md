@@ -11,7 +11,7 @@
 - host 根目录 CMake 构建直接固定为当前单一受支持主线
 - `libs/` 内部新增实现默认应优先 `import` 已有 modules
 - 不再新增横向公开 `#include` 依赖来替代已存在的 module 边界
-- `bag/legacy/**` 已删除，不是当前拓扑的一部分，也不是新代码入口
+- 新代码入口应走当前 modules 或稳定边界，不新增旧路径依赖
 
 ## 当前 `module-first` 程度
 - 当前 host 主线已经是“明确的 `module-first`”，不是“header-first + 少量 module 点缀”。
@@ -82,7 +82,7 @@
 - 主仓 `bag/internal/**` owner 已归零，不再保留现役 declaration layer
 - `link/*` 与 `phy/*` 的 `C++17` fallback 已切到 `bag/interface/common/*`
 - `bag/interface/common/*` 不进入 host-only `import std;` 扩面，也不建立 `bag.interface.*` module mirror
-- 已删除的 `bag/legacy/**` 不再出现在 include 树里；legacy 路径与 include token 回流都会被静态门禁阻止
+- 旧路径与 include token 回流都会被静态门禁阻止
 
 它们不是优先新增能力的主入口；新增内部实现应优先落在：
 - `libs/audio_core/modules/`
@@ -184,9 +184,8 @@
   - `python tools/run.py android native-debug`
   - `python tools/run.py android assemble-debug`
 
-## 当前 legacy 政策摘要
+## 当前兼容政策摘要
 - host 默认 modules 路径是正式主路径。
-- Android 是受支持例外路径，但不是 `bag/legacy/**` 的直接 consumer。
+- Android 是受支持例外路径。
 - 主仓 `bag/internal/**` owner 已归零。
 - 预留接口头当前独立使用 `bag/interface/common/*` declaration layer；这层按长期保留的 internal boundary 管理。
-- `bag/legacy/**` 已删除；任何 legacy include 或路径回流都视为 regression。

@@ -66,7 +66,7 @@
 - `bag_encode_operation_work_plan` 是 Android/Web 生成工作量和总量显示的事实来源，字段映射 core 的 `EncodeWorkPlan`。
 - `bag_encode_operation_pump_budget` 只控制一次 pump 的 work/time 预算；UI 进度刷新节奏应该由消费者节流，不应通过改小 native pump 来制造可见进度。
 - `bag_take_encode_operation_result` 只承担终态结果获取。需要 follow/raw/timeline 展示数据时，使用 `bag_build_encode_follow_data`，不要把 follow hydration 塞回 operation completion。
-- `bag_start_encode_text_job` / `bag_poll_encode_text_job` 是 legacy async-job 兼容层。新增 Android/Web 进度逻辑不要基于 job progress，也不要再新增第二套 phase/percent 推导。
+- 不要新增第二套生成 lifecycle、phase 或 percent 推导。
 - 修改 operation snapshot/work-plan 字段、枚举值或语义时，必须同步检查 Android JNI/Web bridge，并至少运行：
   - `python tools/run.py test-lib audio_api --build-dir build/dev`
   - `python tools/run.py android test-debug`

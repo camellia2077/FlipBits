@@ -16,6 +16,7 @@ set(bag_core_sources
     src/common/version.cpp
     src/flash/codec.cpp
     src/flash/phy_clean.cpp
+    src/flash/phy_rules.cpp
     src/flash/signal.cpp
     src/flash/voicing.cpp
     src/fsk/fsk_codec.cpp
@@ -25,8 +26,11 @@ set(bag_core_sources
     src/pro/phy_clean.cpp
     src/pro/phy_compat.cpp
     src/transport/compat/frame_codec.cpp
+    src/transport/encode_operation_steps.cpp
+    src/transport/encode_work_plan.cpp
     src/transport/follow.cpp
     src/transport/transport.cpp
+    src/transport/transport_encode_operation.cpp
     src/ultra/codec.cpp
     src/ultra/phy_clean.cpp
     src/ultra/phy_compat.cpp
@@ -56,6 +60,7 @@ target_sources(
             modules/bag/common/version.cppm
             modules/bag/flash/codec.cppm
             modules/bag/flash/phy_clean.cppm
+            modules/bag/flash/phy_rules.cppm
             modules/bag/flash/signal.cppm
             modules/bag/flash/voicing.cppm
             modules/bag/fsk/codec.cppm
@@ -66,6 +71,8 @@ target_sources(
             modules/bag/pro/phy_compat.cppm
             modules/bag/transport/decoder.cppm
             modules/bag/transport/compat/frame_codec.cppm
+            modules/bag/transport/encode_operation_steps.cppm
+            modules/bag/transport/encode_work_plan.cppm
             modules/bag/transport/follow.cppm
             modules/bag/transport/facade.cppm
             modules/bag/ultra/codec.cppm

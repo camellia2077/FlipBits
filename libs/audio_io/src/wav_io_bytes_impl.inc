@@ -36,8 +36,7 @@ constexpr std::size_t kFlipBitsMetadataSegmentSampleCountCountOffset =
 constexpr std::size_t kFlipBitsMetadataHeaderSize =
     kFlipBitsMetadataSegmentSampleCountCountOffset + 4;
 constexpr std::size_t kFlipBitsMetadataFixedPayloadSize =
-    kFlipBitsMetadataHeaderSize +
-    (2 * kFlipBitsMetadataVersionTextByteCount);
+    kFlipBitsMetadataHeaderSize + (2 * kFlipBitsMetadataVersionTextByteCount);
 constexpr std::uint8_t kFlipBitsMetadataVersionV7 = 7;
 constexpr std::uint16_t kPcmFormatCode = 1;
 constexpr std::uint16_t kMonoChannelCount = 1;
@@ -146,15 +145,6 @@ std::size_t ComputeFlipBitsMetadataPayloadSize(
          (metadata.segment_sample_counts.size() * 4u);
 }
 
-std::string ReadPaddedAsciiString(const std::uint8_t* data,
-                                  std::size_t byte_count) {
-  std::size_t length = 0;
-  while (length < byte_count && data[length] != 0u) {
-    ++length;
-  }
-  return std::string(reinterpret_cast<const char*>(data), length);
-}
-
 bool HasRange(std::size_t total_size, std::size_t offset,
               std::size_t byte_count) {
   return offset <= total_size && byte_count <= (total_size - offset);
@@ -225,8 +215,7 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
     return {};
   }
 
-  const std::size_t payload_size =
-      ComputeFlipBitsMetadataPayloadSize(metadata);
+  const std::size_t payload_size = ComputeFlipBitsMetadataPayloadSize(metadata);
   std::vector<std::uint8_t> chunk(kChunkHeaderSize + payload_size, 0);
   chunk[0] = 'W';
   chunk[1] = 'B';
@@ -240,8 +229,8 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
       metadata.has_flash_voicing_style ? 1u : 0u;
   chunk[kChunkHeaderSize + kFlipBitsMetadataFlashStyleOffset] =
       metadata.has_flash_voicing_style
-                  ? static_cast<std::uint8_t>(metadata.flash_voicing_style)
-                  : static_cast<std::uint8_t>(0u);
+          ? static_cast<std::uint8_t>(metadata.flash_voicing_style)
+          : static_cast<std::uint8_t>(0u);
   chunk[kChunkHeaderSize + kFlipBitsMetadataInputSourceKindOffset] =
       static_cast<std::uint8_t>(metadata.input_source_kind);
   chunk[kChunkHeaderSize + kFlipBitsMetadataHasMiniSpeedStyleOffset] =
@@ -251,9 +240,8 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
           ? static_cast<std::uint8_t>(metadata.mini_speed_style)
           : static_cast<std::uint8_t>(0u);
   chunk[kChunkHeaderSize + kFlipBitsMetadataReservedOffset] = 0u;
-  WriteU32Le(
-      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataDurationOffset,
-      metadata.duration_ms);
+  WriteU32Le(chunk.data() + kChunkHeaderSize + kFlipBitsMetadataDurationOffset,
+             metadata.duration_ms);
   for (std::size_t index = 0; index < kFlipBitsMetadataIsoUtcByteCount;
        ++index) {
     chunk[kChunkHeaderSize + kFlipBitsMetadataCreatedAtOffset + index] =
@@ -266,16 +254,16 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
       chunk.data() + kChunkHeaderSize + kFlipBitsMetadataFrameSamplesOffset,
       metadata.frame_samples);
   WriteU32Le(
-      chunk.data() + kChunkHeaderSize +
-          kFlipBitsMetadataPcmSampleCountOffset,
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataPcmSampleCountOffset,
       metadata.pcm_sample_count);
   WriteU32Le(
-      chunk.data() + kChunkHeaderSize +
-          kFlipBitsMetadataPayloadByteCountOffset,
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataPayloadByteCountOffset,
       metadata.payload_byte_count);
-  WriteU32Le(chunk.data() + kChunkHeaderSize + kFlipBitsMetadataSegmentCountOffset,
-             metadata.segment_count);
-  WriteU32Le(chunk.data() + kChunkHeaderSize + kFlipBitsMetadataSegmentSampleCountCountOffset,
+  WriteU32Le(
+      chunk.data() + kChunkHeaderSize + kFlipBitsMetadataSegmentCountOffset,
+      metadata.segment_count);
+  WriteU32Le(chunk.data() + kChunkHeaderSize +
+                 kFlipBitsMetadataSegmentSampleCountCountOffset,
              static_cast<std::uint32_t>(metadata.segment_sample_counts.size()));
   std::size_t write_offset = kChunkHeaderSize + kFlipBitsMetadataHeaderSize;
   for (std::uint32_t sample_count : metadata.segment_sample_counts) {
@@ -291,113 +279,6 @@ std::vector<std::uint8_t> BuildFlipBitsMetadataChunk(
         static_cast<std::uint8_t>(metadata.core_version[index]);
   }
   return chunk;
-}
-
-FlipBitsAudioMetadataParseResult ParseFlipBitsMetadataChunk(
-    const std::uint8_t* chunk_data, std::size_t chunk_size) {
-  if (chunk_data == nullptr && chunk_size > 0) {
-    return {FlipBitsAudioMetadataStatus::kInvalidArgument, {}};
-  }
-  if (chunk_size < kFlipBitsMetadataFixedPayloadSize) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-
-  FlipBitsAudioMetadata metadata{};
-  metadata.version = chunk_data[kFlipBitsMetadataVersionOffset];
-  metadata.mode =
-      static_cast<FlipBitsAudioMetadataMode>(chunk_data[kFlipBitsMetadataModeOffset]);
-  metadata.has_flash_voicing_style =
-      chunk_data[kFlipBitsMetadataHasFlashStyleOffset] != 0u;
-  metadata.flash_voicing_style =
-      static_cast<FlipBitsAudioMetadataFlashVoicingStyle>(
-          chunk_data[kFlipBitsMetadataFlashStyleOffset]);
-
-  if (!IsSupportedMetadataVersion(metadata.version)) {
-    return {FlipBitsAudioMetadataStatus::kUnsupportedVersion, {}};
-  }
-  metadata.input_source_kind =
-      static_cast<FlipBitsAudioMetadataInputSourceKind>(
-          chunk_data[kFlipBitsMetadataInputSourceKindOffset]);
-  metadata.has_mini_speed_style =
-      chunk_data[kFlipBitsMetadataHasMiniSpeedStyleOffset] != 0u;
-  metadata.mini_speed_style =
-      static_cast<FlipBitsAudioMetadataMiniSpeedStyle>(
-          chunk_data[kFlipBitsMetadataMiniSpeedStyleOffset]);
-  metadata.duration_ms =
-      ReadU32Le(chunk_data + kFlipBitsMetadataDurationOffset);
-  metadata.created_at_iso_utc.assign(
-      reinterpret_cast<const char*>(chunk_data +
-                                    kFlipBitsMetadataCreatedAtOffset),
-      kFlipBitsMetadataIsoUtcByteCount);
-  metadata.sample_rate_hz =
-      ReadU32Le(chunk_data + kFlipBitsMetadataSampleRateHzOffset);
-  metadata.frame_samples =
-      ReadU32Le(chunk_data + kFlipBitsMetadataFrameSamplesOffset);
-  metadata.pcm_sample_count =
-      ReadU32Le(chunk_data + kFlipBitsMetadataPcmSampleCountOffset);
-  metadata.payload_byte_count =
-      ReadU32Le(chunk_data + kFlipBitsMetadataPayloadByteCountOffset);
-  if (!IsValidCreatedAtIsoUtc(metadata.created_at_iso_utc)) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-  metadata.segment_count = ReadU32Le(chunk_data + kFlipBitsMetadataSegmentCountOffset);
-  const std::uint32_t segment_sample_count_count =
-      ReadU32Le(chunk_data + kFlipBitsMetadataSegmentSampleCountCountOffset);
-  const std::size_t expected_size =
-      kFlipBitsMetadataFixedPayloadSize +
-      (static_cast<std::size_t>(segment_sample_count_count) * 4u);
-  if (chunk_size != expected_size) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-  metadata.segment_sample_counts.reserve(segment_sample_count_count);
-  std::size_t read_offset = kFlipBitsMetadataHeaderSize;
-  for (std::uint32_t index = 0; index < segment_sample_count_count; ++index) {
-    metadata.segment_sample_counts.push_back(
-        ReadU32Le(chunk_data + read_offset));
-    read_offset += 4;
-  }
-  metadata.app_version = ReadPaddedAsciiString(
-      chunk_data + kFlipBitsMetadataAppVersionOffset,
-      kFlipBitsMetadataVersionTextByteCount);
-  metadata.core_version = ReadPaddedAsciiString(
-      chunk_data + kFlipBitsMetadataCoreVersionOffset,
-      kFlipBitsMetadataVersionTextByteCount);
-  if (!IsValidVersionText(metadata.app_version) ||
-      !IsValidVersionText(metadata.core_version)) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-  if (metadata.segment_count == 0u) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-  if (!IsValidSegmentSampleCounts(metadata)) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-  if (!IsSupportedMode(metadata.mode)) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-  if (metadata.has_flash_voicing_style) {
-    if (metadata.mode != FlipBitsAudioMetadataMode::kFlash ||
-        !IsSupportedFlashVoicingStyle(metadata.flash_voicing_style)) {
-      return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-    }
-  } else {
-    metadata.flash_voicing_style =
-        FlipBitsAudioMetadataFlashVoicingStyle::kUnknown;
-  }
-  if (metadata.has_mini_speed_style) {
-    if (metadata.mode != FlipBitsAudioMetadataMode::kMini ||
-        !IsSupportedMiniSpeedStyle(metadata.mini_speed_style)) {
-      return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-    }
-  } else {
-    metadata.mini_speed_style = FlipBitsAudioMetadataMiniSpeedStyle::kUnknown;
-  }
-  if (metadata.sample_rate_hz == 0u ||
-      !IsSupportedInputSourceKind(metadata.input_source_kind)) {
-    return {FlipBitsAudioMetadataStatus::kInvalidMetadata, {}};
-  }
-
-  return {FlipBitsAudioMetadataStatus::kOk, metadata};
 }
 
 }  // namespace
@@ -551,11 +432,12 @@ WavPcm16InfoParseResult ProbeMonoPcm16WavBytes(const std::uint8_t* wav_bytes,
   info.bits_per_sample = bits_per_sample;
   info.data_byte_count = static_cast<std::uint64_t>(data_byte_count);
   info.file_byte_count = static_cast<std::uint64_t>(wav_byte_count);
-  info.pcm_sample_count = static_cast<std::uint64_t>(data_byte_count / kBytesPerSample);
-  info.duration_ms =
-      sample_rate_hz > 0
-          ? (info.pcm_sample_count * 1000u) / static_cast<std::uint64_t>(sample_rate_hz)
-          : 0u;
+  info.pcm_sample_count =
+      static_cast<std::uint64_t>(data_byte_count / kBytesPerSample);
+  info.duration_ms = sample_rate_hz > 0
+                         ? (info.pcm_sample_count * 1000u) /
+                               static_cast<std::uint64_t>(sample_rate_hz)
+                         : 0u;
   return {WavPcm16Status::kOk, info};
 }
 
@@ -634,39 +516,6 @@ WavPcm16ParseResult ParseMonoPcm16WavBytes(const std::uint8_t* wav_bytes,
         static_cast<std::int16_t>(ReadU16Le(wav_bytes + data_offset + offset)));
   }
   return {WavPcm16Status::kOk, wav};
-}
-
-FlipBitsAudioMetadataParseResult ParseFlipBitsAudioMetadataBytes(
-    const std::uint8_t* wav_bytes, std::size_t wav_byte_count) {
-  if (wav_bytes == nullptr && wav_byte_count > 0) {
-    return {FlipBitsAudioMetadataStatus::kInvalidArgument, {}};
-  }
-  if (wav_byte_count < kRiffHeaderSize) {
-    return {FlipBitsAudioMetadataStatus::kInvalidHeader, {}};
-  }
-  if (!MatchesTag(wav_bytes, "RIFF") || !MatchesTag(wav_bytes + 8, "WAVE")) {
-    return {FlipBitsAudioMetadataStatus::kInvalidHeader, {}};
-  }
-
-  std::size_t chunk_offset = kRiffHeaderSize;
-  while (HasRange(wav_byte_count, chunk_offset, kChunkHeaderSize)) {
-    const std::uint8_t* chunk_header = wav_bytes + chunk_offset;
-    const std::uint32_t chunk_size = ReadU32Le(chunk_header + 4);
-    const std::size_t chunk_data_offset = chunk_offset + kChunkHeaderSize;
-    if (MatchesTag(chunk_header, "data")) {
-      return {FlipBitsAudioMetadataStatus::kNotFound, {}};
-    }
-    if (!HasRange(wav_byte_count, chunk_data_offset, chunk_size)) {
-      return {FlipBitsAudioMetadataStatus::kTruncatedData, {}};
-    }
-    if (MatchesTag(chunk_header, "WBAG")) {
-      return ParseFlipBitsMetadataChunk(wav_bytes + chunk_data_offset,
-                                        chunk_size);
-    }
-    chunk_offset = chunk_data_offset + chunk_size + (chunk_size % 2u);
-  }
-
-  return {FlipBitsAudioMetadataStatus::kNotFound, {}};
 }
 
 }  // namespace audio_io::detail::bytes_impl

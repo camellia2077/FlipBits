@@ -2,7 +2,7 @@ use crate::util::c_str_to_string;
 use crate::{
     CliError, FlashStyle, TransportMode, DEFAULT_FRAME_RATE_DIVISOR, DEFAULT_SAMPLE_RATE_HZ,
 };
-use std::ffi::CString;
+use std::ffi::{c_void, CString};
 use std::os::raw::c_int;
 use std::ptr;
 use std::thread;
@@ -13,6 +13,7 @@ type BagTransportMode = c_int;
 type BagFlashSignalProfile = c_int;
 type BagFlashVoicingFlavor = c_int;
 type BagValidationIssue = c_int;
+type BagDecodeContentStatus = c_int;
 
 const BAG_OK: BagErrorCode = 0;
 const BAG_NOT_READY: BagErrorCode = 2;
@@ -34,16 +35,18 @@ const BAG_FLASH_VOICING_FLAVOR_COLLAPSE: BagFlashVoicingFlavor = 4;
 const BAG_FLASH_VOICING_FLAVOR_ZEAL: BagFlashVoicingFlavor = 5;
 const BAG_FLASH_VOICING_FLAVOR_VOID: BagFlashVoicingFlavor = 6;
 const BAG_VALIDATION_OK: BagValidationIssue = 0;
-const BAG_ENCODE_JOB_QUEUED: c_int = 0;
-const BAG_ENCODE_JOB_RUNNING: c_int = 1;
-const BAG_ENCODE_JOB_SUCCEEDED: c_int = 2;
-const BAG_ENCODE_JOB_FAILED: c_int = 3;
-const BAG_ENCODE_JOB_CANCELLED: c_int = 4;
-const BAG_ENCODE_JOB_PHASE_PREPARING_INPUT: c_int = 0;
-const BAG_ENCODE_JOB_PHASE_RENDERING_PCM: c_int = 1;
-const BAG_ENCODE_JOB_PHASE_POSTPROCESSING: c_int = 2;
-const BAG_ENCODE_JOB_PHASE_FINALIZING: c_int = 3;
-const ENCODE_JOB_POLL_INTERVAL_MS: u64 = 33;
+const BAG_ENCODE_OPERATION_QUEUED: c_int = 0;
+const BAG_ENCODE_OPERATION_RUNNING: c_int = 1;
+const BAG_ENCODE_OPERATION_SUCCEEDED: c_int = 2;
+const BAG_ENCODE_OPERATION_FAILED: c_int = 3;
+const BAG_ENCODE_OPERATION_CANCELLED: c_int = 4;
+const BAG_ENCODE_OPERATION_PHASE_PREPARING_INPUT: c_int = 0;
+const BAG_ENCODE_OPERATION_PHASE_RENDERING_PCM: c_int = 1;
+const BAG_ENCODE_OPERATION_PHASE_POSTPROCESSING: c_int = 2;
+const BAG_ENCODE_OPERATION_PHASE_FINALIZING: c_int = 3;
+const ENCODE_OPERATION_PUMP_MAX_WORK_UNITS: u64 = 64;
+const ENCODE_OPERATION_PUMP_MAX_WALL_TIME_MS: u32 = 5;
+const ENCODE_OPERATION_IDLE_SLEEP_MS: u64 = 1;
 
 #[repr(C)]
 struct BagEncoderConfig {
@@ -78,24 +81,115 @@ struct BagTextResult {
 }
 
 #[repr(C)]
-struct BagPcm16Result {
-    samples: *mut i16,
-    sample_count: usize,
+struct BagPayloadFollowData {
+    byte_timeline_buffer: *mut c_void,
+    byte_timeline_buffer_count: usize,
+    byte_timeline_count: usize,
+    byte_timeline_status: BagDecodeContentStatus,
+    binary_group_timeline_buffer: *mut c_void,
+    binary_group_timeline_buffer_count: usize,
+    binary_group_timeline_count: usize,
+    binary_group_timeline_status: BagDecodeContentStatus,
+    ultra_frame_timeline_buffer: *mut c_void,
+    ultra_frame_timeline_buffer_count: usize,
+    ultra_frame_timeline_count: usize,
+    ultra_frame_timeline_status: BagDecodeContentStatus,
+    payload_begin_sample: usize,
+    payload_sample_count: usize,
+    total_pcm_sample_count: usize,
+    available: c_int,
 }
 
 #[repr(C)]
-struct BagEncodeJobProgress {
+struct BagTextFollowData {
+    text_tokens_buffer: *mut i8,
+    text_tokens_buffer_size: usize,
+    text_tokens_size: usize,
+    text_tokens_status: BagDecodeContentStatus,
+    text_token_timeline_buffer: *mut c_void,
+    text_token_timeline_buffer_count: usize,
+    text_token_timeline_count: usize,
+    text_token_timeline_status: BagDecodeContentStatus,
+    text_character_text_buffer: *mut i8,
+    text_character_text_buffer_size: usize,
+    text_character_text_size: usize,
+    text_character_text_status: BagDecodeContentStatus,
+    text_characters_buffer: *mut c_void,
+    text_characters_buffer_count: usize,
+    text_characters_count: usize,
+    text_characters_status: BagDecodeContentStatus,
+    token_raw_segments_buffer: *mut c_void,
+    token_raw_segments_buffer_count: usize,
+    token_raw_segments_count: usize,
+    token_raw_segments_status: BagDecodeContentStatus,
+    token_raw_display_units_buffer: *mut c_void,
+    token_raw_display_units_buffer_count: usize,
+    token_raw_display_units_count: usize,
+    token_raw_display_units_status: BagDecodeContentStatus,
+    lyric_lines_buffer: *mut i8,
+    lyric_lines_buffer_size: usize,
+    lyric_lines_size: usize,
+    lyric_lines_status: BagDecodeContentStatus,
+    lyric_line_timeline_buffer: *mut c_void,
+    lyric_line_timeline_buffer_count: usize,
+    lyric_line_timeline_count: usize,
+    lyric_line_timeline_status: BagDecodeContentStatus,
+    line_token_ranges_buffer: *mut c_void,
+    line_token_ranges_buffer_count: usize,
+    line_token_ranges_count: usize,
+    line_token_ranges_status: BagDecodeContentStatus,
+    line_raw_segments_buffer: *mut c_void,
+    line_raw_segments_buffer_count: usize,
+    line_raw_segments_count: usize,
+    line_raw_segments_status: BagDecodeContentStatus,
+    available: c_int,
+}
+
+#[repr(C)]
+struct BagEncodeResult {
+    samples: *mut i16,
+    sample_count: usize,
+    raw_bytes_hex_buffer: *mut i8,
+    raw_bytes_hex_buffer_size: usize,
+    raw_bytes_hex_size: usize,
+    raw_bits_binary_buffer: *mut i8,
+    raw_bits_binary_buffer_size: usize,
+    raw_bits_binary_size: usize,
+    raw_bytes_hex_status: BagDecodeContentStatus,
+    raw_bits_binary_status: BagDecodeContentStatus,
+    raw_payload_available: c_int,
+    follow_data: BagPayloadFollowData,
+    text_follow_data: BagTextFollowData,
+}
+
+#[repr(C)]
+struct BagEncodeOperationProgress {
     state: c_int,
     phase: c_int,
-    progress_0_to_1: f32,
+    overall_progress_0_to_1: f32,
+    phase_progress_0_to_1: f32,
+    completed_work_units: u64,
+    total_work_units: u64,
+    phase_completed_work_units: u64,
+    phase_total_work_units: u64,
     terminal_code: BagErrorCode,
+    estimated_pcm_sample_count: usize,
+    payload_byte_count: usize,
+    segment_count: usize,
+    current_segment_index: usize,
+}
+
+#[repr(C)]
+struct BagEncodeOperationPumpBudget {
+    max_work_units: u64,
+    max_wall_time_ms: u32,
 }
 
 #[allow(non_camel_case_types)]
 enum BagDecoder {}
 
 #[allow(non_camel_case_types)]
-enum BagEncodeJob {}
+enum BagEncodeOperation {}
 
 unsafe extern "C" {
     fn bag_validate_encode_request(
@@ -105,22 +199,27 @@ unsafe extern "C" {
     fn bag_validate_decoder_config(config: *const BagDecoderConfig) -> BagValidationIssue;
     fn bag_validation_issue_message(issue: BagValidationIssue) -> *const i8;
     fn bag_error_code_message(code: BagErrorCode) -> *const i8;
-    fn bag_start_encode_text_job(
+    fn bag_create_encode_operation(
         config: *const BagEncoderConfig,
         text: *const i8,
-        out_job: *mut *mut BagEncodeJob,
+        out_operation: *mut *mut BagEncodeOperation,
     ) -> BagErrorCode;
-    fn bag_poll_encode_text_job(
-        job: *const BagEncodeJob,
-        out_progress: *mut BagEncodeJobProgress,
+    fn bag_pump_encode_operation(
+        operation: *mut BagEncodeOperation,
+        budget: BagEncodeOperationPumpBudget,
+        out_did_progress: *mut c_int,
     ) -> BagErrorCode;
-    fn bag_cancel_encode_text_job(job: *mut BagEncodeJob) -> BagErrorCode;
-    fn bag_take_encode_text_job_result(
-        job: *const BagEncodeJob,
-        out_result: *mut BagPcm16Result,
+    fn bag_poll_encode_operation(
+        operation: *const BagEncodeOperation,
+        out_progress: *mut BagEncodeOperationProgress,
     ) -> BagErrorCode;
-    fn bag_destroy_encode_text_job(job: *mut BagEncodeJob);
-    fn bag_free_pcm16_result(result: *mut BagPcm16Result);
+    fn bag_cancel_encode_operation(operation: *mut BagEncodeOperation) -> BagErrorCode;
+    fn bag_take_encode_operation_result(
+        operation: *const BagEncodeOperation,
+        out_result: *mut BagEncodeResult,
+    ) -> BagErrorCode;
+    fn bag_destroy_encode_operation(operation: *mut BagEncodeOperation);
+    fn bag_free_encode_result(result: *mut BagEncodeResult);
     fn bag_create_decoder(
         config: *const BagDecoderConfig,
         out_decoder: *mut *mut BagDecoder,
@@ -136,39 +235,59 @@ unsafe extern "C" {
     fn bag_core_version() -> *const i8;
 }
 
-struct EncodeJobGuard(*mut BagEncodeJob);
+struct EncodeOperationGuard(*mut BagEncodeOperation);
 
-impl EncodeJobGuard {
-    fn start(config: &BagEncoderConfig, text: &CString) -> Result<Self, CliError> {
-        let mut raw_job = ptr::null_mut();
-        let start_code = unsafe {
+impl EncodeOperationGuard {
+    fn create(config: &BagEncoderConfig, text: &CString) -> Result<Self, CliError> {
+        let mut raw_operation = ptr::null_mut();
+        let create_code = unsafe {
             // SAFETY: `config` and `text` remain valid for the duration of the FFI
-            // call, and `raw_job` points to writable storage for the returned job.
-            bag_start_encode_text_job(config, text.as_ptr(), &mut raw_job)
+            // call, and `raw_operation` points to writable storage for the handle.
+            bag_create_encode_operation(config, text.as_ptr(), &mut raw_operation)
         };
-        if start_code != BAG_OK || raw_job.is_null() {
-            return Err(CliError::Api(error_code_message(start_code)));
+        if create_code != BAG_OK || raw_operation.is_null() {
+            return Err(CliError::Api(error_code_message(create_code)));
         }
-        Ok(Self(raw_job))
+        Ok(Self(raw_operation))
     }
 
-    fn poll_progress(&self) -> Result<EncodeJobProgress, CliError> {
-        poll_encode_job(self.0)
+    fn pump(&self) -> Result<bool, CliError> {
+        let mut did_progress = 0;
+        let code = unsafe {
+            // SAFETY: `self.0` is a live operation handle and `did_progress`
+            // points to writable storage for the native progress flag.
+            bag_pump_encode_operation(
+                self.0,
+                BagEncodeOperationPumpBudget {
+                    max_work_units: ENCODE_OPERATION_PUMP_MAX_WORK_UNITS,
+                    max_wall_time_ms: ENCODE_OPERATION_PUMP_MAX_WALL_TIME_MS,
+                },
+                &mut did_progress,
+            )
+        };
+        if code != BAG_OK {
+            return Err(CliError::Api(error_code_message(code)));
+        }
+        Ok(did_progress != 0)
+    }
+
+    fn poll_progress(&self) -> Result<EncodeOperationProgress, CliError> {
+        poll_encode_operation(self.0)
     }
 
     fn take_result(&self) -> Result<Vec<i16>, CliError> {
-        take_encode_job_result(self.0)
+        take_encode_operation_result(self.0)
     }
 }
 
-impl Drop for EncodeJobGuard {
+impl Drop for EncodeOperationGuard {
     fn drop(&mut self) {
         if !self.0.is_null() {
             unsafe {
-                // SAFETY: The native API requires encode jobs returned from
-                // `bag_start_encode_text_job` to be cancelled/destroyed exactly once.
-                bag_cancel_encode_text_job(self.0);
-                bag_destroy_encode_text_job(self.0);
+                // SAFETY: The handle is owned by this guard and is destroyed
+                // exactly once. Cancellation is idempotent for terminal operations.
+                bag_cancel_encode_operation(self.0);
+                bag_destroy_encode_operation(self.0);
             }
         }
     }
@@ -227,17 +346,16 @@ impl Drop for DecoderGuard {
     }
 }
 
-struct PcmResultGuard(BagPcm16Result);
+struct EncodeResultGuard(BagEncodeResult);
 
-impl PcmResultGuard {
+impl EncodeResultGuard {
     fn new() -> Self {
-        Self(BagPcm16Result {
-            samples: ptr::null_mut(),
-            sample_count: 0,
-        })
+        // SAFETY: `bag_encode_result` is a C POD result descriptor made only of
+        // integer fields, status codes, and nullable caller/API-owned pointers.
+        Self(unsafe { std::mem::zeroed() })
     }
 
-    fn as_mut_ptr(&mut self) -> *mut BagPcm16Result {
+    fn as_mut_ptr(&mut self) -> *mut BagEncodeResult {
         &mut self.0
     }
 
@@ -246,13 +364,12 @@ impl PcmResultGuard {
     }
 }
 
-impl Drop for PcmResultGuard {
+impl Drop for EncodeResultGuard {
     fn drop(&mut self) {
         unsafe {
-            // SAFETY: The native API requires PCM results produced by
-            // `bag_take_encode_text_job_result` to be released with
-            // `bag_free_pcm16_result`. Null/empty outputs are accepted.
-            bag_free_pcm16_result(&mut self.0);
+            // SAFETY: Results produced by `bag_take_encode_operation_result`
+            // are released with `bag_free_encode_result`; null fields are accepted.
+            bag_free_encode_result(&mut self.0);
         }
     }
 }
@@ -266,7 +383,7 @@ pub struct CodecConfig {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum EncodeJobState {
+pub enum EncodeOperationState {
     Queued,
     Running,
     Succeeded,
@@ -275,7 +392,7 @@ pub enum EncodeJobState {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum EncodeJobPhase {
+pub enum EncodeOperationPhase {
     PreparingInput,
     RenderingPcm,
     Postprocessing,
@@ -283,10 +400,10 @@ pub enum EncodeJobPhase {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct EncodeJobProgress {
-    pub state: EncodeJobState,
-    pub phase: EncodeJobPhase,
-    pub progress_0_to_1: f32,
+pub struct EncodeOperationProgress {
+    pub state: EncodeOperationState,
+    pub phase: EncodeOperationPhase,
+    pub overall_progress_0_to_1: f32,
     pub terminal_code: BagErrorCode,
 }
 
@@ -320,25 +437,27 @@ pub fn encode_text_with_progress<F>(
     mut on_progress: F,
 ) -> Result<Vec<i16>, CliError>
 where
-    F: FnMut(EncodeJobProgress),
+    F: FnMut(EncodeOperationProgress),
 {
     let c_text = CString::new(text)
         .map_err(|_| CliError::Api("encode text contains an interior NUL byte".to_string()))?;
     let raw_config = make_encoder_config(config);
 
     validate_encode_request(&raw_config, &c_text)?;
-    let job = EncodeJobGuard::start(&raw_config, &c_text)?;
+    let operation = EncodeOperationGuard::create(&raw_config, &c_text)?;
     loop {
-        let progress = job.poll_progress()?;
+        let progress = operation.poll_progress()?;
         on_progress(progress);
         match progress.state {
-            EncodeJobState::Queued | EncodeJobState::Running => {
-                thread::sleep(Duration::from_millis(ENCODE_JOB_POLL_INTERVAL_MS));
+            EncodeOperationState::Queued | EncodeOperationState::Running => {
+                if !operation.pump()? {
+                    thread::sleep(Duration::from_millis(ENCODE_OPERATION_IDLE_SLEEP_MS));
+                }
             }
-            EncodeJobState::Succeeded => {
-                return job.take_result();
+            EncodeOperationState::Succeeded => {
+                return operation.take_result();
             }
-            EncodeJobState::Failed | EncodeJobState::Cancelled => {
+            EncodeOperationState::Failed | EncodeOperationState::Cancelled => {
                 let code = if progress.terminal_code == BAG_NOT_READY {
                     BAG_INTERNAL
                 } else {
@@ -457,52 +576,63 @@ fn validate_decoder_config(config: &BagDecoderConfig) -> Result<(), CliError> {
     Ok(())
 }
 
-fn poll_encode_job(job: *mut BagEncodeJob) -> Result<EncodeJobProgress, CliError> {
-    let mut progress = BagEncodeJobProgress {
-        state: BAG_ENCODE_JOB_FAILED,
-        phase: BAG_ENCODE_JOB_PHASE_FINALIZING,
-        progress_0_to_1: 0.0,
+fn poll_encode_operation(
+    operation: *mut BagEncodeOperation,
+) -> Result<EncodeOperationProgress, CliError> {
+    let mut progress = BagEncodeOperationProgress {
+        state: BAG_ENCODE_OPERATION_FAILED,
+        phase: BAG_ENCODE_OPERATION_PHASE_FINALIZING,
+        overall_progress_0_to_1: 0.0,
+        phase_progress_0_to_1: 0.0,
+        completed_work_units: 0,
+        total_work_units: 0,
+        phase_completed_work_units: 0,
+        phase_total_work_units: 0,
         terminal_code: BAG_NOT_READY,
+        estimated_pcm_sample_count: 0,
+        payload_byte_count: 0,
+        segment_count: 0,
+        current_segment_index: 0,
     };
     let code = unsafe {
-        // SAFETY: `job` is a live encode job handle and `progress` points to
-        // writable storage for the polled progress struct.
-        bag_poll_encode_text_job(job, &mut progress)
+        // SAFETY: `operation` is a live encode operation handle and `progress`
+        // points to writable storage for the polled progress struct.
+        bag_poll_encode_operation(operation, &mut progress)
     };
     if code != BAG_OK {
         return Err(CliError::Api(error_code_message(code)));
     }
 
-    Ok(EncodeJobProgress {
+    Ok(EncodeOperationProgress {
         state: match progress.state {
-            BAG_ENCODE_JOB_QUEUED => EncodeJobState::Queued,
-            BAG_ENCODE_JOB_RUNNING => EncodeJobState::Running,
-            BAG_ENCODE_JOB_SUCCEEDED => EncodeJobState::Succeeded,
-            BAG_ENCODE_JOB_CANCELLED => EncodeJobState::Cancelled,
-            _ => EncodeJobState::Failed,
+            BAG_ENCODE_OPERATION_QUEUED => EncodeOperationState::Queued,
+            BAG_ENCODE_OPERATION_RUNNING => EncodeOperationState::Running,
+            BAG_ENCODE_OPERATION_SUCCEEDED => EncodeOperationState::Succeeded,
+            BAG_ENCODE_OPERATION_CANCELLED => EncodeOperationState::Cancelled,
+            _ => EncodeOperationState::Failed,
         },
         phase: match progress.phase {
-            BAG_ENCODE_JOB_PHASE_PREPARING_INPUT => EncodeJobPhase::PreparingInput,
-            BAG_ENCODE_JOB_PHASE_RENDERING_PCM => EncodeJobPhase::RenderingPcm,
-            BAG_ENCODE_JOB_PHASE_POSTPROCESSING => EncodeJobPhase::Postprocessing,
-            _ => EncodeJobPhase::Finalizing,
+            BAG_ENCODE_OPERATION_PHASE_PREPARING_INPUT => EncodeOperationPhase::PreparingInput,
+            BAG_ENCODE_OPERATION_PHASE_RENDERING_PCM => EncodeOperationPhase::RenderingPcm,
+            BAG_ENCODE_OPERATION_PHASE_POSTPROCESSING => EncodeOperationPhase::Postprocessing,
+            _ => EncodeOperationPhase::Finalizing,
         },
-        progress_0_to_1: progress.progress_0_to_1.clamp(0.0, 1.0),
+        overall_progress_0_to_1: progress.overall_progress_0_to_1.clamp(0.0, 1.0),
         terminal_code: progress.terminal_code,
     })
 }
 
-fn take_encode_job_result(job: *mut BagEncodeJob) -> Result<Vec<i16>, CliError> {
-    let mut pcm = PcmResultGuard::new();
+fn take_encode_operation_result(operation: *mut BagEncodeOperation) -> Result<Vec<i16>, CliError> {
+    let mut result = EncodeResultGuard::new();
     let code = unsafe {
-        // SAFETY: `job` is a live encode job handle and `pcm` points to writable
-        // storage for the returned PCM buffer descriptor.
-        bag_take_encode_text_job_result(job, pcm.as_mut_ptr())
+        // SAFETY: `operation` is a live encode operation handle and `result`
+        // points to writable storage for the returned result descriptor.
+        bag_take_encode_operation_result(operation, result.as_mut_ptr())
     };
     if code != BAG_OK {
         return Err(CliError::Api(error_code_message(code)));
     }
-    Ok(pcm.to_vec())
+    Ok(result.to_vec())
 }
 
 fn validation_issue_message(issue: BagValidationIssue) -> String {

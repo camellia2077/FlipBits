@@ -135,27 +135,21 @@ typedef struct audio_io_wav_info {
 } audio_io_wav_info;
 
 audio_io_wav_status audio_io_encode_mono_pcm16_wav(
-    int sample_rate_hz,
-    const int16_t* pcm,
-    size_t sample_count,
+    int sample_rate_hz, const int16_t* pcm, size_t sample_count,
     audio_io_byte_buffer* out_wav_bytes);
 
 audio_io_wav_status audio_io_encode_mono_pcm16_wav_with_metadata(
-    int sample_rate_hz,
-    const int16_t* pcm,
-    size_t sample_count,
+    int sample_rate_hz, const int16_t* pcm, size_t sample_count,
     const audio_io_metadata_view* metadata,
     audio_io_byte_buffer* out_wav_bytes);
 
 audio_io_wav_status audio_io_decode_mono_pcm16_wav(
-    const uint8_t* wav_bytes,
-    size_t wav_byte_count,
+    const uint8_t* wav_bytes, size_t wav_byte_count,
     audio_io_decoded_wav* out_result);
 
-audio_io_wav_status audio_io_probe_mono_pcm16_wav(
-    const uint8_t* wav_bytes,
-    size_t wav_byte_count,
-    audio_io_wav_info* out_info);
+audio_io_wav_status audio_io_probe_mono_pcm16_wav(const uint8_t* wav_bytes,
+                                                  size_t wav_byte_count,
+                                                  audio_io_wav_info* out_info);
 
 const char* audio_io_wav_status_message(audio_io_wav_status status);
 const char* audio_io_metadata_status_message(audio_io_metadata_status status);

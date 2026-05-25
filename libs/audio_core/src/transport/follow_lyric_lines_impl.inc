@@ -26,7 +26,8 @@ void AppendLyricLineRange(
   }
 
   const std::size_t line_index = out_text_follow_data->lyric_lines.size();
-  const auto& first_token_timeline = text_token_timeline[line_begin_token_index];
+  const auto& first_token_timeline =
+      text_token_timeline[line_begin_token_index];
   const auto& last_token_timeline =
       text_token_timeline[line_end_token_index - 1];
   const auto& first_raw_segment = token_raw_segments[line_begin_token_index];
@@ -96,10 +97,10 @@ void BuildLyricLineData(const std::vector<TextTokenSpec>& token_specs,
       continue;
     }
 
-    AppendLyricLineRange(
-        token_specs, out_text_follow_data->text_token_timeline,
-        out_text_follow_data->token_raw_segments, line_begin_token_index,
-        token_index + 1, out_text_follow_data);
+    AppendLyricLineRange(token_specs, out_text_follow_data->text_token_timeline,
+                         out_text_follow_data->token_raw_segments,
+                         line_begin_token_index, token_index + 1,
+                         out_text_follow_data);
     line_begin_token_index = token_index + 1;
     current_line_units = 0;
   }

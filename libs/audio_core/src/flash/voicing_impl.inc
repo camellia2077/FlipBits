@@ -170,8 +170,7 @@ std::vector<int16_t> TrimToPayloadPcm(
 class FlashVoicingStepper::Impl {
  public:
   Impl(const std::vector<int16_t>& clean_payload_pcm,
-       const FlashPayloadLayout& payload_layout,
-       FlashVoicingFlavor flavor,
+       const FlashPayloadLayout& payload_layout, FlashVoicingFlavor flavor,
        const FlashVoicingConfig& config)
       : clean_payload_pcm_(clean_payload_pcm),
         payload_layout_(payload_layout),
@@ -185,10 +184,10 @@ class FlashVoicingStepper::Impl {
         use_standard_low_voice_(use_layered_timbre_ &&
                                 style_traits_.standard_low_voice_gain > 0.0),
         use_hostility_edge_(style_traits_.hostility_edge_gain > 0.0),
-        descriptor_(DescribeVoicingOutput(
-            clean_payload_pcm.size() + LeadingNonpayloadSamples(config) +
-                TrailingNonpayloadSamples(config),
-            config)),
+        descriptor_(DescribeVoicingOutput(clean_payload_pcm.size() +
+                                              LeadingNonpayloadSamples(config) +
+                                              TrailingNonpayloadSamples(config),
+                                          config)),
         spectral_texture_enabled_(ShouldApplySpectralTexture(config)),
         spectral_texture_work_(spectral_texture_enabled_
                                    ? descriptor_.leading_nonpayload_samples +
@@ -260,13 +259,15 @@ class FlashVoicingStepper::Impl {
       chunk_index_ = 0;
       chunk_local_index_ = 0;
     }
-    if (stage_ == Stage::kPayload && chunk_index_ >= payload_layout_.chunks.size()) {
+    if (stage_ == Stage::kPayload &&
+        chunk_index_ >= payload_layout_.chunks.size()) {
       stage_ = Stage::kEpilogue;
       epilogue_index_ = 0;
     }
     if (stage_ == Stage::kEpilogue &&
         epilogue_index_ >= descriptor_.trailing_nonpayload_samples) {
-      stage_ = spectral_texture_enabled_ ? Stage::kSpectralTexture : Stage::kDone;
+      stage_ =
+          spectral_texture_enabled_ ? Stage::kSpectralTexture : Stage::kDone;
       spectral_index_ = 0;
     }
     if (stage_ == Stage::kSpectralTexture &&
@@ -300,8 +301,7 @@ class FlashVoicingStepper::Impl {
             chunk.sample_count,
             RatioToCount(sanitized_.attack_ratio, chunk.sample_count),
             RatioToCount(
-                sanitized_.release_ratio *
-                    style_traits_.payload_release_scale,
+                sanitized_.release_ratio * style_traits_.payload_release_scale,
                 chunk.sample_count));
     chunk_click_window_ = ComputeClickWindow(chunk.sample_count);
     chunk_litany_text_pause_weight_ =
@@ -321,7 +321,8 @@ class FlashVoicingStepper::Impl {
       PrepareChunkState(chunk);
     }
 
-    const std::size_t payload_sample_index = chunk.sample_offset + chunk_local_index_;
+    const std::size_t payload_sample_index =
+        chunk.sample_offset + chunk_local_index_;
     const std::size_t sample_index =
         descriptor_.leading_nonpayload_samples + payload_sample_index;
 
@@ -331,9 +332,9 @@ class FlashVoicingStepper::Impl {
       const double clean_sample =
           static_cast<double>(clean_payload_pcm_[payload_sample_index]) /
           kPcmScale;
-      const double base_envelope = ComputeEnvelope(
-          chunk_local_index_, chunk.sample_count, chunk_attack_count_,
-          chunk_release_count_);
+      const double base_envelope =
+          ComputeEnvelope(chunk_local_index_, chunk.sample_count,
+                          chunk_attack_count_, chunk_release_count_);
       const double envelope =
           base_envelope +
           style_traits_.payload_envelope_floor * (1.0 - base_envelope);
@@ -342,8 +343,7 @@ class FlashVoicingStepper::Impl {
       const double litany_text_articulation =
           ComputeLitanyTextPauseArticulation(chunk_litany_text_pause_weight_,
                                              chunk_local_index_,
-                                             chunk.sample_count,
-                                             style_traits_);
+                                             chunk.sample_count, style_traits_);
       const double collapse_hesitation_articulation =
           ComputeCollapseHesitationArticulation(
               chunk_collapse_hesitation_weight_, chunk_local_index_,
@@ -361,18 +361,20 @@ class FlashVoicingStepper::Impl {
                                     chunk.carrier_freq_hz, chunk_local_index_,
                                     sanitized_.sample_rate_hz);
       const double metallic_layer =
-          use_layered_timbre_ ? envelope * payload_articulation *
-                                   ComputeSecondaryMetallicLayer(
-                                       chunk.carrier_freq_hz, chunk_local_index_,
-                                       sanitized_.sample_rate_hz) *
-                                   style_traits_.metallic_layer_gain_scale
-                             : 0.0;
+          use_layered_timbre_
+              ? envelope * payload_articulation *
+                    ComputeSecondaryMetallicLayer(chunk.carrier_freq_hz,
+                                                  chunk_local_index_,
+                                                  sanitized_.sample_rate_hz) *
+                    style_traits_.metallic_layer_gain_scale
+              : 0.0;
       const double chant_resonance =
           use_layered_timbre_
-              ? envelope * payload_articulation * ComputeChantResonanceLayer(
-                               chunk.carrier_freq_hz, payload_sample_index,
-                               sanitized_.sample_rate_hz,
-                               style_traits_.chant_resonance_gain)
+              ? envelope * payload_articulation *
+                    ComputeChantResonanceLayer(
+                        chunk.carrier_freq_hz, payload_sample_index,
+                        sanitized_.sample_rate_hz,
+                        style_traits_.chant_resonance_gain)
               : 0.0;
       const double chant_drone =
           use_chant_drone_
@@ -392,8 +394,8 @@ class FlashVoicingStepper::Impl {
           use_standard_low_voice_
               ? envelope * payload_articulation *
                     ComputeStandardLowVoiceLayer(payload_sample_index,
-                                               sanitized_.sample_rate_hz,
-                                               style_traits_)
+                                                 sanitized_.sample_rate_hz,
+                                                 style_traits_)
               : 0.0;
       const double hostility_edge =
           use_hostility_edge_
@@ -403,24 +405,22 @@ class FlashVoicingStepper::Impl {
                                               sanitized_.sample_rate_hz,
                                               style_traits_.hostility_edge_gain)
               : 0.0;
-      const double boundary_click =
-          ComputeBoundaryClick(sanitized_.boundary_click_gain, style_traits_,
-                               chunk_index_, chunk_local_index_,
-                               chunk_click_window_);
+      const double boundary_click = ComputeBoundaryClick(
+          sanitized_.boundary_click_gain, style_traits_, chunk_index_,
+          chunk_local_index_, chunk_click_window_);
       const double tremolo =
           use_layered_timbre_
               ? ComputePayloadTremolo(payload_sample_index,
                                       sanitized_.sample_rate_hz, style_traits_)
               : 1.0;
-      const double collapse_tremor =
-          ComputeCollapseTremor(payload_sample_index, sanitized_.sample_rate_hz,
-                                style_traits_);
+      const double collapse_tremor = ComputeCollapseTremor(
+          payload_sample_index, sanitized_.sample_rate_hz, style_traits_);
       const double chant_swell = ComputeChantSwellGain(
           payload_sample_index, sanitized_.sample_rate_hz, style_traits_);
       const double mixed_sample =
           (clean_sample * envelope * payload_articulation + harmonic_mix +
-           metallic_layer + chant_resonance + chant_drone +
-           mechanical_throat + standard_low_voice + hostility_edge) *
+           metallic_layer + chant_resonance + chant_drone + mechanical_throat +
+           standard_low_voice + hostility_edge) *
               tremolo * collapse_tremor * chant_swell +
           boundary_click;
       const double voiced_sample = std::clamp(
@@ -473,10 +473,10 @@ class FlashVoicingStepper::Impl {
         dry *
             (1.0 - kSpectralBandMix * style_traits_.spectral_band_mix_scale -
              kSpectralSoftClipMix * style_traits_.spectral_softclip_mix_scale) +
-        bandpassed * (kSpectralBandMix * style_traits_.spectral_band_mix_scale) +
+        bandpassed *
+            (kSpectralBandMix * style_traits_.spectral_band_mix_scale) +
         saturated *
-            (kSpectralSoftClipMix *
-             style_traits_.spectral_softclip_mix_scale);
+            (kSpectralSoftClipMix * style_traits_.spectral_softclip_mix_scale);
     result_.pcm[spectral_index_] = static_cast<int16_t>(
         std::lround(std::clamp(textured, -1.0, 1.0) * kPcmScale));
     ++spectral_index_;
@@ -536,7 +536,9 @@ std::size_t FlashVoicingStepper::TotalWork() const {
   return impl_->TotalWork();
 }
 
-bool FlashVoicingStepper::Finished() const { return impl_->Finished(); }
+bool FlashVoicingStepper::Finished() const {
+  return impl_->Finished();
+}
 
 FlashVoicingStepProgress FlashVoicingStepper::Pump(std::size_t work_budget) {
   return impl_->Pump(work_budget);
@@ -548,8 +550,8 @@ FlashVoicingResult ApplyVoicingToPayload(
     const EncodeProgressSink* progress_sink, float progress_begin,
     float progress_end) {
   return ApplyVoicingToPayloadWithFlavor(
-      clean_payload_pcm, payload_layout, FlashVoicingFlavor::kStandard,
-      config, progress_sink, progress_begin, progress_end);
+      clean_payload_pcm, payload_layout, FlashVoicingFlavor::kStandard, config,
+      progress_sink, progress_begin, progress_end);
 }
 
 FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
@@ -557,7 +559,8 @@ FlashVoicingResult ApplyVoicingToPayloadWithFlavor(
     const FlashPayloadLayout& payload_layout, FlashVoicingFlavor flavor,
     const FlashVoicingConfig& config, const EncodeProgressSink* progress_sink,
     float progress_begin, float progress_end) {
-  FlashVoicingStepper stepper(clean_payload_pcm, payload_layout, flavor, config);
+  FlashVoicingStepper stepper(clean_payload_pcm, payload_layout, flavor,
+                              config);
   const std::size_t total_postprocess_work = stepper.TotalWork();
   ReportEncodeProgress(progress_sink, EncodeProgressPhase::kPostprocessing,
                        progress_begin);

@@ -62,14 +62,13 @@ void FillEncodeResultLayout(const bag::EncodedPcmFollowResult& result,
   out_layout->text_follow_available = result.text_follow_data.available ? 1 : 0;
 }
 
-void FillEncodeOperationProgress(
-    const bag::EncodeProgressSnapshot& snapshot,
-    bag_encode_operation_progress* out_progress) {
+void FillEncodeOperationProgress(const bag::EncodeProgressSnapshot& snapshot,
+                                 bag_encode_operation_progress* out_progress) {
   if (out_progress == nullptr) {
     return;
   }
   out_progress->state = ToApiOperationState(snapshot.state);
-  out_progress->phase = ToApiJobPhase(snapshot.phase);
+  out_progress->phase = ToApiOperationPhase(snapshot.phase);
   out_progress->overall_progress_0_to_1 =
       std::clamp(snapshot.overall_progress_0_to_1, 0.0f, 1.0f);
   out_progress->phase_progress_0_to_1 =
@@ -87,15 +86,15 @@ void FillEncodeOperationProgress(
   out_progress->current_segment_index = snapshot.current_segment_index;
 }
 
-void FillEncodeOperationWorkPlan(const bag::EncodeWorkPlan& work_plan,
-                                 bag_encode_operation_work_plan* out_work_plan) {
+void FillEncodeOperationWorkPlan(
+    const bag::EncodeWorkPlan& work_plan,
+    bag_encode_operation_work_plan* out_work_plan) {
   if (out_work_plan == nullptr) {
     return;
   }
   out_work_plan->preparing_input_work_units =
       work_plan.preparing_input_work_units;
-  out_work_plan->rendering_pcm_work_units =
-      work_plan.rendering_pcm_work_units;
+  out_work_plan->rendering_pcm_work_units = work_plan.rendering_pcm_work_units;
   out_work_plan->postprocessing_work_units =
       work_plan.postprocessing_work_units;
   out_work_plan->finalizing_work_units = work_plan.finalizing_work_units;
@@ -139,13 +138,14 @@ bag_error_code CopyStructuredEncodeResultToApi(
                                    out_result->raw_bits_binary_buffer_size)
           : BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   CopyFollowDataToApi(result.follow_data, &out_result->follow_data);
-  CopyTextFollowDataToApi(result.text_follow_data, &out_result->text_follow_data);
+  CopyTextFollowDataToApi(result.text_follow_data,
+                          &out_result->text_follow_data);
   return BAG_OK;
 }
 
-bag_error_code BuildEncodeFollowDataResult(const bag::CoreConfig& core_config,
-                                           const std::string& text,
-                                           bag::EncodedPcmFollowResult* result) {
+bag_error_code BuildEncodeFollowDataResult(
+    const bag::CoreConfig& core_config, const std::string& text,
+    bag::EncodedPcmFollowResult* result) {
   if (result == nullptr) {
     return BAG_INVALID_ARGUMENT;
   }

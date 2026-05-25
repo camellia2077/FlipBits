@@ -10,7 +10,6 @@ import std;
 
 export module bag.flash.phy_clean;
 
-
 export import bag.flash.signal;
 export import bag.flash.voicing;
 export import bag.common.error_code;

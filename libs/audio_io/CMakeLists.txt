@@ -5,6 +5,7 @@ add_library(audio_io STATIC
     src/audio_io_api.cpp
     src/wav_io.cpp
     src/wav_io_backend.cpp
+    src/wav_metadata_parse_rules.cpp
 )
 
 target_compile_features(audio_io PUBLIC cxx_std_17)

@@ -198,10 +198,9 @@ class UltraDecoder final : public ITransportDecoder {
     out_result->text.clear();
     const ErrorCode text_code =
         DecodePayloadToText(out_result->raw_payload_bytes, &out_result->text);
-    out_result->text_status =
-        text_code == ErrorCode::kOk
-            ? DecodeContentStatus::kOk
-            : DecodeContentStatus::kInvalidTextPayload;
+    out_result->text_status = text_code == ErrorCode::kOk
+                                  ? DecodeContentStatus::kOk
+                                  : DecodeContentStatus::kInvalidTextPayload;
     if (text_code != ErrorCode::kOk) {
       out_result->text.clear();
     }
@@ -320,9 +319,13 @@ SymbolRenderer::SymbolRenderer(std::uint8_t symbol, std::size_t write_offset,
 
 SymbolRenderer::~SymbolRenderer() = default;
 
-std::size_t SymbolRenderer::TotalWork() const { return impl_->TotalWork(); }
+std::size_t SymbolRenderer::TotalWork() const {
+  return impl_->TotalWork();
+}
 
-bool SymbolRenderer::Finished() const { return impl_->Finished(); }
+bool SymbolRenderer::Finished() const {
+  return impl_->Finished();
+}
 
 SymbolRenderProgress SymbolRenderer::Pump(std::size_t work_budget) {
   return impl_->Pump(work_budget);
@@ -367,7 +370,8 @@ ErrorCode EncodeSymbolsToPcm16(const std::vector<uint8_t>& symbols,
         out_pcm->clear();
         return ErrorCode::kCancelled;
       }
-      const SymbolRenderProgress progress = renderer.Pump(kProgressReportStrideSamples);
+      const SymbolRenderProgress progress =
+          renderer.Pump(kProgressReportStrideSamples);
       rendered_samples = write_offset + progress.completed_work;
       MaybeReportCompletedSampleProgress(
           progress_sink, EncodeProgressPhase::kRenderingPcm, progress_begin,

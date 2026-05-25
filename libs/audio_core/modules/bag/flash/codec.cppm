@@ -10,7 +10,6 @@ import std;
 
 export module bag.flash.codec;
 
-
 export import bag.common.error_code;
 
 export namespace bag::flash {

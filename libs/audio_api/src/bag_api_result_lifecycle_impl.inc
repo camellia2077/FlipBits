@@ -151,8 +151,7 @@ void ClearApiFlashSignalInfo(bag_flash_signal_info* out_info) {
   out_info->decode_path_size = 0;
   out_info->low_carrier_hz_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_info->high_carrier_hz_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
-  out_info->bit_duration_samples_status =
-      BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
+  out_info->bit_duration_samples_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_info->payload_silence_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_info->decode_path_status = BAG_DECODE_CONTENT_STATUS_UNAVAILABLE;
   out_info->available = 0;

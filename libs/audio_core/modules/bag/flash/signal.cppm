@@ -10,7 +10,6 @@ import std;
 
 export module bag.flash.signal;
 
-
 export import bag.common.types;
 
 export namespace bag::flash {

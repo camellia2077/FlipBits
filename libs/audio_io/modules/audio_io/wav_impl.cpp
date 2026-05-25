@@ -1,12 +1,11 @@
 module;
 
-#include "bag/common/build_features.h"
-
 #include <cstdint>
 #include <filesystem>
 #include <vector>
 
 #include "../../src/wav_io_backend.h"
+#include "bag/common/build_features.h"
 
 module audio_io.wav;
 

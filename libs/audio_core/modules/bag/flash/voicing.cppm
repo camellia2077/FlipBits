@@ -10,7 +10,6 @@ import std;
 
 export module bag.flash.voicing;
 
-
 export import bag.flash.signal;
 
 export namespace bag::flash {

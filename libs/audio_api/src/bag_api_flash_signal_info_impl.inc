@@ -51,12 +51,11 @@ std::string PayloadSilenceSummary(const bag::flash::FlashPayloadLayout& layout,
         chunk.sample_count == 0) {
       continue;
     }
-    const std::size_t slot_size =
-        signal_config.samples_per_silence_slot > 0
-            ? signal_config.samples_per_silence_slot
-            : chunk.sample_count;
-    slot_counts.push_back(std::max(static_cast<std::size_t>(1),
-                                   chunk.sample_count / slot_size));
+    const std::size_t slot_size = signal_config.samples_per_silence_slot > 0
+                                      ? signal_config.samples_per_silence_slot
+                                      : chunk.sample_count;
+    slot_counts.push_back(
+        std::max(static_cast<std::size_t>(1), chunk.sample_count / slot_size));
   }
   if (slot_counts.empty()) {
     return "none";
@@ -127,12 +126,12 @@ bag_error_code bag_describe_flash_signal(const bag_encoder_config* config,
 
     const std::string low_text =
         JoinSortedValues<double>(std::move(low_carriers), FormatFrequencyValue);
-    const std::string high_text =
-        JoinSortedValues<double>(std::move(high_carriers), FormatFrequencyValue);
-    const std::string bit_text =
-        JoinSortedValues<std::size_t>(std::move(bit_samples),
-                                      FormatSampleCountValue);
-    const std::string silence_text = PayloadSilenceSummary(layout, signal_config);
+    const std::string high_text = JoinSortedValues<double>(
+        std::move(high_carriers), FormatFrequencyValue);
+    const std::string bit_text = JoinSortedValues<std::size_t>(
+        std::move(bit_samples), FormatSampleCountValue);
+    const std::string silence_text =
+        PayloadSilenceSummary(layout, signal_config);
     const std::string decode_text =
         DecodePathForFlashVoicing(core_config.flash_voicing_flavor);
 
@@ -141,21 +140,21 @@ bag_error_code bag_describe_flash_signal(const bag_encoder_config* config,
     out_info->bit_duration_samples_size = bit_text.size();
     out_info->payload_silence_size = silence_text.size();
     out_info->decode_path_size = decode_text.size();
-    out_info->low_carrier_hz_status = CopyFlashInfoField(
-        low_text, out_info->low_carrier_hz_buffer,
-        out_info->low_carrier_hz_buffer_size);
-    out_info->high_carrier_hz_status = CopyFlashInfoField(
-        high_text, out_info->high_carrier_hz_buffer,
-        out_info->high_carrier_hz_buffer_size);
-    out_info->bit_duration_samples_status = CopyFlashInfoField(
-        bit_text, out_info->bit_duration_samples_buffer,
-        out_info->bit_duration_samples_buffer_size);
-    out_info->payload_silence_status = CopyFlashInfoField(
-        silence_text, out_info->payload_silence_buffer,
-        out_info->payload_silence_buffer_size);
-    out_info->decode_path_status = CopyFlashInfoField(
-        decode_text, out_info->decode_path_buffer,
-        out_info->decode_path_buffer_size);
+    out_info->low_carrier_hz_status =
+        CopyFlashInfoField(low_text, out_info->low_carrier_hz_buffer,
+                           out_info->low_carrier_hz_buffer_size);
+    out_info->high_carrier_hz_status =
+        CopyFlashInfoField(high_text, out_info->high_carrier_hz_buffer,
+                           out_info->high_carrier_hz_buffer_size);
+    out_info->bit_duration_samples_status =
+        CopyFlashInfoField(bit_text, out_info->bit_duration_samples_buffer,
+                           out_info->bit_duration_samples_buffer_size);
+    out_info->payload_silence_status =
+        CopyFlashInfoField(silence_text, out_info->payload_silence_buffer,
+                           out_info->payload_silence_buffer_size);
+    out_info->decode_path_status =
+        CopyFlashInfoField(decode_text, out_info->decode_path_buffer,
+                           out_info->decode_path_buffer_size);
     out_info->available = 1;
     return BAG_OK;
   } catch (const std::invalid_argument&) {
