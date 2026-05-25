@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "../../../../libs/audio_io/src/wav_metadata_parse_rules.h"
 #include "../../../../libs/audio_io/src/wav_io_bytes_impl.inc"
 
 namespace audio_io::detail {

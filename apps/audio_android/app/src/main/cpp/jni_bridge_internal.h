@@ -43,6 +43,78 @@ jdoubleArray NewEncodeOperationSnapshotArray(JNIEnv* env,
 jdoubleArray NewEncodeOperationWorkPlanArray(JNIEnv* env,
                                              const bag_encode_operation_work_plan& work_plan);
 
+jobject NewPayloadFollowByteEntry(JNIEnv* env,
+                                  const bag_payload_follow_byte_entry& entry);
+jobject NewPayloadFollowBinaryGroupEntry(
+    JNIEnv* env,
+    const bag_payload_follow_binary_group_entry& entry);
+jobject NewUltraFrameSymbolEntry(JNIEnv* env,
+                                 const bag_ultra_frame_symbol_entry& entry);
+jobject NewTextFollowTimelineEntry(JNIEnv* env,
+                                   const bag_text_follow_token_entry& entry);
+jobject NewTextFollowCharacterViewData(
+    JNIEnv* env,
+    const bag_text_follow_character_entry& entry,
+    const std::string& text_character_text);
+jobject NewTextFollowRawSegmentViewData(
+    JNIEnv* env,
+    const bag_text_follow_raw_segment_entry& entry,
+    const std::vector<std::string>& hex_tokens,
+    const std::string& compact_bits);
+jobject NewTextFollowRawDisplayUnitViewData(
+    JNIEnv* env,
+    const bag_text_follow_raw_display_unit_entry& entry,
+    const std::vector<std::string>& hex_tokens,
+    const std::string& compact_bits);
+jobject NewTextFollowLyricLineTimelineEntry(
+    JNIEnv* env,
+    const bag_text_follow_lyric_line_entry& entry);
+jobject NewTextFollowLineTokenRangeViewData(
+    JNIEnv* env,
+    const bag_text_follow_line_token_range_entry& entry);
+jobject NewTextFollowLineRawSegmentViewData(
+    JNIEnv* env,
+    const bag_text_follow_line_raw_segment_entry& entry,
+    const std::vector<std::string>& hex_tokens,
+    const std::string& compact_bits);
+
+jobject NewStringList(JNIEnv* env, const std::vector<std::string>& values);
+jobject NewByteTimelineList(JNIEnv* env,
+                            const std::vector<bag_payload_follow_byte_entry>& entries);
+jobject NewBinaryTimelineList(
+    JNIEnv* env,
+    const std::vector<bag_payload_follow_binary_group_entry>& entries);
+jobject NewUltraFrameTimelineList(
+    JNIEnv* env,
+    const std::vector<bag_ultra_frame_symbol_entry>& entries);
+jobject NewTextTimelineList(JNIEnv* env,
+                            const std::vector<bag_text_follow_token_entry>& entries);
+jobject NewTextCharacterList(
+    JNIEnv* env,
+    const std::vector<bag_text_follow_character_entry>& entries,
+    const std::string& text_character_text);
+jobject NewTextRawSegmentList(
+    JNIEnv* env,
+    const std::vector<bag_text_follow_raw_segment_entry>& entries,
+    const std::vector<std::string>& hex_tokens,
+    const std::string& compact_bits);
+jobject NewTextRawDisplayUnitList(
+    JNIEnv* env,
+    const std::vector<bag_text_follow_raw_display_unit_entry>& entries,
+    const std::vector<std::string>& hex_tokens,
+    const std::string& compact_bits);
+jobject NewLyricLineTimelineList(
+    JNIEnv* env,
+    const std::vector<bag_text_follow_lyric_line_entry>& entries);
+jobject NewLineTokenRangeList(
+    JNIEnv* env,
+    const std::vector<bag_text_follow_line_token_range_entry>& entries);
+jobject NewLineRawSegmentList(
+    JNIEnv* env,
+    const std::vector<bag_text_follow_line_raw_segment_entry>& entries,
+    const std::vector<std::string>& hex_tokens,
+    const std::string& compact_bits);
+
 jobject NewPayloadFollowViewData(JNIEnv* env,
                                  const std::string& text_tokens,
                                  const std::string& text_character_text,
@@ -76,6 +148,12 @@ jobject NewDecodedPayloadViewData(JNIEnv* env,
 jobject NewDecodedAudioPayloadResult(JNIEnv* env,
                                      jobject decoded_payload,
                                      jobject follow_data);
+jobject NewEncodedAudioPayloadResult(JNIEnv* env,
+                                     jshortArray pcm,
+                                     const std::string& raw_bytes_hex,
+                                     const std::string& raw_bits_binary,
+                                     jobject follow_data,
+                                     jint terminal_code);
 
 jobject NewFlashSignalInfo(JNIEnv* env,
                            const std::string& low_carrier_hz,
@@ -90,6 +168,7 @@ jobject NewEmptyPayloadFollowViewData(JNIEnv* env);
 jobject NewEmptyDecodedAudioPayloadResult(JNIEnv* env,
                                           jint text_decode_status_code,
                                           jboolean raw_payload_available);
+jobject NewEmptyEncodedPayloadResult(JNIEnv* env, jint terminal_code);
 jobject NewEmptyEncodeOperationPcmPayloadResult(JNIEnv* env,
                                                 jint terminal_code = kBagErrorInternal);
 jobject NewEncodeOperationPcmPayloadResultFromEncodeResult(

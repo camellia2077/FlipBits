@@ -934,7 +934,7 @@ private class EncodeStateReducer(
                         } else {
                             listOf(request.mode.wireName, result.pcmSampleCount)
                         },
-                ),
+                    ),
                 isCodecBusy = false,
                 encodeOperationSnapshot = null,
                 encodeOperationWorkPlan = null,

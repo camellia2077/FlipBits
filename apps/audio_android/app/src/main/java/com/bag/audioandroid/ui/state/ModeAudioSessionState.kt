@@ -2,9 +2,9 @@ package com.bag.audioandroid.ui.state
 
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.DecodedPayloadViewData
-import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.EncodeOperationSnapshot
 import com.bag.audioandroid.domain.EncodeOperationWorkPlan
+import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.WavAudioInfo

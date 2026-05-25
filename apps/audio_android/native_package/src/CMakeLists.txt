@@ -16,17 +16,22 @@ set(bag_android_native_package_source_files
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_signal.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_voicing.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_phy_rules.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_flash_phy_clean.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_mini_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_mini_phy_clean.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_pro_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_pro_phy_clean.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_follow.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_encode_work_plan.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_encode_operation_steps.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_encode_operation.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_transport.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_ultra_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_ultra_phy_clean.cpp"
     "${FLIPBITS_ROOT}/libs/audio_io/src/audio_io_api.cpp"
     "${FLIPBITS_ROOT}/libs/audio_io/src/wav_io.cpp"
+    "${FLIPBITS_ROOT}/libs/audio_io/src/wav_metadata_parse_rules.cpp"
 )
 
 if(FLIPBITS_ANDROID_MODULES_SMOKE)

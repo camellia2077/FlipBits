@@ -198,7 +198,6 @@ class NativeAudioCodecGateway : AudioCodecGateway {
         )
 
     override fun getCoreVersion(): String = NativeBagBridge.nativeGetCoreVersion()
-
 }
 
 private const val ENCODE_OPERATION_PROGRESS_EMIT_INTERVAL_NANOS = 33_000_000L

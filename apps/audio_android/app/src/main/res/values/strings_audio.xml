@@ -20,7 +20,7 @@
     <string name="audio_encode_phase_finalizing_label">Finalizing</string>
     <!-- CONTEXT: Secondary action button that cancels an in-progress audio generation job. -->
     <string name="audio_action_cancel_encode">Cancel</string>
-    <!-- CONTEXT: Busy label shown after the user has requested cancellation and the encode job is stopping. -->
+    <!-- CONTEXT: Busy label shown after the user has requested cancellation and the encode operation is stopping. -->
     <string name="audio_action_cancel_encode_busy">Cancelling…</string>
     <!-- CONTEXT: Playback control for starting audio playback. -->
     <string name="audio_action_play">Play</string>

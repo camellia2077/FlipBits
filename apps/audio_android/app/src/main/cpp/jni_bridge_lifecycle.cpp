@@ -69,8 +69,8 @@ jdoubleArray NativePollEncodeOperation(
     bag_encode_operation* operation = HandleToEncodeOperation(handle);
     if (operation == nullptr) {
         bag_encode_operation_progress failed{};
-        failed.state = BAG_ENCODE_JOB_FAILED;
-        failed.phase = BAG_ENCODE_JOB_PHASE_PREPARING_INPUT;
+        failed.state = BAG_ENCODE_OPERATION_FAILED;
+        failed.phase = BAG_ENCODE_OPERATION_PHASE_PREPARING_INPUT;
         failed.terminal_code = BAG_INVALID_ARGUMENT;
         return NewEncodeOperationSnapshotArray(env, failed);
     }
@@ -78,8 +78,8 @@ jdoubleArray NativePollEncodeOperation(
     bag_encode_operation_progress progress{};
     if (bag_poll_encode_operation(operation, &progress) != BAG_OK) {
         bag_encode_operation_progress failed{};
-        failed.state = BAG_ENCODE_JOB_FAILED;
-        failed.phase = BAG_ENCODE_JOB_PHASE_PREPARING_INPUT;
+        failed.state = BAG_ENCODE_OPERATION_FAILED;
+        failed.phase = BAG_ENCODE_OPERATION_PHASE_PREPARING_INPUT;
         failed.terminal_code = BAG_INVALID_ARGUMENT;
         return NewEncodeOperationSnapshotArray(env, failed);
     }
