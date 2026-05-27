@@ -78,6 +78,14 @@ The Android APK will be published via GitHub Releases.
 
 Under the current reference build, the installation package is approximately `6.32 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
 
+## Live Demo
+
+If you want to try FlipBits without installing the APK, you can use the GitHub Pages demo to generate, listen to, parse, and download audio directly in the browser:
+
+- [FlipBits Pages Live Demo](https://camellia2077.github.io/FlipBits/)
+
+The Pages demo lets you enter text, generate audio in different modes, play it online, parse in-project generated results, and download the resulting audio files. The project still places its main expressive focus on bit-by-bit BFSK / FSK (`flash`).
+
 For user-facing Android release notes, see:
 - [`docs/history/presentation/android/CHANGELOG.md`](docs/history/presentation/android/CHANGELOG.md)
 
@@ -162,22 +170,6 @@ Currently, six styles are provided. Through combinations of bit duration, freque
 
 
 
-### Demo Audio Download
-
-#### 1. Text Content: `rs`
-
-* **[ 8.80s ]** **Litany**: [flash[litany]_rs.wav](https://github.com/user-attachments/files/27856597/flash.litany._rs.wav)
-
-#### 2. Text Content: `github`
-
-The following shows the auditory performance of the same input under different voicing styles:
-
-* **[ 7.02s ]** **Void**: [flash[void]-github.wav](https://github.com/user-attachments/files/27787632/flash.void.-github.wav)
-* **[ 3.60s ]** **Collapse**: [flash[collapse]_github.wav](https://github.com/user-attachments/files/27856341/flash.collapse._github.wav)
-* **[ 2.55s ]** **Standard**: [flash[standard]_github.wav](https://github.com/user-attachments/files/27856350/flash.standard._github.wav)
-* **[ 2.40s ]** **Hostility**: [flash[hostility]_github.wav](https://github.com/user-attachments/files/27856406/flash.hostility._github.wav)
-* **[ 1.80s ]** **Zeal**: [flash[zeal]_github.wav](https://github.com/user-attachments/files/27856411/flash.zeal._github.wav)
-
 ### Design Details
 
 For more details on the emotional positioning, naming semantics, and preset designs of the `flash` voicing style, see:
@@ -209,8 +201,8 @@ Three Speed Presets are currently provided, aiming to balance "feasibility of ma
       <sub>Tokens Mode</sub>
     </td>
     <td width="25%" align="center">
-      <img src="https://github.com/user-attachments/assets/4d653c99-12f8-4959-a8a2-f18b1bff673a" alt="Mix Mode & Token Selection"><br>
-      <sub>Mix Mode & Token Selection</sub>
+      <img src="https://github.com/user-attachments/assets/4d653c99-12f8-4959-a8a2-f18b1bff673a" alt="Token Selection"><br>
+      <sub>Token Selection</sub>
     </td>
   </tr>
 </table>
@@ -220,13 +212,6 @@ Three Speed Presets are currently provided, aiming to balance "feasibility of ma
 | **Slow** | Extremely slow | Teaching-level speed, best for observing dot / dash and word-by-word comparison (Lyrics Follow) |
 | **Standard** | Standard rhythm | Simulates the classic rhythmic feel and recognizability of traditional Morse code |
 | **Fast** | Compact | Compresses dot-dash intervals, providing a more efficient, shorter audio output |
-
-#### Demo Audio Download
-**Text Content**: `github`
-
-*   **[ 3.97s ]** **Slow**: [mini[slow]_GITHUB.wav](https://github.com/user-attachments/files/27856417/mini.slow._GITHUB.wav)
-*   **[ 2.65s ]** **Standard**: [mini[standard]_GITHUB.wav](https://github.com/user-attachments/files/27856419/mini.standard._GITHUB.wav)
-*   **[ 1.32s ]** **Fast**: [mini[fast]_GITHUB.wav](https://github.com/user-attachments/files/27856415/mini.fast._GITHUB.wav)
 
 ### Design Details
 For `mini`'s input specifications, Visual real-time follow logic, and specific preset parameter descriptions, see:
@@ -253,11 +238,6 @@ Auditorily, this is a **pure telephone dial tone**. It is a standard ASCII-only 
     </tr>
   </table>
 </div>
-
-### Demo Audio Download
-* **[ 3.7s ]** **Text Content**: `RED STEEL RECEIVES NEW SERIAL NUMBERS`
-* **Download Link**: [RED STEEL RECE_pro_20260515_105734.wav](https://github.com/user-attachments/files/27786956/RED.STEEL.RECE_pro_20260515_105734.wav)
-
 
 ### Design Details
 For more descriptions of `pro`'s mode positioning and implementation, see:
@@ -295,25 +275,6 @@ For more descriptions of `pro`'s mode positioning and implementation, see:
 | **Generation Time** | ~ 116.0 seconds | **~ 2.0 seconds** | 58x speedup |
 | **Audio Length** | ~ 43.0 minutes | **~ 11.7 minutes** | 3.7x compression |
 | **Core Positioning** | Ritualistic, audibility, emotional | **High throughput, fast processing, industrial feel** | - |
-
----
-
-### Demo Audio: Comparison of Efficiency and Texture
-**Text Content**: `Behind the quarantine wall, the unpowered terminal writes`
-[flash[zeal]_Behind the qua.wav]
-[flash[litany]_Behind the qua.wav]
-[flash[standard]_Behind the qua.wav]
-
-| Mode | Style | Time Cost | Download |
-| :--- | :--- | :--- | :--- |
-| **`ultra`** | **Default** | **5.80s** | [Download audio](https://github.com/user-attachments/files/27856631/ultra_Behind.the.qua.wav) |
-| `flash` | Zeal (Extreme speed) | 15.05s | [Download audio](https://github.com/user-attachments/files/27856644/flash.zeal._Behind.the.qua.wav)|
-| `flash` | Standard | 22.05s | [Download audio](https://github.com/user-attachments/files/27856649/flash.standard._Behind.the.qua.wav) |
-| `flash` | Litany (Solemn) | 187.20s | [Download audio](https://github.com/user-attachments/files/27856650/flash.litany._Behind.the.qua.wav) |
-
-> **Note**: The `litany` style audio is 3 minutes and 7.2 seconds long. This is deliberate redundancy designed for "stylization", aiming to achieve frequency intervals that humans can clearly identify, record, or even read aloud.
-
----
 
 ### Design Details
 For the mode positioning, transport layer protocol, and system architecture design of `ultra`, see:
