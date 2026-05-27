@@ -25,18 +25,43 @@
 
 <table>
   <tr>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/3790efee-6fcb-4584-a5c7-5b3a3140cad7" alt="1-zh"></td>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/1d515f54-abee-4422-8d9b-094165d11b85" alt="2-en"></td>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/e8ee3c5d-a438-4fab-a9ec-d15dee0370be" alt="3-de"></td>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/6641c520-1c35-45c4-8235-6e5a4b78f4a7" alt="4-jp"></td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/3c1a3eaf-17e5-4b19-b4d3-27c642aee92d" alt="主界面"><br>
+      <sub>主界面</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/66efd1fb-61a6-485a-bf69-611646cef57b" alt="歌词式token同步显示"><br>
+      <sub>歌词式token同步显示</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/2b5e3d1c-c61c-4967-926c-ff93d63c1160" alt="自适应布局"><br>
+      <sub>自适应布局</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/bb82b369-ef65-4c55-83fc-7ef515a0007f" alt="音频可视化"><br>
+      <sub>音频可视化</sub>
+    </td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/2b53391f-a415-4765-92f9-b04276792dc5" alt="5-la"></td>
-    <td><img src="https://github.com/user-attachments/assets/04d6ad29-4bed-4554-b4c2-182ad60c094c" alt="6-la"></td>
-    <td><img src="https://github.com/user-attachments/assets/970438f7-2ebe-4efd-9aa7-2afb6d75865c" alt="7-la"></td>
-    <td><img src="https://github.com/user-attachments/assets/a8786e2b-c65e-445d-9d8c-dd9ec05be31a" alt="8-la"></td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/0ec94cc2-8a15-4624-8e23-76900e7495e6" alt="自定义双色主题"><br>
+      <sub>自定义双色主题</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/abae9141-ef48-4ccf-97c0-2c3eb3e2f07c" alt="material主题"><br>
+      <sub>material主题</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/911bd395-81ac-4a2b-ade8-6806e8cec6c2" alt="morse code"><br>
+      <sub>morse code</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/d55089ff-f4cf-4dfb-85e1-488ce2b62658" alt="16 fsk"><br>
+      <sub>16 fsk</sub>
+    </td>
   </tr>
 </table>
+
 
 ## 快速概览
 
@@ -107,22 +132,27 @@ Android app 当前保持轻量原生取向：冷启动速度快，包体控制�
 
 ### 界面预览与样式定义
 
-<div align="center">
-  <table style="width: 100%; table-layout: fixed;">
-    <tr>
-      <td><img src="https://github.com/user-attachments/assets/9fd647f2-b0e6-4a49-93d8-3a24bde45523" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/00e27a38-7475-4866-bf6a-97b089366611" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/8cf04a7b-3fa3-4356-b980-f88b9e72a0c3" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/3f5a97c4-e58f-45ac-b1a8-147f7bba4b55" width="100%"></td>
-    </tr>
-    <tr align="center">
-      <td><small>可视化1</small></td>
-      <td><small>可视化2</small></td>
-      <td><small>可视化3</small></td>
-      <td><small>可视化4</small></td>
-    </tr>
-  </table>
-</div>
+<table>
+  <tr>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/8c7005c3-c870-46d8-bcd7-58ef03f22296" alt="tokens"><br>
+      <sub>Tokens模式</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/8f5b9794-4c03-40fd-9eb3-633c98715abf" alt="visual"><br>
+      <sub>视觉模式</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/6a48510f-522e-4f92-a095-933d8d81994d" alt="tokens和visual一起显示"><br>
+      <sub>Mix效果</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/617b4cfd-9e19-40c3-b02a-8cd059cdf426" alt="选择单个token"><br>
+      <sub>选择单个token</sub>
+    </td>
+  </tr>
+</table>
+
 
 目前提供六种 style，通过 bit 持续时间、频率组织与停顿间隔的组合，塑造出不同的情绪化“说话语气”：
 
@@ -167,22 +197,26 @@ Morse code (`mini`) 按 Morse 规则规范化输入，强调清晰的可视化�
 
 目前提供三种 Speed Preset，旨在平衡“手动识别的可行性”与“传输效率”：
 
-<div align="center">
-  <table style="width: 100%; table-layout: fixed;">
-    <tr>
-      <td><img src="https://github.com/user-attachments/assets/d7d4c86e-e0cb-4ab4-9063-be437f794986" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/d6c1ec7e-2de6-438d-b3c7-5dee5bb17f1c" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/6517cb87-9024-4bb5-b382-a4d600e70a6d" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/55356088-a0cf-4a4e-9a75-3af2bca7127c" width="100%"></td>
-    </tr>
-    <tr align="center">
-      <td><small>页面</small></td>
-      <td><small>可视化1 </small></td>
-      <td><small>可视化2</small></td>
-      <td><small>单词选择</small></td>
-    </tr>
-  </table>
-</div>
+<table>
+  <tr>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/bee0d42f-e8d3-4ef5-8369-5cec7f146f0d" alt="主页面"><br>
+      <sub>主页面</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/302c7ed8-09c7-4fa8-8c51-51211e569ffc" alt="视觉模式"><br>
+      <sub>视觉模式</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/ad7dc5a6-5c4c-4daf-a8f2-648c8269544f" alt="Tokens模式"><br>
+      <sub>Tokens模式</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/d3038ae6-5786-4cc1-9cfe-a08be49b8fc2" alt="Mix模式和token选择"><br>
+      <sub>Mix模式和token选择</sub>
+    </td>
+  </tr>
+</table>
 
 | Speed | 定位 | 设计目标 |
 | :--- | :--- | :--- |
