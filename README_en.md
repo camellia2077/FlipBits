@@ -27,16 +27,40 @@
 
 <table>
   <tr>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/3790efee-6fcb-4584-a5c7-5b3a3140cad7" alt="1-zh"></td>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/1d515f54-abee-4422-8d9b-094165d11b85" alt="2-en"></td>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/e8ee3c5d-a438-4fab-a9ec-d15dee0370be" alt="3-de"></td>
-    <td width="25%"><img src="https://github.com/user-attachments/assets/6641c520-1c35-45c4-8235-6e5a4b78f4a7" alt="4-jp"></td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/3c1a3eaf-17e5-4b19-b4d3-27c642aee92d" alt="Main UI"><br>
+      <sub>Main UI</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/66efd1fb-61a6-485a-bf69-611646cef57b" alt="Lyrics-style Token Sync"><br>
+      <sub>Lyrics-style Token Sync</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/2b5e3d1c-c61c-4967-926c-ff93d63c1160" alt="Adaptive Layout"><br>
+      <sub>Adaptive Layout</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/bb82b369-ef65-4c55-83fc-7ef515a0007f" alt="Audio Visualizer"><br>
+      <sub>Audio Visualizer</sub>
+    </td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/2b53391f-a415-4765-92f9-b04276792dc5" alt="5-la"></td>
-    <td><img src="https://github.com/user-attachments/assets/04d6ad29-4bed-4554-b4c2-182ad60c094c" alt="6-la"></td>
-    <td><img src="https://github.com/user-attachments/assets/970438f7-2ebe-4efd-9aa7-2afb6d75865c" alt="7-la"></td>
-    <td><img src="https://github.com/user-attachments/assets/a8786e2b-c65e-445d-9d8c-dd9ec05be31a" alt="8-la"></td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/0ec94cc2-8a15-4624-8e23-76900e7495e6" alt="Custom Dual-Tone Themes"><br>
+      <sub>Custom Themes</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/abae9141-ef48-4ccf-97c0-2c3eb3e2f07c" alt="Material Design Themes"><br>
+      <sub>Material Design Themes</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/911bd395-81ac-4a2b-ade8-6806e8cec6c2" alt="Morse Code"><br>
+      <sub>Morse Code</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/d55089ff-f4cf-4dfb-85e1-488ce2b62658" alt="16-FSK"><br>
+      <sub>16-FSK</sub>
+    </td>
   </tr>
 </table>
 
@@ -102,22 +126,28 @@ In the Litany style, low speed is an intentional feature. The same text might ge
 
 ### Interface Preview and Style Definition
 
-<div align="center">
-  <table style="width: 100%; table-layout: fixed;">
-    <tr>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/cbf5af39-7069-42b3-aeca-07d219542f83" width="100%"></td>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/2bd1b34b-962e-473e-b105-1964305a58d8" width="100%"></td>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/29db01d6-8164-47f0-af1a-2edb661060ed" width="100%"></td>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/02dcddce-ed31-4c9a-8156-fd629bc21c1b" width="100%"></td>
-    </tr>
-    <tr align="center">
-      <td><small>Visualization 1</small></td>
-      <td><small>Visualization 2</small></td>
-      <td><small>Visualization 3</small></td>
-      <td><small>Visualization 4</small></td>
-    </tr>
-  </table>
-</div>
+
+<table>
+  <tr>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/9871071f-b035-4547-965d-4d81ce701d6d" alt="Tokens Mode"><br>
+      <sub>Tokens Mode</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/29c93da9-fe02-465e-8fe8-6dc0acc783c9" alt="Visual Mode"><br>
+      <sub>Visual Mode</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/49d78c70-b438-430a-adcc-30e8b3437df0" alt="Mix Mode"><br>
+      <sub>Mix Mode</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/13276e10-4351-4e88-9273-2358f1c15fd2" alt="Select Single Token"><br>
+      <sub>Select Single Token</sub>
+    </td>
+  </tr>
+</table>
+
 
 Currently, six styles are provided. Through combinations of bit duration, frequency organization, and pause intervals, they shape different emotional "speaking tones":
 
@@ -163,22 +193,27 @@ Morse code (`mini`) standardizes input according to Morse rules, emphasizing cle
 #### Speed Presets and Visual Follow
 Three Speed Presets are currently provided, aiming to balance "feasibility of manual recognition" and "transmission efficiency":
 
-<div align="center">
-  <table style="width: 100%; table-layout: fixed;">
-    <tr>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/d79e0302-b13f-4ec7-9136-66dbdc7bb00c" style="width: 100%;"></td>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/f50e4b9c-e6b3-4193-b957-bd9bf4a12d64" style="width: 100%;"></td>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/726dd727-bc20-4f1f-9564-f49095f9eddd" style="width: 100%;"></td>
-      <td width="25%"><img src="https://github.com/user-attachments/assets/716cdb9b-0f37-4692-9942-1b1a4d48cc32" style="width: 100%;"></td>
-    </tr>
-    <tr align="center">
-      <td><small>Page</small></td>
-      <td><small>Visualization 1</small></td>
-      <td><small>Visualization 2</small></td>
-      <td><small>Word Selection</small></td>
-    </tr>
-  </table>
-</div>
+
+<table>
+  <tr>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/8980ad13-7fdb-4eed-8e20-284f40208f7b" alt="Main UI"><br>
+      <sub>Main UI</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/f4183307-511b-49a4-9e24-473f3f6171aa" alt="Visual Mode"><br>
+      <sub>Visual Mode</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/f2f82628-9511-4f1c-91f2-009c1ad5556c" alt="Tokens Mode"><br>
+      <sub>Tokens Mode</sub>
+    </td>
+    <td width="25%" align="center">
+      <img src="https://github.com/user-attachments/assets/4d653c99-12f8-4959-a8a2-f18b1bff673a" alt="Mix Mode & Token Selection"><br>
+      <sub>Mix Mode & Token Selection</sub>
+    </td>
+  </tr>
+</table>
 
 | Speed | Positioning | Design Goal |
 | :--- | :--- | :--- |
