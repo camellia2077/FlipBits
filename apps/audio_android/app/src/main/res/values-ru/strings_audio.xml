@@ -86,6 +86,9 @@
     <string name="audio_player_detail_now_playing">Сейчас играет</string>
     <string name="audio_player_detail_decoded_title">Результат считывания</string>
     <string name="audio_player_detail_decoded_empty">Результата пока нет. Нажмите «Считать», когда понадобится.</string>
+    <string name="audio_lyrics_navigator_title">Текст</string>
+    <string name="audio_lyrics_navigator_subtitle">Предпросмотр полноэкранной навигации по тексту.</string>
+    <string name="audio_lyrics_navigator_open">Открыть полный текст</string>
     <string name="audio_playback_view_visual">Визуал</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">Ожидание follow-данных</string>

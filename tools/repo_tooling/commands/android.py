@@ -62,6 +62,18 @@ ANDROID_ACTIONS = {
     },
 }
 
+
+def _extra_gradle_args(args: argparse.Namespace) -> list[str]:
+    tests: list[str] = list(getattr(args, "tests", []) or [])
+    if not tests:
+        return []
+    if args.action != "test-debug":
+        raise ToolError("--tests is only supported with `python tools/run.py android test-debug`.")
+    gradle_args: list[str] = []
+    for test_filter in tests:
+        gradle_args.extend(["--tests", test_filter])
+    return gradle_args
+
 def _add_android_string_key(args: argparse.Namespace) -> None:
     missing_args = [
         option
@@ -140,6 +152,7 @@ def cmd_android(args: argparse.Namespace) -> None:
     action = ANDROID_ACTIONS[args.action]
     command.extend(action["gradle_args"])
     command.extend(action["tasks"])
+    command.extend(_extra_gradle_args(args))
     if args.action == "ktlint-check":
         completed = run_capture_merged_streaming(command, cwd=ANDROID_GRADLE_ROOT)
         if completed.returncode != 0:

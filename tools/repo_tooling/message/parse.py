@@ -22,11 +22,11 @@ _TOOLS_SECTION_MAP = {
 
 def component_name_for_history(path: str) -> str:
     normalized = path.replace("\\", "/")
-    if normalized.startswith("docs/presentation/cli/"):
+    if normalized.startswith("docs/history/presentation/cli/"):
         return "cli-presentation"
-    if normalized.startswith("docs/presentation/android/"):
+    if normalized.startswith("docs/history/presentation/android/"):
         return "android-presentation"
-    if normalized.startswith("docs/libs/"):
+    if normalized.startswith("docs/history/libs/"):
         return "libs"
     if normalized.startswith("docs/tools/history/"):
         return "tools"

@@ -2,13 +2,15 @@ module;
 
 #include "bag/common/build_features.h"
 
-#if FLIPBITS_HAS_STD_MODULE_PROVIDER
-import std;
-#else
+#if !FLIPBITS_HAS_STD_MODULE_PROVIDER
 #include "bag/common/std_compat.h"
 #endif
 
 export module bag.flash.voicing;
+
+#if FLIPBITS_HAS_STD_MODULE_PROVIDER
+import std;
+#endif
 
 export import bag.flash.signal;
 

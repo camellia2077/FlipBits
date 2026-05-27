@@ -23,6 +23,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                length = SampleInputLengthOption.Short,
                 isSampleAutoFillEnabled = true,
             )
 
@@ -44,6 +45,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                length = SampleInputLengthOption.Short,
                 isSampleAutoFillEnabled = true,
                 isDecorationEnabled = true,
             )
@@ -71,6 +73,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                length = SampleInputLengthOption.Short,
                 isSampleAutoFillEnabled = true,
                 isDecorationEnabled = false,
             )
@@ -79,6 +82,28 @@ class SampleInputSessionUpdaterTest {
         assertEquals("sacred-en-${flashSession.sampleInputId}", flashSession.inputText)
         assertNull(flashSession.sampleEmojiShuffleState)
         assertNull(flashSession.appliedSampleEmojiPrefix)
+    }
+
+    @Test
+    fun `initialize seeds long samples when long length is selected`() {
+        val lengthAwareUpdater = SampleInputSessionUpdater(LengthAwareUpdaterSampleInputTextProvider())
+
+        val updated =
+            lengthAwareUpdater.initialize(
+                sessions = TransportModeOption.entries.associateWith { ModeAudioSessionState() },
+                language = AppLanguageOption.English,
+                flavor = SampleFlavor.SacredMachine,
+                length = SampleInputLengthOption.Long,
+                isSampleAutoFillEnabled = true,
+                isDecorationEnabled = false,
+            )
+
+        TransportModeOption.entries.forEach { mode ->
+            val session = updated.getValue(mode)
+            assertTrue(session.sampleInputId in setOf("sacred-long-a", "sacred-long-b"))
+            assertTrue(session.inputText.startsWith("sacred-long-"))
+            assertEquals(SampleInputLengthOption.Long, session.sampleShuffleState?.length)
+        }
     }
 
     @Test
@@ -211,6 +236,7 @@ class SampleInputSessionUpdaterTest {
                 sessions = initialSessions,
                 language = AppLanguageOption.English,
                 flavor = SampleFlavor.SacredMachine,
+                length = SampleInputLengthOption.Short,
                 isSampleAutoFillEnabled = false,
             )
         assertEquals(initialSessions, initialized)
@@ -274,6 +300,53 @@ class SampleInputSessionUpdaterTest {
         assertNull(cleared.getValue(TransportModeOption.Flash).appliedSampleEmojiPrefix)
         assertEquals("CUSTOM", cleared.getValue(TransportModeOption.Mini).inputText)
         assertNull(cleared.getValue(TransportModeOption.Mini).sampleInputId)
+    }
+}
+
+private class LengthAwareUpdaterSampleInputTextProvider : SampleInputTextProvider {
+    override fun defaultSample(
+        mode: TransportModeOption,
+        language: AppLanguageOption,
+        flavor: SampleFlavor,
+    ): SampleInput = entries(flavor, SampleInputLengthOption.Short).first()
+
+    override fun sampleIds(
+        mode: TransportModeOption,
+        flavor: SampleFlavor,
+        length: SampleInputLengthOption,
+    ): List<String> = entries(flavor, length).map(SampleInput::id)
+
+    override fun sampleById(
+        mode: TransportModeOption,
+        language: AppLanguageOption,
+        flavor: SampleFlavor,
+        sampleId: String,
+    ): SampleInput? =
+        (entries(flavor, SampleInputLengthOption.Short) + entries(flavor, SampleInputLengthOption.Long))
+            .firstOrNull { it.id == sampleId }
+
+    private fun entries(
+        flavor: SampleFlavor,
+        length: SampleInputLengthOption,
+    ): List<SampleInput> {
+        val prefix =
+            when (flavor) {
+                SampleFlavor.SacredMachine -> "sacred"
+                SampleFlavor.AncientDynasty -> "dynasty"
+                SampleFlavor.ImmortalRot -> "rot"
+                SampleFlavor.ScarletCarnage -> "scarlet"
+                SampleFlavor.ExquisiteFall -> "exquisite"
+                SampleFlavor.LabyrinthOfMutability -> "labyrinth"
+            }
+        val lengthPart =
+            when (length) {
+                SampleInputLengthOption.Short -> "short"
+                SampleInputLengthOption.Long -> "long"
+            }
+        return listOf(
+            SampleInput("$prefix-$lengthPart-a", "$prefix-$lengthPart-a"),
+            SampleInput("$prefix-$lengthPart-b", "$prefix-$lengthPart-b"),
+        )
     }
 }
 

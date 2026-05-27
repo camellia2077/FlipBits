@@ -9,29 +9,29 @@ Use this layer only for tool definition:
 - command-specific behavior
 
 Do not use this directory as the project workflow entry.
-- Project entry: [apps/audio_android/AGENTS.md](/C:/code/WaveBits/apps/audio_android/AGENTS.md)
-- Execution steps: [.agent/workflows/translations/README.md](/C:/code/WaveBits/.agent/workflows/translations/README.md)
+- Project entry: [apps/audio_android/AGENTS.md](../../../../apps/audio_android/AGENTS.md)
+- Execution steps: [.agent/workflows/translations/README.md](../../../../.agent/workflows/translations/README.md)
 
 ## Start Here
 
-- Tool overview and command map: [sop.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/sop.md)
-- Stable CLI and task JSON contract: [cli_contract.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/cli_contract.md)
-- Tool architecture: [architecture.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/architecture.md)
+- Tool overview and command map: [sop.md](sop.md)
+- Stable CLI and task JSON contract: [cli_contract.md](cli_contract.md)
+- Tool architecture: [architecture.md](architecture.md)
 
 ## Main Commands
 
 - `key-alignment`
   - Missing or extra localized keys.
-  - See [check_translation_key_alignment.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/check_translation_key_alignment.md)
+  - See [check_translation_key_alignment.md](check_translation_key_alignment.md)
 - `compare`
   - EN vs localized review artifacts and task JSON.
-  - See [compare_translation_quality.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/compare_translation_quality.md)
+  - See [compare_translation_quality.md](compare_translation_quality.md)
 - `export-entries` / `build-export-replacements` / `replace`
   - Narrow JSON-first edit/apply path.
-  - See [apply_translation_replacements.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/apply_translation_replacements.md)
+  - See [apply_translation_replacements.md](apply_translation_replacements.md)
 - `mixed-language` / `mixed-language-context-audit`
   - Suspicious untranslated English discovery and triage.
-  - See [check_mixed_language.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/check_mixed_language.md)
+  - See [check_mixed_language.md](check_mixed_language.md)
 - `untranslated-equals-english`
   - Exact `localized == EN` discovery for Latin-script locales.
   - Use this when the main risk is full English leftovers rather than cross-script leakage.

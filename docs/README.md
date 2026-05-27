@@ -22,13 +22,13 @@
   - 记录模式设计、编码方式、协议/PHY 方向与实现口径。
 - `docs/notes/`
   - 记录构建命令、release gate 与持续追踪清单。
-- `docs/libs/`
+- `docs/history/libs/`
   - 记录 `libs/` 共享库版本发布说明。
-- `docs/presentation/`
+- `docs/history/presentation/`
   - 记录 CLI / Android 表现层版本发布说明。
 - `docs/core.md`
   - 记录当前内核状态总览。
-- `docs/presentation/README.md`
+- `docs/history/presentation/README.md`
   - 记录当前表现层发布说明入口。
 - `docs/testing.md`
   - 记录测试分层、语料和验证口径。

@@ -3,7 +3,7 @@
 #include "bag/common/version_generated.h"
 #include "test/test_cli_version_generated.h"
 
-#if !defined(FLIPBITS_TEST_IMPORT_STD)
+#if !defined(FLIPBITS_TEST_IMPORT_STD) || !FLIPBITS_HAS_STD_MODULE_PROVIDER
 #include <string>
 #include <vector>
 #endif

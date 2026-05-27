@@ -30,6 +30,7 @@ internal fun AudioPlaybackDisplayBlock(
     initialFollowViewMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
     extraLyricsRecoveryHeight: Dp = 0.dp,
     applyLyricsPreviewBonusLine: Boolean = false,
+    onOpenLyricsNavigator: () -> Unit = {},
     modifier: Modifier = Modifier,
     onSeekToSample: (Int) -> Unit = {},
 ) {
@@ -56,6 +57,7 @@ internal fun AudioPlaybackDisplayBlock(
         lyricsExpanded = displaySectionState.lyricsExpanded,
         extraLyricsRecoveryHeight = extraLyricsRecoveryHeight,
         applyLyricsPreviewBonusLine = applyLyricsPreviewBonusLine,
+        onOpenLyricsNavigator = onOpenLyricsNavigator,
         onDisplayModeSelected = displaySectionState.onDisplayModeSelected,
         onFlashVisualizationModeSelected = displaySectionState.onFlashVisualizationModeSelected,
         onMorseVisualizationModeSelected = displaySectionState.onMorseVisualizationModeSelected,

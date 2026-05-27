@@ -104,9 +104,12 @@
     <string name="brand_theme_black_crimson_rite_title">Black Crimson Rite</string>
     <string name="brand_theme_black_crimson_rite_description">Soot black and ritual crimson for a severe shrine glow.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Black Crimson Rite theme, near-black with vivid crimson red.</string>
-    <string name="brand_theme_scarlet_guard_title">Scarlet Guard</string>
-    <string name="brand_theme_scarlet_guard_description">Ivory and sealed crimson for a disciplined heraldic tone.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Scarlet Guard theme, light ivory with dark scarlet red.</string>
+    <string name="brand_theme_xeno_code_title">Xeno Code</string>
+    <string name="brand_theme_xeno_code_description">Obsidian circuitry and neon green for an alien machine pulse.</string>
+    <string name="brand_theme_xeno_code_accessibility">Xeno Code theme, dark moss black with neon green and a white outline.</string>
+    <string name="brand_theme_scarlet_guard_title">Hazard Warning</string>
+    <string name="brand_theme_scarlet_guard_description">Pale industrial gray, hazard orange-red, and dark graphite for a machine-alert signal look.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Hazard Warning theme, pale gray with hazard orange-red and a dark graphite outline.</string>
     <string name="brand_theme_dynasty_revival_title">Dynasty Revival</string>
     <string name="brand_theme_dynasty_revival_description">Tomb-metal black and reactor green for a reawakened dynasty glow.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Dynasty Revival theme, deep tomb-metal black with bright reactor green.</string>
@@ -332,21 +335,21 @@
     <string name="config_custom_material_theme_expand">Expand custom colors</string>
     <string name="config_custom_material_theme_collapse">Collapse custom colors</string>
     <!-- CONTEXT: Validation error shown when an imported custom preset block contains a field name that is not allowed. Placeholder 1 is the 1-based block number and 2 is the field name. -->
-    <string name="config_custom_theme_import_error_unknown_field">Block %1$d has an unsupported field: %2$s.</string>
+    <string name="config_custom_theme_import_error_unknown_field">Group %1$d has an unsupported field: %2$s.</string>
     <!-- CONTEXT: Validation error shown when no importable custom preset block was pasted into a custom color/theme import dialog. -->
     <string name="config_custom_theme_import_error_empty">Paste at least one custom preset block.</string>
     <!-- CONTEXT: Validation error shown when an import line is missing the key=value format. Placeholder 1 is the 1-based line number. -->
     <string name="config_custom_theme_import_error_malformed_line">Line %1$d must use key=value.</string>
     <!-- CONTEXT: Validation error shown when an imported custom preset block repeats a field. Placeholder 1 is the 1-based block number and 2 is the localized field label. -->
-    <string name="config_custom_theme_import_error_duplicate_field">Block %1$d repeats %2$s.</string>
+    <string name="config_custom_theme_import_error_duplicate_field">Group %1$d repeats %2$s.</string>
     <!-- CONTEXT: Validation error shown when an imported custom preset block is missing a required field. Placeholder 1 is the 1-based block number and 2 is the localized field label. -->
-    <string name="config_custom_theme_import_error_missing_field">Block %1$d is missing %2$s.</string>
+    <string name="config_custom_theme_import_error_missing_field">Group %1$d is missing %2$s.</string>
     <!-- CONTEXT: Validation error shown when an imported custom preset block contains an invalid hex color value. Placeholder 1 is the 1-based block number, 2 is the localized field label, and 3 is the pasted value. -->
-    <string name="config_custom_theme_import_error_invalid_hex">Block %1$d has an invalid %2$s hex color: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Group %1$d has an invalid %2$s hex color: %3$s.</string>
     <!-- CONTEXT: Validation error shown when a custom dual-tone preset block is pasted into the custom Material colors import dialog. Placeholder 1 is the 1-based block number. -->
-    <string name="config_custom_theme_import_error_wrong_target_dual_tone">Block %1$d uses custom dual-tone fields. Import it from custom dual-tone instead.</string>
+    <string name="config_custom_theme_import_error_wrong_target_dual_tone">Group %1$d uses custom dual-tone fields. Import it from custom dual-tone instead.</string>
     <!-- CONTEXT: Validation error shown when a custom Material color preset block is pasted into the custom dual-tone import dialog. Placeholder 1 is the 1-based block number. -->
-    <string name="config_custom_theme_import_error_wrong_target_material">Block %1$d uses custom color fields. Import it from custom colors instead.</string>
+    <string name="config_custom_theme_import_error_wrong_target_material">Group %1$d uses custom color fields. Import it from custom colors instead.</string>
     <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
     <string name="config_custom_theme_import_field_name">name</string>
     <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->

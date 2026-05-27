@@ -93,9 +93,12 @@
     <string name="brand_theme_black_crimson_rite_title">블랙 크림슨 의식</string>
     <string name="brand_theme_black_crimson_rite_description">엄숙한 제단의 기운을 띠는 그을음빛 검정과 의식용 진홍.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">블랙 크림슨 라이트 테마, 검은색에 가까운 색과 선명한 진홍색.</string>
-    <string name="brand_theme_scarlet_guard_title">스칼렛 가드</string>
-    <string name="brand_theme_scarlet_guard_description">절제된 문장 분위기의 아이보리와 봉인된 진홍.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">스칼렛 가드 테마, 밝은 아이보리와 어두운 스칼렛 레드.</string>
+    <string name="brand_theme_xeno_code_title">제노 코드</string>
+    <string name="brand_theme_xeno_code_description">흑요석 회로와 네온 그린이 외계 기계의 맥동을 만든다.</string>
+    <string name="brand_theme_xeno_code_accessibility">제노 코드 테마, 짙은 이끼빛 검정에 네온 그린과 흰색 윤곽선.</string>
+    <string name="brand_theme_scarlet_guard_title">위험 경고</string>
+    <string name="brand_theme_scarlet_guard_description">옅은 산업 회색, 경고용 주황빛 빨강, 짙은 흑연색으로 기계 경보 같은 분위기를 만든다.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">위험 경고 테마, 옅은 회색에 경고용 주황빛 빨강과 짙은 흑연색 윤곽선.</string>
     <string name="brand_theme_dynasty_revival_title">다이너스티 리바이벌</string>
     <string name="brand_theme_dynasty_revival_description">되살아난 왕조를 떠올리게 하는 툼 메탈 블랙과 리액터 그린.</string>
     <string name="brand_theme_dynasty_revival_accessibility">다이너스티 리바이벌 테마, 깊은 툼 메탈 블랙과 밝은 리액터 그린.</string>

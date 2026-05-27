@@ -100,6 +100,87 @@ class SampleInputThemeStateTest {
     }
 
     @Test
+    fun `brand theme flavor refresh preserves selected long sample length`() {
+        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
+        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+        val lengthAwareUpdater = SampleInputSessionUpdater(LengthAwareThemeStateSampleInputTextProvider())
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
+                selectedBrandTheme = marsRelic,
+                sessions =
+                    mapOf(
+                        TransportModeOption.Flash to
+                            ModeAudioSessionState(
+                                inputText = "sacred-long-a",
+                                sampleInputId = "sacred-long-a",
+                                sampleShuffleState =
+                                    com.bag.audioandroid.ui.state.SampleInputShuffleState(
+                                        flavor = SampleFlavor.SacredMachine,
+                                        length = SampleInputLengthOption.Long,
+                                        shuffledSampleIds = listOf("sacred-long-a", "sacred-long-b"),
+                                        nextSampleIndex = 1,
+                                        lastPresentedSampleId = "sacred-long-a",
+                                    ),
+                            ),
+                        TransportModeOption.Pro to ModeAudioSessionState(inputText = "CUSTOM INPUT", sampleInputId = null),
+                        TransportModeOption.Ultra to ModeAudioSessionState(inputText = "", sampleInputId = null),
+                        TransportModeOption.Mini to ModeAudioSessionState(inputText = "", sampleInputId = null),
+                    ),
+            )
+
+        val updated = state.withSelectedBrandTheme(ancientAlloy, lengthAwareUpdater)
+
+        val flashSession = updated.sessions.getValue(TransportModeOption.Flash)
+        assertTrue(flashSession.inputText.startsWith("dynasty-long-"))
+        assertTrue(flashSession.sampleInputId in setOf("dynasty-long-a", "dynasty-long-b"))
+        assertEquals(SampleInputLengthOption.Long, flashSession.sampleShuffleState?.length)
+    }
+
+    @Test
+    fun `brand theme flavor refresh keeps long selection state and long text in sync`() {
+        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
+        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+        val lengthAwareUpdater = SampleInputSessionUpdater(LengthAwareThemeStateSampleInputTextProvider())
+        val state =
+            AudioAppUiState(
+                selectedLanguage = AppLanguageOption.English,
+                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
+                selectedBrandTheme = marsRelic,
+                selectedSampleInputLength = SampleInputLengthOption.Long,
+                transportMode = TransportModeOption.Flash,
+                sessions =
+                    mapOf(
+                        TransportModeOption.Flash to
+                            ModeAudioSessionState(
+                                inputText = "sacred-long-a",
+                                sampleInputId = "sacred-long-a",
+                                sampleShuffleState =
+                                    com.bag.audioandroid.ui.state.SampleInputShuffleState(
+                                        flavor = SampleFlavor.SacredMachine,
+                                        length = SampleInputLengthOption.Long,
+                                        shuffledSampleIds = listOf("sacred-long-a", "sacred-long-b"),
+                                        nextSampleIndex = 1,
+                                        lastPresentedSampleId = "sacred-long-a",
+                                    ),
+                            ),
+                        TransportModeOption.Pro to ModeAudioSessionState(),
+                        TransportModeOption.Ultra to ModeAudioSessionState(),
+                        TransportModeOption.Mini to ModeAudioSessionState(),
+                    ),
+            )
+
+        val updated = state.withSelectedBrandTheme(ancientAlloy, lengthAwareUpdater)
+
+        assertEquals(SampleInputLengthOption.Long, updated.selectedSampleInputLength)
+        assertEquals(TransportModeOption.Flash, updated.transportMode)
+        assertEquals(SampleInputLengthOption.Long, updated.currentSession.sampleShuffleState?.length)
+        assertTrue(updated.currentSession.inputText.startsWith("dynasty-long-"))
+        assertTrue(updated.currentSession.sampleInputId in setOf("dynasty-long-a", "dynasty-long-b"))
+    }
+
+    @Test
     fun `switching away from dual tone falls back to sacred machine flavor`() {
         val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
         val state =
@@ -262,6 +343,53 @@ class SampleInputThemeStateTest {
     ) {
         assertTrue(session.inputText == "$expectedPrefix-a" || session.inputText == "$expectedPrefix-b")
         assertEquals(session.inputText.removePrefix("$expectedPrefix-"), session.sampleInputId)
+    }
+}
+
+private class LengthAwareThemeStateSampleInputTextProvider : SampleInputTextProvider {
+    override fun defaultSample(
+        mode: TransportModeOption,
+        language: AppLanguageOption,
+        flavor: SampleFlavor,
+    ): SampleInput = entries(flavor, SampleInputLengthOption.Short).first()
+
+    override fun sampleIds(
+        mode: TransportModeOption,
+        flavor: SampleFlavor,
+        length: SampleInputLengthOption,
+    ): List<String> = entries(flavor, length).map(SampleInput::id)
+
+    override fun sampleById(
+        mode: TransportModeOption,
+        language: AppLanguageOption,
+        flavor: SampleFlavor,
+        sampleId: String,
+    ): SampleInput? =
+        (entries(flavor, SampleInputLengthOption.Short) + entries(flavor, SampleInputLengthOption.Long))
+            .firstOrNull { it.id == sampleId }
+
+    private fun entries(
+        flavor: SampleFlavor,
+        length: SampleInputLengthOption,
+    ): List<SampleInput> {
+        val prefix =
+            when (flavor) {
+                SampleFlavor.SacredMachine -> "sacred"
+                SampleFlavor.AncientDynasty -> "dynasty"
+                SampleFlavor.ImmortalRot -> "rot"
+                SampleFlavor.ScarletCarnage -> "scarlet"
+                SampleFlavor.ExquisiteFall -> "exquisite"
+                SampleFlavor.LabyrinthOfMutability -> "labyrinth"
+            }
+        val lengthPart =
+            when (length) {
+                SampleInputLengthOption.Short -> "short"
+                SampleInputLengthOption.Long -> "long"
+            }
+        return listOf(
+            SampleInput("$prefix-$lengthPart-a", "$prefix-$lengthPart-a"),
+            SampleInput("$prefix-$lengthPart-b", "$prefix-$lengthPart-b"),
+        )
     }
 }
 

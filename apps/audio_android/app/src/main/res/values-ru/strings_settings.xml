@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Чёрный Багряный Обряд</string>
     <string name="brand_theme_black_crimson_rite_description">Сажисто-чёрный и ритуальный багряный создают суровую атмосферу машинного святилища.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Тема Чёрный Багряный Обряд, почти чёрный с ярким багряно-красным.</string>
-    <string name="brand_theme_scarlet_guard_title">Багряная Стража</string>
-    <string name="brand_theme_scarlet_guard_description">Слоновая кость и запечатанный багряный придают строгий геральдический тон.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Тема Багряная Стража, светлая слоновая кость с тёмно-багряным красным.</string>
+    <string name="brand_theme_xeno_code_title">Ксено-код</string>
+    <string name="brand_theme_xeno_code_description">Обсидиановые контуры и неоновый зелёный создают пульс чужеродной машины.</string>
+    <string name="brand_theme_xeno_code_accessibility">Тема Ксено-код, тёмный мшисто-чёрный с неоновым зелёным и белой окантовкой.</string>
+    <string name="brand_theme_scarlet_guard_title">Предупреждение об опасности</string>
+    <string name="brand_theme_scarlet_guard_description">Бледно-промышленный серый, сигнальный оранжево-красный и тёмный графит создают вид машинной тревоги.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Тема Предупреждение об опасности, бледно-серый с сигнальным оранжево-красным и тёмно-графитовым контуром.</string>
     <string name="brand_theme_dynasty_revival_title">Возрождение Династии</string>
     <string name="brand_theme_dynasty_revival_description">Чёрный гробовой металл и классический реакторный зелёный для пробудившегося династического ядра.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Тема Возрождение Династии, глубокий чёрный гробовой металл с ярким реакторным зелёным.</string>

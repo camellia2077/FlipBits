@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Schwarzroter Ritus</string>
     <string name="brand_theme_black_crimson_rite_description">Rußschwarz und Ritualkarmesin für die strenge Stimmung eines Maschinenschreins.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Schwarzroter-Ritus-Design, fast schwarz mit leuchtendem Karmesinrot.</string>
-    <string name="brand_theme_scarlet_guard_title">Scharlachwache</string>
-    <string name="brand_theme_scarlet_guard_description">Elfenbeinweiß und versiegeltes Karmesin für einen disziplinierten heraldischen Ton.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Scharlachwache-Design, helles Elfenbein mit dunklem Scharlachrot.</string>
+    <string name="brand_theme_xeno_code_title">Xeno-Code</string>
+    <string name="brand_theme_xeno_code_description">Obsidianschwarze Schaltkreise und Neongrün für den Puls einer fremdartigen Maschine.</string>
+    <string name="brand_theme_xeno_code_accessibility">Xeno-Code-Design, dunkles Moosschwarz mit Neongrün und weißer Kontur.</string>
+    <string name="brand_theme_scarlet_guard_title">Gefahrenwarnung</string>
+    <string name="brand_theme_scarlet_guard_description">Helles Industrie-Grau, Warn-Orange-Rot und dunkler Graphit für den Look eines Maschinenalarms.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Gefahrenwarnung-Design, blasses Grau mit Warn-Orange-Rot und dunkler Graphitkontur.</string>
     <string name="brand_theme_dynasty_revival_title">Wiederkehr der Dynastie</string>
     <string name="brand_theme_dynasty_revival_description">Grabmetallschwarz mit klassischem Reaktorgrün für einen erwachten Dynastiekern.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Wiederkehr-der-Dynastie-Design, tiefes Grabmetallschwarz mit hellem Reaktorgrün.</string>

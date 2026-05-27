@@ -100,6 +100,9 @@
     <!-- CONTEXT: Title inside the player detail sheet for the text produced by reading audio back. Same concept as Read result. -->
     <string name="audio_player_detail_decoded_title">読み取り結果</string>
     <string name="audio_player_detail_decoded_empty">結果はまだありません。必要な時に「読み取り」をタップしてください。</string>
+    <string name="audio_lyrics_navigator_title">歌詞</string>
+    <string name="audio_lyrics_navigator_subtitle">全画面の歌詞ナビゲーションのプレビューです。</string>
+    <string name="audio_lyrics_navigator_open">全画面の歌詞を開く</string>
     <string name="audio_playback_view_visual">ビジュアル</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">フォローデータを待機中</string>

@@ -157,6 +157,9 @@
     <string name="audio_player_detail_decoded_title">Read result</string>
     <!-- CONTEXT: Empty-state text in the player detail sheet before the user has decoded/read the payload. -->
     <string name="audio_player_detail_decoded_empty">No result yet. Tap Read when needed.</string>
+    <string name="audio_lyrics_navigator_title">Lyrics</string>
+    <string name="audio_lyrics_navigator_subtitle">Full-screen lyric navigation preview.</string>
+    <string name="audio_lyrics_navigator_open">Open full lyrics</string>
     <!-- CONTEXT: Tab label for the playback screen's visual mode. Shows waveform/visualizer rather than lyric/data text. -->
     <string name="audio_playback_view_visual">Visual</string>
     <!-- CONTEXT: Tab label for the playback screen's lyric/text-follow mode. -->

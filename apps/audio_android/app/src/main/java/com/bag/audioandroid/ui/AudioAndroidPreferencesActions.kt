@@ -129,7 +129,7 @@ internal class AudioAndroidPreferencesActions(
                 )
             val updatedPresets =
                 if (replacePresetId == null) {
-                    state.customBrandThemePresets + normalizedSettings
+                    listOf(normalizedSettings) + state.customBrandThemePresets
                 } else {
                     state.customBrandThemePresets.map { preset ->
                         if (preset.presetId == replacePresetId) {
@@ -171,7 +171,7 @@ internal class AudioAndroidPreferencesActions(
             )
         uiState.update { state ->
             state
-                .copy(customMaterialThemePresets = state.customMaterialThemePresets + settings)
+                .copy(customMaterialThemePresets = listOf(settings) + state.customMaterialThemePresets)
                 .withSelectedMaterialPaletteTheme(customMaterialPalette(settings))
         }
         val updatedState = uiState.value
@@ -512,6 +512,7 @@ internal class AudioAndroidPreferencesActions(
                         sessions = state.sessions,
                         language = state.selectedLanguage,
                         flavor = state.currentSampleFlavor,
+                        length = state.selectedSampleInputLength,
                         isSampleAutoFillEnabled = true,
                         isDecorationEnabled = state.isSampleDecorationEnabled,
                     )
@@ -603,7 +604,7 @@ internal fun AudioAppUiState.withSavedCustomMaterialTheme(
         )
     val updatedPresets =
         if (replacePresetId == null) {
-            customMaterialThemePresets + normalizedSettings
+            listOf(normalizedSettings) + customMaterialThemePresets
         } else {
             customMaterialThemePresets.map { preset ->
                 if (preset.presetId == replacePresetId) {
@@ -636,6 +637,7 @@ internal fun AudioAppUiState.withSavedCustomMaterialTheme(
 internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<CustomBrandThemeSettings>): AudioAppUiState {
     var updatedPresets = customMaterialThemePresets
     val importedResolved = mutableListOf<CustomBrandThemeSettings>()
+    val insertedPresetIdsInImportOrder = mutableListOf<String>()
     settings.forEach { setting ->
         val normalizedCandidate =
             normalizeCustomMaterialThemeSettings(
@@ -656,6 +658,10 @@ internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<Cus
             )
         updatedPresets =
             if (duplicatePresetId == null) {
+                // Keep batch-imported presets at the top, but preserve the same
+                // order as the shared/exported config text instead of reversing
+                // the batch through repeated head insertion.
+                insertedPresetIdsInImportOrder += resolved.presetId
                 listOf(resolved) + updatedPresets
             } else {
                 updatedPresets.map { preset ->
@@ -668,7 +674,16 @@ internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<Cus
             }
         importedResolved += resolved
     }
-    val updatedState = copy(customMaterialThemePresets = updatedPresets)
+    val orderedInsertedPresets =
+        insertedPresetIdsInImportOrder.mapNotNull { insertedPresetId ->
+            updatedPresets.firstOrNull { it.presetId == insertedPresetId }
+        }
+    val remainingPresets =
+        updatedPresets.filterNot { preset -> preset.presetId in insertedPresetIdsInImportOrder }
+    val updatedState =
+        copy(
+            customMaterialThemePresets = orderedInsertedPresets + remainingPresets,
+        )
     return if (importedResolved.size == 1) {
         updatedState.withSavedCustomMaterialTheme(importedResolved.single(), importedResolved.single().presetId)
     } else {
@@ -678,6 +693,7 @@ internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<Cus
 
 internal fun AudioAppUiState.withImportedCustomBrandThemes(settings: List<CustomBrandThemeSettings>): AudioAppUiState {
     var updatedPresets = customBrandThemePresets
+    val insertedPresetIdsInImportOrder = mutableListOf<String>()
     settings.forEach { setting ->
         val normalizedCandidate =
             setting.copy(
@@ -696,7 +712,10 @@ internal fun AudioAppUiState.withImportedCustomBrandThemes(settings: List<Custom
             )
         updatedPresets =
             if (duplicatePresetId == null) {
-                updatedPresets + resolved
+                // Match imported/exported order at the top of the list while
+                // still treating batch import as a stack push above older presets.
+                insertedPresetIdsInImportOrder += resolved.presetId
+                listOf(resolved) + updatedPresets
             } else {
                 updatedPresets.map { preset ->
                     if (preset.presetId == duplicatePresetId) {
@@ -707,7 +726,13 @@ internal fun AudioAppUiState.withImportedCustomBrandThemes(settings: List<Custom
                 }
             }
     }
-    return copy(customBrandThemePresets = updatedPresets)
+    val orderedInsertedPresets =
+        insertedPresetIdsInImportOrder.mapNotNull { insertedPresetId ->
+            updatedPresets.firstOrNull { it.presetId == insertedPresetId }
+        }
+    val remainingPresets =
+        updatedPresets.filterNot { preset -> preset.presetId in insertedPresetIdsInImportOrder }
+    return copy(customBrandThemePresets = orderedInsertedPresets + remainingPresets)
 }
 
 private const val DefaultFirstMaterialPaletteId = "stone"

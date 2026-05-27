@@ -14,7 +14,7 @@ Use this workflow for Android app UI text in `strings_*.xml`.
 Do not use this workflow for literary audio sample text in `audio_samples_*.xml`; use [android-sample-text.md](android-sample-text.md).
 If the task is specifically to find untranslated English leftovers inside `values-*`, use [check-untranslated-english.md](check-untranslated-english.md) first.
 
-Tool definition for commands and JSON contracts lives in [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md).
+Tool definition for commands and JSON contracts lives in [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md).
 
 ## Quick Path For A Few New Keys
 

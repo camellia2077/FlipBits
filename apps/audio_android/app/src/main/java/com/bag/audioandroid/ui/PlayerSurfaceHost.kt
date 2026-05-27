@@ -1,7 +1,6 @@
 package com.bag.audioandroid.ui
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.spring
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,17 +24,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.FlashSignalInfo
@@ -55,7 +51,6 @@ import com.bag.audioandroid.ui.state.FlashVisualWindowState
 import com.bag.audioandroid.ui.state.QueueSheetValue
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 import com.bag.audioandroid.ui.utilityActionIconButtonColors
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun PlayerSurfaceHost(
@@ -116,75 +111,21 @@ internal fun PlayerSurfaceHost(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val containerHeightPx = constraints.maxHeight.toFloat().coerceAtLeast(1f)
-        val surfaceDragOffsetPx = remember { Animatable(0f) }
-        val scope = rememberCoroutineScope()
+        var isLyricsNavigatorVisible by remember { mutableStateOf(false) }
+        BackHandler(enabled = !isLyricsNavigatorVisible) {
+            if (showQueueSheet) {
+                onCloseSavedAudioSheet()
+            } else {
+                topBarActions.onCollapse()
+            }
+        }
         val collapseChromeContentPadding = 52.dp
-        val expandedPlayerNestedScrollConnection =
-            remember(showQueueSheet, containerHeightPx) {
-                object : NestedScrollConnection {
-                    override fun onPreScroll(
-                        available: androidx.compose.ui.geometry.Offset,
-                        source: NestedScrollSource,
-                    ): androidx.compose.ui.geometry.Offset {
-                        if (showQueueSheet || source != NestedScrollSource.UserInput) {
-                            return androidx.compose.ui.geometry.Offset.Zero
-                        }
-                        if (available.y >= 0f || surfaceDragOffsetPx.value <= 0f) {
-                            return androidx.compose.ui.geometry.Offset.Zero
-                        }
-                        val nextOffset = (surfaceDragOffsetPx.value + available.y).coerceAtLeast(0f)
-                        val consumedY = nextOffset - surfaceDragOffsetPx.value
-                        if (consumedY == 0f) {
-                            return androidx.compose.ui.geometry.Offset.Zero
-                        }
-                        scope.launch {
-                            surfaceDragOffsetPx.snapTo(nextOffset)
-                        }
-                        return androidx.compose.ui.geometry
-                            .Offset(0f, consumedY)
-                    }
-
-                    override fun onPostScroll(
-                        consumed: androidx.compose.ui.geometry.Offset,
-                        available: androidx.compose.ui.geometry.Offset,
-                        source: NestedScrollSource,
-                    ): androidx.compose.ui.geometry.Offset {
-                        if (showQueueSheet || source != NestedScrollSource.UserInput || available.y <= 0f) {
-                            return androidx.compose.ui.geometry.Offset.Zero
-                        }
-                        val nextOffset = (surfaceDragOffsetPx.value + available.y).coerceAtLeast(0f)
-                        val consumedY = nextOffset - surfaceDragOffsetPx.value
-                        if (consumedY == 0f) {
-                            return androidx.compose.ui.geometry.Offset.Zero
-                        }
-                        scope.launch {
-                            surfaceDragOffsetPx.snapTo(nextOffset)
-                        }
-                        return androidx.compose.ui.geometry
-                            .Offset(0f, consumedY)
-                    }
-
-                    override suspend fun onPostFling(
-                        consumed: Velocity,
-                        available: Velocity,
-                    ): Velocity {
-                        if (showQueueSheet) {
-                            surfaceDragOffsetPx.animateTo(0f, spring())
-                            return Velocity.Zero
-                        }
-                        if (PlayerGestureController.shouldCollapseExpandedPlayer(
-                                dragOffsetPx = surfaceDragOffsetPx.value,
-                                containerHeightPx = containerHeightPx,
-                                velocityPxPerSec = available.y,
-                            )
-                        ) {
-                            topBarActions.onCollapse()
-                        }
-                        surfaceDragOffsetPx.animateTo(0f, spring())
-                        return Velocity.Zero
-                    }
-                }
+        val showExpandedPlayerChrome = !isLyricsNavigatorVisible
+        val detailTopContentPadding =
+            if (showExpandedPlayerChrome) {
+                collapseChromeContentPadding
+            } else {
+                0.dp
             }
         Surface(
             color = appThemeVisualTokens().modalContainerColor,
@@ -193,9 +134,7 @@ internal fun PlayerSurfaceHost(
             shadowElevation = 0.dp,
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { translationY = surfaceDragOffsetPx.value }
-                    .nestedScroll(expandedPlayerNestedScrollConnection),
+                    .fillMaxSize(),
         ) {
             Scaffold(
                 containerColor = Color.Transparent,
@@ -248,58 +187,61 @@ internal fun PlayerSurfaceHost(
                         onDebugMorseVisualizationModeHandled = onDebugMorseVisualizationModeHandled,
                         initialFollowViewMode = initialFollowViewMode,
                         initialFlashVisualizationMode = initialFlashVisualizationMode,
-                        topContentPadding = collapseChromeContentPadding,
+                        onLyricsNavigatorVisibilityChanged = { isLyricsNavigatorVisible = it },
+                        topContentPadding = detailTopContentPadding,
                         modifier = Modifier.padding(sheetInnerPadding),
                     )
-                    Box(
-                        modifier =
-                            Modifier
-                                .align(Alignment.TopCenter)
-                                .fillMaxWidth()
-                                .statusBarsPadding()
-                                .padding(start = 8.dp, top = 4.dp, end = 8.dp),
-                    ) {
-                        IconButton(
-                            onClick = topBarActions.onCollapse,
-                            colors = utilityActionIconButtonColors(),
-                            modifier = Modifier.align(Alignment.CenterStart),
+                    if (showExpandedPlayerChrome) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .align(Alignment.TopCenter)
+                                    .fillMaxWidth()
+                                    .statusBarsPadding()
+                                    .padding(start = 8.dp, top = 4.dp, end = 8.dp),
                         ) {
-                            Icon(
-                                imageVector = Icons.Rounded.KeyboardArrowDown,
-                                contentDescription = stringResource(R.string.audio_action_collapse_player_detail),
-                            )
-                        }
-                        Text(
-                            text = stringResource(topBarActions.modeLabelResId),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.align(Alignment.CenterEnd),
-                        ) {
-                            topBarActions.onShareAudio?.let { shareAudio ->
-                                IconButton(
-                                    onClick = shareAudio,
-                                    colors = utilityActionIconButtonColors(),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Share,
-                                        contentDescription = stringResource(R.string.library_action_share),
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(
+                                onClick = topBarActions.onCollapse,
+                                colors = utilityActionIconButtonColors(),
+                                modifier = Modifier.align(Alignment.CenterStart),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.KeyboardArrowDown,
+                                    contentDescription = stringResource(R.string.audio_action_collapse_player_detail),
+                                )
                             }
-                            topBarActions.onDownloadToDevice?.let { downloadToDevice ->
-                                IconButton(
-                                    onClick = downloadToDevice,
-                                    colors = utilityActionIconButtonColors(),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.SaveAlt,
-                                        contentDescription = stringResource(R.string.audio_action_export_to_file),
-                                    )
+                            Text(
+                                text = stringResource(topBarActions.modeLabelResId),
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.align(Alignment.CenterEnd),
+                            ) {
+                                topBarActions.onShareAudio?.let { shareAudio ->
+                                    IconButton(
+                                        onClick = shareAudio,
+                                        colors = utilityActionIconButtonColors(),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Share,
+                                            contentDescription = stringResource(R.string.library_action_share),
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                topBarActions.onDownloadToDevice?.let { downloadToDevice ->
+                                    IconButton(
+                                        onClick = downloadToDevice,
+                                        colors = utilityActionIconButtonColors(),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.SaveAlt,
+                                            contentDescription = stringResource(R.string.audio_action_export_to_file),
+                                        )
+                                    }
                                 }
                             }
                         }

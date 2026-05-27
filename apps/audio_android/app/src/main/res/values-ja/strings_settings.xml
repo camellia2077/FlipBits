@@ -92,9 +92,12 @@
     <string name="brand_theme_black_crimson_rite_title">ブラッククリムゾンの儀</string>
     <string name="brand_theme_black_crimson_rite_description">すすのような黒と儀式的な真紅。厳格な機械の祭壇の雰囲気に。</string>
     <string name="brand_theme_black_crimson_rite_accessibility">ブラッククリムゾンの儀テーマ。黒に近い色と鮮やかな真紅。</string>
-    <string name="brand_theme_scarlet_guard_title">スカーレットガード</string>
-    <string name="brand_theme_scarlet_guard_description">規律ある紋章学的なトーンのための、アイボリーホワイトと封印された真紅。</string>
-    <string name="brand_theme_scarlet_guard_accessibility">スカーレットガード・テーマ。明るいアイボリーと濃いスカーレットレッド。</string>
+    <string name="brand_theme_xeno_code_title">ゼノコード</string>
+    <string name="brand_theme_xeno_code_description">黒曜石めいた回路とネオングリーンが、異星の機械脈動を思わせる。</string>
+    <string name="brand_theme_xeno_code_accessibility">ゼノコード・テーマ。暗い苔黒にネオングリーン、白いアウトライン。</string>
+    <string name="brand_theme_scarlet_guard_title">ハザード警告</string>
+    <string name="brand_theme_scarlet_guard_description">淡い工業グレー、警告オレンジレッド、濃いグラファイトで機械警報のような配色に。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">ハザード警告テーマ。淡いグレーに警告オレンジレッド、濃いグラファイトのアウトライン。</string>
     <string name="brand_theme_dynasty_revival_title">ダイナスティ・リバイバル</string>
     <string name="brand_theme_dynasty_revival_description">再覚醒した王朝の核をイメージした、トゥームメタル・ブラックと伝統的なリアクター・グリーン。</string>
     <string name="brand_theme_dynasty_revival_accessibility">ダイナスティ・リバイバル・テーマ。深いトゥームメタル・ブラックと鮮やかなリアクター・グリーン。</string>

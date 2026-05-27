@@ -31,8 +31,8 @@ def is_history_markdown(path: str) -> bool:
     if not normalized.endswith(".md"):
         return False
     return (
-        normalized.startswith("docs/libs/")
-        or normalized.startswith("docs/presentation/")
+        normalized.startswith("docs/history/libs/")
+        or normalized.startswith("docs/history/presentation/")
         or normalized.startswith("docs/tools/history/")
     )
 

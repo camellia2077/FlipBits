@@ -52,10 +52,10 @@
 ## Download / Install
 The Android APK will be published via GitHub Releases.
 
-Under the current reference build, the installation package is approximately `6.24 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
+Under the current reference build, the installation package is approximately `6.32 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
 
 For user-facing Android release notes, see:
-- [`docs/presentation/android/CHANGELOG.md`](docs/presentation/android/CHANGELOG.md)
+- [`docs/history/presentation/android/CHANGELOG.md`](docs/history/presentation/android/CHANGELOG.md)
 
 ## Modes Overview
 | Mode | Technology Category | Suitable Uses |
@@ -333,7 +333,7 @@ Limitations and Boundaries (Legally Conservative Version):
 If you are an AI / agent, it is recommended to first read [`.agent/AGENTS.md`](.agent/AGENTS.md) and the `AGENTS.md` under the corresponding subsystems to quickly understand the repository structure, tool entry points, and modification conventions.
 
 ### Android
-- The official Android project entry is at `C:\code\FlipBits\apps\audio_android`.
+- The official Android project entry is at `apps/audio_android`.
 - Execute uniformly from the repository root directory:
   - `python tools/run.py android assemble-debug`
   - `python tools/run.py android assemble-release`

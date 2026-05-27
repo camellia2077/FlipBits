@@ -152,11 +152,11 @@ def bucket_name(path: str) -> str:
         return "libs/audio_runtime"
     if path.startswith("libs/"):
         return "libs/other"
-    if path.startswith("docs/presentation/android/"):
-        return "docs/presentation/android"
-    if path.startswith("docs/presentation/cli/"):
-        return "docs/presentation/cli"
-    if path.startswith("docs/libs/"):
+    if path.startswith("docs/history/presentation/android/"):
+        return "docs/history/presentation/android"
+    if path.startswith("docs/history/presentation/cli/"):
+        return "docs/history/presentation/cli"
+    if path.startswith("docs/history/libs/"):
         return "docs/libs"
     if path.startswith("docs/"):
         return "docs/other"

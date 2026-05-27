@@ -69,6 +69,8 @@ internal fun BrandThemeSection(
     deleteActionLabel: String? = null,
     onDeleteBrandTheme: ((BrandThemeOption) -> Unit)? = null,
     canDeleteBrandTheme: ((BrandThemeOption) -> Boolean)? = null,
+    headerTitleColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    headerMetaColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     if (options.isEmpty()) {
         return
@@ -107,13 +109,13 @@ internal fun BrandThemeSection(
                         Text(
                             text = title,
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = headerTitleColor,
                             fontWeight = FontWeight.SemiBold,
                         )
                         Text(
                             text = "${visibleOptions.size}/${options.size}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = headerMetaColor,
                         )
                     }
                     IconButton(
@@ -176,13 +178,13 @@ internal fun BrandThemeSection(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = headerTitleColor,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = "${visibleOptions.size}/${options.size}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = headerMetaColor,
                     )
                 }
                 Row(
@@ -320,7 +322,7 @@ internal fun BrandThemeRow(
                 primaryColor = option.primaryColor,
                 secondaryColor = option.secondaryColor,
                 outlineColor = option.outlineColor,
-                textColor = option.secondaryColor,
+                textColor = option.outlineColor,
                 contentDescription = optionAccessibility,
             )
             Column(

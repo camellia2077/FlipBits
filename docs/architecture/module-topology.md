@@ -124,8 +124,8 @@
   - 文件 I/O 对外边界保持稳定
   - third-party/backend owner 继续被限制在 private include-based surface
 
-## Host `import std;` Required Baseline
-- 当前 required baseline 已包含全部 `18` 个 promoted `audio_core` module interfaces：
+## Host `import std;` Capability Baseline
+- 当前 capability baseline 已覆盖全部 `18` 个 promoted `audio_core` module interfaces：
   - `libs/audio_core/modules/bag/common/config.cppm`
   - `libs/audio_core/modules/bag/common/types.cppm`
   - `libs/audio_core/modules/bag/flash/codec.cppm`
@@ -147,7 +147,8 @@
 - 上述 promoted interfaces 当前都通过统一 capability contract 管理标准库入口：
   - `FLIPBITS_HAS_STD_MODULE_PROVIDER=ON` 时走 `import std;`
   - `FLIPBITS_HAS_STD_MODULE_PROVIDER=OFF` 时走 `bag/common/std_compat.h`
-- Root host 因为正式要求 provider 成立，所以在这条主线上仍表现为 `import-std-only`。
+- Root host 当前正式要求的是 named modules 主线，不是无条件 `import-std-only`。
+- 只要 CMake 没有实际提供 `__CMAKE::CXX23`，host 就应留在 capability-aware fallback 路径。
 - 在 promoted set 全部收口后，当前只保留以下受控形态：
   - core module implementation capability-aware
     - `module;` + capability header + (`import std;` | include-based fallback) + `module bag.*;`

@@ -6,9 +6,9 @@
 - 解释 `audio_android` 为什么会额外维护一套 `android-translate` 工具链，而不是直接让 agent 逐份 XML 读写
 
 真正入口统一是：
-- 项目入口： [apps/audio_android/AGENTS.md](/C:/code/WaveBits/apps/audio_android/AGENTS.md)
-- 执行步骤： [.agent/workflows/translations/README.md](/C:/code/WaveBits/.agent/workflows/translations/README.md)
-- 工具定义： [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md)
+- 项目入口： [apps/audio_android/AGENTS.md](../../../apps/audio_android/AGENTS.md)
+- 执行步骤： [.agent/workflows/translations/README.md](../../../.agent/workflows/translations/README.md)
+- 工具定义： [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md)
 
 ## Why The Tool Exists
 
@@ -74,10 +74,10 @@
 ## Related Docs
 
 - 项目入口：
-  - [apps/audio_android/AGENTS.md](/C:/code/WaveBits/apps/audio_android/AGENTS.md)
+  - [apps/audio_android/AGENTS.md](../../../apps/audio_android/AGENTS.md)
 - workflow 入口：
-  - [.agent/workflows/translations/README.md](/C:/code/WaveBits/.agent/workflows/translations/README.md)
+  - [.agent/workflows/translations/README.md](../../../.agent/workflows/translations/README.md)
 - 工具定义入口：
-  - [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md)
+  - [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md)
 - 工具架构：
-  - [tools/repo_tooling/android_translate/docs/architecture.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/architecture.md)
+  - [tools/repo_tooling/android_translate/docs/architecture.md](../../../tools/repo_tooling/android_translate/docs/architecture.md)

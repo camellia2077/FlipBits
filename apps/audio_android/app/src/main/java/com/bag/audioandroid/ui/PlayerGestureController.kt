@@ -30,17 +30,7 @@ internal data class QueueSheetAnchorPositions(
 }
 
 internal object PlayerGestureController {
-    private const val ExpandedPlayerCollapseVelocityThresholdPxPerSec = 2200f
     private const val QueueVelocityThresholdPxPerSec = 1800f
-
-    fun shouldCollapseExpandedPlayer(
-        dragOffsetPx: Float,
-        containerHeightPx: Float,
-        velocityPxPerSec: Float,
-    ): Boolean {
-        val distanceThresholdPx = containerHeightPx * 0.14f
-        return dragOffsetPx >= distanceThresholdPx || velocityPxPerSec >= ExpandedPlayerCollapseVelocityThresholdPxPerSec
-    }
 
     fun settleQueueValue(
         currentVisibleHeightPx: Float,

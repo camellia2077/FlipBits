@@ -88,6 +88,6 @@ DESC_ZH = {
 # ==========================================
 PRIMARY_COLOR   = "#E8E2D0"   # 背景底色 (米白)
 SECONDARY_COLOR = "#9E1B1B"   # 属性与网格颜色 (深红)
-OUTLINE_COLOR   = "#C5A059"   # 描边颜色 (黄铜)
+OUTLINE_COLOR   = "#C78C25"   # 描边颜色 (黄铜)
 TEXT_COLOR   = "#2E2E2E"   # 文字颜色
 

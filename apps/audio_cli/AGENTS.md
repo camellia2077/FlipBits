@@ -7,8 +7,8 @@
   - `docs/architecture/compatibility-layer-inventory.md`
   - `docs/design/transports.md`
   - `docs/testing.md`
-  - `docs/presentation/README.md`
-  - `docs/presentation/cli/v0.2/0.2.0.md`
+  - `docs/history/presentation/README.md`
+  - `docs/history/presentation/cli/v0.2/0.2.0.md`
 
 ## 快速定位
 

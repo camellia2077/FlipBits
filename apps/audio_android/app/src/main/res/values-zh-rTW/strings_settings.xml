@@ -81,9 +81,12 @@
     <string name="brand_theme_black_crimson_rite_title">黑紅儀式</string>
     <string name="brand_theme_black_crimson_rite_description">煤黑與儀式深紅，透出冷峻聖龕微光。</string>
     <string name="brand_theme_black_crimson_rite_accessibility">黑紅儀式主題，近黑色搭配鮮明深紅。</string>
-    <string name="brand_theme_scarlet_guard_title">猩紅衛隊</string>
-    <string name="brand_theme_scarlet_guard_description">象牙白與封印深紅，透出嚴整紋章氣質。</string>
-    <string name="brand_theme_scarlet_guard_accessibility">猩紅衛隊主題，淺象牙白搭配深猩紅。</string>
+    <string name="brand_theme_xeno_code_title">異種代碼</string>
+    <string name="brand_theme_xeno_code_description">黑曜電路與霓虹綠，透出異星機械脈衝。</string>
+    <string name="brand_theme_xeno_code_accessibility">異種代碼主題，深苔黑搭配霓虹綠與白色描邊。</string>
+    <string name="brand_theme_scarlet_guard_title">危險警示</string>
+    <string name="brand_theme_scarlet_guard_description">淺工業灰、警示橙紅與深石墨色，呈現機械告警訊號感。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">危險警示主題，淺灰色搭配警示橙紅與深石墨描邊。</string>
     <string name="brand_theme_dynasty_revival_title">王朝再興</string>
     <string name="brand_theme_dynasty_revival_description">墓金屬黑與反應爐綠，透出甦醒王朝的幽光。</string>
     <string name="brand_theme_dynasty_revival_accessibility">王朝再興主題，深墓金屬黑搭配明亮反應爐綠。</string>
@@ -239,12 +242,12 @@
     <string name="config_custom_material_theme_collapse">收起自訂顏色</string>
     <string name="config_custom_theme_import_error_empty">請至少貼上一個自訂預設區塊。</string>
     <string name="config_custom_theme_import_error_malformed_line">第 %1$d 行必須使用 key=value 格式。</string>
-    <string name="config_custom_theme_import_error_unknown_field">第 %1$d 個區塊包含不支援的欄位：%2$s。</string>
-    <string name="config_custom_theme_import_error_duplicate_field">第 %1$d 個區塊重複了 %2$s。</string>
-    <string name="config_custom_theme_import_error_missing_field">第 %1$d 個區塊缺少 %2$s。</string>
-    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 個區塊中的 %2$s 十六進位色彩無效：%3$s。</string>
-    <string name="config_custom_theme_import_error_wrong_target_dual_tone">第 %1$d 個區塊使用的是自訂 dual-tone 欄位，請改從自訂 dual-tone 匯入。</string>
-    <string name="config_custom_theme_import_error_wrong_target_material">第 %1$d 個區塊使用的是自訂顏色欄位，請改從自訂顏色匯入。</string>
+    <string name="config_custom_theme_import_error_unknown_field">第 %1$d 組包含不支援的欄位：%2$s。</string>
+    <string name="config_custom_theme_import_error_duplicate_field">第 %1$d 組重複了 %2$s。</string>
+    <string name="config_custom_theme_import_error_missing_field">第 %1$d 組缺少 %2$s。</string>
+    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 組中的 %2$s 十六進位色彩無效：%3$s。</string>
+    <string name="config_custom_theme_import_error_wrong_target_dual_tone">第 %1$d 組使用的是自訂 dual-tone 欄位，請改從自訂 dual-tone 匯入。</string>
+    <string name="config_custom_theme_import_error_wrong_target_material">第 %1$d 組使用的是自訂顏色欄位，請改從自訂顏色匯入。</string>
     <string name="config_custom_theme_import_field_name">名稱</string>
     <string name="config_custom_theme_import_field_primary">主色</string>
     <string name="config_custom_theme_import_field_secondary">輔色</string>

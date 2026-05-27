@@ -8,7 +8,7 @@ description: Agent 专用 GitHub Release 文案写法
 
 它的目标不是替代：
 
-- `docs/presentation/**` 或 `docs/libs/**` 中的 history
+- `docs/history/presentation/**` 或 `docs/history/libs/**` 中的 history
 - Git commit message
 - PR 描述
 
@@ -35,8 +35,8 @@ description: Agent 专用 GitHub Release 文案写法
 编写 GitHub Release 时，语义来源优先级如下：
 
 1. 对应版本的 history 文档
-   - 例如 `docs/presentation/android/v0.4/0.4.16.md`
-   - 例如 `docs/libs/v0.6/0.6.1.md`
+   - 例如 `docs/history/presentation/android/v0.4/0.4.16.md`
+   - 例如 `docs/history/libs/v0.6/0.6.1.md`
 2. 已确认的版本范围内 commit message
 3. 产品实际改动和用户可感知行为
 4. `git diff` / `git status`

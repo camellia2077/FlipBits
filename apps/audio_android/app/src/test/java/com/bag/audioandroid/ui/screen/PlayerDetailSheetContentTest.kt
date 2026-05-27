@@ -1,9 +1,12 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -505,7 +508,62 @@ class PlayerDetailSheetContentTest {
             )
         }
 
-        composeRule.onNodeWithTag("playback-lyrics-expand-toggle").assertExists()
+        composeRule.onNodeWithTag("playback-token-context-tape-list").assertExists()
+        composeRule.onNodeWithTag("playback-lyrics-open-navigator").assertExists()
+        composeRule.onAllNodesWithTag("playback-lyrics-expand-toggle").assertCountEquals(0)
+    }
+
+    @Test
+    fun `lyrics navigator back closes full screen page`() {
+        var visible by mutableStateOf(true)
+        composeRule.setContent {
+            if (visible) {
+                LyricsNavigatorScaffold(
+                    followData =
+                        sampleFollowData().copy(
+                            lyricLines = listOf("ASH BELL RITE", "LAMP TIDE HUSH"),
+                            lineTokenRanges =
+                                listOf(
+                                    com.bag.audioandroid.domain
+                                        .TextFollowLineTokenRangeViewData(0, 0, 3),
+                                    com.bag.audioandroid.domain
+                                        .TextFollowLineTokenRangeViewData(1, 3, 3),
+                                ),
+                            lyricLineFollowAvailable = true,
+                        ),
+                    displayedSamples = 7,
+                    totalSamples = 12,
+                    displayedTime = "0:07",
+                    totalTime = "0:12",
+                    isPlaying = false,
+                    isScrubbing = false,
+                    playbackSequenceMode = PlaybackSequenceMode.Normal,
+                    playbackSpeed = 1.0f,
+                    canSkipPrevious = false,
+                    canSkipNext = false,
+                    transportMode = TransportModeOption.Mini,
+                    durationMs = 44_000L,
+                    sampleRateHz = 44_100,
+                    frameSamples = 2205,
+                    wavAudioInfo = com.bag.audioandroid.domain.WavAudioInfo.Empty,
+                    onBack = { visible = false },
+                    onTogglePlayback = {},
+                    onSkipToPreviousTrack = {},
+                    onSkipToNextTrack = {},
+                    onPlaybackSequenceModeSelected = {},
+                    onPlaybackSpeedSelected = {},
+                    onScrubStarted = {},
+                    onScrubChanged = {},
+                    onScrubFinished = {},
+                    onSeekToSample = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("lyrics-navigator-back").performClick()
+        composeRule.runOnIdle {
+            assertEquals(false, visible)
+        }
     }
 
     private fun setPreviewPlayerDetailContent(initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics) {

@@ -86,6 +86,9 @@
     <string name="audio_player_detail_now_playing">Nunc canit</string>
     <string name="audio_player_detail_decoded_title">Exitus resolutionis</string>
     <string name="audio_player_detail_decoded_empty">Nullus exitus adhuc. Inscribe Solve Hexam cum opus est.</string>
+    <string name="audio_lyrics_navigator_title">Carmina</string>
+    <string name="audio_lyrics_navigator_subtitle">Praevisio navigationis carminum pleno velo.</string>
+    <string name="audio_lyrics_navigator_open">Carmina plena aperi</string>
     <string name="audio_playback_view_visual">Visio</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">Expectatio datorum follow</string>

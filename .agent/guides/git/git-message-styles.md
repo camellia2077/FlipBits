@@ -83,7 +83,7 @@ Release-Version: vX.Y.Z
 - 组件内部版本（如构建号、内部协议号）可以独立演进，但不得替代 `Release-Version`
 - 组件内部版本、子系统版本线或“未变化/仅文档同步”等信息，应写在 `[Component Versions]` 中，而不是追加第二个 `Release-Version`
 - `[Component Versions]` 的职责是帮助区分 `libs`、`presentation`、`cli` 等子系统状态；它是补充说明，不是发布版本来源
-- 补写 `[Component Versions]` 时，优先以 `docs/presentation/android` 或 `docs/presentation/cli` 中已落盘的 history/version 口径为准；若 docs 未明确，再参考代码中的模块版本号；仍不明确时使用 `changed` / `unchanged` 之类的状态描述
+- 补写 `[Component Versions]` 时，优先以 `docs/history/presentation/android` 或 `docs/history/presentation/cli` 中已落盘的 history/version 口径为准；若 docs 未明确，再参考代码中的模块版本号；仍不明确时使用 `changed` / `unchanged` 之类的状态描述
 
 ## Generic Example
 

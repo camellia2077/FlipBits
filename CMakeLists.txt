@@ -46,13 +46,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT 23 IN_LIST CMAKE_CXX_COMPILER_IMPORT_STD)
-    message(
-        FATAL_ERROR
-        "Current root host target requires C++23 import std support from the active Clang toolchain."
-    )
-endif()
-
 set(CMAKE_CXX_STANDARD 23)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

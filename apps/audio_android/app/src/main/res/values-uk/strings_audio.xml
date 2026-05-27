@@ -86,6 +86,9 @@
     <string name="audio_player_detail_now_playing">Зараз грає</string>
     <string name="audio_player_detail_decoded_title">Результат читання</string>
     <string name="audio_player_detail_decoded_empty">Результату ще немає. Натисніть Прочитати, коли буде потрібно.</string>
+    <string name="audio_lyrics_navigator_title">Текст</string>
+    <string name="audio_lyrics_navigator_subtitle">Попередній перегляд повноекранної навігації за текстом.</string>
+    <string name="audio_lyrics_navigator_open">Відкрити повний текст</string>
     <string name="audio_playback_view_visual">Візуал</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">Очікування супровідних даних</string>

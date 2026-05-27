@@ -19,7 +19,7 @@ private val DefaultAudioEncodeGlyphColors =
     AudioEncodeGlyphColors(
         primarySplit = Color(0xFF9E1B1B),
         secondarySplit = Color(0xFFE8E2D0),
-        outline = Color(0xFFC5A059),
+        outline = Color(0xFFC78C25),
     )
 
 val LocalAudioEncodeGlyphColors = staticCompositionLocalOf { DefaultAudioEncodeGlyphColors }

@@ -20,6 +20,7 @@ def register_android_group(subparsers: argparse._SubParsersAction[argparse.Argum
             "- Optionally prepends `clean` before the selected task.\n"
             "- `assemble-staging` builds a minified, shrink-enabled, debuggable APK for catching release-only issues earlier.\n"
             "- `test-debug` runs the Android debug JVM unit test suite.\n"
+            "- `--tests` can be repeated with `test-debug` to filter Gradle unit tests.\n"
             "- `ktlint-check` / `ktlint-format` / `detekt` provide Kotlin quality tooling for apps/audio_android.\n"
             "- `kotlin-policy` runs lightweight project-specific Kotlin policy checks.\n"
             "- `quality` is the minimal Android Kotlin quality gate: ktlintCheck + detekt.\n"
@@ -58,6 +59,12 @@ def register_android_group(subparsers: argparse._SubParsersAction[argparse.Argum
         "--accept-licenses",
         action="store_true",
         help="When used with `install-sdk`, pre-accept Android SDK licenses through sdkmanager.",
+    )
+    android_parser.add_argument(
+        "--tests",
+        action="append",
+        default=[],
+        help="When used with `test-debug`, forward a Gradle `--tests` filter. Repeat to match multiple test classes or methods.",
     )
     android_parser.add_argument(
         "--file",

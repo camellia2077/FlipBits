@@ -52,11 +52,11 @@
 
 Android APK 将通过 GitHub Releases 发布。
 
-当前参考构建下，安装包约 `6.24 MB`(按 Android 系统千进制换算)，这些数字会随版本、ABI 与构建配置变化。
+当前参考构建下，安装包约 `6.32 MB`(按 Android 系统千进制换算)，这些数字会随版本、ABI 与构建配置变化。
 
 Android 用户可读更新摘要见：
 
-- [`docs/presentation/android/CHANGELOG.zh-CN.md`](docs/presentation/android/CHANGELOG.zh-CN.md)
+- [`docs/history/presentation/android/CHANGELOG.zh-CN.md`](docs/history/presentation/android/CHANGELOG.zh-CN.md)
 
 ## 模式总览
 
@@ -352,7 +352,7 @@ FlipBits 图标资源（包括源文件与组件 SVG 文件）作为公共资源
 
 ### Android
 
-- Android 官方工程入口在 `C:\code\FlipBits\apps\audio_android`。
+- Android 官方工程入口在 `apps/audio_android`。
 - 从仓库根目录统一执行：
   - `python tools/run.py android assemble-debug`
   - `python tools/run.py android assemble-release`

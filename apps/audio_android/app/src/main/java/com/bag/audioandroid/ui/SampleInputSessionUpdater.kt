@@ -37,6 +37,7 @@ class SampleInputSessionUpdater(
         sessions: Map<TransportModeOption, ModeAudioSessionState>,
         language: AppLanguageOption,
         flavor: SampleFlavor,
+        length: SampleInputLengthOption,
         isSampleAutoFillEnabled: Boolean,
         isDecorationEnabled: Boolean = true,
     ): Map<TransportModeOption, ModeAudioSessionState> =
@@ -47,6 +48,7 @@ class SampleInputSessionUpdater(
                     mode = mode,
                     language = language,
                     flavor = flavor,
+                    length = length,
                     isDecorationEnabled = isDecorationEnabled,
                 )
             } else {
@@ -98,6 +100,7 @@ class SampleInputSessionUpdater(
                         mode = mode,
                         language = language,
                         flavor = newFlavor,
+                        length = session.sampleShuffleState?.length ?: SampleInputLengthOption.Short,
                         isDecorationEnabled = false,
                     )
                 }
@@ -109,9 +112,9 @@ class SampleInputSessionUpdater(
         mode: TransportModeOption,
         language: AppLanguageOption,
         flavor: SampleFlavor,
+        length: SampleInputLengthOption = SampleInputLengthOption.Short,
         isDecorationEnabled: Boolean,
     ): ModeAudioSessionState {
-        val length = SampleInputLengthOption.Short
         // The first sample does not need to be fixed. We can shuffle first, show
         // the first card immediately, and persist the same deck state so the
         // randomize action simply continues dealing the next sample.

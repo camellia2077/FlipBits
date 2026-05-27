@@ -90,9 +90,12 @@
     <string name="brand_theme_black_crimson_rite_title">黑红仪式</string>
     <string name="brand_theme_black_crimson_rite_description">灰黑与祭祀深红，透出冷峻圣龛微光。</string>
     <string name="brand_theme_black_crimson_rite_accessibility">黑红仪式主题，近黑色配亮深红色。</string>
-    <string name="brand_theme_scarlet_guard_title">猩红卫队</string>
-    <string name="brand_theme_scarlet_guard_description">象牙白与封印深红，透出严整纹章气质。</string>
-    <string name="brand_theme_scarlet_guard_accessibility">猩红卫队主题，浅象牙色配暗猩红色。</string>
+    <string name="brand_theme_xeno_code_title">异形代码</string>
+    <string name="brand_theme_xeno_code_description">黑曜电路与霓虹绿，透出异星机械脉冲。</string>
+    <string name="brand_theme_xeno_code_accessibility">异形代码主题，深苔黑配霓虹绿和白色描边。</string>
+    <string name="brand_theme_scarlet_guard_title">危险警示</string>
+    <string name="brand_theme_scarlet_guard_description">浅工业灰、警示橙红与深石墨色，呈现机械告警信号感。</string>
+    <string name="brand_theme_scarlet_guard_accessibility">危险警示主题，浅灰色配警示橙红色和深石墨描边。</string>
     <string name="brand_theme_dynasty_revival_title">王朝复兴</string>
     <string name="brand_theme_dynasty_revival_description">墓金黑与反应堆绿，透出苏醒王朝的幽光。</string>
     <string name="brand_theme_dynasty_revival_accessibility">王朝复兴主题，深墓金黑色配亮反应堆绿色。</string>
@@ -248,12 +251,12 @@
     <string name="config_custom_material_theme_collapse">收起自定义颜色</string>
     <string name="config_custom_theme_import_error_empty">请至少粘贴一个自定义预设区块。</string>
     <string name="config_custom_theme_import_error_malformed_line">第 %1$d 行必须使用 key=value 格式。</string>
-    <string name="config_custom_theme_import_error_unknown_field">第 %1$d 个区块包含不支持的字段：%2$s。</string>
-    <string name="config_custom_theme_import_error_duplicate_field">第 %1$d 个区块重复了 %2$s。</string>
-    <string name="config_custom_theme_import_error_missing_field">第 %1$d 个区块缺少 %2$s。</string>
-    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 个区块中的 %2$s 十六进制颜色无效：%3$s。</string>
-    <string name="config_custom_theme_import_error_wrong_target_dual_tone">第 %1$d 个区块使用的是自定义 dual-tone 字段，请改为从自定义 dual-tone 导入。</string>
-    <string name="config_custom_theme_import_error_wrong_target_material">第 %1$d 个区块使用的是自定义颜色字段，请改为从自定义颜色导入。</string>
+    <string name="config_custom_theme_import_error_unknown_field">第 %1$d 组包含不支持的字段：%2$s。</string>
+    <string name="config_custom_theme_import_error_duplicate_field">第 %1$d 组重复了 %2$s。</string>
+    <string name="config_custom_theme_import_error_missing_field">第 %1$d 组缺少 %2$s。</string>
+    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 组中的 %2$s 十六进制颜色无效：%3$s。</string>
+    <string name="config_custom_theme_import_error_wrong_target_dual_tone">第 %1$d 组使用的是自定义 dual-tone 字段，请改为从自定义 dual-tone 导入。</string>
+    <string name="config_custom_theme_import_error_wrong_target_material">第 %1$d 组使用的是自定义颜色字段，请改为从自定义颜色导入。</string>
     <string name="config_custom_theme_import_field_name">名称</string>
     <string name="config_custom_theme_import_field_primary">主色</string>
     <string name="config_custom_theme_import_field_secondary">辅色</string>

@@ -86,6 +86,9 @@
     <string name="audio_player_detail_now_playing">正在播放</string>
     <string name="audio_player_detail_decoded_title">讀取結果</string>
     <string name="audio_player_detail_decoded_empty">尚無結果。需要時請點選「讀取」。</string>
+    <string name="audio_lyrics_navigator_title">歌詞</string>
+    <string name="audio_lyrics_navigator_subtitle">全螢幕歌詞導覽預覽。</string>
+    <string name="audio_lyrics_navigator_open">打開全螢幕歌詞</string>
     <string name="audio_playback_view_visual">視覺</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">等待 follow 資料</string>

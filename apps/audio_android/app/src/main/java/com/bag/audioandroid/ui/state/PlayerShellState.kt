@@ -8,9 +8,6 @@ enum class PlayerSurfaceValue {
 data class PlayerSurfaceState(
     val current: PlayerSurfaceValue,
     val target: PlayerSurfaceValue? = null,
-    val dragOffsetPx: Float = 0f,
-    val isDragging: Boolean = false,
-    val animationProgress: Float = if (current == PlayerSurfaceValue.Expanded) 1f else 0f,
 )
 
 enum class QueueSheetValue {
@@ -92,7 +89,7 @@ internal fun PlayerShellState.reduce(event: PlayerShellEvent): PlayerShellState 
                     if (event.preferExpandedSurface) {
                         PlayerSurfaceState(current = PlayerSurfaceValue.Expanded)
                     } else {
-                        surface.copy(target = null, dragOffsetPx = 0f, isDragging = false)
+                        surface.copy(target = null)
                     },
                 queue = QueueSheetState(current = QueueSheetValue.Half),
             )
@@ -108,7 +105,7 @@ internal fun PlayerShellState.reduce(event: PlayerShellEvent): PlayerShellState 
                     if (event.preferExpandedSurface) {
                         PlayerSurfaceState(current = PlayerSurfaceValue.Expanded)
                     } else {
-                        surface.copy(target = null, dragOffsetPx = 0f, isDragging = false)
+                        surface.copy(target = null)
                     },
                 queue = QueueSheetState(current = event.value),
             )

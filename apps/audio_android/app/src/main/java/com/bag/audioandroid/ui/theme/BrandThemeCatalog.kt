@@ -13,6 +13,13 @@ import com.bag.audioandroid.ui.model.SampleFlavor
 
 private val BrandInkLight = Color(0xFF241B18)
 private val BrandInkDark = Color(0xFFF1E8E1)
+private val BrandThemeHexRegex = Regex("^#[0-9A-F]{6}$")
+private val SecondaryTextFallbackBlendSteps =
+    listOf(0.10f, 0.18f, 0.26f, 0.34f, 0.42f, 0.50f, 0.62f, 0.74f, 0.86f, 1f)
+private const val SecondaryTextContrastThreshold = 4.5f
+private const val DefaultCustomPrimaryHex = "#E8E2D0"
+private const val DefaultCustomSecondaryHex = "#9E1B1B"
+private const val DarkThemeLuminanceThreshold = 0.5f
 
 const val CustomBrandThemeId = "custom_dual_tone"
 private const val CustomBrandThemeIdSeparator = "::"
@@ -30,7 +37,7 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             sampleFlavor = SampleFlavor.SacredMachine,
             primaryColor = Color(0xFFE8E2D0),
             secondaryColor = Color(0xFF9E1B1B),
-            outlineColor = Color(0xFFC5A059),
+            outlineColor = Color(0xFFC78C25),
         ),
         buildBrandThemeOption(
             id = "scarlet_guard",
@@ -50,9 +57,20 @@ val BrandDualToneThemes: List<BrandThemeOption> =
             descriptionResId = R.string.brand_theme_black_crimson_rite_description,
             accessibilityLabelResId = R.string.brand_theme_black_crimson_rite_accessibility,
             sampleFlavor = SampleFlavor.SacredMachine,
-            primaryColor = Color(0xFF4A2B2F),
-            secondaryColor = Color(0xFFDC143C),
-            outlineColor = Color(0xFFB2C9AB),
+            primaryColor = Color(0xFF1A1A1A),
+            secondaryColor = Color(0xFFD52112),
+            outlineColor = Color(0xFF00FFFF),
+        ),
+        buildBrandThemeOption(
+            id = "xeno_code",
+            groupTitleResId = R.string.config_dual_tone_group_sacred_machine,
+            titleResId = R.string.brand_theme_xeno_code_title,
+            descriptionResId = R.string.brand_theme_xeno_code_description,
+            accessibilityLabelResId = R.string.brand_theme_xeno_code_accessibility,
+            sampleFlavor = SampleFlavor.SacredMachine,
+            primaryColor = Color(0xFF1B241D),
+            secondaryColor = Color(0xFF00FF7F),
+            outlineColor = Color(0xFFFFFFFF),
         ),
         buildBrandThemeOption(
             id = "blood_soaked_ivory",
@@ -287,6 +305,12 @@ fun buildBrandThemeOption(
     val surfaceVariant = blend(background, secondaryColor, if (isDarkTheme) 0.16f else 0.10f)
     val outline = blend(primary, onBackground, if (isDarkTheme) 0.48f else 0.58f)
     val outlineVariant = blend(surfaceVariant, onBackground, if (isDarkTheme) 0.22f else 0.18f)
+    val onSurfaceVariant =
+        outlineFirstSecondaryTextColor(
+            background = background,
+            outline = outlineColor,
+            fallbackText = onBackground,
+        )
 
     val colorScheme =
         if (isDarkTheme) {
@@ -308,7 +332,7 @@ fun buildBrandThemeOption(
                 surface = surface,
                 onSurface = onBackground,
                 surfaceVariant = surfaceVariant,
-                onSurfaceVariant = blend(onBackground, secondaryColor, 0.22f),
+                onSurfaceVariant = onSurfaceVariant,
                 outline = outline,
                 outlineVariant = outlineVariant,
             )
@@ -331,7 +355,7 @@ fun buildBrandThemeOption(
                 surface = surface,
                 onSurface = onBackground,
                 surfaceVariant = surfaceVariant,
-                onSurfaceVariant = blend(onBackground, secondaryColor, 0.36f),
+                onSurfaceVariant = onSurfaceVariant,
                 outline = outline,
                 outlineVariant = outlineVariant,
             )
@@ -360,8 +384,30 @@ private fun blend(
     ratio: Float,
 ): Color = lerp(from, to, ratio.coerceIn(0f, 1f))
 
-private val BrandThemeHexRegex = Regex("^#[0-9A-F]{6}$")
+private fun outlineFirstSecondaryTextColor(
+    background: Color,
+    outline: Color,
+    fallbackText: Color,
+): Color {
+    if (contrastRatio(background, outline) >= SecondaryTextContrastThreshold) {
+        return outline
+    }
+    for (ratio in SecondaryTextFallbackBlendSteps) {
+        val candidate = blend(outline, fallbackText, ratio)
+        if (contrastRatio(background, candidate) >= SecondaryTextContrastThreshold) {
+            return candidate
+        }
+    }
+    return fallbackText
+}
 
-private const val DefaultCustomPrimaryHex = "#E8E2D0"
-private const val DefaultCustomSecondaryHex = "#9E1B1B"
-private const val DarkThemeLuminanceThreshold = 0.5f
+private fun contrastRatio(
+    first: Color,
+    second: Color,
+): Float {
+    val firstL = first.luminance()
+    val secondL = second.luminance()
+    val lighter = maxOf(firstL, secondL)
+    val darker = minOf(firstL, secondL)
+    return (lighter + 0.05f) / (darker + 0.05f)
+}

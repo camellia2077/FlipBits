@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Czarny Karmazynowy Ryt</string>
     <string name="brand_theme_black_crimson_rite_description">Sadza i rytualny karmazyn budują surowy nastrój maszynowego sanktuarium.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Motyw Czarny Karmazynowy Ryt, prawie czarny z intensywną karmazynową czerwienią.</string>
-    <string name="brand_theme_scarlet_guard_title">Szkarłatna Straż</string>
-    <string name="brand_theme_scarlet_guard_description">Kość słoniowa i zapieczętowany szkarłat tworzą zdyscyplinowany heraldyczny ton.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Motyw Szkarłatna Straż, jasna kość słoniowa z ciemną szkarłatną czerwienią.</string>
+    <string name="brand_theme_xeno_code_title">Ksenokod</string>
+    <string name="brand_theme_xeno_code_description">Obsydianowe obwody i neonowa zieleń tworzą puls obcej maszyny.</string>
+    <string name="brand_theme_xeno_code_accessibility">Motyw Ksenokod, ciemna mszysta czerń z neonową zielenią i białym obrysem.</string>
+    <string name="brand_theme_scarlet_guard_title">Ostrzeżenie o zagrożeniu</string>
+    <string name="brand_theme_scarlet_guard_description">Jasna przemysłowa szarość, ostrzegawczy pomarańczowoczerwony i ciemny grafit tworzą wygląd mechanicznego alarmu.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Motyw Ostrzeżenie o zagrożeniu, blada szarość z ostrzegawczą pomarańczową czerwienią i ciemnym grafitowym obrysem.</string>
     <string name="brand_theme_dynasty_revival_title">Odrodzenie Dynastii</string>
     <string name="brand_theme_dynasty_revival_description">Czarny metal grobowca i klasyczna reaktorowa zieleń dla rdzenia przebudzonej dynastii.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Motyw Odrodzenie Dynastii, głęboka czerń grobowego metalu z jasną reaktorową zielenią.</string>

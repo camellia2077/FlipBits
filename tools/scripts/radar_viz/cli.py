@@ -126,7 +126,7 @@ def cmd_animate(start_token: str, end_token: str, lang: str, frames: int, out_di
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog        = "python main.py",
-        description = "WaveBits Radar Chart Generator · 波段雷达图生成器",
+        description = "FlipBits Radar Chart Generator · 波段雷达图生成器",
         formatter_class = argparse.RawDescriptionHelpFormatter,
         epilog = """\
 示例：

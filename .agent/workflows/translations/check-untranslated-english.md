@@ -2,7 +2,7 @@
 
 Use this workflow when a localized Android XML set may still contain English that was never translated.
 
-Tool definition for commands and JSON contracts lives in [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md).
+Tool definition for commands and JSON contracts lives in [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md).
 
 This workflow has two parts:
 1. find which locale still contains untranslated English

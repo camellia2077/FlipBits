@@ -1,5 +1,6 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
 import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import java.io.File
 import java.util.Properties
@@ -361,6 +362,16 @@ tasks.named("check").configure {
     dependsOn(checkTranslationKeyAlignment)
     dependsOn(translationLintWarn)
     dependsOn(detekt)
+}
+
+tasks.withType<Test>().configureEach {
+    // Android/Gradle defaults have intermittently hit Windows filesystem races
+    // while finalizing in-progress binary test result files. Use explicit,
+    // task-scoped output locations to keep result directories isolated.
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/binary/$name"))
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/xml/$name"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/$name"))
+    maxParallelForks = 1
 }
 
 tasks.matching { it.name == "assembleRelease" }.configureEach {

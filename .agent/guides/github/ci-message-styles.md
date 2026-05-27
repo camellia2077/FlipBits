@@ -113,10 +113,10 @@ description: Agent 专用 CI / tooling / libs 提交消息写法
     - `ci: changed`
 
 - `libs` 提交：
-  - 优先参考 `docs/libs/**` 已落盘口径
+  - 优先参考 `docs/history/libs/**` 已落盘口径
 
 - Android / CLI presentation 提交：
-  - 优先参考 `docs/presentation/android/**` 或 `docs/presentation/cli/**`
+  - 优先参考 `docs/history/presentation/android/**` 或 `docs/history/presentation/cli/**`
 
 ## Release-Version Guidance
 

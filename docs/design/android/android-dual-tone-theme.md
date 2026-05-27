@@ -3,6 +3,7 @@
 Related:
 
 - [Android Encode Glyph Colors](./android-encode-glyph-colors.md)
+- [Android Custom Theme Import Format](./android-custom-theme-import-format.md)
 
 ## Goal
 

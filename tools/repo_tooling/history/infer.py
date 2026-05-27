@@ -420,7 +420,7 @@ def build_history_prep_result(scopes: list[str], target_history_file: Path | Non
     # inferred from git commit timestamps or existing docs.
     suggested_date = date.today().isoformat()
     # Suggested version prefers the explicit target history filename such as
-    # docs/presentation/cli/v0.2/0.2.0.md -> v0.2.0. If no target file is
+    # docs/history/presentation/cli/v0.2/0.2.0.md -> v0.2.0. If no target file is
     # provided, fall back to repo history hints so the agent still gets a
     # version placeholder.
     suggested_version = version_from_target_history_file(target_history_file) or suggest_release_version(version_hints)

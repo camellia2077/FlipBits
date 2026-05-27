@@ -16,13 +16,13 @@ from repo_tooling.message.render import render_result
 
 class MessagePrepTests(unittest.TestCase):
     def test_component_name_infers_known_history_roots(self) -> None:
-        self.assertEqual(component_name_for_history("docs/presentation/cli/v0.2/0.2.0.md"), "cli-presentation")
-        self.assertEqual(component_name_for_history("docs/presentation/android/v0.3/0.3.0.md"), "android-presentation")
-        self.assertEqual(component_name_for_history("docs/libs/v0.4/0.4.1.md"), "libs")
+        self.assertEqual(component_name_for_history("docs/history/presentation/cli/v0.2/0.2.0.md"), "cli-presentation")
+        self.assertEqual(component_name_for_history("docs/history/presentation/android/v0.3/0.3.0.md"), "android-presentation")
+        self.assertEqual(component_name_for_history("docs/history/libs/v0.4/0.4.1.md"), "libs")
         self.assertEqual(component_name_for_history("docs/tools/history/2026-05-11.md"), "tools")
 
     def test_parse_history_file_reads_heading_and_sections(self) -> None:
-        entry = parse_history_file("docs/presentation/cli/v0.2/0.2.0.md")
+        entry = parse_history_file("docs/history/presentation/cli/v0.2/0.2.0.md")
         self.assertEqual(entry.release_version, "v0.2.0")
         self.assertEqual(entry.component_name, "cli-presentation")
         self.assertGreaterEqual(len(entry.added), 1)
@@ -30,14 +30,14 @@ class MessagePrepTests(unittest.TestCase):
         self.assertGreaterEqual(len(entry.fixed), 1)
 
     def test_build_history_message_result_prefers_history_content(self) -> None:
-        result = build_history_message_result(["docs/presentation/cli/v0.2/0.2.0.md"])
+        result = build_history_message_result(["docs/history/presentation/cli/v0.2/0.2.0.md"])
         self.assertEqual(result.source_mode, "history")
         self.assertEqual(result.inferred_type, "feat")
         self.assertEqual(result.release_version, "v0.2.0")
         self.assertIn(("cli-presentation", "v0.2.0"), result.component_versions)
 
     def test_render_result_keeps_required_commit_sections(self) -> None:
-        result = build_history_message_result(["docs/presentation/android/v0.3/0.3.0.md"])
+        result = build_history_message_result(["docs/history/presentation/android/v0.3/0.3.0.md"])
         rendered = render_result(result)
         self.assertIn("[Summary]", rendered)
         self.assertIn("[Component Versions]", rendered)

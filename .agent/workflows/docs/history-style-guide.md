@@ -9,7 +9,7 @@ description: Agent 专用发布历史工作流
 ## Default Workflow
 
 1. 运行 `python tools/run.py history prep --format markdown`。
-2. 若目标文件已知，优先同时加 `--scope <repo-path>` 和 `--target <history-file.md>`，例如 `python tools/run.py history prep --format markdown --scope libs --target docs/libs/v0.6/0.6.1.md`。
+2. 若目标文件已知，优先同时加 `--scope <repo-path>` 和 `--target <history-file.md>`，例如 `python tools/run.py history prep --format markdown --scope libs --target docs/history/libs/v0.6/0.6.1.md`。
 3. 读取 `Release Hints`、`Relevant Summary`、`Writing triage`、topic `fact`、`Draft Entry`。
 4. 基于草稿重写，不直接原样落盘。
 5. 删除无关分类、合并噪音、清理 `TODO(agent)`。

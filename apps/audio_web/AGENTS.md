@@ -2,7 +2,7 @@
 
 ## Role
 
-- `apps/audio_web` 是 `WaveBits` 的 Web presentation / GitHub Pages demo 入口。
+- `apps/audio_web` 是 `FlipBits` 的 Web presentation / GitHub Pages demo 入口。
 - 这里的文档只做导航，不重复写实现细节、视觉规则、构建细节或发布记录。
 - 真实说明统一收口到仓库根目录 `docs/`。
 
@@ -17,7 +17,7 @@
 ## First Read
 
 - 想先看 presentation 版本更新，读：
-  - `docs/presentation/web/2026-05-22.md`
+  - `docs/history/presentation/web/2026-05-22.md`
 - 想看仓库总文档导航，读：
   - `docs/README.md`
 - 想看 transport / mode 设计语义，读：
@@ -53,7 +53,7 @@
   - `site/js/app-controller.js`
   - `site/js/ui-controller.js`
   - `src/flipbits_web_bridge.cpp`
-  - `C:/code/WaveBits/libs/AGENTS.md`
+  - `libs/AGENTS.md`
 - 改 sample 文本导出、Pages 站点准备、本地构建或本地预览入口，先看：
   - `python tools/run.py web export-sample-texts`
   - `python tools/run.py web build-wasm`

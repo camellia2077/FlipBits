@@ -81,9 +81,12 @@
     <string name="brand_theme_black_crimson_rite_title">Rite cramoisi noir</string>
     <string name="brand_theme_black_crimson_rite_description">Noir suie et cramoisi rituel pour une atmosphère sévère de sanctuaire mécanique.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Thème Rite cramoisi noir, presque noir avec rouge cramoisi vif.</string>
-    <string name="brand_theme_scarlet_guard_title">Garde écarlate</string>
-    <string name="brand_theme_scarlet_guard_description">Blanc ivoire et cramoisi scellé pour une tonalité héraldique disciplinée.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Thème Garde écarlate, ivoire clair avec rouge écarlate foncé.</string>
+    <string name="brand_theme_xeno_code_title">Code Xéno</string>
+    <string name="brand_theme_xeno_code_description">Circuits d’obsidienne et vert néon pour une pulsation de machine alien.</string>
+    <string name="brand_theme_xeno_code_accessibility">Thème Code Xéno, noir mousse sombre avec vert néon et contour blanc.</string>
+    <string name="brand_theme_scarlet_guard_title">Alerte danger</string>
+    <string name="brand_theme_scarlet_guard_description">Gris industriel pâle, orange-rouge d’alerte et graphite sombre pour une allure de signal d’alarme mécanique.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Thème Alerte danger, gris pâle avec orange-rouge d’alerte et contour graphite sombre.</string>
     <string name="brand_theme_dynasty_revival_title">Renaissance dynastique</string>
     <string name="brand_theme_dynasty_revival_description">Noir métal funéraire et vert réacteur classique pour un noyau dynastique réveillé.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Thème Renaissance dynastique, noir métal funéraire profond avec vert réacteur lumineux.</string>

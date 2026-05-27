@@ -4,8 +4,8 @@
 
 This document explains how an agent should interpret responsibility-risk JSON and Markdown fields written to files such as:
 
-- [scan_py.json](/C:/code/FlipBits/tools/scripts/loc/logs/scan_py.json)
-- [scan_py_responsibility_test.json](/C:/code/FlipBits/tools/scripts/loc/logs/scan_py_responsibility_test.json)
+- [scan_py.json](../logs/scan_py.json)
+- [scan_py_responsibility_test.json](../logs/scan_py_responsibility_test.json)
 
 The goal is to help agents turn the scan output into better refactoring decisions.
 

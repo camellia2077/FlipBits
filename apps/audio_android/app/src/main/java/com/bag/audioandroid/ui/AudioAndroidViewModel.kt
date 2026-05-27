@@ -214,6 +214,7 @@ class AudioAndroidViewModel(
                         sessions = it.sessions,
                         language = selectedLanguage,
                         flavor = it.currentSampleFlavor,
+                        length = it.selectedSampleInputLength,
                         isSampleAutoFillEnabled = initialSampleAutoFillEnabled,
                         isDecorationEnabled = initialSampleDecorationEnabled,
                     ),

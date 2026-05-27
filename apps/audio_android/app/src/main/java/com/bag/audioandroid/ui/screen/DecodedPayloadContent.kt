@@ -132,7 +132,7 @@ internal fun DecodedPayloadContent(
                     ),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.weight(1f))
             TextButton(onClick = onToggleBodyExpanded) {

@@ -86,6 +86,9 @@
     <string name="audio_player_detail_now_playing">En lecture</string>
     <string name="audio_player_detail_decoded_title">Résultat de lecture</string>
     <string name="audio_player_detail_decoded_empty">Pas encore de résultat. Appuyez sur Lire si nécessaire.</string>
+    <string name="audio_lyrics_navigator_title">Paroles</string>
+    <string name="audio_lyrics_navigator_subtitle">Aperçu de la navigation des paroles en plein écran.</string>
+    <string name="audio_lyrics_navigator_open">Ouvrir les paroles complètes</string>
     <string name="audio_playback_view_visual">Visuel</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">En attente des données de suivi</string>

@@ -14,6 +14,7 @@
   - `ON` 时：target 可以启用 `CXX_MODULE_STD`，源码允许走 `import std;` 主口径。
   - `OFF` 时：不能把 `import std;` 当成无条件前提；需要走 include-based fallback。
   - 当前覆盖面：`libs/audio_core`、`libs/audio_api`、`libs/audio_io` 的标准库入口统一走这一个 capability。
+  - 判定口径：只把 CMake 已实际暴露 `__CMAKE::CXX23` provider target 的 lane 视为 `ON`；不再仅凭 `CMAKE_CXX_COMPILER_IMPORT_STD` 的声明值做正判定，因为它可能出现“编译器声称支持，但标准库模块 provider 实际不可用”的假阳性。
 
 ## 单一入口
 
@@ -27,7 +28,9 @@
 
 - Root host `clang++ + Ninja`
   - 继续视为 module-first 主线。
-  - 这条 lane 当前仍要求 `FLIPBITS_HAS_STD_MODULE_PROVIDER=ON`，因此 host 构建会继续走 `import std;` 主口径。
+  - 这条 lane 继续要求 named modules 主链路成立，但不再把 `std` module provider 当成无条件前提。
+  - 当 CMake 实际提供 `__CMAKE::CXX23` 时，host 会走 `import std;` 主口径。
+  - 当 `__CMAKE::CXX23` 不存在时，host 仍应通过 include-based fallback 完成构建；不能把“声明支持”误当成可依赖 baseline。
 - WebAssembly / Emscripten
   - 当前支持 named modules graph。
   - 当前不把 `std` module provider 当成正式前提。

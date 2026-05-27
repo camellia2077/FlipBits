@@ -1,8 +1,30 @@
 # Android 更新日志
 
-[English Version / 英文版本](C:/code/WaveBits/docs/presentation/android/CHANGELOG.md)
+[English Version / 英文版本](CHANGELOG.md)
 
-面向用户的 Android 版本更新摘要。详细工程历史请继续参考 `docs/presentation/android/v*/x.y.z.md`。
+面向用户的 Android 版本更新摘要。详细工程历史请继续参考 `docs/history/presentation/android/v*/x.y.z.md`。
+
+## v0.5.4
+
+### 新增功能
+* 新增更完整的自定义主题分享能力，`Material` 与 `dual-tone` 现在都支持更清晰的纯文本复制/导出格式，并支持一次导入多组分享主题且保留原始顺序。
+* 新增 `The Sacred Machine` 内置 dual-tone 主题 `Xeno Code`。
+* 新增 mini player detail 歌词拖动选行定位能力，可沿歌词上下拖动并直接跳转到目标歌词时间。
+
+### 体验改进
+* 调整自定义主题管理体验，新建或导入的 `Material` / `dual-tone` 主题现在都会优先出现在列表顶部，更方便继续使用。
+* 调整内置 dual-tone 主题复制导出名称，优先跟随当前应用语言，不再回退成内部 id 或英文常量名。
+* 调整 dual-tone 主题编辑页与分组操作，包括让自定义编辑页更明确使用 `outline` 颜色语义、只在内置分组展开时显示复制入口，以及提升内置主题分组标题与预览卡片标题的可读性。
+* 调整 expanded player 与 full Lyrics 的歌词交互：detail 默认恢复播放跟随，full Lyrics 保留独立滚动控制，歌词拖动选行时的视觉锚线也更稳定。
+* 调整 dual-tone 的辅助文字取色策略，说明文字和次级标签现在优先参考 `outline` 语义，但在自定义配色对比度不足时会自动回退到更清晰的高对比文本色。
+* 调整自定义主题删除确认页的背景表现，`Edit custom dual-tone` 与 `Edit colors` 里的删除页面现在都会跟随当前主题的主背景色，不再回退成通用弹窗底色。
+* 进一步调整自定义主题删除确认页的背景回退逻辑，即使编辑中的 `primary` 输入暂时无效，删除页面也会继续沿用当前 preset 的主背景色。
+
+### 问题修复
+* 修复批量导入多组自定义主题后顺序被反转的问题，导入后的顺序现在与分享时保持一致。
+* 修复 `Sample text` 长度恢复不一致的问题，切换 dual-tone 主题或冷启动后，`short` / `long` 选择现在都能正确保持。
+* 修复内置 dual-tone 主题 `Scarlet Guard` 的名称与颜色描述长期不匹配的问题，现已更名为 `Hazard Warning`，并按实际配色更新说明文案。
+* 修复 release 构建下应用可能在冷启动后立即闪退的问题。
 
 ## v0.4.17
 

@@ -26,8 +26,8 @@ history 落盘 -> message prep -> agent 润色 -> git commit
 ## 高频示例
 
 ```powershell
-python tools/run.py message prep --history docs/presentation/cli/v0.2/0.2.0.md
-python tools/run.py message prep --history docs/presentation/android/v0.3/0.3.0.md
+python tools/run.py message prep --history docs/history/presentation/cli/v0.2/0.2.0.md
+python tools/run.py message prep --history docs/history/presentation/android/v0.3/0.3.0.md
 python tools/run.py message prep
 ```
 

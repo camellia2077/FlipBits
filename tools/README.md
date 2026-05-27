@@ -151,8 +151,8 @@ python tools/run.py windows build
 python tools/run.py file-name prep
 python tools/run.py artifact export-apk
 python tools/run.py history prep
-python tools/run.py message prep --history docs/presentation/cli/v0.2/0.2.0.md
-python tools/run.py history validate docs/presentation/cli
+python tools/run.py message prep --history docs/history/presentation/cli/v0.2/0.2.0.md
+python tools/run.py history validate docs/history/presentation/cli
 python tools/run.py artifact roundtrip --build-dir build/dev --mode ultra --text "你好，FlipBits"
 python tools/run.py artifact smoke --build-dir build/dev
 ```

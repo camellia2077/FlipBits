@@ -5,7 +5,7 @@ data class CustomBrandThemeSettings(
     val displayName: String = DefaultCustomBrandThemeDisplayName,
     val primaryHex: String = "#E8E2D0",
     val secondaryHex: String = "#9E1B1B",
-    val outlineHexOrNull: String? = "#C5A059",
+    val outlineHexOrNull: String? = "#C78C25",
 )
 
 val DefaultCustomBrandThemeSettings = CustomBrandThemeSettings()

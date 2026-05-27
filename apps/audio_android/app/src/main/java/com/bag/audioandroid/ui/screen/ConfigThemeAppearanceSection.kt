@@ -25,11 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.model.BrandThemeExportEntry
 import com.bag.audioandroid.ui.model.BrandThemeOption
 import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
 import com.bag.audioandroid.ui.model.PaletteFamily
@@ -37,6 +39,7 @@ import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.toBatchConfigText
+import com.bag.audioandroid.ui.model.toBrandThemeExportBatchConfigText
 import com.bag.audioandroid.ui.model.toMaterialBatchConfigText
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
@@ -44,6 +47,7 @@ import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.customMaterialPaletteId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 import com.bag.audioandroid.ui.utilityActionIconButtonColors
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -274,15 +278,49 @@ internal fun ConfigThemeAppearanceSection(
             isNeutralsExpanded = isMaterialNeutralsPaletteExpanded,
             onNeutralsExpandedChanged = onMaterialNeutralsPaletteExpandedChanged,
         )
+    val localizedBuiltInBrandThemeNames =
+        mapOf(
+            "mars_relic" to stringResource(R.string.brand_theme_mars_relic_title),
+            "scarlet_guard" to stringResource(R.string.brand_theme_scarlet_guard_title),
+            "black_crimson_rite" to stringResource(R.string.brand_theme_black_crimson_rite_title),
+            "xeno_code" to stringResource(R.string.brand_theme_xeno_code_title),
+            "blood_soaked_ivory" to stringResource(R.string.brand_theme_scarlet_carnage_title),
+            "brass_forge" to stringResource(R.string.brand_theme_brass_forge_title),
+            "fires_of_fate" to stringResource(R.string.brand_theme_fires_of_fate_title),
+            "arcane_abyss" to stringResource(R.string.brand_theme_labyrinth_of_mutability_title),
+            "ecstatic_rapture" to stringResource(R.string.brand_theme_ecstatic_rapture_title),
+            "velvet_nightmare" to stringResource(R.string.brand_theme_exquisite_fall_title),
+            "toxic_effluence" to stringResource(R.string.brand_theme_immortal_rot_title),
+            "plague_mire" to stringResource(R.string.brand_theme_plague_mire_title),
+            "dynasty_revival" to stringResource(R.string.brand_theme_dynasty_revival_title),
+            "sepulcher_cyan" to stringResource(R.string.brand_theme_sepulcher_cyan_title),
+            "ancient_alloy" to stringResource(R.string.brand_theme_ancient_alloy_title),
+            "tomb_sigil" to stringResource(R.string.brand_theme_tomb_sigil_title),
+        )
+    val toLocalizedBrandThemeExportEntry: (BrandThemeOption) -> BrandThemeExportEntry =
+        { option ->
+            BrandThemeExportEntry(
+                displayName =
+                    option.titleOverride
+                        ?: localizedBuiltInBrandThemeNames[option.id]
+                        ?: option.id,
+                primaryHex = option.primaryColor.toHexString(),
+                secondaryHex = option.secondaryColor.toHexString(),
+                outlineHexOrNull = option.outlineColor.toHexString(),
+            )
+        }
     val copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit =
-        remember(clipboard, coroutineScope) {
+        remember(clipboard, coroutineScope, localizedBuiltInBrandThemeNames) {
             { option ->
                 coroutineScope.launch {
                     copyCustomThemeConfig(
                         clipboard = clipboard,
                         settings =
                             CustomBrandThemeSettings(
-                                displayName = option.titleOverride ?: option.id,
+                                displayName =
+                                    option.titleOverride
+                                        ?: localizedBuiltInBrandThemeNames[option.id]
+                                        ?: option.id,
                                 primaryHex = option.primaryColor.toHexString(),
                                 secondaryHex = option.secondaryColor.toHexString(),
                                 outlineHexOrNull = option.outlineColor.toHexString(),
@@ -445,6 +483,9 @@ internal fun ConfigThemeAppearanceSection(
                     copyAllConfigLabel = copyAllConfigLabel,
                     copySelectedBrandThemeConfig = copySelectedBrandThemeConfig,
                     copyAllCustomBrandThemeConfigs = copyAllCustomBrandThemeConfigs,
+                    localizedBuiltInBrandThemeNames = localizedBuiltInBrandThemeNames,
+                    clipboard = clipboard,
+                    coroutineScope = coroutineScope,
                     onReorderCustomBrandThemes = onCustomBrandThemesReordered,
                     onDeleteCustomBrandTheme = { option ->
                         customBrandThemePresets
@@ -723,6 +764,9 @@ private fun ConfigThemeAppearanceExpandedContent(
     copyAllConfigLabel: String,
     copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit,
     copyAllCustomBrandThemeConfigs: () -> Unit,
+    localizedBuiltInBrandThemeNames: Map<String, String>,
+    clipboard: Clipboard,
+    coroutineScope: CoroutineScope,
     onReorderCustomBrandThemes: (Int, Int) -> Unit,
     onDeleteCustomBrandTheme: (BrandThemeOption) -> Unit,
     canDeleteCustomBrandTheme: (BrandThemeOption) -> Boolean,
@@ -785,6 +829,9 @@ private fun ConfigThemeAppearanceExpandedContent(
             copyAllConfigLabel = copyAllConfigLabel,
             copySelectedBrandThemeConfig = copySelectedBrandThemeConfig,
             copyAllCustomBrandThemeConfigs = copyAllCustomBrandThemeConfigs,
+            localizedBuiltInBrandThemeNames = localizedBuiltInBrandThemeNames,
+            clipboard = clipboard,
+            coroutineScope = coroutineScope,
             onReorderCustomBrandThemes = onReorderCustomBrandThemes,
             onDeleteCustomBrandTheme = onDeleteCustomBrandTheme,
             canDeleteCustomBrandTheme = canDeleteCustomBrandTheme,
@@ -948,6 +995,9 @@ private fun ConfigThemeAppearanceBrandContent(
     copyAllConfigLabel: String,
     copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit,
     copyAllCustomBrandThemeConfigs: () -> Unit,
+    localizedBuiltInBrandThemeNames: Map<String, String>,
+    clipboard: Clipboard,
+    coroutineScope: CoroutineScope,
     onReorderCustomBrandThemes: (Int, Int) -> Unit,
     onDeleteCustomBrandTheme: (BrandThemeOption) -> Unit,
     canDeleteCustomBrandTheme: (BrandThemeOption) -> Boolean,
@@ -1041,9 +1091,48 @@ private fun ConfigThemeAppearanceBrandContent(
                     selectedBrandTheme = selectedBrandTheme,
                     expanded = section.expanded,
                     onExpandedChanged = section.onExpandedChanged,
+                    iconActions =
+                        if (section.expanded) {
+                            val exportText =
+                                section.options
+                                    .map { option ->
+                                        BrandThemeExportEntry(
+                                            displayName =
+                                                option.titleOverride
+                                                    ?: localizedBuiltInBrandThemeNames[option.id]
+                                                    ?: option.id,
+                                            primaryHex = option.primaryColor.toHexString(),
+                                            secondaryHex = option.secondaryColor.toHexString(),
+                                            outlineHexOrNull = option.outlineColor.toHexString(),
+                                        )
+                                    }.toBrandThemeExportBatchConfigText()
+                            listOf(
+                                BrandThemeSectionIconAction(
+                                    label = copyAllConfigLabel,
+                                    icon = Icons.Rounded.ContentCopy,
+                                    enabled = section.options.isNotEmpty(),
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            clipboard.setClipEntry(
+                                                ClipEntry(
+                                                    ClipData.newPlainText(
+                                                        "FlipBits built-in dual-tone config",
+                                                        exportText,
+                                                    ),
+                                                ),
+                                            )
+                                        }
+                                    },
+                                ),
+                            )
+                        } else {
+                            emptyList()
+                        },
                     onBrandThemeSelected = onBrandThemeSelected,
                     copyConfigLabel = copyConfigLabel,
                     onCopyConfig = copySelectedBrandThemeConfig,
+                    headerTitleColor = MaterialTheme.colorScheme.onSurface,
+                    headerMetaColor = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }

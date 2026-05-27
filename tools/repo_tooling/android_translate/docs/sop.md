@@ -14,7 +14,7 @@ The replacement step is intentionally strict so it can update XML safely.
 
 Execution-step workflow now lives in:
 
-- [README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md)
+- [README.md](README.md)
 
 ## Human Workflow
 

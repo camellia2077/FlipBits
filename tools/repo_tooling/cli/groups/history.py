@@ -27,7 +27,7 @@ def register_history_group(subparsers: argparse._SubParsersAction[argparse.Argum
             "Prepare release-history context for the current working tree.\n\n"
             "Behavior:\n"
             "- Reads `git status --short` to discover changed files.\n"
-            "- Scans docs/libs and docs/presentation/* for the latest recorded versions.\n"
+            "- Scans docs/libs and docs/history/presentation/* for the latest recorded versions.\n"
             "- Prints a scaffold the agent can rewrite into the final history entry.\n"
             "- This command assists the agent; it does not replace human/agent judgment."
         ),
@@ -46,7 +46,7 @@ def register_history_group(subparsers: argparse._SubParsersAction[argparse.Argum
     )
     history_prep_parser.add_argument(
         "--target",
-        help="Optional target history markdown file. When provided, the suggested version prefers the target filename such as docs/presentation/cli/v0.2/0.2.0.md -> v0.2.0.",
+        help="Optional target history markdown file. When provided, the suggested version prefers the target filename such as docs/history/presentation/cli/v0.2/0.2.0.md -> v0.2.0.",
     )
     history_prep_parser.add_argument(
         "--view",

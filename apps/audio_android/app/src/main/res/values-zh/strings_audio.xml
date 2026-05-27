@@ -100,6 +100,9 @@
     <!-- CONTEXT: Title inside the player detail sheet for the text produced by reading audio back. Same concept as Read result. -->
     <string name="audio_player_detail_decoded_title">读取结果</string>
     <string name="audio_player_detail_decoded_empty">暂无结果。需要时请点击“读取”。</string>
+    <string name="audio_lyrics_navigator_title">歌词</string>
+    <string name="audio_lyrics_navigator_subtitle">全屏歌词导航预览。</string>
+    <string name="audio_lyrics_navigator_open">打开全屏歌词</string>
     <string name="audio_playback_view_visual">视觉效果</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">正在等待跟踪数据</string>

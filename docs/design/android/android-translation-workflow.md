@@ -7,9 +7,9 @@
 - 记录这套工作流与 app 结构、Gradle 校验、英文基线拆分之间的关系
 
 真正入口统一是：
-- 项目入口： [apps/audio_android/AGENTS.md](/C:/code/WaveBits/apps/audio_android/AGENTS.md)
-- 执行步骤： [.agent/workflows/translations/README.md](/C:/code/WaveBits/.agent/workflows/translations/README.md)
-- 工具定义： [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md)
+- 项目入口： [apps/audio_android/AGENTS.md](../../../apps/audio_android/AGENTS.md)
+- 执行步骤： [.agent/workflows/translations/README.md](../../../.agent/workflows/translations/README.md)
+- 工具定义： [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md)
 
 ## Why This Exists
 
@@ -78,8 +78,8 @@ Android 构建会把翻译结构检查接进默认链路。
 ## Related Background Docs
 
 - 语义与术语规则：
-  - [android-localization-guidelines.md](/C:/code/FlipBits/docs/design/android/android-localization-guidelines.md)
+  - [android-localization-guidelines.md](android-localization-guidelines.md)
 - 英文拆分资源说明：
-  - [android-split-strings-translation-guide.md](/C:/code/FlipBits/docs/design/android/translation/android-split-strings-translation-guide.md)
+  - [android-split-strings-translation-guide.md](translation/android-split-strings-translation-guide.md)
 - 工具架构：
-  - [tools/repo_tooling/android_translate/docs/architecture.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/architecture.md)
+  - [tools/repo_tooling/android_translate/docs/architecture.md](../../../tools/repo_tooling/android_translate/docs/architecture.md)

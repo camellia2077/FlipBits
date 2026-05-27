@@ -86,6 +86,9 @@
     <string name="audio_player_detail_now_playing">Teraz odtwarzane</string>
     <string name="audio_player_detail_decoded_title">Wynik odczytu</string>
     <string name="audio_player_detail_decoded_empty">Nie ma jeszcze wyniku. W razie potrzeby stuknij Odczytaj.</string>
+    <string name="audio_lyrics_navigator_title">Tekst</string>
+    <string name="audio_lyrics_navigator_subtitle">Podgląd pełnoekranowej nawigacji po tekście.</string>
+    <string name="audio_lyrics_navigator_open">Otwórz pełny tekst</string>
     <string name="audio_playback_view_visual">Wizualizacja</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">Oczekiwanie na dane follow</string>

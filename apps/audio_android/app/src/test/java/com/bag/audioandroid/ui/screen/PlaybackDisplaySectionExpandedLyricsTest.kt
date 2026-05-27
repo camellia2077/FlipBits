@@ -1,15 +1,10 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowLineTokenRangeViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
@@ -26,9 +21,8 @@ class PlaybackDisplaySectionExpandedLyricsTest {
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun `expanded lyrics switches from compact tape to full scrollable list`() {
+    fun `lyrics section defaults to playback tape with full lyrics entry`() {
         composeRule.setContent {
-            var lyricsExpanded by remember { mutableStateOf(false) }
             PlaybackDisplaySection(
                 displayedSamples = 7,
                 waveformPcm = shortArrayOf(1, 2, 3, 4, 5, 6),
@@ -43,20 +37,53 @@ class PlaybackDisplaySectionExpandedLyricsTest {
                 isScrubbing = false,
                 playbackDisplayMode = PlaybackDisplayMode.Lyrics,
                 flashVisualizationModeName = FlashSignalVisualizationMode.Lanes.name,
-                lyricsExpanded = lyricsExpanded,
+                lyricsExpanded = false,
                 onDisplayModeSelected = {},
                 onFlashVisualizationModeSelected = {},
-                onLyricsExpandedChanged = { lyricsExpanded = it },
+                onLyricsExpandedChanged = {},
+            )
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("playback-token-context-tape-list", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag("playback-lyrics-open-navigator", useUnmergedTree = true).assertExists()
+        composeRule.onAllNodesWithTag("playback-lyrics-expand-toggle", useUnmergedTree = true).assertCountEquals(0)
+        composeRule.onAllNodesWithTag("playback-lyrics-selection-guide", useUnmergedTree = true).assertCountEquals(0)
+        composeRule.onAllNodesWithTag("playback-lyrics-full-list", useUnmergedTree = true).assertCountEquals(0)
+    }
+
+    @Test
+    fun `playing lyrics stays in playback tape until dragged`() {
+        var seekCount = 0
+        composeRule.setContent {
+            PlaybackDisplaySection(
+                displayedSamples = 7,
+                waveformPcm = shortArrayOf(1, 2, 3, 4, 5, 6),
+                sampleRateHz = 44_100,
+                transportMode = TransportModeOption.Mini,
+                frameSamples = 2205,
+                isFlashMode = false,
+                flashVoicingStyle = null,
+                followData = multiLineFollowData(),
+                isPlaying = true,
+                playbackSpeed = 1.0f,
+                isScrubbing = false,
+                playbackDisplayMode = PlaybackDisplayMode.Lyrics,
+                flashVisualizationModeName = FlashSignalVisualizationMode.Lanes.name,
+                lyricsExpanded = true,
+                onDisplayModeSelected = {},
+                onFlashVisualizationModeSelected = {},
+                onLyricsExpandedChanged = {},
+                onSeekToSample = { seekCount += 1 },
             )
         }
 
         composeRule.onNodeWithTag("playback-token-context-tape-list", useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag("playback-lyrics-expand-toggle", useUnmergedTree = true).performClick()
-        composeRule.waitForIdle()
-        composeRule.onNodeWithTag("playback-lyrics-expand-toggle", useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag("playback-lyrics-full-list", useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag("playback-lyrics-full-line-active", useUnmergedTree = true).assertExists()
-        composeRule.onAllNodesWithTag("playback-token-context-tape-list", useUnmergedTree = true).assertCountEquals(0)
+        composeRule.onAllNodesWithTag("playback-lyrics-selection-guide", useUnmergedTree = true).assertCountEquals(0)
+        composeRule.onAllNodesWithTag("playback-lyrics-selection-play", useUnmergedTree = true).assertCountEquals(0)
+        composeRule.runOnIdle {
+            check(seekCount == 0)
+        }
     }
 
     private fun multiLineFollowData(): PayloadFollowViewData =

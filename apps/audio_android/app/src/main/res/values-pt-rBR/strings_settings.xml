@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Rito Negro Carmesim</string>
     <string name="brand_theme_black_crimson_rite_description">Preto fuligem e carmesim ritual para um clima severo de santuário mecânico.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Tema Rito Negro Carmesim, quase preto com vermelho carmesim vivo.</string>
-    <string name="brand_theme_scarlet_guard_title">Guarda Escarlate</string>
-    <string name="brand_theme_scarlet_guard_description">Branco marfim e carmesim selado para um tom heráldico disciplinado.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Tema Guarda Escarlate, marfim claro com vermelho escarlate escuro.</string>
+    <string name="brand_theme_xeno_code_title">Código Xeno</string>
+    <string name="brand_theme_xeno_code_description">Circuitos de obsidiana e verde neon para um pulso mecânico alienígena.</string>
+    <string name="brand_theme_xeno_code_accessibility">Tema Código Xeno, preto-musgo escuro com verde neon e um contorno branco.</string>
+    <string name="brand_theme_scarlet_guard_title">Alerta de Perigo</string>
+    <string name="brand_theme_scarlet_guard_description">Cinza industrial pálido, vermelho alaranjado de aviso e grafite escuro para um visual de alerta mecânico.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Tema Alerta de Perigo, cinza pálido com vermelho alaranjado de aviso e contorno grafite escuro.</string>
     <string name="brand_theme_dynasty_revival_title">Renascimento da Dinastia</string>
     <string name="brand_theme_dynasty_revival_description">Preto de metal tumular com verde reator clássico para o núcleo de uma dinastia desperta.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Tema Renascimento da Dinastia, preto profundo de metal tumular com verde reator brilhante.</string>

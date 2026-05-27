@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Ritus Nigro-Coccineus</string>
     <string name="brand_theme_black_crimson_rite_description">Nigrum fuliginis et coccineum rituale ad animum severum fanorum machinalium.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Thema Ritus Nigro-Coccineus, paene nigrum cum rubro coccineo vivido.</string>
-    <string name="brand_theme_scarlet_guard_title">Custodia Coccinea</string>
-    <string name="brand_theme_scarlet_guard_description">Album eburneum et coccineum sigillatum ad sonum heraldicum disciplinae.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Thema Custodia Coccinea, eburneum lucidum cum rubro coccineo obscuro.</string>
+    <string name="brand_theme_xeno_code_title">Codex Xenus</string>
+    <string name="brand_theme_xeno_code_description">Circuitus obsidiani et viride neon ad pulsum machinae alienae.</string>
+    <string name="brand_theme_xeno_code_accessibility">Thema Codex Xenus, nigrum muscosum obscurum cum viridi neone et linea alba.</string>
+    <string name="brand_theme_scarlet_guard_title">Monitum Periculi</string>
+    <string name="brand_theme_scarlet_guard_description">Griseum industriale pallidum, aurantiacum-rubrum monitorium, et graphites obscurus ad speciem signi machinalis excitati.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Thema Monitum Periculi, griseum pallidum cum aurantiaco-rubro monitorio et linea graphite obscura.</string>
     <string name="brand_theme_dynasty_revival_title">Reditus Aeternus</string>
     <string name="brand_theme_dynasty_revival_description">Metallum sepulcrale et lux smaragdina pro nucleo aeternitatis experrectae.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Thema Renovatio Dynastiae, nigrum sepulcrale profundum cum viridi reactoris claro.</string>

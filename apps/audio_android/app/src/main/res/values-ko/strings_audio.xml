@@ -100,6 +100,9 @@
     <!-- CONTEXT: Title inside the player detail sheet for the text produced by reading audio back. Same concept as Read result. -->
     <string name="audio_player_detail_decoded_title">읽기 결과</string>
     <string name="audio_player_detail_decoded_empty">아직 결과가 없습니다. 필요할 때 읽기를 누르세요.</string>
+    <string name="audio_lyrics_navigator_title">가사</string>
+    <string name="audio_lyrics_navigator_subtitle">전체 화면 가사 탐색 미리보기입니다.</string>
+    <string name="audio_lyrics_navigator_open">전체 가사 열기</string>
     <string name="audio_playback_view_visual">시각화</string>
     <string name="audio_playback_view_lyrics">Tokens</string>
     <string name="audio_pro_visual_waiting_follow">팔로우 데이터 대기 중</string>

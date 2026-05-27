@@ -2,7 +2,7 @@
 
 This directory contains Android-specific architecture and diagnostic documents.
 
-Use it for Android-only behavior such as player UI structure, native bridge strategy, Flash Visual animation, Lyrics follow, and device-driven debugging. Keep cross-platform library architecture in `docs/architecture/` or `docs/libs/`.
+Use it for Android-only behavior such as player UI structure, native bridge strategy, Flash Visual animation, Lyrics follow, and device-driven debugging. Keep cross-platform library architecture in `docs/architecture/` or `docs/history/libs/`.
 
 ## Files
 

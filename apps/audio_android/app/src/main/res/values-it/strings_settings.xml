@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Rito cremisi nero</string>
     <string name="brand_theme_black_crimson_rite_description">Nero fuliggine e cremisi rituale per un’atmosfera severa da santuario meccanico.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Tema Rito cremisi nero, quasi nero con rosso cremisi vivido.</string>
-    <string name="brand_theme_scarlet_guard_title">Guardia scarlatta</string>
-    <string name="brand_theme_scarlet_guard_description">Bianco avorio e cremisi sigillato per un tono araldico disciplinato.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Tema Guardia scarlatta, avorio chiaro con rosso scarlatto scuro.</string>
+    <string name="brand_theme_xeno_code_title">Codice Xeno</string>
+    <string name="brand_theme_xeno_code_description">Circuiti d’ossidiana e verde neon per un impulso meccanico alieno.</string>
+    <string name="brand_theme_xeno_code_accessibility">Tema Codice Xeno, nero muschio scuro con verde neon e un contorno bianco.</string>
+    <string name="brand_theme_scarlet_guard_title">Avviso di pericolo</string>
+    <string name="brand_theme_scarlet_guard_description">Grigio industriale pallido, arancio-rosso di avvertimento e grafite scura per un look da segnale d’allarme meccanico.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Tema Avviso di pericolo, grigio pallido con arancio-rosso di avvertimento e contorno in grafite scura.</string>
     <string name="brand_theme_dynasty_revival_title">Rinascita della Dinastia</string>
     <string name="brand_theme_dynasty_revival_description">Nero metallo tombale e verde reattore classico per un nucleo dinastico risvegliato.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Tema Rinascita della Dinastia, nero metallo tombale profondo con verde reattore brillante.</string>

@@ -47,7 +47,7 @@
     <use
       href="#outer-gear-path"
       fill="none"
-      stroke="#C5A059"
+      stroke="#C78C25"
       stroke-width="3"
       stroke-linejoin="round"
       stroke-linecap="round" />
@@ -55,7 +55,7 @@
     <use
       href="#inner-gear-path"
       fill="none"
-      stroke="#C5A059"
+      stroke="#C78C25"
       stroke-width="3"
       stroke-linejoin="round"
       stroke-linecap="round" />

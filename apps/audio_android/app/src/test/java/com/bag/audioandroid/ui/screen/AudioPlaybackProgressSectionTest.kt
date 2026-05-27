@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -182,7 +182,7 @@ class AudioPlaybackProgressSectionTest {
     }
 
     @Test
-    fun `lyrics expand toggle appears and can be toggled`() {
+    fun `lyrics mode shows selectable lyrics and full lyrics entry`() {
         composeRule.setContent {
             AudioPlaybackProgressSection(
                 displayedSamples = 0,
@@ -204,8 +204,9 @@ class AudioPlaybackProgressSectionTest {
             )
         }
 
-        composeRule.onNodeWithTag("playback-lyrics-expand-toggle").assertIsDisplayed().performClick()
-        composeRule.onNodeWithTag("playback-lyrics-expand-toggle").assertIsDisplayed().performClick()
+        composeRule.onNodeWithTag("playback-token-context-tape-list").assertIsDisplayed()
+        composeRule.onNodeWithTag("playback-lyrics-open-navigator").assertIsDisplayed()
+        composeRule.onAllNodesWithTag("playback-lyrics-expand-toggle").assertCountEquals(0)
     }
 
     @Test

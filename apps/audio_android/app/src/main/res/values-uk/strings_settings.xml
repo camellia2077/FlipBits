@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Чорно-багряний ритуал</string>
     <string name="brand_theme_black_crimson_rite_description">Сажистий чорний і ритуальний багряний для суворого настрою машинного святилища.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Тема Чорно-багряний ритуал, майже чорний із яскравим багряно-червоним.</string>
-    <string name="brand_theme_scarlet_guard_title">Багряна варта</string>
-    <string name="brand_theme_scarlet_guard_description">Білий слонової кістки та запечатаний багряний для стриманого геральдичного тону.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Тема Багряна варта, світла слонова кістка з темно-багряно-червоним.</string>
+    <string name="brand_theme_xeno_code_title">Ксено-код</string>
+    <string name="brand_theme_xeno_code_description">Обсидіанові контури та неоновий зелений створюють пульс чужорідної машини.</string>
+    <string name="brand_theme_xeno_code_accessibility">Тема Ксено-код, темний мохово-чорний із неоновим зеленим і білим контуром.</string>
+    <string name="brand_theme_scarlet_guard_title">Попередження про небезпеку</string>
+    <string name="brand_theme_scarlet_guard_description">Блідий промисловий сірий, попереджувальний помаранчево-червоний і темний графіт створюють вигляд машинної тривоги.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Тема Попередження про небезпеку, блідо-сірий із попереджувальним помаранчево-червоним і темним графітовим контуром.</string>
     <string name="brand_theme_dynasty_revival_title">Відродження династії</string>
     <string name="brand_theme_dynasty_revival_description">Чорний метал гробниці та класичний реакторний зелений для ядра пробудженої династії.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Тема Відродження династії, глибокий чорний метал гробниці з яскравим реакторним зеленим.</string>

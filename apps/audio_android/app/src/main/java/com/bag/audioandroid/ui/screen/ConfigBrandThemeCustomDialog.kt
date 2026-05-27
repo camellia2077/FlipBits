@@ -118,6 +118,8 @@ internal fun CustomBrandThemeDialog(
     val normalizedPrimary = remember(primaryHex) { normalizeBrandThemeHex(primaryHex) }
     val normalizedSecondary = remember(secondaryHex) { normalizeBrandThemeHex(secondaryHex) }
     val normalizedOutline = remember(outlineHexValue) { normalizeBrandThemeHexOrNull(outlineHexValue) }
+    val initialNormalizedPrimary =
+        remember(initialSettings.primaryHex) { normalizeBrandThemeHex(initialSettings.primaryHex) }
 
     val canSave =
         if (isMaterialSingleColor) {
@@ -131,6 +133,7 @@ internal fun CustomBrandThemeDialog(
 
     val previewPrimary = remember(normalizedPrimary) { brandThemeColorOrNull(normalizedPrimary ?: "") }
     val previewSecondary = remember(normalizedSecondary) { brandThemeColorOrNull(normalizedSecondary ?: "") }
+    val initialPrimary = remember(initialNormalizedPrimary) { brandThemeColorOrNull(initialNormalizedPrimary ?: "") }
     val previewOutline =
         remember(normalizedOutline, previewSecondary, outlineHexValue) {
             if (outlineHexValue.isBlank()) {
@@ -161,6 +164,12 @@ internal fun CustomBrandThemeDialog(
         targetValue = previewModalContainerColorTarget,
         animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
         label = "customThemeModalContainer",
+    )
+    val deleteConfirmContainerColorTarget = previewPrimary ?: initialPrimary ?: MaterialTheme.colorScheme.surface
+    val deleteConfirmContainerColor by animateColorAsState(
+        targetValue = deleteConfirmContainerColorTarget,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "customThemeDeleteConfirmContainer",
     )
     val previewModalContentColorTarget =
         if (dialogContentColor != Color.Unspecified) {
@@ -205,7 +214,7 @@ internal fun CustomBrandThemeDialog(
         if (isMaterialSingleColor) {
             previewModalContentColorTarget.copy(alpha = 0.92f)
         } else {
-            previewSecondary ?: Color.Unspecified
+            previewOutline ?: Color.Unspecified
         }
     val previewFocusedBorderColor by animateColorAsState(
         targetValue = previewFocusedBorderColorTarget,
@@ -508,6 +517,9 @@ internal fun CustomBrandThemeDialog(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
+            containerColor = deleteConfirmContainerColor,
+            titleContentColor = previewModalContentColor,
+            textContentColor = previewModalContentColor,
             title = {
                 Text(
                     text =

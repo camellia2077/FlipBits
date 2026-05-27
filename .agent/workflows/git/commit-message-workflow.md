@@ -8,7 +8,7 @@ description: Agent 专用 Git commit message 生成工作流
 
 ## Default Workflow
 
-1. 先确认是否存在对应 history：`docs/libs/...`、`docs/presentation/android/...`、`docs/presentation/cli/...`。
+1. 先确认是否存在对应 history：`docs/history/libs/...`、`docs/history/presentation/android/...`、`docs/history/presentation/cli/...`。
 2. 若已指定或已明确 history，运行 `python tools/run.py message prep --history <history-file.md>`，并以该 history 为首要语义来源。
 3. 若仅有一个变更中的 history 文件，可直接运行 `python tools/run.py message prep`。
 4. 若无可唯一识别的 history，退回 `git diff / git status`（fallback）。

@@ -60,7 +60,7 @@ class AudioAndroidPreferencesActionsMaterialTest {
     }
 
     @Test
-    fun `saving custom material with null replace id appends a new preset`() {
+    fun `saving custom material with null replace id pushes a new preset to the top`() {
         val existing = customMaterialSettings(presetId = "keyboard", displayName = "Keyboard", primaryHex = "#2D005F")
         val state =
             AudioAppUiState(
@@ -75,12 +75,12 @@ class AudioAndroidPreferencesActionsMaterialTest {
             )
 
         assertEquals(2, added.customMaterialThemePresets.size)
-        assertEquals("Keyboard", added.customMaterialThemePresets.first().displayName)
-        assertEquals("Paper", added.customMaterialThemePresets.last().displayName)
-        assertNotEquals(existing.presetId, added.customMaterialThemePresets.last().presetId)
+        assertEquals("Paper", added.customMaterialThemePresets.first().displayName)
+        assertEquals("Keyboard", added.customMaterialThemePresets.last().displayName)
+        assertNotEquals(existing.presetId, added.customMaterialThemePresets.first().presetId)
         assertEquals(ThemeStyleOption.Material, added.selectedThemeStyle)
         assertEquals(
-            customMaterialPaletteId(added.customMaterialThemePresets.last().presetId),
+            customMaterialPaletteId(added.customMaterialThemePresets.first().presetId),
             added.selectedPalette.id,
         )
     }
@@ -121,17 +121,48 @@ class AudioAndroidPreferencesActionsMaterialTest {
 
         val imported =
             state.withImportedCustomMaterialThemes(
-                listOf(customMaterialSettings(presetId = "", displayName = "Keyboard", primaryHex = "#111827")),
+                listOf(customMaterialSettings(presetId = "", displayName = "Keyboard", primaryHex = "#2D005F")),
             )
 
         assertEquals(1, imported.customMaterialThemePresets.size)
         assertEquals("keyboard", imported.customMaterialThemePresets.single().presetId)
-        assertEquals("#111827", imported.customMaterialThemePresets.single().primaryHex)
+        assertEquals("#2D005F", imported.customMaterialThemePresets.single().primaryHex)
         assertEquals(customMaterialPaletteId("keyboard"), imported.selectedPalette.id)
     }
 
     @Test
     fun `importing duplicate custom brand overwrites matching preset`() {
+        val existing =
+            CustomBrandThemeSettings(
+                presetId = "vigilu",
+                displayName = "Vigilu",
+                primaryHex = "#E5E9F0",
+                secondaryHex = "#4C566A",
+                outlineHexOrNull = "#2E3440",
+            )
+        val state = AudioAppUiState(customBrandThemePresets = listOf(existing))
+
+        val imported =
+            state.withImportedCustomBrandThemes(
+                listOf(
+                    CustomBrandThemeSettings(
+                        presetId = "",
+                        displayName = "Vigilu",
+                        primaryHex = "#E5E9F0",
+                        secondaryHex = "#4C566A",
+                        outlineHexOrNull = "#2E3440",
+                    ),
+                ),
+            )
+
+        assertEquals(1, imported.customBrandThemePresets.size)
+        assertEquals("vigilu", imported.customBrandThemePresets.single().presetId)
+        assertEquals("#E5E9F0", imported.customBrandThemePresets.single().primaryHex)
+        assertEquals("#4C566A", imported.customBrandThemePresets.single().secondaryHex)
+    }
+
+    @Test
+    fun `importing same name dual tone with different colors adds a new preset`() {
         val existing =
             CustomBrandThemeSettings(
                 presetId = "vigilu",
@@ -155,10 +186,10 @@ class AudioAndroidPreferencesActionsMaterialTest {
                 ),
             )
 
-        assertEquals(1, imported.customBrandThemePresets.size)
-        assertEquals("vigilu", imported.customBrandThemePresets.single().presetId)
-        assertEquals("#101014", imported.customBrandThemePresets.single().primaryHex)
-        assertEquals("#78D6FF", imported.customBrandThemePresets.single().secondaryHex)
+        assertEquals(2, imported.customBrandThemePresets.size)
+        assertEquals(listOf("Vigilu", "Vigilu"), imported.customBrandThemePresets.map { it.displayName })
+        assertEquals("#101014", imported.customBrandThemePresets.first().primaryHex)
+        assertEquals("#E5E9F0", imported.customBrandThemePresets.last().primaryHex)
     }
 
     @Test
@@ -183,7 +214,7 @@ class AudioAndroidPreferencesActionsMaterialTest {
     }
 
     @Test
-    fun `importing material themes pushes later imports to the top`() {
+    fun `importing material themes keeps shared batch order at the top`() {
         val existing = customMaterialSettings(presetId = "existing", displayName = "Existing", primaryHex = "#2D005F")
         val state = AudioAppUiState(customMaterialThemePresets = listOf(existing))
 
@@ -195,7 +226,29 @@ class AudioAndroidPreferencesActionsMaterialTest {
                 ),
             )
 
-        assertEquals(listOf("Night", "Paper", "Existing"), imported.customMaterialThemePresets.map { it.displayName })
+        assertEquals(listOf("Paper", "Night", "Existing"), imported.customMaterialThemePresets.map { it.displayName })
+    }
+
+    @Test
+    fun `importing same name material with different primary adds a new preset`() {
+        val existing = customMaterialSettings(presetId = "keyboard", displayName = "Keyboard", primaryHex = "#2D005F")
+        val state = AudioAppUiState(customMaterialThemePresets = listOf(existing))
+
+        val imported =
+            state.withImportedCustomMaterialThemes(
+                listOf(
+                    customMaterialSettings(
+                        presetId = "",
+                        displayName = "Keyboard",
+                        primaryHex = "#111827",
+                    ),
+                ),
+            )
+
+        assertEquals(2, imported.customMaterialThemePresets.size)
+        assertEquals(listOf("Keyboard", "Keyboard"), imported.customMaterialThemePresets.map { it.displayName })
+        assertEquals("#111827", imported.customMaterialThemePresets.first().primaryHex)
+        assertEquals("#2D005F", imported.customMaterialThemePresets.last().primaryHex)
     }
 
     @Test
@@ -217,7 +270,7 @@ class AudioAndroidPreferencesActionsMaterialTest {
                         displayName = "Brass",
                         primaryHex = "#E8E2D0",
                         secondaryHex = "#9E1B1B",
-                        outlineHexOrNull = "#C5A059",
+                        outlineHexOrNull = "#C78C25",
                     ),
                 ),
             )
@@ -229,6 +282,41 @@ class AudioAndroidPreferencesActionsMaterialTest {
         )
         assertNotEquals("default", imported.customBrandThemePresets[0].presetId)
         assertNotEquals("default", imported.customBrandThemePresets[1].presetId)
+    }
+
+    @Test
+    fun `importing dual tone themes keeps shared batch order at the top`() {
+        val existing =
+            CustomBrandThemeSettings(
+                presetId = "existing",
+                displayName = "Existing",
+                primaryHex = "#E8E2D0",
+                secondaryHex = "#9E1B1B",
+                outlineHexOrNull = "#C78C25",
+            )
+        val state = AudioAppUiState(customBrandThemePresets = listOf(existing))
+
+        val imported =
+            state.withImportedCustomBrandThemes(
+                listOf(
+                    CustomBrandThemeSettings(
+                        presetId = "",
+                        displayName = "Ash",
+                        primaryHex = "#101014",
+                        secondaryHex = "#78D6FF",
+                        outlineHexOrNull = "#303846",
+                    ),
+                    CustomBrandThemeSettings(
+                        presetId = "",
+                        displayName = "Brass",
+                        primaryHex = "#E8E2D0",
+                        secondaryHex = "#9E1B1B",
+                        outlineHexOrNull = "#C78C25",
+                    ),
+                ),
+            )
+
+        assertEquals(listOf("Ash", "Brass", "Existing"), imported.customBrandThemePresets.map { it.displayName })
     }
 
     private fun customMaterialSettings(

@@ -1,8 +1,30 @@
 # Android Changelog
 
-[中文版本 / Chinese Version](C:/code/WaveBits/docs/presentation/android/CHANGELOG.zh-CN.md)
+[中文版本 / Chinese Version](CHANGELOG.zh-CN.md)
 
-User-facing Android release notes. For detailed engineering history, see `docs/presentation/android/v*/x.y.z.md`.
+User-facing Android release notes. For detailed engineering history, see `docs/history/presentation/android/v*/x.y.z.md`.
+
+## v0.5.4
+
+### Added
+* Added richer custom theme sharing for both `Material` and `dual-tone`, including cleaner plain-text copy/export format and support for importing multiple shared themes while preserving their original order.
+* Added the new `The Sacred Machine` dual-tone theme `Xeno Code`.
+* Added drag-to-select lyric seeking in mini player detail view, with a target timestamp line that lets you scrub directly to a lyric row.
+
+### Improved
+* Improved custom theme management so newly created or imported `Material` and `dual-tone` themes now appear at the top of the list for faster access.
+* Improved built-in dual-tone theme copying so exported names now follow the current app language instead of falling back to internal or English-only identifiers.
+* Refined dual-tone theme editing and section actions, including clearer outline-color usage in custom editing, a copy action that only appears when a built-in section is expanded, and stronger title readability for built-in theme groups and preview cards.
+* Refined expanded player and full lyrics interaction: detail view now follows playback by default, full lyrics keeps its own scrolling controls, and lyric drag selection uses a steadier visual focus line.
+* Refined dual-tone helper text color strategy so secondary labels and descriptions now prefer `outline` styling but still fall back to high-contrast text when a custom palette would otherwise make them hard to read.
+* Refined custom theme deletion dialogs so `Edit custom dual-tone` and `Edit colors` now reuse the current theme's main background color instead of falling back to a generic dialog surface.
+* Refined custom theme deletion dialogs further so they keep using the current preset's primary color even if the edited `primary` field is temporarily invalid.
+
+### Fixed
+* Fixed batch custom theme imports reversing the order of shared themes after insertion.
+* Fixed `Sample text` length restoration so `short` / `long` now stays consistent when switching dual-tone themes and after a cold start.
+* Fixed the built-in dual-tone theme previously labeled `Scarlet Guard`; it is now renamed `Hazard Warning` with updated color description text that matches the actual palette.
+* Fixed a release-only startup crash that could close the app immediately after launch on some builds.
 
 ## v0.4.17
 

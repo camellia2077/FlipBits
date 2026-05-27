@@ -2,7 +2,7 @@
 
 Use this workflow when the task is to check localized XML text against the English baseline and prepare translation updates.
 
-Tool definition for commands and JSON contracts lives in [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md).
+Tool definition for commands and JSON contracts lives in [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md).
 
 ## When To Use
 

@@ -3,8 +3,8 @@
 Use this directory only for execution steps.
 
 Do not use this directory as the project entry or tool-definition layer.
-- Project entry: [apps/audio_android/AGENTS.md](/C:/code/WaveBits/apps/audio_android/AGENTS.md)
-- Tool definition: [tools/repo_tooling/android_translate/docs/README.md](/C:/code/WaveBits/tools/repo_tooling/android_translate/docs/README.md)
+- Project entry: [apps/audio_android/AGENTS.md](../../../apps/audio_android/AGENTS.md)
+- Tool definition: [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md)
 
 ## Choose One Workflow
 

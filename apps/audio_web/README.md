@@ -1,13 +1,13 @@
 # audio_web
 
-`audio_web` 是 `WaveBits` 的 Web presentation / GitHub Pages demo。
+`audio_web` 是 `FlipBits` 的 Web presentation / GitHub Pages demo。
 
 这里的 README 只做导航；实现细节、命令口径、设计语义和发布记录统一收口到根目录 `docs/`。
 
 ## 先看哪里
 
 - Web 发布记录：
-  - `docs/presentation/web/2026-05-22.md`
+  - `docs/history/presentation/web/2026-05-22.md`
 - Web 本地构建 / 预览命令：
   - `docs/notes/web/cmd.md`
 - transport / mode 设计：

@@ -48,7 +48,7 @@ python tools/run.py build --build-dir build/dev
 ### 2. Host ctest
 
 ```powershell
-ctest --test-dir C:\code\WaveBits\build\dev --output-on-failure
+ctest --test-dir build/dev --output-on-failure
 ```
 
 验证点：

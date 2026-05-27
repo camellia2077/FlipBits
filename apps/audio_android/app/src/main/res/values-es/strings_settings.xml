@@ -82,9 +82,12 @@
     <string name="brand_theme_black_crimson_rite_title">Rito carmesí negro</string>
     <string name="brand_theme_black_crimson_rite_description">Negro hollín y carmesí ritual para una atmósfera severa de santuario mecánico.</string>
     <string name="brand_theme_black_crimson_rite_accessibility">Tema Rito carmesí negro, casi negro con rojo carmesí intenso.</string>
-    <string name="brand_theme_scarlet_guard_title">Guardia escarlata</string>
-    <string name="brand_theme_scarlet_guard_description">Blanco marfil y carmesí sellado para un tono heráldico disciplinado.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Tema Guardia escarlata, marfil claro con rojo escarlata oscuro.</string>
+    <string name="brand_theme_xeno_code_title">Código Xeno</string>
+    <string name="brand_theme_xeno_code_description">Circuitería de obsidiana y verde neón para un pulso mecánico alienígena.</string>
+    <string name="brand_theme_xeno_code_accessibility">Tema Código Xeno, negro musgo oscuro con verde neón y un contorno blanco.</string>
+    <string name="brand_theme_scarlet_guard_title">Advertencia de peligro</string>
+    <string name="brand_theme_scarlet_guard_description">Gris industrial pálido, naranja rojizo de advertencia y grafito oscuro para un aspecto de alerta mecánica.</string>
+    <string name="brand_theme_scarlet_guard_accessibility">Tema Advertencia de peligro, gris pálido con naranja rojizo de advertencia y contorno de grafito oscuro.</string>
     <string name="brand_theme_dynasty_revival_title">Renacer de la Dinastía</string>
     <string name="brand_theme_dynasty_revival_description">Negro de metal funerario con verde reactor clásico para un núcleo dinástico reanimado.</string>
     <string name="brand_theme_dynasty_revival_accessibility">Tema Renacer de la Dinastía, negro metal funerario profundo con verde reactor brillante.</string>

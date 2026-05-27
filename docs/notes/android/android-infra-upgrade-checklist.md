@@ -33,9 +33,9 @@
 
 对应入口：
 
-- [apps/audio_android/build.gradle.kts](/C:/code/WaveBits/apps/audio_android/build.gradle.kts)
-- [apps/audio_android/app/build.gradle.kts](/C:/code/WaveBits/apps/audio_android/app/build.gradle.kts)
-- [apps/audio_android/gradle/wrapper/gradle-wrapper.properties](/C:/code/WaveBits/apps/audio_android/gradle/wrapper/gradle-wrapper.properties)
+- [apps/audio_android/build.gradle.kts](../../../apps/audio_android/build.gradle.kts)
+- [apps/audio_android/app/build.gradle.kts](../../../apps/audio_android/app/build.gradle.kts)
+- [apps/audio_android/gradle/wrapper/gradle-wrapper.properties](../../../apps/audio_android/gradle/wrapper/gradle-wrapper.properties)
 
 ## 目标口径
 
@@ -144,8 +144,8 @@
   - `modules-smoke`
   - `native-debug`
 - 如果新版 NDK/CMake 改变了 `externalNativeBuild` 行为，同步更新：
-  - [android-native-strategy.md](/C:/code/WaveBits/docs/architecture/android/android-native-strategy.md)
-  - [android-ndk-cmake-upgrade-decision.md](/C:/code/WaveBits/docs/notes/android/android-ndk-cmake-upgrade-decision.md)
+  - [android-native-strategy.md](../../architecture/android/android-native-strategy.md)
+  - [android-ndk-cmake-upgrade-decision.md](android-ndk-cmake-upgrade-decision.md)
 
 ### 9. 清理旧时代遗留配置
 
@@ -160,10 +160,10 @@
 ### 10. 更新自动化与文档
 
 - 更新：
-  - [apps/audio_android/README.md](/C:/code/WaveBits/apps/audio_android/README.md)
-  - [apps/audio_android/AGENTS.md](/C:/code/WaveBits/apps/audio_android/AGENTS.md)
-  - [docs/notes/android/detekt.md](/C:/code/WaveBits/docs/notes/android/detekt.md)
-  - `docs/presentation/android/...` 中对应版本 history
+  - [apps/audio_android/README.md](../../../apps/audio_android/README.md)
+  - [apps/audio_android/AGENTS.md](../../../apps/audio_android/AGENTS.md)
+  - [docs/notes/android/detekt.md](detekt.md)
+  - `docs/history/presentation/android/...` 中对应版本 history
   - `docs/legal/third_party_inventory.md`
 - 如 `tools/run.py android ...` 行为变化，同步更新命令说明和 CI 文档。
 

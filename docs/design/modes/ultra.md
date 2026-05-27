@@ -7,7 +7,7 @@
 - 它使用低速、清晰、可视化友好、参数保守的 clean `16-FSK`，作为后续更高阶多频模式的基线。
 - 它的设计目标是在传输速度、信息密度、长距离声学传播和抗干扰性之间取保守平衡；相比未来的 Multi-tone FSK，它优先保留更大的抗混响、抗窄带干扰和抗设备频响凹陷余量。
 - 从命名上看它不是 `pro` 的线性升级，而是并列的 UTF-8 / `16-FSK` mode。
-- `ultra` 不承诺兼容任何外部 `16-FSK` / `MFSK` 协议；它是 WaveBits 内部的 clean baseline。
+- `ultra` 不承诺兼容任何外部 `16-FSK` / `MFSK` 协议；它是 FlipBits 内部的 clean baseline。
 - 当前项目目标仍是“encode 生成音频 -> decode 同项目生成音频”的闭环，不承诺真实录音、远距离声学信道、混响或高噪声环境下的接收能力。
 
 ## 输入与字符集边界
@@ -123,7 +123,7 @@ xorout  = 0x0000
 CRC 范围不包含 `preamble` 和 `sync`。这样后续真实接收可以先用 `preamble/sync` 找边界，再用 CRC 判断 frame 内容是否可信。
 
 ## Decode baseline
-- v1 decode 仍假设输入是 WaveBits encode 生成的干净 PCM/WAV。
+- v1 decode 仍假设输入是 FlipBits encode 生成的干净 PCM/WAV。
 - decode 可以按已知 `sample_rate_hz`、`symbol_samples`、tone table 和 frame layout 直接切 symbol。
 - decode 必须验证：
   - `preamble`
