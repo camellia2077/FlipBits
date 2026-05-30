@@ -59,6 +59,7 @@ typedef enum bag_validation_issue {
 
 typedef struct bag_decoder bag_decoder;
 typedef struct bag_encode_operation bag_encode_operation;
+typedef struct bag_decode_operation bag_decode_operation;
 
 typedef struct bag_encoder_config {
   int sample_rate_hz;
@@ -430,6 +431,53 @@ typedef struct bag_encode_operation_pump_budget {
   uint32_t max_wall_time_ms;
 } bag_encode_operation_pump_budget;
 
+// Stable lifecycle values for decode operation snapshots. Numeric assignments
+// intentionally match encode operation state values so Android/Web bindings can
+// use the same terminal-state handling while keeping decode as its own ABI
+// family.
+typedef enum bag_decode_operation_state {
+  BAG_DECODE_OPERATION_QUEUED = 0,
+  BAG_DECODE_OPERATION_RUNNING = 1,
+  BAG_DECODE_OPERATION_SUCCEEDED = 2,
+  BAG_DECODE_OPERATION_FAILED = 3,
+  BAG_DECODE_OPERATION_CANCELLED = 4
+} bag_decode_operation_state;
+
+typedef enum bag_decode_operation_phase {
+  BAG_DECODE_OPERATION_PHASE_PREPARING_INPUT = 0,
+  BAG_DECODE_OPERATION_PHASE_READING_PCM = 1,
+  BAG_DECODE_OPERATION_PHASE_DECODING_PAYLOAD = 2,
+  BAG_DECODE_OPERATION_PHASE_FINALIZING = 3
+} bag_decode_operation_phase;
+
+typedef struct bag_decode_operation_progress {
+  bag_decode_operation_state state;
+  bag_decode_operation_phase phase;
+  float overall_progress_0_to_1;
+  float phase_progress_0_to_1;
+  uint64_t completed_work_units;
+  uint64_t total_work_units;
+  uint64_t phase_completed_work_units;
+  uint64_t phase_total_work_units;
+  bag_error_code terminal_code;
+  size_t pcm_sample_count;
+  size_t pushed_pcm_sample_count;
+} bag_decode_operation_progress;
+
+typedef struct bag_decode_operation_work_plan {
+  uint64_t preparing_input_work_units;
+  uint64_t reading_pcm_work_units;
+  uint64_t decoding_payload_work_units;
+  uint64_t finalizing_work_units;
+  uint64_t total_work_units;
+  size_t pcm_sample_count;
+} bag_decode_operation_work_plan;
+
+typedef struct bag_decode_operation_pump_budget {
+  uint64_t max_work_units;
+  uint32_t max_wall_time_ms;
+} bag_decode_operation_pump_budget;
+
 const char* bag_transport_mode_name(bag_transport_mode mode);
 int bag_try_parse_transport_mode(const char* raw_mode,
                                  bag_transport_mode* out_mode);
@@ -487,6 +535,24 @@ bag_error_code bag_poll_decode_result(bag_decoder* decoder,
 bag_error_code bag_poll_result(bag_decoder* decoder,
                                bag_text_result* out_result);
 void bag_reset(bag_decoder* decoder);
+
+bag_error_code bag_create_decode_operation(
+    const bag_decoder_config* config, const int16_t* samples,
+    size_t sample_count, bag_decode_operation** out_operation);
+bag_error_code bag_run_decode_operation(bag_decode_operation* operation);
+bag_error_code bag_cancel_decode_operation(bag_decode_operation* operation);
+bag_error_code bag_get_decode_operation_work_plan(
+    const bag_decode_operation* operation,
+    bag_decode_operation_work_plan* out_work_plan);
+bag_error_code bag_pump_decode_operation(
+    bag_decode_operation* operation, bag_decode_operation_pump_budget budget,
+    int* out_did_progress);
+bag_error_code bag_poll_decode_operation(
+    const bag_decode_operation* operation,
+    bag_decode_operation_progress* out_progress);
+bag_error_code bag_take_decode_operation_result(
+    const bag_decode_operation* operation, bag_decode_result* out_result);
+void bag_destroy_decode_operation(bag_decode_operation* operation);
 const char* bag_core_version(void);
 
 #ifdef __cplusplus
