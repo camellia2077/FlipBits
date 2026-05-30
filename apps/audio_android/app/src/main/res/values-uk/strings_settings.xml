@@ -216,11 +216,11 @@
 
     <string name="config_sample_decoration_title">Оформлення зразка</string>
     <string name="config_sample_decoration_subtitle">Додає необов’язкові префіксні позначки до випадкового зразка тексту.</string>
-    <string name="config_sample_text_title">Зразок тексту</string>
-    <string name="config_sample_text_subtitle">Керуйте тим, як приклад тексту відображається в полі вводу.</string>
+    <string name="config_sample_text_title">Налаштування аудіо</string>
+    <string name="config_sample_text_subtitle">Керуйте збереженими аудіоданими й тим, як приклад тексту відображається в полі вводу.</string>
     <string name="config_sample_auto_fill_subtitle">Заповнювати поле вводу випадковим прикладом, коли зразок тексту доступний.</string>
-    <string name="config_sample_text_collapse">Згорнути налаштування зразка тексту</string>
-    <string name="config_sample_text_expand">Розгорнути налаштування зразка тексту</string>
+    <string name="config_sample_text_collapse">Згорнути налаштування аудіо</string>
+    <string name="config_sample_text_expand">Розгорнути налаштування аудіо</string>
     <string name="config_sample_auto_fill_title">Автозаповнення зразком тексту</string>
     <string name="config_demo_mode_title">Демо-режим</string>
     <string name="config_demo_mode_subtitle">Показувати відгук на натискання та підказки дій клавіш для запису.</string>
@@ -265,5 +265,7 @@
     <string name="config_custom_theme_import_field_primary">основний</string>
     <string name="config_custom_theme_import_field_secondary">вторинний</string>
     <string name="config_custom_theme_import_field_outline">контур</string>
+    <string name="config_saved_playback_data_subtitle">Зберігає готовими супровід тексту й покращені візуальні ефекти для аудіо, збереженого в застосунку.</string>
+    <string name="config_saved_playback_data_title">Зберігати деталі відтворення</string>
 </resources>
 

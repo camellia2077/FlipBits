@@ -216,11 +216,11 @@
 
     <string name="config_sample_decoration_title">Dekoracja sample</string>
     <string name="config_sample_decoration_subtitle">Dodaj opcjonalne prefiksy do losowanego tekstu sample.</string>
-    <string name="config_sample_text_title">Tekst przykładowy</string>
-    <string name="config_sample_text_subtitle">Steruje tym, jak tekst przykładowy pojawia się w polu wejściowym.</string>
+    <string name="config_sample_text_title">Preferencje audio</string>
+    <string name="config_sample_text_subtitle">Steruje zapisanymi danymi audio i tym, jak tekst przykładowy pojawia się w polu wejściowym.</string>
     <string name="config_sample_auto_fill_subtitle">Wypełnia pole wejściowe losowym przykładem, gdy tekst przykładowy jest dostępny.</string>
-    <string name="config_sample_text_collapse">Zwiń ustawienia tekstu przykładowego</string>
-    <string name="config_sample_text_expand">Rozwiń ustawienia tekstu przykładowego</string>
+    <string name="config_sample_text_collapse">Zwiń preferencje audio</string>
+    <string name="config_sample_text_expand">Rozwiń preferencje audio</string>
     <string name="config_sample_auto_fill_title">Automatycznie wypełniaj tekst przykładowy</string>
     <string name="config_demo_mode_title">Tryb demo</string>
     <string name="config_demo_mode_subtitle">Pokazuje efekt dotyku i podpowiedzi do nagrania.</string>
@@ -265,4 +265,6 @@
     <string name="config_custom_theme_import_field_primary">podstawowy</string>
     <string name="config_custom_theme_import_field_secondary">drugorzędny</string>
     <string name="config_custom_theme_import_field_outline">obrys</string>
+    <string name="config_saved_playback_data_subtitle">Utrzymuje śledzenie tekstu i ulepszone wizualizacje gotowe dla audio zapisanego w aplikacji.</string>
+    <string name="config_saved_playback_data_title">Zapisuj szczegóły odtwarzania</string>
 </resources>

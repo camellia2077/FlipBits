@@ -11,6 +11,7 @@ from ..android_debug import (
     flash_alignment,
     flash_visual_sweep,
     mini_alignment,
+    playback_speed,
     saved_audio,
     settings_import,
     tab_navigation,
@@ -52,6 +53,10 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
     if args.action == "encode-progress-summary":
         events = _read_events(args.log, encode_progress.parse_event)
         _write_or_print(encode_progress.build_summary(events, max_rows=args.max_rows), args.output)
+        return
+    if args.action == "playback-speed-summary":
+        events = _read_events(args.log, playback_speed.parse_event)
+        _write_or_print(playback_speed.build_summary(events, max_rows=args.max_rows), args.output)
         return
     if args.action == "crash-summary":
         lines = crash_summary.read_lines(args.log)
@@ -176,12 +181,22 @@ def cmd_android_debug(args: argparse.Namespace) -> None:
             start=lambda: capture.start_activity(capture.ENCODE_PROGRESS_ACTION, extras),
         )
         return
+    if args.action == "capture-playback-speed":
+        capture.capture_manual_logcat_window(
+            output_dir=_output_dir(args, "playback-speed"),
+            wait_ms=args.wait_ms,
+            filters=capture.PLAYBACK_SPEED_LOGCAT_FILTERS,
+            event_parser=playback_speed.parse_event,
+            summary_builder=lambda events: playback_speed.build_summary(events, max_rows=args.max_rows),
+        )
+        return
     if args.action == "capture-saved":
         extras = []
         capture.string_extra(extras, "wb.saved.item_id", args.item_id)
         capture.string_extra(extras, "wb.saved.display_name", args.display_name)
         capture.long_extra(extras, "wb.saved.seed_duration_ms", args.seed_duration_ms)
         capture.string_extra(extras, "wb.saved.seed_mode", args.seed_mode)
+        capture.bool_extra(extras, "wb.saved.decode", args.decode)
         capture.capture_common(
             output_dir=_output_dir(args, "saved-audio"),
             wait_ms=args.wait_ms,

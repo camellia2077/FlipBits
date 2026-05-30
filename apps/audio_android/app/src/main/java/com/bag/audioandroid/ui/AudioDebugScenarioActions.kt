@@ -26,12 +26,19 @@ import com.bag.audioandroid.ui.screen.FlashAlignmentPerfTrace
 import com.bag.audioandroid.ui.screen.FlashVisualPerfTrace
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.util.measureElapsedMs
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.Instant
 
 internal class AudioDebugScenarioActions(
     private val uiState: StateFlow<AudioAppUiState>,
+    private val scope: CoroutineScope,
     private val sampleInputTextProvider: SampleInputTextProvider,
     private val savedAudioRepository: SavedAudioRepository,
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
@@ -46,12 +53,15 @@ internal class AudioDebugScenarioActions(
     private val onEncode: () -> Unit,
     private val onPlaybackSpeedSelected: (Float) -> Unit,
     private val onShellSavedAudioSelected: (String) -> Unit,
+    private val onDecode: () -> Unit,
     private val onOpenPlayerDetailSheet: () -> Unit,
     private val onTabSelected: (AppTab) -> Unit,
     private val onThemeStyleSelected: (ThemeStyleOption) -> Unit,
     private val onCustomMaterialThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
     private val onCustomMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
 ) {
+    private var pendingSavedAudioDecodeJob: Job? = null
+
     fun startFlashDebugScenario(scenario: FlashDebugScenario) {
         if (!BuildConfig.DEBUG) {
             return
@@ -265,6 +275,44 @@ internal class AudioDebugScenarioActions(
             "openDetail requestId=${scenario.requestId} itemId=${target.itemId} " +
                 "elapsedMs=$openDetailMs detailVisible=${uiState.value.isExpandedPlayerVisible}",
         )
+        if (scenario.decode) {
+            requestSavedAudioDecodeWhenHydrated(
+                requestId = scenario.requestId,
+                itemId = target.itemId,
+            )
+        }
+    }
+
+    private fun requestSavedAudioDecodeWhenHydrated(
+        requestId: Long,
+        itemId: String,
+    ) {
+        pendingSavedAudioDecodeJob?.cancel()
+        pendingSavedAudioDecodeJob =
+            scope.launch {
+                val hydrated =
+                    withTimeoutOrNull(SAVED_AUDIO_DECODE_WAIT_TIMEOUT_MS) {
+                        uiState
+                            .filter { state ->
+                                val selected = state.selectedSavedAudio
+                                selected?.item?.itemId == itemId &&
+                                    !selected.isLoadingContent &&
+                                    !selected.isDecodingContent
+                            }.first()
+                    }?.selectedSavedAudio
+                if (hydrated == null) {
+                    safeLogD(
+                        SAVED_AUDIO_AUTOMATION_TAG,
+                        "decodeSkipped requestId=$requestId itemId=$itemId reason=hydrate_timeout",
+                    )
+                    return@launch
+                }
+                safeLogD(
+                    SAVED_AUDIO_AUTOMATION_TAG,
+                    "decodeRequested requestId=$requestId itemId=$itemId hydrated=true mode=${hydrated.item.modeWireName}",
+                )
+                onDecode()
+            }
     }
 
     fun startAppTabDebugScenario(scenario: AppTabDebugScenario) {
@@ -589,6 +637,7 @@ private const val FLASH_AUTOMATION_TAG = "FlashAutomation"
 private const val MINI_AUTOMATION_TAG = "MiniAutomation"
 private const val ENCODE_PROGRESS_AUTOMATION_TAG = "EncodeProgressAutomation"
 private const val SAVED_AUDIO_AUTOMATION_TAG = "SavedAudioAutomation"
+private const val SAVED_AUDIO_DECODE_WAIT_TIMEOUT_MS = 30_000L
 private const val TAB_AUTOMATION_TAG = "TabAutomation"
 private const val SETTINGS_IMPORT_AUTOMATION_TAG = "TabAutomation"
 

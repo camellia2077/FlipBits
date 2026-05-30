@@ -214,8 +214,23 @@ class AudioPlayer {
             "setSpeed handle=${playback.debugHandleId()} from=${playback.playbackSpeed} to=$resolvedPlaybackSpeed",
         )
         playback.playbackSpeed = resolvedPlaybackSpeed
-        val track = playback.track ?: return true
-        return setPlaybackSpeedSafely(track, resolvedPlaybackSpeed)
+        val track =
+            playback.track
+                ?: run {
+                    safeDebugLog(
+                        AudioPlayerDiagTag,
+                        "setSpeedResult handle=${playback.debugHandleId()} requested=$playbackSpeed stored=${playback.playbackSpeed} " +
+                            "applied=true track=false",
+                    )
+                    return true
+                }
+        val applied = setPlaybackSpeedSafely(track, resolvedPlaybackSpeed)
+        safeDebugLog(
+            AudioPlayerDiagTag,
+            "setSpeedResult handle=${playback.debugHandleId()} requested=$playbackSpeed stored=${playback.playbackSpeed} " +
+                "applied=$applied track=true",
+        )
+        return applied
     }
 
     fun stop() {

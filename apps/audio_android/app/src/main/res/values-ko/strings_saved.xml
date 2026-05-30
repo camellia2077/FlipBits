@@ -12,6 +12,11 @@
     <string name="library_action_export_to_file">파일로 내보내기</string>
     <string name="library_action_rename">이름 바꾸기</string>
     <string name="library_action_delete">삭제</string>
+    <string name="library_action_more">더보기</string>
+    <string name="library_decode_status_decoded">재생 데이터 준비됨</string>
+    <string name="library_decode_status_needed">재생 데이터 필요</string>
+    <string name="library_action_clear_decode_data">재생 데이터 지우기</string>
+    <string name="library_status_decode_data_cleared">재생 데이터가 지워졌습니다</string>
     <string name="library_action_select_all">전체 선택</string>
     <string name="library_action_clear_selection">선택 종료</string>
     <string name="library_action_delete_selected">선택 항목 삭제</string>

@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.DecodeOperationSnapshot
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioItem
@@ -76,9 +78,13 @@ internal fun PlayerSurfaceHost(
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
     followData: PayloadFollowViewData,
+    playbackDetailsSource: String = "unknown",
+    decodedPayload: DecodedPayloadViewData = DecodedPayloadViewData.Empty,
+    lyricsNavigatorReadingModel: LyricsNavigatorReadingModel?,
     flashVisualWindow: FlashVisualWindowState,
     savedAudioItem: SavedAudioItem?,
     showSavedAudioDecodeLoadingNotice: Boolean,
+    savedAudioDecodeProgressSnapshot: DecodeOperationSnapshot? = null,
     isFlashVisualPerfOverlayEnabled: Boolean,
     showQueueSheet: Boolean,
     queueSheetValue: QueueSheetValue,
@@ -164,9 +170,13 @@ internal fun PlayerSurfaceHost(
                         canSkipNext = canSkipNext,
                         canExportGeneratedAudio = canExportGeneratedAudio,
                         followData = followData,
+                        playbackDetailsSource = playbackDetailsSource,
+                        decodedPayload = decodedPayload,
+                        lyricsNavigatorReadingModel = lyricsNavigatorReadingModel,
                         flashVisualWindow = flashVisualWindow,
                         savedAudioItem = savedAudioItem,
                         showSavedAudioDecodeLoadingNotice = showSavedAudioDecodeLoadingNotice,
+                        savedAudioDecodeProgressSnapshot = savedAudioDecodeProgressSnapshot,
                         isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
                         onTogglePlayback = onTogglePlayback,
                         onSkipToPreviousTrack = onSkipToPreviousTrack,

@@ -8,6 +8,11 @@
     <string name="library_action_export_to_file">Экспортировать в файл</string>
     <string name="library_action_rename">Переименовать</string>
     <string name="library_action_delete">Удалить</string>
+    <string name="library_action_more">Ещё</string>
+    <string name="library_decode_status_decoded">Данные воспроизведения готовы</string>
+    <string name="library_decode_status_needed">Нужны данные воспроизведения</string>
+    <string name="library_action_clear_decode_data">Очистить данные воспроизведения</string>
+    <string name="library_status_decode_data_cleared">Данные воспроизведения очищены</string>
     <string name="library_action_select_all">Выбрать всё</string>
     <string name="library_action_clear_selection">Выйти из выбора</string>
     <string name="library_action_delete_selected">Удалить выбранное</string>

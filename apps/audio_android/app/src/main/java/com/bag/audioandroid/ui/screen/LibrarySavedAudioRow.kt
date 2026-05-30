@@ -11,14 +11,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.SaveAlt
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,6 +39,7 @@ import com.bag.audioandroid.ui.utilityActionIconButtonColors
 @Composable
 internal fun LibrarySavedAudioRow(
     item: SavedAudioItem,
+    isDecoded: Boolean,
     isSelectionMode: Boolean,
     isSelected: Boolean,
     folderName: String?,
@@ -41,8 +49,10 @@ internal fun LibrarySavedAudioRow(
     onShare: () -> Unit,
     onMove: () -> Unit,
     onRename: () -> Unit,
+    onClearDecodeData: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
     Column(
         modifier =
             Modifier
@@ -80,7 +90,12 @@ internal fun LibrarySavedAudioRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = formatSavedAudioTime(item.savedAtEpochSeconds),
+                    text =
+                        if (isDecoded) {
+                            stringResource(R.string.library_decode_status_decoded)
+                        } else {
+                            stringResource(R.string.library_decode_status_needed)
+                        },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -94,51 +109,93 @@ internal fun LibrarySavedAudioRow(
             }
             if (!isSelectionMode) {
                 IconButton(
-                    onClick = onExportToFile,
+                    onClick = { menuExpanded = true },
                     colors = utilityActionIconButtonColors(),
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.SaveAlt,
-                        contentDescription = stringResource(R.string.library_action_export_to_file),
+                        imageVector = Icons.Rounded.MoreVert,
+                        contentDescription = stringResource(R.string.library_action_more),
                     )
                 }
-                IconButton(
-                    onClick = onShare,
-                    colors = utilityActionIconButtonColors(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Share,
-                        contentDescription = stringResource(R.string.library_action_share),
-                    )
-                }
-                IconButton(
-                    onClick = onMove,
-                    colors = utilityActionIconButtonColors(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.FolderOpen,
-                        contentDescription = stringResource(R.string.library_action_move),
-                    )
-                }
-                IconButton(
-                    onClick = onRename,
-                    colors = utilityActionIconButtonColors(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Edit,
-                        contentDescription = stringResource(R.string.library_action_rename),
-                    )
-                }
-                IconButton(
-                    onClick = onDelete,
-                    colors = utilityActionIconButtonColors(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.DeleteOutline,
-                        contentDescription = stringResource(R.string.library_action_delete),
-                    )
-                }
+                LibrarySavedAudioRowMenu(
+                    expanded = menuExpanded,
+                    onDismiss = { menuExpanded = false },
+                    onExportToFile = onExportToFile,
+                    onShare = onShare,
+                    onMove = onMove,
+                    onRename = onRename,
+                    onClearDecodeData = onClearDecodeData,
+                    canClearDecodeData = isDecoded,
+                    onDelete = onDelete,
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun LibrarySavedAudioRowMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onExportToFile: () -> Unit,
+    onShare: () -> Unit,
+    onMove: () -> Unit,
+    onRename: () -> Unit,
+    onClearDecodeData: () -> Unit,
+    canClearDecodeData: Boolean,
+    onDelete: () -> Unit,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.library_action_export_to_file)) },
+            leadingIcon = { Icon(Icons.Rounded.SaveAlt, contentDescription = null) },
+            onClick = {
+                onDismiss()
+                onExportToFile()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.library_action_share)) },
+            leadingIcon = { Icon(Icons.Rounded.Share, contentDescription = null) },
+            onClick = {
+                onDismiss()
+                onShare()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.library_action_move)) },
+            leadingIcon = { Icon(Icons.Rounded.FolderOpen, contentDescription = null) },
+            onClick = {
+                onDismiss()
+                onMove()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.library_action_rename)) },
+            leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
+            onClick = {
+                onDismiss()
+                onRename()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.library_action_clear_decode_data)) },
+            enabled = canClearDecodeData,
+            onClick = {
+                onDismiss()
+                onClearDecodeData()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.library_action_delete)) },
+            leadingIcon = { Icon(Icons.Rounded.DeleteOutline, contentDescription = null) },
+            onClick = {
+                onDismiss()
+                onDelete()
+            },
+        )
     }
 }

@@ -216,11 +216,11 @@
 
     <string name="config_sample_decoration_title">Оформление sample-текста</string>
     <string name="config_sample_decoration_subtitle">Добавляет необязательные префиксные маркеры к случайному sample-тексту.</string>
-    <string name="config_sample_text_title">Пример текста</string>
-    <string name="config_sample_text_subtitle">Управляет тем, как пример текста появляется в поле ввода.</string>
+    <string name="config_sample_text_title">Настройки аудио</string>
+    <string name="config_sample_text_subtitle">Управляет сохраненными аудиоданными и тем, как пример текста появляется в поле ввода.</string>
     <string name="config_sample_auto_fill_subtitle">Заполняет поле ввода случайным примером, когда пример текста доступен.</string>
-    <string name="config_sample_text_collapse">Свернуть настройки примера текста</string>
-    <string name="config_sample_text_expand">Развернуть настройки примера текста</string>
+    <string name="config_sample_text_collapse">Свернуть настройки аудио</string>
+    <string name="config_sample_text_expand">Развернуть настройки аудио</string>
     <string name="config_sample_auto_fill_title">Автозаполнение примером текста</string>
     <string name="config_demo_mode_title">Демо-режим</string>
     <string name="config_demo_mode_subtitle">Показывает отклик касаний и подсказки действий для записи.</string>
@@ -265,4 +265,6 @@
     <string name="config_custom_theme_import_field_primary">основной</string>
     <string name="config_custom_theme_import_field_secondary">вторичный</string>
     <string name="config_custom_theme_import_field_outline">контур</string>
+    <string name="config_saved_playback_data_subtitle">Сохраняет готовыми текстовое сопровождение и улучшенную визуализацию для аудио, сохраненного в приложении.</string>
+    <string name="config_saved_playback_data_title">Сохранять детали воспроизведения</string>
 </resources>

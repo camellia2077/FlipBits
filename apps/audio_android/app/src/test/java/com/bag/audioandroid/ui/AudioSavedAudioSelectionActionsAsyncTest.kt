@@ -1,14 +1,17 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.domain.AudioExportResult
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
 import com.bag.audioandroid.domain.GeneratedAudioInputSourceKind
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.GeneratedAudioPcmCacheWriter
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioContent
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
+import com.bag.audioandroid.domain.SavedAudioDecodedCacheEntry
 import com.bag.audioandroid.domain.SavedAudioImportResult
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.SavedAudioRenameResult
@@ -240,6 +243,62 @@ class AudioSavedAudioSelectionActionsAsyncTest {
 
             assertEquals(1, playCurrentFromStartCalls)
         }
+
+    @Test
+    fun `prepare saved audio selection ignores stale decode cache without follow timelines`() =
+        runTest {
+            val savedItem =
+                SavedAudioItem(
+                    itemId = "saved-stale-cache",
+                    displayName = "stale.wav",
+                    uriString = "content://saved/stale",
+                    modeWireName = TransportModeOption.Flash.wireName,
+                    durationMs = 181_000L,
+                    savedAtEpochSeconds = 1L,
+                    sampleRateHz = 44_100,
+                )
+            val uiState = MutableStateFlow(AudioAppUiState(savedAudioItems = listOf(savedItem)))
+            val actions =
+                AudioSavedAudioSelectionActions(
+                    uiState = uiState,
+                    scope = this,
+                    playbackRuntimeGateway = AsyncTestPlaybackRuntimeGateway(),
+                    savedAudioRepository =
+                        AsyncTestSavedAudioRepository(
+                            listItems = listOf(savedItem),
+                            loadBlock = {
+                                SavedAudioContent(
+                                    item = savedItem,
+                                    pcm = shortArrayOf(),
+                                    waveformPcm = shortArrayOf(1, 2),
+                                    pcmFilePath = "stale.pcm16",
+                                    sampleRateHz = 44_100,
+                                )
+                            },
+                        ),
+                    stopPlayback = {},
+                    playCurrentFromStart = { false },
+                    setCurrentStatusText = {},
+                    generatedAudioCacheGateway = AsyncTestGeneratedAudioCacheGateway(),
+                    savedAudioDecodeCacheGateway =
+                        AsyncTestSavedAudioDecodeCacheGateway(
+                            cachedDecode =
+                                SavedAudioDecodedCacheEntry(
+                                    decodedPayload = DecodedPayloadViewData.Empty,
+                                    followData = PayloadFollowViewData(followAvailable = true),
+                                    flashSignalInfo = FlashSignalInfo.Empty,
+                                ),
+                        ),
+                    workerDispatcher = StandardTestDispatcher(testScheduler),
+                )
+
+            assertTrue(actions.prepareSavedAudioSelection(savedItem.itemId))
+            advanceUntilIdle()
+
+            val selection = uiState.value.selectedSavedAudio ?: error("selection missing")
+            assertTrue(selection.needsDecodedContent)
+            assertFalse(selection.followData.followAvailable)
+        }
 }
 
 private class AsyncTestSavedAudioRepository(
@@ -352,11 +411,15 @@ private class AsyncTestGeneratedAudioCacheGateway : GeneratedAudioCacheGateway {
     override fun pruneCachedFiles(retainedPaths: Set<String>) = Unit
 }
 
-private class AsyncTestSavedAudioDecodeCacheGateway : SavedAudioDecodeCacheGateway {
+private class AsyncTestSavedAudioDecodeCacheGateway(
+    private val cachedDecode: SavedAudioDecodedCacheEntry? = null,
+) : SavedAudioDecodeCacheGateway {
+    override fun exists(itemId: String): Boolean = cachedDecode != null
+
     override fun read(
         item: SavedAudioItem,
         metadata: GeneratedAudioMetadata?,
-    ) = null
+    ) = cachedDecode
 
     override fun write(
         item: SavedAudioItem,

@@ -322,11 +322,11 @@
     <string name="config_custom_material_theme_import_config_label">Color config</string>
     <!-- CONTEXT: Validation error shown when pasted custom Material color preset configuration cannot be parsed. -->
     <string name="config_custom_material_theme_import_invalid">Paste a valid custom color config.</string>
-    <string name="config_sample_text_title">Sample text</string>
-    <string name="config_sample_text_subtitle">Control how example text appears in the input field.</string>
+    <string name="config_sample_text_title">Audio preferences</string>
+    <string name="config_sample_text_subtitle">Control saved audio data and how example text appears in the input field.</string>
     <string name="config_sample_auto_fill_subtitle">Fill the input field with a randomized example when sample text is available.</string>
-    <string name="config_sample_text_collapse">Collapse sample text settings</string>
-    <string name="config_sample_text_expand">Expand sample text settings</string>
+    <string name="config_sample_text_collapse">Collapse audio preference settings</string>
+    <string name="config_sample_text_expand">Expand audio preference settings</string>
     <string name="config_sample_auto_fill_title">Auto-fill sample text</string>
     <string name="config_palette_custom_section_title">Custom palettes</string>
     <string name="config_palette_builtin_section_title">Built-in palettes</string>
@@ -358,4 +358,6 @@
     <string name="config_custom_theme_import_field_secondary">secondary</string>
     <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
     <string name="config_custom_theme_import_field_outline">outline</string>
+    <string name="config_saved_playback_data_subtitle">Keep text follow and enhanced visuals ready for audio saved in the app.</string>
+    <string name="config_saved_playback_data_title">Save playback details</string>
 </resources>

@@ -124,6 +124,10 @@ internal class AudioAndroidLibraryActions(
         mutationActions.onShareSavedAudio(item)
     }
 
+    fun onClearSavedAudioDecodeData(itemId: String) {
+        mutationActions.onClearSavedAudioDecodeData(itemId)
+    }
+
     fun onCreateSavedAudioFolder(name: String) {
         mutationActions.onCreateSavedAudioFolder(name)
     }

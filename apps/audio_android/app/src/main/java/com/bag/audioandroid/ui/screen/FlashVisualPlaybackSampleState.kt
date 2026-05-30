@@ -113,7 +113,13 @@ internal fun rememberFlashVisualPlaybackSampleState(
         val maxSample = latestTotalSamples.toFloat()
         val initialAnchor = latestAnchorSample.coerceIn(0f, maxSample)
         val hardAnchorThreshold = sampleRateHz * PlaybackHardAnchorThresholdSeconds
-        visualSample = initialPlaybackVisualSample(initialAnchor, visualSample, maxSample)
+        visualSample =
+            initialPlaybackVisualSample(
+                initialAnchor = initialAnchor,
+                visualSample = visualSample,
+                maxSample = maxSample,
+                hardAnchorThreshold = hardAnchorThreshold,
+            )
         val frameClock =
             FlashVisualPlaybackFrameClock(
                 anchorNanos = withFrameNanos { it },
@@ -199,15 +205,17 @@ private fun flashVisualPausedSampleDecision(
     )
 }
 
-private fun initialPlaybackVisualSample(
+internal fun initialPlaybackVisualSample(
     initialAnchor: Float,
     visualSample: Float,
     maxSample: Float,
+    hardAnchorThreshold: Float,
 ): Float =
-    if (initialAnchor + 0.5f < visualSample) {
-        initialAnchor
-    } else {
-        visualSample.coerceIn(0f, maxSample)
+    when {
+        initialAnchor + 0.5f < visualSample -> initialAnchor
+        // Scrub/seek resume can jump far ahead; snap instead of visibly fast-forwarding the visual readout.
+        initialAnchor - visualSample > hardAnchorThreshold -> initialAnchor
+        else -> visualSample.coerceIn(0f, maxSample)
     }
 
 private fun nextPlayingVisualSample(

@@ -8,6 +8,11 @@
     <string name="library_action_export_to_file">Esporta in un file</string>
     <string name="library_action_rename">Rinomina</string>
     <string name="library_action_delete">Elimina</string>
+    <string name="library_action_more">Altro</string>
+    <string name="library_decode_status_decoded">Dati di riproduzione pronti</string>
+    <string name="library_decode_status_needed">Dati di riproduzione necessari</string>
+    <string name="library_action_clear_decode_data">Cancella dati di riproduzione</string>
+    <string name="library_status_decode_data_cleared">Dati di riproduzione cancellati</string>
     <string name="library_action_select_all">Seleziona tutto</string>
     <string name="library_action_clear_selection">Esci dalla selezione</string>
     <string name="library_action_delete_selected">Elimina selezione</string>

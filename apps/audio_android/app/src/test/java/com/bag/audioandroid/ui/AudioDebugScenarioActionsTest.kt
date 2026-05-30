@@ -120,6 +120,7 @@ class AudioDebugScenarioActionsTest {
         onCustomMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
     ) = AudioDebugScenarioActions(
         uiState = uiState,
+        scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Unconfined),
         sampleInputTextProvider = DebugScenarioFakeSampleInputTextProvider(),
         savedAudioRepository = DebugScenarioFakeSavedAudioRepository(),
         generatedAudioCacheGateway = DebugScenarioFakeGeneratedAudioCacheGateway(),
@@ -134,6 +135,7 @@ class AudioDebugScenarioActionsTest {
         onEncode = {},
         onPlaybackSpeedSelected = {},
         onShellSavedAudioSelected = {},
+        onDecode = {},
         onOpenPlayerDetailSheet = {},
         onTabSelected = { tab -> uiState.value = uiState.value.copy(selectedTab = tab) },
         onThemeStyleSelected = { style -> uiState.value = uiState.value.copy(selectedThemeStyle = style) },

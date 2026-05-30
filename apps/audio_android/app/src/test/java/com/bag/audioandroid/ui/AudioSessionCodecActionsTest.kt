@@ -993,6 +993,65 @@ class AudioSessionCodecMiniNormalizationTest {
         }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
+class AudioSessionCodecLyricsNavigatorModelTest {
+    @Test
+    fun `segmented follow hydration keeps full lyrics navigator model beyond active window`() =
+        runTest {
+            val segmentInput = "A".repeat(64) + "B".repeat(64) + "C".repeat(4)
+            val segmentSamples = 1_400_000
+            val fixture =
+                createFixture(
+                    gateway =
+                        FakeAudioCodecGateway(
+                            encodeTextBlock = { _, _ ->
+                                EncodeAudioResult.Success(ShortArray(segmentSamples))
+                            },
+                            buildFollowDataBlock = { text ->
+                                PayloadFollowViewData(
+                                    textTokens = listOf(text),
+                                    textTokenTimeline = listOf(TextFollowTimelineEntry(0, segmentSamples, 0)),
+                                    textFollowAvailable = true,
+                                    lyricLines = listOf(text),
+                                    lyricLineTimeline = listOf(TextFollowLyricLineTimelineEntry(0, segmentSamples, 0)),
+                                    lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 1)),
+                                    lyricLineFollowAvailable = true,
+                                    totalPcmSampleCount = segmentSamples,
+                                    followAvailable = true,
+                                )
+                            },
+                        ),
+                    testScope = this,
+                )
+
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    transportMode = TransportModeOption.Flash,
+                    selectedFlashVoicingStyle = FlashVoicingStyleOption.Litany,
+                    sessions =
+                        fixture.uiState.value.sessions +
+                            (
+                                TransportModeOption.Flash to
+                                    fixture.uiState.value.sessions.getValue(TransportModeOption.Flash).copy(
+                                        inputText = segmentInput,
+                                    )
+                            ),
+                )
+
+            fixture.actions.onEncode()
+            advanceUntilIdle()
+
+            val session =
+                fixture.uiState.value.sessions
+                    .getValue(TransportModeOption.Flash)
+            assertEquals(listOf("A".repeat(64)), session.followData.lyricLines)
+            assertEquals(
+                "A".repeat(64) + "\n" + "B".repeat(64) + "\n" + "C".repeat(4),
+                session.lyricsNavigatorReadingModel?.text,
+            )
+        }
+}
+
 private fun createFixture(
     gateway: AudioCodecGateway,
     testScope: TestScope,
@@ -1107,14 +1166,26 @@ private class FakeAudioCodecGateway(
         flashVoicingFlavor: Int,
     ): Int = BagApiCodes.VALIDATION_OK
 
-    override fun decodeGeneratedPcm(
+    override suspend fun decodeGeneratedPcm(
         pcm: ShortArray,
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
+        onProgress: (com.bag.audioandroid.domain.DecodeProgressUpdate) -> Unit,
     ): DecodedAudioPayloadResult = decodeBlock?.invoke(pcm, mode) ?: DecodedAudioPayloadResult()
+
+    override suspend fun decodePcmFileSegment(
+        pcmFilePath: String,
+        startSample: Long,
+        sampleCount: Int,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): DecodedAudioPayloadResult = DecodedAudioPayloadResult()
 
     override fun getCoreVersion(): String = "test"
 }
@@ -1275,6 +1346,8 @@ private class CodecFakeGeneratedAudioCacheGateway : GeneratedAudioCacheGateway {
 }
 
 private class CodecFakeSavedAudioDecodeCacheGateway : SavedAudioDecodeCacheGateway {
+    override fun exists(itemId: String): Boolean = false
+
     override fun read(
         item: SavedAudioItem,
         metadata: GeneratedAudioMetadata?,

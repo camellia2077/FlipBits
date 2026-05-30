@@ -8,6 +8,8 @@ package com.bag.audioandroid.domain
  *   re-decode work every time the user reopens the same clip.
  */
 interface SavedAudioDecodeCacheGateway {
+    fun exists(itemId: String): Boolean
+
     fun read(
         item: SavedAudioItem,
         metadata: GeneratedAudioMetadata?,

@@ -39,6 +39,31 @@ object NativeBagBridge {
 
     external fun nativeTakeEncodeOperationResult(handle: Long): EncodedAudioPayloadResult
 
+    external fun nativeCreateDecodeOperation(
+        pcm: ShortArray,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): Long
+
+    external fun nativePumpDecodeOperation(
+        handle: Long,
+        maxWorkUnits: Int,
+        maxWallTimeMs: Int,
+    ): Int
+
+    external fun nativeGetDecodeOperationWorkPlan(handle: Long): DoubleArray
+
+    external fun nativePollDecodeOperation(handle: Long): DoubleArray
+
+    external fun nativeTakeDecodeOperationResult(handle: Long): DecodedAudioPayloadResult
+
+    external fun nativeCancelDecodeOperation(handle: Long): Int
+
+    external fun nativeDestroyDecodeOperation(handle: Long)
+
     external fun nativeBuildEncodeFollowData(
         text: String,
         sampleRateHz: Int,
@@ -62,6 +87,17 @@ object NativeBagBridge {
 
     external fun nativeDecodeGeneratedPcm(
         pcm: ShortArray,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): DecodedAudioPayloadResult
+
+    external fun nativeDecodePcmFileSegment(
+        pcmFilePath: String,
+        startSample: Long,
+        sampleCount: Int,
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int,

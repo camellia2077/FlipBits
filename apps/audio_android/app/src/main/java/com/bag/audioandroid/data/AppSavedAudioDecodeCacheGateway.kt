@@ -18,6 +18,8 @@ import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowRawSegmentViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
 import com.bag.audioandroid.domain.UltraFrameSymbolTimelineEntry
+import com.bag.audioandroid.domain.needsSavedDecodeRefresh
+import com.bag.audioandroid.util.safeDebugLog
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -27,12 +29,15 @@ class AppSavedAudioDecodeCacheGateway(
 ) : SavedAudioDecodeCacheGateway {
     private val cacheDirectory = File(context.filesDir, CACHE_DIRECTORY_NAME).apply { mkdirs() }
 
+    override fun exists(itemId: String): Boolean = cacheFileForItemId(itemId).exists()
+
     override fun read(
         item: SavedAudioItem,
         metadata: GeneratedAudioMetadata?,
     ): SavedAudioDecodedCacheEntry? {
         val file = cacheFileForItemId(item.itemId)
         if (!file.exists()) {
+            playbackDetailsCacheLog("read itemId=${item.itemId} hit=false reason=missing")
             return null
         }
         return runCatching {
@@ -40,13 +45,29 @@ class AppSavedAudioDecodeCacheGateway(
             val fingerprint = json.optString(JSON_KEY_FINGERPRINT)
             if (fingerprint != buildFingerprint(item, metadata)) {
                 file.delete()
+                playbackDetailsCacheLog("read itemId=${item.itemId} hit=false reason=fingerprint")
                 return null
             }
-            SavedAudioDecodedCacheEntry(
-                decodedPayload = json.optJSONObject(JSON_KEY_DECODED_PAYLOAD)?.toDecodedPayload() ?: DecodedPayloadViewData.Empty,
-                followData = json.optJSONObject(JSON_KEY_FOLLOW_DATA)?.toFollowData() ?: PayloadFollowViewData.Empty,
-                flashSignalInfo = json.optJSONObject(JSON_KEY_FLASH_SIGNAL_INFO)?.toFlashSignalInfo() ?: FlashSignalInfo.Empty,
+            val entry =
+                SavedAudioDecodedCacheEntry(
+                    decodedPayload = json.optJSONObject(JSON_KEY_DECODED_PAYLOAD)?.toDecodedPayload() ?: DecodedPayloadViewData.Empty,
+                    followData = json.optJSONObject(JSON_KEY_FOLLOW_DATA)?.toFollowData() ?: PayloadFollowViewData.Empty,
+                    flashSignalInfo = json.optJSONObject(JSON_KEY_FLASH_SIGNAL_INFO)?.toFlashSignalInfo() ?: FlashSignalInfo.Empty,
+                )
+            if (entry.followData.needsSavedDecodeRefresh(item, metadata)) {
+                file.delete()
+                playbackDetailsCacheLog(
+                    "read itemId=${item.itemId} hit=false reason=stale-follow ${entry.followData.diagSummary()}",
+                )
+                return null
+            }
+            playbackDetailsCacheLog(
+                "read itemId=${item.itemId} hit=true mode=${item.modeWireName} " +
+                    "metadataMode=${metadata?.mode?.wireName.orEmpty()} ${entry.followData.diagSummary()}",
             )
+            entry
+        }.onFailure { throwable ->
+            playbackDetailsCacheLog("read itemId=${item.itemId} hit=false reason=exception type=${throwable::class.simpleName}")
         }.getOrNull()
     }
 
@@ -67,6 +88,12 @@ class AppSavedAudioDecodeCacheGateway(
         runCatching {
             file.parentFile?.mkdirs()
             file.writeText(json.toString())
+            playbackDetailsCacheLog(
+                "write itemId=${item.itemId} mode=${item.modeWireName} " +
+                    "metadataMode=${metadata?.mode?.wireName.orEmpty()} ${followData.diagSummary()}",
+            )
+        }.onFailure { throwable ->
+            playbackDetailsCacheLog("write itemId=${item.itemId} failed type=${throwable::class.simpleName}")
         }
     }
 
@@ -120,6 +147,16 @@ class AppSavedAudioDecodeCacheGateway(
         const val JSON_KEY_FLASH_SIGNAL_INFO = "flash_signal_info"
     }
 }
+
+private fun playbackDetailsCacheLog(message: String) {
+    safeDebugLog("SavedAudioPlaybackDetails", message)
+}
+
+private fun PayloadFollowViewData.diagSummary(): String =
+    "follow=$followAvailable textFollow=$textFollowAvailable lyricFollow=$lyricLineFollowAvailable " +
+        "tokens=${textTokens.size} textTimeline=${textTokenTimeline.size} rawUnits=${textRawDisplayUnits.size} " +
+        "byteTimeline=${byteTimeline.size} binaryGroups=${binaryGroupTimeline.size} ultraFrames=${ultraFrameTimeline.size} " +
+        "payloadBegin=$payloadBeginSample payloadSamples=$payloadSampleCount total=$totalPcmSampleCount"
 
 private fun DecodedPayloadViewData.toJson() =
     JSONObject()

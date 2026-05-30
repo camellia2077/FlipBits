@@ -174,6 +174,48 @@ class PlaybackTokenContextTapeTest {
     }
 
     @Test
+    fun `exact lyric source line is preserved as one display line`() {
+        val displayLines =
+            buildDisplayTokenLineRanges(
+                followData =
+                    PayloadFollowViewData(
+                        textTokens = listOf("🕯️", "深", "渊", "隔", "离", "日", "志", "以", "核", "准", "的", "句", "式", "开", "篇", "："),
+                        lyricLines = listOf("🕯️ 深渊隔离日志以核准的句式开篇："),
+                        lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 16)),
+                        lyricLineFollowAvailable = true,
+                        textFollowAvailable = true,
+                    ),
+            )
+
+        assertEquals(1, displayLines.size)
+        assertEquals(0, displayLines.single().tokenBeginIndex)
+        assertEquals(16, displayLines.single().tokenCount)
+        assertTrue(displayLines.single().coversFullSourceLine)
+    }
+
+    @Test
+    fun `navigator display can split exact lyric source line into multiple rows`() {
+        val displayLines =
+            buildDisplayTokenLineRanges(
+                followData =
+                    PayloadFollowViewData(
+                        textTokens = listOf("PRAISE", "THE", "OMNISSIAH", "PRAISE", "THE", "MACHINE"),
+                        lyricLines = listOf("PRAISE THE OMNISSIAH PRAISE THE MACHINE"),
+                        lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 6)),
+                        lyricLineFollowAvailable = true,
+                        textFollowAvailable = true,
+                    ),
+                preserveExactLyricLines = false,
+            )
+
+        assertEquals(2, displayLines.size)
+        assertEquals(0, displayLines[0].tokenBeginIndex)
+        assertEquals(3, displayLines[0].tokenCount)
+        assertEquals(3, displayLines[1].tokenBeginIndex)
+        assertEquals(3, displayLines[1].tokenCount)
+    }
+
+    @Test
     fun `mini morse style long text does not remain one display line`() {
         val displayLines =
             buildDisplayTokenLineRanges(

@@ -62,6 +62,7 @@ internal object PlaybackStartupTrace {
         displayedSamples: Int,
         isPlaying: Boolean,
         transportMode: TransportModeOption?,
+        playbackDetailsSource: String,
     ) {
         if (!enabled || transportMode != TransportModeOption.Ultra) {
             return
@@ -92,12 +93,18 @@ internal object PlaybackStartupTrace {
         val byteDelta = tokenState.deltaFromPreviousByte(presentationState.activeByteIndexWithinToken)
         logDebug(
             "surface=token event=${if (started) "start" else "tick"} session=${tokenState.session} " +
-                "elapsedMs=${tokenState.elapsedMs(now)} mode=${mode.name} playing=$isPlaying " +
+                "elapsedMs=${tokenState.elapsedMs(now)} mode=${mode.name} source=$playbackDetailsSource playing=$isPlaying " +
                 "sample=$displayedSamples sampleDelta=$sampleDelta token=${presentationState.activeTextIndex} " +
                 "tokenDelta=$tokenDelta byte=${presentationState.activeByteIndexWithinToken} byteDelta=$byteDelta " +
                 "bit=${presentationState.activeBitIndexWithinByte} globalBit=$globalBit tone=${presentationState.isActiveBitTone} " +
                 "unitStart=${activeUnit?.startSample ?: -1} unitEnd=${activeUnit?.let { it.startSample + it.sampleCount } ?: -1} " +
                 "hex=${activeUnit?.hexText.orEmpty().ifBlank { "_" }} bin=${activeUnit?.binaryText.orEmpty().ifBlank { "_" }} " +
+                "follow=${followData.followAvailable} textFollow=${followData.textFollowAvailable} " +
+                "tokens=${followData.textTokens.size} textTimeline=${followData.textTokenTimeline.size} " +
+                "rawUnits=${followData.textRawDisplayUnits.size} binaryGroups=${followData.binaryGroupTimeline.size} " +
+                "ultraFrames=${followData.ultraFrameTimeline.size} " +
+                "firstUnit=${followData.textRawDisplayUnits.firstOrNull()?.startSample ?: -1} " +
+                "firstGroup=${followData.binaryGroupTimeline.firstOrNull()?.startSample ?: -1} " +
                 "sampleBack=${sampleDelta < 0} tokenBack=${tokenDelta < 0} byteBack=${byteDelta < 0}",
         )
     }

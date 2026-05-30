@@ -1,12 +1,14 @@
 package com.bag.audioandroid.ui.state
 
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.DecodeOperationSnapshot
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioFolder
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
+import com.bag.audioandroid.ui.LyricsNavigatorReadingModel
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
@@ -56,6 +58,7 @@ data class AudioAppUiState(
     val isDemoModeEnabled: Boolean = false,
     val isSampleAutoFillEnabled: Boolean = true,
     val isSampleDecorationEnabled: Boolean = true,
+    val isSavedAudioPlaybackDataStorageEnabled: Boolean = true,
     val isFlashVisualPerfOverlayEnabled: Boolean = false,
     val isConfigLanguageExpanded: Boolean = true,
     val isConfigThemeAppearanceExpanded: Boolean = true,
@@ -87,6 +90,7 @@ data class AudioAppUiState(
     val playbackSequenceMode: PlaybackSequenceMode = PlaybackSequenceMode.Normal,
     val selectedSavedAudio: SavedAudioPlaybackSelection? = null,
     val savedAudioItems: List<SavedAudioItem> = emptyList(),
+    val decodedSavedAudioItemIds: Set<String> = emptySet(),
     val savedAudioFolders: List<SavedAudioFolder> = emptyList(),
     val savedAudioFolderAssignments: Map<String, String> = emptyMap(),
     val librarySelection: LibrarySelectionUiState = LibrarySelectionUiState(),
@@ -246,31 +250,47 @@ data class AudioAppUiState(
                 is AudioPlaybackSource.Generated ->
                     sessions.getValue(source.mode).generatedAudioMetadata?.frameSamples ?: 2205
                 is AudioPlaybackSource.Saved ->
-                    selectedSavedAudio
-                        ?.takeIf { it.item.itemId == source.itemId }
+                    currentSavedAudioSelection
                         ?.metadata
                         ?.frameSamples
                         ?: 2205
             }
 
-    val currentSavedAudioItem: SavedAudioItem?
+    val currentSavedAudioSelection: SavedAudioPlaybackSelection?
         get() =
-            when (val source = currentPlaybackSource) {
-                is AudioPlaybackSource.Generated -> null
+            (currentPlaybackSource as? AudioPlaybackSource.Saved)
+                ?.let { source ->
+                    selectedSavedAudio?.takeIf { it.item.itemId == source.itemId }
+                }
+
+    val currentSavedAudioItem: SavedAudioItem?
+        get() = currentSavedAudioSelection?.item
+
+    val currentPlaybackDetailsSourceWireName: String
+        get() =
+            when (currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> "generated-session"
                 is AudioPlaybackSource.Saved ->
-                    selectedSavedAudio
-                        ?.takeIf { it.item.itemId == source.itemId }
-                        ?.item
+                    currentSavedAudioSelection
+                        ?.playbackDetailsSource
+                        ?.wireName
+                        ?: "saved-unknown"
             }
+
+    val showCurrentSavedAudioDecodeLoadingNotice: Boolean
+        get() =
+            currentSavedAudioSelection
+                ?.let { it.needsDecodedContent || it.isDecodingContent }
+                ?: false
+
+    val currentSavedAudioDecodeProgressSnapshot: DecodeOperationSnapshot?
+        get() = currentSavedAudioSelection?.decodeOperationSnapshot
 
     val currentPlaybackDecodedPayload: DecodedPayloadViewData?
         get() =
             when (val source = currentPlaybackSource) {
                 is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).decodedPayload
-                is AudioPlaybackSource.Saved ->
-                    selectedSavedAudio
-                        ?.takeIf { it.item.itemId == source.itemId }
-                        ?.decodedPayload
+                is AudioPlaybackSource.Saved -> currentSavedAudioSelection?.decodedPayload
             }
 
     val audioTabDecodedPayload: DecodedPayloadViewData
@@ -316,11 +336,14 @@ data class AudioAppUiState(
         get() =
             when (val source = currentPlaybackSource) {
                 is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).followData
-                is AudioPlaybackSource.Saved ->
-                    selectedSavedAudio
-                        ?.takeIf { it.item.itemId == source.itemId }
-                        ?.followData
-                        ?: PayloadFollowViewData.Empty
+                is AudioPlaybackSource.Saved -> currentSavedAudioSelection?.followData ?: PayloadFollowViewData.Empty
+            }
+
+    val currentPlaybackLyricsNavigatorReadingModel: LyricsNavigatorReadingModel?
+        get() =
+            when (val source = currentPlaybackSource) {
+                is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).lyricsNavigatorReadingModel
+                is AudioPlaybackSource.Saved -> null
             }
 
     val currentPlaybackFlashVisualWindow: FlashVisualWindowState
@@ -334,22 +357,14 @@ data class AudioAppUiState(
         get() =
             when (val source = currentPlaybackSource) {
                 is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).generatedFlashSignalInfo
-                is AudioPlaybackSource.Saved ->
-                    selectedSavedAudio
-                        ?.takeIf { it.item.itemId == source.itemId }
-                        ?.flashSignalInfo
-                        ?: FlashSignalInfo.Empty
+                is AudioPlaybackSource.Saved -> currentSavedAudioSelection?.flashSignalInfo ?: FlashSignalInfo.Empty
             }
 
     val currentPlaybackWavAudioInfo: WavAudioInfo
         get() =
             when (val source = currentPlaybackSource) {
                 is AudioPlaybackSource.Generated -> sessions.getValue(source.mode).generatedWavAudioInfo
-                is AudioPlaybackSource.Saved ->
-                    selectedSavedAudio
-                        ?.takeIf { it.item.itemId == source.itemId }
-                        ?.wavAudioInfo
-                        ?: WavAudioInfo.Empty
+                is AudioPlaybackSource.Saved -> currentSavedAudioSelection?.wavAudioInfo ?: WavAudioInfo.Empty
             }
 
     val miniPlayerModel: MiniPlayerUiModel?

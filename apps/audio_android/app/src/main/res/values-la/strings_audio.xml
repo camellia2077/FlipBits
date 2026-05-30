@@ -5,10 +5,10 @@
     <string name="audio_action_encode">Invocare</string>
     <string name="audio_action_encode_busy">Invocatio…</string>
     <string name="audio_action_encode_busy_progress">Invocatio… %1$d%%</string>
-    <string name="audio_encode_phase_preparing_input_label">Initium Protocolli</string>
-    <string name="audio_encode_phase_rendering_pcm_label">Formatio Signi</string>
-    <string name="audio_encode_phase_postprocessing_label">Transmutatio</string>
-    <string name="audio_encode_phase_finalizing_label">Sigillatio</string>
+    <string name="audio_encode_phase_preparing_input_label">Praeparatio inputi</string>
+    <string name="audio_encode_phase_rendering_pcm_label">Generatio vocis</string>
+    <string name="audio_encode_phase_postprocessing_label">Formatio vocis</string>
+    <string name="audio_encode_phase_finalizing_label">Data reproductionis struuntur</string>
     <string name="audio_action_cancel_encode">Aborta</string>
     <string name="audio_action_cancel_encode_busy">Abortio…</string>
     <string name="audio_action_play">Excita</string>
@@ -133,8 +133,10 @@
     <string name="audio_ultra_visual_level_high">Altum</string>
     <string name="audio_ultra_visual_level_mid">Medium</string>
     <string name="audio_ultra_visual_level_low">Humile</string>
-    <string name="audio_follow_unavailable">Sequela payload pro hoc audio nunc praesto non est.</string>
-    <string name="audio_follow_text_unavailable">Sequela textus pro hoc audio nunc praesto non est.</string>
+    <string name="audio_follow_unavailable">Visualizationes auctae huic audio nondum paratae sunt.</string>
+    <string name="audio_follow_text_unavailable">Sequela textus huic audio nondum parata est.</string>
+    <string name="audio_follow_visuals_failed">Visualizationes auctae huic audio parari non potuerunt.</string>
+    <string name="audio_follow_text_failed">Sequela textus huic audio parari non potuit.</string>
     <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Data</string>
     <string name="audio_follow_view_hex">Hex</string>
@@ -192,10 +194,10 @@
     <string name="status_input_empty">Introiti vacuus est.</string>
     <string name="status_mode_audio_generating">Confectio vocis %1$s…</string>
     <string name="status_mode_audio_generating_progress">Confectio vocis %1$s… %2$d%%</string>
-    <string name="status_mode_audio_generating_preparing_input">Praeparatio vocis %1$s…</string>
-    <string name="status_mode_audio_generating_rendering_pcm">Renderatio vocis %1$s…</string>
-    <string name="status_mode_audio_generating_postprocessing">Perfectio vocis %1$s…</string>
-    <string name="status_mode_audio_generating_finalizing">Finalizatio vocis %1$s…</string>
+    <string name="status_mode_audio_generating_preparing_input">Praeparatio inputi %1$s…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">Generatio vocis %1$s…</string>
+    <string name="status_mode_audio_generating_postprocessing">Formatio vocis %1$s…</string>
+    <string name="status_mode_audio_generating_finalizing">Data reproductionis %1$s struuntur…</string>
     <string name="status_mode_audio_canceling">Intermissio vocis %1$s…</string>
     <string name="status_mode_audio_cancelled">Vox %1$s intermissa</string>
     <string name="status_mode_audio_generated">%1$s parata, %2$d campiones</string>
@@ -237,7 +239,6 @@
     <string name="audio_info_flash_decode_path">Iter decodendi</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s campiones</string>
-
     <string name="demo_hint_demo_mode_on">Modus demo excitatus</string>
     <string name="demo_hint_tab_audio">Ad Vox-Matrix transitus</string>
     <string name="demo_hint_tab_saved">Ad Reliquiarium transitus</string>
@@ -251,11 +252,10 @@
     <string name="demo_hint_pause">Lusio pausata</string>
     <string name="demo_hint_theme_changed">Thema mutatum</string>
     <string name="demo_hint_language_changed">Lingua mutata et exemplum renovatum</string>
-    <string name="audio_saved_audio_decode_loading_title">Vox archivata legitur…</string>
-    <string name="audio_saved_audio_decode_loading_body">Haec vox semel legitur ut prospectus textus et cantici reusabilis fiat. Eventus intra hanc appem tantum manet ut iterum celerius aperiatur.</string>
+    <string name="audio_saved_audio_decode_loading_title">Vox servata decoditur…</string>
+    <string name="audio_saved_audio_decode_loading_body">Textus et data temporis ex hac voce extrahuntur. Vox longior moram aliquam capere potest.</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Verticalis</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontalis</string>
 </resources>
-

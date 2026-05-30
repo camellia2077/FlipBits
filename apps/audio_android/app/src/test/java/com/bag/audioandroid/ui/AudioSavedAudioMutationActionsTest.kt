@@ -2,9 +2,12 @@ package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioExportResult
+import com.bag.audioandroid.domain.DecodedPayloadViewData
+import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.GeneratedAudioPcmCacheWriter
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioContent
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
 import com.bag.audioandroid.domain.SavedAudioFolder
@@ -16,8 +19,11 @@ import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.PlaybackUiState
+import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -162,6 +168,58 @@ class AudioSavedAudioMutationActionsTest {
         assertResId(state.value.libraryStatusText, R.string.library_status_moved_to_folder)
     }
 
+    @Test
+    fun `clear decode data deletes cache and marks selected saved audio as needing decode`() {
+        val item =
+            SavedAudioItem(
+                itemId = "2",
+                displayName = "decoded.wav",
+                uriString = "content://saved/2",
+                modeWireName = "flash",
+                durationMs = 1000L,
+                savedAtEpochSeconds = 1L,
+            )
+        val decodeCache = MutationFakeSavedAudioDecodeCacheGateway(existingItemIds = mutableSetOf(item.itemId))
+        val state =
+            MutableStateFlow(
+                AudioAppUiState(
+                    savedAudioItems = listOf(item),
+                    decodedSavedAudioItemIds = setOf(item.itemId),
+                    selectedSavedAudio =
+                        SavedAudioPlaybackSelection(
+                            item = item,
+                            pcm = shortArrayOf(1, 2),
+                            sampleRateHz = 44_100,
+                            playback = PlaybackUiState(),
+                            decodedPayload = DecodedPayloadViewData(text = "decoded", rawPayloadAvailable = true),
+                            followData = PayloadFollowViewData(followAvailable = true),
+                            flashSignalInfo = FlashSignalInfo(available = true),
+                            needsDecodedContent = false,
+                        ),
+                ),
+            )
+        val actions =
+            AudioSavedAudioMutationActions(
+                uiState = state,
+                savedAudioRepository = FakeSavedAudioRepository(listedItems = listOf(item)),
+                stopPlayback = {},
+                setCurrentStatusText = {},
+                generatedAudioCacheGateway = MutationFakeGeneratedAudioCacheGateway(),
+                savedAudioDecodeCacheGateway = decodeCache,
+            )
+
+        actions.onClearSavedAudioDecodeData(item.itemId)
+
+        assertEquals(listOf(item.itemId), decodeCache.deletedItemIds)
+        assertFalse(item.itemId in state.value.decodedSavedAudioItemIds)
+        val selection = state.value.selectedSavedAudio ?: error("selected saved audio missing")
+        assertEquals(DecodedPayloadViewData.Empty, selection.decodedPayload)
+        assertEquals(PayloadFollowViewData.Empty, selection.followData)
+        assertEquals(FlashSignalInfo.Empty, selection.flashSignalInfo)
+        assertTrue(selection.needsDecodedContent)
+        assertResId(state.value.libraryStatusText, R.string.library_status_decode_data_cleared)
+    }
+
     private fun assertResId(
         text: UiText,
         expectedResId: Int,
@@ -247,7 +305,13 @@ private class MutationFakeGeneratedAudioCacheGateway : GeneratedAudioCacheGatewa
     override fun pruneCachedFiles(retainedPaths: Set<String>) = Unit
 }
 
-private class MutationFakeSavedAudioDecodeCacheGateway : SavedAudioDecodeCacheGateway {
+private class MutationFakeSavedAudioDecodeCacheGateway(
+    private val existingItemIds: MutableSet<String> = mutableSetOf(),
+) : SavedAudioDecodeCacheGateway {
+    val deletedItemIds = mutableListOf<String>()
+
+    override fun exists(itemId: String): Boolean = itemId in existingItemIds
+
     override fun read(
         item: SavedAudioItem,
         metadata: GeneratedAudioMetadata?,
@@ -261,7 +325,10 @@ private class MutationFakeSavedAudioDecodeCacheGateway : SavedAudioDecodeCacheGa
         flashSignalInfo: com.bag.audioandroid.domain.FlashSignalInfo,
     ) = Unit
 
-    override fun delete(itemId: String) = Unit
+    override fun delete(itemId: String) {
+        existingItemIds -= itemId
+        deletedItemIds += itemId
+    }
 
     override fun prune(validItemIds: Set<String>) = Unit
 }

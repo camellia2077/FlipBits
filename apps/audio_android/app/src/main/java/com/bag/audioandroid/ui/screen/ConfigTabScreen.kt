@@ -108,6 +108,8 @@ fun ConfigTabScreen(
     onSampleAutoFillEnabledChange: (Boolean) -> Unit,
     isSampleDecorationEnabled: Boolean,
     onSampleDecorationEnabledChange: (Boolean) -> Unit,
+    isSavedAudioPlaybackDataStorageEnabled: Boolean,
+    onSavedAudioPlaybackDataStorageEnabledChange: (Boolean) -> Unit,
     isFlashVisualPerfOverlayEnabled: Boolean,
     onFlashVisualPerfOverlayEnabledChange: (Boolean) -> Unit,
     selectedPalette: PaletteOption,
@@ -340,6 +342,29 @@ fun ConfigTabScreen(
                         Switch(
                             checked = isSampleDecorationEnabled,
                             onCheckedChange = onSampleDecorationEnabledChange,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text(
+                                stringResource(R.string.config_saved_playback_data_title),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(
+                                stringResource(R.string.config_saved_playback_data_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                        Switch(
+                            checked = isSavedAudioPlaybackDataStorageEnabled,
+                            onCheckedChange = onSavedAudioPlaybackDataStorageEnabledChange,
                         )
                     }
                 }

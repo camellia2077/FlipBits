@@ -76,6 +76,7 @@ internal class AudioAndroidPreferencesBindings(
         observeDemoModeEnabled()
         observeSampleAutoFillEnabled()
         observeSampleDecorationEnabled()
+        observeSavedAudioPlaybackDataStorageEnabled()
         observeFlashVisualPerfOverlayEnabled()
     }
 
@@ -721,6 +722,22 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(isSampleAutoFillEnabled = enabled)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSavedAudioPlaybackDataStorageEnabled() {
+        scope.launch {
+            appSettingsRepository.isSavedAudioPlaybackDataStorageEnabled
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    uiState.update { state ->
+                        if (state.isSavedAudioPlaybackDataStorageEnabled == enabled) {
+                            state
+                        } else {
+                            state.copy(isSavedAudioPlaybackDataStorageEnabled = enabled)
                         }
                     }
                 }

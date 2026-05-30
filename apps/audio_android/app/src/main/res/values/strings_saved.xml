@@ -16,6 +16,16 @@
     <string name="library_action_rename">Rename</string>
     <!-- CONTEXT: Row or dialog confirm action for deleting one saved audio file. -->
     <string name="library_action_delete">Delete</string>
+    <!-- CONTEXT: Row action button that opens the saved-audio overflow menu. -->
+    <string name="library_action_more">More</string>
+    <!-- CONTEXT: Saved-audio row status meaning reusable playback data for text follow/visuals is already cached. -->
+    <string name="library_decode_status_decoded">Playback data ready</string>
+    <!-- CONTEXT: Saved-audio row status meaning reusable playback data for text follow/visuals has not been prepared yet. -->
+    <string name="library_decode_status_needed">Playback data needed</string>
+    <!-- CONTEXT: Row overflow menu action that deletes only cached playback data for text follow/visuals, not the audio file. -->
+    <string name="library_action_clear_decode_data">Clear playback data</string>
+    <!-- CONTEXT: Status/snackbar message shown after cached playback data for one saved audio file is deleted. -->
+    <string name="library_status_decode_data_cleared">Playback data cleared</string>
     <!-- CONTEXT: Selection-mode toolbar action that selects every currently visible saved audio item. -->
     <string name="library_action_select_all">Select all</string>
     <!-- CONTEXT: Selection-mode toolbar action that exits multi-selection mode. -->

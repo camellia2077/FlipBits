@@ -4,6 +4,7 @@ import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.util.safeDebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -88,7 +89,16 @@ internal class AudioAndroidPlaybackActions(
 
     fun onPlaybackSpeedSelected(playbackSpeed: Float) {
         val current = uiState.value
-        when (val source = current.currentPlaybackSource) {
+        val source = current.currentPlaybackSource
+        val sourceKey = playbackSourceCoordinator.sourceKey(source)
+        val currentPlayback = current.currentPlayback
+        safeDebugLog(
+            PlaybackSpeedDiagTag,
+            "select source=$sourceKey requested=$playbackSpeed previous=${current.currentPlaybackSpeed} " +
+                "phase=${currentPlayback.phase} playing=${currentPlayback.isPlaying} " +
+                "sample=${currentPlayback.displayedSamples}/${currentPlayback.totalSamples}",
+        )
+        when (source) {
             is AudioPlaybackSource.Generated ->
                 sessionStateStore.updateSession(source.mode) {
                     it.copy(playbackSpeed = playbackSpeed)
@@ -105,9 +115,24 @@ internal class AudioAndroidPlaybackActions(
                     )
                 }
         }
-        playbackCoordinator.setPlaybackSpeed(
-            sourceKey = playbackSourceCoordinator.sourceKey(current.currentPlaybackSource),
-            playbackSpeed = playbackSpeed,
+        val updated = uiState.value
+        safeDebugLog(
+            PlaybackSpeedDiagTag,
+            "stateApplied source=$sourceKey requested=$playbackSpeed stored=${updated.currentPlaybackSpeed} " +
+                "currentSource=${playbackSourceCoordinator.sourceKey(updated.currentPlaybackSource)}",
         )
+        val applied =
+            playbackCoordinator.setPlaybackSpeed(
+                sourceKey = sourceKey,
+                playbackSpeed = playbackSpeed,
+            )
+        safeDebugLog(
+            PlaybackSpeedDiagTag,
+            "coordinatorApplied source=$sourceKey requested=$playbackSpeed applied=$applied",
+        )
+    }
+
+    private companion object {
+        const val PlaybackSpeedDiagTag = "PlaybackSpeedDiag"
     }
 }

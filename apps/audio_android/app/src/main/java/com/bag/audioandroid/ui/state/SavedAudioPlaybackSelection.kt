@@ -1,5 +1,7 @@
 package com.bag.audioandroid.ui.state
 
+import com.bag.audioandroid.domain.DecodeOperationSnapshot
+import com.bag.audioandroid.domain.DecodeOperationWorkPlan
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
@@ -19,8 +21,21 @@ data class SavedAudioPlaybackSelection(
     val playbackSpeed: Float = com.bag.audioandroid.ui.model.PlaybackSpeedOption.default.speed,
     val decodedPayload: DecodedPayloadViewData = DecodedPayloadViewData.Empty,
     val followData: PayloadFollowViewData = PayloadFollowViewData.Empty,
+    val playbackDetailsSource: PlaybackDetailsSource = PlaybackDetailsSource.None,
     val flashSignalInfo: FlashSignalInfo = FlashSignalInfo.Empty,
     val isLoadingContent: Boolean = false,
     val needsDecodedContent: Boolean = false,
     val isDecodingContent: Boolean = false,
+    val decodeOperationSnapshot: DecodeOperationSnapshot? = null,
+    val decodeOperationWorkPlan: DecodeOperationWorkPlan? = null,
 )
+
+enum class PlaybackDetailsSource(
+    val wireName: String,
+) {
+    None("none"),
+    Loading("loading"),
+    DecodePending("decode-pending"),
+    SavedCache("saved-cache"),
+    FreshDecode("fresh-decode"),
+}

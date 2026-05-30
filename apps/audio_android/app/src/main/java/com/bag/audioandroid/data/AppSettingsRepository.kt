@@ -390,6 +390,16 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SampleAutoFillEnabled] ?: true }
 
+    val isSavedAudioPlaybackDataStorageEnabled: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SavedAudioPlaybackDataStorageEnabled] ?: true }
+
     val isFlashVisualPerfOverlayEnabled: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -622,6 +632,12 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setSavedAudioPlaybackDataStorageEnabled(enabled: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SavedAudioPlaybackDataStorageEnabled] = enabled
+        }
+    }
+
     suspend fun setFlashVisualPerfOverlayEnabled(enabled: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.FlashVisualPerfOverlayEnabled] = enabled
@@ -677,6 +693,8 @@ class AppSettingsRepository(
         val DemoModeEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("demo_mode_enabled")
         val SampleAutoFillEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("sample_auto_fill_enabled")
         val SampleDecorationEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("sample_decoration_enabled")
+        val SavedAudioPlaybackDataStorageEnabled: Preferences.Key<Boolean> =
+            booleanPreferencesKey("saved_audio_playback_data_storage_enabled")
         val FlashVisualPerfOverlayEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("visual_fps_overlay_enabled")
     }
 }

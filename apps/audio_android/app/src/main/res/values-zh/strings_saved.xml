@@ -12,6 +12,11 @@
     <string name="library_action_export_to_file">导出到文件</string>
     <string name="library_action_rename">重命名</string>
     <string name="library_action_delete">删除</string>
+    <string name="library_action_more">更多</string>
+    <string name="library_decode_status_decoded">播放数据已准备好</string>
+    <string name="library_decode_status_needed">需要播放数据</string>
+    <string name="library_action_clear_decode_data">清除播放数据</string>
+    <string name="library_status_decode_data_cleared">播放数据已清除</string>
     <string name="library_action_select_all">全选</string>
     <string name="library_action_clear_selection">退出选择</string>
     <string name="library_action_delete_selected">删除所选</string>

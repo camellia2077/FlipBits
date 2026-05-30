@@ -1,9 +1,15 @@
 package com.bag.audioandroid.ui.screen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +17,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Pause
@@ -26,33 +37,59 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagDecodeContentCodes
+import com.bag.audioandroid.domain.DecodeOperationSnapshot
+import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
+import com.bag.audioandroid.ui.LyricsNavigatorReadingModel
 import com.bag.audioandroid.ui.PlayerChromeColors
 import com.bag.audioandroid.ui.PlayerDetailBottomActions
+import com.bag.audioandroid.ui.buildLyricsNavigatorReadingModel
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerChromeColors
+import com.bag.audioandroid.ui.resolveSeekSampleForReadingLine
 import com.bag.audioandroid.ui.state.FlashVisualWindowState
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @Composable
 internal fun PlayerDetailSheetContent(
@@ -76,9 +113,13 @@ internal fun PlayerDetailSheetContent(
     canSkipNext: Boolean,
     canExportGeneratedAudio: Boolean,
     followData: PayloadFollowViewData,
+    playbackDetailsSource: String = "unknown",
+    decodedPayload: DecodedPayloadViewData = DecodedPayloadViewData.Empty,
+    lyricsNavigatorReadingModel: LyricsNavigatorReadingModel? = null,
     flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     savedAudioItem: SavedAudioItem?,
     showSavedAudioDecodeLoadingNotice: Boolean = false,
+    savedAudioDecodeProgressSnapshot: DecodeOperationSnapshot? = null,
     isFlashVisualPerfOverlayEnabled: Boolean = false,
     onTogglePlayback: () -> Unit,
     onSkipToPreviousTrack: () -> Unit,
@@ -211,6 +252,7 @@ internal fun PlayerDetailSheetContent(
                 if (isLyricsNavigatorVisible) {
                     LyricsNavigatorScaffold(
                         followData = followData,
+                        navigatorReadingModel = lyricsNavigatorReadingModel,
                         displayedSamples = displayedSamples,
                         totalSamples = totalSamples,
                         displayedTime = displayedTime,
@@ -254,6 +296,8 @@ internal fun PlayerDetailSheetContent(
                         isFlashMode = miniPlayerModel.isFlashMode,
                         flashVoicingStyle = miniPlayerModel.flashVoicingStyle,
                         followData = followData,
+                        playbackDetailsSource = playbackDetailsSource,
+                        decodedTextStatusCode = decodedPayload.textDecodeStatusCode,
                         flashVisualWindow = flashVisualWindow,
                         isPlaying = isPlaying,
                         isScrubbing = isScrubbing,
@@ -263,6 +307,7 @@ internal fun PlayerDetailSheetContent(
                         initialFollowViewMode = initialFollowViewMode,
                         savedAudioItem = savedAudioItem,
                         showSavedAudioDecodeLoadingNotice = showSavedAudioDecodeLoadingNotice,
+                        savedAudioDecodeProgressSnapshot = savedAudioDecodeProgressSnapshot,
                         topContentPadding = topContentPadding,
                         extraLyricsRecoveryHeight = layoutPolicyState.extraLyricsRecoveryHeight,
                         applyLyricsPreviewBonusLine = layoutPolicyState.applyLyricsPreviewBonusLine,
@@ -324,6 +369,8 @@ private fun PlayerDetailScrollContent(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    playbackDetailsSource: String,
+    decodedTextStatusCode: Int = BagDecodeContentCodes.STATUS_UNAVAILABLE,
     flashVisualWindow: FlashVisualWindowState,
     isPlaying: Boolean,
     isScrubbing: Boolean,
@@ -333,6 +380,7 @@ private fun PlayerDetailScrollContent(
     initialFollowViewMode: PlaybackFollowViewMode,
     savedAudioItem: SavedAudioItem?,
     showSavedAudioDecodeLoadingNotice: Boolean,
+    savedAudioDecodeProgressSnapshot: DecodeOperationSnapshot?,
     topContentPadding: Dp,
     extraLyricsRecoveryHeight: Dp,
     applyLyricsPreviewBonusLine: Boolean,
@@ -356,7 +404,7 @@ private fun PlayerDetailScrollContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         if (savedAudioItem != null && showSavedAudioDecodeLoadingNotice) {
-            SavedAudioDecodeLoadingNotice()
+            SavedAudioDecodeLoadingNotice(savedAudioDecodeProgressSnapshot)
         }
         AudioPlaybackDisplayBlock(
             displayedSamples = displayedSamples,
@@ -369,6 +417,8 @@ private fun PlayerDetailScrollContent(
             isFlashMode = isFlashMode,
             flashVoicingStyle = flashVoicingStyle,
             followData = followData,
+            playbackDetailsSource = playbackDetailsSource,
+            decodedTextStatusCode = decodedTextStatusCode,
             flashVisualWindow = flashVisualWindow,
             isPlaying = isPlaying,
             isScrubbing = isScrubbing,
@@ -392,6 +442,7 @@ private fun PlayerDetailScrollContent(
 @Composable
 internal fun LyricsNavigatorScaffold(
     followData: PayloadFollowViewData,
+    navigatorReadingModel: LyricsNavigatorReadingModel? = null,
     displayedSamples: Int,
     totalSamples: Int,
     displayedTime: String,
@@ -419,17 +470,17 @@ internal fun LyricsNavigatorScaffold(
     onSeekToSample: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val layoutModel =
-        rememberPlaybackLyricsLayoutModel(
-            followData = followData,
-            displayedSamples = displayedSamples,
-            transportMode = null,
-            playbackDisplayMode = PlaybackDisplayMode.Lyrics,
-            tokenStripHeightDp = null,
-            extraLyricsRecoveryHeight = 0.dp,
-            applyLyricsPreviewBonusLine = false,
-            lyricsExpanded = true,
-        )
+    val readingModel =
+        remember(
+            navigatorReadingModel,
+            followData.textCharacters,
+            followData.lyricLines,
+            followData.lineTokenRanges,
+            followData.textTokenTimeline,
+            followData.textTokens,
+        ) {
+            navigatorReadingModel ?: buildLyricsNavigatorReadingModel(followData)
+        }
     Column(
         modifier =
             modifier
@@ -477,14 +528,11 @@ internal fun LyricsNavigatorScaffold(
             shape = MaterialTheme.shapes.large,
             tonalElevation = 1.dp,
         ) {
-            PlaybackLyricsFullList(
-                followData = followData,
-                displayLineRanges = layoutModel.displayLineRanges,
-                activeLineIndex = layoutModel.activeLineIndex,
+            LyricsNavigatorReadingText(
+                readingModel = readingModel,
+                displayedSamples = displayedSamples,
                 sampleRateHz = sampleRateHz,
                 onSeekToSample = onSeekToSample,
-                useFixedHeight = false,
-                showSelectionGuideOnlyWhileScrolling = true,
                 modifier =
                     Modifier
                         .fillMaxSize()
@@ -515,6 +563,365 @@ internal fun LyricsNavigatorScaffold(
         )
     }
 }
+
+@Composable
+private fun LyricsNavigatorReadingText(
+    readingModel: LyricsNavigatorReadingModel,
+    displayedSamples: Int,
+    sampleRateHz: Int,
+    onSeekToSample: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val baseStyle = MaterialTheme.typography.bodyMedium
+    val formattedModel = remember(readingModel) { formatLyricsNavigatorReadingModelForDisplay(readingModel) }
+    val textMeasurer = rememberTextMeasurer()
+    val latestOnSeekToSample by rememberUpdatedState(onSeekToSample)
+    val scope = rememberCoroutineScope()
+    BoxWithConstraints(
+        modifier = modifier.testTag("lyrics-navigator-reading-text"),
+    ) {
+        val widthPx = with(LocalDensity.current) { maxWidth.roundToPx() }
+        val lines =
+            remember(formattedModel, widthPx, baseStyle, textMeasurer) {
+                if (widthPx <= 0) {
+                    emptyList()
+                } else {
+                    buildLyricsNavigatorDisplayLines(
+                        readingModel = formattedModel,
+                        textMeasurer = textMeasurer,
+                        style = baseStyle,
+                        maxWidthPx = widthPx,
+                    )
+                }
+            }
+        val activeTokenRange =
+            remember(formattedModel, displayedSamples) {
+                resolveActiveTokenCharacterRange(
+                    readingModel = formattedModel,
+                    displayedSamples = displayedSamples,
+                )
+            }
+        val listState =
+            rememberLazyListState(
+                initialFirstVisibleItemIndex =
+                    resolveNavigatorInitialLineIndex(lines).coerceAtLeast(0),
+            )
+        var isSelectingLine by remember { mutableStateOf(false) }
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.isScrollInProgress }
+                .map { scrolling -> scrolling }
+                .distinctUntilChanged()
+                .collectLatest { scrolling ->
+                    isSelectingLine = scrolling
+                }
+        }
+        val selectedLineIndex by remember(listState, lines) {
+            derivedStateOf {
+                centeredNavigatorLineIndex(
+                    listState = listState,
+                    fallbackIndex = 0,
+                    lineCount = lines.size,
+                )
+            }
+        }
+        val selectedLine = lines.getOrNull(selectedLineIndex)
+        val selectedSample = selectedLine?.startSample
+        val selectorPadding =
+            ((maxHeight - LyricsNavigatorSelectionTargetHeight) / 2).coerceAtLeast(0.dp)
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(lines) {
+                        detectVerticalDragGestures(
+                            onDragStart = {
+                                isSelectingLine = true
+                            },
+                            onVerticalDrag = { change, dragAmount ->
+                                change.consume()
+                                scope.launch {
+                                    listState.scrollBy(-dragAmount)
+                                }
+                            },
+                            onDragEnd = {
+                                selectedSample?.let(latestOnSeekToSample)
+                                isSelectingLine = false
+                            },
+                            onDragCancel = {
+                                isSelectingLine = false
+                            },
+                        )
+                    },
+        ) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = selectorPadding),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                itemsIndexed(lines) { index, line ->
+                    val selectedDistance = abs(index - selectedLineIndex)
+                    val isSelected = index == selectedLineIndex
+                    val lineColor =
+                        when (selectedDistance) {
+                            0 -> MaterialTheme.colorScheme.onSurface
+                            1 -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.92f)
+                            2 -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.56f)
+                        }
+                    Text(
+                        text =
+                            buildLyricsNavigatorLineAnnotatedText(
+                                line = line,
+                                activeTokenRange = activeTokenRange,
+                                activeTokenColor = MaterialTheme.colorScheme.secondary,
+                            ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable(enabled = line.startSample != null) {
+                                    scope.launch {
+                                        listState.animateScrollToItem(index)
+                                        line.startSample?.let(latestOnSeekToSample)
+                                    }
+                                },
+                        style =
+                            baseStyle.copy(
+                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                            ),
+                        color = lineColor,
+                        overflow = TextOverflow.Clip,
+                    )
+                }
+            }
+            if (isSelectingLine) {
+                LyricsNavigatorSelectionGuide(
+                    selectedStartSample = selectedSample,
+                    sampleRateHz = sampleRateHz,
+                    lineColor = lyricsNavigatorSelectionLineColor(),
+                    modifier =
+                        Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+private data class LyricsNavigatorDisplayLine(
+    val text: String,
+    val startOffset: Int,
+    val endOffset: Int,
+    val startSample: Int?,
+)
+
+private val LyricsNavigatorSelectionTargetHeight = 48.dp
+private val LyricsNavigatorSelectionLineWidth = 132.dp
+
+private fun buildLyricsNavigatorDisplayLines(
+    readingModel: LyricsNavigatorReadingModel,
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    style: androidx.compose.ui.text.TextStyle,
+    maxWidthPx: Int,
+): List<LyricsNavigatorDisplayLine> {
+    val layout =
+        textMeasurer.measure(
+            text = AnnotatedString(readingModel.text),
+            style = style,
+            constraints = Constraints(maxWidth = maxWidthPx),
+        )
+    val lines = ArrayList<LyricsNavigatorDisplayLine>(layout.lineCount)
+    repeat(layout.lineCount) { lineIndex ->
+        val lineStart = layout.getLineStart(lineIndex)
+        val lineEnd = layout.getLineEnd(lineIndex, visibleEnd = true)
+        if (lineStart >= lineEnd) {
+            return@repeat
+        }
+        val text = readingModel.text.substring(lineStart, lineEnd).trimEnd('\n', '\r')
+        if (text.isEmpty()) {
+            return@repeat
+        }
+        lines +=
+            LyricsNavigatorDisplayLine(
+                text = text,
+                startOffset = lineStart,
+                endOffset = lineEnd,
+                startSample =
+                    resolveSeekSampleForReadingLine(
+                        text = readingModel.text,
+                        sampleAtOffset = readingModel.sampleAtOffset,
+                        lineStart = lineStart,
+                        lineEnd = lineEnd,
+                    ),
+            )
+    }
+    return lines
+}
+
+internal fun formatLyricsNavigatorReadingModelForDisplay(readingModel: LyricsNavigatorReadingModel): LyricsNavigatorReadingModel {
+    if (readingModel.text.isEmpty()) {
+        return readingModel
+    }
+    val textBuilder = StringBuilder(readingModel.text.length + 16)
+    val samples = ArrayList<Int>(readingModel.sampleAtOffset.size + 16)
+    var runLength = 0
+    readingModel.text.forEachIndexed { index, ch ->
+        textBuilder.append(ch)
+        samples += readingModel.sampleAtOffset.getOrElse(index) { -1 }
+        when {
+            ch == '\n' || ch == '\r' -> runLength = 0
+            ch.isWhitespace() -> Unit
+            else -> runLength += 1
+        }
+        val nextChar = readingModel.text.getOrNull(index + 1)
+        val shouldBreak =
+            when {
+                nextChar == null -> false
+                nextChar == '\n' || nextChar == '\r' -> false
+                ch in StrongPunctuationBreaks -> true
+                ch in SoftPunctuationBreaks && runLength >= SoftBreakMinRunLength -> true
+                else -> false
+            }
+        if (shouldBreak) {
+            textBuilder.append('\n')
+            samples += -1
+            runLength = 0
+        }
+    }
+    return LyricsNavigatorReadingModel(
+        text = textBuilder.toString(),
+        sampleAtOffset = samples.toIntArray(),
+    )
+}
+
+private fun centeredNavigatorLineIndex(
+    listState: LazyListState,
+    fallbackIndex: Int,
+    lineCount: Int,
+): Int {
+    if (lineCount <= 0) {
+        return 0
+    }
+    val layoutInfo = listState.layoutInfo
+    val centerOffset = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
+    val centeredItem =
+        layoutInfo.visibleItemsInfo.minByOrNull { itemInfo ->
+            abs((itemInfo.offset + itemInfo.size / 2) - centerOffset)
+        }
+    return centeredItem?.index?.coerceIn(0, lineCount - 1) ?: fallbackIndex.coerceIn(0, lineCount - 1)
+}
+
+private fun resolveNavigatorInitialLineIndex(lines: List<LyricsNavigatorDisplayLine>): Int =
+    lines.indexOfFirst { it.startSample != null }.coerceAtLeast(0)
+
+private fun resolveActiveTokenCharacterRange(
+    readingModel: LyricsNavigatorReadingModel,
+    displayedSamples: Int,
+): IntRange? {
+    if (readingModel.text.isEmpty() || readingModel.sampleAtOffset.isEmpty()) {
+        return null
+    }
+    val activeOffset =
+        readingModel.sampleAtOffset.indexOfLast { sample ->
+            sample >= 0 && sample <= displayedSamples
+        }
+    if (activeOffset < 0 || activeOffset >= readingModel.text.length) {
+        return null
+    }
+    val activeChar = readingModel.text[activeOffset]
+    if (activeChar.isWhitespace() || activeChar == '\n' || activeChar == '\r') {
+        return null
+    }
+    var start = activeOffset
+    while (start > 0) {
+        val previous = readingModel.text[start - 1]
+        val previousSample = readingModel.sampleAtOffset[start - 1]
+        if (previous.isWhitespace() || previous == '\n' || previous == '\r' || previousSample < 0) {
+            break
+        }
+        start -= 1
+    }
+    var end = activeOffset
+    while (end + 1 < readingModel.text.length) {
+        val next = readingModel.text[end + 1]
+        val nextSample = readingModel.sampleAtOffset[end + 1]
+        if (next.isWhitespace() || next == '\n' || next == '\r' || nextSample < 0) {
+            break
+        }
+        end += 1
+    }
+    return start..end
+}
+
+private fun buildLyricsNavigatorLineAnnotatedText(
+    line: LyricsNavigatorDisplayLine,
+    activeTokenRange: IntRange?,
+    activeTokenColor: Color,
+): AnnotatedString {
+    val overlap =
+        activeTokenRange?.let { range ->
+            val start = maxOf(line.startOffset, range.first)
+            val endExclusive = minOf(line.endOffset, range.last + 1)
+            if (start < endExclusive) start until endExclusive else null
+        }
+    return buildAnnotatedString {
+        if (overlap == null) {
+            append(line.text)
+            return@buildAnnotatedString
+        }
+        val localStart = (overlap.first - line.startOffset).coerceAtLeast(0)
+        val localEndExclusive = (overlap.last - line.startOffset + 1).coerceAtMost(line.text.length)
+        append(line.text.substring(0, localStart))
+        withStyle(SpanStyle(color = activeTokenColor)) {
+            append(line.text.substring(localStart, localEndExclusive))
+        }
+        append(line.text.substring(localEndExclusive))
+    }
+}
+
+@Composable
+private fun lyricsNavigatorSelectionLineColor(): Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.28f)
+
+@Composable
+private fun LyricsNavigatorSelectionGuide(
+    selectedStartSample: Int?,
+    sampleRateHz: Int,
+    lineColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    val selectedTime =
+        formatDurationMillis(
+            samplesToMillis(
+                samples = selectedStartSample ?: 0,
+                sampleRateHz = sampleRateHz,
+            ),
+        )
+    Row(
+        modifier = modifier.height(LyricsNavigatorSelectionTargetHeight),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .height(1.dp)
+                    .background(lineColor),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = selectedTime,
+            modifier = Modifier.width(48.dp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+private val StrongPunctuationBreaks = setOf('。', '！', '？', '；', '：', '.', '!', '?', ';', ':')
+private val SoftPunctuationBreaks = setOf('，', '、', ',')
+private const val SoftBreakMinRunLength = 12
 
 @Composable
 private fun LyricsNavigatorBottomDock(
@@ -656,7 +1063,8 @@ private fun LyricsNavigatorIconButton(
 }
 
 @Composable
-private fun SavedAudioDecodeLoadingNotice() {
+private fun SavedAudioDecodeLoadingNotice(progressSnapshot: DecodeOperationSnapshot?) {
+    val progress = progressSnapshot?.overallProgress0To1?.coerceIn(0f, 1f) ?: 0f
     Surface(
         shape = MaterialTheme.shapes.large,
         tonalElevation = 2.dp,
@@ -671,6 +1079,7 @@ private fun SavedAudioDecodeLoadingNotice() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 LinearProgressIndicator(
+                    progress = { progress },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

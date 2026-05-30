@@ -56,7 +56,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.PayloadFollowViewData
+import com.bag.audioandroid.ui.PlaybackScrubDiagTrace
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -88,6 +90,8 @@ internal fun PlaybackDisplaySection(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    decodedTextStatusCode: Int = BagDecodeContentCodes.STATUS_UNAVAILABLE,
+    playbackDetailsSource: String = "unknown",
     flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     isPlaying: Boolean,
     isScrubbing: Boolean,
@@ -147,6 +151,23 @@ internal fun PlaybackDisplaySection(
             lyricsSample = visualDisplayedSamples,
             frameSamples = frameSamples,
             speed = MorseSpeedOption.fromFrameSamples(frameSamples).id,
+        )
+    }
+    SideEffect {
+        PlaybackScrubDiagTrace.display(
+            displayMode = playbackDisplayMode,
+            visualizationRoute = layoutModel.visualizationRoute,
+            displayedSamples = displayedSamples,
+            visualDisplayedSamples = visualDisplayedSamples,
+            followSectionDisplayedSamples = followSectionDisplayedSamples,
+            isPlaying = isPlaying,
+            isScrubbing = isScrubbing,
+            playbackSpeed = playbackSpeed,
+            activeTokenIndex =
+                activeTextTimelineIndex(
+                    entries = followData.textTokenTimeline,
+                    displayedSamples = displayedSamples,
+                ),
         )
     }
     val resolvedTokenStripHeightDp =
@@ -210,6 +231,20 @@ internal fun PlaybackDisplaySection(
                 onFlashVisualizationModeSelected = onFlashVisualizationModeSelected,
                 onMorseVisualizationModeSelected = onMorseVisualizationModeSelected,
             )
+            enhancedVisualStatusTextResId(
+                playbackDisplayMode = playbackDisplayMode,
+                transportMode = transportMode,
+                visualizationRoute = layoutModel.visualizationRoute,
+                followData = followData,
+                decodedTextStatusCode = decodedTextStatusCode,
+            )?.let { statusTextResId ->
+                Text(
+                    text = stringResource(statusTextResId),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
         }
         if (renderPolicy.showsMixSpacer) {
             Spacer(modifier = Modifier.height(14.dp))
@@ -222,6 +257,8 @@ internal fun PlaybackDisplaySection(
                 displayedSamples = followSectionDisplayedSamples,
                 isPlaying = isPlaying,
                 transportMode = transportMode,
+                decodedTextStatusCode = decodedTextStatusCode,
+                playbackDetailsSource = playbackDetailsSource,
                 initialAnnotationMode = initialFollowViewMode,
                 contentSpacing = renderPolicy.followContentSpacing,
                 onTokenStripHeightDpChanged = { heightDp ->
@@ -310,6 +347,49 @@ internal fun playbackFollowSectionDisplayedSamples(
     } else {
         displayedSamples
     }
+
+private fun enhancedVisualStatusTextResId(
+    playbackDisplayMode: PlaybackDisplayMode,
+    transportMode: TransportModeOption?,
+    visualizationRoute: PlaybackVisualizationRoute,
+    followData: PayloadFollowViewData,
+    decodedTextStatusCode: Int,
+): Int? {
+    if (playbackDisplayMode != PlaybackDisplayMode.Visual) {
+        return null
+    }
+    val isEnhancedVisualMissing =
+        when (transportMode) {
+            TransportModeOption.Flash ->
+                visualizationRoute is PlaybackVisualizationRoute.PcmWaveform &&
+                    (!followData.followAvailable || followData.binaryGroupTimeline.isEmpty())
+
+            TransportModeOption.Pro,
+            TransportModeOption.Ultra,
+            ->
+                visualizationRoute is PlaybackVisualizationRoute.SymbolEnvelope &&
+                    !followData.followAvailable
+
+            TransportModeOption.Mini ->
+                visualizationRoute is PlaybackVisualizationRoute.PcmWaveform &&
+                    (!followData.followAvailable || followData.binaryGroupTimeline.isEmpty())
+
+            null -> false
+        }
+    if (!isEnhancedVisualMissing) {
+        return null
+    }
+    return if (decodedTextStatusCode.isDecodeFailureStatus()) {
+        R.string.audio_follow_visuals_failed
+    } else {
+        R.string.audio_follow_unavailable
+    }
+}
+
+private fun Int.isDecodeFailureStatus(): Boolean =
+    this != BagDecodeContentCodes.STATUS_UNAVAILABLE &&
+        this != BagDecodeContentCodes.STATUS_OK &&
+        this != BagDecodeContentCodes.STATUS_BUFFER_TOO_SMALL
 
 @Composable
 private fun rememberMixFlashPlaybackSampleState(
@@ -646,6 +726,7 @@ internal fun PlaybackLyricsFullList(
     onSeekToSample: (Int) -> Unit,
     extraHeight: Dp = 0.dp,
     useFixedHeight: Boolean = true,
+    useCenteredSelectionViewport: Boolean = true,
     listState: LazyListState? = null,
     autoSeekOnScrollStop: Boolean = true,
     showSelectionGuideOnlyWhileScrolling: Boolean = false,
@@ -685,18 +766,28 @@ internal fun PlaybackLyricsFullList(
     val resolvedListState =
         listState ?: rememberLazyListState(
             initialFirstVisibleItemIndex =
-                (activeLineIndex - 2).coerceIn(
+                (
+                    if (useCenteredSelectionViewport) {
+                        activeLineIndex - 2
+                    } else {
+                        activeLineIndex
+                    }
+                ).coerceIn(
                     minimumValue = 0,
                     maximumValue = displayLineRanges.lastIndex.coerceAtLeast(0),
                 ),
         )
-    val selectedLineIndex by remember(resolvedListState, lineItems, activeLineIndex) {
+    val selectedLineIndex by remember(resolvedListState, lineItems, activeLineIndex, useCenteredSelectionViewport) {
         derivedStateOf {
-            centeredVisibleLineIndex(
-                listState = resolvedListState,
-                fallbackIndex = activeLineIndex,
-                lineCount = lineItems.size,
-            )
+            if (useCenteredSelectionViewport) {
+                centeredVisibleLineIndex(
+                    listState = resolvedListState,
+                    fallbackIndex = activeLineIndex,
+                    lineCount = lineItems.size,
+                )
+            } else {
+                activeLineIndex.coerceIn(0, lineItems.lastIndex.coerceAtLeast(0))
+            }
         }
     }
     val selectedStartSample = lineItems.getOrNull(selectedLineIndex)?.startSample
@@ -707,7 +798,11 @@ internal fun PlaybackLyricsFullList(
     LaunchedEffect(selectedStartSample) {
         onSelectedSampleChanged(selectedStartSample)
     }
-    LaunchedEffect(resolvedListState, autoSeekOnScrollStop, showSelectionGuideOnlyWhileScrolling) {
+    LaunchedEffect(resolvedListState, autoSeekOnScrollStop, showSelectionGuideOnlyWhileScrolling, useCenteredSelectionViewport) {
+        if (!useCenteredSelectionViewport) {
+            isSelectionGuideVisible = false
+            return@LaunchedEffect
+        }
         snapshotFlow { resolvedListState.isScrollInProgress }
             .collect { isScrollInProgress ->
                 isSelectionGuideVisible = !showSelectionGuideOnlyWhileScrolling || isScrollInProgress
@@ -723,7 +818,7 @@ internal fun PlaybackLyricsFullList(
             }
     }
     LaunchedEffect(showSelectionGuideOnlyWhileScrolling) {
-        if (!showSelectionGuideOnlyWhileScrolling) {
+        if (!showSelectionGuideOnlyWhileScrolling && useCenteredSelectionViewport) {
             isSelectionGuideVisible = true
         }
     }
@@ -739,7 +834,12 @@ internal fun PlaybackLyricsFullList(
                     },
                 ).testTag("playback-lyrics-full-list"),
     ) {
-        val selectorPadding = ((maxHeight - PlaybackLyricsSelectionTargetHeight) / 2).coerceAtLeast(0.dp)
+        val selectorPadding =
+            if (useCenteredSelectionViewport) {
+                ((maxHeight - PlaybackLyricsSelectionTargetHeight) / 2).coerceAtLeast(0.dp)
+            } else {
+                0.dp
+            }
         LazyColumn(
             state = resolvedListState,
             modifier =
@@ -786,7 +886,7 @@ internal fun PlaybackLyricsFullList(
                 )
             }
         }
-        if (isSelectionGuideVisible) {
+        if (useCenteredSelectionViewport && isSelectionGuideVisible) {
             PlaybackLyricsSelectionGuide(
                 selectedStartSample = selectedStartSample,
                 sampleRateHz = sampleRateHz,

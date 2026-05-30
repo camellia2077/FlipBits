@@ -82,6 +82,33 @@
 
 - `docs/architecture/android/android-settings-automation.md`
 
+### Manual Playback-Speed Capture
+
+适用场景：
+
+- 手动复现播放器倍速切换问题
+- 需要确认 UI 选中倍速、`AudioPlaybackCoordinator` 请求和底层 `AudioTrack` 实际应用值是否一致
+- 复现路径不能只靠现有 `capture-flash` / `capture-mini` 初始倍速 extra 表达，例如播放中切到其他倍速再切回 `1.0x`
+
+推荐命令：
+
+```powershell
+python tools/run.py android-debug capture-playback-speed --wait-ms 120000
+```
+
+命令会清空 logcat、等待手动操作、写出：
+
+- `temp/android-debug/<timestamp>-playback-speed/raw.log`
+- `temp/android-debug/<timestamp>-playback-speed/summary.md`
+- `temp/android-debug/<timestamp>-playback-speed/crash-summary.txt`
+
+需要只抓原始 adb 日志时可用：
+
+```powershell
+adb logcat -c
+adb logcat -v time PlaybackSpeedDiag:D PlaybackCoordDiag:D AudioPlayerDiag:D AudioTrackTransport:D PlaybackAutomation:D AndroidRuntime:E libc:E *:S > temp\playback-speed.log
+```
+
 ## Minimal Read Combos
 
 - 判断新增回归放 JVM / instrumentation / adb 哪层：
@@ -94,6 +121,8 @@
   - `android-automation-agent-index.md` -> `android-encode-progress-automation.md`
 - Saved 选择与 hydration 时延：
   - `android-automation-agent-index.md` -> `android-saved-automation.md`
+- 播放中倍速切换：
+  - `android-automation-agent-index.md` -> Manual Playback-Speed Capture
 - 语言切换或 wrapper/extras 差异：
   - `android-automation-agent-index.md` -> `android-settings-automation.md`
 

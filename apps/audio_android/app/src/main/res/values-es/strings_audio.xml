@@ -5,10 +5,10 @@
     <string name="audio_action_encode">Crear</string>
     <string name="audio_action_encode_busy">Creando…</string>
     <string name="audio_action_encode_busy_progress">Creando… %1$d%%</string>
-    <string name="audio_encode_phase_preparing_input_label">Preparando</string>
-    <string name="audio_encode_phase_rendering_pcm_label">Renderizando</string>
-    <string name="audio_encode_phase_postprocessing_label">Finalizando</string>
-    <string name="audio_encode_phase_finalizing_label">Completando</string>
+    <string name="audio_encode_phase_preparing_input_label">Preparando entrada</string>
+    <string name="audio_encode_phase_rendering_pcm_label">Generando audio</string>
+    <string name="audio_encode_phase_postprocessing_label">Moldeando audio</string>
+    <string name="audio_encode_phase_finalizing_label">Creando datos de reproducción</string>
     <string name="audio_action_cancel_encode">Cancelar</string>
     <string name="audio_action_cancel_encode_busy">Cancelando…</string>
     <string name="audio_action_play">Reproducir</string>
@@ -133,8 +133,10 @@
     <string name="audio_ultra_visual_level_high">Alto</string>
     <string name="audio_ultra_visual_level_mid">Medio</string>
     <string name="audio_ultra_visual_level_low">Bajo</string>
-    <string name="audio_follow_unavailable">El seguimiento de payload no está disponible para este audio en este momento.</string>
-    <string name="audio_follow_text_unavailable">El seguimiento de texto no está disponible para este audio en este momento.</string>
+    <string name="audio_follow_unavailable">Las visualizaciones mejoradas aún no están listas para este audio.</string>
+    <string name="audio_follow_text_unavailable">El seguimiento de texto aún no está listo para este audio.</string>
+    <string name="audio_follow_visuals_failed">No se pudieron preparar las visualizaciones mejoradas para este audio.</string>
+    <string name="audio_follow_text_failed">No se pudo preparar el seguimiento de texto para este audio.</string>
     <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Datos</string>
     <string name="audio_follow_view_hex">Hex</string>
@@ -192,10 +194,10 @@
     <string name="status_input_empty">La entrada está vacía.</string>
     <string name="status_mode_audio_generating">Creando audio %1$s…</string>
     <string name="status_mode_audio_generating_progress">Creando audio %1$s… %2$d%%</string>
-    <string name="status_mode_audio_generating_preparing_input">Preparando audio %1$s…</string>
-    <string name="status_mode_audio_generating_rendering_pcm">Renderizando audio %1$s…</string>
-    <string name="status_mode_audio_generating_postprocessing">Finalizando audio %1$s…</string>
-    <string name="status_mode_audio_generating_finalizing">Completando audio %1$s…</string>
+    <string name="status_mode_audio_generating_preparing_input">Preparando entrada %1$s…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">Generando audio %1$s…</string>
+    <string name="status_mode_audio_generating_postprocessing">Moldeando audio %1$s…</string>
+    <string name="status_mode_audio_generating_finalizing">Creando datos de reproducción %1$s…</string>
     <string name="status_mode_audio_canceling">Cancelando audio %1$s…</string>
     <string name="status_mode_audio_cancelled">Audio %1$s cancelado</string>
     <string name="status_mode_audio_generated">%1$s listo, %2$d muestras</string>
@@ -237,7 +239,6 @@
     <string name="audio_info_flash_decode_path">Ruta de decodificación</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s muestras</string>
-
     <string name="demo_hint_demo_mode_on">Modo demo activado</string>
     <string name="demo_hint_tab_audio">Cambio a Audio</string>
     <string name="demo_hint_tab_saved">Cambio a Guardado</string>
@@ -251,11 +252,10 @@
     <string name="demo_hint_pause">Reproducción en pausa</string>
     <string name="demo_hint_theme_changed">Tema cambiado</string>
     <string name="demo_hint_language_changed">Idioma cambiado y sample actualizado</string>
-    <string name="audio_saved_audio_decode_loading_title">Leyendo audio guardado…</string>
-    <string name="audio_saved_audio_decode_loading_body">Este clip se está leyendo una vez para crear su vista reutilizable de texto y letra. El resultado se guarda solo dentro de esta app para volver a abrirlo más rápido.</string>
+    <string name="audio_saved_audio_decode_loading_title">Decodificando audio guardado…</string>
+    <string name="audio_saved_audio_decode_loading_body">Extrayendo texto y datos de sincronización de este clip. El audio más largo puede tardar un poco.</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Vertical</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
 </resources>
-

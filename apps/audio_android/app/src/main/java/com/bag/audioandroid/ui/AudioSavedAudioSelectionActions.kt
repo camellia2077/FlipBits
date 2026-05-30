@@ -1,12 +1,11 @@
 package com.bag.audioandroid.ui
 
+import android.util.Log
 import com.bag.audioandroid.R
-import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
-import com.bag.audioandroid.domain.SavedAudioContent
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
-import com.bag.audioandroid.domain.SavedAudioDecodedCacheEntry
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
@@ -14,6 +13,7 @@ import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.LibrarySelectionUiState
+import com.bag.audioandroid.ui.state.PlaybackDetailsSource
 import com.bag.audioandroid.ui.state.PlayerShellEvent
 import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
 import com.bag.audioandroid.ui.state.reduce
@@ -42,6 +42,7 @@ internal class AudioSavedAudioSelectionActions(
     private var pendingSavedSelectionLoad: Job? = null
 
     fun onSavedAudioSelected(itemId: String) {
+        releaseSavedDecodeLog("onSavedAudioSelected itemId=$itemId")
         stopPlayback()
         if (!prepareSavedAudioSelection(
                 itemId,
@@ -50,10 +51,20 @@ internal class AudioSavedAudioSelectionActions(
                 closeSavedAudioSheet = false,
             )
         ) {
+            releaseSavedDecodeLog("onSavedAudioSelected prepareFailed itemId=$itemId")
             setCurrentStatusText(UiText.Resource(R.string.status_saved_audio_load_failed))
             return
         }
-        val savedAudio = uiState.value.selectedSavedAudio ?: return
+        val savedAudio =
+            uiState.value.selectedSavedAudio ?: run {
+                releaseSavedDecodeLog("onSavedAudioSelected noSelection itemId=$itemId")
+                return
+            }
+        releaseSavedDecodeLog(
+            "onSavedAudioSelected prepared itemId=$itemId loading=${savedAudio.isLoadingContent} " +
+                "needsDecoded=${savedAudio.needsDecodedContent} cachedTextStatus=${savedAudio.decodedPayload.textDecodeStatusCode} " +
+                "followAvailable=${savedAudio.followData.textFollowAvailable}",
+        )
         if (savedAudio.isLoadingContent) {
             return
         }
@@ -103,6 +114,10 @@ internal class AudioSavedAudioSelectionActions(
         pendingSavedSelectionLoad?.cancel()
         val selectionStartedAtNs = System.nanoTime()
         val previousSelection = uiState.value.selectedSavedAudio
+        releaseSavedDecodeLog(
+            "selectionRequest itemId=$itemId previousItemId=${previousSelection?.item?.itemId.orEmpty()} " +
+                "currentSource=${uiState.value.currentPlaybackSource} followUp=$followUp",
+        )
         safeDebugLog(
             SavedAudioPerfTag,
             "selectionRequest itemId=$itemId previousItemId=${previousSelection?.item?.itemId.orEmpty()} " +
@@ -114,10 +129,20 @@ internal class AudioSavedAudioSelectionActions(
                 SavedAudioPerfTag,
                 "selectionRequestStop itemId=$itemId currentSource=${uiState.value.currentPlaybackSource}",
             )
+            releaseSavedDecodeLog("selectionRequestStop itemId=$itemId currentSource=${uiState.value.currentPlaybackSource}")
             stopPlayback()
         }
-        val placeholderItem = resolveSavedAudioItem(itemId) ?: return false
+        val placeholderItem =
+            resolveSavedAudioItem(itemId) ?: run {
+                releaseSavedDecodeLog("selectionResolveFailed itemId=$itemId")
+                return false
+            }
+        releaseSavedDecodeLog(
+            "selectionResolved itemId=$itemId durationMs=${placeholderItem.durationMs} " +
+                "sampleRate=${placeholderItem.sampleRateHz ?: -1} async=${shouldHydrateSavedAudioAsync(placeholderItem)}",
+        )
         if (shouldHydrateSavedAudioAsync(placeholderItem)) {
+            releaseSavedDecodeLog("selectionAsyncPlaceholder itemId=$itemId")
             applySelection(
                 savedAudio =
                     placeholderSelection(
@@ -141,8 +166,12 @@ internal class AudioSavedAudioSelectionActions(
                         SavedAudioPerfTag,
                         "selectionLoadSavedAudio itemId=$itemId elapsedMs=$loadMs loaded=${loadedSavedAudio != null} async=true",
                     )
+                    releaseSavedDecodeLog(
+                        "selectionLoadSavedAudio itemId=$itemId elapsedMs=$loadMs loaded=${loadedSavedAudio != null} async=true",
+                    )
                     val hydrated =
                         loadedSavedAudio ?: run {
+                            releaseSavedDecodeLog("selectionLoadFailed itemId=$itemId async=true")
                             setCurrentStatusText(UiText.Resource(R.string.status_saved_audio_load_failed))
                             return@launch
                         }
@@ -154,6 +183,12 @@ internal class AudioSavedAudioSelectionActions(
                         SavedAudioPerfTag,
                         "selectionDecodeCache itemId=$itemId elapsedMs=$cacheMs hit=${cachedDecode != null} async=true",
                     )
+                    releaseSavedDecodeLog(
+                        "selectionDecodeCache itemId=$itemId elapsedMs=$cacheMs hit=${cachedDecode != null} async=true " +
+                            "metadataMode=${hydrated.metadata?.mode?.wireName.orEmpty()} " +
+                            "fileBacked=${!hydrated.pcmFilePath.isNullOrBlank()} " +
+                            "pcmSamples=${hydrated.pcm.size} metadataSamples=${hydrated.metadata?.pcmSampleCount ?: 0}",
+                    )
                     val (_, stateUpdateMs) =
                         measureElapsedMs {
                             uiState.update { state ->
@@ -163,7 +198,7 @@ internal class AudioSavedAudioSelectionActions(
                                         ?: return@update state
                                 state.copy(
                                     selectedSavedAudio =
-                                        hydrated.toSelection(
+                                        hydrated.toPlaybackSelection(
                                             playbackSpeed = currentSelection.playbackSpeed,
                                             cachedDecode = cachedDecode,
                                             playback =
@@ -180,6 +215,13 @@ internal class AudioSavedAudioSelectionActions(
                         "selectionStateUpdate itemId=$itemId elapsedMs=$stateUpdateMs " +
                             "waveformSamples=${hydrated.waveformPcm.size} fileBacked=${!hydrated.pcmFilePath.isNullOrBlank()} async=true",
                     )
+                    releaseSavedDecodeLog(
+                        "selectionHydratedStateUpdate itemId=$itemId elapsedMs=$stateUpdateMs " +
+                            "needsDecoded=${cachedDecode == null} waveformSamples=${hydrated.waveformPcm.size} " +
+                            "fileBacked=${!hydrated.pcmFilePath.isNullOrBlank()} async=true " +
+                            "detailsSource=${uiState.value.selectedSavedAudio?.playbackDetailsSource?.wireName.orEmpty()} " +
+                            "${uiState.value.selectedSavedAudio?.followData?.selectionFollowDiagSummary().orEmpty()}",
+                    )
                     val (_, pruneMs) =
                         measureElapsedMs {
                             generatedAudioCacheGateway.enforceGeneratedAudioCachePolicy(uiState.value)
@@ -190,6 +232,9 @@ internal class AudioSavedAudioSelectionActions(
                     )
                     safeDebugLog(
                         SavedAudioPerfTag,
+                        "selectionHydrateEnd itemId=$itemId totalElapsedMs=${(System.nanoTime() - selectionStartedAtNs) / 1_000_000L}",
+                    )
+                    releaseSavedDecodeLog(
                         "selectionHydrateEnd itemId=$itemId totalElapsedMs=${(System.nanoTime() - selectionStartedAtNs) / 1_000_000L}",
                     )
                     setCurrentStatusText(
@@ -212,15 +257,24 @@ internal class AudioSavedAudioSelectionActions(
             SavedAudioPerfTag,
             "selectionLoadSavedAudio itemId=$itemId elapsedMs=$loadMs loaded=${savedAudio != null}",
         )
-        savedAudio ?: return false
+        releaseSavedDecodeLog("selectionLoadSavedAudio itemId=$itemId elapsedMs=$loadMs loaded=${savedAudio != null}")
+        savedAudio ?: run {
+            releaseSavedDecodeLog("selectionLoadFailed itemId=$itemId")
+            return false
+        }
         val (cachedDecode, cacheMs) = measureElapsedMs { savedAudioDecodeCacheGateway.read(savedAudio.item, savedAudio.metadata) }
         safeDebugLog(
             SavedAudioPerfTag,
             "selectionDecodeCache itemId=$itemId elapsedMs=$cacheMs hit=${cachedDecode != null}",
         )
+        releaseSavedDecodeLog(
+            "selectionDecodeCache itemId=$itemId elapsedMs=$cacheMs hit=${cachedDecode != null} " +
+                "metadataMode=${savedAudio.metadata?.mode?.wireName.orEmpty()} fileBacked=${!savedAudio.pcmFilePath.isNullOrBlank()} " +
+                "pcmSamples=${savedAudio.pcm.size} metadataSamples=${savedAudio.metadata?.pcmSampleCount ?: 0}",
+        )
         applySelection(
             savedAudio =
-                savedAudio.toSelection(
+                savedAudio.toPlaybackSelection(
                     playbackSpeed =
                         previousSelection
                             ?.takeIf { it.item.itemId == savedAudio.item.itemId }
@@ -245,8 +299,10 @@ internal class AudioSavedAudioSelectionActions(
     }
 
     fun onShellSavedAudioSelected(itemId: String) {
+        releaseSavedDecodeLog("onShellSavedAudioSelected itemId=$itemId")
         stopPlayback()
         if (!prepareSavedAudioSelection(itemId, closeSavedAudioSheet = true)) {
+            releaseSavedDecodeLog("onShellSavedAudioSelected prepareFailed itemId=$itemId")
             uiState.update { state ->
                 state.copy(
                     playerShellState =
@@ -258,7 +314,16 @@ internal class AudioSavedAudioSelectionActions(
             setCurrentStatusText(UiText.Resource(R.string.status_saved_audio_load_failed))
             return
         }
-        val savedAudio = uiState.value.selectedSavedAudio ?: return
+        val savedAudio =
+            uiState.value.selectedSavedAudio ?: run {
+                releaseSavedDecodeLog("onShellSavedAudioSelected noSelection itemId=$itemId")
+                return
+            }
+        releaseSavedDecodeLog(
+            "onShellSavedAudioSelected prepared itemId=$itemId loading=${savedAudio.isLoadingContent} " +
+                "needsDecoded=${savedAudio.needsDecodedContent} cachedTextStatus=${savedAudio.decodedPayload.textDecodeStatusCode} " +
+                "followAvailable=${savedAudio.followData.textFollowAvailable}",
+        )
         if (savedAudio.isLoadingContent) {
             return
         }
@@ -383,6 +448,13 @@ internal class AudioSavedAudioSelectionActions(
                 "loading=${savedAudio.isLoadingContent} previousItemId=${previousSelection?.item?.itemId.orEmpty()} " +
                 "currentSource=${uiState.value.currentPlaybackSource}",
         )
+        releaseSavedDecodeLog(
+            "selectionStateUpdate itemId=$itemId elapsedMs=$stateUpdateMs " +
+                "loading=${savedAudio.isLoadingContent} needsDecoded=${savedAudio.needsDecodedContent} " +
+                "decoding=${savedAudio.isDecodingContent} fileBacked=${!savedAudio.pcmFilePath.isNullOrBlank()} " +
+                "currentSource=${uiState.value.currentPlaybackSource} " +
+                "detailsSource=${savedAudio.playbackDetailsSource.wireName} ${savedAudio.followData.selectionFollowDiagSummary()}",
+        )
         val (_, pruneMs) =
             measureElapsedMs {
                 generatedAudioCacheGateway.enforceGeneratedAudioCachePolicy(uiState.value)
@@ -395,6 +467,11 @@ internal class AudioSavedAudioSelectionActions(
             SavedAudioPerfTag,
             "selectionEnd itemId=$itemId totalElapsedMs=${(System.nanoTime() - selectionStartedAtNs) / 1_000_000L} " +
                 "loading=${savedAudio.isLoadingContent}",
+        )
+        releaseSavedDecodeLog(
+            "selectionEnd itemId=$itemId totalElapsedMs=${(System.nanoTime() - selectionStartedAtNs) / 1_000_000L} " +
+                "loading=${savedAudio.isLoadingContent} needsDecoded=${savedAudio.needsDecodedContent} " +
+                "detailsSource=${savedAudio.playbackDetailsSource.wireName}",
         )
     }
 
@@ -426,6 +503,7 @@ internal class AudioSavedAudioSelectionActions(
                     ?.playbackSpeed
                     ?: PlaybackSpeedOption.default.speed,
             isLoadingContent = true,
+            playbackDetailsSource = PlaybackDetailsSource.Loading,
         )
     }
 
@@ -438,32 +516,24 @@ internal class AudioSavedAudioSelectionActions(
 }
 
 private const val SavedAudioPerfTag = "SavedAudioPerf"
+private const val SavedAudioDecodeProgressTag = "SavedAudioDecodeProgress"
 private const val LONG_AUDIO_FILE_THRESHOLD_MS = 120_000L
 private const val DEFAULT_SAVED_AUDIO_SAMPLE_RATE_HZ = 44_100
+
+private fun releaseSavedDecodeLog(message: String) {
+    try {
+        Log.e(SavedAudioDecodeProgressTag, message)
+    } catch (_: RuntimeException) {
+        // Plain JVM unit tests use the Android stub jar, where Log.e is not implemented.
+    }
+}
 
 private enum class SavedAudioSelectionFollowUp {
     None,
     PlayFromStart,
 }
 
-private fun SavedAudioContent.toSelection(
-    playbackSpeed: Float,
-    cachedDecode: SavedAudioDecodedCacheEntry?,
-    playback: com.bag.audioandroid.ui.state.PlaybackUiState,
-) = SavedAudioPlaybackSelection(
-    item = item,
-    pcm = pcm,
-    waveformPcm = waveformPcm,
-    pcmFilePath = pcmFilePath,
-    sampleRateHz = sampleRateHz,
-    metadata = metadata,
-    wavAudioInfo = wavAudioInfo,
-    playback = playback,
-    playbackSpeed = playbackSpeed,
-    decodedPayload = cachedDecode?.decodedPayload ?: com.bag.audioandroid.domain.DecodedPayloadViewData.Empty,
-    followData = cachedDecode?.followData ?: com.bag.audioandroid.domain.PayloadFollowViewData.Empty,
-    flashSignalInfo = cachedDecode?.flashSignalInfo ?: FlashSignalInfo.Empty,
-    isLoadingContent = false,
-    needsDecodedContent = cachedDecode == null,
-    isDecodingContent = false,
-)
+private fun PayloadFollowViewData.selectionFollowDiagSummary(): String =
+    "follow=$followAvailable textFollow=$textFollowAvailable tokens=${textTokens.size} " +
+        "textTimeline=${textTokenTimeline.size} rawUnits=${textRawDisplayUnits.size} " +
+        "binaryGroups=${binaryGroupTimeline.size} ultraFrames=${ultraFrameTimeline.size} total=$totalPcmSampleCount"

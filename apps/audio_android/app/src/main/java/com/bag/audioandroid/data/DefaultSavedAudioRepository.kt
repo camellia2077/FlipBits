@@ -72,6 +72,21 @@ class DefaultSavedAudioRepository(
 
     override fun shareSavedAudio(item: SavedAudioItem): Boolean = audioShareGateway.shareSavedAudio(item)
 
+    override fun shareGeneratedAudio(
+        inputText: String,
+        pcm: ShortArray,
+        pcmFilePath: String?,
+        sampleRateHz: Int,
+        metadata: GeneratedAudioMetadata,
+    ): Boolean =
+        audioShareGateway.shareGeneratedAudio(
+            displayName = audioExportGateway.suggestGeneratedAudioDisplayName(inputText, metadata),
+            pcm = pcm,
+            pcmFilePath = pcmFilePath,
+            sampleRateHz = sampleRateHz,
+            metadata = metadata,
+        )
+
     override fun shareAudio(
         displayName: String,
         uriString: String,

@@ -4,6 +4,7 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.domain.AudioCodecGateway
+import com.bag.audioandroid.domain.AudioDecodePhase
 import com.bag.audioandroid.domain.AudioExportResult
 import com.bag.audioandroid.domain.AudioIoGateway
 import com.bag.audioandroid.domain.BagApiCodes
@@ -468,6 +469,71 @@ class AudioSessionDecodeActionsTest {
         }
 
     @Test
+    fun `segmented decode progress aggregates across all segments without resetting`() {
+        val progressSequence =
+            listOf(
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 0, segmentCount = 4, segmentProgress0To1 = 0f),
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 0, segmentCount = 4, segmentProgress0To1 = 1f),
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 1, segmentCount = 4, segmentProgress0To1 = 0f),
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 1, segmentCount = 4, segmentProgress0To1 = 0.5f),
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 1, segmentCount = 4, segmentProgress0To1 = 1f),
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 2, segmentCount = 4, segmentProgress0To1 = 0f),
+                aggregateSegmentedDecodeProgress0To1(segmentIndex = 3, segmentCount = 4, segmentProgress0To1 = 1f),
+            )
+
+        assertEquals(listOf(0f, 0.25f, 0.25f, 0.375f, 0.5f, 0.5f, 1f), progressSequence)
+        assertTrue(progressSequence.zipWithNext().all { (previous, next) -> next >= previous })
+        assertEquals(
+            375_000L,
+            aggregateSegmentedDecodeWorkUnits(
+                segmentIndex = 1,
+                segmentCount = 4,
+                segmentProgress0To1 = 0.5f,
+            ),
+        )
+    }
+
+    @Test
+    fun `file backed segmented decode progress reports aggregate payload phase`() {
+        val update =
+            segmentedDecodeProgressUpdate(
+                segmentIndex = 1,
+                segmentCount = 4,
+                segmentProgress0To1 = 1f,
+            )
+
+        assertEquals(AudioDecodePhase.DecodingPayload, update.phase)
+        assertEquals(AudioDecodePhase.DecodingPayload, update.snapshot.phase)
+        assertEquals(0.5f, update.progress0To1)
+        assertEquals(0.5f, update.snapshot.overallProgress0To1)
+        assertEquals(0.5f, update.snapshot.phaseProgress0To1)
+        assertEquals(500_000L, update.snapshot.completedWorkUnits)
+        assertEquals(SEGMENTED_DECODE_AGGREGATE_WORK_UNITS, update.snapshot.totalWorkUnits)
+        assertEquals(500_000L, update.snapshot.phaseCompletedWorkUnits)
+        assertEquals(SEGMENTED_DECODE_AGGREGATE_WORK_UNITS, update.snapshot.phaseTotalWorkUnits)
+    }
+
+    @Test
+    fun `saved decode progress maps real stages into one monotonic progress range`() {
+        val progressSequence =
+            listOf(
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.PreparingInput, 0f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.PreparingInput, 1f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.LoadingAudioData, 0f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.LoadingAudioData, 0.5f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.LoadingAudioData, 1f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.AnalyzingSignal, 0f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.AnalyzingSignal, 0.5f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.AnalyzingSignal, 1f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.BuildingPlaybackData, 0f),
+                mapSavedDecodeProgress0To1(SavedDecodeProgressStage.BuildingPlaybackData, 1f),
+            )
+
+        assertEquals(listOf(0f, 0.05f, 0.05f, 0.125f, 0.2f, 0.2f, 0.55f, 0.9f, 0.9f, 1f), progressSequence)
+        assertTrue(progressSequence.zipWithNext().all { (previous, next) -> next >= previous })
+    }
+
+    @Test
     fun `flash decode falls back to other styles until text succeeds`() =
         runTest {
             val successful =
@@ -680,19 +746,34 @@ private class FakeDecodeAudioCodecGateway(
         flashVoicingFlavor: Int,
     ): Int = BagApiCodes.VALIDATION_OK
 
-    override fun decodeGeneratedPcm(
+    override suspend fun decodeGeneratedPcm(
         pcm: ShortArray,
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
+        onProgress: (com.bag.audioandroid.domain.DecodeProgressUpdate) -> Unit,
     ): DecodedAudioPayloadResult {
         decodeSignalProfiles += flashSignalProfile
         return decodeResultBySignalProfile[flashSignalProfile]
             ?: decodeResultsQueue.removeFirstOrNull()
             ?: decodedResult
     }
+
+    override suspend fun decodePcmFileSegment(
+        pcmFilePath: String,
+        startSample: Long,
+        sampleCount: Int,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+    ): DecodedAudioPayloadResult =
+        decodeResultBySignalProfile[flashSignalProfile]
+            ?: decodeResultsQueue.removeFirstOrNull()
+            ?: decodedResult
 
     override fun getCoreVersion(): String = "test"
 }
@@ -809,6 +890,8 @@ private class LocalFakeGeneratedAudioCacheGateway : GeneratedAudioCacheGateway {
 }
 
 private class LocalFakeSavedAudioDecodeCacheGateway : SavedAudioDecodeCacheGateway {
+    override fun exists(itemId: String): Boolean = false
+
     override fun read(
         item: SavedAudioItem,
         metadata: GeneratedAudioMetadata?,

@@ -9,6 +9,7 @@ import com.bag.audioandroid.data.AppGeneratedAudioCacheGateway
 import com.bag.audioandroid.data.AppSavedAudioDecodeCacheGateway
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.data.DefaultSavedAudioRepository
+import com.bag.audioandroid.data.GeneratedAudioTemporaryShareGateway
 import com.bag.audioandroid.data.MediaStoreAudioExportGateway
 import com.bag.audioandroid.data.MediaStoreSavedAudioLibraryGateway
 import com.bag.audioandroid.data.NativeAudioCodecGateway
@@ -42,8 +43,15 @@ internal fun rememberAudioAndroidViewModelFactory(appContext: Context): AudioAnd
             MediaStoreSavedAudioLibraryGateway(appContext, audioIoGateway, generatedAudioCacheGateway)
         }
     val audioShareGateway =
-        remember(appContext) {
-            AndroidIntentAudioShareGateway(appContext)
+        remember(appContext, audioIoGateway) {
+            AndroidIntentAudioShareGateway(
+                appContext = appContext,
+                generatedAudioTemporaryShareGateway =
+                    GeneratedAudioTemporaryShareGateway(
+                        appContext = appContext,
+                        audioIoGateway = audioIoGateway,
+                    ),
+            )
         }
     val libraryMetadataStore =
         remember(appContext) {

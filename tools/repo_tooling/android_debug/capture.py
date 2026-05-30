@@ -59,7 +59,23 @@ ENCODE_PROGRESS_LOGCAT_FILTERS = [
 SAVED_AUDIO_LOGCAT_FILTERS = [
     "SavedAudioAutomation:D",
     "SavedAudioPerf:D",
+    "SavedAudioDecodeProgress:E",
+    "FlipBitsLongAudio:E",
     "PlaybackAutomation:D",
+    "AndroidRuntime:E",
+    "libc:E",
+    "*:S",
+]
+PLAYBACK_SPEED_LOGCAT_FILTERS = [
+    "PlaybackSpeedDiag:D",
+    "PlaybackCoordDiag:D",
+    "AudioPlayerDiag:D",
+    "AudioTrackTransport:D",
+    "PlaybackAutomation:D",
+    "FlashAutomation:D",
+    "MiniAutomation:D",
+    "FlipBitsLongAudio:D",
+    "GeneratedAudioCache:D",
     "AndroidRuntime:E",
     "libc:E",
     "*:S",
@@ -213,6 +229,40 @@ def capture_common(
     force_stop_app()
     start()
     print(f"Waiting {wait_ms} ms before dumping logcat...")
+    time.sleep(wait_ms / 1000)
+    dump_logcat(raw_log, filters)
+
+    text = raw_log.read_text(encoding="utf-8", errors="replace")
+    events = [event for line in text.splitlines() if (event := event_parser(line)) is not None]
+    write_text(summary, summary_builder(events))
+
+    from . import crash_summary
+
+    lines = crash_summary.read_lines(raw_log)
+    blocks = crash_summary.extract_blocks(lines, context=8)
+    crash_text = build_crash_text(raw_log, lines, blocks, max_blocks=40)
+    write_text(crash_summary_path, crash_text)
+    result = CaptureResult(raw_log=raw_log, summary=summary, crash_summary=crash_summary_path)
+    print_result(result)
+    return result
+
+
+def capture_manual_logcat_window(
+    *,
+    output_dir: Path,
+    wait_ms: int,
+    filters: list[str],
+    summary_builder,
+    event_parser,
+) -> CaptureResult:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    raw_log = output_dir / "raw.log"
+    summary = output_dir / "summary.md"
+    crash_summary_path = output_dir / "crash-summary.txt"
+
+    device_prep()
+    run_adb(["logcat", "-c"])
+    print(f"Reproduce the issue now. Waiting {wait_ms} ms before dumping logcat...")
     time.sleep(wait_ms / 1000)
     dump_logcat(raw_log, filters)
 

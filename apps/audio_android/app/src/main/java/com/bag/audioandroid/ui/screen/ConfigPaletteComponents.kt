@@ -319,6 +319,12 @@ private fun MaterialCustomPaletteSection(
     expanded: Boolean,
 ) {
     val visualTokens = appThemeVisualTokens()
+    val visibleOptions =
+        visibleCustomMaterialPaletteOptions(
+            options = group.options,
+            selectedPaletteId = selectedPalette.id,
+            expanded = expanded,
+        )
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -328,49 +334,52 @@ private fun MaterialCustomPaletteSection(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                group.iconActions.forEach { action ->
-                    IconButton(
-                        onClick = action.onClick,
-                        enabled = action.enabled,
-                        colors = utilityActionIconButtonColors(),
-                    ) {
-                        Icon(
-                            imageVector = action.icon,
-                            contentDescription = action.label,
-                        )
+            if (expanded) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    group.iconActions.forEach { action ->
+                        IconButton(
+                            onClick = action.onClick,
+                            enabled = action.enabled,
+                            colors = utilityActionIconButtonColors(),
+                        ) {
+                            Icon(
+                                imageVector = action.icon,
+                                contentDescription = action.label,
+                            )
+                        }
                     }
-                }
-                if (group.onEditOption != null && group.editActionLabel != null) {
-                    TextButton(onClick = group.onEditOption) {
-                        Text(text = group.editActionLabel)
+                    if (group.onEditOption != null && group.editActionLabel != null) {
+                        TextButton(onClick = group.onEditOption) {
+                            Text(text = group.editActionLabel)
+                        }
                     }
-                }
-                if (group.onAddOption != null && group.addActionLabel != null) {
-                    TextButton(onClick = group.onAddOption) {
-                        Text(text = group.addActionLabel)
+                    if (group.onAddOption != null && group.addActionLabel != null) {
+                        TextButton(onClick = group.onAddOption) {
+                            Text(text = group.addActionLabel)
+                        }
                     }
                 }
             }
 
-            if (expanded) {
+            if (visibleOptions.isNotEmpty()) {
                 ConfigThemeReorderableSwipeRows(
-                    items = group.options,
+                    items = visibleOptions,
                     itemId = PaletteOption::id,
                     rowSpacing = MaterialCustomRowSpacing,
                     estimatedRowHeightPx = EstimatedMaterialCustomRowHeightPx,
                     rowSpacingPx = MaterialCustomRowSpacingPx,
                     reorderThresholdFraction = MaterialCustomReorderThresholdFraction,
-                    reorderEnabled = group.onMoveOption != null,
+                    reorderEnabled = expanded && group.onMoveOption != null,
                     onMove = group.onMoveOption,
                     deleteSpec = { option ->
                         ConfigThemeSwipeDeleteSpec(
                             enabled =
-                                group.deleteActionLabel != null &&
+                                expanded &&
+                                    group.deleteActionLabel != null &&
                                     group.onDeleteOption != null &&
                                     group.canDeleteOption?.invoke(option) == true,
                             deleteLabel = group.deleteActionLabel.orEmpty(),
@@ -380,7 +389,7 @@ private fun MaterialCustomPaletteSection(
                             onDelete = { group.onDeleteOption?.invoke(option) },
                         )
                     },
-                    showDropIndicator = { true },
+                    showDropIndicator = { expanded },
                     dropIndicator = { ReorderDropIndicator(accentTokens = accentTokens) },
                 ) { option, rowModifier, dragOffsetY ->
                     MaterialCustomPaletteRow(
@@ -514,3 +523,14 @@ private const val MaterialBuiltInColumns = 2
 private const val MaterialCustomRowSpacingPx = 8f
 private const val MaterialCustomReorderThresholdFraction = 0.42f
 private const val EstimatedMaterialCustomRowHeightPx = 56f
+
+internal fun visibleCustomMaterialPaletteOptions(
+    options: List<PaletteOption>,
+    selectedPaletteId: String,
+    expanded: Boolean,
+): List<PaletteOption> =
+    if (expanded) {
+        options
+    } else {
+        options.filter { option -> option.id == selectedPaletteId }
+    }

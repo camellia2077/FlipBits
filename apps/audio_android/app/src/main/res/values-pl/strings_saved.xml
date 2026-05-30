@@ -8,6 +8,11 @@
     <string name="library_action_export_to_file">Eksportuj do pliku</string>
     <string name="library_action_rename">Zmień nazwę</string>
     <string name="library_action_delete">Usuń</string>
+    <string name="library_action_more">Więcej</string>
+    <string name="library_decode_status_decoded">Dane odtwarzania gotowe</string>
+    <string name="library_decode_status_needed">Potrzebne dane odtwarzania</string>
+    <string name="library_action_clear_decode_data">Wyczyść dane odtwarzania</string>
+    <string name="library_status_decode_data_cleared">Wyczyszczono dane odtwarzania</string>
     <string name="library_action_select_all">Zaznacz wszystko</string>
     <string name="library_action_clear_selection">Zakończ zaznaczanie</string>
     <string name="library_action_delete_selected">Usuń zaznaczone</string>

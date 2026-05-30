@@ -12,6 +12,11 @@
     <string name="library_action_export_to_file">ファイルへ書き出し</string>
     <string name="library_action_rename">名前を変更</string>
     <string name="library_action_delete">削除</string>
+    <string name="library_action_more">その他</string>
+    <string name="library_decode_status_decoded">再生データ準備済み</string>
+    <string name="library_decode_status_needed">再生データが必要</string>
+    <string name="library_action_clear_decode_data">再生データを消去</string>
+    <string name="library_status_decode_data_cleared">再生データを消去しました</string>
     <string name="library_action_select_all">すべて選択</string>
     <string name="library_action_clear_selection">選択を解除</string>
     <string name="library_action_delete_selected">選択した項目を削除</string>

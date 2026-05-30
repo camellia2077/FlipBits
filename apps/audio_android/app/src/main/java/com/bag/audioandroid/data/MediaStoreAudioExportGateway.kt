@@ -60,6 +60,7 @@ class MediaStoreAudioExportGateway(
                         pcmFilePath = requireNotNull(pcmFilePath),
                         sampleRateHz = sampleRateHz,
                         totalSamples = metadata.pcmSampleCount,
+                        metadata = metadata,
                     )
                 }
             } ?: return AudioExportResult.Failed.also { contentResolver.delete(uri, null, null) }
@@ -107,6 +108,7 @@ class MediaStoreAudioExportGateway(
                         pcmFilePath = requireNotNull(pcmFilePath),
                         sampleRateHz = sampleRateHz,
                         totalSamples = metadata.pcmSampleCount,
+                        metadata = metadata,
                     )
                 }
                 outputStream.flush()

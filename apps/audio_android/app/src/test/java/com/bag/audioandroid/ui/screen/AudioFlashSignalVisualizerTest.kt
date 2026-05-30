@@ -34,6 +34,32 @@ class AudioFlashSignalVisualizerTest {
     }
 
     @Test
+    fun `visual sample snaps to scrub resume anchor instead of catching up from old position`() {
+        val displayedSample =
+            initialPlaybackVisualSample(
+                initialAnchor = 5_240_138f,
+                visualSample = 4_877_404f,
+                maxSample = 6_379_590f,
+                hardAnchorThreshold = 44_100f * 0.35f,
+            )
+
+        assertEquals(5_240_138f, displayedSample, 0.001f)
+    }
+
+    @Test
+    fun `visual sample keeps smoothing for ordinary forward playback drift`() {
+        val displayedSample =
+            initialPlaybackVisualSample(
+                initialAnchor = 44_500f,
+                visualSample = 44_100f,
+                maxSample = 6_379_590f,
+                hardAnchorThreshold = 44_100f * 0.35f,
+            )
+
+        assertEquals(44_100f, displayedSample, 0.001f)
+    }
+
+    @Test
     fun `lane active bit state resolves current bit span inside timeline`() {
         val state =
             flashLaneActiveBitState(

@@ -9,10 +9,10 @@
     <string name="audio_action_encode">생성</string>
     <string name="audio_action_encode_busy">생성 중…</string>
     <string name="audio_action_encode_busy_progress">생성 중… %1$d%%</string>
-    <string name="audio_encode_phase_preparing_input_label">준비 중</string>
-    <string name="audio_encode_phase_rendering_pcm_label">렌더링 중</string>
-    <string name="audio_encode_phase_postprocessing_label">마무리 중</string>
-    <string name="audio_encode_phase_finalizing_label">완료 중</string>
+    <string name="audio_encode_phase_preparing_input_label">입력 준비 중</string>
+    <string name="audio_encode_phase_rendering_pcm_label">오디오 생성 중</string>
+    <string name="audio_encode_phase_postprocessing_label">오디오 다듬는 중</string>
+    <string name="audio_encode_phase_finalizing_label">재생 데이터 생성 중</string>
     <string name="audio_action_cancel_encode">취소</string>
     <string name="audio_action_cancel_encode_busy">취소 중…</string>
     <string name="audio_action_play">재생</string>
@@ -151,8 +151,10 @@
     <string name="audio_ultra_visual_level_high">높음</string>
     <string name="audio_ultra_visual_level_mid">중간</string>
     <string name="audio_ultra_visual_level_low">낮음</string>
-    <string name="audio_follow_unavailable">현재 이 오디오의 페이로드 팔로우를 사용할 수 없습니다.</string>
-    <string name="audio_follow_text_unavailable">현재 이 오디오의 텍스트 팔로우를 사용할 수 없습니다.</string>
+    <string name="audio_follow_unavailable">이 오디오의 향상된 시각화가 아직 준비되지 않았습니다.</string>
+    <string name="audio_follow_text_unavailable">이 오디오의 텍스트 팔로우가 아직 준비되지 않았습니다.</string>
+    <string name="audio_follow_visuals_failed">이 오디오의 향상된 시각화를 준비하지 못했습니다.</string>
+    <string name="audio_follow_text_failed">이 오디오의 텍스트 팔로우를 준비하지 못했습니다.</string>
     <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">데이터</string>
     <string name="audio_follow_view_hex">Hex</string>
@@ -209,14 +211,14 @@
     <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
     <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
     <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
-    <string name="status_ready_to_encode">텍스트를 입력하고 &quot;생성&quot;을 누르세요</string>
+    <string name="status_ready_to_encode">텍스트를 입력하고 "생성"을 누르세요</string>
     <string name="status_input_empty">입력 내용이 없습니다.</string>
     <string name="status_mode_audio_generating">%1$s 오디오 생성 중…</string>
     <string name="status_mode_audio_generating_progress">%1$s 오디오 생성 중… %2$d%%</string>
-    <string name="status_mode_audio_generating_preparing_input">%1$s 오디오 준비 중…</string>
-    <string name="status_mode_audio_generating_rendering_pcm">%1$s 오디오 렌더링 중…</string>
-    <string name="status_mode_audio_generating_postprocessing">%1$s 오디오 마무리 중…</string>
-    <string name="status_mode_audio_generating_finalizing">%1$s 오디오 완료 중…</string>
+    <string name="status_mode_audio_generating_preparing_input">%1$s 입력 준비 중…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">%1$s 오디오 생성 중…</string>
+    <string name="status_mode_audio_generating_postprocessing">%1$s 오디오 다듬는 중…</string>
+    <string name="status_mode_audio_generating_finalizing">%1$s 재생 데이터 생성 중…</string>
     <string name="status_mode_audio_canceling">%1$s 오디오 취소 중…</string>
     <string name="status_mode_audio_cancelled">%1$s 오디오가 취소되었습니다</string>
     <string name="status_mode_audio_generated">%1$s 준비 완료, %2$d개 샘플</string>
@@ -258,7 +260,6 @@
     <string name="audio_info_flash_decode_path">디코드 경로</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s개 샘플</string>
-
     <string name="demo_hint_demo_mode_on">데모 모드가 켜졌습니다</string>
     <string name="demo_hint_tab_audio">오디오로 전환됨</string>
     <string name="demo_hint_tab_saved">저장됨으로 전환됨</string>
@@ -272,11 +273,10 @@
     <string name="demo_hint_pause">재생 일시정지됨</string>
     <string name="demo_hint_theme_changed">테마가 변경됨</string>
     <string name="demo_hint_language_changed">언어가 바뀌고 샘플이 새로고침됨</string>
-    <string name="audio_saved_audio_decode_loading_title">저장된 오디오 읽는 중…</string>
-    <string name="audio_saved_audio_decode_loading_body">이 클립은 재사용 가능한 텍스트 및 가사 보기를 만들기 위해 한 번만 읽습니다. 결과는 더 빠르게 다시 열 수 있도록 이 앱 안에만 저장됩니다.</string>
+    <string name="audio_saved_audio_decode_loading_title">저장된 오디오 디코드 중…</string>
+    <string name="audio_saved_audio_decode_loading_body">이 클립에서 텍스트와 타이밍 데이터를 추출하고 있습니다. 긴 오디오는 시간이 걸릴 수 있습니다.</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">세로</string>
     <string name="audio_morse_visualizer_mode_horizontal">가로</string>
 </resources>
-

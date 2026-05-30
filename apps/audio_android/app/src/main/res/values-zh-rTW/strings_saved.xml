@@ -8,6 +8,11 @@
     <string name="library_action_export_to_file">匯出到檔案</string>
     <string name="library_action_rename">重新命名</string>
     <string name="library_action_delete">刪除</string>
+    <string name="library_action_more">更多</string>
+    <string name="library_decode_status_decoded">播放資料已準備好</string>
+    <string name="library_decode_status_needed">需要播放資料</string>
+    <string name="library_action_clear_decode_data">清除播放資料</string>
+    <string name="library_status_decode_data_cleared">播放資料已清除</string>
     <string name="library_action_select_all">全選</string>
     <string name="library_action_clear_selection">結束選取</string>
     <string name="library_action_delete_selected">刪除選取項目</string>

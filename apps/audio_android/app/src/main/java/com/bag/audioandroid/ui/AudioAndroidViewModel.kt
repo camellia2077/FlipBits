@@ -169,6 +169,7 @@ class AudioAndroidViewModel(
     private val debugScenarioActions =
         AudioDebugScenarioActions(
             uiState = uiStateFlow,
+            scope = viewModelScope,
             sampleInputTextProvider = sampleInputTextProvider,
             savedAudioRepository = savedAudioRepository,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
@@ -183,6 +184,7 @@ class AudioAndroidViewModel(
             onEncode = ::onEncode,
             onPlaybackSpeedSelected = ::onPlaybackSpeedSelected,
             onShellSavedAudioSelected = ::onShellSavedAudioSelected,
+            onDecode = ::onDecode,
             onOpenPlayerDetailSheet = ::onOpenPlayerDetailSheet,
             onTabSelected = ::onTabSelected,
             onThemeStyleSelected = ::onThemeStyleSelected,
@@ -202,6 +204,8 @@ class AudioAndroidViewModel(
             )
         val initialSampleAutoFillEnabled = runBlocking { appSettingsRepository.isSampleAutoFillEnabled.first() }
         val initialSampleDecorationEnabled = runBlocking { appSettingsRepository.isSampleDecorationEnabled.first() }
+        val initialSavedAudioPlaybackDataStorageEnabled =
+            runBlocking { appSettingsRepository.isSavedAudioPlaybackDataStorageEnabled.first() }
         uiStateFlow.update {
             it.copy(
                 selectedLanguage = selectedLanguage,
@@ -209,6 +213,7 @@ class AudioAndroidViewModel(
                 coreVersion = coreVersion.ifBlank { "" },
                 isSampleAutoFillEnabled = initialSampleAutoFillEnabled,
                 isSampleDecorationEnabled = initialSampleDecorationEnabled,
+                isSavedAudioPlaybackDataStorageEnabled = initialSavedAudioPlaybackDataStorageEnabled,
                 sessions =
                     sampleInputSessionUpdater.initialize(
                         sessions = it.sessions,
@@ -418,6 +423,10 @@ class AudioAndroidViewModel(
 
     fun onSampleAutoFillEnabledChanged(enabled: Boolean) {
         preferencesActions.onSampleAutoFillEnabledChanged(enabled)
+    }
+
+    fun onSavedAudioPlaybackDataStorageEnabledChanged(enabled: Boolean) {
+        preferencesActions.onSavedAudioPlaybackDataStorageEnabledChanged(enabled)
     }
 
     fun onFlashVisualPerfOverlayEnabledChanged(enabled: Boolean) {
@@ -717,6 +726,10 @@ class AudioAndroidViewModel(
 
     fun onShareSavedAudio(item: SavedAudioItem) {
         libraryActions.onShareSavedAudio(item)
+    }
+
+    fun onClearSavedAudioDecodeData(itemId: String) {
+        libraryActions.onClearSavedAudioDecodeData(itemId)
     }
 
     fun onRequestExportSavedAudioToDocument(item: SavedAudioItem) {

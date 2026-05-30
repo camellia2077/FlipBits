@@ -31,6 +31,7 @@ internal fun activeTextTimelineIndex(
         displayedSamples = displayedSamples,
         startSample = TextFollowTimelineEntry::startSample,
         sampleCount = TextFollowTimelineEntry::sampleCount,
+        keepPreviousEntryActiveAcrossGaps = true,
     )
 
 internal fun activeLineTimelineIndex(
@@ -42,6 +43,7 @@ internal fun activeLineTimelineIndex(
         displayedSamples = displayedSamples,
         startSample = TextFollowLyricLineTimelineEntry::startSample,
         sampleCount = TextFollowLyricLineTimelineEntry::sampleCount,
+        keepPreviousEntryActiveAcrossGaps = true,
     )
 
 internal fun <T> activeTimelineIndexBySample(
@@ -49,9 +51,11 @@ internal fun <T> activeTimelineIndexBySample(
     displayedSamples: Int,
     startSample: (T) -> Int,
     sampleCount: (T) -> Int,
+    keepPreviousEntryActiveAcrossGaps: Boolean = false,
 ): Int {
     var low = 0
     var high = entries.lastIndex
+    var previousEntryIndex = -1
     while (low <= high) {
         val mid = (low + high).ushr(1)
         val entry = entries[mid]
@@ -59,11 +63,14 @@ internal fun <T> activeTimelineIndexBySample(
         val end = start + sampleCount(entry)
         when {
             displayedSamples < start -> high = mid - 1
-            displayedSamples >= end -> low = mid + 1
+            displayedSamples >= end -> {
+                previousEntryIndex = mid
+                low = mid + 1
+            }
             else -> return mid
         }
     }
-    return -1
+    return if (keepPreviousEntryActiveAcrossGaps) previousEntryIndex else -1
 }
 
 internal fun activeByteIndexWithinToken(
@@ -116,12 +123,15 @@ internal fun activeBitPositionWithinByte(
     val binaryGroupTimeline = followData.binaryGroupTimeline
     val byteBitStart = activeByte.byteOffset * 8
     val byteBitEnd = byteBitStart + activeByte.byteCount * 8
+    val byteBitGroups =
+        binaryGroupTimeline.filter { entry ->
+            entry.bitOffset < byteBitEnd &&
+                entry.bitOffset + entry.bitCount > byteBitStart
+        }
     val activeBitGroup =
-        binaryGroupTimeline.firstOrNull { entry ->
+        byteBitGroups.firstOrNull { entry ->
             displayedSamples >= entry.startSample &&
-                displayedSamples < entry.startSample + entry.sampleCount &&
-                entry.bitOffset >= byteBitStart &&
-                entry.bitOffset < byteBitEnd
+                displayedSamples < entry.startSample + entry.sampleCount
         }
     if (activeBitGroup != null) {
         val bitIndexWithinByte = (activeBitGroup.bitOffset - byteBitStart).coerceIn(0, 7)
@@ -135,13 +145,19 @@ internal fun activeBitPositionWithinByte(
     // During Litany/Collapse silence, keep the last completed bit visible but
     // mark it inactive so completed hex/bin history does not blink again.
     val completedBitGroup =
-        binaryGroupTimeline
+        byteBitGroups
             .filter { entry ->
-                entry.startSample + entry.sampleCount <= displayedSamples &&
-                    entry.bitOffset < byteBitEnd &&
-                    entry.bitOffset + entry.bitCount > byteBitStart
+                entry.startSample + entry.sampleCount <= displayedSamples
             }.maxByOrNull { it.startSample + it.sampleCount }
-            ?: return ActiveBitPosition.Inactive
+    if (completedBitGroup == null && byteBitGroups.isEmpty()) {
+        return activeBitPositionFromByteProgress(
+            activeByte = activeByte,
+            displayedSamples = displayedSamples,
+        )
+    }
+    if (completedBitGroup == null) {
+        return ActiveBitPosition.Inactive
+    }
 
     val completedBitIndexWithinByte =
         (completedBitGroup.bitOffset + completedBitGroup.bitCount - 1 - byteBitStart)
@@ -150,6 +166,27 @@ internal fun activeBitPositionWithinByte(
         bitIndexWithinByte = completedBitIndexWithinByte,
         bitCountWithinByte = 1,
         isToneActive = false,
+    )
+}
+
+private fun activeBitPositionFromByteProgress(
+    activeByte: TextFollowRawDisplayUnitViewData,
+    displayedSamples: Int,
+): ActiveBitPosition {
+    if (activeByte.sampleCount <= 0 ||
+        displayedSamples < activeByte.startSample ||
+        displayedSamples >= activeByte.startSample + activeByte.sampleCount
+    ) {
+        return ActiveBitPosition.Inactive
+    }
+    val bitCount = activeByte.byteCount.coerceAtLeast(1) * 8
+    val progress =
+        ((displayedSamples - activeByte.startSample).toFloat() / activeByte.sampleCount.toFloat())
+            .coerceIn(0f, 0.9999f)
+    return ActiveBitPosition(
+        bitIndexWithinByte = (progress * bitCount).toInt().coerceIn(0, 7),
+        bitCountWithinByte = 1,
+        isToneActive = true,
     )
 }
 

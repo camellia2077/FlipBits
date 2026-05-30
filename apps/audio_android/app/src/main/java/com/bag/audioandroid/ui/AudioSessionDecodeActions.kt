@@ -6,6 +6,7 @@ import com.bag.audioandroid.data.readPcmSegmentsFromFile
 import com.bag.audioandroid.domain.AudioCodecGateway
 import com.bag.audioandroid.domain.BagApiCodes
 import com.bag.audioandroid.domain.BagDecodeContentCodes
+import com.bag.audioandroid.domain.DecodeProgressUpdate
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
 import com.bag.audioandroid.domain.DecodedPayloadViewData
 import com.bag.audioandroid.domain.FlashSignalInfo
@@ -15,6 +16,7 @@ import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.PlaybackDetailsSource
 import com.bag.audioandroid.ui.state.SavedAudioPlaybackSelection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -50,8 +52,16 @@ internal class AudioSessionDecodeActions(
     fun onDecode() {
         val current = uiState.value
         if (current.currentSession.isCodecBusy) {
+            safeLogE(
+                SAVED_DECODE_PROGRESS_LOG_TAG,
+                "onDecode skipped busy source=${current.currentPlaybackSource}",
+            )
             return
         }
+        safeLogE(
+            SAVED_DECODE_PROGRESS_LOG_TAG,
+            "onDecode source=${current.currentPlaybackSource} selectedSaved=${current.selectedSavedAudio?.item?.itemId.orEmpty()}",
+        )
         when (val source = current.currentPlaybackSource) {
             is AudioPlaybackSource.Generated -> onDecodeGenerated(current, source.mode)
             is AudioPlaybackSource.Saved -> onDecodeSaved(current, source.itemId)
@@ -61,17 +71,43 @@ internal class AudioSessionDecodeActions(
     fun ensureCurrentPlaybackDecodedForLyrics() {
         val current = uiState.value
         if (current.currentSession.isCodecBusy) {
+            safeLogE(
+                SAVED_DECODE_PROGRESS_LOG_TAG,
+                "ensureSavedDecode skipped busy source=${current.currentPlaybackSource}",
+            )
             return
         }
-        val source = current.currentPlaybackSource as? AudioPlaybackSource.Saved ?: return
+        val source =
+            current.currentPlaybackSource as? AudioPlaybackSource.Saved ?: run {
+                safeLogE(
+                    SAVED_DECODE_PROGRESS_LOG_TAG,
+                    "ensureSavedDecode skipped nonSaved source=${current.currentPlaybackSource}",
+                )
+                return
+            }
         val selectedSavedAudio =
             current.selectedSavedAudio
                 ?.takeIf { it.item.itemId == source.itemId }
-                ?: return
+                ?: run {
+                    safeLogE(
+                        SAVED_DECODE_PROGRESS_LOG_TAG,
+                        "ensureSavedDecode skipped noSelection itemId=${source.itemId} selected=${current.selectedSavedAudio?.item?.itemId.orEmpty()}",
+                    )
+                    return
+                }
+        safeLogE(
+            SAVED_DECODE_PROGRESS_LOG_TAG,
+            "ensureSavedDecode itemId=${source.itemId} loading=${selectedSavedAudio.isLoadingContent} " +
+                "decoding=${selectedSavedAudio.isDecodingContent} needsDecoded=${selectedSavedAudio.needsDecodedContent} " +
+                "textStatus=${selectedSavedAudio.decodedPayload.textDecodeStatusCode} " +
+                "followAvailable=${selectedSavedAudio.followData.textFollowAvailable}",
+        )
         if (selectedSavedAudio.isLoadingContent) {
+            safeLogE(SAVED_DECODE_PROGRESS_LOG_TAG, "ensureSavedDecode skipped loading itemId=${source.itemId}")
             return
         }
         if (selectedSavedAudio.isDecodingContent) {
+            safeLogE(SAVED_DECODE_PROGRESS_LOG_TAG, "ensureSavedDecode skipped alreadyDecoding itemId=${source.itemId}")
             return
         }
         val alreadyDecodedForLyrics =
@@ -79,8 +115,10 @@ internal class AudioSessionDecodeActions(
                 BagDecodeContentCodes.STATUS_UNAVAILABLE ||
                 selectedSavedAudio.followData.textFollowAvailable
         if (alreadyDecodedForLyrics) {
+            safeLogE(SAVED_DECODE_PROGRESS_LOG_TAG, "ensureSavedDecode skipped alreadyDecoded itemId=${source.itemId}")
             return
         }
+        safeLogE(SAVED_DECODE_PROGRESS_LOG_TAG, "ensureSavedDecode start itemId=${source.itemId}")
         onDecodeSaved(current, source.itemId)
     }
 
@@ -120,17 +158,39 @@ internal class AudioSessionDecodeActions(
         val selectedSavedAudio =
             current.selectedSavedAudio
                 ?.takeIf { it.item.itemId == itemId }
-                ?: return
+                ?: run {
+                    safeLogE(
+                        SAVED_DECODE_PROGRESS_LOG_TAG,
+                        "onDecodeSaved skipped noSelection itemId=$itemId selected=${current.selectedSavedAudio?.item?.itemId.orEmpty()}",
+                    )
+                    return
+                }
+        safeLogE(
+            SAVED_DECODE_PROGRESS_LOG_TAG,
+            "onDecodeSaved itemId=$itemId loading=${selectedSavedAudio.isLoadingContent} " +
+                "decoding=${selectedSavedAudio.isDecodingContent} needsDecoded=${selectedSavedAudio.needsDecodedContent} " +
+                "mode=${selectedSavedAudio.item.modeWireName} fileBacked=${!selectedSavedAudio.pcmFilePath.isNullOrBlank()} " +
+                "inMemorySamples=${selectedSavedAudio.pcm.size} metadataSamples=${selectedSavedAudio.metadata?.pcmSampleCount ?: 0}",
+        )
         if (selectedSavedAudio.isLoadingContent || selectedSavedAudio.isDecodingContent) {
+            safeLogE(
+                SAVED_DECODE_PROGRESS_LOG_TAG,
+                "onDecodeSaved skipped loadingOrDecoding itemId=$itemId loading=${selectedSavedAudio.isLoadingContent} " +
+                    "decoding=${selectedSavedAudio.isDecodingContent}",
+            )
             return
         }
         val mode = TransportModeOption.fromWireName(selectedSavedAudio.item.modeWireName)
         if (mode == null) {
+            safeLogE(
+                SAVED_DECODE_PROGRESS_LOG_TAG,
+                "onDecodeSaved failed unknownMode itemId=$itemId mode=${selectedSavedAudio.item.modeWireName}",
+            )
             stateReducer.applySavedLoadFailure()
             return
         }
-        val request = requestFactory.buildSaved(current, mode, selectedSavedAudio, current.selectedFlashVoicingStyle)
-        launchSavedDecode(itemId, request, selectedSavedAudio)
+        safeLogE(SAVED_DECODE_PROGRESS_LOG_TAG, "onDecodeSaved launch itemId=$itemId mode=${mode.wireName}")
+        launchSavedDecode(current, mode, itemId, selectedSavedAudio)
     }
 
     private fun launchGeneratedDecode(request: DecodeRequest) {
@@ -144,35 +204,77 @@ internal class AudioSessionDecodeActions(
     }
 
     private fun launchSavedDecode(
+        current: AudioAppUiState,
+        mode: TransportModeOption,
         itemId: String,
-        request: DecodeRequest,
         selectedSavedAudio: SavedAudioPlaybackSelection,
     ) {
-        stateReducer.markBusy(request.mode)
+        stateReducer.markBusy(mode)
         stateReducer.markSavedDecodeStarted(itemId)
         scope.launch {
-            val result = decodeRunner.execute(request)
+            val progressReporter =
+                SavedDecodeProgressReporter { update ->
+                    stateReducer.applySavedDecodeProgress(itemId, update)
+                }
+            progressReporter.reportPreparing()
+            val request =
+                kotlinx.coroutines.withContext(workerDispatcher) {
+                    val startedNanos = System.nanoTime()
+                    val builtRequest =
+                        requestFactory.buildSaved(
+                            current = current,
+                            mode = mode,
+                            savedAudio = selectedSavedAudio,
+                            fallbackFlashStyle = current.selectedFlashVoicingStyle,
+                            onPcmLoadProgress = progressReporter::reportAudioDataLoading,
+                        )
+                    safeLogE(
+                        SAVED_DECODE_PROGRESS_LOG_TAG,
+                        "buildSavedDecodeRequest elapsedMs=${elapsedMsSince(startedNanos)} " +
+                            "itemId=$itemId fileBacked=${!selectedSavedAudio.pcmFilePath.isNullOrBlank()} " +
+                            "inMemorySamples=${selectedSavedAudio.pcm.size} segmentedCount=${builtRequest.segmentCount}",
+                    )
+                    builtRequest
+                }
+            val result =
+                decodeRunner.execute(request) { update ->
+                    progressReporter.reportNativeDecode(update)
+                }
             when (result) {
                 is DecodeResult.ValidationFailure ->
                     stateReducer.reduceSavedValidationFailure(itemId, result.validationIssue)
 
                 is DecodeResult.Success -> {
-                    val flashSignalInfo = describeSavedFlashSignal(selectedSavedAudio, result.decoded.decodedPayload)
-                    kotlinx.coroutines.withContext(workerDispatcher) {
-                        savedAudioDecodeCacheGateway.write(
-                            item = selectedSavedAudio.item,
-                            metadata = selectedSavedAudio.metadata,
-                            decodedPayload = result.decoded.decodedPayload,
-                            followData = result.decoded.followData,
-                            flashSignalInfo = flashSignalInfo,
-                        )
-                    }
+                    progressReporter.reportPlaybackDataBuilding(0f)
+                    val flashSignalInfo =
+                        kotlinx.coroutines.withContext(workerDispatcher) {
+                            val startedNanos = System.nanoTime()
+                            val info = describeSavedFlashSignal(selectedSavedAudio, result.decoded.decodedPayload)
+                            savedAudioDecodeCacheGateway.write(
+                                item = selectedSavedAudio.item,
+                                metadata = selectedSavedAudio.metadata,
+                                decodedPayload = result.decoded.decodedPayload,
+                                followData = result.decoded.followData,
+                                flashSignalInfo = info,
+                            )
+                            safeLogE(
+                                SAVED_DECODE_PROGRESS_LOG_TAG,
+                                "buildSavedPlaybackData elapsedMs=${elapsedMsSince(startedNanos)} " +
+                                    "itemId=$itemId textChars=${result.decoded.decodedPayload.text.length} " +
+                                    "followAvailable=${result.decoded.followData.followAvailable}",
+                            )
+                            info
+                        }
+                    progressReporter.reportPlaybackDataBuilding(1f)
                     stateReducer.reduceSavedSuccess(
                         itemId = itemId,
-                        mode = request.mode,
+                        mode = mode,
                         decoded = result.decoded,
                         flashSignalInfo = flashSignalInfo,
                     )
+                    uiState.update { state ->
+                        state.copy(decodedSavedAudioItemIds = state.decodedSavedAudioItemIds + itemId)
+                    }
                 }
             }
         }
@@ -199,6 +301,9 @@ internal class AudioSessionDecodeActions(
 }
 
 private const val LONG_AUDIO_LOG_TAG = "FlipBitsLongAudio"
+private const val SAVED_DECODE_PROGRESS_LOG_TAG = "SavedAudioDecodeProgress"
+
+private fun elapsedMsSince(startedNanos: Long): Long = (System.nanoTime() - startedNanos).coerceAtLeast(0L) / 1_000_000L
 
 private fun safeLogE(
     tag: String,
@@ -263,21 +368,24 @@ private class DecodeRequestFactory(
         mode: TransportModeOption,
         savedAudio: SavedAudioPlaybackSelection,
         fallbackFlashStyle: FlashVoicingStyleOption,
+        onPcmLoadProgress: (completedSamples: Int, totalSamples: Int) -> Unit = { _, _ -> },
     ): DecodeRequest {
+        val segmentSampleCounts =
+            savedAudio.metadata?.segmentSampleCounts?.takeIf { counts -> counts.isNotEmpty() }
+                ?: savedAudio.metadata?.pcmSampleCount?.let(::listOf)
         val segmentedPcm =
             when {
                 savedAudio.pcm.isNotEmpty() ->
-                    savedAudio.metadata?.segmentSampleCounts?.let {
+                    savedAudio.metadata?.segmentSampleCounts?.takeIf { it.isNotEmpty() }?.let {
                         splitPcmIntoSegments(savedAudio.pcm, it)
                     }
-                !savedAudio.pcmFilePath.isNullOrBlank() ->
-                    savedAudio.metadata?.let {
-                        readPcmSegmentsFromFile(
-                            savedAudio.pcmFilePath,
-                            it.segmentSampleCounts.takeIf { counts -> counts.isNotEmpty() } ?: listOf(it.pcmSampleCount),
-                        )
-                    }
                 else -> null
+            }
+        val fileBackedSegmentSampleCounts =
+            if (segmentedPcm == null && !savedAudio.pcmFilePath.isNullOrBlank()) {
+                segmentSampleCounts
+            } else {
+                null
             }
         safeLogE(
             LONG_AUDIO_LOG_TAG,
@@ -286,7 +394,7 @@ private class DecodeRequestFactory(
                 "inMemorySamples=${savedAudio.pcm.size} " +
                 "fileBacked=${!savedAudio.pcmFilePath.isNullOrBlank()} " +
                 "metadataSamples=${savedAudio.metadata?.pcmSampleCount ?: 0} " +
-                "segmentedCount=${segmentedPcm?.size ?: 0}",
+                "segmentedCount=${segmentedPcm?.size ?: fileBackedSegmentSampleCounts?.size ?: 0}",
         )
         return DecodeRequest(
             mode = mode,
@@ -295,6 +403,8 @@ private class DecodeRequestFactory(
             sampleRateHz = savedAudio.sampleRateHz,
             frameSamples = savedAudio.metadata?.frameSamples ?: frameSamples,
             segmentedPcm = segmentedPcm,
+            fileBackedSegmentSampleCounts = fileBackedSegmentSampleCounts,
+            onPcmLoadProgress = onPcmLoadProgress,
             flashPresets =
                 flashPresetCandidates(
                     mode = mode,
@@ -325,14 +435,19 @@ private class DecodeRunner(
     private val audioCodecGateway: AudioCodecGateway,
     private val workerDispatcher: CoroutineDispatcher,
 ) {
-    suspend fun execute(request: DecodeRequest): DecodeResult =
+    suspend fun execute(request: DecodeRequest): DecodeResult = execute(request, onProgress = {})
+
+    suspend fun execute(
+        request: DecodeRequest,
+        onProgress: (DecodeProgressUpdate) -> Unit,
+    ): DecodeResult =
         kotlinx.coroutines.withContext(workerDispatcher) {
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
                 "decodeRunner:start mode=${request.mode.wireName} " +
                     "inMemorySamples=${request.generatedPcm.size} " +
                     "fileBacked=${!request.generatedPcmFilePath.isNullOrBlank()} " +
-                    "segmentedCount=${request.segmentedPcm?.size ?: 0} " +
+                    "segmentedCount=${request.segmentCount} " +
                     "sampleRate=${request.sampleRateHz} " +
                     "frameSamples=${request.frameSamples}",
             )
@@ -348,21 +463,29 @@ private class DecodeRunner(
                 return@withContext DecodeResult.ValidationFailure(validationIssue)
             }
 
-            val decoded = decodeWithFallback(request)
+            val decoded = decodeWithFallback(request, onProgress)
             val decodedText = decoded.decodedPayload.text
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
                 "decodeRunner:done mode=${request.mode.wireName} decodedStatus=${decoded.decodedPayload.textDecodeStatusCode} " +
-                    "followAvailable=${decoded.followData.followAvailable} textChars=${decodedText.length} " +
+                    "followAvailable=${decoded.followData.followAvailable} " +
+                    "textFollowAvailable=${decoded.followData.textFollowAvailable} " +
+                    "textTokens=${decoded.followData.textTokens.size} " +
+                    "textTimeline=${decoded.followData.textTokenTimeline.size} " +
+                    "binaryGroups=${decoded.followData.binaryGroupTimeline.size} " +
+                    "textChars=${decodedText.length} " +
                     "textWhitespace=${decodedText.count(Char::isWhitespace)} rawBytesHex=${decoded.decodedPayload.rawBytesHex}",
             )
 
             DecodeResult.Success(decoded)
         }
 
-    private fun decodeWithFallback(request: DecodeRequest): DecodedAudioPayloadResult {
+    private suspend fun decodeWithFallback(
+        request: DecodeRequest,
+        onProgress: (DecodeProgressUpdate) -> Unit,
+    ): DecodedAudioPayloadResult {
         if (request.mode != TransportModeOption.Flash) {
-            return decodeWithPreset(request, request.flashPresets.first())
+            return decodeWithPreset(request, request.flashPresets.first(), onProgress)
         }
         val attempts = mutableListOf<DecodeAttempt>()
         request.flashPresets.forEach { preset ->
@@ -373,7 +496,7 @@ private class DecodeRunner(
             val attempt =
                 DecodeAttempt(
                     preset = preset,
-                    result = decodeWithPreset(request, preset),
+                    result = decodeWithPreset(request, preset, onProgress),
                 )
             attempts += attempt
             if (isStrongDecodeMatch(attempt, request.expectedPayloadByteCount)) {
@@ -383,12 +506,13 @@ private class DecodeRunner(
         return attempts
             .maxWithOrNull(compareBy<DecodeAttempt> { scoreDecodeAttempt(it, request.expectedPayloadByteCount) })
             ?.result
-            ?: decodeWithPreset(request, FlashVoicingStyleOption.Standard)
+            ?: decodeWithPreset(request, FlashVoicingStyleOption.Standard, onProgress)
     }
 
-    private fun decodeWithPreset(
+    private suspend fun decodeWithPreset(
         request: DecodeRequest,
         preset: FlashVoicingStyleOption,
+        onProgress: (DecodeProgressUpdate) -> Unit,
     ): DecodedAudioPayloadResult =
         request.segmentedPcm?.let { segmentedPcm ->
             safeLogE(
@@ -396,7 +520,7 @@ private class DecodeRunner(
                 "decodeRunner:segmented mode=${request.mode.wireName} segments=${segmentedPcm.size} preset=${preset.id}",
             )
             mergeSegmentedDecodedPayloadResults(
-                segmentedPcm.map { segmentPcm ->
+                segmentedPcm.mapIndexed { index, segmentPcm ->
                     audioCodecGateway.decodeGeneratedPcm(
                         segmentPcm,
                         request.sampleRateHz,
@@ -404,10 +528,52 @@ private class DecodeRunner(
                         request.mode.nativeValue,
                         preset.signalProfileValue,
                         preset.voicingFlavorValue,
+                        onProgress =
+                            aggregateSegmentProgressCallback(
+                                segmentIndex = index,
+                                segmentCount = segmentedPcm.size,
+                                onProgress = onProgress,
+                            ),
                     )
                 },
             )
         }
+            ?: request.fileBackedSegmentSampleCounts?.let { segmentSampleCounts ->
+                val pcmFilePath = request.generatedPcmFilePath
+                if (pcmFilePath.isNullOrBlank()) {
+                    return@let null
+                }
+                safeLogE(
+                    LONG_AUDIO_LOG_TAG,
+                    "decodeRunner:fileSegmented mode=${request.mode.wireName} segments=${segmentSampleCounts.size} preset=${preset.id}",
+                )
+                var segmentStartSample = 0L
+                request.onPcmLoadProgress(request.totalFileBackedSamples, request.totalFileBackedSamples)
+                mergeSegmentedDecodedPayloadResults(
+                    segmentSampleCounts.mapIndexed { index, segmentSampleCount ->
+                        val decoded =
+                            audioCodecGateway.decodePcmFileSegment(
+                                pcmFilePath = pcmFilePath,
+                                startSample = segmentStartSample,
+                                sampleCount = segmentSampleCount,
+                                sampleRateHz = request.sampleRateHz,
+                                frameSamples = request.frameSamples,
+                                mode = request.mode.nativeValue,
+                                flashSignalProfile = preset.signalProfileValue,
+                                flashVoicingFlavor = preset.voicingFlavorValue,
+                            )
+                        segmentStartSample += segmentSampleCount.toLong()
+                        onProgress(
+                            segmentedDecodeProgressUpdate(
+                                segmentIndex = index,
+                                segmentCount = segmentSampleCounts.size,
+                                segmentProgress0To1 = 1f,
+                            ),
+                        )
+                        decoded
+                    },
+                )
+            }
             ?: audioCodecGateway.decodeGeneratedPcm(
                 request.generatedPcm,
                 request.sampleRateHz,
@@ -415,7 +581,39 @@ private class DecodeRunner(
                 request.mode.nativeValue,
                 preset.signalProfileValue,
                 preset.voicingFlavorValue,
+                onProgress,
             )
+
+    private fun aggregateSegmentProgressCallback(
+        segmentIndex: Int,
+        segmentCount: Int,
+        onProgress: (DecodeProgressUpdate) -> Unit,
+    ): (DecodeProgressUpdate) -> Unit =
+        { update ->
+            val segmentProgress = update.snapshot.overallProgress0To1.coerceIn(0f, 1f)
+            val aggregateProgress =
+                aggregateSegmentedDecodeProgress0To1(
+                    segmentIndex = segmentIndex,
+                    segmentCount = segmentCount,
+                    segmentProgress0To1 = segmentProgress,
+                )
+            onProgress(
+                update.copy(
+                    progress0To1 = aggregateProgress,
+                    snapshot =
+                        update.snapshot.copy(
+                            overallProgress0To1 = aggregateProgress,
+                            completedWorkUnits =
+                                aggregateSegmentedDecodeWorkUnits(
+                                    segmentIndex = segmentIndex,
+                                    segmentCount = segmentCount,
+                                    segmentProgress0To1 = segmentProgress,
+                                ),
+                            totalWorkUnits = SEGMENTED_DECODE_AGGREGATE_WORK_UNITS,
+                        ),
+                ),
+            )
+        }
 
     private fun scoreDecodeAttempt(
         attempt: DecodeAttempt,
@@ -522,6 +720,7 @@ private class DecodeStateReducer(
     }
 
     fun markSavedDecodeStarted(itemId: String) {
+        safeLogE(SAVED_DECODE_PROGRESS_LOG_TAG, "start itemId=$itemId")
         uiState.update { state ->
             val selected =
                 state.selectedSavedAudio
@@ -531,6 +730,38 @@ private class DecodeStateReducer(
                 selectedSavedAudio =
                     selected.copy(
                         isDecodingContent = true,
+                        decodeOperationSnapshot = null,
+                        decodeOperationWorkPlan = null,
+                    ),
+            )
+        }
+    }
+
+    fun applySavedDecodeProgress(
+        itemId: String,
+        update: DecodeProgressUpdate,
+    ) {
+        val snapshot = update.snapshot
+        val workPlan = update.workPlan
+        safeLogE(
+            SAVED_DECODE_PROGRESS_LOG_TAG,
+            "progress itemId=$itemId state=${snapshot.state.name.lowercase()} " +
+                "phase=${snapshot.phase.name.lowercase()} percent=${"%.1f".format(snapshot.overallProgress0To1 * 100f)} " +
+                "phasePercent=${"%.1f".format(snapshot.phaseProgress0To1 * 100f)} " +
+                "completed=${snapshot.completedWorkUnits} total=${snapshot.totalWorkUnits} " +
+                "phaseCompleted=${snapshot.phaseCompletedWorkUnits} phaseTotal=${snapshot.phaseTotalWorkUnits} " +
+                "terminal=${snapshot.terminalCode} expectedPcm=${workPlan.pcmSampleCount}",
+        )
+        uiState.update { state ->
+            val selected =
+                state.selectedSavedAudio
+                    ?.takeIf { it.item.itemId == itemId }
+                    ?: return@update state
+            state.copy(
+                selectedSavedAudio =
+                    selected.copy(
+                        decodeOperationSnapshot = update.snapshot,
+                        decodeOperationWorkPlan = update.workPlan,
                     ),
             )
         }
@@ -540,6 +771,10 @@ private class DecodeStateReducer(
         itemId: String,
         validationIssue: Int,
     ) {
+        safeLogE(
+            SAVED_DECODE_PROGRESS_LOG_TAG,
+            "failed itemId=$itemId validationIssue=$validationIssue",
+        )
         uiState.update { state ->
             val selected =
                 state.selectedSavedAudio
@@ -549,6 +784,8 @@ private class DecodeStateReducer(
                 selectedSavedAudio =
                     selected.copy(
                         isDecodingContent = false,
+                        decodeOperationSnapshot = null,
+                        decodeOperationWorkPlan = null,
                     ),
             )
         }
@@ -562,6 +799,11 @@ private class DecodeStateReducer(
         flashSignalInfo: FlashSignalInfo,
     ) {
         val status = decodeStatusText(mode, decoded.decodedPayload)
+        safeLogE(
+            SAVED_DECODE_PROGRESS_LOG_TAG,
+            "done itemId=$itemId mode=${mode.wireName} decodedStatus=${decoded.decodedPayload.textDecodeStatusCode} " +
+                "textChars=${decoded.decodedPayload.text.length} followAvailable=${decoded.followData.followAvailable}",
+        )
         applySavedSuccess(itemId, decoded, flashSignalInfo, status)
     }
 
@@ -599,9 +841,12 @@ private class DecodeStateReducer(
                     selected.copy(
                         decodedPayload = decoded.decodedPayload,
                         followData = decoded.followData,
+                        playbackDetailsSource = PlaybackDetailsSource.FreshDecode,
                         flashSignalInfo = flashSignalInfo,
                         needsDecodedContent = false,
                         isDecodingContent = false,
+                        decodeOperationSnapshot = null,
+                        decodeOperationWorkPlan = null,
                     ),
             )
         }
@@ -649,8 +894,16 @@ private data class DecodeRequest(
     val frameSamples: Int,
     val flashPresets: List<FlashVoicingStyleOption>,
     val segmentedPcm: List<ShortArray>? = null,
+    val fileBackedSegmentSampleCounts: List<Int>? = null,
+    val onPcmLoadProgress: (completedSamples: Int, totalSamples: Int) -> Unit = { _, _ -> },
     val expectedPayloadByteCount: Int? = null,
-)
+) {
+    val segmentCount: Int
+        get() = segmentedPcm?.size ?: fileBackedSegmentSampleCounts?.size ?: 0
+
+    val totalFileBackedSamples: Int
+        get() = fileBackedSegmentSampleCounts?.sum() ?: 0
+}
 
 private data class DecodeAttempt(
     val preset: FlashVoicingStyleOption,

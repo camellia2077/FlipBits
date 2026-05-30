@@ -638,6 +638,12 @@ def parse_args() -> argparse.Namespace:
         help="Optional language folder suffix such as fr, ko, or zh-rTW.",
     )
     lint_parser.add_argument(
+        "--text-type",
+        default="",
+        choices=("", *TEXT_TYPES),
+        help="Optional text type scope: app_text or sample_text.",
+    )
+    lint_parser.add_argument(
         "--json-output",
         action="store_true",
         help="Emit machine-readable JSON instead of human-readable text.",
@@ -1122,7 +1128,34 @@ def run() -> int:
                 print(error)
         return result.exit_code
     if command == "lint":
-        result = run_translation_lint(res_dir=args.res_dir, lang=args.lang or None)
+        try:
+            result = run_translation_lint(
+                res_dir=args.res_dir,
+                lang=args.lang or None,
+                text_type=args.text_type or None,
+            )
+        except ValueError as exc:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "lint",
+                        "exit_code": 2,
+                        "summary": {
+                            "checked_files": 0,
+                            "issues": 0,
+                            "errors": 0,
+                            "warnings": 0,
+                            "text_type": args.text_type or None,
+                        },
+                        "artifacts": {},
+                        "errors": [str(exc)],
+                        "issues": [],
+                    }
+                )
+            else:
+                print(str(exc))
+            return 2
         effective_issues = list(result.issues)
         baseline_path = args.baseline_file or ""
         new_issues_count = None
@@ -1142,6 +1175,7 @@ def run() -> int:
                     "warnings": sum(1 for issue in result.issues if issue.level == "warn"),
                     "baseline_written": True,
                     "baseline_file": normalize_path_string(baseline_path),
+                    "text_type": args.text_type or None,
                 },
                 "artifacts": {
                     "baseline_file": normalize_path_string(baseline_path),
@@ -1181,6 +1215,7 @@ def run() -> int:
                 "fail_on_new": bool(args.fail_on_new),
                 "baseline_file": normalize_path_string(baseline_path) if baseline_path else None,
                 "new_issues": new_issues_count,
+                "text_type": args.text_type or None,
             },
             "artifacts": {},
             "errors": [],

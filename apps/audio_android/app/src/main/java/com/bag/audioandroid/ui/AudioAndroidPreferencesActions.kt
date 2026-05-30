@@ -529,6 +529,13 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
+    fun onSavedAudioPlaybackDataStorageEnabledChanged(enabled: Boolean) {
+        uiState.update { it.copy(isSavedAudioPlaybackDataStorageEnabled = enabled) }
+        scope.launch {
+            appSettingsRepository.setSavedAudioPlaybackDataStorageEnabled(enabled)
+        }
+    }
+
     fun onFlashVisualPerfOverlayEnabledChanged(enabled: Boolean) {
         uiState.update { it.copy(isFlashVisualPerfOverlayEnabled = enabled) }
         scope.launch {

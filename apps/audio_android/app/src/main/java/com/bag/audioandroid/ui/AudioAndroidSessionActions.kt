@@ -69,8 +69,11 @@ internal class AudioAndroidSessionActions(
             scope = scope,
             sessionStateStore = sessionStateStore,
             savedAudioRepository = savedAudioRepository,
+            savedAudioDecodeCacheGateway = savedAudioDecodeCacheGateway,
             generatedAudioCacheGateway = generatedAudioCacheGateway,
+            audioCodecGateway = audioCodecGateway,
             sampleRateHz = sampleRateHz,
+            frameSamples = frameSamples,
             refreshSavedAudioItems = refreshSavedAudioItems,
             workerDispatcher = workerDispatcher,
         )

@@ -364,6 +364,7 @@ data class SavedAudioDebugScenario(
     val displayName: String? = null,
     val seedDurationMs: Long = 0L,
     val seedMode: TransportModeOption = TransportModeOption.Pro,
+    val decode: Boolean = false,
     val requestId: Long = System.nanoTime(),
 ) {
     companion object {
@@ -372,6 +373,7 @@ data class SavedAudioDebugScenario(
         const val ExtraDisplayName = "wb.saved.display_name"
         const val ExtraSeedDurationMs = "wb.saved.seed_duration_ms"
         const val ExtraSeedMode = "wb.saved.seed_mode"
+        const val ExtraDecode = "wb.saved.decode"
         private const val Tag = "SavedAudioAutomation"
 
         fun fromIntent(intent: Intent?): SavedAudioDebugScenario? {
@@ -384,12 +386,13 @@ data class SavedAudioDebugScenario(
                     displayName = intent.getStringExtra(ExtraDisplayName)?.takeIf { it.isNotBlank() },
                     seedDurationMs = intent.getLongExtra(ExtraSeedDurationMs, 0L).coerceAtLeast(0L),
                     seedMode = intent.getStringExtra(ExtraSeedMode).toProgressScenarioMode(),
+                    decode = intent.getBooleanExtra(ExtraDecode, false),
                 )
             Log.d(
                 Tag,
                 "received requestId=${scenario.requestId} itemId=${scenario.itemId.orEmpty()} " +
                     "displayName=${scenario.displayName.orEmpty()} seedDurationMs=${scenario.seedDurationMs} " +
-                    "seedMode=${scenario.seedMode.wireName}",
+                    "seedMode=${scenario.seedMode.wireName} decode=${scenario.decode}",
             )
             return scenario
         }

@@ -45,8 +45,20 @@ interface AudioCodecGateway {
         flashVoicingFlavor: Int,
     ): Int
 
-    fun decodeGeneratedPcm(
+    suspend fun decodeGeneratedPcm(
         pcm: ShortArray,
+        sampleRateHz: Int,
+        frameSamples: Int,
+        mode: Int,
+        flashSignalProfile: Int,
+        flashVoicingFlavor: Int,
+        onProgress: (DecodeProgressUpdate) -> Unit = {},
+    ): DecodedAudioPayloadResult
+
+    suspend fun decodePcmFileSegment(
+        pcmFilePath: String,
+        startSample: Long,
+        sampleCount: Int,
         sampleRateHz: Int,
         frameSamples: Int,
         mode: Int,

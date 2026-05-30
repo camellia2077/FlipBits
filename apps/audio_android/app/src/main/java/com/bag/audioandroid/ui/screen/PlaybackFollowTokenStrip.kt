@@ -43,6 +43,7 @@ internal fun PlaybackFollowTokenStrip(
     displayedSamples: Int,
     isPlaying: Boolean,
     transportMode: TransportModeOption?,
+    playbackDetailsSource: String = "unknown",
     onMeasuredHeightDpChanged: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -62,6 +63,7 @@ internal fun PlaybackFollowTokenStrip(
             displayedSamples = displayedSamples,
             isPlaying = isPlaying,
             transportMode = transportMode,
+            playbackDetailsSource = playbackDetailsSource,
         )
     }
 

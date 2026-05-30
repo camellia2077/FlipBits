@@ -20,6 +20,8 @@ import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
 import com.bag.audioandroid.domain.TextFollowTimelineEntry
+import com.bag.audioandroid.ui.LyricsNavigatorReadingModel
+import com.bag.audioandroid.ui.buildLyricsNavigatorReadingModel
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerSource
@@ -27,6 +29,7 @@ import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.resolveSeekSampleForReadingLine
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -564,6 +567,200 @@ class PlayerDetailSheetContentTest {
         composeRule.runOnIdle {
             assertEquals(false, visible)
         }
+    }
+
+    @Test
+    fun `lyrics navigator uses plain full text reading view`() {
+        composeRule.setContent {
+            LyricsNavigatorScaffold(
+                followData =
+                    PayloadFollowViewData(
+                        textTokens = listOf("ASH", "BELL", "RITE", "LAMP", "TIDE", "HUSH"),
+                        textTokenTimeline =
+                            listOf(
+                                TextFollowTimelineEntry(0, 4, 0),
+                                TextFollowTimelineEntry(4, 4, 1),
+                                TextFollowTimelineEntry(8, 4, 2),
+                                TextFollowTimelineEntry(12, 4, 3),
+                                TextFollowTimelineEntry(16, 4, 4),
+                                TextFollowTimelineEntry(20, 4, 5),
+                            ),
+                        lyricLines = listOf("ASH BELL RITE", "LAMP TIDE HUSH"),
+                        lineTokenRanges =
+                            listOf(
+                                com.bag.audioandroid.domain
+                                    .TextFollowLineTokenRangeViewData(0, 0, 3),
+                                com.bag.audioandroid.domain
+                                    .TextFollowLineTokenRangeViewData(1, 3, 3),
+                            ),
+                        textFollowAvailable = true,
+                        lyricLineFollowAvailable = true,
+                        followAvailable = true,
+                    ),
+                displayedSamples = 7,
+                totalSamples = 24,
+                displayedTime = "0:07",
+                totalTime = "0:24",
+                isPlaying = false,
+                isScrubbing = false,
+                playbackSequenceMode = PlaybackSequenceMode.Normal,
+                playbackSpeed = 1.0f,
+                canSkipPrevious = false,
+                canSkipNext = false,
+                transportMode = TransportModeOption.Mini,
+                durationMs = 44_000L,
+                sampleRateHz = 44_100,
+                frameSamples = 2205,
+                wavAudioInfo = com.bag.audioandroid.domain.WavAudioInfo.Empty,
+                onBack = {},
+                onTogglePlayback = {},
+                onSkipToPreviousTrack = {},
+                onSkipToNextTrack = {},
+                onPlaybackSequenceModeSelected = {},
+                onPlaybackSpeedSelected = {},
+                onScrubStarted = {},
+                onScrubChanged = {},
+                onScrubFinished = {},
+                onSeekToSample = {},
+            )
+        }
+
+        composeRule.onNodeWithTag("lyrics-navigator-reading-text").assertExists()
+        composeRule.onAllNodesWithTag("playback-lyrics-full-list", useUnmergedTree = true).assertCountEquals(0)
+    }
+
+    @Test
+    fun `lyrics navigator prefers full reading model over windowed follow data`() {
+        composeRule.setContent {
+            LyricsNavigatorScaffold(
+                followData =
+                    PayloadFollowViewData(
+                        lyricLines = listOf("WINDOW ONLY"),
+                        textFollowAvailable = true,
+                        followAvailable = true,
+                    ),
+                navigatorReadingModel =
+                    LyricsNavigatorReadingModel(
+                        text = "LINE ONE\nLINE TWO\nLINE THREE",
+                        sampleAtOffset = IntArray("LINE ONE\nLINE TWO\nLINE THREE".length) { 12 },
+                    ),
+                displayedSamples = 7,
+                totalSamples = 24,
+                displayedTime = "0:07",
+                totalTime = "0:24",
+                isPlaying = false,
+                isScrubbing = false,
+                playbackSequenceMode = PlaybackSequenceMode.Normal,
+                playbackSpeed = 1.0f,
+                canSkipPrevious = false,
+                canSkipNext = false,
+                transportMode = TransportModeOption.Mini,
+                durationMs = 44_000L,
+                sampleRateHz = 44_100,
+                frameSamples = 2205,
+                wavAudioInfo = com.bag.audioandroid.domain.WavAudioInfo.Empty,
+                onBack = {},
+                onTogglePlayback = {},
+                onSkipToPreviousTrack = {},
+                onSkipToNextTrack = {},
+                onPlaybackSequenceModeSelected = {},
+                onPlaybackSpeedSelected = {},
+                onScrubStarted = {},
+                onScrubChanged = {},
+                onScrubFinished = {},
+                onSeekToSample = {},
+            )
+        }
+
+        composeRule.onNodeWithText("LINE ONE").assertExists()
+        composeRule.onNodeWithText("LINE TWO").assertExists()
+        composeRule.onNodeWithText("LINE THREE").assertExists()
+        composeRule.onAllNodesWithText("WINDOW ONLY", substring = true).assertCountEquals(0)
+    }
+
+    @Test
+    fun `lyrics navigator reading model preserves full parsed text`() {
+        val model =
+            buildLyricsNavigatorReadingModel(
+                PayloadFollowViewData(
+                    textCharacters =
+                        listOf(
+                            com.bag.audioandroid.domain
+                                .TextFollowCharacterViewData(0, 0, 0, 1, 0, 2, text = "A"),
+                            com.bag.audioandroid.domain.TextFollowCharacterViewData(
+                                0,
+                                1,
+                                1,
+                                1,
+                                2,
+                                2,
+                                kindCode = com.bag.audioandroid.domain.TextFollowCharacterKind.Space.wireValue,
+                                text = " ",
+                            ),
+                            com.bag.audioandroid.domain
+                                .TextFollowCharacterViewData(1, 0, 0, 1, 4, 2, text = "B"),
+                            com.bag.audioandroid.domain.TextFollowCharacterViewData(
+                                1,
+                                1,
+                                1,
+                                1,
+                                6,
+                                2,
+                                kindCode = com.bag.audioandroid.domain.TextFollowCharacterKind.Newline.wireValue,
+                                text = "\n",
+                            ),
+                            com.bag.audioandroid.domain
+                                .TextFollowCharacterViewData(2, 0, 0, 1, 8, 2, text = "C"),
+                        ),
+                    textFollowAvailable = true,
+                    followAvailable = true,
+                ),
+            )
+
+        assertEquals("A B\nC", model.text)
+        assertEquals(5, model.sampleAtOffset.size)
+        assertEquals(0, model.sampleAtOffset[0])
+        assertEquals(2, model.sampleAtOffset[1])
+        assertEquals(4, model.sampleAtOffset[2])
+        assertEquals(6, model.sampleAtOffset[3])
+        assertEquals(8, model.sampleAtOffset[4])
+    }
+
+    @Test
+    fun `lyrics navigator reading line seeks to first visible character sample`() {
+        val sample =
+            resolveSeekSampleForReadingLine(
+                text = "AB\nCD",
+                sampleAtOffset = intArrayOf(10, 12, -1, 20, 22),
+                lineStart = 3,
+                lineEnd = 5,
+            )
+
+        assertEquals(20, sample)
+    }
+
+    @Test
+    fun `lyrics navigator reading model inserts conservative punctuation breaks`() {
+        val model =
+            buildLyricsNavigatorReadingModel(
+                PayloadFollowViewData(
+                    lyricLines = listOf("第一句。第二句，第三句需要更长一点，第四句。"),
+                    lineTokenRanges =
+                        listOf(
+                            com.bag.audioandroid.domain
+                                .TextFollowLineTokenRangeViewData(0, 0, 1),
+                        ),
+                    textTokenTimeline = listOf(TextFollowTimelineEntry(12, 8, 0)),
+                    lyricLineFollowAvailable = true,
+                    followAvailable = true,
+                ),
+            )
+        val formatted = formatLyricsNavigatorReadingModelForDisplay(model)
+
+        assertEquals(
+            "第一句。\n第二句，第三句需要更长一点，\n第四句。",
+            formatted.text,
+        )
     }
 
     private fun setPreviewPlayerDetailContent(initialDisplayMode: PlaybackDisplayMode = PlaybackDisplayMode.Lyrics) {

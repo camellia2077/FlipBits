@@ -17,6 +17,8 @@ import com.bag.audioandroid.ui.state.LibrarySelectionUiState
 @Composable
 fun LibraryTabScreen(
     savedAudioItems: List<SavedAudioItem>,
+    decodedSavedAudioItemIds: Set<String>,
+    currentSavedAudioItem: SavedAudioItem?,
     savedAudioFolders: List<com.bag.audioandroid.domain.SavedAudioFolder>,
     savedAudioFolderAssignments: Map<String, String>,
     librarySelection: LibrarySelectionUiState,
@@ -36,6 +38,7 @@ fun LibraryTabScreen(
     onMoveSavedAudioToFolder: (Collection<String>, String?) -> Unit,
     onShareSavedAudio: (SavedAudioItem) -> Unit,
     onExportSavedAudioToDocument: (SavedAudioItem) -> Unit,
+    onClearSavedAudioDecodeData: (String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
 ) {
@@ -122,6 +125,8 @@ fun LibraryTabScreen(
     ) {
         LibraryTabScreenContent(
             savedAudioItems = savedAudioItems,
+            decodedSavedAudioItemIds = decodedSavedAudioItemIds,
+            currentSavedAudioItem = currentSavedAudioItem,
             librarySelection = librarySelection,
             statusText = statusText,
             contentPadding = contentPadding,
@@ -134,6 +139,7 @@ fun LibraryTabScreen(
             onClearLibrarySelection = onClearLibrarySelection,
             onShareSavedAudio = onShareSavedAudio,
             onExportSavedAudioToDocument = onExportSavedAudioToDocument,
+            onClearSavedAudioDecodeData = onClearSavedAudioDecodeData,
         )
     }
 }

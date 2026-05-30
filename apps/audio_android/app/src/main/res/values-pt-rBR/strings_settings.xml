@@ -216,11 +216,11 @@
 
     <string name="config_sample_decoration_title">Decoração de exemplo</string>
     <string name="config_sample_decoration_subtitle">Adiciona marcadores de prefixo opcionais ao texto de exemplo aleatório.</string>
-    <string name="config_sample_text_title">Texto de exemplo</string>
-    <string name="config_sample_text_subtitle">Controla como o texto de exemplo aparece no campo de entrada.</string>
+    <string name="config_sample_text_title">Preferências de áudio</string>
+    <string name="config_sample_text_subtitle">Controla os dados de áudio salvos e como o texto de exemplo aparece no campo de entrada.</string>
     <string name="config_sample_auto_fill_subtitle">Preenche o campo de entrada com um exemplo aleatório quando houver texto de exemplo disponível.</string>
-    <string name="config_sample_text_collapse">Recolher configurações de texto de exemplo</string>
-    <string name="config_sample_text_expand">Expandir configurações de texto de exemplo</string>
+    <string name="config_sample_text_collapse">Recolher preferências de áudio</string>
+    <string name="config_sample_text_expand">Expandir preferências de áudio</string>
     <string name="config_sample_auto_fill_title">Preencher texto de exemplo automaticamente</string>
     <string name="config_demo_mode_title">Modo demonstração</string>
     <string name="config_demo_mode_subtitle">Mostra feedback de toque e dicas para gravação.</string>
@@ -265,4 +265,6 @@
     <string name="config_custom_theme_import_field_primary">primária</string>
     <string name="config_custom_theme_import_field_secondary">secundária</string>
     <string name="config_custom_theme_import_field_outline">contorno</string>
+    <string name="config_saved_playback_data_subtitle">Mantém o acompanhamento de texto e os visuais aprimorados prontos para áudios salvos no app.</string>
+    <string name="config_saved_playback_data_title">Salvar detalhes da reprodução</string>
 </resources>

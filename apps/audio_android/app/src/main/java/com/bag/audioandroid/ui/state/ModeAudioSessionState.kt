@@ -8,6 +8,7 @@ import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.WavAudioInfo
+import com.bag.audioandroid.ui.LyricsNavigatorReadingModel
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
 import com.bag.audioandroid.ui.model.SampleFlavor
@@ -33,6 +34,7 @@ data class ModeAudioSessionState(
     // source above lets playback/Lyrics load adjacent windows without keeping
     // all token and timeline lists in Compose state.
     val followData: PayloadFollowViewData = PayloadFollowViewData.Empty,
+    val lyricsNavigatorReadingModel: LyricsNavigatorReadingModel? = null,
     val followWindowSource: FollowDataWindowSource? = null,
     val followWindow: FollowDataWindowState = FollowDataWindowState(),
     val flashVisualWindowSource: FlashVisualWindowSource? = null,

@@ -16,6 +16,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.PayloadFollowBinaryGroupTimelineEntry
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.TextFollowRawDisplayUnitViewData
@@ -48,7 +49,22 @@ class PlaybackDataFollowSectionTest {
             )
         }
 
-        composeRule.onNodeWithText(string(R.string.audio_follow_unavailable)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.audio_follow_text_unavailable)).assertIsDisplayed()
+    }
+
+    @Test
+    fun `shows failed message when text follow could not be prepared`() {
+        composeRule.setContent {
+            PlaybackDataFollowSection(
+                followData = PayloadFollowViewData.Empty,
+                displayedSamples = 0,
+                isPlaying = false,
+                transportMode = TransportModeOption.Flash,
+                decodedTextStatusCode = BagDecodeContentCodes.STATUS_INTERNAL_ERROR,
+            )
+        }
+
+        composeRule.onNodeWithText(string(R.string.audio_follow_text_failed)).assertIsDisplayed()
     }
 
     @Test
@@ -103,6 +119,20 @@ class PlaybackDataFollowSectionTest {
 
         assertEquals(1, followActiveTextTimelineIndex(followData, displayedSamples = 10_000))
         assertEquals(0, followActiveTextTimelineIndex(followData, displayedSamples = 409))
+    }
+
+    @Test
+    fun `text follow stays on previous token during flash timing gap`() {
+        val entries =
+            listOf(
+                TextFollowTimelineEntry(0, 5_000, 0),
+                TextFollowTimelineEntry(9_000, 5_000, 1),
+                TextFollowTimelineEntry(20_000, 5_000, 2),
+            )
+
+        assertEquals(0, activeTextTimelineIndex(entries, displayedSamples = 7_500))
+        assertEquals(1, activeTextTimelineIndex(entries, displayedSamples = 16_000))
+        assertEquals(2, activeTextTimelineIndex(entries, displayedSamples = 30_000))
     }
 
     @Test
@@ -809,6 +839,33 @@ class PlaybackDataFollowSectionTest {
             )
 
         assertEquals(4, position.bitIndexWithinByte)
+        assertTrue(position.isToneActive)
+    }
+
+    @Test
+    fun `active bit position falls back to byte progress when saved timeline lacks bit groups`() {
+        val rawDisplayUnit =
+            TextFollowRawDisplayUnitViewData(
+                tokenIndex = 0,
+                startSample = 29_558_025,
+                sampleCount = 138_915,
+                byteIndexWithinToken = 0,
+                byteOffset = 208,
+                byteCount = 1,
+                hexText = "77",
+                binaryText = "01110111",
+            )
+        val position =
+            activeBitPositionWithinByte(
+                activeTextIndex = 0,
+                activeByteIndexWithinToken = 0,
+                displayedSamples = 29_615_542,
+                followData = PayloadFollowViewData(binaryGroupTimeline = emptyList()),
+                rawDisplayUnitsByToken = mapOf(0 to listOf(rawDisplayUnit)),
+            )
+
+        assertEquals(3, position.bitIndexWithinByte)
+        assertEquals(1, position.bitCountWithinByte)
         assertTrue(position.isToneActive)
     }
 

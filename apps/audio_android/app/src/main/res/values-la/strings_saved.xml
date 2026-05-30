@@ -8,6 +8,11 @@
     <string name="library_action_export_to_file">Edicere in Archivum Electum</string>
     <string name="library_action_rename">Muta Titulum</string>
     <string name="library_action_delete">Purga</string>
+    <string name="library_action_more">Plura</string>
+    <string name="library_decode_status_decoded">Data reproductionis parata</string>
+    <string name="library_decode_status_needed">Data reproductionis necessaria</string>
+    <string name="library_action_clear_decode_data">Data reproductionis dele</string>
+    <string name="library_status_decode_data_cleared">Data reproductionis deleta</string>
     <string name="library_action_select_all">Omnes Sectores Selige</string>
     <string name="library_action_clear_selection">Solve Vincula</string>
     <string name="library_action_delete_selected">Purga Selecta</string>

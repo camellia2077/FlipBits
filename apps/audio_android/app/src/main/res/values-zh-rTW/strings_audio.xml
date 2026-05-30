@@ -5,10 +5,10 @@
     <string name="audio_action_encode">建立</string>
     <string name="audio_action_encode_busy">建立中…</string>
     <string name="audio_action_encode_busy_progress">建立中… %1$d%%</string>
-    <string name="audio_encode_phase_preparing_input_label">準備中</string>
-    <string name="audio_encode_phase_rendering_pcm_label">轉譯中</string>
-    <string name="audio_encode_phase_postprocessing_label">收尾中</string>
-    <string name="audio_encode_phase_finalizing_label">完成中</string>
+    <string name="audio_encode_phase_preparing_input_label">準備輸入</string>
+    <string name="audio_encode_phase_rendering_pcm_label">生成音訊</string>
+    <string name="audio_encode_phase_postprocessing_label">塑形音訊</string>
+    <string name="audio_encode_phase_finalizing_label">建立播放資料</string>
     <string name="audio_action_cancel_encode">取消</string>
     <string name="audio_action_cancel_encode_busy">取消中…</string>
     <string name="audio_action_play">播放</string>
@@ -133,8 +133,10 @@
     <string name="audio_ultra_visual_level_high">高</string>
     <string name="audio_ultra_visual_level_mid">中</string>
     <string name="audio_ultra_visual_level_low">低</string>
-    <string name="audio_follow_unavailable">目前此音訊無法提供載荷跟隨資料。</string>
-    <string name="audio_follow_text_unavailable">目前此音訊無法提供文字跟隨資料。</string>
+    <string name="audio_follow_unavailable">此音訊的增強視覺化尚未準備好。</string>
+    <string name="audio_follow_text_unavailable">此音訊的文字跟隨尚未準備好。</string>
+    <string name="audio_follow_visuals_failed">無法為此音訊準備增強視覺化。</string>
+    <string name="audio_follow_text_failed">無法為此音訊準備文字跟隨。</string>
     <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">資料</string>
     <string name="audio_follow_view_hex">Hex</string>
@@ -192,10 +194,10 @@
     <string name="status_input_empty">輸入內容為空。</string>
     <string name="status_mode_audio_generating">正在建立 %1$s 音訊…</string>
     <string name="status_mode_audio_generating_progress">正在建立 %1$s 音訊… %2$d%%</string>
-    <string name="status_mode_audio_generating_preparing_input">正在準備 %1$s 音訊…</string>
-    <string name="status_mode_audio_generating_rendering_pcm">正在轉譯 %1$s 音訊…</string>
-    <string name="status_mode_audio_generating_postprocessing">正在收尾 %1$s 音訊…</string>
-    <string name="status_mode_audio_generating_finalizing">正在完成 %1$s 音訊…</string>
+    <string name="status_mode_audio_generating_preparing_input">正在準備 %1$s 輸入…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">正在生成 %1$s 音訊…</string>
+    <string name="status_mode_audio_generating_postprocessing">正在塑形 %1$s 音訊…</string>
+    <string name="status_mode_audio_generating_finalizing">正在建立 %1$s 播放資料…</string>
     <string name="status_mode_audio_canceling">正在取消 %1$s 音訊…</string>
     <string name="status_mode_audio_cancelled">%1$s 音訊已取消</string>
     <string name="status_mode_audio_generated">%1$s 已就緒，%2$d 個樣本</string>
@@ -237,7 +239,6 @@
     <string name="audio_info_flash_decode_path">解碼路徑</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s 個樣本</string>
-
     <string name="demo_hint_demo_mode_on">示範模式已啟用</string>
     <string name="demo_hint_tab_audio">已切換到音訊</string>
     <string name="demo_hint_tab_saved">已切換到已儲存</string>
@@ -251,11 +252,10 @@
     <string name="demo_hint_pause">播放已暫停</string>
     <string name="demo_hint_theme_changed">主題已變更</string>
     <string name="demo_hint_language_changed">語言已變更，示例已重新整理</string>
-    <string name="audio_saved_audio_decode_loading_title">正在讀取已儲存音訊…</string>
-    <string name="audio_saved_audio_decode_loading_body">此片段會讀取一次，用來建立可重用的文字與歌詞檢視。結果只會保存在此 app 內，讓下次開啟更快。</string>
+    <string name="audio_saved_audio_decode_loading_title">正在解碼已儲存音訊…</string>
+    <string name="audio_saved_audio_decode_loading_body">正在從此片段擷取文字與時間資料。較長的音訊可能需要一些時間。</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">縱向</string>
     <string name="audio_morse_visualizer_mode_horizontal">橫向</string>
 </resources>
-

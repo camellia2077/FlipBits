@@ -12,6 +12,8 @@ import androidx.compose.material.icons.automirrored.rounded.Input
 import androidx.compose.material.icons.rounded.CreateNewFolder
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DriveFileRenameOutline
+import androidx.compose.material.icons.rounded.SaveAlt
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,8 @@ import com.bag.audioandroid.ui.utilityActionIconButtonColors
 @Composable
 internal fun LibraryTabScreenContent(
     savedAudioItems: List<SavedAudioItem>,
+    decodedSavedAudioItemIds: Set<String>,
+    currentSavedAudioItem: SavedAudioItem?,
     librarySelection: LibrarySelectionUiState,
     statusText: UiText,
     contentPadding: PaddingValues,
@@ -42,6 +46,7 @@ internal fun LibraryTabScreenContent(
     onClearLibrarySelection: () -> Unit,
     onShareSavedAudio: (SavedAudioItem) -> Unit,
     onExportSavedAudioToDocument: (SavedAudioItem) -> Unit,
+    onClearSavedAudioDecodeData: (String) -> Unit,
 ) {
     if (librarySelection.isSelectionMode) {
         LibrarySelectionActionsRow(
@@ -67,6 +72,26 @@ internal fun LibraryTabScreenContent(
                 )
             }
             Row {
+                currentSavedAudioItem?.let { currentItem ->
+                    IconButton(
+                        onClick = { onExportSavedAudioToDocument(currentItem) },
+                        colors = utilityActionIconButtonColors(),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.SaveAlt,
+                            contentDescription = stringResource(R.string.library_action_export_to_file),
+                        )
+                    }
+                    IconButton(
+                        onClick = { onShareSavedAudio(currentItem) },
+                        colors = utilityActionIconButtonColors(),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Share,
+                            contentDescription = stringResource(R.string.library_action_share),
+                        )
+                    }
+                }
                 IconButton(
                     onClick = screenState.onCreateFolderStarted,
                     colors = utilityActionIconButtonColors(),
@@ -150,6 +175,7 @@ internal fun LibraryTabScreenContent(
             items(screenState.filteredItems, key = { it.itemId }) { item ->
                 LibrarySavedAudioRow(
                     item = item,
+                    isDecoded = item.itemId in decodedSavedAudioItemIds,
                     isSelectionMode = librarySelection.isSelectionMode,
                     isSelected = item.itemId in librarySelection.selectedItemIds,
                     folderName =
@@ -167,6 +193,7 @@ internal fun LibraryTabScreenContent(
                     onShare = { onShareSavedAudio(item) },
                     onMove = { screenState.onMoveStarted(item) },
                     onRename = { screenState.onRenameStarted(item) },
+                    onClearDecodeData = { onClearSavedAudioDecodeData(item.itemId) },
                     onDelete = { screenState.onDeleteStarted(item) },
                 )
             }

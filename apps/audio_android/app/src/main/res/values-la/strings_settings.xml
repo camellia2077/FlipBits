@@ -216,11 +216,11 @@
 
     <string name="config_sample_decoration_title">Ornamentum exemplaris</string>
     <string name="config_sample_decoration_subtitle">Adde notas praefixas optionarias textui exemplari fortuito.</string>
-    <string name="config_sample_text_title">Textus exemplaris</string>
-    <string name="config_sample_text_subtitle">Moderatur quomodo textus exemplaris in campo ingressus appareat.</string>
+    <string name="config_sample_text_title">Praeferentiae audio</string>
+    <string name="config_sample_text_subtitle">Moderatur data audio servata et quomodo textus exemplaris in campo ingressus appareat.</string>
     <string name="config_sample_auto_fill_subtitle">Campum ingressus exemplo fortuito complet cum textus exemplaris praesto est.</string>
-    <string name="config_sample_text_collapse">Occulta occasus textus exemplaris</string>
-    <string name="config_sample_text_expand">Expande occasus textus exemplaris</string>
+    <string name="config_sample_text_collapse">Occulta praeferentias audio</string>
+    <string name="config_sample_text_expand">Expande praeferentias audio</string>
     <string name="config_sample_auto_fill_title">Textum exemplaris automatice inserere</string>
     <string name="config_demo_mode_title">Modus Demonstratio</string>
     <string name="config_demo_mode_subtitle">Monstra signum tactus et monita ad capturam.</string>
@@ -265,4 +265,6 @@
     <string name="config_custom_theme_import_field_primary">primarium</string>
     <string name="config_custom_theme_import_field_secondary">secundarium</string>
     <string name="config_custom_theme_import_field_outline">limbus</string>
+    <string name="config_saved_playback_data_subtitle">Servat sequelam textus et visus auctos paratos pro audio in app servato.</string>
+    <string name="config_saved_playback_data_title">Serva singula reproductionis</string>
 </resources>

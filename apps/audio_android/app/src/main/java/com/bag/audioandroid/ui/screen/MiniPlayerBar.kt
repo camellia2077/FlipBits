@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
+import com.bag.audioandroid.ui.miniPlayerTextColors
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerUiModel
 import com.bag.audioandroid.ui.model.asString
@@ -51,6 +52,7 @@ internal fun MiniPlayerBar(
     containerColor: Color = MaterialTheme.colorScheme.surface,
     modifier: Modifier = Modifier,
 ) {
+    val textColors = miniPlayerTextColors(containerColor)
     // Keep the mini-player fully opaque. A translucent card lets the screen content show through
     // and makes the title/subtitle harder to read while the dock is floating above the page.
     Surface(
@@ -95,13 +97,14 @@ internal fun MiniPlayerBar(
                         text = model.title.asString(),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
+                        color = textColors.titleColor,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = model.subtitle.asString(),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = textColors.subtitleColor,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )

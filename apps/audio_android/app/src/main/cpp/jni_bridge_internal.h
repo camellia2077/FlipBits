@@ -37,11 +37,16 @@ bag_decoder_config MakeDecoderConfig(int sample_rate_hz,
                                      int flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD);
 
 bag_encode_operation* HandleToEncodeOperation(jlong handle);
+bag_decode_operation* HandleToDecodeOperation(jlong handle);
 
 jdoubleArray NewEncodeOperationSnapshotArray(JNIEnv* env,
                                              const bag_encode_operation_progress& progress);
 jdoubleArray NewEncodeOperationWorkPlanArray(JNIEnv* env,
                                              const bag_encode_operation_work_plan& work_plan);
+jdoubleArray NewDecodeOperationSnapshotArray(JNIEnv* env,
+                                             const bag_decode_operation_progress& progress);
+jdoubleArray NewDecodeOperationWorkPlanArray(JNIEnv* env,
+                                             const bag_decode_operation_work_plan& work_plan);
 
 jobject NewPayloadFollowByteEntry(JNIEnv* env,
                                   const bag_payload_follow_byte_entry& entry);
@@ -211,6 +216,33 @@ jobject NativeDecodeGeneratedPcm(JNIEnv* env,
                                  jint mode,
                                  jint flash_signal_profile,
                                  jint flash_voicing_flavor);
+
+jobject NativeDecodePcmFileSegment(JNIEnv* env,
+                                   jstring pcm_file_path,
+                                   jlong start_sample,
+                                   jint sample_count,
+                                   jint sample_rate_hz,
+                                   jint frame_samples,
+                                   jint mode,
+                                   jint flash_signal_profile,
+                                   jint flash_voicing_flavor);
+
+jlong NativeCreateDecodeOperation(JNIEnv* env,
+                                  jshortArray pcm,
+                                  jint sample_rate_hz,
+                                  jint frame_samples,
+                                  jint mode,
+                                  jint flash_signal_profile,
+                                  jint flash_voicing_flavor);
+jint NativePumpDecodeOperation(jlong handle,
+                               jint max_work_units,
+                               jint max_wall_time_ms,
+                               jboolean* did_progress);
+jdoubleArray NativeGetDecodeOperationWorkPlan(JNIEnv* env, jlong handle);
+jdoubleArray NativePollDecodeOperation(JNIEnv* env, jlong handle);
+jobject NativeTakeDecodeOperationResult(JNIEnv* env, jlong handle);
+jint NativeCancelDecodeOperation(jlong handle);
+void NativeDestroyDecodeOperation(jlong handle);
 
 jint NativeValidateDecodeConfig(JNIEnv* env,
                                 jint sample_rate_hz,

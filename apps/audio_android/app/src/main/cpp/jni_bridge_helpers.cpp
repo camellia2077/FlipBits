@@ -70,6 +70,10 @@ bag_encode_operation* HandleToEncodeOperation(jlong handle) {
     return reinterpret_cast<bag_encode_operation*>(static_cast<intptr_t>(handle));
 }
 
+bag_decode_operation* HandleToDecodeOperation(jlong handle) {
+    return reinterpret_cast<bag_decode_operation*>(static_cast<intptr_t>(handle));
+}
+
 jdoubleArray NewEncodeOperationSnapshotArray(
     JNIEnv* env,
     const bag_encode_operation_progress& progress) {
@@ -116,6 +120,51 @@ jdoubleArray NewEncodeOperationWorkPlanArray(
         static_cast<jdouble>(work_plan.segment_count),
     };
     env->SetDoubleArrayRegion(out, 0, 8, values);
+    return out;
+}
+
+jdoubleArray NewDecodeOperationSnapshotArray(
+    JNIEnv* env,
+    const bag_decode_operation_progress& progress) {
+    jdoubleArray out = env->NewDoubleArray(11);
+    if (out == nullptr) {
+        return nullptr;
+    }
+
+    const jdouble values[11] = {
+        static_cast<jdouble>(progress.state),
+        static_cast<jdouble>(progress.phase),
+        static_cast<jdouble>(progress.overall_progress_0_to_1),
+        static_cast<jdouble>(progress.phase_progress_0_to_1),
+        static_cast<jdouble>(progress.completed_work_units),
+        static_cast<jdouble>(progress.total_work_units),
+        static_cast<jdouble>(progress.phase_completed_work_units),
+        static_cast<jdouble>(progress.phase_total_work_units),
+        static_cast<jdouble>(progress.terminal_code),
+        static_cast<jdouble>(progress.pcm_sample_count),
+        static_cast<jdouble>(progress.pushed_pcm_sample_count),
+    };
+    env->SetDoubleArrayRegion(out, 0, 11, values);
+    return out;
+}
+
+jdoubleArray NewDecodeOperationWorkPlanArray(
+    JNIEnv* env,
+    const bag_decode_operation_work_plan& work_plan) {
+    jdoubleArray out = env->NewDoubleArray(6);
+    if (out == nullptr) {
+        return nullptr;
+    }
+
+    const jdouble values[6] = {
+        static_cast<jdouble>(work_plan.preparing_input_work_units),
+        static_cast<jdouble>(work_plan.reading_pcm_work_units),
+        static_cast<jdouble>(work_plan.decoding_payload_work_units),
+        static_cast<jdouble>(work_plan.finalizing_work_units),
+        static_cast<jdouble>(work_plan.total_work_units),
+        static_cast<jdouble>(work_plan.pcm_sample_count),
+    };
+    env->SetDoubleArrayRegion(out, 0, 6, values);
     return out;
 }
 

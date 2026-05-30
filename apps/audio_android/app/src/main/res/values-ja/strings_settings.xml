@@ -214,11 +214,11 @@
 
     <string name="config_sample_decoration_title">サンプル装飾</string>
     <string name="config_sample_decoration_subtitle">ランダム化されたサンプルテキストに任意の接頭マーカーを追加します。</string>
-    <string name="config_sample_text_title">サンプルテキスト</string>
-    <string name="config_sample_text_subtitle">入力欄にサンプルテキストをどう表示するかを設定します。</string>
+    <string name="config_sample_text_title">オーディオ設定</string>
+    <string name="config_sample_text_subtitle">保存済みオーディオデータと、入力欄でのサンプルテキストの表示を設定します。</string>
     <string name="config_sample_auto_fill_subtitle">サンプルテキストが利用できるとき、入力欄をランダムな例文で埋めます。</string>
-    <string name="config_sample_text_collapse">サンプルテキスト設定を折りたたむ</string>
-    <string name="config_sample_text_expand">サンプルテキスト設定を展開する</string>
+    <string name="config_sample_text_collapse">オーディオ設定を折りたたむ</string>
+    <string name="config_sample_text_expand">オーディオ設定を展開する</string>
     <string name="config_sample_auto_fill_title">サンプルテキストを自動入力</string>
     <string name="config_demo_mode_title">デモモード</string>
     <string name="config_demo_mode_subtitle">録画向けにタップの視覚フィードバックと操作ヒントを表示します。</string>
@@ -263,4 +263,6 @@
     <string name="config_custom_theme_import_field_primary">メインカラー</string>
     <string name="config_custom_theme_import_field_secondary">サブカラー</string>
     <string name="config_custom_theme_import_field_outline">アウトライン</string>
+    <string name="config_saved_playback_data_subtitle">アプリに保存したオーディオで、テキスト追従と強化ビジュアルをすぐ使えるようにします。</string>
+    <string name="config_saved_playback_data_title">再生詳細を保存</string>
 </resources>

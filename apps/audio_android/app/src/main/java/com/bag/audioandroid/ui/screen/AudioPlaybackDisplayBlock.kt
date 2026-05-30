@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -21,6 +22,8 @@ internal fun AudioPlaybackDisplayBlock(
     isFlashMode: Boolean,
     flashVoicingStyle: FlashVoicingStyleOption?,
     followData: PayloadFollowViewData,
+    decodedTextStatusCode: Int = BagDecodeContentCodes.STATUS_UNAVAILABLE,
+    playbackDetailsSource: String = "unknown",
     flashVisualWindow: FlashVisualWindowState = FlashVisualWindowState(),
     isPlaying: Boolean,
     isScrubbing: Boolean = false,
@@ -36,6 +39,7 @@ internal fun AudioPlaybackDisplayBlock(
 ) {
     PlaybackDisplaySection(
         followData = followData,
+        playbackDetailsSource = playbackDetailsSource,
         flashVisualWindow = flashVisualWindow,
         isFlashVisualPerfOverlayEnabled = isFlashVisualPerfOverlayEnabled,
         displayedSamples = displayedSamples,
@@ -48,6 +52,7 @@ internal fun AudioPlaybackDisplayBlock(
         isFlashMode = isFlashMode,
         flashVoicingStyle = flashVoicingStyle,
         isPlaying = isPlaying,
+        decodedTextStatusCode = decodedTextStatusCode,
         isScrubbing = isScrubbing,
         playbackSpeed = playbackSpeed,
         playbackDisplayMode = displaySectionState.playbackDisplayMode,

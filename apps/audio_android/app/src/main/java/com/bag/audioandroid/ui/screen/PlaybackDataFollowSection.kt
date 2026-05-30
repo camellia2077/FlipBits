@@ -37,7 +37,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.BagDecodeContentCodes
 import com.bag.audioandroid.domain.PayloadFollowViewData
+import com.bag.audioandroid.ui.PlaybackScrubDiagTrace
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
@@ -47,6 +49,8 @@ internal fun PlaybackDataFollowSection(
     displayedSamples: Int,
     isPlaying: Boolean,
     transportMode: TransportModeOption?,
+    decodedTextStatusCode: Int = BagDecodeContentCodes.STATUS_UNAVAILABLE,
+    playbackDetailsSource: String = "unknown",
     onTokenStripHeightDpChanged: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
     initialAnnotationMode: PlaybackFollowViewMode = PlaybackFollowViewMode.Binary,
@@ -75,6 +79,17 @@ internal fun PlaybackDataFollowSection(
             presentationState = presentationState,
             displayedSamples = displayedSamples,
         )
+        PlaybackScrubDiagTrace.follow(
+            transportMode = transportMode,
+            followViewMode = presentationState.followViewMode,
+            displayedSamples = displayedSamples,
+            isPlaying = isPlaying,
+            activeTokenIndex = presentationState.activeTextIndex,
+            activeByteIndex = presentationState.activeByteIndexWithinToken,
+            activeBitIndex = presentationState.activeBitIndexWithinByte,
+            activeBitCount = presentationState.activeBitCountWithinByte,
+            isActiveBitTone = presentationState.isActiveBitTone,
+        )
     }
 
     Column(
@@ -86,7 +101,14 @@ internal fun PlaybackDataFollowSection(
     ) {
         if (!followData.followAvailable) {
             Text(
-                text = stringResource(R.string.audio_follow_unavailable),
+                text =
+                    stringResource(
+                        if (decodedTextStatusCode.isDecodeFailureStatus()) {
+                            R.string.audio_follow_text_failed
+                        } else {
+                            R.string.audio_follow_text_unavailable
+                        },
+                    ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -94,7 +116,14 @@ internal fun PlaybackDataFollowSection(
         }
         if (!followData.textFollowAvailable || followData.textTokens.isEmpty()) {
             Text(
-                text = stringResource(R.string.audio_follow_text_unavailable),
+                text =
+                    stringResource(
+                        if (decodedTextStatusCode.isDecodeFailureStatus()) {
+                            R.string.audio_follow_text_failed
+                        } else {
+                            R.string.audio_follow_text_unavailable
+                        },
+                    ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -132,6 +161,7 @@ internal fun PlaybackDataFollowSection(
             displayedSamples = displayedSamples,
             isPlaying = isPlaying,
             transportMode = transportMode,
+            playbackDetailsSource = playbackDetailsSource,
             onMeasuredHeightDpChanged = onTokenStripHeightDpChanged,
         )
         if (isTokenizerOpen) {
@@ -145,6 +175,11 @@ internal fun PlaybackDataFollowSection(
         }
     }
 }
+
+private fun Int.isDecodeFailureStatus(): Boolean =
+    this != BagDecodeContentCodes.STATUS_UNAVAILABLE &&
+        this != BagDecodeContentCodes.STATUS_OK &&
+        this != BagDecodeContentCodes.STATUS_BUFFER_TOO_SMALL
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

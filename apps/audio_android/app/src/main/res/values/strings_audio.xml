@@ -10,14 +10,14 @@
     <string name="audio_action_encode_busy">Creating…</string>
     <!-- CONTEXT: Busy label for the primary create button while audio generation is running. %1$d is the integer progress percent. -->
     <string name="audio_action_encode_busy_progress">Creating… %1$d%%</string>
-    <!-- CONTEXT: Short progress-stage label shown while the encoder is preparing input before audio rendering starts. -->
-    <string name="audio_encode_phase_preparing_input_label">Preparing</string>
-    <!-- CONTEXT: Short progress-stage label shown while PCM audio is being rendered. -->
-    <string name="audio_encode_phase_rendering_pcm_label">Rendering</string>
-    <!-- CONTEXT: Short progress-stage label shown while postprocessing/render cleanup is happening near the end. -->
-    <string name="audio_encode_phase_postprocessing_label">Finishing</string>
-    <!-- CONTEXT: Short progress-stage label shown during the final wrap-up step of audio generation. -->
-    <string name="audio_encode_phase_finalizing_label">Finalizing</string>
+    <!-- CONTEXT: Short progress-stage label shown while the encoder prepares input before audio rendering starts. -->
+    <string name="audio_encode_phase_preparing_input_label">Preparing input</string>
+    <!-- CONTEXT: Short progress-stage label shown while PCM audio is being generated. -->
+    <string name="audio_encode_phase_rendering_pcm_label">Generating audio</string>
+    <!-- CONTEXT: Short progress-stage label shown while generated audio is shaped/postprocessed. -->
+    <string name="audio_encode_phase_postprocessing_label">Shaping audio</string>
+    <!-- CONTEXT: Short progress-stage label shown while playback/follow data is built at the end of generation. -->
+    <string name="audio_encode_phase_finalizing_label">Building playback data</string>
     <!-- CONTEXT: Secondary action button that cancels an in-progress audio generation job. -->
     <string name="audio_action_cancel_encode">Cancel</string>
     <!-- CONTEXT: Busy label shown after the user has requested cancellation and the encode operation is stopping. -->
@@ -248,10 +248,14 @@
     <string name="audio_ultra_visual_level_mid">Mid</string>
     <!-- CONTEXT: Reference tick label in the ultra symbol visualizer for the low level band. -->
     <string name="audio_ultra_visual_level_low">Low</string>
-    <!-- CONTEXT: Message in playback follow/data sections when payload follow data is currently unavailable. -->
-    <string name="audio_follow_unavailable">Payload follow is unavailable for this audio right now.</string>
-    <!-- CONTEXT: Message in playback follow/lyrics sections when text follow data is currently unavailable. -->
-    <string name="audio_follow_text_unavailable">Text follow is unavailable for this audio right now.</string>
+    <!-- CONTEXT: Message in the visual area when enhanced playback visuals are not ready yet. The basic waveform may still be visible. -->
+    <string name="audio_follow_unavailable">Enhanced visuals are not ready for this audio yet.</string>
+    <!-- CONTEXT: Message in the token/text-follow area when text follow data is not ready yet. -->
+    <string name="audio_follow_text_unavailable">Text follow is not ready for this audio yet.</string>
+    <!-- CONTEXT: Message in the visual area when enhanced playback visuals failed to build. The basic waveform may still be visible. -->
+    <string name="audio_follow_visuals_failed">Enhanced visuals could not be prepared for this audio.</string>
+    <!-- CONTEXT: Message in the token/text-follow area when text follow data failed to build. -->
+    <string name="audio_follow_text_failed">Text follow could not be prepared for this audio.</string>
     <!-- CONTEXT: Tab label in the playback follow section for lyric/text-style following. -->
     <string name="audio_follow_display_lyrics">Tokens</string>
     <!-- CONTEXT: Tab label in the playback follow section for data-oriented following. -->
@@ -367,13 +371,13 @@
     <!-- CONTEXT: Busy status for audio generation with progress. %1$s is the transport mode label and %2$d is the progress percent. -->
     <string name="status_mode_audio_generating_progress">Creating %1$s audio… %2$d%%</string>
     <!-- CONTEXT: Busy status for the input-preparation phase of audio generation. %1$s is the transport mode label. -->
-    <string name="status_mode_audio_generating_preparing_input">Preparing %1$s audio…</string>
+    <string name="status_mode_audio_generating_preparing_input">Preparing %1$s input…</string>
     <!-- CONTEXT: Busy status for the PCM rendering phase of audio generation. %1$s is the transport mode label. -->
-    <string name="status_mode_audio_generating_rendering_pcm">Rendering %1$s audio…</string>
-    <!-- CONTEXT: Busy status for the postprocessing phase of audio generation. %1$s is the transport mode label. -->
-    <string name="status_mode_audio_generating_postprocessing">Finishing %1$s audio…</string>
-    <!-- CONTEXT: Busy status for the finalization phase of audio generation. %1$s is the transport mode label. -->
-    <string name="status_mode_audio_generating_finalizing">Finalizing %1$s audio…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">Generating %1$s audio…</string>
+    <!-- CONTEXT: Busy status for the postprocessing phase where generated audio is shaped. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_generating_postprocessing">Shaping %1$s audio…</string>
+    <!-- CONTEXT: Busy status for the final phase where playback/follow data is built. %1$s is the transport mode label. -->
+    <string name="status_mode_audio_generating_finalizing">Building %1$s playback data…</string>
     <!-- CONTEXT: Busy status shown while a generation job is being cancelled. %1$s is the transport mode label. -->
     <string name="status_mode_audio_canceling">Cancelling %1$s audio…</string>
     <!-- CONTEXT: Completion status shown after the user successfully cancelled a generation job. %1$s is the transport mode label. -->
@@ -476,10 +480,10 @@
     <string name="demo_hint_theme_changed">Theme changed</string>
     <!-- CONTEXT: Short demo hint shown after the user changes app language and the sample text refreshes. Keep it concise but preserve both actions. -->
     <string name="demo_hint_language_changed">Language changed and sample refreshed</string>
-    <!-- CONTEXT: Shown in the Saved player detail sheet the first time the app reads a saved clip to build reusable text/lyrics data. -->
-    <string name="audio_saved_audio_decode_loading_title">Reading saved audio…</string>
-    <!-- CONTEXT: Body text shown while the app performs the first saved-audio parse and writes the reusable decode result into app-private storage. -->
-    <string name="audio_saved_audio_decode_loading_body">This clip is being read once to build its reusable text and lyrics view. The result stays only inside this app for faster reopening.</string>
+    <!-- CONTEXT: Shown in the Saved player detail sheet while the app decodes a saved clip to build reusable text/timing data. -->
+    <string name="audio_saved_audio_decode_loading_title">Decoding saved audio…</string>
+    <!-- CONTEXT: Body text shown while the app extracts saved-audio text and timing data before caching the reusable result. -->
+    <string name="audio_saved_audio_decode_loading_body">Extracting text and timing data from this clip. Longer audio may take a while.</string>
     <!-- CONTEXT: Tab label for the playback screen's mixed mode that combines the visualizer and token view. Keep it short and preserve the English product term Mix in all locales. -->
     <string name="audio_playback_view_mix">Mix</string>
     <!-- CONTEXT: Label for the flash visualizer mode that displays frequency in hertz. Keep "Hz" as the unit label. -->

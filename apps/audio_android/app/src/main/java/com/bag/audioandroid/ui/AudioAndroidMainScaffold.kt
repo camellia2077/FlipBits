@@ -134,9 +134,32 @@ internal fun AudioAndroidMainScaffold(
     LaunchedEffect(
         uiState.isExpandedPlayerVisible,
         uiState.currentPlaybackSource,
+        uiState.selectedSavedAudio?.item?.itemId,
+        uiState.selectedSavedAudio?.isLoadingContent,
+        uiState.selectedSavedAudio?.needsDecodedContent,
+        uiState.selectedSavedAudio?.isDecodingContent,
         uiState.currentPlaybackDecodedPayload?.textDecodeStatusCode,
+        uiState.currentPlaybackFollowData.followAvailable,
         uiState.currentPlaybackFollowData.textFollowAvailable,
+        uiState.currentPlaybackFollowData.textTokens.size,
+        uiState.currentPlaybackFollowData.binaryGroupTimeline.size,
     ) {
+        try {
+            Log.e(
+                "SavedAudioDecodeProgress",
+                "mainScaffoldDecodeEffect expanded=${uiState.isExpandedPlayerVisible} source=${uiState.currentPlaybackSource} " +
+                    "textStatus=${uiState.currentPlaybackDecodedPayload?.textDecodeStatusCode} " +
+                    "followAvailable=${uiState.currentPlaybackFollowData.followAvailable} " +
+                    "textFollowAvailable=${uiState.currentPlaybackFollowData.textFollowAvailable} " +
+                    "textTokens=${uiState.currentPlaybackFollowData.textTokens.size} " +
+                    "binaryGroups=${uiState.currentPlaybackFollowData.binaryGroupTimeline.size} " +
+                    "selectedSaved=${uiState.selectedSavedAudio?.item?.itemId.orEmpty()} " +
+                    "loading=${uiState.selectedSavedAudio?.isLoadingContent} decoding=${uiState.selectedSavedAudio?.isDecodingContent} " +
+                    "needsDecoded=${uiState.selectedSavedAudio?.needsDecodedContent}",
+            )
+        } catch (_: RuntimeException) {
+            // Plain JVM unit tests use the Android stub jar, where Log.e is not implemented.
+        }
         if (uiState.isExpandedPlayerVisible && uiState.currentPlaybackSource is AudioPlaybackSource.Saved) {
             viewModel.ensureCurrentPlaybackDecodedForLyrics()
         }
@@ -273,13 +296,13 @@ internal fun AudioAndroidMainScaffold(
                                     canSkipNext = uiState.canSkipNext,
                                     canExportGeneratedAudio = isGeneratedPlayback,
                                     followData = uiState.currentPlaybackFollowData,
+                                    playbackDetailsSource = uiState.currentPlaybackDetailsSourceWireName,
+                                    decodedPayload = uiState.audioTabDecodedPayload,
+                                    lyricsNavigatorReadingModel = uiState.currentPlaybackLyricsNavigatorReadingModel,
                                     flashVisualWindow = uiState.currentPlaybackFlashVisualWindow,
                                     savedAudioItem = uiState.currentSavedAudioItem,
-                                    showSavedAudioDecodeLoadingNotice =
-                                        uiState.selectedSavedAudio
-                                            ?.takeIf { selection -> selection.item.itemId == uiState.currentSavedAudioItem?.itemId }
-                                            ?.let { it.needsDecodedContent || it.isDecodingContent }
-                                            ?: false,
+                                    showSavedAudioDecodeLoadingNotice = uiState.showCurrentSavedAudioDecodeLoadingNotice,
+                                    savedAudioDecodeProgressSnapshot = uiState.currentSavedAudioDecodeProgressSnapshot,
                                     isFlashVisualPerfOverlayEnabled = uiState.isFlashVisualPerfOverlayEnabled,
                                     showQueueSheet = uiState.isExpandedQueueVisible,
                                     queueSheetValue = uiState.playerShellState.queue.current,
@@ -416,6 +439,8 @@ internal fun AudioAndroidMainScaffold(
                     onSampleAutoFillEnabledChange = viewModel::onSampleAutoFillEnabledChanged,
                     isSampleDecorationEnabled = uiState.isSampleDecorationEnabled,
                     onSampleDecorationEnabledChange = viewModel::onSampleDecorationEnabledChanged,
+                    isSavedAudioPlaybackDataStorageEnabled = uiState.isSavedAudioPlaybackDataStorageEnabled,
+                    onSavedAudioPlaybackDataStorageEnabledChange = viewModel::onSavedAudioPlaybackDataStorageEnabledChanged,
                     isFlashVisualPerfOverlayEnabled = uiState.isFlashVisualPerfOverlayEnabled,
                     onFlashVisualPerfOverlayEnabledChange = viewModel::onFlashVisualPerfOverlayEnabledChanged,
                     selectedPalette = uiState.selectedPalette,
@@ -467,6 +492,8 @@ internal fun AudioAndroidMainScaffold(
             AppTab.Library ->
                 LibraryTabScreen(
                     savedAudioItems = uiState.savedAudioItems,
+                    decodedSavedAudioItemIds = uiState.decodedSavedAudioItemIds,
+                    currentSavedAudioItem = uiState.currentSavedAudioItem,
                     savedAudioFolders = uiState.savedAudioFolders,
                     savedAudioFolderAssignments = uiState.savedAudioFolderAssignments,
                     librarySelection = uiState.librarySelection,
@@ -486,6 +513,7 @@ internal fun AudioAndroidMainScaffold(
                     onMoveSavedAudioToFolder = viewModel::onMoveSavedAudioToFolder,
                     onShareSavedAudio = viewModel::onShareSavedAudio,
                     onExportSavedAudioToDocument = viewModel::onRequestExportSavedAudioToDocument,
+                    onClearSavedAudioDecodeData = viewModel::onClearSavedAudioDecodeData,
                     contentPadding = contentPadding,
                     modifier =
                         Modifier

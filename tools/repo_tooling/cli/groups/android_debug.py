@@ -46,6 +46,11 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
         "Summarize Mini/Pro/Ultra encode progress adb logs.",
         default_max_rows=80,
     )
+    add_log_summary(
+        "playback-speed-summary",
+        "Summarize playback speed selection and AudioTrack adb logs.",
+        default_max_rows=80,
+    )
 
     crash_parser = action_parsers.add_parser("crash-summary", help="Extract likely crash regions from logcat.")
     crash_parser.add_argument("log", type=_path_arg)
@@ -141,6 +146,20 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     progress_capture.add_argument("--max-rows", type=int, default=80, help="Maximum summary rows.")
     progress_capture.set_defaults(func=cmd_android_debug)
 
+    playback_speed_capture = action_parsers.add_parser(
+        "capture-playback-speed",
+        help="Capture playback speed logs while you manually reproduce a speed switch issue.",
+    )
+    playback_speed_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")
+    playback_speed_capture.add_argument(
+        "--wait-ms",
+        type=int,
+        default=120000,
+        help="Manual reproduction window before dumping logcat.",
+    )
+    playback_speed_capture.add_argument("--max-rows", type=int, default=80, help="Maximum summary rows.")
+    playback_speed_capture.set_defaults(func=cmd_android_debug)
+
     saved_capture = action_parsers.add_parser("capture-saved", help="Run Saved-audio debug scenario and write logs.")
     saved_capture.add_argument("--output-dir", type=_path_arg, help="Directory for raw log and summaries.")
     saved_capture.add_argument("--wait-ms", type=int, default=15000, help="Delay before dumping logcat.")
@@ -148,6 +167,7 @@ def register_android_debug_group(subparsers: argparse._SubParsersAction[argparse
     saved_capture.add_argument("--display-name", help="Exact Saved display name.")
     saved_capture.add_argument("--seed-duration-ms", type=int, help="Optional duration for debug-only seeding.")
     saved_capture.add_argument("--seed-mode", choices=["mini", "pro", "ultra"], default="mini")
+    saved_capture.add_argument("--decode", action="store_true", help="After selecting Saved audio, request payload decode.")
     saved_capture.set_defaults(func=cmd_android_debug)
 
     tab_capture = action_parsers.add_parser("capture-tab", help="Jump to an app tab through adb and write logs.")

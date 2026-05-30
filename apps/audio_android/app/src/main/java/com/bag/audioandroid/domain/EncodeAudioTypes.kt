@@ -130,3 +130,99 @@ data class EncodeProgressUpdate(
         ),
     val workPlan: EncodeOperationWorkPlan = EncodeOperationWorkPlan.Empty,
 )
+
+enum class AudioDecodePhase(
+    val nativeValue: Int,
+) {
+    PreparingInput(0),
+    ReadingPcm(1),
+    DecodingPayload(2),
+    Finalizing(3),
+    ;
+
+    companion object {
+        fun fromNative(value: Int): AudioDecodePhase = entries.firstOrNull { it.nativeValue == value } ?: Finalizing
+    }
+}
+
+enum class DecodeOperationState(
+    val nativeValue: Int,
+) {
+    Queued(0),
+    Running(1),
+    Succeeded(2),
+    Failed(3),
+    Cancelled(4),
+    ;
+
+    fun isTerminal(): Boolean =
+        this == Succeeded ||
+            this == Failed ||
+            this == Cancelled
+
+    companion object {
+        fun fromNative(value: Int): DecodeOperationState = entries.firstOrNull { it.nativeValue == value } ?: Failed
+    }
+}
+
+data class DecodeOperationWorkPlan(
+    val preparingInputWorkUnits: Long,
+    val readingPcmWorkUnits: Long,
+    val decodingPayloadWorkUnits: Long,
+    val finalizingWorkUnits: Long,
+    val totalWorkUnits: Long,
+    val pcmSampleCount: Long,
+) {
+    companion object {
+        val Empty =
+            DecodeOperationWorkPlan(
+                preparingInputWorkUnits = 0L,
+                readingPcmWorkUnits = 0L,
+                decodingPayloadWorkUnits = 0L,
+                finalizingWorkUnits = 0L,
+                totalWorkUnits = 0L,
+                pcmSampleCount = 0L,
+            )
+    }
+}
+
+data class DecodeOperationSnapshot(
+    val state: DecodeOperationState,
+    val phase: AudioDecodePhase,
+    val overallProgress0To1: Float,
+    val phaseProgress0To1: Float,
+    val completedWorkUnits: Long,
+    val totalWorkUnits: Long,
+    val phaseCompletedWorkUnits: Long,
+    val phaseTotalWorkUnits: Long,
+    val terminalCode: Int,
+    val pcmSampleCount: Long,
+    val pushedPcmSampleCount: Long,
+) {
+    val isTerminal: Boolean
+        get() = state.isTerminal()
+
+    companion object {
+        val Initial =
+            DecodeOperationSnapshot(
+                state = DecodeOperationState.Queued,
+                phase = AudioDecodePhase.PreparingInput,
+                overallProgress0To1 = 0f,
+                phaseProgress0To1 = 0f,
+                completedWorkUnits = 0L,
+                totalWorkUnits = 0L,
+                phaseCompletedWorkUnits = 0L,
+                phaseTotalWorkUnits = 0L,
+                terminalCode = BagApiCodes.ERROR_NOT_READY,
+                pcmSampleCount = 0L,
+                pushedPcmSampleCount = 0L,
+            )
+    }
+}
+
+data class DecodeProgressUpdate(
+    val phase: AudioDecodePhase,
+    val progress0To1: Float,
+    val snapshot: DecodeOperationSnapshot,
+    val workPlan: DecodeOperationWorkPlan = DecodeOperationWorkPlan.Empty,
+)

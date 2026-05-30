@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 
 from core.android_resource_escapes import run_fix_android_resource_escapes
 from core.mixed_language_policy import load_mixed_language_policy
+from core.translation_paths import TEXT_TYPES, get_text_type_from_filename
 
 HEX_LITERAL_PATTERN = re.compile(r"#RRGGBB")
 PLACEHOLDER_PATTERN = re.compile(r"%\d+\$[sdf]")
@@ -118,7 +119,13 @@ def filter_new_lint_issues(*, issues: list[LintIssue], baseline_fingerprints: se
     return out
 
 
-def _iter_xml_files(res_dir: str, lang: str | None) -> list[Path]:
+def _iter_xml_files(
+    res_dir: str,
+    lang: str | None,
+    text_type: str | None = None,
+) -> list[Path]:
+    if text_type is not None and text_type not in TEXT_TYPES:
+        raise ValueError(f"Unsupported text type filter: {text_type}. Expected one of: {', '.join(TEXT_TYPES)}")
     root = Path(res_dir)
     dirs: list[Path]
     if lang:
@@ -130,6 +137,8 @@ def _iter_xml_files(res_dir: str, lang: str | None) -> list[Path]:
         if not d.exists():
             continue
         files.extend(sorted(d.glob("*.xml")))
+    if text_type is not None:
+        files = [path for path in files if get_text_type_from_filename(path.name) == text_type]
     return files
 
 
@@ -151,9 +160,14 @@ def _english_map(res_dir: str) -> dict[str, dict[str, str]]:
     return out
 
 
-def run_translation_lint(*, res_dir: str, lang: str | None = None) -> LintResult:
+def run_translation_lint(
+    *,
+    res_dir: str,
+    lang: str | None = None,
+    text_type: str | None = None,
+) -> LintResult:
     issues: list[LintIssue] = []
-    files = _iter_xml_files(res_dir, lang)
+    files = _iter_xml_files(res_dir, lang, text_type)
     en = _english_map(res_dir)
     locked_terms = load_mixed_language_policy().detection.shared_locked_terms
     for path in files:

@@ -212,11 +212,11 @@
 
     <string name="config_sample_decoration_title">示例装饰</string>
     <string name="config_sample_decoration_subtitle">为随机示例文本添加可选的前缀标记。</string>
-    <string name="config_sample_text_title">示例文本</string>
-    <string name="config_sample_text_subtitle">控制示例文本如何出现在输入框中。</string>
+    <string name="config_sample_text_title">音频偏好</string>
+    <string name="config_sample_text_subtitle">控制保存的音频数据，以及示例文本在输入框中的显示方式。</string>
     <string name="config_sample_auto_fill_subtitle">当示例文本可用时，用随机示例自动填充输入框。</string>
-    <string name="config_sample_text_collapse">收起示例文本设置</string>
-    <string name="config_sample_text_expand">展开示例文本设置</string>
+    <string name="config_sample_text_collapse">收起音频偏好设置</string>
+    <string name="config_sample_text_expand">展开音频偏好设置</string>
     <string name="config_sample_auto_fill_title">自动填充示例文本</string>
     <string name="config_demo_mode_title">演示模式</string>
     <string name="config_demo_mode_subtitle">为录制显示点击反馈和按键操作提示。</string>
@@ -261,4 +261,6 @@
     <string name="config_custom_theme_import_field_primary">主色</string>
     <string name="config_custom_theme_import_field_secondary">辅色</string>
     <string name="config_custom_theme_import_field_outline">描边</string>
+    <string name="config_saved_playback_data_subtitle">让应用内保存的音频随时可用文本跟随和增强视觉效果。</string>
+    <string name="config_saved_playback_data_title">保存播放详情</string>
 </resources>

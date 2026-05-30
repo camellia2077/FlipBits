@@ -191,6 +191,15 @@ internal class AudioSessionEncodeActions(
                         flashVisualWindowSource = flashVisualWindowSource,
                         flashVisualWindow = flashVisualWindow,
                     )
+                    val navigatorReadingModel =
+                        encodeRunner.buildFullLyricsNavigatorReadingModel(request.encodeRequest)
+                    if (navigatorReadingModel != null) {
+                        stateReducer.applyLyricsNavigatorReadingModel(
+                            mode = request.mode,
+                            revision = request.generatedContentRevision,
+                            readingModel = navigatorReadingModel,
+                        )
+                    }
                 } else {
                     safeLogE(
                         LONG_AUDIO_LOG_TAG,
@@ -412,6 +421,19 @@ private class EncodeRunner(
                 )
             result.followData.takeIf { it.followAvailable }
         }
+
+    suspend fun buildFullLyricsNavigatorReadingModel(request: EncodeRequest): LyricsNavigatorReadingModel? {
+        val followData =
+            buildFollowDataWindow(
+                request = request,
+                windowStartSample = 0,
+                windowEndSampleExclusive = request.totalPcmSampleCount.coerceAtLeast(1),
+            ) ?: return null
+        if (!followData.followAvailable) {
+            return null
+        }
+        return buildLyricsNavigatorReadingModel(followData).takeIf { it.text.isNotEmpty() }
+    }
 
     suspend fun buildFlashVisualWindowSource(request: EncodeRequest): FlashVisualWindowSource? =
         kotlinx.coroutines.withContext(workerDispatcher) {
@@ -796,6 +818,7 @@ private class EncodeStateReducer(
                 generatedFlashSignalInfo = FlashSignalInfo.Empty,
                 decodedPayload = DecodedPayloadViewData.Empty,
                 followData = PayloadFollowViewData.Empty,
+                lyricsNavigatorReadingModel = null,
                 followWindowSource = null,
                 followWindow = FollowDataWindowState(),
                 flashVisualWindowSource = null,
@@ -836,6 +859,7 @@ private class EncodeStateReducer(
                 generatedFlashSignalInfo = FlashSignalInfo.Empty,
                 decodedPayload = DecodedPayloadViewData.Empty,
                 followData = PayloadFollowViewData.Empty,
+                lyricsNavigatorReadingModel = null,
                 followWindowSource = null,
                 followWindow = FollowDataWindowState(),
                 flashVisualWindowSource = null,
@@ -918,6 +942,7 @@ private class EncodeStateReducer(
                 generatedContentRevision = nextRevision,
                 decodedPayload = DecodedPayloadViewData.Empty,
                 followData = PayloadFollowViewData.Empty,
+                lyricsNavigatorReadingModel = null,
                 followWindowSource = result.toFollowDataWindowSource(request),
                 followWindow = FollowDataWindowState(),
                 flashVisualWindowSource = result.toFlashVisualWindowSource(request),
@@ -1034,6 +1059,20 @@ private class EncodeStateReducer(
                     flashVisualWindowSource = flashVisualWindowSource ?: session.flashVisualWindowSource,
                     flashVisualWindow = flashVisualWindow.takeIf { it.available } ?: session.flashVisualWindow,
                 )
+            }
+        }
+    }
+
+    fun applyLyricsNavigatorReadingModel(
+        mode: TransportModeOption,
+        revision: Long,
+        readingModel: LyricsNavigatorReadingModel,
+    ) {
+        sessionStateStore.updateSession(mode) { session ->
+            if (session.generatedContentRevision != revision) {
+                session
+            } else {
+                session.copy(lyricsNavigatorReadingModel = readingModel)
             }
         }
     }

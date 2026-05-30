@@ -1,5 +1,6 @@
 package com.bag.audioandroid.data
 
+import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.io.IOException
@@ -13,10 +14,13 @@ internal fun writeMonoPcm16WavFromFile(
     pcmFilePath: String,
     sampleRateHz: Int,
     totalSamples: Int,
+    metadata: GeneratedAudioMetadata? = null,
 ) {
+    // Long audio uses this file-backed path; without WBAG metadata, Saved decode reloads as unknown mode.
+    val metadataChunk = metadata?.toFlipBitsWavMetadataChunk() ?: byteArrayOf()
     val dataBytes = totalSamples * ShortBytes
     val byteRate = sampleRateHz * ShortBytes
-    val riffChunkSize = WaveHeaderBytes - 8 + dataBytes
+    val riffChunkSize = WaveHeaderBytes - 8 + metadataChunk.size + dataBytes
     output.writeAscii("RIFF")
     output.writeInt32LE(riffChunkSize)
     output.writeAscii("WAVE")
@@ -28,6 +32,9 @@ internal fun writeMonoPcm16WavFromFile(
     output.writeInt32LE(byteRate)
     output.writeInt16LE(ShortBytes)
     output.writeInt16LE(16)
+    if (metadataChunk.isNotEmpty()) {
+        output.write(metadataChunk)
+    }
     output.writeAscii("data")
     output.writeInt32LE(dataBytes)
     BufferedInputStream(FileInputStream(pcmFilePath)).use { input ->
@@ -65,14 +72,48 @@ internal fun buildWaveformPreviewFromPcmFile(
 internal fun readPcmSegmentsFromFile(
     pcmFilePath: String,
     segmentSampleCounts: List<Int>,
+    onProgress: (completedSamples: Int, totalSamples: Int) -> Unit = { _, _ -> },
 ): List<ShortArray> {
     if (segmentSampleCounts.isEmpty()) {
         return emptyList()
     }
+    val totalSamples = segmentSampleCounts.sum()
+    var completedSamples = 0
     BufferedInputStream(FileInputStream(pcmFilePath)).use { input ->
         return segmentSampleCounts.map { sampleCount ->
-            readShortArray(input, sampleCount)
+            readShortArray(input, sampleCount) { segmentCompletedSamples ->
+                onProgress(completedSamples + segmentCompletedSamples, totalSamples)
+            }.also {
+                completedSamples += sampleCount
+                onProgress(completedSamples, totalSamples)
+            }
         }
+    }
+}
+
+internal suspend fun <T> mapPcmSegmentsFromFile(
+    pcmFilePath: String,
+    segmentSampleCounts: List<Int>,
+    onProgress: (completedSamples: Int, totalSamples: Int) -> Unit = { _, _ -> },
+    transform: suspend (segmentIndex: Int, segmentPcm: ShortArray) -> T,
+): List<T> {
+    if (segmentSampleCounts.isEmpty()) {
+        return emptyList()
+    }
+    val totalSamples = segmentSampleCounts.sum()
+    var completedSamples = 0
+    BufferedInputStream(FileInputStream(pcmFilePath)).use { input ->
+        val results = ArrayList<T>(segmentSampleCounts.size)
+        segmentSampleCounts.forEachIndexed { index, sampleCount ->
+            val segmentPcm =
+                readShortArray(input, sampleCount) { segmentCompletedSamples ->
+                    onProgress(completedSamples + segmentCompletedSamples, totalSamples)
+                }
+            completedSamples += sampleCount
+            onProgress(completedSamples, totalSamples)
+            results += transform(index, segmentPcm)
+        }
+        return results
     }
 }
 
@@ -168,6 +209,7 @@ private inline fun forEachPcmSample(
 private fun readShortArray(
     input: BufferedInputStream,
     sampleCount: Int,
+    onProgress: (completedSamples: Int) -> Unit = {},
 ): ShortArray {
     val buffer = ShortArray(sampleCount)
     val byteBuffer = ByteArray(sampleCount * ShortBytes)
@@ -178,6 +220,7 @@ private fun readShortArray(
             throw IOException("Unexpected end of PCM file.")
         }
         bytesFilled += bytesRead
+        onProgress(bytesFilled / ShortBytes)
     }
     var byteIndex = 0
     repeat(sampleCount) { sampleIndex ->

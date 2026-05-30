@@ -7,16 +7,36 @@ import android.content.Intent
 import android.net.Uri
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioShareGateway
+import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioItem
 
-class AndroidIntentAudioShareGateway(
+internal class AndroidIntentAudioShareGateway(
     private val appContext: Context,
+    private val generatedAudioTemporaryShareGateway: GeneratedAudioTemporaryShareGateway,
 ) : AudioShareGateway {
     override fun shareSavedAudio(item: SavedAudioItem): Boolean =
         shareAudio(
             displayName = item.displayName,
             uriString = item.uriString,
         )
+
+    override fun shareGeneratedAudio(
+        displayName: String,
+        pcm: ShortArray,
+        pcmFilePath: String?,
+        sampleRateHz: Int,
+        metadata: GeneratedAudioMetadata,
+    ): Boolean =
+        generatedAudioTemporaryShareGateway
+            .createShareUri(
+                displayName = displayName,
+                pcm = pcm,
+                pcmFilePath = pcmFilePath,
+                sampleRateHz = sampleRateHz,
+                metadata = metadata,
+            )?.let { uri ->
+                shareAudio(displayName, uri.toString())
+            } ?: false
 
     override fun shareAudio(
         displayName: String,

@@ -1,7 +1,10 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.R
+import com.bag.audioandroid.domain.DecodedPayloadViewData
+import com.bag.audioandroid.domain.FlashSignalInfo
 import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
+import com.bag.audioandroid.domain.PayloadFollowViewData
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
 import com.bag.audioandroid.domain.SavedAudioFolder
 import com.bag.audioandroid.domain.SavedAudioFolderMutationResult
@@ -283,11 +286,40 @@ internal class AudioSavedAudioMutationActions(
         }
     }
 
+    fun onClearSavedAudioDecodeData(itemId: String) {
+        savedAudioDecodeCacheGateway.delete(itemId)
+        uiState.update { state ->
+            val selectedSavedAudio = state.selectedSavedAudio
+            state.copy(
+                decodedSavedAudioItemIds = state.decodedSavedAudioItemIds - itemId,
+                selectedSavedAudio =
+                    if (selectedSavedAudio?.item?.itemId == itemId) {
+                        selectedSavedAudio.copy(
+                            decodedPayload = DecodedPayloadViewData.Empty,
+                            followData = PayloadFollowViewData.Empty,
+                            flashSignalInfo = FlashSignalInfo.Empty,
+                            needsDecodedContent = true,
+                            isDecodingContent = false,
+                            decodeOperationSnapshot = null,
+                            decodeOperationWorkPlan = null,
+                        )
+                    } else {
+                        selectedSavedAudio
+                    },
+                libraryStatusText = UiText.Resource(R.string.library_status_decode_data_cleared),
+            )
+        }
+    }
+
     fun refreshSavedAudioItems() {
         val savedAudioItems = savedAudioRepository.listSavedAudio()
         val libraryMetadata = savedAudioRepository.readLibraryMetadata()
         val savedAudioItemIds = savedAudioItems.map { it.itemId }.toSet()
         savedAudioDecodeCacheGateway.prune(savedAudioItemIds)
+        val decodedSavedAudioItemIds =
+            savedAudioItemIds
+                .filter(savedAudioDecodeCacheGateway::exists)
+                .toSet()
         val currentSelection = uiState.value.selectedSavedAudio
         if (currentSelection != null && currentSelection.item.itemId !in savedAudioItemIds) {
             generatedAudioCacheGateway.deleteCachedFile(currentSelection.pcmFilePath)
@@ -297,6 +329,7 @@ internal class AudioSavedAudioMutationActions(
             val currentPlaybackSource = state.currentPlaybackSource
             state.copy(
                 savedAudioItems = savedAudioItems,
+                decodedSavedAudioItemIds = decodedSavedAudioItemIds,
                 savedAudioFolders = libraryMetadata.folders,
                 savedAudioFolderAssignments = libraryMetadata.itemFolderAssignments.filterKeys { it in savedAudioItemIds },
                 selectedSavedAudio = state.selectedSavedAudio?.takeIf { it.item.itemId in savedAudioItemIds },

@@ -70,6 +70,15 @@ internal class AudioPlaybackUiStateSync(
         totalSamples: Int,
     ) {
         if (isPlaybackPaused(source)) {
+            currentPlaybackForSource(source)?.let { playback ->
+                PlaybackScrubDiagTrace.progress(
+                    eventName = "progressPausedDrop",
+                    source = source,
+                    playback = playback,
+                    playedSamples = playedSamples,
+                    totalSamples = totalSamples,
+                )
+            }
             return
         }
         if (!shouldPublishProgressToUi(source, playedSamples, totalSamples)) {
@@ -88,6 +97,14 @@ internal class AudioPlaybackUiStateSync(
                     currentPlayback
                 }
             playbackRuntimeGateway.progress(playbackBase, playedSamples)
+        }
+        currentPlaybackForSource(source)?.let { playback ->
+            PlaybackScrubDiagTrace.progress(
+                source = source,
+                playback = playback,
+                playedSamples = playedSamples,
+                totalSamples = totalSamples,
+            )
         }
         if (source is AudioPlaybackSource.Generated) {
             followDataWindowActions?.ensureCurrentWindow(source.mode, playedSamples)
@@ -149,6 +166,16 @@ internal class AudioPlaybackUiStateSync(
                 uiState.value.selectedSavedAudio
                     ?.playback
                     ?.isPaused == true
+        }
+
+    private fun currentPlaybackForSource(source: AudioPlaybackSource): PlaybackUiState? =
+        when (source) {
+            is AudioPlaybackSource.Generated ->
+                uiState.value.sessions[source.mode]?.playback
+            is AudioPlaybackSource.Saved ->
+                uiState.value.selectedSavedAudio
+                    ?.takeIf { it.item.itemId == source.itemId }
+                    ?.playback
         }
 
     private fun progressThrottleKey(source: AudioPlaybackSource): String =

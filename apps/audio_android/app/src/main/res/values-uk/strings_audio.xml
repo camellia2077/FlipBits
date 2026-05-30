@@ -5,10 +5,10 @@
     <string name="audio_action_encode">Створити</string>
     <string name="audio_action_encode_busy">Створення…</string>
     <string name="audio_action_encode_busy_progress">Створення… %1$d%%</string>
-    <string name="audio_encode_phase_preparing_input_label">Підготовка</string>
-    <string name="audio_encode_phase_rendering_pcm_label">Рендеринг</string>
-    <string name="audio_encode_phase_postprocessing_label">Завершення</string>
-    <string name="audio_encode_phase_finalizing_label">Фіналізація</string>
+    <string name="audio_encode_phase_preparing_input_label">Підготовка вводу</string>
+    <string name="audio_encode_phase_rendering_pcm_label">Генерування аудіо</string>
+    <string name="audio_encode_phase_postprocessing_label">Формування аудіо</string>
+    <string name="audio_encode_phase_finalizing_label">Створення даних відтворення</string>
     <string name="audio_action_cancel_encode">Скасувати</string>
     <string name="audio_action_cancel_encode_busy">Скасування…</string>
     <string name="audio_action_play">Відтворити</string>
@@ -133,8 +133,10 @@
     <string name="audio_ultra_visual_level_high">Високий</string>
     <string name="audio_ultra_visual_level_mid">Середній</string>
     <string name="audio_ultra_visual_level_low">Низький</string>
-    <string name="audio_follow_unavailable">Супровід payload зараз недоступний для цього аудіо.</string>
-    <string name="audio_follow_text_unavailable">Текстовий супровід зараз недоступний для цього аудіо.</string>
+    <string name="audio_follow_unavailable">Розширену візуалізацію для цього аудіо ще не підготовлено.</string>
+    <string name="audio_follow_text_unavailable">Текстовий супровід для цього аудіо ще не підготовлено.</string>
+    <string name="audio_follow_visuals_failed">Не вдалося підготувати розширену візуалізацію для цього аудіо.</string>
+    <string name="audio_follow_text_failed">Не вдалося підготувати текстовий супровід для цього аудіо.</string>
     <string name="audio_follow_display_lyrics">Tokens</string>
     <string name="audio_follow_display_data">Дані</string>
     <string name="audio_follow_view_hex">Hex</string>
@@ -192,10 +194,10 @@
     <string name="status_input_empty">Поле введення порожнє.</string>
     <string name="status_mode_audio_generating">Створення аудіо %1$s…</string>
     <string name="status_mode_audio_generating_progress">Створення аудіо %1$s… %2$d%%</string>
-    <string name="status_mode_audio_generating_preparing_input">Підготовка аудіо %1$s…</string>
-    <string name="status_mode_audio_generating_rendering_pcm">Рендеринг аудіо %1$s…</string>
-    <string name="status_mode_audio_generating_postprocessing">Завершення аудіо %1$s…</string>
-    <string name="status_mode_audio_generating_finalizing">Фіналізація аудіо %1$s…</string>
+    <string name="status_mode_audio_generating_preparing_input">Підготовка вводу %1$s…</string>
+    <string name="status_mode_audio_generating_rendering_pcm">Генерування аудіо %1$s…</string>
+    <string name="status_mode_audio_generating_postprocessing">Формування аудіо %1$s…</string>
+    <string name="status_mode_audio_generating_finalizing">Створення даних відтворення %1$s…</string>
     <string name="status_mode_audio_canceling">Скасування аудіо %1$s…</string>
     <string name="status_mode_audio_cancelled">Аудіо %1$s скасовано</string>
     <string name="status_mode_audio_generated">%1$s готово, %2$d зразків</string>
@@ -237,7 +239,6 @@
     <string name="audio_info_flash_decode_path">Шлях декодування</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s зразків</string>
-
     <string name="demo_hint_demo_mode_on">Демо-режим увімкнено</string>
     <string name="demo_hint_tab_audio">Перемкнено на Аудіо</string>
     <string name="demo_hint_tab_saved">Перемкнено на Збережене</string>
@@ -251,11 +252,10 @@
     <string name="demo_hint_pause">Відтворення призупинено</string>
     <string name="demo_hint_theme_changed">Тему змінено</string>
     <string name="demo_hint_language_changed">Мову змінено, зразок оновлено</string>
-    <string name="audio_saved_audio_decode_loading_title">Читання збереженого аудіо…</string>
-    <string name="audio_saved_audio_decode_loading_body">Цей кліп зчитується один раз, щоб створити його повторно використовуваний текстовий і ліричний вигляд. Результат зберігається лише в цьому застосунку, щоб повторне відкриття було швидшим.</string>
+    <string name="audio_saved_audio_decode_loading_title">Декодування збереженого аудіо…</string>
+    <string name="audio_saved_audio_decode_loading_body">З цього кліпу витягуються текст і дані синхронізації. Довше аудіо може зайняти деякий час.</string>
     <string name="audio_playback_view_mix">Mix</string>
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Вертикально</string>
     <string name="audio_morse_visualizer_mode_horizontal">Горизонтально</string>
 </resources>
-

@@ -227,11 +227,11 @@
 
     <string name="config_sample_decoration_title">샘플 장식</string>
     <string name="config_sample_decoration_subtitle">무작위 샘플 텍스트에 선택적 접두 마커를 추가합니다.</string>
-    <string name="config_sample_text_title">샘플 텍스트</string>
-    <string name="config_sample_text_subtitle">입력 필드에 예시 텍스트가 어떻게 표시될지 설정합니다.</string>
+    <string name="config_sample_text_title">오디오 설정</string>
+    <string name="config_sample_text_subtitle">저장된 오디오 데이터와 입력 필드의 예시 텍스트 표시 방식을 설정합니다.</string>
     <string name="config_sample_auto_fill_subtitle">샘플 텍스트를 사용할 수 있을 때 입력 필드를 무작위 예시로 채웁니다.</string>
-    <string name="config_sample_text_collapse">샘플 텍스트 설정 접기</string>
-    <string name="config_sample_text_expand">샘플 텍스트 설정 펼치기</string>
+    <string name="config_sample_text_collapse">오디오 설정 접기</string>
+    <string name="config_sample_text_expand">오디오 설정 펼치기</string>
     <string name="config_sample_auto_fill_title">샘플 텍스트 자동 채우기</string>
     <string name="config_demo_mode_title">데모 모드</string>
     <string name="config_demo_mode_subtitle">녹화를 위해 탭 피드백과 키 동작 힌트를 표시합니다.</string>
@@ -276,4 +276,6 @@
     <string name="config_custom_theme_import_field_primary">기본색</string>
     <string name="config_custom_theme_import_field_secondary">보조색</string>
     <string name="config_custom_theme_import_field_outline">윤곽선</string>
+    <string name="config_saved_playback_data_subtitle">앱에 저장한 오디오에서 텍스트 따라가기와 향상된 시각 효과를 바로 사용할 수 있게 유지합니다.</string>
+    <string name="config_saved_playback_data_title">재생 세부 정보 저장</string>
 </resources>

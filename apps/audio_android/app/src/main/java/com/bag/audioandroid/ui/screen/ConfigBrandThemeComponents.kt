@@ -76,15 +76,13 @@ internal fun BrandThemeSection(
         return
     }
 
-    val selectedOption = options.firstOrNull { it.id == selectedBrandTheme.id }
     val visibleOptions =
-        if (expanded) {
-            options
-        } else {
-            selectedOption?.let(::listOf) ?: emptyList()
-        }
-    val showCollapsedSelectionActions = selectedOption != null
-    val showHeaderActions = expanded || showCollapsedSelectionActions
+        visibleBrandThemeOptions(
+            options = options,
+            selectedBrandThemeId = selectedBrandTheme.id,
+            expanded = expanded,
+        )
+    val showHeaderActions = expanded
     val expandContentDescription =
         if (expanded) {
             stringResource(R.string.config_palette_collapse)
@@ -447,3 +445,14 @@ private val BrandThemeRowSpacing = 8.dp
 private val BrandThemeDeleteActionLaneWidth = 112.dp
 private const val BrandThemeRowSpacingPx = 8f
 private const val EstimatedBrandThemeRowHeightPx = 64f
+
+internal fun visibleBrandThemeOptions(
+    options: List<BrandThemeOption>,
+    selectedBrandThemeId: String,
+    expanded: Boolean,
+): List<BrandThemeOption> =
+    if (expanded) {
+        options
+    } else {
+        options.filter { option -> option.id == selectedBrandThemeId }
+    }

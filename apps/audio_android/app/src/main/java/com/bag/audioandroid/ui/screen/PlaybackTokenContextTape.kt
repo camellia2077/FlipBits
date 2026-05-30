@@ -613,6 +613,7 @@ internal fun resolveActiveTokenLineRange(
 
 internal fun buildDisplayTokenLineRanges(
     followData: PayloadFollowViewData,
+    preserveExactLyricLines: Boolean = true,
     sourceLineRanges: List<TextFollowLineTokenRangeViewData> =
         followData.lineTokenRanges.ifEmpty {
             listOf(TextFollowLineTokenRangeViewData(0, 0, followData.textTokens.size))
@@ -632,6 +633,7 @@ internal fun buildDisplayTokenLineRanges(
         appendDisplayLineRangesForSourceLine(
             followData = followData,
             sourceLineRange = sourceLineRange,
+            preserveExactLyricLines = preserveExactLyricLines,
             out = displayLineRanges,
         )
     }
@@ -641,10 +643,32 @@ internal fun buildDisplayTokenLineRanges(
 private fun appendDisplayLineRangesForSourceLine(
     followData: PayloadFollowViewData,
     sourceLineRange: TextFollowLineTokenRangeViewData,
+    preserveExactLyricLines: Boolean,
     out: MutableList<DisplayTokenLineRange>,
 ) {
     val sourceStart = sourceLineRange.tokenBeginIndex
     val sourceEndExclusive = sourceLineRange.tokenBeginIndex + sourceLineRange.tokenCount
+    val sourceTokenRange = sourceStart until sourceEndExclusive
+    val exactLyricLineText = followData.lyricLines.getOrNull(sourceLineRange.lineIndex)
+    if (
+        preserveExactLyricLines &&
+        exactLyricLineText != null &&
+        resolveExactLyricViewportLine(
+            followData = followData,
+            tokenRange = sourceTokenRange,
+            lyricLineText = exactLyricLineText,
+        ) != null
+    ) {
+        out +=
+            DisplayTokenLineRange(
+                lineIndex = out.size,
+                tokenBeginIndex = sourceStart,
+                tokenCount = sourceLineRange.tokenCount,
+                sourceLineIndex = sourceLineRange.lineIndex,
+                coversFullSourceLine = true,
+            )
+        return
+    }
     var lineStart = sourceStart
     var lineUnits = 0
 

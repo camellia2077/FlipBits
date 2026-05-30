@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -344,11 +343,6 @@ internal fun ConfigThemeAppearanceSection(
                 }
             }
         }
-    AutoExpandSelectedBrandThemeSection(
-        isBrandStyle = renderState.isBrandStyle,
-        selectedBrandTheme = selectedBrandTheme,
-        expansionState = brandThemeExpansionState,
-    )
     ConfigThemeAppearanceDialogHost(
         dialogState = dialogState,
         selectedThemeMode = selectedThemeMode,
@@ -725,20 +719,6 @@ private fun rememberConfigThemeAppearanceBrandThemeGroups(brandThemes: List<Bran
                 },
         )
     }
-
-@Composable
-private fun AutoExpandSelectedBrandThemeSection(
-    isBrandStyle: Boolean,
-    selectedBrandTheme: BrandThemeOption,
-    expansionState: ConfigThemeAppearanceBrandThemeExpansionState,
-) {
-    LaunchedEffect(isBrandStyle, selectedBrandTheme.id, selectedBrandTheme.groupTitleResId) {
-        if (!isBrandStyle) {
-            return@LaunchedEffect
-        }
-        expansionState.ensureSelectedGroupExpanded(selectedBrandTheme.groupTitleResId)
-    }
-}
 
 @Composable
 private fun ConfigThemeAppearanceExpandedContent(
@@ -1181,39 +1161,6 @@ private fun brandBuiltInThemeSections(
             onExpandedChanged = expansionState.onExquisiteFallBrandThemeExpandedChanged,
         ),
     )
-
-private fun ConfigThemeAppearanceBrandThemeExpansionState.ensureSelectedGroupExpanded(groupTitleResId: Int) {
-    when (groupTitleResId) {
-        R.string.config_dual_tone_group_custom ->
-            if (!isCustomBrandThemeExpanded) {
-                onCustomBrandThemeExpandedChanged(true)
-            }
-        R.string.config_dual_tone_group_sacred_machine ->
-            if (!isSacredMachineBrandThemeExpanded) {
-                onSacredMachineBrandThemeExpandedChanged(true)
-            }
-        R.string.config_dual_tone_group_ancient_dynasty ->
-            if (!isAncientDynastyBrandThemeExpanded) {
-                onAncientDynastyBrandThemeExpandedChanged(true)
-            }
-        R.string.config_dual_tone_group_immortal_rot ->
-            if (!isImmortalRotBrandThemeExpanded) {
-                onImmortalRotBrandThemeExpandedChanged(true)
-            }
-        R.string.config_dual_tone_group_scarlet_carnage ->
-            if (!isScarletCarnageBrandThemeExpanded) {
-                onScarletCarnageBrandThemeExpandedChanged(true)
-            }
-        R.string.config_dual_tone_group_exquisite_fall ->
-            if (!isExquisiteFallBrandThemeExpanded) {
-                onExquisiteFallBrandThemeExpandedChanged(true)
-            }
-        R.string.config_dual_tone_group_labyrinth_of_mutability ->
-            if (!isLabyrinthOfMutabilityBrandThemeExpanded) {
-                onLabyrinthOfMutabilityBrandThemeExpandedChanged(true)
-            }
-    }
-}
 
 private fun androidx.compose.ui.graphics.Color.toHexString(): String {
     val red = (this.red * 255f).roundToInt().coerceIn(0, 255)

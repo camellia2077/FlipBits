@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -44,6 +45,12 @@ internal data class SavedAudioPickerColors(
     val unselectedItemColors: ListItemColors,
 )
 
+@Immutable
+internal data class MiniPlayerTextColors(
+    val titleColor: Color,
+    val subtitleColor: Color,
+)
+
 /**
  * Returns the container color for the "Dock System" (Mini Player + Bottom Navigation).
  *
@@ -54,6 +61,20 @@ internal data class SavedAudioPickerColors(
  */
 @Composable
 internal fun playerDockContainerColor(uiState: AudioAppUiState): Color = appThemeVisualTokens().dockContainerColor
+
+@Composable
+internal fun miniPlayerTextColors(containerColor: Color): MiniPlayerTextColors {
+    val baseForeground =
+        if (containerColor.luminance() < 0.5f) {
+            Color.White
+        } else {
+            Color.Black
+        }
+    return MiniPlayerTextColors(
+        titleColor = baseForeground,
+        subtitleColor = baseForeground.copy(alpha = 0.72f),
+    )
+}
 
 @Composable
 internal fun playerSegmentedButtonColors() =

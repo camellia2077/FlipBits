@@ -85,6 +85,7 @@ Wrapper capture:
 ```powershell
 python tools/run.py android-debug capture-saved --seed-duration-ms 181000 --seed-mode pro
 python tools/run.py android-debug capture-saved --display-name "saved perf 181_pro_20260511_224633.wav"
+python tools/run.py android-debug capture-saved --display-name "saved perf 181_pro_20260511_224633.wav" --decode --wait-ms 120000
 ```
 
 Recommended log capture:
@@ -127,6 +128,9 @@ For the old blocking regression, the important comparison is:
   - File-backed extraction timing
   - Waveform preview timing
   - Final hydration completion
+- `SavedAudioDecodeProgress`
+  - Saved payload decode start/progress/done events when `--decode` is passed
+  - Native decode operation phase and overall percent, used to diagnose long saved-audio parsing progress
 
 ## Maintenance Rules
 
