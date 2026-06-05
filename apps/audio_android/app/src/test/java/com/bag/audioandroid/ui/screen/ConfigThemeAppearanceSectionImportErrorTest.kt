@@ -2,7 +2,7 @@ package com.bag.audioandroid.ui.screen
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.CustomThemeImportError
 import com.bag.audioandroid.ui.model.CustomThemeImportMode
 import org.junit.Assert.assertEquals
@@ -15,9 +15,9 @@ class ConfigThemeAppearanceSectionImportErrorTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Test
-    fun `batch dual tone import preview treats fully matching configs as duplicates`() {
+    fun `batch faction theme import preview treats fully matching configs as duplicates`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "custom1",
                 displayName = "custom1",
                 primaryHex = "#E5E9F0",
@@ -25,14 +25,14 @@ class ConfigThemeAppearanceSectionImportErrorTest {
                 outlineHexOrNull = "#2E3440",
             )
         val duplicate =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 displayName = "custom1",
                 primaryHex = "#E5E9F0",
                 secondaryHex = "#4C566A",
                 outlineHexOrNull = "#2E3440",
             )
         val newTheme =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 displayName = "custom2",
                 primaryHex = "#101014",
                 secondaryHex = "#78D6FF",
@@ -40,7 +40,7 @@ class ConfigThemeAppearanceSectionImportErrorTest {
             )
 
         val preview =
-            buildCustomBrandThemeBatchImportPreview(
+            buildCustomFactionThemeBatchImportPreview(
                 existing = listOf(existing),
                 imported = listOf(duplicate, newTheme),
                 mode = DuplicateImportMode.Brand,
@@ -53,9 +53,9 @@ class ConfigThemeAppearanceSectionImportErrorTest {
     }
 
     @Test
-    fun `batch dual tone import preview treats same name with different colors as new`() {
+    fun `batch faction theme import preview treats same name with different colors as new`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "custom1",
                 displayName = "custom1",
                 primaryHex = "#E5E9F0",
@@ -63,7 +63,7 @@ class ConfigThemeAppearanceSectionImportErrorTest {
                 outlineHexOrNull = "#2E3440",
             )
         val imported =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 displayName = "custom1",
                 primaryHex = "#3D0101",
                 secondaryHex = "#FF9500",
@@ -71,7 +71,7 @@ class ConfigThemeAppearanceSectionImportErrorTest {
             )
 
         val preview =
-            buildCustomBrandThemeBatchImportPreview(
+            buildCustomFactionThemeBatchImportPreview(
                 existing = listOf(existing),
                 imported = listOf(imported),
                 mode = DuplicateImportMode.Brand,
@@ -85,19 +85,19 @@ class ConfigThemeAppearanceSectionImportErrorTest {
     @Test
     fun `batch material import preview treats matching name and primary as duplicates`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "custom1",
                 displayName = "custom1",
                 primaryHex = "#E5E9F0",
             )
         val imported =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 displayName = "custom1",
                 primaryHex = "#E5E9F0",
             )
 
         val preview =
-            buildCustomBrandThemeBatchImportPreview(
+            buildCustomFactionThemeBatchImportPreview(
                 existing = listOf(existing),
                 imported = listOf(imported),
                 mode = DuplicateImportMode.Material,
@@ -111,19 +111,19 @@ class ConfigThemeAppearanceSectionImportErrorTest {
     @Test
     fun `batch material import preview treats same name with different primary as new`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "custom1",
                 displayName = "custom1",
                 primaryHex = "#E5E9F0",
             )
         val imported =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 displayName = "custom1",
                 primaryHex = "#3D0101",
             )
 
         val preview =
-            buildCustomBrandThemeBatchImportPreview(
+            buildCustomFactionThemeBatchImportPreview(
                 existing = listOf(existing),
                 imported = listOf(imported),
                 mode = DuplicateImportMode.Material,
@@ -183,9 +183,9 @@ class ConfigThemeAppearanceSectionImportErrorTest {
     }
 
     @Test
-    fun `formats wrong target dual tone import error`() {
+    fun `formats wrong target faction theme import error`() {
         assertEquals(
-            "Group 1 uses custom dual-tone fields. Import it from custom dual-tone instead.",
+            "Group 1 uses custom faction theme fields. Import it from custom faction theme instead.",
             formatCustomThemeImportErrorMessage(
                 context,
                 CustomThemeImportError.WrongImportMode(

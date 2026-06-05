@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <em>Icon designed by camellia2077 (FlipBits Project)</em>
+  <em>Icon designed for <a href="https://github.com/camellia2077/FlipBits">camellia2077/FlipBits</a></em>
 </p>
 
 <h1 align="center">FlipBits</h1>
@@ -76,7 +76,7 @@
 ## Download / Install
 The Android APK will be published via GitHub Releases.
 
-Under the current reference build, the installation package is approximately `6.44 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
+Under the current reference build, the installation package is approximately `6.47 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
 
 ## Live Demo
 
@@ -293,14 +293,15 @@ The implementation approach of the `ultra` mode referenced the public engineerin
 ## Usage & Liability
 
 ### Icon Usage Instructions (Public Resource)
+
 FlipBits icon resources (including source files and component SVG files) are open to the community as public resources.
 
-Under the premise of complying with this repository's license and applicable laws, you can use these icons for badges, fan creations, video displays, and commercial releases (including sales), without needing to apply for separate authorization from the project.
+Subject to this repository's license and applicable laws, you can freely use these icons for badges, fan creations, video showcases, and commercial releases (including sales), without requiring any separate authorization.
 
-If used for public dissemination, it is recommended to attribute:
-`Icon designed by FlipBits Project`
+**Recommended Attribution:**
+`Icon source: github.com/camellia2077/FlipBits`
 
-Limitations and Boundaries (Legally Conservative Version):
+Limitations and Boundaries:
 - This authorization only covers the icon resources themselves and does not grant trademark rights, patent rights, moral rights, or any rights not explicitly granted.
 - Icons are provided "as is", without any express or implied warranties; users shall bear their own compliance and risk responsibilities.
 - You may not privatize, claim exclusivity, or sublicense these icon resources as proprietary/exclusive resources.
@@ -319,6 +320,7 @@ Limitations and Boundaries (Legally Conservative Version):
 * **Disclaimer of Affiliation**: This project is an independent original work and has no affiliation, authorization, sponsorship, endorsement, or other connection with Games Workshop and Warhammer 40,000.
 * **Style source explanation**: The project references general creative directions such as retro-futurism, industrial aesthetics, and religious ritualistic expressions in its visual and copywriting temperament, but it does not use any proprietary settings from protected worldviews as the foundation of the project.
 * **Content processing principles**: If materials, namings, or expressions that may cause confusion, infringement, or inappropriate associations appear in the repository, you are welcome to raise them via [GitHub Issues](../../issues), and we will promptly evaluate and correct them.
+* **Additional notices**: See [NOTICE](NOTICE) and [docs/legal/TRADEMARKS.md](docs/legal/TRADEMARKS.md) for the distribution notice and the more detailed trademark boundary statement.
 
 ---
 

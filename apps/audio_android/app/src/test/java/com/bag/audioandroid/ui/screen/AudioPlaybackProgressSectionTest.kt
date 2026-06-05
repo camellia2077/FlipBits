@@ -258,7 +258,7 @@ class AudioPlaybackProgressSectionTest {
             )
         }
 
-        composeRule.onNodeWithTag("pro-encoding-visualizer").assertIsDisplayed()
+        composeRule.onNodeWithTag("pro-compact-visualizer").assertIsDisplayed()
         composeRule.onAllNodesWithTag("flash-visualization-mode-switcher").assertCountEquals(0)
     }
 
@@ -292,6 +292,7 @@ class AudioPlaybackProgressSectionTest {
 
     private fun sampleFollowData(): PayloadFollowViewData =
         PayloadFollowViewData(
+            followAvailable = true,
             textTokens = listOf("ASH", "BELL", "RITE", "OF", "THE", "WEST", "GATE", "WAITS", "DAWN"),
             textTokenTimeline =
                 listOf(
@@ -368,6 +369,5 @@ class AudioPlaybackProgressSectionTest {
             lyricLineTimeline = listOf(TextFollowLyricLineTimelineEntry(0, 12, 0)),
             lineTokenRanges = listOf(TextFollowLineTokenRangeViewData(0, 0, 3)),
             lyricLineFollowAvailable = true,
-            followAvailable = true,
         )
 }

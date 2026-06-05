@@ -1,6 +1,6 @@
 package com.bag.audioandroid.ui.screen
 
-import com.bag.audioandroid.ui.theme.BrandDualToneThemes
+import com.bag.audioandroid.ui.theme.FactionThemes
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -36,14 +36,14 @@ class ConfigCustomThemeCollapseTest {
     }
 
     @Test
-    fun `collapsed brand theme section exposes only selected theme`() {
-        val options = BrandDualToneThemes.take(3)
+    fun `collapsed faction theme section exposes only selected theme`() {
+        val options = FactionThemes.take(3)
         val selected = options[1]
 
         val visible =
-            visibleBrandThemeOptions(
+            visibleFactionThemeOptions(
                 options = options,
-                selectedBrandThemeId = selected.id,
+                selectedFactionThemeId = selected.id,
                 expanded = false,
             )
 
@@ -51,13 +51,13 @@ class ConfigCustomThemeCollapseTest {
     }
 
     @Test
-    fun `expanded brand theme section exposes all themes`() {
-        val options = BrandDualToneThemes.take(3)
+    fun `expanded faction theme section exposes all themes`() {
+        val options = FactionThemes.take(3)
 
         val visible =
-            visibleBrandThemeOptions(
+            visibleFactionThemeOptions(
                 options = options,
-                selectedBrandThemeId = options[1].id,
+                selectedFactionThemeId = options[1].id,
                 expanded = true,
             )
 
@@ -65,13 +65,13 @@ class ConfigCustomThemeCollapseTest {
     }
 
     @Test
-    fun `collapsed brand theme section exposes no theme when selection is outside group`() {
-        val options = BrandDualToneThemes.take(3)
+    fun `collapsed faction theme section exposes no theme when selection is outside group`() {
+        val options = FactionThemes.take(3)
 
         val visible =
-            visibleBrandThemeOptions(
+            visibleFactionThemeOptions(
                 options = options,
-                selectedBrandThemeId = "outside",
+                selectedFactionThemeId = "outside",
                 expanded = false,
             )
 

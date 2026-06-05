@@ -3,6 +3,9 @@ package com.bag.audioandroid.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,17 +24,7 @@ internal fun ProEncodingExplanationVisualizer(
     frameSamples: Int,
     modifier: Modifier = Modifier,
 ) {
-    val analysisCache = remember(followData, frameSamples) { ProEncodingVisualizationAnalysisCache() }
-    val state =
-        remember(followData, displayedSamples, frameSamples) {
-            analysisCache.state(displayedSamples) {
-                deriveProEncodingVisualizationState(
-                    followData = followData,
-                    displayedSamples = displayedSamples,
-                    frameSamples = frameSamples,
-                )
-            }
-        }
+    val state = rememberProEncodingVisualizationState(followData, displayedSamples, frameSamples)
     if (state == null) {
         Text(
             text = stringResource(R.string.audio_pro_visual_waiting_follow),
@@ -45,6 +38,8 @@ internal fun ProEncodingExplanationVisualizer(
     Column(
         modifier =
             modifier
+                .heightIn(max = 420.dp)
+                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .testTag("pro-encoding-visualizer"),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -71,7 +66,25 @@ internal fun ProEncodingExplanationVisualizer(
     }
 }
 
-private class ProEncodingVisualizationAnalysisCache {
+@Composable
+internal fun rememberProEncodingVisualizationState(
+    followData: PayloadFollowViewData,
+    displayedSamples: Int,
+    frameSamples: Int,
+): ProEncodingVisualizationState? {
+    val analysisCache = remember(followData, frameSamples) { ProEncodingVisualizationAnalysisCache() }
+    return remember(followData, displayedSamples, frameSamples) {
+        analysisCache.state(displayedSamples) {
+            deriveProEncodingVisualizationState(
+                followData = followData,
+                displayedSamples = displayedSamples,
+                frameSamples = frameSamples,
+            )
+        }
+    }
+}
+
+internal class ProEncodingVisualizationAnalysisCache {
     private val statesByDisplayedSamples = LinkedHashMap<Int, ProEncodingVisualizationState?>()
 
     fun state(

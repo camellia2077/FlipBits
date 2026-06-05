@@ -1,0 +1,562 @@
+package com.bag.audioandroid.ui.model
+
+import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class CustomFactionThemeConfigCodecTest {
+    @Test
+    fun `serializes single custom theme config`() {
+        val text =
+            CustomFactionThemeSettings(
+                displayName = "Test Theme",
+                primaryHex = "#101014",
+                secondaryHex = "#78D6FF",
+                outlineHexOrNull = "#303846",
+            ).toConfigText()
+
+        assertEquals(
+            """
+            name=Test Theme
+            primary=#101014 secondary=#78D6FF outline=#303846
+            """.trimIndent(),
+            text,
+        )
+    }
+
+    @Test
+    fun `serializes single custom material theme config`() {
+        val text =
+            normalizeCustomMaterialThemeSettings(
+                CustomFactionThemeSettings(
+                    displayName = "Paper",
+                    primaryHex = "#E5E9F0",
+                    secondaryHex = "#111111",
+                    outlineHexOrNull = "#222222",
+                ),
+            ).toMaterialConfigText()
+
+        assertEquals(
+            """
+            name=Paper
+            primary=#E5E9F0
+            """.trimIndent(),
+            text,
+        )
+    }
+
+    @Test
+    fun `parses single custom theme config in legacy multi line format`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                NAME = Imported
+
+                Primary = 101014
+                SECONDARY = #78d6ff
+                outline =
+                """.trimIndent(),
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(1, result.settings.size)
+        assertEquals("Imported", result.settings.single().displayName)
+        assertEquals("#101014", result.settings.single().primaryHex)
+        assertEquals("#78D6FF", result.settings.single().secondaryHex)
+        assertEquals(null, result.settings.single().outlineHexOrNull)
+    }
+
+    @Test
+    fun `parses single custom theme config in single line format`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                "name=Imported primary=101014 secondary=#78d6ff outline=",
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(1, result.settings.size)
+        assertEquals("Imported", result.settings.single().displayName)
+        assertEquals("#101014", result.settings.single().primaryHex)
+        assertEquals("#78D6FF", result.settings.single().secondaryHex)
+        assertEquals(null, result.settings.single().outlineHexOrNull)
+    }
+
+    @Test
+    fun `parses single custom theme config in compact format without spaces`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                "name=Importedprimary=101014secondary=#78d6ffoutline=",
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(1, result.settings.size)
+        assertEquals("Imported", result.settings.single().displayName)
+        assertEquals("#101014", result.settings.single().primaryHex)
+        assertEquals("#78D6FF", result.settings.single().secondaryHex)
+        assertEquals(null, result.settings.single().outlineHexOrNull)
+    }
+
+    @Test
+    fun `rejects invalid config`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary=nope
+                secondary=#78D6FF
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.InvalidHex(1, "primary", "nope"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `serializes batch custom theme config`() {
+        val text =
+            listOf(
+                CustomFactionThemeSettings(
+                    displayName = "First",
+                    primaryHex = "#101014",
+                    secondaryHex = "#78D6FF",
+                    outlineHexOrNull = null,
+                ),
+                CustomFactionThemeSettings(
+                    displayName = "Second",
+                    primaryHex = "#1A100C",
+                    secondaryHex = "#FFAA55",
+                    outlineHexOrNull = "#553011",
+                ),
+            ).toBatchConfigText()
+
+        assertEquals(
+            """
+            name=First
+            primary=#101014 secondary=#78D6FF outline=
+
+            name=Second
+            primary=#1A100C secondary=#FFAA55 outline=#553011
+            """.trimIndent(),
+            text,
+        )
+    }
+
+    @Test
+    fun `parses batch custom theme config in legacy multi line format`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=First
+                primary=#101014
+                secondary=#78D6FF
+                outline=
+
+                name=Second
+                primary=1a100c
+                secondary=ffaa55
+                outline=553011
+                """.trimIndent(),
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(2, result.settings.size)
+        assertEquals("First", result.settings[0].displayName)
+        assertEquals(null, result.settings[0].outlineHexOrNull)
+        assertEquals("#1A100C", result.settings[1].primaryHex)
+        assertEquals("#FFAA55", result.settings[1].secondaryHex)
+        assertEquals("#553011", result.settings[1].outlineHexOrNull)
+    }
+
+    @Test
+    fun `parses batch custom theme config in single line format`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=First primary=#101014 secondary=#78D6FF outline=
+                name=Second primary=1a100c secondary=ffaa55 outline=553011
+                """.trimIndent(),
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(2, result.settings.size)
+        assertEquals("First", result.settings[0].displayName)
+        assertEquals(null, result.settings[0].outlineHexOrNull)
+        assertEquals("#1A100C", result.settings[1].primaryHex)
+        assertEquals("#FFAA55", result.settings[1].secondaryHex)
+        assertEquals("#553011", result.settings[1].outlineHexOrNull)
+    }
+
+    @Test
+    fun `rejects empty batch custom theme config`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(CustomThemeImportError.EmptyInput),
+            result,
+        )
+    }
+
+    @Test
+    fun `rejects batch with invalid block`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary=nope
+                secondary=#78D6FF
+                outline=
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.InvalidHex(1, "primary", "nope"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports missing required field in faction theme import`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary=#101014
+                outline=#FFFFFF
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.MissingField(1, "secondary"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports malformed import line`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary:#101014
+                secondary=#78D6FF
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.MalformedLine(2),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports duplicate field in faction theme import`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary=#101014
+                primary=#202020
+                secondary=#78D6FF
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.DuplicateField(1, "primary"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports invalid secondary hex in faction theme import`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary=#101014
+                secondary=#xyzxyz
+                outline=#303846
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.InvalidHex(1, "secondary", "#xyzxyz"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports invalid outline hex in faction theme import`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=Broken
+                primary=#101014
+                secondary=#78D6FF
+                outline=#oops00
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.InvalidHex(1, "outline", "#oops00"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports later group index when second faction theme config is invalid`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=First primary=#101014 secondary=#78D6FF outline=
+
+                name=Second primary=#1A100C secondary=#oops00 outline=#553011
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.InvalidHex(2, "secondary", "#oops00"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports wrong mode when glued material import uses faction theme field`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                "name=keyboardsecondary=#2D005F",
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.WrongImportMode(
+                    blockIndex = 1,
+                    expectedMode = CustomThemeImportMode.Material,
+                    detectedMode = CustomThemeImportMode.DualTone,
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `parses name containing reserved key substring in compact faction theme format`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                "name=Night primary ritualprimary=#101014secondary=#78D6FFoutline=#303846",
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(1, result.settings.size)
+        assertEquals("Night primary ritual", result.settings.single().displayName)
+        assertEquals("#101014", result.settings.single().primaryHex)
+        assertEquals("#78D6FF", result.settings.single().secondaryHex)
+        assertEquals("#303846", result.settings.single().outlineHexOrNull)
+    }
+
+    @Test
+    fun `parses batch custom material theme config in legacy multi line format`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                """
+                name=keyboard
+                primary=#2D005F
+
+                name=paper
+                primary=E5E9F0
+                """.trimIndent(),
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(2, result.settings.size)
+        assertEquals("keyboard", result.settings[0].displayName)
+        assertEquals("#2D005F", result.settings[0].primaryHex)
+        assertEquals("paper", result.settings[1].displayName)
+        assertEquals("#E5E9F0", result.settings[1].primaryHex)
+    }
+
+    @Test
+    fun `parses batch custom material theme config in single line format`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                """
+                name=keyboard primary=#2D005F
+                name=paper primary=E5E9F0
+                """.trimIndent(),
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(2, result.settings.size)
+        assertEquals("keyboard", result.settings[0].displayName)
+        assertEquals("#2D005F", result.settings[0].primaryHex)
+        assertEquals("paper", result.settings[1].displayName)
+        assertEquals("#E5E9F0", result.settings[1].primaryHex)
+    }
+
+    @Test
+    fun `parses single custom material theme config in compact format without spaces`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                "name=keyboardprimary=#2D005F",
+            )
+
+        require(result is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(1, result.settings.size)
+        assertEquals("keyboard", result.settings.single().displayName)
+        assertEquals("#2D005F", result.settings.single().primaryHex)
+    }
+
+    @Test
+    fun `reports unknown field in material import`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                """
+                name=keyboard
+                primary=#2D005F
+                tertiary=#FFFFFF
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.UnknownField(1, "tertiary"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports faction theme text pasted into material import`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                """
+                name=Vigilu
+                primary=#E5E9F0
+                secondary=#4C566A
+                outline=#2E3440
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.WrongImportMode(
+                    blockIndex = 1,
+                    expectedMode = CustomThemeImportMode.Material,
+                    detectedMode = CustomThemeImportMode.DualTone,
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports material text pasted into faction theme import`() {
+        val result =
+            parseCustomFactionThemeImportText(
+                """
+                name=keyboard
+                primary=#2D005F
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.WrongImportMode(
+                    blockIndex = 1,
+                    expectedMode = CustomThemeImportMode.DualTone,
+                    detectedMode = CustomThemeImportMode.Material,
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `reports invalid material hex`() {
+        val result =
+            parseCustomMaterialThemeImportText(
+                """
+                name=keyboard
+                primary=#xyzxyz
+                """.trimIndent(),
+            )
+
+        assertEquals(
+            CustomFactionThemeImportParseResult.Invalid(
+                CustomThemeImportError.InvalidHex(1, "primary", "#xyzxyz"),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `material export then import matches existing preset for duplicate confirm`() {
+        val existing =
+            normalizeCustomMaterialThemeSettings(
+                CustomFactionThemeSettings(
+                    presetId = "keyboard",
+                    displayName = "Keyboard",
+                    primaryHex = "#2D005F",
+                    secondaryHex = "",
+                    outlineHexOrNull = null,
+                ),
+            )
+        val exported = listOf(existing).toMaterialBatchConfigText()
+        val parsed = parseCustomMaterialThemeImportText(exported)
+
+        require(parsed is CustomFactionThemeImportParseResult.Valid)
+        assertEquals(
+            "keyboard",
+            findDuplicateImportedThemePresetId(
+                existing = listOf(existing),
+                imported = parsed.settings.single(),
+                mode = CustomThemeImportMode.Material,
+            ),
+        )
+    }
+
+    @Test
+    fun `matches duplicate theme by user visible fields`() {
+        val first =
+            CustomFactionThemeSettings(
+                presetId = "a",
+                displayName = "Same",
+                primaryHex = "#101014",
+                secondaryHex = "#78D6FF",
+                outlineHexOrNull = null,
+            )
+        val second =
+            CustomFactionThemeSettings(
+                presetId = "b",
+                displayName = "Same",
+                primaryHex = "#101014",
+                secondaryHex = "#78d6ff",
+                outlineHexOrNull = "",
+            )
+
+        assertTrue(first.hasSameConfigAs(second))
+    }
+}

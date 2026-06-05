@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 
 from ...commands import cmd_export_apk, cmd_roundtrip, cmd_smoke
+from ...commands.flash_speed_analysis import add_flash_speed_analysis_parser
 from ...constants import DEFAULT_GENERATOR
 from ..common import RAW_FORMATTER, add_common_build_dir_argument
 
@@ -15,6 +16,7 @@ def register_artifact_group(subparsers: argparse._SubParsersAction[argparse.Argu
             "Artifact helper commands.\n\n"
             "Use this group for visible test artifacts and final delivery artifacts.\n"
             "- `roundtrip`: generate one WAV artifact and decode it back to text.\n"
+            "- `flash-speed-analysis`: compare Flash source PCM and speed-adjusted rendered PCM.\n"
             "- `smoke`: generate a representative flash/pro/ultra artifact batch.\n"
             "- `export-apk`: copy a built Android APK into a stable delivery directory."
         ),
@@ -113,3 +115,5 @@ def register_artifact_group(subparsers: argparse._SubParsersAction[argparse.Argu
         help="Artifact batch name under build/test-artifacts/smoke/.",
     )
     smoke_parser.set_defaults(func=cmd_smoke)
+
+    add_flash_speed_analysis_parser(artifact_subparsers)

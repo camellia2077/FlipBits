@@ -1,17 +1,15 @@
 # exporter.py
-# 职责：将已绘制的雷达图加上标题后保存为 PNG
-# 依赖：config.py (颜色)，config_fonts.py (字体路径/大小)
+# 职责：将已绘制的雷达图保存为 PNG
+# 依赖：config.py (颜色)
 
 import os
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
 
 import config
-import config_fonts
 
 
 # Flash 模式统一输出到 {lang}/flash/ 子目录
-_FLASH_MODES = {"Steady", "Hostility", "Litany", "Collapse", "Zeal", "Void"}
+_FLASH_MODES = {"Standard", "Hostility", "Litany", "Collapse", "Zeal", "Void"}
 
 
 def _resolve_out_path(mode_key, lang, script_dir):
@@ -19,16 +17,23 @@ def _resolve_out_path(mode_key, lang, script_dir):
     base_dir = os.path.join(script_dir, lang)
     if mode_key in _FLASH_MODES:
         out_dir = os.path.join(base_dir, "flash")
+        filename = f"Flash[{mode_key}].png"
+    elif mode_key.startswith("Mini "):
+        out_dir = base_dir
+        parts = mode_key.split()
+        speed = parts[1] if len(parts) >= 2 else ""
+        filename = f"Mini[{speed}WPM].png"
     else:
         out_dir = base_dir
+        safe_name = mode_key.replace(" ", "_")
+        filename = f"{safe_name}.png"
     os.makedirs(out_dir, exist_ok=True)
-    safe_name = mode_key.replace(" ", "_")
-    return os.path.join(out_dir, f"radar_panel_{safe_name}.png")
+    return os.path.join(out_dir, filename)
 
 
 def save_and_title(fig, mode_key, lang='en', script_dir=None):
     """
-    为已有 figure 添加居中标题，并保存为透明背景 PNG。
+    保存已绘制的雷达图为透明背景 PNG（不加标题）。
     """
     if script_dir is None:
         here = os.path.dirname(os.path.abspath(__file__))
@@ -36,33 +41,10 @@ def save_and_title(fig, mode_key, lang='en', script_dir=None):
 
     ax = fig.gca()
 
-    # 清理旧标题 text artist（仅移除带 _is_title 标记的，保留维度标签）
+    # 清理旧标题 text artist（若有）
     for t in list(ax.texts):
         if getattr(t, '_is_title', False):
             t.remove()
-
-    # 标题配置选择
-    if lang == 'zh':
-        title_font = FontProperties(fname=config_fonts.FONT_ZH_PATH,
-                                    weight='bold', size=config_fonts.SIZE_RADAR_TITLE_ZH)
-        title_y = config_fonts.POS_Y_RADAR_TITLE_ZH
-    else:
-        title_font = FontProperties(fname=config_fonts.FONT_IBM_PLEX_BOLD,
-                                    size=config_fonts.SIZE_RADAR_TITLE_EN)
-        title_y = config_fonts.POS_Y_RADAR_TITLE_EN
-
-    # 从数据配置中直接读取显示名称
-    from data import DATA_DICT
-    mode_data = DATA_DICT[mode_key]
-    display_title = mode_data["name_zh"] if lang == 'zh' else mode_data["name_en"]
-
-    # 居中顶部标题（向上偏移，避免与雷达图重叠）
-    title_artist = plt.text(0.5, title_y, display_title,
-                            transform=ax.transAxes,
-                            fontproperties=title_font,
-                            color=config.TEXT_COLOR,
-                            ha='center', va='top')
-    title_artist._is_title = True  # 标记为标题，供下次清理时识别
 
     # 保存
     out_path = _resolve_out_path(mode_key, lang, script_dir)

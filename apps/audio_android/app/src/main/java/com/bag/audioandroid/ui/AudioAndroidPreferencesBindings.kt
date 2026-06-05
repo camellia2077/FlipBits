@@ -1,8 +1,8 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.data.AppSettingsRepository
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
-import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
@@ -12,17 +12,17 @@ import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.materialPaletteIdForMode
 import com.bag.audioandroid.ui.state.resolveMaterialPaletteById
-import com.bag.audioandroid.ui.theme.BrandDualToneThemes
-import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
+import com.bag.audioandroid.ui.theme.DefaultFactionTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
+import com.bag.audioandroid.ui.theme.FactionThemes
 import com.bag.audioandroid.ui.theme.MaterialPalettes
-import com.bag.audioandroid.ui.theme.customBrandTheme
-import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.customFactionTheme
+import com.bag.audioandroid.ui.theme.isCustomFactionThemeOptionId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
-import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
-import com.bag.audioandroid.ui.theme.normalizeBrandThemeHexOrNull
 import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
+import com.bag.audioandroid.ui.theme.normalizeFactionThemeHex
+import com.bag.audioandroid.ui.theme.normalizeFactionThemeHexOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -46,8 +46,8 @@ internal class AudioAndroidPreferencesBindings(
         observeSelectedMaterialPaletteIdDark()
         observeSelectedThemeStyle()
         observeCustomMaterialThemeSettings()
-        observeCustomBrandThemeSettings()
-        observeSelectedBrandTheme()
+        observeCustomFactionThemeSettings()
+        observeSelectedFactionTheme()
         observeSelectedFlashVoicingStyle()
         observeSelectedMorseSpeedStyle()
         observeSelectedSampleInputLength()
@@ -64,14 +64,14 @@ internal class AudioAndroidPreferencesBindings(
         observeConfigMaterialBluesPaletteExpanded()
         observeConfigMaterialPurplesPaletteExpanded()
         observeConfigMaterialNeutralsPaletteExpanded()
-        observeConfigCustomBrandThemeExpanded()
+        observeConfigCustomFactionThemeExpanded()
         observeConfigSampleTextExpanded()
-        observeConfigSacredMachineBrandThemeExpanded()
-        observeConfigAncientDynastyBrandThemeExpanded()
-        observeConfigImmortalRotBrandThemeExpanded()
-        observeConfigScarletCarnageBrandThemeExpanded()
-        observeConfigExquisiteFallBrandThemeExpanded()
-        observeConfigLabyrinthOfMutabilityBrandThemeExpanded()
+        observeConfigSacredMachineFactionThemeExpanded()
+        observeConfigAncientDynastyFactionThemeExpanded()
+        observeConfigImmortalRotFactionThemeExpanded()
+        observeConfigScarletCarnageFactionThemeExpanded()
+        observeConfigExquisiteFallFactionThemeExpanded()
+        observeConfigLabyrinthOfMutabilityFactionThemeExpanded()
         observeConfigDebugExpanded()
         observeDemoModeEnabled()
         observeSampleAutoFillEnabled()
@@ -169,63 +169,63 @@ internal class AudioAndroidPreferencesBindings(
         }
     }
 
-    private fun observeSelectedBrandTheme() {
+    private fun observeSelectedFactionTheme() {
         scope.launch {
-            appSettingsRepository.selectedBrandThemeId
+            appSettingsRepository.selectedFactionThemeId
                 .distinctUntilChanged()
-                .collect { brandThemeId ->
+                .collect { factionThemeId ->
                     uiState.update { state ->
-                        val brandTheme =
-                            if (brandThemeId != null && isCustomBrandThemeOptionId(brandThemeId)) {
-                                state.customBrandThemes.firstOrNull { it.id == brandThemeId } ?: state.customBrandThemes.first()
+                        val factionTheme =
+                            if (factionThemeId != null && isCustomFactionThemeOptionId(factionThemeId)) {
+                                state.customFactionThemes.firstOrNull { it.id == factionThemeId } ?: state.customFactionThemes.first()
                             } else {
-                                BrandDualToneThemes.firstOrNull { it.id == brandThemeId } ?: DefaultBrandTheme
+                                FactionThemes.firstOrNull { it.id == factionThemeId } ?: DefaultFactionTheme
                             }
-                        state.withSelectedBrandTheme(brandTheme, sampleInputSessionUpdater)
+                        state.withSelectedFactionTheme(factionTheme, sampleInputSessionUpdater)
                     }
                 }
         }
     }
 
-    private fun observeCustomBrandThemeSettings() {
+    private fun observeCustomFactionThemeSettings() {
         scope.launch {
-            appSettingsRepository.customBrandThemePresets
+            appSettingsRepository.customFactionThemePresets
                 .map { presets ->
                     val normalizedPresets =
                         presets.map { settings ->
-                            CustomBrandThemeSettings(
+                            CustomFactionThemeSettings(
                                 presetId = settings.presetId,
-                                displayName = settings.displayName.trim().ifBlank { DefaultCustomBrandThemeSettings.displayName },
+                                displayName = settings.displayName.trim().ifBlank { DefaultCustomFactionThemeSettings.displayName },
                                 primaryHex =
-                                    normalizeBrandThemeHex(settings.primaryHex)
-                                        ?: DefaultCustomBrandThemeSettings.primaryHex,
+                                    normalizeFactionThemeHex(settings.primaryHex)
+                                        ?: DefaultCustomFactionThemeSettings.primaryHex,
                                 secondaryHex =
-                                    normalizeBrandThemeHex(settings.secondaryHex)
-                                        ?: DefaultCustomBrandThemeSettings.secondaryHex,
+                                    normalizeFactionThemeHex(settings.secondaryHex)
+                                        ?: DefaultCustomFactionThemeSettings.secondaryHex,
                                 outlineHexOrNull =
                                     settings.outlineHexOrNull?.let { outlineHex ->
-                                        normalizeBrandThemeHexOrNull(outlineHex) ?: DefaultCustomBrandThemeSettings.outlineHexOrNull
+                                        normalizeFactionThemeHexOrNull(outlineHex) ?: DefaultCustomFactionThemeSettings.outlineHexOrNull
                                     },
                             )
                         }
                     if (normalizedPresets.isEmpty()) {
-                        listOf(DefaultCustomBrandThemeSettings)
+                        listOf(DefaultCustomFactionThemeSettings)
                     } else {
                         normalizedPresets
                     }
                 }.distinctUntilChanged()
                 .collect { presets ->
                     uiState.update { state ->
-                        val presetThemes = presets.map(::customBrandTheme)
-                        val selectedBrandTheme =
-                            if (isCustomBrandThemeOptionId(state.selectedBrandTheme.id)) {
-                                presetThemes.firstOrNull { it.id == state.selectedBrandTheme.id } ?: presetThemes.first()
+                        val presetThemes = presets.map(::customFactionTheme)
+                        val selectedFactionTheme =
+                            if (isCustomFactionThemeOptionId(state.selectedFactionTheme.id)) {
+                                presetThemes.firstOrNull { it.id == state.selectedFactionTheme.id } ?: presetThemes.first()
                             } else {
-                                state.selectedBrandTheme
+                                state.selectedFactionTheme
                             }
                         state.copy(
-                            customBrandThemePresets = presets,
-                            selectedBrandTheme = selectedBrandTheme,
+                            customFactionThemePresets = presets,
+                            selectedFactionTheme = selectedFactionTheme,
                         )
                     }
                 }
@@ -528,16 +528,16 @@ internal class AudioAndroidPreferencesBindings(
         }
     }
 
-    private fun observeConfigCustomBrandThemeExpanded() {
+    private fun observeConfigCustomFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigCustomBrandThemeExpanded
+            appSettingsRepository.isConfigCustomFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigCustomBrandThemeExpanded == expanded) {
+                        if (state.isConfigCustomFactionThemeExpanded == expanded) {
                             state
                         } else {
-                            state.copy(isConfigCustomBrandThemeExpanded = expanded)
+                            state.copy(isConfigCustomFactionThemeExpanded = expanded)
                         }
                     }
                 }
@@ -560,108 +560,108 @@ internal class AudioAndroidPreferencesBindings(
         }
     }
 
-    private fun observeConfigSacredMachineBrandThemeExpanded() {
+    private fun observeConfigSacredMachineFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigSacredMachineBrandThemeExpanded
+            appSettingsRepository.isConfigSacredMachineFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigSacredMachineBrandThemeExpanded ==
+                        if (state.isConfigSacredMachineFactionThemeExpanded ==
                             expanded
                         ) {
                             state
                         } else {
-                            state.copy(isConfigSacredMachineBrandThemeExpanded = expanded)
+                            state.copy(isConfigSacredMachineFactionThemeExpanded = expanded)
                         }
                     }
                 }
         }
     }
 
-    private fun observeConfigAncientDynastyBrandThemeExpanded() {
+    private fun observeConfigAncientDynastyFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigAncientDynastyBrandThemeExpanded
+            appSettingsRepository.isConfigAncientDynastyFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigAncientDynastyBrandThemeExpanded ==
+                        if (state.isConfigAncientDynastyFactionThemeExpanded ==
                             expanded
                         ) {
                             state
                         } else {
-                            state.copy(isConfigAncientDynastyBrandThemeExpanded = expanded)
+                            state.copy(isConfigAncientDynastyFactionThemeExpanded = expanded)
                         }
                     }
                 }
         }
     }
 
-    private fun observeConfigImmortalRotBrandThemeExpanded() {
+    private fun observeConfigImmortalRotFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigImmortalRotBrandThemeExpanded
+            appSettingsRepository.isConfigImmortalRotFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigImmortalRotBrandThemeExpanded ==
+                        if (state.isConfigImmortalRotFactionThemeExpanded ==
                             expanded
                         ) {
                             state
                         } else {
-                            state.copy(isConfigImmortalRotBrandThemeExpanded = expanded)
+                            state.copy(isConfigImmortalRotFactionThemeExpanded = expanded)
                         }
                     }
                 }
         }
     }
 
-    private fun observeConfigScarletCarnageBrandThemeExpanded() {
+    private fun observeConfigScarletCarnageFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigScarletCarnageBrandThemeExpanded
+            appSettingsRepository.isConfigScarletCarnageFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigScarletCarnageBrandThemeExpanded ==
+                        if (state.isConfigScarletCarnageFactionThemeExpanded ==
                             expanded
                         ) {
                             state
                         } else {
-                            state.copy(isConfigScarletCarnageBrandThemeExpanded = expanded)
+                            state.copy(isConfigScarletCarnageFactionThemeExpanded = expanded)
                         }
                     }
                 }
         }
     }
 
-    private fun observeConfigExquisiteFallBrandThemeExpanded() {
+    private fun observeConfigExquisiteFallFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigExquisiteFallBrandThemeExpanded
+            appSettingsRepository.isConfigExquisiteFallFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigExquisiteFallBrandThemeExpanded ==
+                        if (state.isConfigExquisiteFallFactionThemeExpanded ==
                             expanded
                         ) {
                             state
                         } else {
-                            state.copy(isConfigExquisiteFallBrandThemeExpanded = expanded)
+                            state.copy(isConfigExquisiteFallFactionThemeExpanded = expanded)
                         }
                     }
                 }
         }
     }
 
-    private fun observeConfigLabyrinthOfMutabilityBrandThemeExpanded() {
+    private fun observeConfigLabyrinthOfMutabilityFactionThemeExpanded() {
         scope.launch {
-            appSettingsRepository.isConfigLabyrinthOfMutabilityBrandThemeExpanded
+            appSettingsRepository.isConfigLabyrinthOfMutabilityFactionThemeExpanded
                 .distinctUntilChanged()
                 .collect { expanded ->
                     uiState.update { state ->
-                        if (state.isConfigLabyrinthOfMutabilityBrandThemeExpanded ==
+                        if (state.isConfigLabyrinthOfMutabilityFactionThemeExpanded ==
                             expanded
                         ) {
                             state
                         } else {
-                            state.copy(isConfigLabyrinthOfMutabilityBrandThemeExpanded = expanded)
+                            state.copy(isConfigLabyrinthOfMutabilityFactionThemeExpanded = expanded)
                         }
                     }
                 }
@@ -781,6 +781,6 @@ internal fun inferPersistedThemeStyle(
     return if (hasCustomMaterialPalette || hasNonDefaultBuiltInMaterialPalette) {
         ThemeStyleOption.Material
     } else {
-        ThemeStyleOption.BrandDualTone
+        ThemeStyleOption.FactionTheme
     }
 }

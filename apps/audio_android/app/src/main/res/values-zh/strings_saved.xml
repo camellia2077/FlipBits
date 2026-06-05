@@ -5,7 +5,6 @@
     <!-- Saved tab strings: file list, import, rename, move, delete, folder actions. -->
     <!-- Keep placeholders unchanged. -->
     <string name="saved_audio_filter_empty">没有匹配项</string>
-    <string name="library_title">已保存</string>
     <string name="library_empty">暂无保存内容</string>
     <string name="library_action_import">导入</string>
     <string name="library_action_share">分享</string>

@@ -14,6 +14,41 @@ internal fun safelyStopTrack(track: AudioTrack) {
     }
 }
 
+internal fun safelyFadeOutAndStopTrack(track: AudioTrack) {
+    val startedAtNanos = System.nanoTime()
+    safeDebugLog(
+        PlaybackEdgeFadeDiagTag,
+        "fadeOutStart playState=${track.playState} head=${track.safePlaybackHeadPosition() ?: -1} " +
+            "sampleRate=${track.sampleRate} speed=${track.safePlaybackParamsSpeed() ?: "_"} " +
+            "rate=${track.safePlaybackRate() ?: -1} steps=$PlaybackStopFadeSteps stepMs=$PlaybackStopFadeStepMs",
+    )
+    try {
+        if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+            var step = PlaybackStopFadeSteps
+            while (step >= 0 && track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+                track.setVolume(step.toFloat() / PlaybackStopFadeSteps.toFloat())
+                if (step > 0) {
+                    Thread.sleep(PlaybackStopFadeStepMs)
+                }
+                step -= 1
+            }
+        }
+    } catch (_: Exception) {
+        // Fall through to the hard stop path if volume fades race with teardown.
+    }
+    safelyStopTrack(track)
+    val elapsedMs = (System.nanoTime() - startedAtNanos) / 1_000_000L
+    safeDebugLog(
+        PlaybackEdgeFadeDiagTag,
+        "fadeOutStop playState=${track.playState} head=${track.safePlaybackHeadPosition() ?: -1} elapsedMs=$elapsedMs",
+    )
+    try {
+        track.setVolume(1.0f)
+    } catch (_: Exception) {
+        // Ignore volume reset races while the track is being torn down.
+    }
+}
+
 internal fun safelyPauseTrack(track: AudioTrack) {
     try {
         if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
@@ -52,7 +87,7 @@ internal fun setPlaybackSpeedSafely(
     track: AudioTrack,
     playbackSpeed: Float,
 ): Boolean {
-    val resolvedPlaybackSpeed = playbackSpeed.coerceAtLeast(0.1f)
+    val resolvedPlaybackSpeed = playbackSpeed.coerceAtLeast(PlaybackSpeedMin)
     val basePlaybackRate = track.sampleRate.coerceAtLeast(1)
     val beforeSpeed = track.safePlaybackParamsSpeed()
     val beforeRate = track.safePlaybackRate()
@@ -123,6 +158,9 @@ private fun setPlaybackParamsSpeedSafely(
     }
 
 private const val AudioTrackTransportDiagTag = "AudioTrackTransport"
+private const val PlaybackEdgeFadeDiagTag = "PlaybackEdgeFade"
+private const val PlaybackStopFadeSteps = 6
+private const val PlaybackStopFadeStepMs = 2L
 
 private fun AudioTrack.safePlaybackParamsSpeed(): Float? =
     try {
@@ -134,6 +172,13 @@ private fun AudioTrack.safePlaybackParamsSpeed(): Float? =
 private fun AudioTrack.safePlaybackRate(): Int? =
     try {
         playbackRate
+    } catch (_: Exception) {
+        null
+    }
+
+internal fun AudioTrack.safePlaybackHeadPosition(): Int? =
+    try {
+        playbackHeadPosition
     } catch (_: Exception) {
         null
     }

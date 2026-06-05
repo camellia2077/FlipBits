@@ -6,7 +6,7 @@ import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.WavAudioInfo
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.screen.LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
@@ -249,7 +249,7 @@ class AudioAppUiStateTest {
     private fun customMaterialSettings(
         presetId: String,
         primaryHex: String,
-    ) = CustomBrandThemeSettings(
+    ) = CustomFactionThemeSettings(
         presetId = presetId,
         displayName = presetId,
         primaryHex = primaryHex,

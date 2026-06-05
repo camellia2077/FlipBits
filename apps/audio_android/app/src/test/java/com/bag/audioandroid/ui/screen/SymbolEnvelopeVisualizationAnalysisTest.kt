@@ -17,7 +17,7 @@ import kotlin.math.sin
 
 class SymbolEnvelopeVisualizationAnalysisTest {
     @Test
-    fun `pro dual tone builds non-zero dual-lane buckets without saturating all bars`() {
+    fun `pro faction theme builds non-zero dual-lane buckets without saturating all bars`() {
         val pcm =
             buildTonePcm(
                 sampleRateHz = 44_100,

@@ -21,6 +21,7 @@ For app UI text, keep labels concise and natural in Simplified Chinese.
 Use stable Simplified Chinese product terminology across related controls, settings, dialogs, and validation messages.
 Prefer the clearer Simplified Chinese expression when direct transfer from another locale would sound unnatural.
 Keep mini-player, tab, segmented-control, and chip labels short.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/zh_theme_colors.md`.
 
 [sample_text_rule]
 For sample prose, preserve tone and atmosphere while writing fluent Simplified Chinese.
@@ -32,3 +33,4 @@ When filling missing entries, write Simplified Chinese localization.
 Use Simplified Chinese characters and terminology consistently.
 Do not copy Traditional Chinese phrasing or mixed-locale wording unless the term is intentionally shared.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d 个字符 • %2$d 字节`.
+When working on theme or palette entries, prefer the Simplified Chinese theme/color rules above over older verbose or overly literal wording.

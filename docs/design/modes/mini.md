@@ -32,7 +32,7 @@
 - `mini` 不是原始 byte 透明传输；它只接受 Morse 表中存在的字符。
 - `mini` 也不是 nibble / 多频映射模式；每个字符最终会通过 International Morse 表映射到 dot / dash pattern。
 - decode 后返回的是规范化文本：
-  - 例如 `"praise   the omnissiah"` roundtrip 后返回 `"PRAISE THE OMNISSIAH"`。
+  - 例如 `"this   is a sample text"` roundtrip 后返回 `"THIS IS A SAMPLE TEXT"`。
 
 ## 音频层
 - 使用 clean Morse tone PHY。

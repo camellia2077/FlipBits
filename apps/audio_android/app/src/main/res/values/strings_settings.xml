@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="config_title">Settings</string>
     <string name="config_language_title">Language</string>
     <string name="config_language_subtitle">Choose app language</string>
     <string name="config_language_follow_system">Follow system</string>
@@ -33,42 +32,39 @@
     <!-- CONTEXT: Language picker option label for the custom High Gothic locale. Keep this stylized display name rather than translating it as ordinary prose. -->
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Expand language settings</string>
-    <string name="config_language_collapse">Collapse language settings</string>
     <string name="config_theme_mode_title">Theme mode</string>
     <string name="config_theme_mode_subtitle">Choose system, light, or dark.</string>
-    <!-- CONTEXT: Helper text under Theme mode. It explains that dual-tone themes do not switch between light/dark variants and instead keep one fixed appearance. -->
-    <string name="config_theme_mode_brand_fixed">Dual-tone themes use a fixed look.</string>
+    <!-- CONTEXT: Helper text under Theme mode. It explains that faction themes do not switch between light/dark variants and instead keep one fixed appearance. -->
+    <string name="config_theme_mode_faction_theme_fixed">Faction themes use a fixed look.</string>
     <string name="config_theme_mode_follow_system">Follow system</string>
     <string name="config_theme_mode_light">Light</string>
     <string name="config_theme_mode_dark">Dark</string>
-    <string name="config_theme_mode_custom">Custom</string>
     <string name="config_theme_appearance_title">Theme appearance</string>
-    <string name="config_theme_style_title">Theme style</string>
-    <!-- CONTEXT: Subtitle shown under the "Theme style" setting in the Settings screen. It tells the user to choose between the standard Material look and the custom dual-tone theme system. -->
-    <string name="config_theme_style_subtitle">Choose Material or dual-tone.</string>
+    <!-- CONTEXT: Subtitle shown under the "Theme style" setting in the Settings screen. It tells the user to choose between the standard Material look and the custom faction theme system. -->
+    <string name="config_theme_style_subtitle">Choose Material or Faction theme.</string>
     <!-- CONTEXT: Label for the standard Material theme-style option in the Settings screen. This is the segmented/selectable option name, not a long description. -->
     <string name="config_theme_style_material">Material</string>
-    <string name="config_theme_style_brand_dual_tone">Dual-tone</string>
+    <string name="config_theme_style_faction_theme">Faction theme</string>
     <string name="config_theme_appearance_expand">Expand theme appearance settings</string>
     <string name="config_theme_appearance_collapse">Collapse theme appearance settings</string>
     <string name="config_palette_title">Color palettes</string>
     <string name="config_palette_selected">Selected</string>
     <string name="config_palette_expand">Expand palettes</string>
     <string name="config_palette_collapse">Collapse palettes</string>
-    <!-- CONTEXT: Section title above the built-in dual-tone theme picker in Settings. Keep it compact like a settings section heading. -->
-    <string name="config_brand_theme_title">Dual-tone themes</string>
-    <!-- CONTEXT: Short description under the built-in dual-tone theme section. It explains that these presets have a fixed appearance and are previewed with two colors. -->
-    <string name="config_brand_theme_description">Each dual-tone theme keeps a fixed look with a two-color preview.</string>
-    <string name="config_dual_tone_group_sacred_machine">The Sacred Machine</string>
-    <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
-    <string name="config_dual_tone_group_custom">Custom</string>
-    <string name="config_dual_tone_group_ancient_dynasty">The Ancient Dynasty</string>
-    <string name="config_dual_tone_group_immortal_rot">The Immortal Rot</string>
-    <string name="config_dual_tone_group_scarlet_carnage">The Scarlet Carnage</string>
-    <string name="config_dual_tone_group_exquisite_fall">The Exquisite Fall</string>
-    <string name="config_dual_tone_group_labyrinth_of_mutability">The Labyrinth of Mutability</string>
-    <!-- CONTEXT: Palette family heading shown above the built-in dual-tone theme presets in the color palette picker. -->
-    <string name="palette_family_brand">Dual-tone</string>
+    <!-- CONTEXT: Section title above the built-in faction theme picker in Settings. Keep it compact like a settings section heading. -->
+    <string name="config_faction_theme_title">Faction themes</string>
+    <!-- CONTEXT: Short description under the built-in faction theme section. It explains that these presets have a fixed appearance and are previewed with two colors. -->
+    <string name="config_faction_theme_description">Each faction theme keeps a fixed look with a two-color preview.</string>
+    <string name="config_faction_theme_group_sacred_machine">The Sacred Machine</string>
+    <!-- CONTEXT: Group heading in the faction theme list for user-created presets. Keep it short, like a section title. -->
+    <string name="config_faction_theme_group_custom">Custom</string>
+    <string name="config_faction_theme_group_ancient_dynasty">The Ancient Dynasty</string>
+    <string name="config_faction_theme_group_immortal_rot">The Immortal Rot</string>
+    <string name="config_faction_theme_group_scarlet_carnage">The Scarlet Carnage</string>
+    <string name="config_faction_theme_group_exquisite_fall">The Exquisite Fall</string>
+    <string name="config_faction_theme_group_labyrinth_of_mutability">The Labyrinth of Mutability</string>
+    <!-- CONTEXT: Palette family heading shown above the built-in faction theme presets in the color palette picker. -->
+    <string name="palette_family_faction_theme">Faction theme</string>
     <string name="palette_family_custom">Custom</string>
     <string name="palette_family_reds_pinks">Reds</string>
     <!-- CONTEXT: Palette family heading shown above built-in orange-toned Material presets in the color palette picker. -->
@@ -79,18 +75,16 @@
     <string name="palette_family_purples_magentas">Purples</string>
     <string name="palette_family_neutrals">Neutrals</string>
     <!-- CONTEXT: Settings section title for flash audio voice/style presets. -->
-    <string name="config_flash_style_title">Flash style</string>
     <!-- CONTEXT: Subtitle under the Flash style setting. It tells the user to choose the sound character of flash-mode audio. -->
-    <string name="config_flash_style_subtitle">Choose how flash audio should sound.</string>
     <!-- CONTEXT: Label for the default flash-style preset in Settings. Keep it short like a segmented option or preset chip. -->
     <string name="config_flash_style_standard_label">Standard</string>
-    <string name="config_flash_style_standard_description">Clear, stable machine signaling.</string>
+    <string name="config_flash_style_standard_description">Stable, clear.</string>
     <string name="config_flash_style_hostility_label">Hostility</string>
-    <string name="config_flash_style_hostility_description">An angry command preset with shorter, harder signal timing.</string>
+    <string name="config_flash_style_hostility_description">Aggressive, angry.</string>
     <string name="config_flash_style_litany_label">Litany</string>
-    <string name="config_flash_style_litany_description">A reverent prayer preset using the slower ritual signal cadence.</string>
+    <string name="config_flash_style_litany_description">Reverent, ritual.</string>
     <string name="config_flash_style_collapse_label">Collapse</string>
-    <string name="config_flash_style_collapse_description">A fear and breakdown preset; currently uses the standard signal shell.</string>
+    <string name="config_flash_style_collapse_description">Unstable, fearful.</string>
     <string name="config_about_title">About</string>
     <string name="config_about_subtitle">Author, project link, and licenses</string>
     <string name="palette_ruby_title">Ruby</string>
@@ -98,118 +92,121 @@
     <string name="palette_red_title">Material Red</string>
     <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_mars_relic_title">Mars</string>
-    <string name="brand_theme_mars_relic_title">Mars Relic</string>
-    <string name="brand_theme_mars_relic_description">Deep red and parchment for a ceremonial archive glow.</string>
-    <string name="brand_theme_mars_relic_accessibility">Mars Relic theme, deep red with parchment beige.</string>
-    <string name="brand_theme_black_crimson_rite_title">Black Crimson Rite</string>
-    <string name="brand_theme_black_crimson_rite_description">Soot black and ritual crimson for a severe shrine glow.</string>
-    <string name="brand_theme_black_crimson_rite_accessibility">Black Crimson Rite theme, near-black with vivid crimson red.</string>
-    <string name="brand_theme_xeno_code_title">Xeno Code</string>
-    <string name="brand_theme_xeno_code_description">Obsidian circuitry and neon green for an alien machine pulse.</string>
-    <string name="brand_theme_xeno_code_accessibility">Xeno Code theme, dark moss black with neon green and a white outline.</string>
-    <string name="brand_theme_scarlet_guard_title">Hazard Warning</string>
-    <string name="brand_theme_scarlet_guard_description">Pale industrial gray, hazard orange-red, and dark graphite for a machine-alert signal look.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Hazard Warning theme, pale gray with hazard orange-red and a dark graphite outline.</string>
-    <string name="brand_theme_dynasty_revival_title">Dynasty Revival</string>
-    <string name="brand_theme_dynasty_revival_description">Tomb-metal black and reactor green for a reawakened dynasty glow.</string>
-    <string name="brand_theme_dynasty_revival_accessibility">Dynasty Revival theme, deep tomb-metal black with bright reactor green.</string>
-    <string name="brand_theme_sepulcher_cyan_title">Sepulcher Cyan</string>
-    <string name="brand_theme_sepulcher_cyan_description">Cold sepulcher steel and restrained cyan-green for a quiet royal glow.</string>
-    <string name="brand_theme_sepulcher_cyan_accessibility">Sepulcher Cyan theme, cold dark steel with muted cyan-green.</string>
-    <string name="brand_theme_tomb_sigil_title">Tomb Sigil</string>
-    <string name="brand_theme_tomb_sigil_description">Warm crypt iron and sharp revival green for a ceremonial dynasty mark.</string>
-    <string name="brand_theme_tomb_sigil_accessibility">Tomb Sigil theme, dark crypt iron with vivid revival green.</string>
-    <string name="brand_theme_ancient_alloy_title">Ancient Alloy</string>
-    <string name="brand_theme_ancient_alloy_description">Weathered metal and cold turquoise for a tomb-forge glow.</string>
-    <string name="brand_theme_ancient_alloy_accessibility">Ancient Alloy theme, dark bronze gray with bright turquoise.</string>
-    <string name="brand_theme_immortal_rot_title">Toxic Effluence</string>
-    <string name="brand_theme_immortal_rot_description">Fern green and citrine yellow in a damp, overgrown hush.</string>
-    <string name="brand_theme_immortal_rot_accessibility">Toxic Effluence theme, fern green with citrine yellow.</string>
-    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
-    <string name="brand_theme_plague_mire_title">Plague Mire</string>
-    <!-- CONTEXT: Short flavor description shown under the built-in "Plague Mire" dual-tone preset in the Settings theme picker. It describes the color mood of the preview card, not a technical color editor field. -->
-    <string name="brand_theme_plague_mire_description">Bog-black green, sickly lime, and caustic orange in a feverish marsh haze.</string>
-    <!-- CONTEXT: Accessibility label read for the "Plague Mire" dual-tone theme preview. It should clearly describe the theme name and visible colors for screen readers. -->
-    <string name="brand_theme_plague_mire_accessibility">Plague Mire theme, bog-black green with sickly lime and a caustic orange outline.</string>
-    <string name="brand_theme_scarlet_carnage_title">Blood-Soaked Ivory</string>
-    <string name="brand_theme_scarlet_carnage_description">Dark red and brass in a stern martial glow.</string>
-    <string name="brand_theme_scarlet_carnage_accessibility">Blood-Soaked Ivory theme, dark red with dark goldenrod brass.</string>
-    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
-    <string name="brand_theme_brass_forge_title">Brass Forge</string>
-    <!-- CONTEXT: Short flavor description shown under the built-in "Brass Forge" dual-tone preset in the Settings theme picker. It describes the visual mood and color mix of the preview card. -->
-    <string name="brand_theme_brass_forge_description">Near-black crimson, furnace brass, and flame-orange in a molten martial glow.</string>
-    <!-- CONTEXT: Accessibility label read for the "Brass Forge" dual-tone theme preview. It should describe the theme name and its key colors for screen readers. -->
-    <string name="brand_theme_brass_forge_accessibility">Brass Forge theme, near-black crimson with furnace brass and a flame-orange outline.</string>
-    <string name="brand_theme_exquisite_fall_title">Velvet Nightmare</string>
-    <string name="brand_theme_exquisite_fall_description">Midnight violet, hot pink, and soft peach in a languid decadent bloom.</string>
-    <string name="brand_theme_exquisite_fall_accessibility">Velvet Nightmare theme, midnight violet with hot pink and a soft peach outline.</string>
-    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
-    <string name="brand_theme_ecstatic_rapture_title">Ecstatic Rapture</string>
-    <!-- CONTEXT: Short flavor description shown under the built-in "Ecstatic Rapture" dual-tone preset in the Settings theme picker. It describes the preview palette's color mood, not editable fields. -->
-    <string name="brand_theme_ecstatic_rapture_description">Orchid violet, blush pink, and radiant gold in a luminous rapturous bloom.</string>
-    <!-- CONTEXT: Accessibility label read for the "Ecstatic Rapture" dual-tone theme preview. It should describe the theme name and dominant colors for screen readers. -->
-    <string name="brand_theme_ecstatic_rapture_accessibility">Ecstatic Rapture theme, orchid violet with blush pink and a radiant gold outline.</string>
-    <string name="brand_theme_labyrinth_of_mutability_title">Arcane Abyss</string>
-    <string name="brand_theme_labyrinth_of_mutability_description">Midnight navy, electric cyan, and lavender in a shifting maze of cold light.</string>
-    <string name="brand_theme_labyrinth_of_mutability_accessibility">Arcane Abyss theme, midnight navy with electric cyan and a lavender outline.</string>
-    <!-- CONTEXT: Display name of a built-in dual-tone theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
-    <string name="brand_theme_fires_of_fate_title">Fires of Fate</string>
-    <!-- CONTEXT: Short flavor description shown under the built-in "Fires of Fate" dual-tone preset in the Settings theme picker. It describes the preview palette's color mood and atmosphere. -->
-    <string name="brand_theme_fires_of_fate_description">Fatefire blue, magenta flame, and venom-lime in an omen-lit blaze.</string>
-    <!-- CONTEXT: Accessibility label read for the "Fires of Fate" dual-tone theme preview. It should describe the theme name and key colors for screen readers. -->
-    <string name="brand_theme_fires_of_fate_accessibility">Fires of Fate theme, fatefire blue with magenta flame and a venom-lime outline.</string>
-    <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
-    <string name="brand_theme_custom_title">Custom dual-tone</string>
-    <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
-    <string name="brand_theme_custom_description">Your own dual-tone colors with The Sacred Machine sample text.</string>
-    <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
-    <string name="brand_theme_custom_accessibility">Custom dual-tone theme preview.</string>
-    <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
-    <string name="config_custom_brand_theme_add">Add</string>
-    <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_edit">Edit colors</string>
-    <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
-    <string name="config_custom_brand_theme_dialog_title">Custom dual-tone colors</string>
-    <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_dialog_title_new">New custom dual-tone</string>
-    <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_dialog_title_edit">Edit custom dual-tone</string>
+    <string name="faction_theme_mars_relic_title">Mars Relic</string>
+    <string name="faction_theme_mars_relic_description">Deep red and parchment for a ceremonial archive glow.</string>
+    <string name="faction_theme_mars_relic_accessibility">Mars Relic theme, deep red with parchment beige.</string>
+    <string name="faction_theme_black_crimson_rite_title">Black Crimson Rite</string>
+    <string name="faction_theme_black_crimson_rite_description">Soot black and ritual crimson for a severe shrine glow.</string>
+    <string name="faction_theme_black_crimson_rite_accessibility">Black Crimson Rite theme, near-black with vivid crimson red.</string>
+    <string name="faction_theme_xeno_code_title">Xeno Code</string>
+    <string name="faction_theme_xeno_code_description">Obsidian circuitry and neon green for an alien machine pulse.</string>
+    <string name="faction_theme_xeno_code_accessibility">Xeno Code theme, dark moss black with neon green and a white outline.</string>
+    <string name="faction_theme_scarlet_guard_title">Hazard Warning</string>
+    <string name="faction_theme_scarlet_guard_description">Pale industrial gray, hazard orange-red, and dark graphite for a machine-alert signal look.</string>
+    <string name="faction_theme_scarlet_guard_accessibility">Hazard Warning theme, pale gray with hazard orange-red and a dark graphite outline.</string>
+    <string name="faction_theme_dynasty_revival_title">Sovereign Tempest</string>
+    <string name="faction_theme_dynasty_revival_description">Deep jade, neon green, and pale alloy.</string>
+    <string name="faction_theme_dynasty_revival_accessibility">Sovereign Tempest theme, deep jade with neon green and a pale alloy outline.</string>
+    <string name="faction_theme_sepulcher_cyan_title">Silent Hegemony</string>
+    <string name="faction_theme_sepulcher_cyan_description">Muted bronze, neon green, and pale ivory.</string>
+    <string name="faction_theme_sepulcher_cyan_accessibility">Silent Hegemony theme, muted bronze with neon green and a pale ivory outline.</string>
+    <string name="faction_theme_tomb_sigil_title">Gilded Apathy</string>
+    <string name="faction_theme_tomb_sigil_description">Burnished gold, bright cyan, and cool gray.</string>
+    <string name="faction_theme_tomb_sigil_accessibility">Gilded Apathy theme, burnished gold with bright cyan and a cool gray outline.</string>
+    <string name="faction_theme_ancient_alloy_title">Solar Extinction</string>
+    <string name="faction_theme_ancient_alloy_description">Olive green, amber orange, and ash gray.</string>
+    <string name="faction_theme_ancient_alloy_accessibility">Solar Extinction theme, olive green with amber orange and an ash gray outline.</string>
+    <string name="faction_theme_void_fluctuation_title">Void Fluctuation</string>
+    <string name="faction_theme_void_fluctuation_description">Deep blue, electric cyan, and steel blue.</string>
+    <string name="faction_theme_void_fluctuation_accessibility">Void Fluctuation theme, deep blue with electric cyan and a steel blue outline.</string>
+    <string name="faction_theme_crimson_decree_title">Crimson Decree</string>
+    <string name="faction_theme_crimson_decree_description">Slate gray, dark crimson, and signal orange.</string>
+    <string name="faction_theme_crimson_decree_accessibility">Crimson Decree theme, slate gray with dark crimson and a signal orange outline.</string>
+    <string name="faction_theme_immortal_rot_title">Toxic Effluence</string>
+    <string name="faction_theme_immortal_rot_description">Fern green and citrine yellow in a damp, overgrown hush.</string>
+    <string name="faction_theme_immortal_rot_accessibility">Toxic Effluence theme, fern green with citrine yellow.</string>
+    <!-- CONTEXT: Display name of a built-in faction theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
+    <string name="faction_theme_plague_mire_title">Plague Mire</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Plague Mire" faction theme preset in the Settings theme picker. It describes the color mood of the preview card, not a technical color editor field. -->
+    <string name="faction_theme_plague_mire_description">Bog-black green, sickly lime, and caustic orange in a feverish marsh haze.</string>
+    <!-- CONTEXT: Accessibility label read for the "Plague Mire" faction theme preview. It should clearly describe the theme name and visible colors for screen readers. -->
+    <string name="faction_theme_plague_mire_accessibility">Plague Mire theme, bog-black green with sickly lime and a caustic orange outline.</string>
+    <string name="faction_theme_scarlet_carnage_title">Blood-Soaked Ivory</string>
+    <string name="faction_theme_scarlet_carnage_description">Dark red and brass in a stern martial glow.</string>
+    <string name="faction_theme_scarlet_carnage_accessibility">Blood-Soaked Ivory theme, dark red with dark goldenrod brass.</string>
+    <!-- CONTEXT: Display name of a built-in faction theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
+    <string name="faction_theme_brass_forge_title">Brass Forge</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Brass Forge" faction theme preset in the Settings theme picker. It describes the visual mood and color mix of the preview card. -->
+    <string name="faction_theme_brass_forge_description">Near-black crimson, furnace brass, and flame-orange in a molten martial glow.</string>
+    <!-- CONTEXT: Accessibility label read for the "Brass Forge" faction theme preview. It should describe the theme name and its key colors for screen readers. -->
+    <string name="faction_theme_brass_forge_accessibility">Brass Forge theme, near-black crimson with furnace brass and a flame-orange outline.</string>
+    <string name="faction_theme_exquisite_fall_title">Velvet Nightmare</string>
+    <string name="faction_theme_exquisite_fall_description">Midnight violet, hot pink, and soft peach in a languid decadent bloom.</string>
+    <string name="faction_theme_exquisite_fall_accessibility">Velvet Nightmare theme, midnight violet with hot pink and a soft peach outline.</string>
+    <!-- CONTEXT: Display name of a built-in faction theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
+    <string name="faction_theme_ecstatic_rapture_title">Ecstatic Rapture</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Ecstatic Rapture" faction theme preset in the Settings theme picker. It describes the preview palette's color mood, not editable fields. -->
+    <string name="faction_theme_ecstatic_rapture_description">Orchid violet, blush pink, and radiant gold in a luminous rapturous bloom.</string>
+    <!-- CONTEXT: Accessibility label read for the "Ecstatic Rapture" faction theme preview. It should describe the theme name and dominant colors for screen readers. -->
+    <string name="faction_theme_ecstatic_rapture_accessibility">Ecstatic Rapture theme, orchid violet with blush pink and a radiant gold outline.</string>
+    <string name="faction_theme_labyrinth_of_mutability_title">Arcane Abyss</string>
+    <string name="faction_theme_labyrinth_of_mutability_description">Midnight navy, electric cyan, and lavender in a shifting maze of cold light.</string>
+    <string name="faction_theme_labyrinth_of_mutability_accessibility">Arcane Abyss theme, midnight navy with electric cyan and a lavender outline.</string>
+    <!-- CONTEXT: Display name of a built-in faction theme preset shown in the Settings theme picker. Keep it short like a palette/theme title. -->
+    <string name="faction_theme_fires_of_fate_title">Fires of Fate</string>
+    <!-- CONTEXT: Short flavor description shown under the built-in "Fires of Fate" faction theme preset in the Settings theme picker. It describes the preview palette's color mood and atmosphere. -->
+    <string name="faction_theme_fires_of_fate_description">Fatefire blue, magenta flame, and venom-lime in an omen-lit blaze.</string>
+    <!-- CONTEXT: Accessibility label read for the "Fires of Fate" faction theme preview. It should describe the theme name and key colors for screen readers. -->
+    <string name="faction_theme_fires_of_fate_accessibility">Fires of Fate theme, fatefire blue with magenta flame and a venom-lime outline.</string>
+    <!-- CONTEXT: Display name for the built-in "custom" faction theme option. This is the title shown in settings, not a button. -->
+    <string name="faction_theme_custom_title">Custom theme</string>
+    <!-- CONTEXT: Short description under the custom faction theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
+    <string name="faction_theme_custom_description">User-defined theme colors and names.</string>
+    <!-- CONTEXT: Accessibility label read for the custom faction theme preview swatch. -->
+    <string name="faction_theme_custom_accessibility">Custom faction theme preview.</string>
+    <!-- CONTEXT: Small action label for creating a new custom faction theme preset. Keep it compact like a button or chip. -->
+    <string name="config_custom_faction_theme_add">Add</string>
+    <!-- CONTEXT: Action label for opening the editor for an existing custom faction theme preset. -->
+    <string name="config_custom_faction_theme_edit">Edit colors</string>
+    <!-- CONTEXT: Generic dialog title for the custom faction theme color editor. -->
+    <!-- CONTEXT: Dialog title when creating a brand-new custom faction theme preset. -->
+    <string name="config_custom_faction_theme_dialog_title_new">New custom faction theme</string>
+    <!-- CONTEXT: Dialog title when editing an existing custom faction theme preset. -->
+    <string name="config_custom_faction_theme_dialog_title_edit">Edit custom faction theme</string>
     <!-- CONTEXT: Dialog title when creating a brand-new custom Material palette preset. -->
     <string name="config_custom_material_theme_dialog_title_new">New custom colors</string>
     <!-- CONTEXT: Dialog title when editing an existing custom Material palette preset. -->
     <string name="config_custom_material_theme_dialog_title_edit">Edit colors</string>
-    <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
-    <string name="config_custom_brand_theme_dialog_description">Enter hex colors in #RRGGBB format. Leave outline empty to reuse the secondary color.</string>
-    <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_randomize">Randomize colors</string>
-    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
-    <string name="config_custom_brand_theme_randomize_hint">Use the dice to roll a fresh primary, secondary, and outline combination.</string>
+    <!-- CONTEXT: Helper text inside the custom faction theme editor. It explains the required hex format and that outline may be left empty. -->
+    <!-- CONTEXT: Button label that rolls a new random color combination for the custom faction theme preset. -->
+    <string name="config_custom_faction_theme_randomize">Randomize colors</string>
+    <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom faction theme editor. -->
     <!-- CONTEXT: Form field label for the user-defined preset name. -->
-    <string name="config_custom_brand_theme_name_label">Preset name</string>
-    <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_background_label">Primary color</string>
-    <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Secondary color</string>
-    <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_outline_label">Outline color</string>
+    <string name="config_custom_faction_theme_name_label">Preset name</string>
+    <!-- CONTEXT: Form field label for the main/background color of the custom faction theme. -->
+    <string name="config_custom_faction_theme_background_label">Primary color</string>
+    <!-- CONTEXT: Form field label for the accent/secondary color of the custom faction theme. -->
+    <string name="config_custom_faction_theme_accent_label">Secondary color</string>
+    <!-- CONTEXT: Form field label for the outline/stroke color used by the custom faction theme. -->
+    <string name="config_custom_faction_theme_outline_label">Outline color</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
-    <string name="config_custom_brand_theme_outline_optional">Optional</string>
-    <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_save">Save</string>
-    <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_delete">Delete</string>
-    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_delete_title">Delete custom dual-tone</string>
-    <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
-    <string name="config_custom_brand_theme_delete_message">Delete the preset %1$s?</string>
+    <string name="config_custom_faction_theme_outline_optional">Optional</string>
+    <!-- CONTEXT: Confirm button label for saving the custom faction theme preset. -->
+    <string name="config_custom_faction_theme_save">Save</string>
+    <!-- CONTEXT: Destructive action label for deleting a custom faction theme preset. -->
+    <string name="config_custom_faction_theme_delete">Delete</string>
+    <!-- CONTEXT: Confirmation dialog title shown before deleting a custom faction theme preset. -->
+    <string name="config_custom_faction_theme_delete_title">Delete custom faction theme</string>
+    <!-- CONTEXT: Confirmation dialog message before deleting a custom faction theme preset. %1$s is the preset name. -->
+    <string name="config_custom_faction_theme_delete_message">Delete the preset %1$s?</string>
     <!-- CONTEXT: Confirmation dialog title shown before deleting a custom Material palette preset. -->
     <string name="config_custom_material_theme_delete_title">Delete custom colors</string>
     <!-- CONTEXT: Confirmation dialog message before deleting a custom Material palette preset. %1$s is the preset name. -->
     <string name="config_custom_material_theme_delete_message">Delete the preset %1$s?</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
-    <string name="config_custom_brand_theme_invalid_name">Enter a preset name.</string>
+    <string name="config_custom_faction_theme_invalid_name">Enter a preset name.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
+    <string name="config_custom_faction_theme_invalid_hex">Use RRGGBB or #RRGGBB.</string>
     <string name="palette_crimson_title">Crimson</string>
     <!-- CONTEXT: Built-in Material palette name shown in the color palette picker. This is a short preset title, not a descriptive sentence. -->
     <string name="palette_rose_title">Rose</string>
@@ -269,49 +266,46 @@
     <string name="palette_graphite_title">Graphite</string>
     <string name="palette_ivory_title">Ivory</string>
     <string name="config_flash_style_zeal_label">Zeal</string>
-    <string name="config_flash_style_zeal_description">A bright, dense preset with variable rapid timing and punctuation pauses.</string>
+    <string name="config_flash_style_zeal_description">Urgent, intense.</string>
     <string name="config_flash_style_void_label">Void</string>
-    <string name="config_flash_style_void_description">A low, sparse preset using a slower signal cadence.</string>
+    <string name="config_flash_style_void_description">Sparse, hollow.</string>
     <string name="config_sample_decoration_title">Sample decoration</string>
     <string name="config_sample_decoration_subtitle">Add optional prefix markers to randomized sample text.</string>
-    <string name="config_demo_mode_title">Demo mode</string>
-    <string name="config_demo_mode_subtitle">Show tap feedback and key action hints for recording.</string>
-    <!-- CONTEXT: Dialog title for importing one custom dual-tone preset from pasted text. -->
-    <string name="config_custom_brand_theme_import_title">Import custom dual-tone</string>
-    <!-- CONTEXT: Action label for importing a custom dual-tone preset from pasted text. -->
-    <string name="config_custom_brand_theme_import">Import</string>
-    <!-- CONTEXT: Action label for copying one custom dual-tone preset as plain text. -->
-    <string name="config_custom_brand_theme_copy_config">Copy</string>
+    <!-- CONTEXT: Dialog title for importing one custom faction theme preset from pasted text. -->
+    <string name="config_custom_faction_theme_import_title">Import custom faction theme</string>
+    <!-- CONTEXT: Action label for importing a custom faction theme preset from pasted text. -->
+    <string name="config_custom_faction_theme_import">Import</string>
+    <!-- CONTEXT: Action label for copying one custom faction theme preset as plain text. -->
+    <string name="config_custom_faction_theme_copy_config">Copy</string>
     <!-- CONTEXT: Action label for copying every custom color preset in the current custom section. -->
     <string name="config_custom_theme_copy_all">Copy all colors</string>
-    <!-- CONTEXT: Helper text in the custom dual-tone import dialog. -->
-    <string name="config_custom_brand_theme_import_description">Paste a FlipBits custom theme config.</string>
-    <!-- CONTEXT: Text field label for pasted custom dual-tone theme configuration. -->
-    <string name="config_custom_brand_theme_import_config_label">Theme config</string>
-    <!-- CONTEXT: Validation error shown when pasted custom dual-tone theme configuration cannot be parsed. -->
-    <string name="config_custom_brand_theme_import_invalid">Paste a valid FlipBits custom theme config.</string>
+    <!-- CONTEXT: Helper text in the custom faction theme import dialog. -->
+    <string name="config_custom_faction_theme_import_description">Paste a FlipBits custom theme config.</string>
+    <!-- CONTEXT: Text field label for pasted custom faction theme configuration. -->
+    <string name="config_custom_faction_theme_import_config_label">Theme config</string>
+    <!-- CONTEXT: Validation error shown when pasted custom faction theme configuration cannot be parsed. -->
     <!-- CONTEXT: Dialog message shown when importing a custom theme or color preset whose name matches an existing preset. -->
-    <string name="config_custom_brand_theme_import_duplicate_message">This name matches an existing custom theme. Overwrite it or add another copy?</string>
-    <!-- CONTEXT: Action label for replacing an existing custom dual-tone preset during import. -->
-    <string name="config_custom_brand_theme_import_overwrite">Overwrite</string>
+    <string name="config_custom_faction_theme_import_duplicate_message">This name matches an existing custom theme. Overwrite it or add another copy?</string>
+    <!-- CONTEXT: Action label for replacing an existing custom faction theme preset during import. -->
+    <string name="config_custom_faction_theme_import_overwrite">Overwrite</string>
     <!-- CONTEXT: Dialog title shown when importing a custom theme or color preset whose name matches an existing preset. -->
-    <string name="config_custom_brand_theme_import_duplicate_title">Theme name already exists</string>
-    <!-- CONTEXT: Action label for importing a duplicate custom dual-tone preset as a separate copy. -->
-    <string name="config_custom_brand_theme_import_add_copy">Add copy</string>
-    <!-- CONTEXT: Helper text in the custom dual-tone export dialog. -->
-    <string name="config_custom_brand_theme_export_description">Choose whether to copy the selected custom dual-tone or every custom dual-tone.</string>
-    <!-- CONTEXT: Dialog title for exporting the selected custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_export_title">Export custom dual-tone</string>
-    <!-- CONTEXT: Segmented control option for exporting only the selected custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_export_scope_selected">Selected</string>
-    <!-- CONTEXT: Segmented control option for exporting all custom dual-tone presets. -->
-    <string name="config_custom_brand_theme_export_scope_all">All</string>
-    <!-- CONTEXT: Dialog title for confirming a batch custom dual-tone import. -->
-    <string name="config_custom_brand_theme_batch_import_title">Import custom dual-tones</string>
+    <string name="config_custom_faction_theme_import_duplicate_title">Theme name already exists</string>
+    <!-- CONTEXT: Action label for importing a duplicate custom faction theme preset as a separate copy. -->
+    <string name="config_custom_faction_theme_import_add_copy">Add copy</string>
+    <!-- CONTEXT: Helper text in the custom faction theme export dialog. -->
+    <string name="config_custom_faction_theme_export_description">Choose whether to copy the selected custom faction theme or every custom faction theme.</string>
+    <!-- CONTEXT: Dialog title for exporting the selected custom faction theme preset. -->
+    <string name="config_custom_faction_theme_export_title">Export custom faction theme</string>
+    <!-- CONTEXT: Segmented control option for exporting only the selected custom faction theme preset. -->
+    <string name="config_custom_faction_theme_export_scope_selected">Selected</string>
+    <!-- CONTEXT: Segmented control option for exporting all custom faction theme presets. -->
+    <string name="config_custom_faction_theme_export_scope_all">All</string>
+    <!-- CONTEXT: Dialog title for confirming a batch custom faction theme import. -->
+    <string name="config_custom_faction_theme_batch_import_title">Import custom faction themes</string>
     <!-- CONTEXT: Batch import summary. Placeholder 1 is total themes, 2 is new themes, 3 is presets whose names match existing presets. -->
-    <string name="config_custom_brand_theme_batch_import_summary">%1$d themes found. %2$d new, %3$d matching existing names.</string>
-    <!-- CONTEXT: Helper text shown when confirming batch custom dual-tone import. -->
-    <string name="config_custom_brand_theme_batch_import_duplicate_note">Matching existing names will be overwritten after you confirm.</string>
+    <string name="config_custom_faction_theme_batch_import_summary">%1$d themes found. %2$d new, %3$d matching existing names.</string>
+    <!-- CONTEXT: Helper text shown when confirming batch custom faction theme import. -->
+    <string name="config_custom_faction_theme_batch_import_duplicate_note">Matching existing names will be overwritten after you confirm.</string>
     <!-- CONTEXT: Dialog title for importing one or more custom Material color presets from pasted text. -->
     <string name="config_custom_material_theme_import_title">Import custom colors</string>
     <!-- CONTEXT: Action label for importing custom Material color presets from pasted text. -->
@@ -321,7 +315,6 @@
     <!-- CONTEXT: Text field label for pasted custom Material color preset configuration. -->
     <string name="config_custom_material_theme_import_config_label">Color config</string>
     <!-- CONTEXT: Validation error shown when pasted custom Material color preset configuration cannot be parsed. -->
-    <string name="config_custom_material_theme_import_invalid">Paste a valid custom color config.</string>
     <string name="config_sample_text_title">Audio preferences</string>
     <string name="config_sample_text_subtitle">Control saved audio data and how example text appears in the input field.</string>
     <string name="config_sample_auto_fill_subtitle">Fill the input field with a randomized example when sample text is available.</string>
@@ -332,8 +325,6 @@
     <string name="config_palette_builtin_section_title">Built-in palettes</string>
     <string name="config_palette_custom_section_subtitle">Create, name, import, and reorder your own presets.</string>
     <string name="config_palette_builtin_section_subtitle">Browse the fixed palette collection grouped by color family.</string>
-    <string name="config_custom_material_theme_expand">Expand custom colors</string>
-    <string name="config_custom_material_theme_collapse">Collapse custom colors</string>
     <!-- CONTEXT: Validation error shown when an imported custom preset block contains a field name that is not allowed. Placeholder 1 is the 1-based block number and 2 is the field name. -->
     <string name="config_custom_theme_import_error_unknown_field">Group %1$d has an unsupported field: %2$s.</string>
     <!-- CONTEXT: Validation error shown when no importable custom preset block was pasted into a custom color/theme import dialog. -->
@@ -346,9 +337,9 @@
     <string name="config_custom_theme_import_error_missing_field">Group %1$d is missing %2$s.</string>
     <!-- CONTEXT: Validation error shown when an imported custom preset block contains an invalid hex color value. Placeholder 1 is the 1-based block number, 2 is the localized field label, and 3 is the pasted value. -->
     <string name="config_custom_theme_import_error_invalid_hex">Group %1$d has an invalid %2$s hex color: %3$s.</string>
-    <!-- CONTEXT: Validation error shown when a custom dual-tone preset block is pasted into the custom Material colors import dialog. Placeholder 1 is the 1-based block number. -->
-    <string name="config_custom_theme_import_error_wrong_target_dual_tone">Group %1$d uses custom dual-tone fields. Import it from custom dual-tone instead.</string>
-    <!-- CONTEXT: Validation error shown when a custom Material color preset block is pasted into the custom dual-tone import dialog. Placeholder 1 is the 1-based block number. -->
+    <!-- CONTEXT: Validation error shown when a custom faction theme preset block is pasted into the custom Material colors import dialog. Placeholder 1 is the 1-based block number. -->
+    <string name="config_custom_theme_import_error_wrong_target_faction_theme">Group %1$d uses custom faction theme fields. Import it from custom faction theme instead.</string>
+    <!-- CONTEXT: Validation error shown when a custom Material color preset block is pasted into the custom faction theme import dialog. Placeholder 1 is the 1-based block number. -->
     <string name="config_custom_theme_import_error_wrong_target_material">Group %1$d uses custom color fields. Import it from custom colors instead.</string>
     <!-- CONTEXT: Localized field label used in custom preset import validation messages. -->
     <string name="config_custom_theme_import_field_name">name</string>

@@ -4,9 +4,11 @@ import android.util.Log
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
+import com.bag.audioandroid.audio.PlaybackRenderContext
 import com.bag.audioandroid.audio.PlaybackResult
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import kotlinx.coroutines.CoroutineScope
@@ -135,9 +137,41 @@ internal class AudioPlaybackCommandActions(
         startPlayback(target)
     }
 
+    fun restartActivePlaybackForSpeedChange(
+        source: AudioPlaybackSource,
+        wasPlaying: Boolean,
+    ): Boolean {
+        val sourceKey = playbackSourceCoordinator.sourceKey(source)
+        if (!playbackCoordinator.hasActivePlaybackForSource(sourceKey)) {
+            return false
+        }
+        val target = playbackSourceCoordinator.resolveTarget(uiState.value) ?: return false
+        safeLogD(
+            PLAYBACK_SPEED_DIAG_TAG,
+            "restartRequested source=$sourceKey wasPlaying=$wasPlaying speed=${target.playbackSpeed} " +
+                "played=${target.playback.playedSamples}/${target.totalSamples} phase=${target.playback.phase} " +
+                "fileBacked=${!target.pcmFilePath.isNullOrBlank()} mode=${target.transportMode?.wireName ?: "_"}",
+        )
+        val restarted =
+            if (wasPlaying) {
+                startPlayback(target, handoffFromActivePlayback = true)
+                true
+            } else {
+                playbackCoordinator.stopPlayback()
+                true
+            }
+        safeLogD(
+            PLAYBACK_SPEED_DIAG_TAG,
+            "restartApplied source=$sourceKey wasPlaying=$wasPlaying restarted=$restarted speed=${target.playbackSpeed} " +
+                "played=${target.playback.playedSamples}/${target.totalSamples}",
+        )
+        return restarted
+    }
+
     private fun startPlayback(
         target: PlaybackSourceCoordinator.PlaybackTarget,
         restartFromBeginning: Boolean = false,
+        handoffFromActivePlayback: Boolean = false,
     ) {
         val sourceKey = playbackSourceCoordinator.sourceKey(target.source)
         val basePlayback =
@@ -163,6 +197,15 @@ internal class AudioPlaybackCommandActions(
             sampleRateHz = target.sampleRateHz,
             playbackSpeed = target.playbackSpeed,
             startSampleIndex = startedPlayback.playedSamples,
+            renderContext =
+                PlaybackRenderContext(
+                    isMiniMode = target.transportMode == TransportModeOption.Mini,
+                    isFlashMode = target.transportMode == TransportModeOption.Flash,
+                    frameSamples = target.frameSamples,
+                    followData = target.followData,
+                    totalSamples = target.totalSamples,
+                ),
+            handoffFromActivePlayback = handoffFromActivePlayback,
             onStarted = {
                 playbackUiStateSync.updatePlaybackState(target.source) { startedPlayback }
                 playbackUiStateSync.setCurrentStatusText(playbackUiStateSync.playbackStatusPlaying(target.source))
@@ -199,6 +242,7 @@ internal class AudioPlaybackCommandActions(
 }
 
 private const val PLAYBACK_AUTOMATION_TAG = "PlaybackAutomation"
+private const val PLAYBACK_SPEED_DIAG_TAG = "PlaybackSpeedDiag"
 
 private fun AudioPlaybackSource.debugSourceId(): String =
     when (this) {

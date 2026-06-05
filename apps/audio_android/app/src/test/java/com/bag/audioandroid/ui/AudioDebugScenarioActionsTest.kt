@@ -15,7 +15,7 @@ import com.bag.audioandroid.domain.SavedAudioRenameResult
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
@@ -50,8 +50,8 @@ class AudioDebugScenarioActionsTest {
                     selectedPalette = customMaterialPalette(existing),
                 ),
             )
-        val savedCalls = mutableListOf<Pair<CustomBrandThemeSettings, String?>>()
-        val importedBatches = mutableListOf<List<CustomBrandThemeSettings>>()
+        val savedCalls = mutableListOf<Pair<CustomFactionThemeSettings, String?>>()
+        val importedBatches = mutableListOf<List<CustomFactionThemeSettings>>()
         val actions =
             createActions(
                 uiState = state,
@@ -89,7 +89,7 @@ class AudioDebugScenarioActionsTest {
                     selectedPalette = customMaterialPalette(keyboard),
                 ),
             )
-        val importedBatches = mutableListOf<List<CustomBrandThemeSettings>>()
+        val importedBatches = mutableListOf<List<CustomFactionThemeSettings>>()
         val actions =
             createActions(
                 uiState = state,
@@ -116,8 +116,8 @@ class AudioDebugScenarioActionsTest {
 
     private fun createActions(
         uiState: MutableStateFlow<AudioAppUiState>,
-        onCustomMaterialThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
-        onCustomMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
+        onCustomMaterialThemeSaved: (CustomFactionThemeSettings, String?) -> Unit,
+        onCustomMaterialThemesImported: (List<CustomFactionThemeSettings>) -> Unit,
     ) = AudioDebugScenarioActions(
         uiState = uiState,
         scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Unconfined),
@@ -147,7 +147,7 @@ class AudioDebugScenarioActionsTest {
         presetId: String,
         displayName: String,
         primaryHex: String,
-    ) = CustomBrandThemeSettings(
+    ) = CustomFactionThemeSettings(
         presetId = presetId,
         displayName = displayName,
         primaryHex = primaryHex,

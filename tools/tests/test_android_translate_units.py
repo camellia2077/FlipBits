@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -26,6 +27,7 @@ from core.mixed_language_detection import (
 )
 from commands.fix_android_resource_escapes import run_fix_android_resource_escapes
 from commands.check_translation_key_alignment import TranslationKeyAlignmentChecker
+from commands.check_unused_translation_keys import run_unused_translation_key_check, validate_unused_key_scope
 from commands.build_replacements_from_suggestions import build_replacements_from_suggestions
 from core.translation_resources import AndroidStringResourceRepository
 from core.replacement_entries import load_replacement_entries
@@ -226,7 +228,7 @@ class AndroidStringTextTests(unittest.TestCase):
         encoded = encode_android_string_resource_text(literal_text)
         decoded = decode_android_string_resource_text(encoded)
 
-        self.assertEqual(encoded, '\\@alert says \\"it\\\'s ready\\"')
+        self.assertEqual(encoded, '"@alert says \\"it\'s ready\\""')
         self.assertEqual(decoded, literal_text)
 
     def test_high_risk_patterns_detect_raw_apostrophe_and_invalid_unicode_escape(self) -> None:
@@ -235,15 +237,77 @@ class AndroidStringTextTests(unittest.TestCase):
         self.assertTrue(any("raw ASCII apostrophe" in risk for risk in risks))
         self.assertTrue(any("invalid \\u escape sequence" in risk for risk in risks))
 
-    def test_normalize_android_string_resource_text_escapes_raw_apostrophes(self) -> None:
+    def test_normalize_android_string_resource_text_wraps_ascii_apostrophes_in_quotes(self) -> None:
         normalized = normalize_android_string_resource_text("Необов'язково")
 
-        self.assertEqual(normalized, "Необов\\'язково")
+        self.assertEqual(normalized, '"Необов\'язково"')
+
+    def test_decode_android_string_resource_text_strips_android_quote_wrappers(self) -> None:
+        decoded = decode_android_string_resource_text('"Forgia d\'ottone"')
+
+        self.assertEqual(decoded, "Forgia d'ottone")
+
+
+class UnusedTranslationKeyTests(unittest.TestCase):
+    def test_unused_key_checker_reports_only_unreferenced_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            res_dir = repo_root / "res"
+            values_dir = res_dir / "values"
+            layout_dir = res_dir / "layout"
+            source_dir = repo_root / "src"
+            values_dir.mkdir(parents=True, exist_ok=True)
+            layout_dir.mkdir(parents=True, exist_ok=True)
+            source_dir.mkdir(parents=True, exist_ok=True)
+
+            (values_dir / "strings_audio.xml").write_text(
+                (
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                    "<resources>\n"
+                    "    <string name=\"audio_used_label\">Used</string>\n"
+                    "    <string name=\"audio_unused_label\">Unused</string>\n"
+                    "</resources>\n"
+                ),
+                encoding="utf-8",
+            )
+            (layout_dir / "player.xml").write_text(
+                (
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                    "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
+                    "    android:orientation=\"vertical\"\n"
+                    "    android:layout_width=\"match_parent\"\n"
+                    "    android:layout_height=\"wrap_content\">\n"
+                    "    <TextView android:text=\"@string/audio_used_label\" />\n"
+                    "</LinearLayout>\n"
+                ),
+                encoding="utf-8",
+            )
+            (source_dir / "Player.kt").write_text(
+                "val title = R.string.audio_used_label\n",
+                encoding="utf-8",
+            )
+
+            result = run_unused_translation_key_check(
+                res_dir=res_dir,
+                output_dir=repo_root / "out",
+                repo_root=repo_root,
+                quiet=True,
+                emit_text=False,
+            )
+
+            self.assertEqual(result.exit_code, 2)
+            self.assertEqual(result.suspicious_unused_key_count, 1)
+            report_json = json.loads((repo_root / "out" / "unused_translation_keys.json").read_text(encoding="utf-8"))
+            self.assertEqual([item["name"] for item in report_json["items"]], ["audio_unused_label"])
+
+    def test_unused_key_scope_requires_text_type_for_group(self) -> None:
+        with self.assertRaisesRegex(ValueError, "--group"):
+            validate_unused_key_scope(text_type="", group="strings_audio")
 
 
 class MixedLanguageDetectionTests(unittest.TestCase):
     def test_cjk_strategy_flags_english_chunks(self) -> None:
-        suspicious = check_cjk_language_for_latin_chunks("검은 강철과 stolen floor 의 의식")
+        suspicious = check_cjk_language_for_latin_chunks("검은 강철과 stolen floor 의 의식", lang_code="ko")
 
         self.assertIn("stolen floor", suspicious)
 
@@ -575,8 +639,40 @@ class FixAndroidResourceEscapesTests(unittest.TestCase):
             self.assertEqual(result.files_updated, 1)
             self.assertEqual(result.strings_updated, 1)
             updated_text = xml_path.read_text(encoding="utf-8")
-            self.assertIn("Colore d\\'accento", updated_text)
+            self.assertIn('"Colore d\'accento"', updated_text)
             self.assertIn("Nome del preset", updated_text)
+
+    def test_fix_android_resource_escapes_rewrites_legacy_escaped_apostrophes_without_guessing_invalid_unicode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            res_dir = Path(tmp_dir) / "res"
+            values_fr_dir = res_dir / "values-fr"
+            values_fr_dir.mkdir(parents=True, exist_ok=True)
+            xml_path = values_fr_dir / "strings_settings.xml"
+            xml_path.write_text(
+                (
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                    "<resources>\n"
+                    "    <string name=\"legacy_apostrophe\">d\\'accento</string>\n"
+                    "    <string name=\"broken_unicode\">bad \\\\u12G4 sample</string>\n"
+                    "</resources>\n"
+                ),
+                encoding="utf-8",
+            )
+
+            result = run_fix_android_resource_escapes(
+                res_dir=res_dir,
+                files=[str(xml_path)],
+                quiet=True,
+                emit_text=False,
+            )
+
+            self.assertEqual(result.files_checked, 1)
+            self.assertEqual(result.files_updated, 1)
+            self.assertEqual(result.strings_updated, 1)
+
+            updated_text = xml_path.read_text(encoding="utf-8")
+            self.assertIn('"d\'accento"', updated_text)
+            self.assertIn("bad \\\\u12G4 sample", updated_text)
 
 
 class TranslationCliPayloadTests(unittest.TestCase):
@@ -640,11 +736,15 @@ class TranslationCliPayloadTests(unittest.TestCase):
                 "failed_ambiguous_count": 0,
                 "failed_validation_count": 0,
                 "validation_error_count": 0,
+                "write_completed": True,
+                "write_ok": True,
                 "smoke_check_ran": True,
                 "smoke_check_ok": True,
                 "auto_fix_applied": False,
                 "auto_fix_summary": None,
                 "dir_name": "values-de",
+                "touched_files": ("values-de/strings_settings.xml",),
+                "applied_targets": ("values-de::config_theme_mode_title",),
                 "errors": (),
             },
         )()

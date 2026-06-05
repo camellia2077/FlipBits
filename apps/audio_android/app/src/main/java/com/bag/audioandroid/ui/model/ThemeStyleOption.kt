@@ -11,13 +11,13 @@ enum class ThemeStyleOption(
         id = "material",
         labelResId = R.string.config_theme_style_material,
     ),
-    BrandDualTone(
-        id = "brand_dual_tone",
-        labelResId = R.string.config_theme_style_brand_dual_tone,
+    FactionTheme(
+        id = "faction_theme",
+        labelResId = R.string.config_theme_style_faction_theme,
     ),
     ;
 
     companion object {
-        fun fromId(id: String?): ThemeStyleOption = entries.firstOrNull { it.id == id } ?: BrandDualTone
+        fun fromId(id: String?): ThemeStyleOption = entries.firstOrNull { it.id == id } ?: FactionTheme
     }
 }

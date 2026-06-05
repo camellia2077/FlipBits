@@ -61,16 +61,16 @@ SIZE_RADAR_LABEL_ZH = 64    # 中文维度标签大小
 # 值增大：远离圆心；值减小：靠近圆心
 RADAR_LABEL_RADIUS_OFFSETS_ZH = {
     # --- 侧翼维度 (Side) ---
-    ENCODING_EFFICIENCY:    1.40, # 编码效率
-    TRANSMISSION_STABILITY: 1.40, # 传输稳定
-    EMOTIONAL_RICHNESS:     1.40, # 情感丰富度
-    ELECTRONIC_FEEL:        1.40, # 电子感
+    ENCODING_EFFICIENCY:    1.40, # 效率
+    TRANSMISSION_STABILITY: 1.40, # 稳定
+    EMOTIONAL_RICHNESS:     1.40, # 情感
+    ELECTRONIC_FEEL:        1.40, # 电子
 
     # --- 垂直维度 (Vertical) ---
-    TRANSMISSION_SPEED:      0.30,  # 传输速度
+    TRANSMISSION_SPEED:      0.30,  # 速度
     SENSE_OF_RITUAL:         0.30,  # 仪式感
 
-    COMPATIBILITY:           0.50, # 兼容性
+    COMPATIBILITY:           0.50, # 兼容
     PARSING_DIFFICULTY:      0.50, # 解析难度
 }
 

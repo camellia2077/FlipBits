@@ -23,6 +23,7 @@ Follow existing Ukrainian terms for this app where present: символів/б�
 Keep mini-player, tab, segmented-control, and chip labels short.
 Do not turn short controls, visualizer mode labels, or transport labels into explanatory sentences.
 Keep product mode names mini, flash, pro, and ultra lowercase unless the string begins with a sentence that already capitalizes nearby product terms.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/uk_theme_colors.md`.
 
 [sample_text_rule]
 For sample prose, preserve tone and atmosphere while writing fluent Ukrainian.
@@ -34,3 +35,4 @@ When filling missing entries, write Ukrainian localization for Ukrainian users.
 Do not use mixed-language phrasing or grammar patterns that do not fit natural Ukrainian.
 Match the existing Ukrainian locale's terminology while improving any obviously unnatural transfer wording encountered nearby.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d символів • %2$d байтів`.
+When working on theme or palette entries, prefer the Ukrainian theme/color rules above over older verbose or overly literal wording.

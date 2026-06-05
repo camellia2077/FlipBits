@@ -19,6 +19,7 @@ For app UI text, keep labels compact enough for Android buttons, tabs, segmented
 Use German compounds where they are natural, but avoid overlong compounds in narrow UI controls.
 Follow existing project terms where present: Audio, Zeichen, Bytes, Eingaberegeln, Visual, Tokens, Hex, Morse, Payload, Token, Nibble, niedriger Träger, and hoher Träger.
 Do not turn short controls, visualizer mode labels, or transport labels into explanatory sentences.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/de_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere while writing fluent German.
@@ -28,3 +29,4 @@ Keep pro-mode sample strings strict ASCII when the key or context says pro/ASCII
 When filling missing entries, write German localization that matches the current XML terminology.
 Preserve placeholders and do not alter German plural or case around numeric placeholders unless the full string requires it.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d Zeichen • %2$d Bytes`.
+When working on theme or palette entries, prefer the German theme/color rules above over older verbose or overly literal wording.

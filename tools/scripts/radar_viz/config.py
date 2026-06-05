@@ -10,7 +10,7 @@ import numpy as np
 # [ 导出尺寸配置 ]
 # ==========================================
 # 1. 雷达图
-FIG_SIZE_RADAR   = (26, 26)    # 画布尺寸 (英寸)
+FIG_SIZE_RADAR   = (20, 20)    # 画布尺寸 (英寸)
 EXPORT_DPI_RADAR = 300         # 导出分辨率
 RADAR_AXES_SCALE = 0.68        # 雷达图本体相对画布的缩放；只影响雷达图区，不改变输出背景尺寸;1.0 表示尽量占满
 
@@ -27,13 +27,13 @@ EXPORT_DPI_LEGEND = 300        # 导出分辨率
 # 左半球 (Machine/Rational): 负责客观的数据量化
 # 右半球 (Spirit/Emotional): 负责主观的听感与叙事评价
 
-TRANSMISSION_SPEED      = 0  # 传输速度 (Left-Top)
-ENCODING_EFFICIENCY     = 1  # 编码效率 (Left-Mid)
-TRANSMISSION_STABILITY  = 2  # 传输稳定 (Left-Mid)
-COMPATIBILITY           = 3  # 兼容性 (Left-Bottom)
+TRANSMISSION_SPEED      = 0  # 速度 (Left-Top)
+ENCODING_EFFICIENCY     = 1  # 效率 (Left-Mid)
+TRANSMISSION_STABILITY  = 2  # 稳定 (Left-Mid)
+COMPATIBILITY           = 3  # 兼容 (Left-Bottom)
 PARSING_DIFFICULTY      = 4  # 解析难度 (Right-Bottom)
-ELECTRONIC_FEEL         = 5  # 电子感 (Right-Mid)
-EMOTIONAL_RICHNESS      = 6  # 情感丰富度 (Right-Mid)
+ELECTRONIC_FEEL         = 5  # 电子 (Right-Mid)
+EMOTIONAL_RICHNESS      = 6  # 情感 (Right-Mid)
 SENSE_OF_RITUAL         = 7  # 仪式感 (Right-Top)
 
 # ==========================================
@@ -51,13 +51,13 @@ LABELS_EN = np.array([
 ])
 
 LABELS_ZH = np.array([
-    '传输速度',
-    '编码效率',
-    '传输稳定',
-    '兼容性',
+    '速度',
+    '效率',
+    '稳定',
+    '兼容',
     '解析难度',
-    '电子感',
-    '情感丰富度',
+    '电子',
+    '情感',
     '仪式感'
 ])
 
@@ -73,13 +73,13 @@ DESC_EN = {
 }
 
 DESC_ZH = {
-    '传输速度': '吞吐量与物理层波特率',
-    '编码效率': '单位符号携带的有效比特数',
-    '传输稳定': '信号连续性、抗干扰能力与无抖动表现',
-    '兼容性': '对字符集的严格限制与载荷挑剔程度',
+    '速度': '吞吐量与物理层波特率',
+    '效率': '单位符号携带的有效比特数',
+    '稳定': '信号连续性、抗干扰能力与无抖动表现',
+    '兼容': '对字符集的严格限制与载荷挑剔程度',
     '解析难度': '人类或机器解析难度',
-    '电子感': '电子感与偏离人类表达的程度',
-    '情感丰富度': '情感丰富度',
+    '电子': '电子与偏离人类表达的程度',
+    '情感': '情感',
     '仪式感': '结构规整度、格式顿挫与强制停顿间隔'
 }
 
@@ -87,7 +87,8 @@ DESC_ZH = {
 # [ 视觉风格配置 ]
 # ==========================================
 PRIMARY_COLOR   = "#E8E2D0"   # 背景底色 (米白)
-SECONDARY_COLOR = "#9E1B1B"   # 属性与网格颜色 (深红)
+SECONDARY_COLOR = "#9E1B1B"   # 属性颜色 (深红)
+GRID_COLOR      = "#C78C25"   # 描边颜色 (黄铜)
 OUTLINE_COLOR   = "#C78C25"   # 描边颜色 (黄铜)
-TEXT_COLOR   = "#2E2E2E"   # 文字颜色
+TEXT_COLOR      = "#2E2E2E"   # 文字颜色
 

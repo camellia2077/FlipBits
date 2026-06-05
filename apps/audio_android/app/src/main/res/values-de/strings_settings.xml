@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="config_title">Einstellungen</string>
     <string name="config_language_title">Sprache</string>
     <string name="config_language_subtitle">App-Sprache wählen</string>
     <string name="config_language_follow_system">Systemsprache verwenden</string>
@@ -19,36 +18,33 @@
     <string name="config_language_polish">Polski</string>
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Spracheinstellungen erweitern</string>
-    <string name="config_language_collapse">Spracheinstellungen einklappen</string>
     <string name="config_theme_mode_title">Designmodus</string>
     <string name="config_theme_mode_subtitle">System-, Hell- oder Dunkelmodus wählen.</string>
-    <string name="config_theme_mode_brand_fixed">Dual-tone-Designs haben ein festes Erscheinungsbild.</string>
+    <string name="config_theme_mode_faction_theme_fixed">Fraktionsthemen haben ein festes Erscheinungsbild.</string>
     <string name="config_theme_mode_follow_system">Systemeinstellung verwenden</string>
     <string name="config_theme_mode_light">Hell</string>
     <string name="config_theme_mode_dark">Dunkel</string>
-    <string name="config_theme_mode_custom">Benutzerdefiniert</string>
     <string name="config_theme_appearance_title">Designoptik</string>
-    <string name="config_theme_style_title">Designstil</string>
-    <string name="config_theme_style_subtitle">Material oder Dual-tone wählen.</string>
+    <string name="config_theme_style_subtitle">Material oder Fraktionsthema wählen.</string>
     <string name="config_theme_style_material">Material</string>
-    <string name="config_theme_style_brand_dual_tone">Zweiton</string>
+    <string name="config_theme_style_faction_theme">Fraktionsthema</string>
     <string name="config_theme_appearance_expand">Designoptik erweitern</string>
     <string name="config_theme_appearance_collapse">Designoptik einklappen</string>
     <string name="config_palette_title">Farbpaletten</string>
     <string name="config_palette_selected">Ausgewählt</string>
     <string name="config_palette_expand">Paletten erweitern</string>
     <string name="config_palette_collapse">Paletten einklappen</string>
-    <string name="config_brand_theme_title">Dual-tone-Designs</string>
-    <string name="config_brand_theme_description">Jedes Dual-tone-Design behält einen festen Look mit zweifarbiger Vorschau.</string>
-    <string name="config_dual_tone_group_sacred_machine">Heilige Maschine</string>
+    <string name="config_faction_theme_title">Fraktionsthemen</string>
+    <string name="config_faction_theme_description">Jedes Fraktionsthema hat ein festes Erscheinungsbild mit zweifarbiger Vorschau.</string>
+    <string name="config_faction_theme_group_sacred_machine">Heilige Maschine</string>
     <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
-    <string name="config_dual_tone_group_custom">Benutzerdefiniert</string>
-    <string name="config_dual_tone_group_ancient_dynasty">Alte Dynastie</string>
-    <string name="config_dual_tone_group_immortal_rot">Die unsterbliche Fäulnis</string>
-    <string name="config_dual_tone_group_scarlet_carnage">Das scharlachrote Gemetzel</string>
-    <string name="config_dual_tone_group_exquisite_fall">Erlesener Fall</string>
-    <string name="config_dual_tone_group_labyrinth_of_mutability">Das Labyrinth der Wandelbarkeit</string>
-    <string name="palette_family_brand">Zweiton</string>
+    <string name="config_faction_theme_group_custom">Benutzerdefiniert</string>
+    <string name="config_faction_theme_group_ancient_dynasty">Alte Dynastie</string>
+    <string name="config_faction_theme_group_immortal_rot">Unsterbliche Fäulnis</string>
+    <string name="config_faction_theme_group_scarlet_carnage">Scharlachrotes Gemetzel</string>
+    <string name="config_faction_theme_group_exquisite_fall">Exquisiter Fall</string>
+    <string name="config_faction_theme_group_labyrinth_of_mutability">Labyrinth der Wandelbarkeit</string>
+    <string name="palette_family_faction_theme">Fraktionsthema</string>
     <string name="palette_family_custom">Benutzerdefiniert</string>
     <string name="palette_family_reds_pinks">Rot</string>
     <string name="palette_family_oranges">Orange</string>
@@ -57,121 +53,122 @@
     <string name="palette_family_cyans_blues">Blau</string>
     <string name="palette_family_purples_magentas">Lila</string>
     <string name="palette_family_neutrals">Neutral</string>
-    <string name="config_flash_style_title">Flash-Stil</string>
-    <string name="config_flash_style_subtitle">Wähle, wie Flash-Audio klingen soll.</string>
     <string name="config_flash_style_standard_label">Standard</string>
-    <string name="config_flash_style_standard_description">Klare, stabile Maschinensignale.</string>
+    <string name="config_flash_style_standard_description">Stabil, klar.</string>
     <string name="config_flash_style_hostility_label">Feindseligkeit</string>
-    <string name="config_flash_style_hostility_description">Ein wütendes Befehls-Preset mit kürzerem, härterem Signaltiming.</string>
+    <string name="config_flash_style_hostility_description">Aggressiv, wütend.</string>
     <string name="config_flash_style_litany_label">Litanei</string>
-    <string name="config_flash_style_litany_description">Ein ehrfürchtiges Gebets-Preset mit langsamerem rituellem Signaltakt.</string>
+    <string name="config_flash_style_litany_description">Ehrfürchtig, rituell.</string>
     <string name="config_flash_style_collapse_label">Zusammenbruch</string>
-    <string name="config_flash_style_collapse_description">Ein Furcht- und Zusammenbruch-Preset; verwendet derzeit die Standard-Signalhülle.</string>
+    <string name="config_flash_style_collapse_description">Instabil, ängstlich.</string>
     <string name="config_flash_style_zeal_label">Eifer</string>
-    <string name="config_flash_style_zeal_description">Helles, dichtes Preset mit variablem schnellen Timing und Interpunktionspausen.</string>
+    <string name="config_flash_style_zeal_description">Dringlich, intensiv.</string>
     <string name="config_flash_style_void_label">Leere</string>
-    <string name="config_flash_style_void_description">Tiefes, sparsames Preset mit langsamerer Signalkadenz.</string>
+    <string name="config_flash_style_void_description">Spärlich, hohl.</string>
     <string name="config_about_title">Info</string>
     <string name="config_about_subtitle">Autor, Projektlink und Lizenzen</string>
     <string name="palette_ruby_title">Rubin</string>
     <string name="palette_red_title">Material-Rot</string>
     <string name="palette_mars_relic_title">Mars</string>
-    <string name="brand_theme_mars_relic_title">Mars-Relikt</string>
-    <string name="brand_theme_mars_relic_description">Tiefrot mit Pergament für den Look eines zeremoniellen Archivs.</string>
-    <string name="brand_theme_mars_relic_accessibility">Mars-Relikt-Design, tiefes Rot mit pergamentbeigem Ton.</string>
-    <string name="brand_theme_black_crimson_rite_title">Schwarzroter Ritus</string>
-    <string name="brand_theme_black_crimson_rite_description">Rußschwarz und Ritualkarmesin für die strenge Stimmung eines Maschinenschreins.</string>
-    <string name="brand_theme_black_crimson_rite_accessibility">Schwarzroter-Ritus-Design, fast schwarz mit leuchtendem Karmesinrot.</string>
-    <string name="brand_theme_xeno_code_title">Xeno-Code</string>
-    <string name="brand_theme_xeno_code_description">Obsidianschwarze Schaltkreise und Neongrün für den Puls einer fremdartigen Maschine.</string>
-    <string name="brand_theme_xeno_code_accessibility">Xeno-Code-Design, dunkles Moosschwarz mit Neongrün und weißer Kontur.</string>
-    <string name="brand_theme_scarlet_guard_title">Gefahrenwarnung</string>
-    <string name="brand_theme_scarlet_guard_description">Helles Industrie-Grau, Warn-Orange-Rot und dunkler Graphit für den Look eines Maschinenalarms.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Gefahrenwarnung-Design, blasses Grau mit Warn-Orange-Rot und dunkler Graphitkontur.</string>
-    <string name="brand_theme_dynasty_revival_title">Wiederkehr der Dynastie</string>
-    <string name="brand_theme_dynasty_revival_description">Grabmetallschwarz mit klassischem Reaktorgrün für einen erwachten Dynastiekern.</string>
-    <string name="brand_theme_dynasty_revival_accessibility">Wiederkehr-der-Dynastie-Design, tiefes Grabmetallschwarz mit hellem Reaktorgrün.</string>
-    <string name="brand_theme_sepulcher_cyan_title">Grabkammer-Cyan</string>
-    <string name="brand_theme_sepulcher_cyan_description">Kalter Grabkammerstahl mit zurückhaltendem Cyan-Grün für ein ruhigeres königliches Maschinenglühen.</string>
-    <string name="brand_theme_sepulcher_cyan_accessibility">Grabkammer-Cyan-Design, kalter dunkler Stahl mit gedämpftem Cyan-Grün.</string>
-    <string name="brand_theme_tomb_sigil_title">Grabsiegel</string>
-    <string name="brand_theme_tomb_sigil_description">Warmes Kryptaeisen und scharfes Erweckungsgrün für ein zeremonielles Dynastiezeichen.</string>
-    <string name="brand_theme_tomb_sigil_accessibility">Grabsiegel-Design, dunkles Kryptaeisen mit leuchtendem Erweckungsgrün.</string>
-    <string name="brand_theme_ancient_alloy_title">Uralte Legierung</string>
-    <string name="brand_theme_ancient_alloy_description">Verwitterte Metallschatten und kaltes Türkis für das Glühen einer Grabesschmiede.</string>
-    <string name="brand_theme_ancient_alloy_accessibility">Uralte-Legierung-Design, dunkles Bronze-Grau mit hellem Türkis.</string>
-    <string name="brand_theme_immortal_rot_title">Giftige Ausdünstung</string>
-    <string name="brand_theme_immortal_rot_description">Farngrün und Citringelb bilden eine feuchte, überwucherte Dual-tone-Palette.</string>
-    <string name="brand_theme_immortal_rot_accessibility">Giftige-Ausdünstung-Design, Farngrün mit Citringelb.</string>
-    <string name="brand_theme_plague_mire_title">Seuchensumpf</string>
-    <string name="brand_theme_plague_mire_description">Moorschwarzgrün, kränkliches Limettengrün und Giftorange in einem fiebrigen Sumpfschleier.</string>
-    <string name="brand_theme_plague_mire_accessibility">Seuchensumpf-Design, moorschwarzgrün mit kränklichem Limettengrün und giftoranger Kontur.</string>
-    <string name="brand_theme_scarlet_carnage_title">Blutgetränktes Elfenbein</string>
-    <string name="brand_theme_scarlet_carnage_description">Dunkelrot und Messing formen eine brutale Dual-tone-Palette aus Blut und Kriegsmetall.</string>
-    <string name="brand_theme_scarlet_carnage_accessibility">Blutgetränktes-Elfenbein-Design, Dunkelrot mit messingfarbenem Dunkelgold.</string>
-    <string name="brand_theme_brass_forge_title">Messingschmiede</string>
-    <string name="brand_theme_brass_forge_description">Fast schwarzes Karmesin, Ofenmessing und Flammenorange in einem glühenden Kriegsmetallschein.</string>
-    <string name="brand_theme_brass_forge_accessibility">Messingschmiede-Design, fast schwarzes Karmesin mit Ofenmessing und flammenoranger Kontur.</string>
-    <string name="brand_theme_exquisite_fall_title">Samtiger Albtraum</string>
-    <string name="brand_theme_exquisite_fall_description">Mitternachtsviolett und grelles Pink mit einer weichen pfirsichfarbenen Kontur schaffen eine dekadente Dual-tone-Palette aus Eitelkeit und Reiz.</string>
-    <string name="brand_theme_exquisite_fall_accessibility">Samtiger-Albtraum-Design, Mitternachtsviolett mit grellem Pink und weicher pfirsichfarbener Kontur.</string>
-    <string name="brand_theme_ecstatic_rapture_title">Ekstatische Verzückung</string>
-    <string name="brand_theme_ecstatic_rapture_description">Orchideenviolett, Rougepink und Strahlgold in einer leuchtend verzückten Blüte.</string>
-    <string name="brand_theme_ecstatic_rapture_accessibility">Design Ekstatische Verzückung, Orchideenviolett mit Rougepink und strahlgoldener Kontur.</string>
-    <string name="brand_theme_labyrinth_of_mutability_title">Arkane Tiefe</string>
-    <string name="brand_theme_labyrinth_of_mutability_description">Mitternachtsnavy, elektrisches Cyan und eine lavendelfarbene Kontur formen ein wandelbares Dual-tone-Labyrinth aus kaltem Signallicht.</string>
-    <string name="brand_theme_labyrinth_of_mutability_accessibility">Arkane-Tiefe-Design, Mitternachtsnavy mit elektrischem Cyan und lavendelfarbener Kontur.</string>
-    <string name="brand_theme_fires_of_fate_title">Schicksalsfeuer</string>
-    <string name="brand_theme_fires_of_fate_description">Schicksalsblau, Magentaflamme und Giftlimette in einem unheilshellen Brand.</string>
-    <string name="brand_theme_fires_of_fate_accessibility">Schicksalsfeuer-Design, Schicksalsblau mit Magentaflamme und giftlimettgrüner Kontur.</string>
+    <string name="faction_theme_mars_relic_title">Mars-Relikt</string>
+    <string name="faction_theme_mars_relic_description">Tiefrot und Pergament.</string>
+    <string name="faction_theme_mars_relic_accessibility">Theme „Mars-Relikt“: Tiefrot mit Pergamentbeige.</string>
+    <string name="faction_theme_black_crimson_rite_title">Schwarzroter Ritus</string>
+    <string name="faction_theme_black_crimson_rite_description">Rußschwarz und Ritualkarmesin.</string>
+    <string name="faction_theme_black_crimson_rite_accessibility">Theme „Schwarzroter Ritus“: Fast schwarz mit leuchtendem Karmesinrot.</string>
+    <string name="faction_theme_xeno_code_title">Xeno-Code</string>
+    <string name="faction_theme_xeno_code_description">Obsidianschwarz und Neongrün.</string>
+    <string name="faction_theme_xeno_code_accessibility">Theme „Xeno-Code“: Dunkles Moosschwarz mit Neongrün und weißer Kontur.</string>
+    <string name="faction_theme_scarlet_guard_title">Gefahrenwarnung</string>
+    <string name="faction_theme_scarlet_guard_description">Industriegrau, Warn-Orange-Rot und dunkler Graphit.</string>
+    <string name="faction_theme_scarlet_guard_accessibility">Theme „Gefahrenwarnung“: Blasses Grau mit Warn-Orange-Rot und dunkler Graphitkontur.</string>
+    <string name="faction_theme_dynasty_revival_title">Souveräner Sturm</string>
+    <string name="faction_theme_dynasty_revival_description">Tiefes Jadegrün, Neongrün und blasses Legierungsgrau.</string>
+    <string name="faction_theme_dynasty_revival_accessibility">Theme „Souveräner Sturm“: Tiefes Jadegrün mit Neongrün und blassgrauer Legierungskontur.</string>
+    <string name="faction_theme_sepulcher_cyan_title">Stille Hegemonie</string>
+    <string name="faction_theme_sepulcher_cyan_description">Gedämpfte Bronze, Neongrün und blasses Elfenbein.</string>
+    <string name="faction_theme_sepulcher_cyan_accessibility">Theme „Stille Hegemonie“: Gedämpfte Bronze mit Neongrün und blass elfenbeinfarbener Kontur.</string>
+    <string name="faction_theme_tomb_sigil_title">Vergoldete Apathie</string>
+    <string name="faction_theme_tomb_sigil_description">Poliertes Gold, helles Cyan und kühles Grau.</string>
+    <string name="faction_theme_tomb_sigil_accessibility">Theme „Vergoldete Apathie“: Poliertes Gold mit hellem Cyan und kühler grauer Kontur.</string>
+    <string name="faction_theme_ancient_alloy_title">Solare Auslöschung</string>
+    <string name="faction_theme_ancient_alloy_description">Olivgrün, Bernsteinorange und Aschgrau.</string>
+    <string name="faction_theme_ancient_alloy_accessibility">Theme „Solare Auslöschung“: Olivgrün mit Bernsteinorange und aschgrauer Kontur.</string>
+    <string name="faction_theme_void_fluctuation_title">Fluktuation der Leere</string>
+    <string name="faction_theme_void_fluctuation_description">Tiefblau, elektrisches Cyan und Stahlblau.</string>
+    <string name="faction_theme_void_fluctuation_accessibility">Theme „Fluktuation der Leere“: Tiefblau mit elektrischem Cyan und stahlblauer Kontur.</string>
+    <string name="faction_theme_crimson_decree_title">Karmesinrotes Dekret</string>
+    <string name="faction_theme_crimson_decree_description">Schiefergrau, dunkles Karmesin und Signalorange.</string>
+    <string name="faction_theme_crimson_decree_accessibility">Theme „Karmesinrotes Dekret“: Schiefergrau mit dunklem Karmesin und signaloranger Kontur.</string>
+    <string name="faction_theme_immortal_rot_title">Giftige Ausdünstung</string>
+    <string name="faction_theme_immortal_rot_description">Farngrün und Citringelb.</string>
+    <string name="faction_theme_immortal_rot_accessibility">Theme „Giftige Ausdünstung“: Farngrün mit Citringelb.</string>
+    <string name="faction_theme_plague_mire_title">Seuchensumpf</string>
+    <string name="faction_theme_plague_mire_description">Moorschwarzgrün, kränkliches Limettengrün und Giftorange.</string>
+    <string name="faction_theme_plague_mire_accessibility">Theme „Seuchensumpf“: Moorschwarzgrün mit kränklichem Limettengrün und giftoranger Kontur.</string>
+    <string name="faction_theme_scarlet_carnage_title">Blutgetränktes Elfenbein</string>
+    <string name="faction_theme_scarlet_carnage_description">Dunkelrot und Messing.</string>
+    <string name="faction_theme_scarlet_carnage_accessibility">Theme „Blutgetränktes Elfenbein“: Dunkelrot mit messingfarbenem Dunkelgold.</string>
+    <string name="faction_theme_brass_forge_title">Messingschmiede</string>
+    <string name="faction_theme_brass_forge_description">Fast schwarzes Karmesin, Ofenmessing und Flammenorange.</string>
+    <string name="faction_theme_brass_forge_accessibility">Theme „Messingschmiede“: Fast schwarzes Karmesin mit Ofenmessing und flammenoranger Kontur.</string>
+    <string name="faction_theme_exquisite_fall_title">Samtiger Albtraum</string>
+    <string name="faction_theme_exquisite_fall_description">Mitternachtsviolett, grelles Pink und weiches Pfirsich.</string>
+    <string name="faction_theme_exquisite_fall_accessibility">Theme „Samtiger Albtraum“: Mitternachtsviolett mit grellem Pink und weicher pfirsichfarbener Kontur.</string>
+    <string name="faction_theme_ecstatic_rapture_title">Ekstatische Verzückung</string>
+    <string name="faction_theme_ecstatic_rapture_description">Orchideenviolett, Rougepink und Strahlgold.</string>
+    <string name="faction_theme_ecstatic_rapture_accessibility">Theme „Ekstatische Verzückung“: Orchideenviolett mit Rougepink und strahlgoldener Kontur.</string>
+    <string name="faction_theme_labyrinth_of_mutability_title">Arkane Tiefe</string>
+    <string name="faction_theme_labyrinth_of_mutability_description">Mitternachtsnavy, elektrisches Cyan und Lavendel.</string>
+    <string name="faction_theme_labyrinth_of_mutability_accessibility">Theme „Arkane Tiefe“: Mitternachtsnavy mit elektrischem Cyan und lavendelfarbener Kontur.</string>
+    <string name="faction_theme_fires_of_fate_title">Schicksalsfeuer</string>
+    <string name="faction_theme_fires_of_fate_description">Schicksalsblau, Magenta und Giftlimette.</string>
+    <string name="faction_theme_fires_of_fate_accessibility">Theme „Schicksalsfeuer“: Schicksalsblau mit Magenta und giftlimettgrüner Kontur.</string>
     <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
-    <string name="brand_theme_custom_title">Benutzerdefiniertes Dual-Tone</string>
+    <string name="faction_theme_custom_title">Benutzerdefiniertes Thema</string>
     <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
-    <string name="brand_theme_custom_description">Eigene Dual-Tone-Farben mit Sacred-Machine-Beispieltext.</string>
+    <string name="faction_theme_custom_description">Benutzerdefinierte Themenfarben und Namen.</string>
     <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
-    <string name="brand_theme_custom_accessibility">Vorschau des benutzerdefinierten Dual-Tone-Themes.</string>
+    <string name="faction_theme_custom_accessibility">Vorschau des benutzerdefinierten Fraktionsthemas.</string>
     <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
-    <string name="config_custom_brand_theme_add">Hinzufügen</string>
+    <string name="config_custom_faction_theme_add">Hinzufügen</string>
     <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_edit">Farben bearbeiten</string>
+    <string name="config_custom_faction_theme_edit">Farben bearbeiten</string>
     <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
-    <string name="config_custom_brand_theme_dialog_title">Benutzerdefinierte Dual-Tone-Farben</string>
     <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_dialog_title_new">Neues benutzerdefiniertes Dual-Tone</string>
+    <string name="config_custom_faction_theme_dialog_title_new">Neues benutzerdefiniertes Fraktionsthema</string>
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_dialog_title_edit">Benutzerdefiniertes Dual-Tone bearbeiten</string>
+    <string name="config_custom_faction_theme_dialog_title_edit">Benutzerdefiniertes Fraktionsthema bearbeiten</string>
     <string name="config_custom_material_theme_dialog_title_new">Neue benutzerdefinierte Farben</string>
     <string name="config_custom_material_theme_dialog_title_edit">Farben bearbeiten</string>
     <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
-    <string name="config_custom_brand_theme_dialog_description">Hex-Farben im Format #RRGGBB eingeben. Umrandung leer lassen, um die Akzentfarbe zu verwenden.</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_randomize">Farben zufällig wählen</string>
+    <string name="config_custom_faction_theme_randomize">Farben zufällig wählen</string>
     <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
-    <string name="config_custom_brand_theme_randomize_hint">Würfel verwenden, um eine neue Kombination aus Primär-, Akzent- und Umrandungsfarbe zu generieren.</string>
     <!-- CONTEXT: Form field label for the user-defined preset name. -->
-    <string name="config_custom_brand_theme_name_label">Name der Voreinstellung</string>
+    <string name="config_custom_faction_theme_name_label">Name der Voreinstellung</string>
     <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_background_label">Primärfarbe</string>
+    <string name="config_custom_faction_theme_background_label">Primärfarbe</string>
     <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Sekundärfarbe</string>
+    <string name="config_custom_faction_theme_accent_label">Sekundärfarbe</string>
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_outline_label">Umrandungsfarbe</string>
+    <string name="config_custom_faction_theme_outline_label">Umrandungsfarbe</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
-    <string name="config_custom_brand_theme_outline_optional">Optional</string>
+    <string name="config_custom_faction_theme_outline_optional">Optional</string>
     <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_save">Speichern</string>
+    <string name="config_custom_faction_theme_save">Speichern</string>
     <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_delete">Löschen</string>
+    <string name="config_custom_faction_theme_delete">Löschen</string>
     <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_delete_title">Benutzerdefiniertes Dual-Tone löschen</string>
+    <string name="config_custom_faction_theme_delete_title">Benutzerdefiniertes Fraktionsthema löschen</string>
     <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
-    <string name="config_custom_brand_theme_delete_message">Voreinstellung %1$s löschen?</string>
+    <string name="config_custom_faction_theme_delete_message">Voreinstellung %1$s löschen?</string>
     <string name="config_custom_material_theme_delete_title">Benutzerdefinierte Farben löschen</string>
     <string name="config_custom_material_theme_delete_message">Voreinstellung %1$s löschen?</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
-    <string name="config_custom_brand_theme_invalid_name">Namen für Voreinstellung eingeben.</string>
+    <string name="config_custom_faction_theme_invalid_name">Namen für Voreinstellung eingeben.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">RRGGBB oder #RRGGBB verwenden.</string>
+    <string name="config_custom_faction_theme_invalid_hex">RRGGBB oder #RRGGBB verwenden.</string>
     <string name="palette_crimson_title">Karmesin</string>
     <string name="palette_rose_title">Rose</string>
     <string name="palette_sakura_title">Sakura</string>
@@ -213,7 +210,6 @@
     <string name="palette_stone_title">Stein</string>
     <string name="palette_graphite_title">Graphit</string>
     <string name="palette_ivory_title">Elfenbein</string>
-
     <string name="config_sample_decoration_title">Sample-Dekoration</string>
     <string name="config_sample_decoration_subtitle">Fügt dem zufälligen Sample-Text optionale Präfixmarker hinzu.</string>
     <string name="config_sample_text_title">Audio-Einstellungen</string>
@@ -222,44 +218,38 @@
     <string name="config_sample_text_collapse">Audio-Einstellungen einklappen</string>
     <string name="config_sample_text_expand">Audio-Einstellungen ausklappen</string>
     <string name="config_sample_auto_fill_title">Beispieltext automatisch einfügen</string>
-    <string name="config_demo_mode_title">Demo-Modus</string>
-    <string name="config_demo_mode_subtitle">Zeigt Tipp-Feedback und Aktionshinweise für Aufnahmen.</string>
-    <string name="config_custom_brand_theme_import_title">Benutzerdefinierten dual-tone importieren</string>
-    <string name="config_custom_brand_theme_import">Importieren</string>
-    <string name="config_custom_brand_theme_copy_config">Kopieren</string>
+    <string name="config_custom_faction_theme_import_title">Benutzerdefiniertes Fraktionsthema importieren</string>
+    <string name="config_custom_faction_theme_import">Importieren</string>
+    <string name="config_custom_faction_theme_copy_config">Kopieren</string>
     <string name="config_custom_theme_copy_all">Alle Farben kopieren</string>
-    <string name="config_custom_brand_theme_import_description">Füge eine FlipBits-Konfiguration für ein benutzerdefiniertes Theme ein.</string>
-    <string name="config_custom_brand_theme_import_config_label">Theme-Konfiguration</string>
-    <string name="config_custom_brand_theme_import_invalid">Füge eine gültige FlipBits-Konfiguration für ein benutzerdefiniertes Theme ein.</string>
-    <string name="config_custom_brand_theme_import_duplicate_message">Dieser Name entspricht einem vorhandenen benutzerdefinierten Theme. Überschreiben oder als weitere Kopie hinzufügen?</string>
-    <string name="config_custom_brand_theme_import_overwrite">Überschreiben</string>
-    <string name="config_custom_brand_theme_import_duplicate_title">Theme-Name ist bereits vorhanden</string>
-    <string name="config_custom_brand_theme_import_add_copy">Kopie hinzufügen</string>
-    <string name="config_custom_brand_theme_export_title">Benutzerdefinierte dual-tones exportieren</string>
-    <string name="config_custom_brand_theme_export_description">Wähle, ob du den ausgewählten benutzerdefinierten dual-tone oder alle benutzerdefinierten dual-tones kopieren möchtest.</string>
-    <string name="config_custom_brand_theme_export_scope_selected">Ausgewählt</string>
-    <string name="config_custom_brand_theme_export_scope_all">Alle</string>
-    <string name="config_custom_brand_theme_batch_import_title">Benutzerdefinierte dual-tones importieren</string>
-    <string name="config_custom_brand_theme_batch_import_summary">%1$d Themes gefunden. %2$d neu, %3$d mit vorhandenen Namen.</string>
-    <string name="config_custom_brand_theme_batch_import_duplicate_note">Themes mit vorhandenen Namen werden nach deiner Bestätigung überschrieben.</string>
+    <string name="config_custom_faction_theme_import_description">Füge eine FlipBits-Konfiguration für ein benutzerdefiniertes Theme ein.</string>
+    <string name="config_custom_faction_theme_import_config_label">Theme-Konfiguration</string>
+    <string name="config_custom_faction_theme_import_duplicate_message">Dieser Name entspricht einem vorhandenen benutzerdefinierten Theme. Überschreiben oder als weitere Kopie hinzufügen?</string>
+    <string name="config_custom_faction_theme_import_overwrite">Überschreiben</string>
+    <string name="config_custom_faction_theme_import_duplicate_title">Theme-Name ist bereits vorhanden</string>
+    <string name="config_custom_faction_theme_import_add_copy">Kopie hinzufügen</string>
+    <string name="config_custom_faction_theme_export_title">Benutzerdefinierte Fraktionsthemen exportieren</string>
+    <string name="config_custom_faction_theme_export_description">Wähle, ob du das ausgewählte benutzerdefinierte Fraktionsthema oder alle benutzerdefinierten Fraktionsthemen kopieren möchtest.</string>
+    <string name="config_custom_faction_theme_export_scope_selected">Ausgewählt</string>
+    <string name="config_custom_faction_theme_export_scope_all">Alle</string>
+    <string name="config_custom_faction_theme_batch_import_title">Benutzerdefinierte Fraktionsthemen importieren</string>
+    <string name="config_custom_faction_theme_batch_import_summary">%1$d Themes gefunden. %2$d neu, %3$d mit vorhandenen Namen.</string>
+    <string name="config_custom_faction_theme_batch_import_duplicate_note">Themes mit vorhandenen Namen werden nach deiner Bestätigung überschrieben.</string>
     <string name="config_custom_material_theme_import_title">Benutzerdefinierte Farben importieren</string>
     <string name="config_custom_material_theme_import">Importieren</string>
     <string name="config_custom_material_theme_import_description">Benutzerdefinierte Farb-Voreinstellungen mit name- und primary-Werten einfügen.</string>
     <string name="config_custom_material_theme_import_config_label">Farbkonfiguration</string>
-    <string name="config_custom_material_theme_import_invalid">Eine gültige Konfiguration für benutzerdefinierte Farben einfügen.</string>
     <string name="config_palette_custom_section_title">Eigene Paletten</string>
     <string name="config_palette_builtin_section_title">Feste Paletten</string>
     <string name="config_palette_custom_section_subtitle">Erstellen, benennen, importieren und sortieren Sie Ihre eigenen Presets.</string>
     <string name="config_palette_builtin_section_subtitle">Durchsuchen Sie die feste Palettensammlung nach Farbfamilien.</string>
-    <string name="config_custom_material_theme_expand">Eigene Farben ausklappen</string>
-    <string name="config_custom_material_theme_collapse">Eigene Farben einklappen</string>
     <string name="config_custom_theme_import_error_empty">Fügen Sie mindestens einen Block für ein benutzerdefiniertes Preset ein.</string>
     <string name="config_custom_theme_import_error_malformed_line">Zeile %1$d muss key=value verwenden.</string>
     <string name="config_custom_theme_import_error_unknown_field">Block %1$d enthält ein nicht unterstütztes Feld: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">Block %1$d enthält %2$s mehrfach.</string>
     <string name="config_custom_theme_import_error_missing_field">In Block %1$d fehlt %2$s.</string>
     <string name="config_custom_theme_import_error_invalid_hex">Block %1$d enthält eine ungültige Hex-Farbe für %2$s: %3$s.</string>
-    <string name="config_custom_theme_import_error_wrong_target_dual_tone">Block %1$d verwendet Felder für benutzerdefinierte dual-tone. Importieren Sie ihn stattdessen über benutzerdefinierte dual-tone.</string>
+    <string name="config_custom_theme_import_error_wrong_target_faction_theme">Block %1$d verwendet Felder für benutzerdefinierte Fraktionsthemen. Importieren Sie ihn stattdessen über benutzerdefinierte Fraktionsthemen.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Block %1$d verwendet Felder für benutzerdefinierte Farben. Importieren Sie ihn stattdessen über benutzerdefinierte Farben.</string>
     <string name="config_custom_theme_import_field_name">Name</string>
     <string name="config_custom_theme_import_field_primary">Primär</string>

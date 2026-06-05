@@ -17,6 +17,7 @@ Use natural Polish case, gender, and word order rather than literal English stru
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.
 Follow existing project terms where present: audio, znaków, bajtów, reguły wejścia, Hex, Morse, payload, token, nibble, niska nośna, and wysoka nośna.
 Do not turn short controls, visualizer mode labels, or transport labels into explanatory sentences.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/pl_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere while writing fluent Polish.
@@ -26,3 +27,4 @@ Keep pro-mode sample strings strict ASCII, without Polish diacritics, when the k
 When filling missing entries, write Polish localization that matches the current XML terminology.
 Be careful with Polish case and number around placeholders; do not change placeholders or numeric units casually.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d znaków • %2$d bajtów`.
+When working on theme or palette entries, prefer the Polish theme/color rules above over older verbose or overly literal wording.

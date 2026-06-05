@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use('Agg')   # 无头渲染，避免弹出窗口
 import matplotlib.pyplot as plt
 
-from radar import RadarChart
+from generator import RadarGenerator
 
 # ==========================================
 # [ 插值工具 ]
@@ -56,13 +56,8 @@ def _build_frame_sequence(
 
 def _render_frame(vals: np.ndarray, out_path: str, dpi: int = 150):
     """渲染单帧：装甲 + 网格 + 数据多边形（无标签），保存透明 PNG。"""
-    chart = RadarChart(vals)
-    chart.draw_armor()
-    chart.draw_grids()
-    chart.draw_data(list(vals))
-
-    chart.fig.savefig(out_path, facecolor='none', transparent=True, dpi=dpi)
-    chart.close()
+    with RadarGenerator(vals=vals) as generator:
+        generator.generate_frame(out_path, dpi)
 
 
 # ==========================================

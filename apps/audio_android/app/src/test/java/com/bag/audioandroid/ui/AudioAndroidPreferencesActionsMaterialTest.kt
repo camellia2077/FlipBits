@@ -3,7 +3,7 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
@@ -22,7 +22,7 @@ class AudioAndroidPreferencesActionsMaterialTest {
 
     @Test
     fun `first switch to material defaults to stone palette`() {
-        val state = AudioAppUiState(selectedThemeStyle = ThemeStyleOption.BrandDualTone)
+        val state = AudioAppUiState(selectedThemeStyle = ThemeStyleOption.FactionTheme)
 
         val updated = state.withSelectedMaterialThemeStyle(sampleInputSessionUpdater)
 
@@ -36,7 +36,7 @@ class AudioAndroidPreferencesActionsMaterialTest {
         val persistedPalette = MaterialPalettes.first { it.id == "slate" }
         val state =
             AudioAppUiState(
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
                 selectedPalette = persistedPalette,
                 selectedMaterialPaletteIdLight = persistedPalette.id,
             )
@@ -50,7 +50,7 @@ class AudioAndroidPreferencesActionsMaterialTest {
 
     @Test
     fun `selecting built in material palette switches theme style to material`() {
-        val state = AudioAppUiState(selectedThemeStyle = ThemeStyleOption.BrandDualTone)
+        val state = AudioAppUiState(selectedThemeStyle = ThemeStyleOption.FactionTheme)
 
         val updated = state.withSelectedMaterialPaletteTheme(DefaultMaterialPalette)
 
@@ -133,19 +133,19 @@ class AudioAndroidPreferencesActionsMaterialTest {
     @Test
     fun `importing duplicate custom brand overwrites matching preset`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "vigilu",
                 displayName = "Vigilu",
                 primaryHex = "#E5E9F0",
                 secondaryHex = "#4C566A",
                 outlineHexOrNull = "#2E3440",
             )
-        val state = AudioAppUiState(customBrandThemePresets = listOf(existing))
+        val state = AudioAppUiState(customFactionThemePresets = listOf(existing))
 
         val imported =
-            state.withImportedCustomBrandThemes(
+            state.withImportedCustomFactionThemes(
                 listOf(
-                    CustomBrandThemeSettings(
+                    CustomFactionThemeSettings(
                         presetId = "",
                         displayName = "Vigilu",
                         primaryHex = "#E5E9F0",
@@ -155,28 +155,28 @@ class AudioAndroidPreferencesActionsMaterialTest {
                 ),
             )
 
-        assertEquals(1, imported.customBrandThemePresets.size)
-        assertEquals("vigilu", imported.customBrandThemePresets.single().presetId)
-        assertEquals("#E5E9F0", imported.customBrandThemePresets.single().primaryHex)
-        assertEquals("#4C566A", imported.customBrandThemePresets.single().secondaryHex)
+        assertEquals(1, imported.customFactionThemePresets.size)
+        assertEquals("vigilu", imported.customFactionThemePresets.single().presetId)
+        assertEquals("#E5E9F0", imported.customFactionThemePresets.single().primaryHex)
+        assertEquals("#4C566A", imported.customFactionThemePresets.single().secondaryHex)
     }
 
     @Test
-    fun `importing same name dual tone with different colors adds a new preset`() {
+    fun `importing same name faction theme with different colors adds a new preset`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "vigilu",
                 displayName = "Vigilu",
                 primaryHex = "#E5E9F0",
                 secondaryHex = "#4C566A",
                 outlineHexOrNull = "#2E3440",
             )
-        val state = AudioAppUiState(customBrandThemePresets = listOf(existing))
+        val state = AudioAppUiState(customFactionThemePresets = listOf(existing))
 
         val imported =
-            state.withImportedCustomBrandThemes(
+            state.withImportedCustomFactionThemes(
                 listOf(
-                    CustomBrandThemeSettings(
+                    CustomFactionThemeSettings(
                         presetId = "",
                         displayName = "Vigilu",
                         primaryHex = "#101014",
@@ -186,10 +186,10 @@ class AudioAndroidPreferencesActionsMaterialTest {
                 ),
             )
 
-        assertEquals(2, imported.customBrandThemePresets.size)
-        assertEquals(listOf("Vigilu", "Vigilu"), imported.customBrandThemePresets.map { it.displayName })
-        assertEquals("#101014", imported.customBrandThemePresets.first().primaryHex)
-        assertEquals("#E5E9F0", imported.customBrandThemePresets.last().primaryHex)
+        assertEquals(2, imported.customFactionThemePresets.size)
+        assertEquals(listOf("Vigilu", "Vigilu"), imported.customFactionThemePresets.map { it.displayName })
+        assertEquals("#101014", imported.customFactionThemePresets.first().primaryHex)
+        assertEquals("#E5E9F0", imported.customFactionThemePresets.last().primaryHex)
     }
 
     @Test
@@ -252,20 +252,20 @@ class AudioAndroidPreferencesActionsMaterialTest {
     }
 
     @Test
-    fun `batch importing dual tone themes generates unique preset ids for default template imports`() {
-        val state = AudioAppUiState(customBrandThemePresets = emptyList())
+    fun `batch importing faction theme themes generates unique preset ids for default template imports`() {
+        val state = AudioAppUiState(customFactionThemePresets = emptyList())
 
         val imported =
-            state.withImportedCustomBrandThemes(
+            state.withImportedCustomFactionThemes(
                 listOf(
-                    CustomBrandThemeSettings(
+                    CustomFactionThemeSettings(
                         presetId = "default",
                         displayName = "Ash",
                         primaryHex = "#101014",
                         secondaryHex = "#78D6FF",
                         outlineHexOrNull = "#303846",
                     ),
-                    CustomBrandThemeSettings(
+                    CustomFactionThemeSettings(
                         presetId = "default",
                         displayName = "Brass",
                         primaryHex = "#E8E2D0",
@@ -275,38 +275,38 @@ class AudioAndroidPreferencesActionsMaterialTest {
                 ),
             )
 
-        assertEquals(2, imported.customBrandThemePresets.size)
+        assertEquals(2, imported.customFactionThemePresets.size)
         assertNotEquals(
-            imported.customBrandThemePresets[0].presetId,
-            imported.customBrandThemePresets[1].presetId,
+            imported.customFactionThemePresets[0].presetId,
+            imported.customFactionThemePresets[1].presetId,
         )
-        assertNotEquals("default", imported.customBrandThemePresets[0].presetId)
-        assertNotEquals("default", imported.customBrandThemePresets[1].presetId)
+        assertNotEquals("default", imported.customFactionThemePresets[0].presetId)
+        assertNotEquals("default", imported.customFactionThemePresets[1].presetId)
     }
 
     @Test
-    fun `importing dual tone themes keeps shared batch order at the top`() {
+    fun `importing faction theme themes keeps shared batch order at the top`() {
         val existing =
-            CustomBrandThemeSettings(
+            CustomFactionThemeSettings(
                 presetId = "existing",
                 displayName = "Existing",
                 primaryHex = "#E8E2D0",
                 secondaryHex = "#9E1B1B",
                 outlineHexOrNull = "#C78C25",
             )
-        val state = AudioAppUiState(customBrandThemePresets = listOf(existing))
+        val state = AudioAppUiState(customFactionThemePresets = listOf(existing))
 
         val imported =
-            state.withImportedCustomBrandThemes(
+            state.withImportedCustomFactionThemes(
                 listOf(
-                    CustomBrandThemeSettings(
+                    CustomFactionThemeSettings(
                         presetId = "",
                         displayName = "Ash",
                         primaryHex = "#101014",
                         secondaryHex = "#78D6FF",
                         outlineHexOrNull = "#303846",
                     ),
-                    CustomBrandThemeSettings(
+                    CustomFactionThemeSettings(
                         presetId = "",
                         displayName = "Brass",
                         primaryHex = "#E8E2D0",
@@ -316,14 +316,14 @@ class AudioAndroidPreferencesActionsMaterialTest {
                 ),
             )
 
-        assertEquals(listOf("Ash", "Brass", "Existing"), imported.customBrandThemePresets.map { it.displayName })
+        assertEquals(listOf("Ash", "Brass", "Existing"), imported.customFactionThemePresets.map { it.displayName })
     }
 
     private fun customMaterialSettings(
         presetId: String,
         displayName: String,
         primaryHex: String,
-    ) = CustomBrandThemeSettings(
+    ) = CustomFactionThemeSettings(
         presetId = presetId,
         displayName = displayName,
         primaryHex = primaryHex,

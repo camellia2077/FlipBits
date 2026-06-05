@@ -106,7 +106,7 @@ python tools/run.py android-debug capture-playback-speed --wait-ms 120000
 
 ```powershell
 adb logcat -c
-adb logcat -v time PlaybackSpeedDiag:D PlaybackCoordDiag:D AudioPlayerDiag:D AudioTrackTransport:D PlaybackAutomation:D AndroidRuntime:E libc:E *:S > temp\playback-speed.log
+adb logcat -v time PlaybackSpeedDiag:D PlaybackCoordDiag:D AudioPlayerDiag:D AudioTrackTransport:D PlaybackEdgeFade:D PlaybackAutomation:D AndroidRuntime:E libc:E *:S > temp\playback-speed.log
 ```
 
 ## Minimal Read Combos

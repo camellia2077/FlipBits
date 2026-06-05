@@ -11,10 +11,10 @@ enum class SampleFlavor {
 
 fun effectiveSampleFlavor(
     themeStyle: ThemeStyleOption,
-    brandTheme: BrandThemeOption,
+    factionTheme: FactionThemeOption,
 ): SampleFlavor =
-    if (themeStyle == ThemeStyleOption.BrandDualTone) {
-        brandTheme.sampleFlavor
+    if (themeStyle == ThemeStyleOption.FactionTheme) {
+        factionTheme.sampleFlavor
     } else {
         SampleFlavor.SacredMachine
     }

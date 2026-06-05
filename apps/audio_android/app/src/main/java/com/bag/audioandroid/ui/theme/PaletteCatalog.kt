@@ -3,7 +3,7 @@ package com.bag.audioandroid.ui.theme
 import com.bag.audioandroid.ui.model.PaletteOption
 
 val DefaultCustomMaterialPaletteSettings =
-    com.bag.audioandroid.ui.model.CustomBrandThemeSettings(
+    com.bag.audioandroid.ui.model.CustomFactionThemeSettings(
         presetId = "material_custom",
         displayName = "Custom 1",
         primaryHex = "#6750A4",

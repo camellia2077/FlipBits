@@ -689,7 +689,7 @@ private class DecodeStateReducer(
                 statusText =
                     UiText.Resource(
                         R.string.status_mode_audio_decoding,
-                        listOf(mode.wireName),
+                        listOf(mode.fixedEnglishLabel),
                     ),
             )
         }
@@ -881,7 +881,7 @@ private class DecodeStateReducer(
         } else {
             UiText.Resource(
                 R.string.status_mode_decode_completed,
-                listOf(mode.wireName),
+                listOf(mode.fixedEnglishLabel),
             )
         }
 }

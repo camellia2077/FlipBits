@@ -18,8 +18,8 @@ import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
-import com.bag.audioandroid.ui.model.BrandThemeOption
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
+import com.bag.audioandroid.ui.model.FactionThemeOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
@@ -33,13 +33,13 @@ import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.QueueSheetValue
-import com.bag.audioandroid.ui.theme.BrandDualToneThemes
-import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
+import com.bag.audioandroid.ui.theme.DefaultFactionTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
-import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.FactionThemes
+import com.bag.audioandroid.ui.theme.customFactionTheme
 import com.bag.audioandroid.ui.theme.customMaterialPalette
-import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.isCustomFactionThemeOptionId
 import com.bag.audioandroid.util.safeDebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -269,23 +269,23 @@ class AudioAndroidViewModel(
         preferencesActions.onThemeStyleSelected(themeStyle)
     }
 
-    fun onBrandThemeSelected(brandTheme: BrandThemeOption) {
-        preferencesActions.onBrandThemeSelected(brandTheme)
+    fun onFactionThemeSelected(factionTheme: FactionThemeOption) {
+        preferencesActions.onFactionThemeSelected(factionTheme)
     }
 
-    fun onCustomBrandThemeSaved(
-        settings: CustomBrandThemeSettings,
+    fun onCustomFactionThemeSaved(
+        settings: CustomFactionThemeSettings,
         replacePresetId: String?,
     ) {
-        preferencesActions.onCustomBrandThemeSaved(settings, replacePresetId)
+        preferencesActions.onCustomFactionThemeSaved(settings, replacePresetId)
     }
 
-    fun onCustomBrandThemeDeleted(presetId: String) {
-        preferencesActions.onCustomBrandThemeDeleted(presetId)
+    fun onCustomFactionThemeDeleted(presetId: String) {
+        preferencesActions.onCustomFactionThemeDeleted(presetId)
     }
 
     fun onCustomMaterialThemeSaved(
-        settings: CustomBrandThemeSettings,
+        settings: CustomFactionThemeSettings,
         replacePresetId: String? = null,
     ) {
         preferencesActions.onCustomMaterialThemeSaved(settings, replacePresetId)
@@ -299,7 +299,7 @@ class AudioAndroidViewModel(
         preferencesActions.onCreateCustomMaterialTheme()
     }
 
-    fun onCustomMaterialThemesImported(settings: List<CustomBrandThemeSettings>) {
+    fun onCustomMaterialThemesImported(settings: List<CustomFactionThemeSettings>) {
         preferencesActions.onCustomMaterialThemesImported(settings)
     }
 
@@ -310,15 +310,15 @@ class AudioAndroidViewModel(
         preferencesActions.onCustomMaterialThemesReordered(fromIndex, toIndex)
     }
 
-    fun onCustomBrandThemesImported(settings: List<CustomBrandThemeSettings>) {
-        preferencesActions.onCustomBrandThemesImported(settings)
+    fun onCustomFactionThemesImported(settings: List<CustomFactionThemeSettings>) {
+        preferencesActions.onCustomFactionThemesImported(settings)
     }
 
-    fun onCustomBrandThemesReordered(
+    fun onCustomFactionThemesReordered(
         fromIndex: Int,
         toIndex: Int,
     ) {
-        preferencesActions.onCustomBrandThemesReordered(fromIndex, toIndex)
+        preferencesActions.onCustomFactionThemesReordered(fromIndex, toIndex)
     }
 
     fun onConfigLanguageExpandedChanged(expanded: Boolean) {
@@ -365,36 +365,36 @@ class AudioAndroidViewModel(
         preferencesActions.onConfigMaterialNeutralsPaletteExpandedChanged(expanded)
     }
 
-    fun onConfigCustomBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigCustomBrandThemeExpandedChanged(expanded)
+    fun onConfigCustomFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigCustomFactionThemeExpandedChanged(expanded)
     }
 
     fun onConfigSampleTextExpandedChanged(expanded: Boolean) {
         preferencesActions.onConfigSampleTextExpandedChanged(expanded)
     }
 
-    fun onConfigSacredMachineBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigSacredMachineBrandThemeExpandedChanged(expanded)
+    fun onConfigSacredMachineFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigSacredMachineFactionThemeExpandedChanged(expanded)
     }
 
-    fun onConfigAncientDynastyBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigAncientDynastyBrandThemeExpandedChanged(expanded)
+    fun onConfigAncientDynastyFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigAncientDynastyFactionThemeExpandedChanged(expanded)
     }
 
-    fun onConfigImmortalRotBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigImmortalRotBrandThemeExpandedChanged(expanded)
+    fun onConfigImmortalRotFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigImmortalRotFactionThemeExpandedChanged(expanded)
     }
 
-    fun onConfigScarletCarnageBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigScarletCarnageBrandThemeExpandedChanged(expanded)
+    fun onConfigScarletCarnageFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigScarletCarnageFactionThemeExpandedChanged(expanded)
     }
 
-    fun onConfigExquisiteFallBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigExquisiteFallBrandThemeExpandedChanged(expanded)
+    fun onConfigExquisiteFallFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigExquisiteFallFactionThemeExpandedChanged(expanded)
     }
 
-    fun onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged(expanded: Boolean) {
-        preferencesActions.onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged(expanded)
+    fun onConfigLabyrinthOfMutabilityFactionThemeExpandedChanged(expanded: Boolean) {
+        preferencesActions.onConfigLabyrinthOfMutabilityFactionThemeExpandedChanged(expanded)
     }
 
     fun onConfigDebugExpandedChanged(expanded: Boolean) {
@@ -805,9 +805,9 @@ class AudioAndroidViewModel(
 
 private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): AudioAppUiState =
     runBlocking {
-        val customBrandThemePresets =
-            appSettingsRepository.customBrandThemePresets.first().ifEmpty {
-                listOf(com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings)
+        val customFactionThemePresets =
+            appSettingsRepository.customFactionThemePresets.first().ifEmpty {
+                listOf(com.bag.audioandroid.ui.model.DefaultCustomFactionThemeSettings)
             }
         val customMaterialThemePresets =
             appSettingsRepository.customMaterialThemePresets.first().ifEmpty {
@@ -821,15 +821,15 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
                 lightPaletteId = appSettingsRepository.selectedMaterialPaletteIdLight.first(),
                 darkPaletteId = appSettingsRepository.selectedMaterialPaletteIdDark.first(),
             )
-        val selectedBrandThemeId = appSettingsRepository.selectedBrandThemeId.first()
-        val selectedBrandTheme =
-            if (selectedBrandThemeId != null && isCustomBrandThemeOptionId(selectedBrandThemeId)) {
-                customBrandThemePresets
-                    .map(::customBrandTheme)
-                    .firstOrNull { it.id == selectedBrandThemeId }
-                    ?: customBrandTheme(customBrandThemePresets.first())
+        val selectedFactionThemeId = appSettingsRepository.selectedFactionThemeId.first()
+        val selectedFactionTheme =
+            if (selectedFactionThemeId != null && isCustomFactionThemeOptionId(selectedFactionThemeId)) {
+                customFactionThemePresets
+                    .map(::customFactionTheme)
+                    .firstOrNull { it.id == selectedFactionThemeId }
+                    ?: customFactionTheme(customFactionThemePresets.first())
             } else {
-                BrandDualToneThemes.firstOrNull { it.id == selectedBrandThemeId } ?: DefaultBrandTheme
+                FactionThemes.firstOrNull { it.id == selectedFactionThemeId } ?: DefaultFactionTheme
             }
         val selectedMaterialPaletteIdLight = appSettingsRepository.selectedMaterialPaletteIdLight.first()
         val selectedMaterialPaletteIdDark = appSettingsRepository.selectedMaterialPaletteIdDark.first()
@@ -861,8 +861,8 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
             selectedMaterialPaletteIdLight = selectedMaterialPaletteIdLight,
             selectedMaterialPaletteIdDark = selectedMaterialPaletteIdDark,
             customMaterialThemePresets = customMaterialThemePresets,
-            selectedBrandTheme = selectedBrandTheme,
-            customBrandThemePresets = customBrandThemePresets,
+            selectedFactionTheme = selectedFactionTheme,
+            customFactionThemePresets = customFactionThemePresets,
             selectedThemeStyle = selectedThemeStyle,
             selectedThemeMode = selectedThemeMode,
             isMaterialDarkThemeActive = isMaterialDarkThemeActive,

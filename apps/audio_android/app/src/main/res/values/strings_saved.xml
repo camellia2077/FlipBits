@@ -3,7 +3,6 @@
     <!-- CONTEXT: Empty-state text shown when the current filter/search leaves the saved-audio list with no matches. -->
     <string name="saved_audio_filter_empty">No matches.</string>
     <!-- CONTEXT: Title/tab label for the saved audio library screen. Keep it short to match the bottom tab label. -->
-    <string name="library_title">Saved</string>
     <!-- CONTEXT: Empty-state text shown when the user has not saved or imported any audio yet. -->
     <string name="library_empty">Nothing saved yet.</string>
     <!-- CONTEXT: Toolbar/icon action that imports an existing audio file into the saved library. -->

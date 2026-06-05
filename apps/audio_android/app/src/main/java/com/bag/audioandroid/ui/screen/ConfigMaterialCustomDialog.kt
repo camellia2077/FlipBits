@@ -38,25 +38,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.audioInputTextFieldColors
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.theme.LocalAudioEncodeGlyphColors
 import com.bag.audioandroid.ui.theme.audioEncodeGlyphColorsForMaterial
-import com.bag.audioandroid.ui.theme.brandThemeColorOrNull
 import com.bag.audioandroid.ui.theme.customMaterialPalette
-import com.bag.audioandroid.ui.theme.normalizeBrandThemeHex
+import com.bag.audioandroid.ui.theme.factionThemeColorOrNull
 import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
-import com.bag.audioandroid.ui.theme.randomCustomBrandThemeColors
+import com.bag.audioandroid.ui.theme.normalizeFactionThemeHex
+import com.bag.audioandroid.ui.theme.randomCustomFactionThemeColors
 
 @Composable
 internal fun ConfigMaterialCustomDialog(
-    initialSettings: CustomBrandThemeSettings,
+    initialSettings: CustomFactionThemeSettings,
     onDismiss: () -> Unit,
-    onSave: (CustomBrandThemeSettings) -> Unit,
+    onSave: (CustomFactionThemeSettings) -> Unit,
 ) {
     var primaryHex by rememberSaveable { mutableStateOf(initialSettings.primaryHex) }
-    val normalizedPrimary = remember(primaryHex) { normalizeBrandThemeHex(primaryHex) }
-    val previewPrimary = remember(normalizedPrimary) { brandThemeColorOrNull(normalizedPrimary ?: "") }
+    val normalizedPrimary = remember(primaryHex) { normalizeFactionThemeHex(primaryHex) }
+    val previewPrimary = remember(normalizedPrimary) { factionThemeColorOrNull(normalizedPrimary ?: "") }
     val canSave = normalizedPrimary != null
     val isPreviewDark = (previewPrimary?.luminance() ?: 1f) < 0.46f
     val previewPalette =
@@ -108,7 +108,7 @@ internal fun ConfigMaterialCustomDialog(
         titleContentColor = previewContentColor,
         textContentColor = previewContentColor,
         title = {
-            Text(text = stringResource(R.string.config_custom_brand_theme_dialog_title_edit))
+            Text(text = stringResource(R.string.config_custom_faction_theme_dialog_title_edit))
         },
         text = {
             Column(
@@ -128,7 +128,7 @@ internal fun ConfigMaterialCustomDialog(
                         )
                     }
                     IconButton(
-                        onClick = { primaryHex = randomCustomBrandThemeColors().primaryHex },
+                        onClick = { primaryHex = randomCustomFactionThemeColors().primaryHex },
                         colors =
                             IconButtonDefaults.filledIconButtonColors(
                                 containerColor = previewContentColor.copy(alpha = 0.12f),
@@ -137,7 +137,7 @@ internal fun ConfigMaterialCustomDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.Casino,
-                            contentDescription = stringResource(R.string.config_custom_brand_theme_randomize),
+                            contentDescription = stringResource(R.string.config_custom_faction_theme_randomize),
                         )
                     }
                 }
@@ -165,7 +165,7 @@ internal fun ConfigMaterialCustomDialog(
                     androidx.compose.material3.ButtonDefaults
                         .textButtonColors(contentColor = previewContentColor),
             ) {
-                Text(text = stringResource(R.string.config_custom_brand_theme_save))
+                Text(text = stringResource(R.string.config_custom_faction_theme_save))
             }
         },
         dismissButton = {
@@ -201,7 +201,7 @@ private fun MaterialCustomHexField(
             singleLine = true,
             label = {
                 Text(
-                    text = stringResource(R.string.config_custom_brand_theme_background_label),
+                    text = stringResource(R.string.config_custom_faction_theme_background_label),
                     fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Medium,
                 )
             },
@@ -211,10 +211,10 @@ private fun MaterialCustomHexField(
                     .weight(1f)
                     .onFocusChanged { isFocused = it.isFocused },
             shape = MaterialTheme.shapes.medium,
-            colors = audioInputTextFieldColors(ThemeStyleOption.BrandDualTone),
+            colors = audioInputTextFieldColors(ThemeStyleOption.FactionTheme),
             supportingText = {
                 if (isError) {
-                    Text(text = stringResource(R.string.config_custom_brand_theme_invalid_hex))
+                    Text(text = stringResource(R.string.config_custom_faction_theme_invalid_hex))
                 }
             },
         )

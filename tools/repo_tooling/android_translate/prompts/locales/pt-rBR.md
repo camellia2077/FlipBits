@@ -19,6 +19,7 @@ For app UI text, keep labels compact enough for Android buttons, tabs, segmented
 Follow existing project terms where present: áudio, caracteres, bytes, regras de entrada, Visual, Hex, Morse, payload, token, nibble, portadora baixa, and portadora alta.
 Use "arquivo" rather than European Portuguese "ficheiro" if file wording is needed.
 Do not turn protocol labels or visualizer labels into explanatory sentences.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/pt-rBR_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere in fluent Brazilian Portuguese.
@@ -28,3 +29,4 @@ Keep pro-mode sample strings strict ASCII, without accents, when the key or cont
 When filling missing entries, write Brazilian Portuguese localization.
 Use Brazilian Portuguese terminology consistently and avoid European Portuguese variants unless already established in the same XML file.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d caracteres • %2$d bytes`.
+When working on theme or palette entries, prefer the Brazilian Portuguese theme/color rules above over older verbose or overly literal wording.

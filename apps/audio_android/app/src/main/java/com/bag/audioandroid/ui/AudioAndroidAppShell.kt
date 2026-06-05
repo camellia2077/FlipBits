@@ -11,14 +11,14 @@ import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.screen.OpenSourceLicensesScreen
 import com.bag.audioandroid.ui.state.AudioAppUiState
-import com.bag.audioandroid.ui.theme.BrandDualToneThemes
+import com.bag.audioandroid.ui.theme.FactionThemes
 import com.bag.audioandroid.ui.theme.LocalAppThemeAccentTokens
 import com.bag.audioandroid.ui.theme.LocalAppThemeVisualTokens
 import com.bag.audioandroid.ui.theme.LocalAudioEncodeGlyphColors
 import com.bag.audioandroid.ui.theme.MaterialPalettes
 import com.bag.audioandroid.ui.theme.materialAccentTokens
 import com.bag.audioandroid.ui.theme.materialThemeVisualTokens
-import com.bag.audioandroid.ui.theme.rememberAnimatedBrandThemeSnapshot
+import com.bag.audioandroid.ui.theme.rememberAnimatedFactionThemeSnapshot
 import com.bag.audioandroid.ui.theme.rememberAnimatedMaterialColorScheme
 import com.bag.audioandroid.ui.theme.rememberAnimatedThemeSnapshot
 
@@ -42,7 +42,7 @@ internal fun AudioAndroidAppShell(
     LaunchedEffect(shouldUseDarkTheme) {
         viewModel.onMaterialDarkThemeActiveChanged(shouldUseDarkTheme)
     }
-    val animatedBrandThemeSnapshot = rememberAnimatedBrandThemeSnapshot(uiState.activeBrandTheme)
+    val animatedFactionThemeSnapshot = rememberAnimatedFactionThemeSnapshot(uiState.activeFactionTheme)
     val materialColorScheme =
         if (shouldUseDarkTheme) {
             uiState.selectedPalette.darkScheme
@@ -52,19 +52,19 @@ internal fun AudioAndroidAppShell(
     val animatedMaterialColorScheme = rememberAnimatedMaterialColorScheme(materialColorScheme)
     val colorScheme =
         when (uiState.selectedThemeStyle) {
-            // Dual-tone brand themes are curated, fixed looks. They can be either light or dark
+            // Faction theme faction themes are curated, fixed looks. They can be either light or dark
             // on their own, so they do not follow the app's Material light/dark mode toggle.
-            ThemeStyleOption.BrandDualTone -> animatedBrandThemeSnapshot.colorScheme
+            ThemeStyleOption.FactionTheme -> animatedFactionThemeSnapshot.colorScheme
             ThemeStyleOption.Material -> animatedMaterialColorScheme
         }
     val targetAccentTokens =
         when (uiState.selectedThemeStyle) {
-            ThemeStyleOption.BrandDualTone -> animatedBrandThemeSnapshot.accentTokens
+            ThemeStyleOption.FactionTheme -> animatedFactionThemeSnapshot.accentTokens
             ThemeStyleOption.Material -> materialAccentTokens(colorScheme.primary)
         }
     val targetVisualTokens =
         when (uiState.selectedThemeStyle) {
-            ThemeStyleOption.BrandDualTone -> animatedBrandThemeSnapshot.visualTokens
+            ThemeStyleOption.FactionTheme -> animatedFactionThemeSnapshot.visualTokens
             ThemeStyleOption.Material -> materialThemeVisualTokens(colorScheme)
         }
     val animatedThemeSnapshot =
@@ -101,7 +101,7 @@ internal fun AudioAndroidAppShell(
                         onSavedAudioFilterChange = onSavedAudioFilterChange,
                         accentTokens = animatedThemeSnapshot.accentTokens,
                         materialPalettes = MaterialPalettes,
-                        brandThemes = BrandDualToneThemes,
+                        factionThemes = FactionThemes,
                         viewModel = viewModel,
                         debugScenario = debugScenario,
                         debugExpandLyricsRequestId = debugExpandLyricsRequestId,

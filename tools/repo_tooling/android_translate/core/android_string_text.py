@@ -12,7 +12,7 @@ def decode_android_string_resource_text(raw_text: str) -> str:
     review JSON and replacement matching to operate on.
     """
     xml_unescaped = unescape(raw_text)
-    return _unescape_android_string(xml_unescaped)
+    return _unescape_android_string(_strip_android_quoted_literal(xml_unescaped))
 
 
 def encode_android_string_resource_text(literal_text: str) -> str:
@@ -83,6 +83,9 @@ def _escape_android_string(value: str) -> str:
     if not value:
         return value
 
+    if _should_wrap_in_android_quotes(value):
+        return _escape_android_quoted_string(value)
+
     escaped_chars: list[str] = []
     for index, char in enumerate(value):
         if char == "\\":
@@ -96,6 +99,29 @@ def _escape_android_string(value: str) -> str:
         else:
             escaped_chars.append(char)
     return "".join(escaped_chars)
+
+
+def _escape_android_quoted_string(value: str) -> str:
+    escaped_chars: list[str] = ['"']
+    for char in value:
+        if char == "\\":
+            escaped_chars.append("\\\\")
+        elif char == '"':
+            escaped_chars.append('\\"')
+        else:
+            escaped_chars.append(char)
+    escaped_chars.append('"')
+    return "".join(escaped_chars)
+
+
+def _should_wrap_in_android_quotes(value: str) -> bool:
+    return "'" in value
+
+
+def _strip_android_quoted_literal(value: str) -> str:
+    if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+        return value[1:-1]
+    return value
 
 
 def _unescape_android_string(value: str) -> str:

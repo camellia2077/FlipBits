@@ -7,7 +7,7 @@ enum class PaletteFamily(
     @param:StringRes val titleResId: Int,
 ) {
     Custom(R.string.palette_family_custom),
-    Brand(R.string.palette_family_brand),
+    Brand(R.string.palette_family_faction_theme),
     Reds(R.string.palette_family_reds_pinks),
     Oranges(R.string.palette_family_oranges),
     Yellows(R.string.palette_family_yellows),

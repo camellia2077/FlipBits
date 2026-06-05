@@ -3,10 +3,10 @@ package com.bag.audioandroid.ui
 import androidx.appcompat.app.AppCompatDelegate
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
-import com.bag.audioandroid.ui.model.BrandThemeOption
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.CustomThemeImportMode
-import com.bag.audioandroid.ui.model.DefaultCustomBrandThemePresetId
+import com.bag.audioandroid.ui.model.DefaultCustomFactionThemePresetId
+import com.bag.audioandroid.ui.model.FactionThemeOption
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PaletteOption
@@ -21,8 +21,8 @@ import com.bag.audioandroid.ui.state.withMaterialDarkThemeActive
 import com.bag.audioandroid.ui.state.withSelectedThemeMode
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.MaterialPalettes
-import com.bag.audioandroid.ui.theme.customBrandTheme
-import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.customFactionTheme
+import com.bag.audioandroid.ui.theme.customFactionThemeOptionId
 import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.customMaterialPaletteId
 import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
@@ -110,15 +110,15 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
-    fun onBrandThemeSelected(brandTheme: BrandThemeOption) {
-        uiState.update { state -> state.withSelectedBrandTheme(brandTheme, sampleInputSessionUpdater) }
+    fun onFactionThemeSelected(factionTheme: FactionThemeOption) {
+        uiState.update { state -> state.withSelectedFactionTheme(factionTheme, sampleInputSessionUpdater) }
         scope.launch {
-            appSettingsRepository.setSelectedBrandThemeId(brandTheme.id)
+            appSettingsRepository.setSelectedFactionThemeId(factionTheme.id)
         }
     }
 
-    fun onCustomBrandThemeSaved(
-        settings: CustomBrandThemeSettings,
+    fun onCustomFactionThemeSaved(
+        settings: CustomFactionThemeSettings,
         replacePresetId: String?,
     ) {
         uiState.update { state ->
@@ -129,9 +129,9 @@ internal class AudioAndroidPreferencesActions(
                 )
             val updatedPresets =
                 if (replacePresetId == null) {
-                    listOf(normalizedSettings) + state.customBrandThemePresets
+                    listOf(normalizedSettings) + state.customFactionThemePresets
                 } else {
-                    state.customBrandThemePresets.map { preset ->
+                    state.customFactionThemePresets.map { preset ->
                         if (preset.presetId == replacePresetId) {
                             normalizedSettings
                         } else {
@@ -139,17 +139,17 @@ internal class AudioAndroidPreferencesActions(
                         }
                     }
                 }
-            val updatedState = state.copy(customBrandThemePresets = updatedPresets)
-            updatedState.withSelectedBrandTheme(customBrandTheme(normalizedSettings), sampleInputSessionUpdater)
+            val updatedState = state.copy(customFactionThemePresets = updatedPresets)
+            updatedState.withSelectedFactionTheme(customFactionTheme(normalizedSettings), sampleInputSessionUpdater)
         }
         scope.launch {
-            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
-            appSettingsRepository.setSelectedBrandThemeId(uiState.value.activeBrandTheme.id)
+            appSettingsRepository.setCustomFactionThemePresets(uiState.value.customFactionThemePresets)
+            appSettingsRepository.setSelectedFactionThemeId(uiState.value.activeFactionTheme.id)
         }
     }
 
     fun onCustomMaterialThemeSaved(
-        settings: CustomBrandThemeSettings,
+        settings: CustomFactionThemeSettings,
         replacePresetId: String? = null,
     ) {
         uiState.update { state -> state.withSavedCustomMaterialTheme(settings, replacePresetId) }
@@ -219,7 +219,7 @@ internal class AudioAndroidPreferencesActions(
         persistSelectedMaterialThemeState(updatedState)
     }
 
-    fun onCustomMaterialThemesImported(settings: List<CustomBrandThemeSettings>) {
+    fun onCustomMaterialThemesImported(settings: List<CustomFactionThemeSettings>) {
         if (settings.isEmpty()) {
             return
         }
@@ -250,54 +250,54 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
-    fun onCustomBrandThemeDeleted(presetId: String) {
+    fun onCustomFactionThemeDeleted(presetId: String) {
         uiState.update { state ->
-            val remainingPresets = state.customBrandThemePresets.filterNot { it.presetId == presetId }
+            val remainingPresets = state.customFactionThemePresets.filterNot { it.presetId == presetId }
             if (remainingPresets.isEmpty()) {
                 return@update state
             }
 
-            val updatedState = state.copy(customBrandThemePresets = remainingPresets)
-            val deletedActiveCustomTheme = state.selectedBrandTheme.id == customBrandThemeOptionId(presetId)
+            val updatedState = state.copy(customFactionThemePresets = remainingPresets)
+            val deletedActiveCustomTheme = state.selectedFactionTheme.id == customFactionThemeOptionId(presetId)
 
             if (deletedActiveCustomTheme) {
-                updatedState.withSelectedBrandTheme(customBrandTheme(remainingPresets.first()), sampleInputSessionUpdater)
+                updatedState.withSelectedFactionTheme(customFactionTheme(remainingPresets.first()), sampleInputSessionUpdater)
             } else {
                 updatedState
             }
         }
         scope.launch {
-            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
-            appSettingsRepository.setSelectedBrandThemeId(uiState.value.activeBrandTheme.id)
+            appSettingsRepository.setCustomFactionThemePresets(uiState.value.customFactionThemePresets)
+            appSettingsRepository.setSelectedFactionThemeId(uiState.value.activeFactionTheme.id)
         }
     }
 
-    fun onCustomBrandThemesImported(settings: List<CustomBrandThemeSettings>) {
+    fun onCustomFactionThemesImported(settings: List<CustomFactionThemeSettings>) {
         if (settings.isEmpty()) {
             return
         }
-        uiState.update { state -> state.withImportedCustomBrandThemes(settings) }
+        uiState.update { state -> state.withImportedCustomFactionThemes(settings) }
         scope.launch {
-            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
+            appSettingsRepository.setCustomFactionThemePresets(uiState.value.customFactionThemePresets)
         }
     }
 
-    fun onCustomBrandThemesReordered(
+    fun onCustomFactionThemesReordered(
         fromIndex: Int,
         toIndex: Int,
     ) {
         uiState.update { state ->
-            val presets = state.customBrandThemePresets
+            val presets = state.customFactionThemePresets
             if (fromIndex !in presets.indices || toIndex !in presets.indices || fromIndex == toIndex) {
                 return@update state
             }
             val reordered = presets.toMutableList()
             val moved = reordered.removeAt(fromIndex)
             reordered.add(toIndex, moved)
-            state.copy(customBrandThemePresets = reordered)
+            state.copy(customFactionThemePresets = reordered)
         }
         scope.launch {
-            appSettingsRepository.setCustomBrandThemePresets(uiState.value.customBrandThemePresets)
+            appSettingsRepository.setCustomFactionThemePresets(uiState.value.customFactionThemePresets)
         }
     }
 
@@ -425,10 +425,10 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
-    fun onConfigCustomBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigCustomBrandThemeExpanded = expanded) }
+    fun onConfigCustomFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigCustomFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigCustomBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigCustomFactionThemeExpanded(expanded)
         }
     }
 
@@ -439,45 +439,45 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
-    fun onConfigSacredMachineBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigSacredMachineBrandThemeExpanded = expanded) }
+    fun onConfigSacredMachineFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigSacredMachineFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigSacredMachineBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigSacredMachineFactionThemeExpanded(expanded)
         }
     }
 
-    fun onConfigAncientDynastyBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigAncientDynastyBrandThemeExpanded = expanded) }
+    fun onConfigAncientDynastyFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigAncientDynastyFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigAncientDynastyBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigAncientDynastyFactionThemeExpanded(expanded)
         }
     }
 
-    fun onConfigImmortalRotBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigImmortalRotBrandThemeExpanded = expanded) }
+    fun onConfigImmortalRotFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigImmortalRotFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigImmortalRotBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigImmortalRotFactionThemeExpanded(expanded)
         }
     }
 
-    fun onConfigScarletCarnageBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigScarletCarnageBrandThemeExpanded = expanded) }
+    fun onConfigScarletCarnageFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigScarletCarnageFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigScarletCarnageBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigScarletCarnageFactionThemeExpanded(expanded)
         }
     }
 
-    fun onConfigExquisiteFallBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigExquisiteFallBrandThemeExpanded = expanded) }
+    fun onConfigExquisiteFallFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigExquisiteFallFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigExquisiteFallBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigExquisiteFallFactionThemeExpanded(expanded)
         }
     }
 
-    fun onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged(expanded: Boolean) {
-        uiState.update { it.copy(isConfigLabyrinthOfMutabilityBrandThemeExpanded = expanded) }
+    fun onConfigLabyrinthOfMutabilityFactionThemeExpandedChanged(expanded: Boolean) {
+        uiState.update { it.copy(isConfigLabyrinthOfMutabilityFactionThemeExpanded = expanded) }
         scope.launch {
-            appSettingsRepository.setConfigLabyrinthOfMutabilityBrandThemeExpanded(expanded)
+            appSettingsRepository.setConfigLabyrinthOfMutabilityFactionThemeExpanded(expanded)
         }
     }
 
@@ -600,7 +600,7 @@ internal fun AudioAppUiState.withSelectedMaterialThemeStyle(sampleInputSessionUp
 }
 
 internal fun AudioAppUiState.withSavedCustomMaterialTheme(
-    settings: CustomBrandThemeSettings,
+    settings: CustomFactionThemeSettings,
     replacePresetId: String? = null,
 ): AudioAppUiState {
     val normalizedSettings =
@@ -641,9 +641,9 @@ internal fun AudioAppUiState.withSavedCustomMaterialTheme(
     )
 }
 
-internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<CustomBrandThemeSettings>): AudioAppUiState {
+internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<CustomFactionThemeSettings>): AudioAppUiState {
     var updatedPresets = customMaterialThemePresets
-    val importedResolved = mutableListOf<CustomBrandThemeSettings>()
+    val importedResolved = mutableListOf<CustomFactionThemeSettings>()
     val insertedPresetIdsInImportOrder = mutableListOf<String>()
     settings.forEach { setting ->
         val normalizedCandidate =
@@ -698,8 +698,8 @@ internal fun AudioAppUiState.withImportedCustomMaterialThemes(settings: List<Cus
     }
 }
 
-internal fun AudioAppUiState.withImportedCustomBrandThemes(settings: List<CustomBrandThemeSettings>): AudioAppUiState {
-    var updatedPresets = customBrandThemePresets
+internal fun AudioAppUiState.withImportedCustomFactionThemes(settings: List<CustomFactionThemeSettings>): AudioAppUiState {
+    var updatedPresets = customFactionThemePresets
     val insertedPresetIdsInImportOrder = mutableListOf<String>()
     settings.forEach { setting ->
         val normalizedCandidate =
@@ -739,7 +739,7 @@ internal fun AudioAppUiState.withImportedCustomBrandThemes(settings: List<Custom
         }
     val remainingPresets =
         updatedPresets.filterNot { preset -> preset.presetId in insertedPresetIdsInImportOrder }
-    return copy(customBrandThemePresets = orderedInsertedPresets + remainingPresets)
+    return copy(customFactionThemePresets = orderedInsertedPresets + remainingPresets)
 }
 
 private const val DefaultFirstMaterialPaletteId = "stone"
@@ -747,5 +747,5 @@ private const val DefaultFirstMaterialPaletteId = "stone"
 private fun importedPresetIdOrNew(presetId: String): String =
     presetId
         .takeUnless {
-            it.isBlank() || it == DefaultCustomBrandThemePresetId
+            it.isBlank() || it == DefaultCustomFactionThemePresetId
         } ?: UUID.randomUUID().toString()

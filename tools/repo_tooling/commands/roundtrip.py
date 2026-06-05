@@ -77,7 +77,7 @@ def ensure_cli_binary(args: argparse.Namespace, build_dir: Path) -> Path:
             build_dir=str(build_dir),
             configure_if_missing=True,
             generator=args.generator,
-            target=[CLI_TARGET_NAME],
+            target=["FlipBits_build"],
         )
     )
     cli_binary = find_cli_binary(build_dir)

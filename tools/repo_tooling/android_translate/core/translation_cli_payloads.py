@@ -142,6 +142,25 @@ def untranslated_equals_english_payload(result) -> dict[str, object]:
     }
 
 
+def unused_keys_payload(result) -> dict[str, object]:
+    return {
+        "ok": result.exit_code == 0,
+        "command": "unused-keys",
+        "exit_code": result.exit_code,
+        "summary": {
+            "suspicious_unused_key_count": result.suspicious_unused_key_count,
+            "scanned_file_count": result.scanned_file_count,
+            "scanned_string_reference_count": result.scanned_string_reference_count,
+            "report_file_count": result.report_file_count,
+        },
+        "artifacts": {
+            "output_dir": str(result.output_dir),
+            "summary_json_path": result.summary_json_path,
+        },
+        "errors": [],
+    }
+
+
 def replace_payload(
     result,
     *,
@@ -161,6 +180,8 @@ def replace_payload(
             "failed_ambiguous_count": result.failed_ambiguous_count,
             "failed_validation_count": result.failed_validation_count,
             "validation_error_count": result.validation_error_count,
+            "write_completed": result.write_completed,
+            "write_ok": result.write_ok,
             "smoke_check_ran": result.smoke_check_ran,
             "smoke_check_ok": result.smoke_check_ok,
             "auto_fix_applied": result.auto_fix_applied,
@@ -175,6 +196,8 @@ def replace_payload(
         },
         "artifacts": {
             "dir": result.dir_name,
+            "touched_files": list(result.touched_files),
+            "applied_targets": list(result.applied_targets),
         },
         "errors": list(result.errors),
     }
@@ -186,6 +209,66 @@ def replace_payload(
     if result.auto_fix_summary is not None:
         payload["summary"]["auto_fix_summary"] = result.auto_fix_summary
     return payload
+
+
+def replace_batch_payload(
+    result,
+    *,
+    json_paths: list[str],
+    summary_out: str | None = None,
+    normalize_path: callable | None = None,
+) -> dict[str, object]:
+    normalize = normalize_path or (lambda value: value)
+    item_payloads = [
+        replace_payload(
+            item,
+            json_path=item.json_path,
+            normalize_path=normalize,
+        )
+        for item in result.results
+    ]
+    payload = {
+        "ok": result.exit_code == 0,
+        "command": "replace-batch",
+        "exit_code": result.exit_code,
+        "summary": {
+            "file_count": result.file_count,
+            "processed_count": result.processed_count,
+            "success_count": result.success_count,
+            "failure_count": result.failure_count,
+            "write_completed_count": result.write_completed_count,
+            "write_ok_count": result.write_ok_count,
+            "smoke_check_requested": result.smoke_check_requested,
+            "smoke_check_ran": result.smoke_check_ran,
+            "smoke_check_ok": result.smoke_check_ok,
+        },
+        "artifacts": {
+            "input_jsons": [normalize(path) for path in json_paths],
+            "results": item_payloads,
+        },
+        "errors": list(result.errors),
+    }
+    if summary_out:
+        payload["artifacts"]["summary_out"] = normalize(summary_out)
+    return payload
+
+
+def smoke_check_payload(result, *, normalize_path: callable | None = None) -> dict[str, object]:
+    normalize = normalize_path or (lambda value: value)
+    return {
+        "ok": result.ok,
+        "command": "smoke-check",
+        "exit_code": 0 if result.ok else 3,
+        "summary": {
+            "smoke_check_ran": True,
+            "smoke_check_ok": result.ok,
+            "return_code": result.return_code,
+        },
+        "artifacts": {
+            "command": [normalize(part) if index == 0 else part for index, part in enumerate(result.command)],
+        },
+        "errors": [] if result.ok else ["Smoke check failed: Android resource compilation did not pass."],
+    }
 
 
 def fix_resource_escapes_payload(result) -> dict[str, object]:

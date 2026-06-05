@@ -3,15 +3,15 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.data.SampleInput
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.ui.model.AppLanguageOption
-import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.ModeAudioSessionState
-import com.bag.audioandroid.ui.theme.BrandDualToneThemes
-import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.FactionThemes
+import com.bag.audioandroid.ui.theme.customFactionTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -22,14 +22,14 @@ class SampleInputThemeStateTest {
     private val updater = SampleInputSessionUpdater(provider)
 
     @Test
-    fun `brand theme change within same flavor leaves sampled sessions untouched`() {
-        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
-        val scarletGuard = BrandDualToneThemes.first { it.id == "scarlet_guard" }
+    fun `faction theme change within same flavor leaves sampled sessions untouched`() {
+        val marsRelic = FactionThemes.first { it.id == "mars_relic" }
+        val scarletGuard = FactionThemes.first { it.id == "scarlet_guard" }
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = marsRelic,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = marsRelic,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -50,9 +50,9 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(scarletGuard, updater)
+        val updated = state.withSelectedFactionTheme(scarletGuard, updater)
 
-        assertEquals("scarlet_guard", updated.selectedBrandTheme.id)
+        assertEquals("scarlet_guard", updated.selectedFactionTheme.id)
         assertEquals("sacred-en-a", updated.sessions.getValue(TransportModeOption.Flash).inputText)
         assertEquals("a", updated.sessions.getValue(TransportModeOption.Flash).sampleInputId)
         assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
@@ -62,14 +62,14 @@ class SampleInputThemeStateTest {
     }
 
     @Test
-    fun `brand theme change across flavors refreshes sampled sessions only`() {
-        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
-        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+    fun `faction theme change across flavors refreshes sampled sessions only`() {
+        val marsRelic = FactionThemes.first { it.id == "mars_relic" }
+        val ancientAlloy = FactionThemes.first { it.id == "ancient_alloy" }
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = marsRelic,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = marsRelic,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -90,9 +90,9 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(ancientAlloy, updater)
+        val updated = state.withSelectedFactionTheme(ancientAlloy, updater)
 
-        assertEquals("ancient_alloy", updated.selectedBrandTheme.id)
+        assertEquals("ancient_alloy", updated.selectedFactionTheme.id)
         assertFlavorSample(updated.sessions.getValue(TransportModeOption.Flash), "dynasty-en")
         assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
         assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)
@@ -100,15 +100,15 @@ class SampleInputThemeStateTest {
     }
 
     @Test
-    fun `brand theme flavor refresh preserves selected long sample length`() {
-        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
-        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+    fun `faction theme flavor refresh preserves selected long sample length`() {
+        val marsRelic = FactionThemes.first { it.id == "mars_relic" }
+        val ancientAlloy = FactionThemes.first { it.id == "ancient_alloy" }
         val lengthAwareUpdater = SampleInputSessionUpdater(LengthAwareThemeStateSampleInputTextProvider())
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = marsRelic,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = marsRelic,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -130,7 +130,7 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(ancientAlloy, lengthAwareUpdater)
+        val updated = state.withSelectedFactionTheme(ancientAlloy, lengthAwareUpdater)
 
         val flashSession = updated.sessions.getValue(TransportModeOption.Flash)
         assertTrue(flashSession.inputText.startsWith("dynasty-long-"))
@@ -139,15 +139,15 @@ class SampleInputThemeStateTest {
     }
 
     @Test
-    fun `brand theme flavor refresh keeps long selection state and long text in sync`() {
-        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
-        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+    fun `faction theme flavor refresh keeps long selection state and long text in sync`() {
+        val marsRelic = FactionThemes.first { it.id == "mars_relic" }
+        val ancientAlloy = FactionThemes.first { it.id == "ancient_alloy" }
         val lengthAwareUpdater = SampleInputSessionUpdater(LengthAwareThemeStateSampleInputTextProvider())
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = marsRelic,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = marsRelic,
                 selectedSampleInputLength = SampleInputLengthOption.Long,
                 transportMode = TransportModeOption.Flash,
                 sessions =
@@ -171,7 +171,7 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(ancientAlloy, lengthAwareUpdater)
+        val updated = state.withSelectedFactionTheme(ancientAlloy, lengthAwareUpdater)
 
         assertEquals(SampleInputLengthOption.Long, updated.selectedSampleInputLength)
         assertEquals(TransportModeOption.Flash, updated.transportMode)
@@ -181,13 +181,13 @@ class SampleInputThemeStateTest {
     }
 
     @Test
-    fun `switching away from dual tone falls back to sacred machine flavor`() {
-        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+    fun `switching away from faction theme falls back to sacred machine flavor`() {
+        val ancientAlloy = FactionThemes.first { it.id == "ancient_alloy" }
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = ancientAlloy,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = ancientAlloy,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -219,13 +219,13 @@ class SampleInputThemeStateTest {
 
     @Test
     fun `switching from sacred machine preset to custom theme keeps sacred machine samples`() {
-        val marsRelic = BrandDualToneThemes.first { it.id == "mars_relic" }
-        val customTheme = customBrandTheme(DefaultCustomBrandThemeSettings)
+        val marsRelic = FactionThemes.first { it.id == "mars_relic" }
+        val customTheme = customFactionTheme(DefaultCustomFactionThemeSettings)
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = marsRelic,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = marsRelic,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -246,9 +246,9 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(customTheme, updater)
+        val updated = state.withSelectedFactionTheme(customTheme, updater)
 
-        assertEquals(customTheme.id, updated.selectedBrandTheme.id)
+        assertEquals(customTheme.id, updated.selectedFactionTheme.id)
         assertFlavorSample(updated.sessions.getValue(TransportModeOption.Flash), "sacred-en")
         assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
         assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)
@@ -257,13 +257,13 @@ class SampleInputThemeStateTest {
 
     @Test
     fun `switching from ancient dynasty to custom theme falls back to sacred machine samples`() {
-        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
-        val customTheme = customBrandTheme(DefaultCustomBrandThemeSettings)
+        val ancientAlloy = FactionThemes.first { it.id == "ancient_alloy" }
+        val customTheme = customFactionTheme(DefaultCustomFactionThemeSettings)
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = ancientAlloy,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = ancientAlloy,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -284,9 +284,9 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(customTheme, updater)
+        val updated = state.withSelectedFactionTheme(customTheme, updater)
 
-        assertEquals(customTheme.id, updated.selectedBrandTheme.id)
+        assertEquals(customTheme.id, updated.selectedFactionTheme.id)
         assertFlavorSample(updated.sessions.getValue(TransportModeOption.Flash), "sacred-en")
         assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
         assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)
@@ -295,10 +295,10 @@ class SampleInputThemeStateTest {
 
     @Test
     fun `switching to named custom preset still uses sacred machine samples`() {
-        val ancientAlloy = BrandDualToneThemes.first { it.id == "ancient_alloy" }
+        val ancientAlloy = FactionThemes.first { it.id == "ancient_alloy" }
         val customTheme =
-            customBrandTheme(
-                DefaultCustomBrandThemeSettings.copy(
+            customFactionTheme(
+                DefaultCustomFactionThemeSettings.copy(
                     presetId = "named-custom",
                     displayName = "Named Custom",
                 ),
@@ -306,8 +306,8 @@ class SampleInputThemeStateTest {
         val state =
             AudioAppUiState(
                 selectedLanguage = AppLanguageOption.English,
-                selectedThemeStyle = ThemeStyleOption.BrandDualTone,
-                selectedBrandTheme = ancientAlloy,
+                selectedThemeStyle = ThemeStyleOption.FactionTheme,
+                selectedFactionTheme = ancientAlloy,
                 sessions =
                     mapOf(
                         TransportModeOption.Flash to
@@ -328,9 +328,9 @@ class SampleInputThemeStateTest {
                     ),
             )
 
-        val updated = state.withSelectedBrandTheme(customTheme, updater)
+        val updated = state.withSelectedFactionTheme(customTheme, updater)
 
-        assertEquals(customTheme.id, updated.selectedBrandTheme.id)
+        assertEquals(customTheme.id, updated.selectedFactionTheme.id)
         assertFlavorSample(updated.sessions.getValue(TransportModeOption.Flash), "sacred-en")
         assertEquals("CUSTOM INPUT", updated.sessions.getValue(TransportModeOption.Pro).inputText)
         assertNull(updated.sessions.getValue(TransportModeOption.Pro).sampleInputId)

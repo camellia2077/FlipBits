@@ -9,6 +9,7 @@ namespace {
 constexpr double kPi = 3.14159265358979323846;
 constexpr double kSilenceRmsThreshold = 0.04;
 constexpr std::size_t kProgressReportStrideSamples = 256;
+constexpr double kToneEnvelopeSeconds = 0.005;
 
 bool IsValidConfig(const MorseToneConfig& config) {
   return config.sample_rate_hz > 0 && config.unit_samples > 0 &&
@@ -51,6 +52,51 @@ void AppendSilenceUnits(std::size_t unit_count, const MorseToneConfig& config,
                   0);
 }
 
+std::size_t ToneEnvelopeRampSampleCount(const MorseToneConfig& config,
+                                        std::size_t sample_count) {
+  if (sample_count < 2 || config.sample_rate_hz <= 0) {
+    return 0;
+  }
+  const std::size_t target_samples = static_cast<std::size_t>(std::lround(
+      static_cast<double>(config.sample_rate_hz) * kToneEnvelopeSeconds));
+  return std::min(target_samples, sample_count / static_cast<std::size_t>(2));
+}
+
+double ToneEnvelopeGain(std::size_t sample_index, std::size_t sample_count,
+                        const MorseToneConfig& config) {
+  const std::size_t ramp_samples =
+      ToneEnvelopeRampSampleCount(config, sample_count);
+  if (ramp_samples == 0 || sample_count == 0) {
+    return 1.0;
+  }
+  double gain = 1.0;
+  if (sample_index < ramp_samples) {
+    const double ratio = static_cast<double>(sample_index) /
+                         static_cast<double>(ramp_samples);
+    gain = std::min(gain, 0.5 - 0.5 * std::cos(kPi * ratio));
+  }
+  const std::size_t samples_from_end = sample_count - sample_index - 1;
+  if (samples_from_end < ramp_samples) {
+    const double ratio = static_cast<double>(samples_from_end) /
+                         static_cast<double>(ramp_samples);
+    gain = std::min(gain, 0.5 - 0.5 * std::cos(kPi * ratio));
+  }
+  return gain;
+}
+
+int16_t RenderToneSample(std::size_t sample_index, std::size_t sample_count,
+                         const MorseToneConfig& config) {
+  const double omega = 2.0 * kPi * config.tone_freq_hz;
+  const double time =
+      static_cast<double>(sample_index) /
+      static_cast<double>(config.sample_rate_hz);
+  const double sample =
+      config.amplitude * ToneEnvelopeGain(sample_index, sample_count, config) *
+      std::sin(omega * time);
+  const double clamped = std::clamp(sample, -1.0, 1.0);
+  return static_cast<int16_t>(std::lround(clamped * 32767.0));
+}
+
 void AppendToneUnits(std::size_t unit_count, const MorseToneConfig& config,
                      std::vector<int16_t>* out_pcm) {
   if (out_pcm == nullptr || unit_count == 0) {
@@ -60,14 +106,9 @@ void AppendToneUnits(std::size_t unit_count, const MorseToneConfig& config,
       unit_count * static_cast<std::size_t>(config.unit_samples);
   const std::size_t start_offset = out_pcm->size();
   out_pcm->resize(start_offset + sample_count);
-  const double omega = 2.0 * kPi * config.tone_freq_hz;
   for (std::size_t index = 0; index < sample_count; ++index) {
-    const double time =
-        static_cast<double>(index) / static_cast<double>(config.sample_rate_hz);
-    const double sample = config.amplitude * std::sin(omega * time);
-    const double clamped = std::clamp(sample, -1.0, 1.0);
     (*out_pcm)[start_offset + index] =
-        static_cast<int16_t>(std::lround(clamped * 32767.0));
+        RenderToneSample(index, sample_count, config);
   }
 }
 
@@ -244,13 +285,9 @@ class ToneUnitRenderer::Impl {
       if (!segment.is_tone) {
         (*out_pcm_)[write_index] = 0;
       } else {
-        constexpr double kPi = 3.14159265358979323846;
-        const double omega = 2.0 * kPi * config_.tone_freq_hz;
-        const double time = static_cast<double>(segment_sample_index_) /
-                            static_cast<double>(config_.sample_rate_hz);
-        const double sample = config_.amplitude * std::sin(omega * time);
-        (*out_pcm_)[write_index] = static_cast<int16_t>(
-            std::lround(std::clamp(sample, -1.0, 1.0) * 32767.0));
+        (*out_pcm_)[write_index] =
+            RenderToneSample(segment_sample_index_, segment.sample_count,
+                             config_);
       }
       ++segment_sample_index_;
       ++completed_work_;

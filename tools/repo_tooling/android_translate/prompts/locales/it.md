@@ -18,6 +18,7 @@ For Android string safety, do not introduce raw backslashes, pseudo unicode esca
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.
 Follow existing project terms where present: audio, caratteri, byte, regole di input, Visuale, Tokens, Hex, Morse, payload, token, nibble, portante bassa, and portante alta.
 Do not turn short controls, visualizer mode labels, or transport labels into explanatory sentences.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/it_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere while writing fluent Italian.
@@ -28,3 +29,4 @@ When filling missing entries, write Italian localization that matches the curren
 Preserve placeholders and avoid English-like noun stacking.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d caratteri • %2$d byte`.
 Before finalizing `values-it`, run the escape normalization flow so resource strings remain AAPT2-safe.
+When working on theme or palette entries, prefer the Italian theme/color rules above over older verbose or overly literal wording.

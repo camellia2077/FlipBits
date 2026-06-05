@@ -10,7 +10,7 @@
 ## 调整维度数值
 
 1. 打开 `data.py`，找到对应模式的 `vals`
-2. 8 个数值按顺序：传输速度、编码效率、传输稳定、兼容性、解析难度、电子感、情感丰富度、仪式感
+2. 8 个数值按顺序：速度、效率、稳定、兼容、解析难度、电子、情感、仪式感
 3. 从物理参数计算客观分数：运行 `docs/metrics.py`
 
 ## 调整标签位置 / 字号
@@ -28,7 +28,8 @@
 | 参数 | 文件 | 说明 |
 |------|------|------|
 | `PRIMARY_COLOR` | config.py | 背景底色（米白）|
-| `SECONDARY_COLOR` | config.py | 数据多边形 + 网格（深红）|
+| `GRID_COLOR` | config.py | 内部参考网格（深红）|
+| `SECONDARY_COLOR` | config.py | 数据多边形与属性数值（深红）|
 | `OUTLINE_COLOR` | config.py | 八边形边框（黄铜）|
 | `TEXT_COLOR` | config.py | 标签文字颜色 |
 

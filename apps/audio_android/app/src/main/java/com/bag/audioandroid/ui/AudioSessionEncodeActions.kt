@@ -724,7 +724,7 @@ private class EncodeStateReducer(
                 statusText =
                     UiText.Resource(
                         R.string.status_mode_audio_canceling,
-                        listOf(mode.wireName),
+                        listOf(mode.fixedEnglishLabel),
                     ),
             )
         }
@@ -753,7 +753,7 @@ private class EncodeStateReducer(
                 session.copy(
                     encodeOperationSnapshot = clampedSnapshot,
                     encodeOperationWorkPlan = update.workPlan,
-                    statusText = uiTextMapper.encodePhaseStatus(mode.wireName, clampedSnapshot.phase),
+                    statusText = uiTextMapper.encodePhaseStatus(mode.fixedEnglishLabel, clampedSnapshot.phase),
                 )
             }
         }
@@ -789,7 +789,7 @@ private class EncodeStateReducer(
                 statusText =
                     UiText.Resource(
                         R.string.status_mode_audio_cancelled,
-                        listOf(mode.wireName),
+                        listOf(mode.fixedEnglishLabel),
                     ),
             )
         }
@@ -955,9 +955,9 @@ private class EncodeStateReducer(
                             R.string.status_mode_audio_generated
                         },
                         if (result.segmentCount > 1) {
-                            listOf(request.mode.wireName, result.pcmSampleCount, result.segmentCount)
+                            listOf(request.mode.fixedEnglishLabel, result.pcmSampleCount, result.segmentCount)
                         } else {
-                            listOf(request.mode.wireName, result.pcmSampleCount)
+                            listOf(request.mode.fixedEnglishLabel, result.pcmSampleCount)
                         },
                     ),
                 isCodecBusy = false,

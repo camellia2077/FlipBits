@@ -20,6 +20,7 @@ For app UI text, keep labels recognizable enough to navigate, but favor elevated
 Complex vocabulary and heavy cadence are acceptable because users selecting this locale are choosing atmosphere and entertainment value, not maximum readability.
 Do not force strict classical correctness if it weakens product clarity or the High Gothic voice.
 Follow existing High Gothic house terms when nearby strings provide them, such as Vox, Liturgia Binaria, Chantus Hex, Regulae inputus, Portator humilis/altus, and Ritus flash.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/la_theme_colors.md`.
 
 [sample_text_rule]
 For sample prose, atmosphere outranks literal fidelity and readability.
@@ -33,3 +34,4 @@ When filling missing entries, write in the repository's High Gothic house style 
 Preserve atmosphere, ceremonial gravity, liturgical religious texture, and worldbuilding voice.
 Short UI labels may stay compact, but sample prose should prefer elevated diction and immersive cadence.
 For compact counters and rule links, mirror nearby forms such as characteres, bytes, Textus ASCII, and Regulae inputus.
+When working on theme or palette entries, prefer the High Gothic theme/color rules above over older verbose or overly literal wording.

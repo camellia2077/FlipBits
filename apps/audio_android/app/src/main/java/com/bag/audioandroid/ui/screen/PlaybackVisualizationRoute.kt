@@ -14,6 +14,8 @@ internal sealed interface PlaybackVisualizationRoute {
         val input: FlashSignalVisualizationInput,
     ) : PlaybackVisualizationRoute
 
+    data object ProCompact : PlaybackVisualizationRoute
+
     data object ProExplanation : PlaybackVisualizationRoute
 
     data object UltraStep : PlaybackVisualizationRoute
@@ -61,7 +63,7 @@ internal fun resolvePlaybackVisualizationRoute(
             if (useLightweightVisualization) {
                 PlaybackVisualizationRoute.SymbolEnvelope(transportMode = transportMode)
             } else if (transportMode == TransportModeOption.Pro) {
-                PlaybackVisualizationRoute.ProExplanation
+                PlaybackVisualizationRoute.ProCompact
             } else {
                 PlaybackVisualizationRoute.UltraStep
             }

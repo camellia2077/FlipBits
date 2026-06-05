@@ -13,6 +13,7 @@ if str(TOOLS_DIR) not in sys.path:
 from repo_tooling.android_debug import capture, flash_alignment
 from repo_tooling.android_debug import flash_visual_sweep
 from repo_tooling.android_debug import mini_alignment
+from repo_tooling.android_debug import playback_speed
 from repo_tooling.commands import android_debug
 
 
@@ -44,6 +45,28 @@ def test_string_extra_keeps_whitespace_value() -> None:
     extras: list[str] = []
     capture.string_extra(extras, "wb.input", " \n ")
     assert extras == ["--es", "wb.input", " \n "]
+
+
+def test_playback_speed_summary_includes_memory_events() -> None:
+    line = (
+        "06-03 12:34:56.789 D/PlaybackSpeedMemory( 1234): "
+        "preRendered handle=abc renderer=flash mode=flash speed=0.1 streaming=false fileBacked=true "
+        "sourceSamples=48000 renderedSamples=480000 sourcePcmBytes=96000 renderedPcmBytes=960000 "
+        "heapBefore=100 heapAfter=900 heapDelta=800 nativeHeapBefore=10 nativeHeapAfter=20 "
+        "nativeHeapDelta=10 renderTimeMs=42"
+    )
+
+    event = playback_speed.parse_event(line)
+    assert event is not None
+    assert event.tag == "PlaybackSpeedMemory"
+    assert event.kind == "preRendered"
+    assert event.fields["renderer"] == "flash"
+
+    summary = playback_speed.build_summary([event], max_rows=10)
+    assert "Latest playback memory" in summary
+    assert "## Memory Rows" in summary
+    assert "heapDelta" in summary
+    assert "800" in summary
 
 
 def test_capture_flash_defaults_ui_play_ms_to_longer_duration(monkeypatch, tmp_path) -> None:

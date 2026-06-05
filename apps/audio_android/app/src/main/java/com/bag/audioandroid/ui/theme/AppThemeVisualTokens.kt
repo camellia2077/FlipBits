@@ -8,7 +8,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
-import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.FactionThemeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 
 @Immutable
@@ -133,8 +133,8 @@ fun materialThemeVisualTokens(colorScheme: ColorScheme): AppThemeVisualTokens =
         visualizationInactiveToneColor = colorScheme.outlineVariant,
     )
 
-fun brandThemeVisualTokens(
-    theme: BrandThemeOption,
+fun factionThemeVisualTokens(
+    theme: FactionThemeOption,
     accentTokens: AppThemeAccentTokens,
 ): AppThemeVisualTokens {
     val base = theme.primaryColor
@@ -147,8 +147,8 @@ fun brandThemeVisualTokens(
     val depthShadow = blend(base, Color.Black, if (isDarkTheme) 0.62f else 0.28f)
 
     return AppThemeVisualTokens(
-        themeStyle = ThemeStyleOption.BrandDualTone,
-        audioEncodeGlyphColors = audioEncodeGlyphColorsForBrandTheme(theme),
+        themeStyle = ThemeStyleOption.FactionTheme,
+        audioEncodeGlyphColors = audioEncodeGlyphColorsForFactionTheme(theme),
         // Keep the dock on the main color lane with just enough accent tint to separate it from
         // the page background. This avoids falling back to Material's primaryContainer semantics.
         dockContainerColor = blend(base, accent, 0.10f),

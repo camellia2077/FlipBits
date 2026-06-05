@@ -3,7 +3,7 @@
 # 可独立运行 (python metrics.py)，结果同时打印到终端并导出至 calc_results.md
 #
 # 参考文档：
-#   - temp/stability_reference.md  — 传输稳定维度计算规则
+#   - temp/stability_reference.md  — 稳定维度计算规则
 
 import json
 import math  # noqa: F401 — 保留以备后续公式扩展
@@ -21,7 +21,7 @@ import os
 # ==========================================
 RAW_DATA = {
     # Flash 模式 (基准 BFSK)
-    "Steady":   {"fs": 0.9375, "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
+    "Standard":   {"fs": 0.9375, "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
     "Hostility":  {"fs": 0.875,  "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
     "Litany":   {"fs": 6.0,    "bps": 1,    "charset": 256, "silence": 2, "jitter": 0, "dtmf": 0},
     "Collapse": {"fs": 1.0,    "bps": 1,    "charset": 256, "silence": 0, "jitter": 5, "dtmf": 0},
@@ -77,10 +77,10 @@ def compute_scores(raw_data: dict = None) -> dict:
     raw_results = _calc_raw(raw_data)
 
     mapping = {
-        "TRANSMISSION_SPEED":     "传输速度",
-        "ENCODING_EFFICIENCY":    "编码效率",
-        "TRANSMISSION_STABILITY": "传输稳定",
-        "COMPATIBILITY":          "兼容性",
+        "TRANSMISSION_SPEED":     "速度",
+        "ENCODING_EFFICIENCY":    "效率",
+        "TRANSMISSION_STABILITY": "稳定",
+        "COMPATIBILITY":          "兼容",
     }
 
     final_scores = {key: _min_max_normalize(raw_results, key) for key in mapping}

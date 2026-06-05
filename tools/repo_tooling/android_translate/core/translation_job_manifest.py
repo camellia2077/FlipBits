@@ -66,3 +66,18 @@ def build_replace_manifest_patch(
             "result": payload,
         }
     }
+
+
+def build_replace_batch_manifest_patch(
+    *,
+    json_paths: list[str],
+    summary_out: str | None,
+    payload: dict[str, object],
+) -> dict[str, object]:
+    return {
+        "replace_batch": {
+            "input_jsons": [normalize_path_string(path) for path in json_paths],
+            "result_json": normalize_path_string(summary_out) if summary_out else None,
+            "result": payload,
+        }
+    }

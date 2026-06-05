@@ -50,7 +50,7 @@ internal fun AudioAndroidMainScaffold(
     onSavedAudioFilterChange: (SavedAudioModeFilter) -> Unit,
     accentTokens: com.bag.audioandroid.ui.theme.AppThemeAccentTokens,
     materialPalettes: List<com.bag.audioandroid.ui.model.PaletteOption>,
-    brandThemes: List<com.bag.audioandroid.ui.model.BrandThemeOption>,
+    factionThemes: List<com.bag.audioandroid.ui.model.FactionThemeOption>,
     onImportAudio: () -> Unit,
     viewModel: AudioAndroidViewModel,
     debugScenario: FlashDebugScenario? = null,
@@ -82,14 +82,14 @@ internal fun AudioAndroidMainScaffold(
     val waveformDisplayedSamples = playbackVisualData.displayedSamplesFor(currentPlayback.displayedSamples)
     val navigationBarColors = navigationBarItemColors(uiState)
     val demoTouchStrokeColor =
-        if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.BrandDualTone) {
-            uiState.activeBrandTheme.secondaryColor
+        if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.FactionTheme) {
+            uiState.activeFactionTheme.secondaryColor
         } else {
             androidx.compose.material3.MaterialTheme.colorScheme.primary
         }
     val demoTouchFillColor =
-        if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.BrandDualTone) {
-            val primary = uiState.activeBrandTheme.primaryColor
+        if (uiState.selectedThemeStyle == com.bag.audioandroid.ui.model.ThemeStyleOption.FactionTheme) {
+            val primary = uiState.activeFactionTheme.primaryColor
             if (primary.luminance() < 0.5f) {
                 lerp(Color.White, primary, 0.15f)
             } else {
@@ -362,7 +362,7 @@ internal fun AudioAndroidMainScaffold(
                         onOpenDetails = viewModel::onOpenPlayerDetailSheet,
                         // Keep the mini-player on the same dock container color as the tab bar.
                         // The two pieces should read as one bottom playback system that adapts
-                        // automatically when the user switches brand dual-tone themes in config.
+                        // automatically when the user switches brand faction themes in config.
                         containerColor = playerDockContainerColor(uiState),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -378,13 +378,13 @@ internal fun AudioAndroidMainScaffold(
                     onLanguageExpandedChanged = viewModel::onConfigLanguageExpandedChanged,
                     selectedThemeStyle = uiState.selectedThemeStyle,
                     onThemeStyleSelected = viewModel::onThemeStyleSelected,
-                    selectedBrandTheme = uiState.activeBrandTheme,
-                    onBrandThemeSelected = viewModel::onBrandThemeSelected,
-                    customBrandThemes = uiState.customBrandThemes,
-                    onCustomBrandThemeSaved = viewModel::onCustomBrandThemeSaved,
-                    onCustomBrandThemeDeleted = viewModel::onCustomBrandThemeDeleted,
-                    onCustomBrandThemesImported = viewModel::onCustomBrandThemesImported,
-                    onCustomBrandThemesReordered = viewModel::onCustomBrandThemesReordered,
+                    selectedFactionTheme = uiState.activeFactionTheme,
+                    onFactionThemeSelected = viewModel::onFactionThemeSelected,
+                    customFactionThemes = uiState.customFactionThemes,
+                    onCustomFactionThemeSaved = viewModel::onCustomFactionThemeSaved,
+                    onCustomFactionThemeDeleted = viewModel::onCustomFactionThemeDeleted,
+                    onCustomFactionThemesImported = viewModel::onCustomFactionThemesImported,
+                    onCustomFactionThemesReordered = viewModel::onCustomFactionThemesReordered,
                     customMaterialThemePresets = uiState.customMaterialThemePresets,
                     customMaterialThemeSettings = uiState.customMaterialThemeSettings,
                     onCustomMaterialThemeSaved = viewModel::onCustomMaterialThemeSaved,
@@ -392,7 +392,7 @@ internal fun AudioAndroidMainScaffold(
                     onCustomMaterialThemesImported = viewModel::onCustomMaterialThemesImported,
                     onCustomMaterialThemesReordered = viewModel::onCustomMaterialThemesReordered,
                     onCreateCustomMaterialTheme = viewModel::onCreateCustomMaterialTheme,
-                    customBrandThemePresets = uiState.customBrandThemePresets,
+                    customFactionThemePresets = uiState.customFactionThemePresets,
                     selectedThemeMode = uiState.selectedThemeMode,
                     onThemeModeSelected = viewModel::onThemeModeSelected,
                     isThemeAppearanceExpanded = uiState.isConfigThemeAppearanceExpanded,
@@ -415,22 +415,23 @@ internal fun AudioAndroidMainScaffold(
                     onMaterialPurplesPaletteExpandedChanged = viewModel::onConfigMaterialPurplesPaletteExpandedChanged,
                     isMaterialNeutralsPaletteExpanded = uiState.isConfigMaterialNeutralsPaletteExpanded,
                     onMaterialNeutralsPaletteExpandedChanged = viewModel::onConfigMaterialNeutralsPaletteExpandedChanged,
-                    isCustomBrandThemeExpanded = uiState.isConfigCustomBrandThemeExpanded,
-                    onCustomBrandThemeExpandedChanged = viewModel::onConfigCustomBrandThemeExpandedChanged,
+                    isCustomFactionThemeExpanded = uiState.isConfigCustomFactionThemeExpanded,
+                    onCustomFactionThemeExpandedChanged = viewModel::onConfigCustomFactionThemeExpandedChanged,
                     isSampleTextExpanded = uiState.isConfigSampleTextExpanded,
                     onSampleTextExpandedChanged = viewModel::onConfigSampleTextExpandedChanged,
-                    isSacredMachineBrandThemeExpanded = uiState.isConfigSacredMachineBrandThemeExpanded,
-                    onSacredMachineBrandThemeExpandedChanged = viewModel::onConfigSacredMachineBrandThemeExpandedChanged,
-                    isAncientDynastyBrandThemeExpanded = uiState.isConfigAncientDynastyBrandThemeExpanded,
-                    onAncientDynastyBrandThemeExpandedChanged = viewModel::onConfigAncientDynastyBrandThemeExpandedChanged,
-                    isImmortalRotBrandThemeExpanded = uiState.isConfigImmortalRotBrandThemeExpanded,
-                    onImmortalRotBrandThemeExpandedChanged = viewModel::onConfigImmortalRotBrandThemeExpandedChanged,
-                    isScarletCarnageBrandThemeExpanded = uiState.isConfigScarletCarnageBrandThemeExpanded,
-                    onScarletCarnageBrandThemeExpandedChanged = viewModel::onConfigScarletCarnageBrandThemeExpandedChanged,
-                    isExquisiteFallBrandThemeExpanded = uiState.isConfigExquisiteFallBrandThemeExpanded,
-                    onExquisiteFallBrandThemeExpandedChanged = viewModel::onConfigExquisiteFallBrandThemeExpandedChanged,
-                    isLabyrinthOfMutabilityBrandThemeExpanded = uiState.isConfigLabyrinthOfMutabilityBrandThemeExpanded,
-                    onLabyrinthOfMutabilityBrandThemeExpandedChanged = viewModel::onConfigLabyrinthOfMutabilityBrandThemeExpandedChanged,
+                    isSacredMachineFactionThemeExpanded = uiState.isConfigSacredMachineFactionThemeExpanded,
+                    onSacredMachineFactionThemeExpandedChanged = viewModel::onConfigSacredMachineFactionThemeExpandedChanged,
+                    isAncientDynastyFactionThemeExpanded = uiState.isConfigAncientDynastyFactionThemeExpanded,
+                    onAncientDynastyFactionThemeExpandedChanged = viewModel::onConfigAncientDynastyFactionThemeExpandedChanged,
+                    isImmortalRotFactionThemeExpanded = uiState.isConfigImmortalRotFactionThemeExpanded,
+                    onImmortalRotFactionThemeExpandedChanged = viewModel::onConfigImmortalRotFactionThemeExpandedChanged,
+                    isScarletCarnageFactionThemeExpanded = uiState.isConfigScarletCarnageFactionThemeExpanded,
+                    onScarletCarnageFactionThemeExpandedChanged = viewModel::onConfigScarletCarnageFactionThemeExpandedChanged,
+                    isExquisiteFallFactionThemeExpanded = uiState.isConfigExquisiteFallFactionThemeExpanded,
+                    onExquisiteFallFactionThemeExpandedChanged = viewModel::onConfigExquisiteFallFactionThemeExpandedChanged,
+                    isLabyrinthOfMutabilityFactionThemeExpanded = uiState.isConfigLabyrinthOfMutabilityFactionThemeExpanded,
+                    onLabyrinthOfMutabilityFactionThemeExpandedChanged =
+                        viewModel::onConfigLabyrinthOfMutabilityFactionThemeExpandedChanged,
                     isDebugExpanded = uiState.isConfigDebugExpanded,
                     onDebugExpandedChanged = viewModel::onConfigDebugExpandedChanged,
                     isDemoModeEnabled = uiState.isDemoModeEnabled,
@@ -446,7 +447,7 @@ internal fun AudioAndroidMainScaffold(
                     selectedPalette = uiState.selectedPalette,
                     onPaletteSelected = viewModel::onPaletteSelected,
                     materialPalettes = materialPalettes,
-                    brandThemes = brandThemes,
+                    factionThemes = factionThemes,
                     accentTokens = accentTokens,
                     onOpenAboutPage = viewModel::onOpenAboutPage,
                     contentPadding = contentPadding,

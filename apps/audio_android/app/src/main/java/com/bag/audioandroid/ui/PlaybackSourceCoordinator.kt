@@ -26,6 +26,9 @@ class PlaybackSourceCoordinator(
                         sampleRateHz = generatedSampleRateHz,
                         playback = session.playback,
                         playbackSpeed = session.playbackSpeed,
+                        transportMode = source.mode,
+                        frameSamples = session.generatedAudioMetadata?.frameSamples ?: 0,
+                        followData = session.followData,
                     )
                 }
             }
@@ -46,6 +49,9 @@ class PlaybackSourceCoordinator(
                     sampleRateHz = selectedSavedAudio.sampleRateHz,
                     playback = selectedSavedAudio.playback,
                     playbackSpeed = selectedSavedAudio.playbackSpeed,
+                    transportMode = TransportModeOption.fromWireName(selectedSavedAudio.item.modeWireName),
+                    frameSamples = selectedSavedAudio.metadata?.frameSamples ?: 0,
+                    followData = selectedSavedAudio.followData,
                 )
             }
         }
@@ -88,5 +94,8 @@ class PlaybackSourceCoordinator(
         val sampleRateHz: Int,
         val playback: PlaybackUiState,
         val playbackSpeed: Float,
+        val transportMode: TransportModeOption? = null,
+        val frameSamples: Int = 0,
+        val followData: com.bag.audioandroid.domain.PayloadFollowViewData = com.bag.audioandroid.domain.PayloadFollowViewData.Empty,
     )
 }

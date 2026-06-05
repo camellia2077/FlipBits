@@ -490,6 +490,14 @@ private fun PlaybackVisualizationContent(
             )
         }
 
+        PlaybackVisualizationRoute.ProCompact ->
+            ProCompactVisualizer(
+                followData = followData,
+                displayedSamples = displayedSamples,
+                frameSamples = frameSamples,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
         PlaybackVisualizationRoute.ProExplanation ->
             ProEncodingExplanationVisualizer(
                 followData = followData,

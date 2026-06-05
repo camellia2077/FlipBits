@@ -40,12 +40,12 @@ class AudioAndroidPreferencesBindingsTest {
     fun `explicit persisted theme style still wins`() {
         val restored =
             inferPersistedThemeStyle(
-                themeStyleId = ThemeStyleOption.BrandDualTone.id,
+                themeStyleId = ThemeStyleOption.FactionTheme.id,
                 paletteId = customMaterialPaletteId("keyboard"),
                 lightPaletteId = customMaterialPaletteId("keyboard"),
                 darkPaletteId = customMaterialPaletteId("keyboard"),
             )
 
-        assertEquals(ThemeStyleOption.BrandDualTone, restored)
+        assertEquals(ThemeStyleOption.FactionTheme, restored)
     }
 }

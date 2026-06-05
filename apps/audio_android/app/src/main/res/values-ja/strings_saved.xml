@@ -5,7 +5,6 @@
     <!-- Saved tab strings: file list, import, rename, move, delete, folder actions. -->
     <!-- Keep placeholders unchanged. -->
     <string name="saved_audio_filter_empty">一致する項目はありません。</string>
-    <string name="library_title">保存済み</string>
     <string name="library_empty">まだ保存された項目はありません。</string>
     <string name="library_action_import">インポート</string>
     <string name="library_action_share">共有</string>

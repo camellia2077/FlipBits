@@ -18,6 +18,7 @@ radar_viz 是 FlipBits 项目的雷达图可视化工具。它将音频编码模
 radar_viz/
 ├── main.py              入口，调用 cli.run()
 ├── cli.py               CLI 参数解析，分发到各子命令
+├── generator.py         RadarGenerator 管线调度类（含上下文管理）
 ├── config.py            维度常量、颜色方案、导出尺寸
 ├── config_fonts.py      字体路径、字号、标签位置微调偏移
 ├── data.py              DATA_DICT 数据集定义（所有模式的 8 维数值）
@@ -33,7 +34,7 @@ radar_viz/
 │   ├── modifications.md 常见修改场景
 │   ├── metrics.py       从物理参数计算客观维度分数
 │   ├── arousal_reference.md   解析难度维度参照标准
-│   └── stability_reference.md 传输稳定维度参照标准
+│   └── stability_reference.md 稳定维度参照标准
 └── legacy/              废弃的旧版单体渲染器（不参与主流程）
 ```
 

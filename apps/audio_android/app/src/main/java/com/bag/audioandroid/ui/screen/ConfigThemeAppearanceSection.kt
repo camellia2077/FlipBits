@@ -30,45 +30,48 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
-import com.bag.audioandroid.ui.model.BrandThemeExportEntry
-import com.bag.audioandroid.ui.model.BrandThemeOption
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
+import com.bag.audioandroid.ui.model.FactionThemeExportEntry
+import com.bag.audioandroid.ui.model.FactionThemeOption
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.toBatchConfigText
-import com.bag.audioandroid.ui.model.toBrandThemeExportBatchConfigText
+import com.bag.audioandroid.ui.model.toFactionThemeExportBatchConfigText
 import com.bag.audioandroid.ui.model.toMaterialBatchConfigText
 import com.bag.audioandroid.ui.theme.AppThemeAccentTokens
-import com.bag.audioandroid.ui.theme.customBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
+import com.bag.audioandroid.ui.theme.customFactionThemeOptionId
 import com.bag.audioandroid.ui.theme.customMaterialPalette
 import com.bag.audioandroid.ui.theme.customMaterialPaletteId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
+import com.bag.audioandroid.ui.theme.normalizeCustomMaterialThemeSettings
 import com.bag.audioandroid.ui.utilityActionIconButtonColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.UUID
 import kotlin.math.roundToInt
 
-private data class ConfigThemeAppearanceBrandThemeGroups(
-    val sacredMachineThemes: List<BrandThemeOption>,
-    val ancientDynastyThemes: List<BrandThemeOption>,
-    val immortalRotThemes: List<BrandThemeOption>,
-    val scarletCarnageThemes: List<BrandThemeOption>,
-    val exquisiteFallThemes: List<BrandThemeOption>,
-    val labyrinthOfMutabilityThemes: List<BrandThemeOption>,
+private data class ConfigThemeAppearanceFactionThemeGroups(
+    val sacredMachineThemes: List<FactionThemeOption>,
+    val ancientDynastyThemes: List<FactionThemeOption>,
+    val immortalRotThemes: List<FactionThemeOption>,
+    val scarletCarnageThemes: List<FactionThemeOption>,
+    val exquisiteFallThemes: List<FactionThemeOption>,
+    val labyrinthOfMutabilityThemes: List<FactionThemeOption>,
 )
 
 private data class ConfigThemeAppearanceSectionRenderState(
     val isBrandStyle: Boolean,
     val materialPaletteGroups: List<PaletteGroupUi>,
-    val brandThemeGroups: ConfigThemeAppearanceBrandThemeGroups,
-    val selectedCustomBrandThemePreset: CustomBrandThemeSettings?,
+    val factionThemeGroups: ConfigThemeAppearanceFactionThemeGroups,
+    val selectedCustomFactionThemePreset: CustomFactionThemeSettings?,
 )
 
-private data class BrandThemeBuiltInSectionUi(
+private data class FactionThemeBuiltInSectionUi(
     val titleResId: Int,
-    val options: List<BrandThemeOption>,
+    val options: List<FactionThemeOption>,
     val expanded: Boolean,
     val onExpandedChanged: (Boolean) -> Unit,
 )
@@ -120,40 +123,40 @@ private data class ConfigMaterialPaletteExpansionState(
         }
 }
 
-private data class ConfigThemeAppearanceBrandThemeExpansionState(
-    val isCustomBrandThemeExpanded: Boolean,
-    val onCustomBrandThemeExpandedChanged: (Boolean) -> Unit,
-    val isSacredMachineBrandThemeExpanded: Boolean,
-    val onSacredMachineBrandThemeExpandedChanged: (Boolean) -> Unit,
-    val isAncientDynastyBrandThemeExpanded: Boolean,
-    val onAncientDynastyBrandThemeExpandedChanged: (Boolean) -> Unit,
-    val isImmortalRotBrandThemeExpanded: Boolean,
-    val onImmortalRotBrandThemeExpandedChanged: (Boolean) -> Unit,
-    val isScarletCarnageBrandThemeExpanded: Boolean,
-    val onScarletCarnageBrandThemeExpandedChanged: (Boolean) -> Unit,
-    val isExquisiteFallBrandThemeExpanded: Boolean,
-    val onExquisiteFallBrandThemeExpandedChanged: (Boolean) -> Unit,
-    val isLabyrinthOfMutabilityBrandThemeExpanded: Boolean,
-    val onLabyrinthOfMutabilityBrandThemeExpandedChanged: (Boolean) -> Unit,
+private data class ConfigThemeAppearanceFactionThemeExpansionState(
+    val isCustomFactionThemeExpanded: Boolean,
+    val onCustomFactionThemeExpandedChanged: (Boolean) -> Unit,
+    val isSacredMachineFactionThemeExpanded: Boolean,
+    val onSacredMachineFactionThemeExpandedChanged: (Boolean) -> Unit,
+    val isAncientDynastyFactionThemeExpanded: Boolean,
+    val onAncientDynastyFactionThemeExpandedChanged: (Boolean) -> Unit,
+    val isImmortalRotFactionThemeExpanded: Boolean,
+    val onImmortalRotFactionThemeExpandedChanged: (Boolean) -> Unit,
+    val isScarletCarnageFactionThemeExpanded: Boolean,
+    val onScarletCarnageFactionThemeExpandedChanged: (Boolean) -> Unit,
+    val isExquisiteFallFactionThemeExpanded: Boolean,
+    val onExquisiteFallFactionThemeExpandedChanged: (Boolean) -> Unit,
+    val isLabyrinthOfMutabilityFactionThemeExpanded: Boolean,
+    val onLabyrinthOfMutabilityFactionThemeExpandedChanged: (Boolean) -> Unit,
 )
 
 @Composable
 internal fun ConfigThemeAppearanceSection(
     selectedThemeStyle: ThemeStyleOption,
     onThemeStyleSelected: (ThemeStyleOption) -> Unit,
-    selectedBrandTheme: BrandThemeOption,
-    onBrandThemeSelected: (BrandThemeOption) -> Unit,
-    customBrandThemes: List<BrandThemeOption>,
-    customBrandThemePresets: List<CustomBrandThemeSettings>,
-    onCustomBrandThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
-    onCustomBrandThemeDeleted: (String) -> Unit,
-    onCustomBrandThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
-    onCustomBrandThemesReordered: (Int, Int) -> Unit,
-    customMaterialThemePresets: List<CustomBrandThemeSettings>,
-    customMaterialThemeSettings: CustomBrandThemeSettings,
-    onCustomMaterialThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
+    selectedFactionTheme: FactionThemeOption,
+    onFactionThemeSelected: (FactionThemeOption) -> Unit,
+    customFactionThemes: List<FactionThemeOption>,
+    customFactionThemePresets: List<CustomFactionThemeSettings>,
+    onCustomFactionThemeSaved: (CustomFactionThemeSettings, String?) -> Unit,
+    onCustomFactionThemeDeleted: (String) -> Unit,
+    onCustomFactionThemesImported: (List<CustomFactionThemeSettings>) -> Unit,
+    onCustomFactionThemesReordered: (Int, Int) -> Unit,
+    customMaterialThemePresets: List<CustomFactionThemeSettings>,
+    customMaterialThemeSettings: CustomFactionThemeSettings,
+    onCustomMaterialThemeSaved: (CustomFactionThemeSettings, String?) -> Unit,
     onCustomMaterialThemeDeleted: (String) -> Unit,
-    onCustomMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
+    onCustomMaterialThemesImported: (List<CustomFactionThemeSettings>) -> Unit,
     onCustomMaterialThemesReordered: (Int, Int) -> Unit,
     onCreateCustomMaterialTheme: () -> Unit,
     selectedThemeMode: ThemeModeOption,
@@ -178,35 +181,35 @@ internal fun ConfigThemeAppearanceSection(
     onMaterialPurplesPaletteExpandedChanged: (Boolean) -> Unit,
     isMaterialNeutralsPaletteExpanded: Boolean,
     onMaterialNeutralsPaletteExpandedChanged: (Boolean) -> Unit,
-    isCustomBrandThemeExpanded: Boolean,
-    onCustomBrandThemeExpandedChanged: (Boolean) -> Unit,
-    isSacredMachineBrandThemeExpanded: Boolean,
-    onSacredMachineBrandThemeExpandedChanged: (Boolean) -> Unit,
-    isAncientDynastyBrandThemeExpanded: Boolean,
-    onAncientDynastyBrandThemeExpandedChanged: (Boolean) -> Unit,
-    isImmortalRotBrandThemeExpanded: Boolean,
-    onImmortalRotBrandThemeExpandedChanged: (Boolean) -> Unit,
-    isScarletCarnageBrandThemeExpanded: Boolean,
-    onScarletCarnageBrandThemeExpandedChanged: (Boolean) -> Unit,
-    isExquisiteFallBrandThemeExpanded: Boolean,
-    onExquisiteFallBrandThemeExpandedChanged: (Boolean) -> Unit,
-    isLabyrinthOfMutabilityBrandThemeExpanded: Boolean,
-    onLabyrinthOfMutabilityBrandThemeExpandedChanged: (Boolean) -> Unit,
+    isCustomFactionThemeExpanded: Boolean,
+    onCustomFactionThemeExpandedChanged: (Boolean) -> Unit,
+    isSacredMachineFactionThemeExpanded: Boolean,
+    onSacredMachineFactionThemeExpandedChanged: (Boolean) -> Unit,
+    isAncientDynastyFactionThemeExpanded: Boolean,
+    onAncientDynastyFactionThemeExpandedChanged: (Boolean) -> Unit,
+    isImmortalRotFactionThemeExpanded: Boolean,
+    onImmortalRotFactionThemeExpandedChanged: (Boolean) -> Unit,
+    isScarletCarnageFactionThemeExpanded: Boolean,
+    onScarletCarnageFactionThemeExpandedChanged: (Boolean) -> Unit,
+    isExquisiteFallFactionThemeExpanded: Boolean,
+    onExquisiteFallFactionThemeExpandedChanged: (Boolean) -> Unit,
+    isLabyrinthOfMutabilityFactionThemeExpanded: Boolean,
+    onLabyrinthOfMutabilityFactionThemeExpandedChanged: (Boolean) -> Unit,
     selectedPalette: PaletteOption,
     onPaletteSelected: (PaletteOption) -> Unit,
     materialPalettes: List<PaletteOption>,
-    brandThemes: List<BrandThemeOption>,
+    factionThemes: List<FactionThemeOption>,
     accentTokens: AppThemeAccentTokens,
 ) {
-    val editCustomMaterialLabel = stringResource(R.string.config_custom_brand_theme_edit)
+    val editCustomMaterialLabel = stringResource(R.string.config_custom_faction_theme_edit)
     val dialogState = rememberConfigThemeAppearanceDialogState()
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-    val copyConfigLabel = stringResource(R.string.config_custom_brand_theme_copy_config)
+    val copyConfigLabel = stringResource(R.string.config_custom_faction_theme_copy_config)
     val copyAllConfigLabel = stringResource(R.string.config_custom_theme_copy_all)
-    val addCustomLabel = stringResource(R.string.config_custom_brand_theme_add)
-    val importCustomLabel = stringResource(R.string.config_custom_brand_theme_import)
-    val deleteCustomLabel = stringResource(R.string.config_custom_brand_theme_delete)
+    val addCustomLabel = stringResource(R.string.config_custom_faction_theme_add)
+    val importCustomLabel = stringResource(R.string.config_custom_faction_theme_import)
+    val deleteCustomLabel = stringResource(R.string.config_custom_faction_theme_delete)
     val renderState =
         rememberConfigThemeAppearanceSectionRenderState(
             selectedThemeStyle = selectedThemeStyle,
@@ -217,10 +220,22 @@ internal fun ConfigThemeAppearanceSection(
             addCustomLabel = addCustomLabel,
             importCustomLabel = importCustomLabel,
             deleteCustomLabel = deleteCustomLabel,
-            onCreateCustomMaterialTheme = onCreateCustomMaterialTheme,
+            onCreateCustomMaterialTheme = {
+                val nextIndex = customMaterialThemePresets.size + 1
+                dialogState.openCreateCustomMaterialTheme(
+                    normalizeCustomMaterialThemeSettings(
+                        DefaultCustomMaterialPaletteSettings.copy(
+                            presetId = UUID.randomUUID().toString(),
+                            displayName = "Custom $nextIndex",
+                        ),
+                    ),
+                )
+            },
             onCustomMaterialThemesReordered = onCustomMaterialThemesReordered,
             onCustomMaterialThemeDeleted = onCustomMaterialThemeDeleted,
-            onOpenCustomMaterialThemeDialog = dialogState::openCustomMaterialThemeDialog,
+            onOpenCustomMaterialThemeDialog = {
+                dialogState.openEditCustomMaterialTheme(customMaterialThemeSettings)
+            },
             onOpenCustomMaterialThemeImportDialog = dialogState::openCustomMaterialThemeImportDialog,
             onCopyAllCustomMaterialThemes = {
                 coroutineScope.launch {
@@ -235,26 +250,26 @@ internal fun ConfigThemeAppearanceSection(
                 }
             },
             copyAllConfigLabel = copyAllConfigLabel,
-            brandThemes = brandThemes,
-            selectedBrandTheme = selectedBrandTheme,
-            customBrandThemePresets = customBrandThemePresets,
+            factionThemes = factionThemes,
+            selectedFactionTheme = selectedFactionTheme,
+            customFactionThemePresets = customFactionThemePresets,
         )
-    val brandThemeExpansionState =
-        ConfigThemeAppearanceBrandThemeExpansionState(
-            isCustomBrandThemeExpanded = isCustomBrandThemeExpanded,
-            onCustomBrandThemeExpandedChanged = onCustomBrandThemeExpandedChanged,
-            isSacredMachineBrandThemeExpanded = isSacredMachineBrandThemeExpanded,
-            onSacredMachineBrandThemeExpandedChanged = onSacredMachineBrandThemeExpandedChanged,
-            isAncientDynastyBrandThemeExpanded = isAncientDynastyBrandThemeExpanded,
-            onAncientDynastyBrandThemeExpandedChanged = onAncientDynastyBrandThemeExpandedChanged,
-            isImmortalRotBrandThemeExpanded = isImmortalRotBrandThemeExpanded,
-            onImmortalRotBrandThemeExpandedChanged = onImmortalRotBrandThemeExpandedChanged,
-            isScarletCarnageBrandThemeExpanded = isScarletCarnageBrandThemeExpanded,
-            onScarletCarnageBrandThemeExpandedChanged = onScarletCarnageBrandThemeExpandedChanged,
-            isExquisiteFallBrandThemeExpanded = isExquisiteFallBrandThemeExpanded,
-            onExquisiteFallBrandThemeExpandedChanged = onExquisiteFallBrandThemeExpandedChanged,
-            isLabyrinthOfMutabilityBrandThemeExpanded = isLabyrinthOfMutabilityBrandThemeExpanded,
-            onLabyrinthOfMutabilityBrandThemeExpandedChanged = onLabyrinthOfMutabilityBrandThemeExpandedChanged,
+    val factionThemeExpansionState =
+        ConfigThemeAppearanceFactionThemeExpansionState(
+            isCustomFactionThemeExpanded = isCustomFactionThemeExpanded,
+            onCustomFactionThemeExpandedChanged = onCustomFactionThemeExpandedChanged,
+            isSacredMachineFactionThemeExpanded = isSacredMachineFactionThemeExpanded,
+            onSacredMachineFactionThemeExpandedChanged = onSacredMachineFactionThemeExpandedChanged,
+            isAncientDynastyFactionThemeExpanded = isAncientDynastyFactionThemeExpanded,
+            onAncientDynastyFactionThemeExpandedChanged = onAncientDynastyFactionThemeExpandedChanged,
+            isImmortalRotFactionThemeExpanded = isImmortalRotFactionThemeExpanded,
+            onImmortalRotFactionThemeExpandedChanged = onImmortalRotFactionThemeExpandedChanged,
+            isScarletCarnageFactionThemeExpanded = isScarletCarnageFactionThemeExpanded,
+            onScarletCarnageFactionThemeExpandedChanged = onScarletCarnageFactionThemeExpandedChanged,
+            isExquisiteFallFactionThemeExpanded = isExquisiteFallFactionThemeExpanded,
+            onExquisiteFallFactionThemeExpandedChanged = onExquisiteFallFactionThemeExpandedChanged,
+            isLabyrinthOfMutabilityFactionThemeExpanded = isLabyrinthOfMutabilityFactionThemeExpanded,
+            onLabyrinthOfMutabilityFactionThemeExpandedChanged = onLabyrinthOfMutabilityFactionThemeExpandedChanged,
         )
     val materialPaletteExpansionState =
         ConfigMaterialPaletteExpansionState(
@@ -277,48 +292,50 @@ internal fun ConfigThemeAppearanceSection(
             isNeutralsExpanded = isMaterialNeutralsPaletteExpanded,
             onNeutralsExpandedChanged = onMaterialNeutralsPaletteExpandedChanged,
         )
-    val localizedBuiltInBrandThemeNames =
+    val localizedBuiltInFactionThemeNames =
         mapOf(
-            "mars_relic" to stringResource(R.string.brand_theme_mars_relic_title),
-            "scarlet_guard" to stringResource(R.string.brand_theme_scarlet_guard_title),
-            "black_crimson_rite" to stringResource(R.string.brand_theme_black_crimson_rite_title),
-            "xeno_code" to stringResource(R.string.brand_theme_xeno_code_title),
-            "blood_soaked_ivory" to stringResource(R.string.brand_theme_scarlet_carnage_title),
-            "brass_forge" to stringResource(R.string.brand_theme_brass_forge_title),
-            "fires_of_fate" to stringResource(R.string.brand_theme_fires_of_fate_title),
-            "arcane_abyss" to stringResource(R.string.brand_theme_labyrinth_of_mutability_title),
-            "ecstatic_rapture" to stringResource(R.string.brand_theme_ecstatic_rapture_title),
-            "velvet_nightmare" to stringResource(R.string.brand_theme_exquisite_fall_title),
-            "toxic_effluence" to stringResource(R.string.brand_theme_immortal_rot_title),
-            "plague_mire" to stringResource(R.string.brand_theme_plague_mire_title),
-            "dynasty_revival" to stringResource(R.string.brand_theme_dynasty_revival_title),
-            "sepulcher_cyan" to stringResource(R.string.brand_theme_sepulcher_cyan_title),
-            "ancient_alloy" to stringResource(R.string.brand_theme_ancient_alloy_title),
-            "tomb_sigil" to stringResource(R.string.brand_theme_tomb_sigil_title),
+            "mars_relic" to stringResource(R.string.faction_theme_mars_relic_title),
+            "scarlet_guard" to stringResource(R.string.faction_theme_scarlet_guard_title),
+            "black_crimson_rite" to stringResource(R.string.faction_theme_black_crimson_rite_title),
+            "xeno_code" to stringResource(R.string.faction_theme_xeno_code_title),
+            "blood_soaked_ivory" to stringResource(R.string.faction_theme_scarlet_carnage_title),
+            "brass_forge" to stringResource(R.string.faction_theme_brass_forge_title),
+            "fires_of_fate" to stringResource(R.string.faction_theme_fires_of_fate_title),
+            "arcane_abyss" to stringResource(R.string.faction_theme_labyrinth_of_mutability_title),
+            "ecstatic_rapture" to stringResource(R.string.faction_theme_ecstatic_rapture_title),
+            "velvet_nightmare" to stringResource(R.string.faction_theme_exquisite_fall_title),
+            "toxic_effluence" to stringResource(R.string.faction_theme_immortal_rot_title),
+            "plague_mire" to stringResource(R.string.faction_theme_plague_mire_title),
+            "dynasty_revival" to stringResource(R.string.faction_theme_dynasty_revival_title),
+            "sepulcher_cyan" to stringResource(R.string.faction_theme_sepulcher_cyan_title),
+            "ancient_alloy" to stringResource(R.string.faction_theme_ancient_alloy_title),
+            "tomb_sigil" to stringResource(R.string.faction_theme_tomb_sigil_title),
+            "void_fluctuation" to stringResource(R.string.faction_theme_void_fluctuation_title),
+            "crimson_decree" to stringResource(R.string.faction_theme_crimson_decree_title),
         )
-    val toLocalizedBrandThemeExportEntry: (BrandThemeOption) -> BrandThemeExportEntry =
+    val toLocalizedFactionThemeExportEntry: (FactionThemeOption) -> FactionThemeExportEntry =
         { option ->
-            BrandThemeExportEntry(
+            FactionThemeExportEntry(
                 displayName =
                     option.titleOverride
-                        ?: localizedBuiltInBrandThemeNames[option.id]
+                        ?: localizedBuiltInFactionThemeNames[option.id]
                         ?: option.id,
                 primaryHex = option.primaryColor.toHexString(),
                 secondaryHex = option.secondaryColor.toHexString(),
                 outlineHexOrNull = option.outlineColor.toHexString(),
             )
         }
-    val copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit =
-        remember(clipboard, coroutineScope, localizedBuiltInBrandThemeNames) {
+    val copySelectedFactionThemeConfig: (FactionThemeOption) -> Unit =
+        remember(clipboard, coroutineScope, localizedBuiltInFactionThemeNames) {
             { option ->
                 coroutineScope.launch {
                     copyCustomThemeConfig(
                         clipboard = clipboard,
                         settings =
-                            CustomBrandThemeSettings(
+                            CustomFactionThemeSettings(
                                 displayName =
                                     option.titleOverride
-                                        ?: localizedBuiltInBrandThemeNames[option.id]
+                                        ?: localizedBuiltInFactionThemeNames[option.id]
                                         ?: option.id,
                                 primaryHex = option.primaryColor.toHexString(),
                                 secondaryHex = option.secondaryColor.toHexString(),
@@ -328,15 +345,15 @@ internal fun ConfigThemeAppearanceSection(
                 }
             }
         }
-    val copyAllCustomBrandThemeConfigs: () -> Unit =
-        remember(clipboard, coroutineScope, customBrandThemePresets) {
+    val copyAllCustomFactionThemeConfigs: () -> Unit =
+        remember(clipboard, coroutineScope, customFactionThemePresets) {
             {
                 coroutineScope.launch {
                     clipboard.setClipEntry(
                         ClipEntry(
                             ClipData.newPlainText(
                                 "FlipBits custom theme config",
-                                customBrandThemePresets.toBatchConfigText(),
+                                customFactionThemePresets.toBatchConfigText(),
                             ),
                         ),
                     )
@@ -346,9 +363,9 @@ internal fun ConfigThemeAppearanceSection(
     ConfigThemeAppearanceDialogHost(
         dialogState = dialogState,
         selectedThemeMode = selectedThemeMode,
-        customBrandThemePresets = customBrandThemePresets,
-        onCustomBrandThemeSaved = onCustomBrandThemeSaved,
-        onCustomBrandThemeDeleted = onCustomBrandThemeDeleted,
+        customFactionThemePresets = customFactionThemePresets,
+        onCustomFactionThemeSaved = onCustomFactionThemeSaved,
+        onCustomFactionThemeDeleted = onCustomFactionThemeDeleted,
         customMaterialThemePresets = customMaterialThemePresets,
         customMaterialThemeSettings = customMaterialThemeSettings,
         onCustomMaterialThemeSaved = onCustomMaterialThemeSaved,
@@ -363,15 +380,15 @@ internal fun ConfigThemeAppearanceSection(
         },
         onSingleThemeImported = { importedSettings ->
             dialogState.stageSingleImportedTheme(
-                existing = customBrandThemePresets,
+                existing = customFactionThemePresets,
                 imported = importedSettings,
                 mode = DuplicateImportMode.Brand,
-                onSave = onCustomBrandThemeSaved,
+                onSave = onCustomFactionThemeSaved,
             )
         },
         onBatchMaterialThemesImported = { importedSettings ->
             val preview =
-                buildCustomBrandThemeBatchImportPreview(
+                buildCustomFactionThemeBatchImportPreview(
                     existing = customMaterialThemePresets,
                     imported = importedSettings,
                     mode = DuplicateImportMode.Material,
@@ -384,24 +401,24 @@ internal fun ConfigThemeAppearanceSection(
         },
         onBatchThemesImported = { importedSettings ->
             val preview =
-                buildCustomBrandThemeBatchImportPreview(
-                    existing = customBrandThemePresets,
+                buildCustomFactionThemeBatchImportPreview(
+                    existing = customFactionThemePresets,
                     imported = importedSettings,
                     mode = DuplicateImportMode.Brand,
                 )
             if (preview.duplicateCount == 0) {
-                onCustomBrandThemesImported(importedSettings)
+                onCustomFactionThemesImported(importedSettings)
             } else {
                 dialogState.stageBatchImport(preview)
             }
         },
-        selectedCustomBrandThemePreset = renderState.selectedCustomBrandThemePreset,
+        selectedCustomFactionThemePreset = renderState.selectedCustomFactionThemePreset,
         clipboard = clipboard,
         coroutineScope = coroutineScope,
         onConfirmBatchImport = { preview ->
             confirmBatchThemeImport(
                 preview = preview,
-                onBrandImport = onCustomBrandThemesImported,
+                onBrandImport = onCustomFactionThemesImported,
                 onMaterialImport = onCustomMaterialThemesImported,
             )
             dialogState.dismissBatchImportDialog()
@@ -411,7 +428,7 @@ internal fun ConfigThemeAppearanceSection(
                 settings = settings,
                 presetId = presetId,
                 mode = mode,
-                onBrandSave = onCustomBrandThemeSaved,
+                onBrandSave = onCustomFactionThemeSaved,
                 onMaterialSave = onCustomMaterialThemeSaved,
             )
             dialogState.dismissDuplicateImport()
@@ -421,7 +438,7 @@ internal fun ConfigThemeAppearanceSection(
                 settings = settings,
                 presetId = null,
                 mode = mode,
-                onBrandSave = onCustomBrandThemeSaved,
+                onBrandSave = onCustomFactionThemeSaved,
                 onMaterialSave = onCustomMaterialThemeSaved,
             )
             dialogState.dismissDuplicateImport()
@@ -466,37 +483,37 @@ internal fun ConfigThemeAppearanceSection(
                     materialPaletteGroups = renderState.materialPaletteGroups,
                     onReorderCustomMaterialThemes = onCustomMaterialThemesReordered,
                     materialPaletteExpansionState = materialPaletteExpansionState,
-                    selectedBrandTheme = selectedBrandTheme,
-                    onBrandThemeSelected = onBrandThemeSelected,
-                    customBrandThemes = customBrandThemes,
-                    customBrandThemePresets = customBrandThemePresets,
-                    brandThemeGroups = renderState.brandThemeGroups,
-                    brandThemeExpansionState = brandThemeExpansionState,
-                    selectedCustomBrandThemePreset = renderState.selectedCustomBrandThemePreset,
+                    selectedFactionTheme = selectedFactionTheme,
+                    onFactionThemeSelected = onFactionThemeSelected,
+                    customFactionThemes = customFactionThemes,
+                    customFactionThemePresets = customFactionThemePresets,
+                    factionThemeGroups = renderState.factionThemeGroups,
+                    factionThemeExpansionState = factionThemeExpansionState,
+                    selectedCustomFactionThemePreset = renderState.selectedCustomFactionThemePreset,
                     copyConfigLabel = copyConfigLabel,
                     copyAllConfigLabel = copyAllConfigLabel,
-                    copySelectedBrandThemeConfig = copySelectedBrandThemeConfig,
-                    copyAllCustomBrandThemeConfigs = copyAllCustomBrandThemeConfigs,
-                    localizedBuiltInBrandThemeNames = localizedBuiltInBrandThemeNames,
+                    copySelectedFactionThemeConfig = copySelectedFactionThemeConfig,
+                    copyAllCustomFactionThemeConfigs = copyAllCustomFactionThemeConfigs,
+                    localizedBuiltInFactionThemeNames = localizedBuiltInFactionThemeNames,
                     clipboard = clipboard,
                     coroutineScope = coroutineScope,
-                    onReorderCustomBrandThemes = onCustomBrandThemesReordered,
-                    onDeleteCustomBrandTheme = { option ->
-                        customBrandThemePresets
-                            .firstOrNull { preset -> option.id == customBrandThemeOptionId(preset.presetId) }
+                    onReorderCustomFactionThemes = onCustomFactionThemesReordered,
+                    onDeleteCustomFactionTheme = { option ->
+                        customFactionThemePresets
+                            .firstOrNull { preset -> option.id == customFactionThemeOptionId(preset.presetId) }
                             ?.presetId
-                            ?.let(onCustomBrandThemeDeleted)
+                            ?.let(onCustomFactionThemeDeleted)
                     },
-                    canDeleteCustomBrandTheme = { _: BrandThemeOption -> customBrandThemePresets.size > 1 },
-                    onOpenCreateCustomBrandTheme = dialogState::openCreateCustomBrandTheme,
-                    onOpenEditCustomBrandTheme = { option ->
-                        dialogState.openEditCustomBrandTheme(
-                            customBrandThemePresets
-                                .firstOrNull { preset -> option.id == customBrandThemeOptionId(preset.presetId) }
+                    canDeleteCustomFactionTheme = { _: FactionThemeOption -> customFactionThemePresets.size > 1 },
+                    onOpenCreateCustomFactionTheme = dialogState::openCreateCustomFactionTheme,
+                    onOpenEditCustomFactionTheme = { option ->
+                        dialogState.openEditCustomFactionTheme(
+                            customFactionThemePresets
+                                .firstOrNull { preset -> option.id == customFactionThemeOptionId(preset.presetId) }
                                 ?.presetId,
                         )
                     },
-                    onOpenImportCustomBrandTheme = dialogState::openCustomThemeImportDialog,
+                    onOpenImportCustomFactionTheme = dialogState::openCustomThemeImportDialog,
                 )
             }
         }
@@ -508,7 +525,7 @@ private fun rememberConfigThemeAppearanceSectionRenderState(
     selectedThemeStyle: ThemeStyleOption,
     selectedPalette: PaletteOption,
     materialPalettes: List<PaletteOption>,
-    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    customMaterialThemePresets: List<CustomFactionThemeSettings>,
     editCustomMaterialLabel: String,
     addCustomLabel: String,
     importCustomLabel: String,
@@ -520,11 +537,11 @@ private fun rememberConfigThemeAppearanceSectionRenderState(
     onOpenCustomMaterialThemeImportDialog: () -> Unit,
     onCopyAllCustomMaterialThemes: () -> Unit,
     copyAllConfigLabel: String,
-    brandThemes: List<BrandThemeOption>,
-    selectedBrandTheme: BrandThemeOption,
-    customBrandThemePresets: List<CustomBrandThemeSettings>,
+    factionThemes: List<FactionThemeOption>,
+    selectedFactionTheme: FactionThemeOption,
+    customFactionThemePresets: List<CustomFactionThemeSettings>,
 ): ConfigThemeAppearanceSectionRenderState {
-    val isBrandStyle = selectedThemeStyle == ThemeStyleOption.BrandDualTone
+    val isBrandStyle = selectedThemeStyle == ThemeStyleOption.FactionTheme
     val materialPaletteGroups =
         rememberMaterialPaletteGroups(
             isBrandStyle = isBrandStyle,
@@ -543,18 +560,18 @@ private fun rememberConfigThemeAppearanceSectionRenderState(
             onOpenCustomMaterialThemeImportDialog = onOpenCustomMaterialThemeImportDialog,
             onCopyAllCustomMaterialThemes = onCopyAllCustomMaterialThemes,
         )
-    val brandThemeGroups = rememberConfigThemeAppearanceBrandThemeGroups(brandThemes)
-    val selectedCustomBrandThemePreset =
-        remember(selectedBrandTheme.id, customBrandThemePresets) {
-            customBrandThemePresets.firstOrNull { preset ->
-                selectedBrandTheme.id == customBrandThemeOptionId(preset.presetId)
+    val factionThemeGroups = rememberConfigThemeAppearanceFactionThemeGroups(factionThemes)
+    val selectedCustomFactionThemePreset =
+        remember(selectedFactionTheme.id, customFactionThemePresets) {
+            customFactionThemePresets.firstOrNull { preset ->
+                selectedFactionTheme.id == customFactionThemeOptionId(preset.presetId)
             }
         }
     return ConfigThemeAppearanceSectionRenderState(
         isBrandStyle = isBrandStyle,
         materialPaletteGroups = materialPaletteGroups,
-        brandThemeGroups = brandThemeGroups,
-        selectedCustomBrandThemePreset = selectedCustomBrandThemePreset,
+        factionThemeGroups = factionThemeGroups,
+        selectedCustomFactionThemePreset = selectedCustomFactionThemePreset,
     )
 }
 
@@ -563,7 +580,7 @@ private fun rememberMaterialPaletteGroups(
     isBrandStyle: Boolean,
     selectedPalette: PaletteOption,
     materialPalettes: List<PaletteOption>,
-    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    customMaterialThemePresets: List<CustomFactionThemeSettings>,
     editCustomMaterialLabel: String,
     addCustomLabel: String,
     importCustomLabel: String,
@@ -618,7 +635,7 @@ private fun rememberMaterialPaletteGroups(
 private fun materialPaletteGroupOrNull(
     family: PaletteFamily,
     materialPalettes: List<PaletteOption>,
-    customMaterialThemePresets: List<CustomBrandThemeSettings>,
+    customMaterialThemePresets: List<CustomFactionThemeSettings>,
     isCustomMaterialSelected: Boolean,
     editCustomMaterialLabel: String,
     addCustomLabel: String,
@@ -690,32 +707,34 @@ private fun materialPaletteGroupOrNull(
 }
 
 @Composable
-private fun rememberConfigThemeAppearanceBrandThemeGroups(brandThemes: List<BrandThemeOption>): ConfigThemeAppearanceBrandThemeGroups =
-    remember(brandThemes) {
-        ConfigThemeAppearanceBrandThemeGroups(
+private fun rememberConfigThemeAppearanceFactionThemeGroups(
+    factionThemes: List<FactionThemeOption>,
+): ConfigThemeAppearanceFactionThemeGroups =
+    remember(factionThemes) {
+        ConfigThemeAppearanceFactionThemeGroups(
             sacredMachineThemes =
-                brandThemes.filter {
-                    it.groupTitleResId == R.string.config_dual_tone_group_sacred_machine
+                factionThemes.filter {
+                    it.groupTitleResId == R.string.config_faction_theme_group_sacred_machine
                 },
             ancientDynastyThemes =
-                brandThemes.filter {
-                    it.groupTitleResId == R.string.config_dual_tone_group_ancient_dynasty
+                factionThemes.filter {
+                    it.groupTitleResId == R.string.config_faction_theme_group_ancient_dynasty
                 },
             immortalRotThemes =
-                brandThemes.filter {
-                    it.groupTitleResId == R.string.config_dual_tone_group_immortal_rot
+                factionThemes.filter {
+                    it.groupTitleResId == R.string.config_faction_theme_group_immortal_rot
                 },
             scarletCarnageThemes =
-                brandThemes.filter {
-                    it.groupTitleResId == R.string.config_dual_tone_group_scarlet_carnage
+                factionThemes.filter {
+                    it.groupTitleResId == R.string.config_faction_theme_group_scarlet_carnage
                 },
             exquisiteFallThemes =
-                brandThemes.filter {
-                    it.groupTitleResId == R.string.config_dual_tone_group_exquisite_fall
+                factionThemes.filter {
+                    it.groupTitleResId == R.string.config_faction_theme_group_exquisite_fall
                 },
             labyrinthOfMutabilityThemes =
-                brandThemes.filter {
-                    it.groupTitleResId == R.string.config_dual_tone_group_labyrinth_of_mutability
+                factionThemes.filter {
+                    it.groupTitleResId == R.string.config_faction_theme_group_labyrinth_of_mutability
                 },
         )
     }
@@ -733,26 +752,26 @@ private fun ConfigThemeAppearanceExpandedContent(
     materialPaletteGroups: List<PaletteGroupUi>,
     onReorderCustomMaterialThemes: (Int, Int) -> Unit,
     materialPaletteExpansionState: ConfigMaterialPaletteExpansionState,
-    selectedBrandTheme: BrandThemeOption,
-    onBrandThemeSelected: (BrandThemeOption) -> Unit,
-    customBrandThemes: List<BrandThemeOption>,
-    customBrandThemePresets: List<CustomBrandThemeSettings>,
-    brandThemeGroups: ConfigThemeAppearanceBrandThemeGroups,
-    brandThemeExpansionState: ConfigThemeAppearanceBrandThemeExpansionState,
-    selectedCustomBrandThemePreset: CustomBrandThemeSettings?,
+    selectedFactionTheme: FactionThemeOption,
+    onFactionThemeSelected: (FactionThemeOption) -> Unit,
+    customFactionThemes: List<FactionThemeOption>,
+    customFactionThemePresets: List<CustomFactionThemeSettings>,
+    factionThemeGroups: ConfigThemeAppearanceFactionThemeGroups,
+    factionThemeExpansionState: ConfigThemeAppearanceFactionThemeExpansionState,
+    selectedCustomFactionThemePreset: CustomFactionThemeSettings?,
     copyConfigLabel: String,
     copyAllConfigLabel: String,
-    copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit,
-    copyAllCustomBrandThemeConfigs: () -> Unit,
-    localizedBuiltInBrandThemeNames: Map<String, String>,
+    copySelectedFactionThemeConfig: (FactionThemeOption) -> Unit,
+    copyAllCustomFactionThemeConfigs: () -> Unit,
+    localizedBuiltInFactionThemeNames: Map<String, String>,
     clipboard: Clipboard,
     coroutineScope: CoroutineScope,
-    onReorderCustomBrandThemes: (Int, Int) -> Unit,
-    onDeleteCustomBrandTheme: (BrandThemeOption) -> Unit,
-    canDeleteCustomBrandTheme: (BrandThemeOption) -> Boolean,
-    onOpenCreateCustomBrandTheme: () -> Unit,
-    onOpenEditCustomBrandTheme: (BrandThemeOption) -> Unit,
-    onOpenImportCustomBrandTheme: () -> Unit,
+    onReorderCustomFactionThemes: (Int, Int) -> Unit,
+    onDeleteCustomFactionTheme: (FactionThemeOption) -> Unit,
+    canDeleteCustomFactionTheme: (FactionThemeOption) -> Boolean,
+    onOpenCreateCustomFactionTheme: () -> Unit,
+    onOpenEditCustomFactionTheme: (FactionThemeOption) -> Unit,
+    onOpenImportCustomFactionTheme: () -> Unit,
 ) {
     ThemeStyleOption.entries.forEach { option ->
         SelectionRow(
@@ -775,7 +794,7 @@ private fun ConfigThemeAppearanceExpandedContent(
         )
         if (isBrandStyle) {
             Text(
-                text = stringResource(R.string.config_theme_mode_brand_fixed),
+                text = stringResource(R.string.config_theme_mode_faction_theme_fixed),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -798,26 +817,26 @@ private fun ConfigThemeAppearanceExpandedContent(
             accentTokens = accentTokens,
             selectedThemeMode = selectedThemeMode,
             onThemeModeSelected = onThemeModeSelected,
-            selectedBrandTheme = selectedBrandTheme,
-            onBrandThemeSelected = onBrandThemeSelected,
-            customBrandThemes = customBrandThemes,
-            customBrandThemePresets = customBrandThemePresets,
-            brandThemeGroups = brandThemeGroups,
-            brandThemeExpansionState = brandThemeExpansionState,
-            selectedCustomBrandThemePreset = selectedCustomBrandThemePreset,
+            selectedFactionTheme = selectedFactionTheme,
+            onFactionThemeSelected = onFactionThemeSelected,
+            customFactionThemes = customFactionThemes,
+            customFactionThemePresets = customFactionThemePresets,
+            factionThemeGroups = factionThemeGroups,
+            factionThemeExpansionState = factionThemeExpansionState,
+            selectedCustomFactionThemePreset = selectedCustomFactionThemePreset,
             copyConfigLabel = copyConfigLabel,
             copyAllConfigLabel = copyAllConfigLabel,
-            copySelectedBrandThemeConfig = copySelectedBrandThemeConfig,
-            copyAllCustomBrandThemeConfigs = copyAllCustomBrandThemeConfigs,
-            localizedBuiltInBrandThemeNames = localizedBuiltInBrandThemeNames,
+            copySelectedFactionThemeConfig = copySelectedFactionThemeConfig,
+            copyAllCustomFactionThemeConfigs = copyAllCustomFactionThemeConfigs,
+            localizedBuiltInFactionThemeNames = localizedBuiltInFactionThemeNames,
             clipboard = clipboard,
             coroutineScope = coroutineScope,
-            onReorderCustomBrandThemes = onReorderCustomBrandThemes,
-            onDeleteCustomBrandTheme = onDeleteCustomBrandTheme,
-            canDeleteCustomBrandTheme = canDeleteCustomBrandTheme,
-            onOpenCreateCustomBrandTheme = onOpenCreateCustomBrandTheme,
-            onOpenEditCustomBrandTheme = onOpenEditCustomBrandTheme,
-            onOpenImportCustomBrandTheme = onOpenImportCustomBrandTheme,
+            onReorderCustomFactionThemes = onReorderCustomFactionThemes,
+            onDeleteCustomFactionTheme = onDeleteCustomFactionTheme,
+            canDeleteCustomFactionTheme = canDeleteCustomFactionTheme,
+            onOpenCreateCustomFactionTheme = onOpenCreateCustomFactionTheme,
+            onOpenEditCustomFactionTheme = onOpenEditCustomFactionTheme,
+            onOpenImportCustomFactionTheme = onOpenImportCustomFactionTheme,
         )
     }
 }
@@ -964,26 +983,26 @@ private fun ConfigThemeAppearanceBrandContent(
     accentTokens: AppThemeAccentTokens,
     selectedThemeMode: ThemeModeOption,
     onThemeModeSelected: (ThemeModeOption) -> Unit,
-    selectedBrandTheme: BrandThemeOption,
-    onBrandThemeSelected: (BrandThemeOption) -> Unit,
-    customBrandThemes: List<BrandThemeOption>,
-    customBrandThemePresets: List<CustomBrandThemeSettings>,
-    brandThemeGroups: ConfigThemeAppearanceBrandThemeGroups,
-    brandThemeExpansionState: ConfigThemeAppearanceBrandThemeExpansionState,
-    selectedCustomBrandThemePreset: CustomBrandThemeSettings?,
+    selectedFactionTheme: FactionThemeOption,
+    onFactionThemeSelected: (FactionThemeOption) -> Unit,
+    customFactionThemes: List<FactionThemeOption>,
+    customFactionThemePresets: List<CustomFactionThemeSettings>,
+    factionThemeGroups: ConfigThemeAppearanceFactionThemeGroups,
+    factionThemeExpansionState: ConfigThemeAppearanceFactionThemeExpansionState,
+    selectedCustomFactionThemePreset: CustomFactionThemeSettings?,
     copyConfigLabel: String,
     copyAllConfigLabel: String,
-    copySelectedBrandThemeConfig: (BrandThemeOption) -> Unit,
-    copyAllCustomBrandThemeConfigs: () -> Unit,
-    localizedBuiltInBrandThemeNames: Map<String, String>,
+    copySelectedFactionThemeConfig: (FactionThemeOption) -> Unit,
+    copyAllCustomFactionThemeConfigs: () -> Unit,
+    localizedBuiltInFactionThemeNames: Map<String, String>,
     clipboard: Clipboard,
     coroutineScope: CoroutineScope,
-    onReorderCustomBrandThemes: (Int, Int) -> Unit,
-    onDeleteCustomBrandTheme: (BrandThemeOption) -> Unit,
-    canDeleteCustomBrandTheme: (BrandThemeOption) -> Boolean,
-    onOpenCreateCustomBrandTheme: () -> Unit,
-    onOpenEditCustomBrandTheme: (BrandThemeOption) -> Unit,
-    onOpenImportCustomBrandTheme: () -> Unit,
+    onReorderCustomFactionThemes: (Int, Int) -> Unit,
+    onDeleteCustomFactionTheme: (FactionThemeOption) -> Unit,
+    canDeleteCustomFactionTheme: (FactionThemeOption) -> Boolean,
+    onOpenCreateCustomFactionTheme: () -> Unit,
+    onOpenEditCustomFactionTheme: (FactionThemeOption) -> Unit,
+    onOpenImportCustomFactionTheme: () -> Unit,
 ) {
     Column(
         modifier = Modifier.alpha(0.48f),
@@ -1002,12 +1021,12 @@ private fun ConfigThemeAppearanceBrandContent(
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = stringResource(R.string.config_brand_theme_title),
+            text = stringResource(R.string.config_faction_theme_title),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
         )
         Text(
-            text = stringResource(R.string.config_brand_theme_description),
+            text = stringResource(R.string.config_faction_theme_description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -1018,57 +1037,57 @@ private fun ConfigThemeAppearanceBrandContent(
                     .selectableGroup(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            BrandThemeSection(
+            FactionThemeSection(
                 accentTokens = accentTokens,
-                title = stringResource(R.string.config_dual_tone_group_custom),
-                options = customBrandThemes,
-                selectedBrandTheme = selectedBrandTheme,
-                expanded = brandThemeExpansionState.isCustomBrandThemeExpanded,
-                onExpandedChanged = brandThemeExpansionState.onCustomBrandThemeExpandedChanged,
-                onBrandThemeSelected = onBrandThemeSelected,
-                onEditBrandTheme = { onOpenEditCustomBrandTheme(it) },
+                title = stringResource(R.string.config_faction_theme_group_custom),
+                options = customFactionThemes,
+                selectedFactionTheme = selectedFactionTheme,
+                expanded = factionThemeExpansionState.isCustomFactionThemeExpanded,
+                onExpandedChanged = factionThemeExpansionState.onCustomFactionThemeExpandedChanged,
+                onFactionThemeSelected = onFactionThemeSelected,
+                onEditFactionTheme = { onOpenEditCustomFactionTheme(it) },
                 editSelectedOnly = true,
-                editActionLabel = stringResource(R.string.config_custom_brand_theme_edit),
+                editActionLabel = stringResource(R.string.config_custom_faction_theme_edit),
                 onMoveOption =
-                    if (brandThemeExpansionState.isCustomBrandThemeExpanded) {
-                        onReorderCustomBrandThemes
+                    if (factionThemeExpansionState.isCustomFactionThemeExpanded) {
+                        onReorderCustomFactionThemes
                     } else {
                         null
                     },
                 onEditActionClick =
-                    selectedBrandTheme
-                        .takeIf { selectedCustomBrandThemePreset != null }
-                        ?.let { { onOpenEditCustomBrandTheme(it) } },
-                actionLabel = stringResource(R.string.config_custom_brand_theme_add),
-                onActionClick = onOpenCreateCustomBrandTheme,
+                    selectedFactionTheme
+                        .takeIf { selectedCustomFactionThemePreset != null }
+                        ?.let { { onOpenEditCustomFactionTheme(it) } },
+                actionLabel = stringResource(R.string.config_custom_faction_theme_add),
+                onActionClick = onOpenCreateCustomFactionTheme,
                 iconActions =
                     listOf(
-                        BrandThemeSectionIconAction(
-                            label = stringResource(R.string.config_custom_brand_theme_import),
+                        FactionThemeSectionIconAction(
+                            label = stringResource(R.string.config_custom_faction_theme_import),
                             icon = Icons.AutoMirrored.Rounded.Input,
-                            onClick = onOpenImportCustomBrandTheme,
+                            onClick = onOpenImportCustomFactionTheme,
                         ),
-                        BrandThemeSectionIconAction(
+                        FactionThemeSectionIconAction(
                             label = copyAllConfigLabel,
                             icon = Icons.Rounded.ContentCopy,
-                            enabled = customBrandThemePresets.isNotEmpty(),
-                            onClick = copyAllCustomBrandThemeConfigs,
+                            enabled = customFactionThemePresets.isNotEmpty(),
+                            onClick = copyAllCustomFactionThemeConfigs,
                         ),
                     ),
                 stackHeaderActions = true,
-                deleteActionLabel = stringResource(R.string.config_custom_brand_theme_delete),
-                onDeleteBrandTheme = onDeleteCustomBrandTheme,
-                canDeleteBrandTheme = canDeleteCustomBrandTheme,
+                deleteActionLabel = stringResource(R.string.config_custom_faction_theme_delete),
+                onDeleteFactionTheme = onDeleteCustomFactionTheme,
+                canDeleteFactionTheme = canDeleteCustomFactionTheme,
             )
             brandBuiltInThemeSections(
-                groups = brandThemeGroups,
-                expansionState = brandThemeExpansionState,
+                groups = factionThemeGroups,
+                expansionState = factionThemeExpansionState,
             ).forEach { section ->
-                BrandThemeSection(
+                FactionThemeSection(
                     accentTokens = accentTokens,
                     title = stringResource(section.titleResId),
                     options = section.options,
-                    selectedBrandTheme = selectedBrandTheme,
+                    selectedFactionTheme = selectedFactionTheme,
                     expanded = section.expanded,
                     onExpandedChanged = section.onExpandedChanged,
                     iconActions =
@@ -1076,18 +1095,18 @@ private fun ConfigThemeAppearanceBrandContent(
                             val exportText =
                                 section.options
                                     .map { option ->
-                                        BrandThemeExportEntry(
+                                        FactionThemeExportEntry(
                                             displayName =
                                                 option.titleOverride
-                                                    ?: localizedBuiltInBrandThemeNames[option.id]
+                                                    ?: localizedBuiltInFactionThemeNames[option.id]
                                                     ?: option.id,
                                             primaryHex = option.primaryColor.toHexString(),
                                             secondaryHex = option.secondaryColor.toHexString(),
                                             outlineHexOrNull = option.outlineColor.toHexString(),
                                         )
-                                    }.toBrandThemeExportBatchConfigText()
+                                    }.toFactionThemeExportBatchConfigText()
                             listOf(
-                                BrandThemeSectionIconAction(
+                                FactionThemeSectionIconAction(
                                     label = copyAllConfigLabel,
                                     icon = Icons.Rounded.ContentCopy,
                                     enabled = section.options.isNotEmpty(),
@@ -1096,7 +1115,7 @@ private fun ConfigThemeAppearanceBrandContent(
                                             clipboard.setClipEntry(
                                                 ClipEntry(
                                                     ClipData.newPlainText(
-                                                        "FlipBits built-in dual-tone config",
+                                                        "FlipBits built-in faction theme config",
                                                         exportText,
                                                     ),
                                                 ),
@@ -1108,9 +1127,9 @@ private fun ConfigThemeAppearanceBrandContent(
                         } else {
                             emptyList()
                         },
-                    onBrandThemeSelected = onBrandThemeSelected,
+                    onFactionThemeSelected = onFactionThemeSelected,
                     copyConfigLabel = copyConfigLabel,
-                    onCopyConfig = copySelectedBrandThemeConfig,
+                    onCopyConfig = copySelectedFactionThemeConfig,
                     headerTitleColor = MaterialTheme.colorScheme.onSurface,
                     headerMetaColor = MaterialTheme.colorScheme.onSurface,
                 )
@@ -1120,45 +1139,45 @@ private fun ConfigThemeAppearanceBrandContent(
 }
 
 private fun brandBuiltInThemeSections(
-    groups: ConfigThemeAppearanceBrandThemeGroups,
-    expansionState: ConfigThemeAppearanceBrandThemeExpansionState,
-): List<BrandThemeBuiltInSectionUi> =
+    groups: ConfigThemeAppearanceFactionThemeGroups,
+    expansionState: ConfigThemeAppearanceFactionThemeExpansionState,
+): List<FactionThemeBuiltInSectionUi> =
     listOf(
-        BrandThemeBuiltInSectionUi(
-            titleResId = R.string.config_dual_tone_group_sacred_machine,
+        FactionThemeBuiltInSectionUi(
+            titleResId = R.string.config_faction_theme_group_sacred_machine,
             options = groups.sacredMachineThemes,
-            expanded = expansionState.isSacredMachineBrandThemeExpanded,
-            onExpandedChanged = expansionState.onSacredMachineBrandThemeExpandedChanged,
+            expanded = expansionState.isSacredMachineFactionThemeExpanded,
+            onExpandedChanged = expansionState.onSacredMachineFactionThemeExpandedChanged,
         ),
-        BrandThemeBuiltInSectionUi(
-            titleResId = R.string.config_dual_tone_group_ancient_dynasty,
+        FactionThemeBuiltInSectionUi(
+            titleResId = R.string.config_faction_theme_group_ancient_dynasty,
             options = groups.ancientDynastyThemes,
-            expanded = expansionState.isAncientDynastyBrandThemeExpanded,
-            onExpandedChanged = expansionState.onAncientDynastyBrandThemeExpandedChanged,
+            expanded = expansionState.isAncientDynastyFactionThemeExpanded,
+            onExpandedChanged = expansionState.onAncientDynastyFactionThemeExpandedChanged,
         ),
-        BrandThemeBuiltInSectionUi(
-            titleResId = R.string.config_dual_tone_group_scarlet_carnage,
+        FactionThemeBuiltInSectionUi(
+            titleResId = R.string.config_faction_theme_group_scarlet_carnage,
             options = groups.scarletCarnageThemes,
-            expanded = expansionState.isScarletCarnageBrandThemeExpanded,
-            onExpandedChanged = expansionState.onScarletCarnageBrandThemeExpandedChanged,
+            expanded = expansionState.isScarletCarnageFactionThemeExpanded,
+            onExpandedChanged = expansionState.onScarletCarnageFactionThemeExpandedChanged,
         ),
-        BrandThemeBuiltInSectionUi(
-            titleResId = R.string.config_dual_tone_group_labyrinth_of_mutability,
+        FactionThemeBuiltInSectionUi(
+            titleResId = R.string.config_faction_theme_group_labyrinth_of_mutability,
             options = groups.labyrinthOfMutabilityThemes,
-            expanded = expansionState.isLabyrinthOfMutabilityBrandThemeExpanded,
-            onExpandedChanged = expansionState.onLabyrinthOfMutabilityBrandThemeExpandedChanged,
+            expanded = expansionState.isLabyrinthOfMutabilityFactionThemeExpanded,
+            onExpandedChanged = expansionState.onLabyrinthOfMutabilityFactionThemeExpandedChanged,
         ),
-        BrandThemeBuiltInSectionUi(
-            titleResId = R.string.config_dual_tone_group_immortal_rot,
+        FactionThemeBuiltInSectionUi(
+            titleResId = R.string.config_faction_theme_group_immortal_rot,
             options = groups.immortalRotThemes,
-            expanded = expansionState.isImmortalRotBrandThemeExpanded,
-            onExpandedChanged = expansionState.onImmortalRotBrandThemeExpandedChanged,
+            expanded = expansionState.isImmortalRotFactionThemeExpanded,
+            onExpandedChanged = expansionState.onImmortalRotFactionThemeExpandedChanged,
         ),
-        BrandThemeBuiltInSectionUi(
-            titleResId = R.string.config_dual_tone_group_exquisite_fall,
+        FactionThemeBuiltInSectionUi(
+            titleResId = R.string.config_faction_theme_group_exquisite_fall,
             options = groups.exquisiteFallThemes,
-            expanded = expansionState.isExquisiteFallBrandThemeExpanded,
-            onExpandedChanged = expansionState.onExquisiteFallBrandThemeExpandedChanged,
+            expanded = expansionState.isExquisiteFallFactionThemeExpanded,
+            onExpandedChanged = expansionState.onExquisiteFallFactionThemeExpandedChanged,
         ),
     )
 

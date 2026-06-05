@@ -40,32 +40,32 @@ class BagUiTextMapper {
         }
 
     fun encodePhaseStatus(
-        modeWireName: String,
+        modeLabel: String,
         phase: AudioEncodePhase,
     ): UiText =
         when (phase) {
             AudioEncodePhase.PreparingInput ->
                 UiText.Resource(
                     R.string.status_mode_audio_generating_preparing_input,
-                    listOf(modeWireName),
+                    listOf(modeLabel),
                 )
 
             AudioEncodePhase.RenderingPcm ->
                 UiText.Resource(
                     R.string.status_mode_audio_generating_rendering_pcm,
-                    listOf(modeWireName),
+                    listOf(modeLabel),
                 )
 
             AudioEncodePhase.Postprocessing ->
                 UiText.Resource(
                     R.string.status_mode_audio_generating_postprocessing,
-                    listOf(modeWireName),
+                    listOf(modeLabel),
                 )
 
             AudioEncodePhase.Finalizing ->
                 UiText.Resource(
                     R.string.status_mode_audio_generating_finalizing,
-                    listOf(modeWireName),
+                    listOf(modeLabel),
                 )
         }
 }

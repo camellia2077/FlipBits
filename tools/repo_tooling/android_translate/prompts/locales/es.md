@@ -18,6 +18,7 @@ Avoid regional idioms when a neutral product expression works.
 For app UI text, keep labels compact enough for Android buttons, tabs, segmented controls, mini-player sheets, sliders, and narrow cards.
 Follow existing project terms where present: audio, caracteres, bytes, reglas de entrada, Visual, Tokens, Hex, Morse, payload, token, nibble, portadora baja, and portadora alta.
 Do not turn short controls, visualizer mode labels, or transport labels into explanatory sentences.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/es_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere while writing fluent neutral Spanish.
@@ -27,3 +28,4 @@ Keep pro-mode sample strings strict ASCII, without accents, when the key or cont
 When filling missing entries, write neutral Spanish localization that matches the current XML terminology.
 Preserve placeholders and avoid changing number or gender agreement around them unless required by the whole string.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d caracteres • %2$d bytes`.
+When working on theme or palette entries, prefer the Spanish theme/color rules above over older verbose or overly literal wording.

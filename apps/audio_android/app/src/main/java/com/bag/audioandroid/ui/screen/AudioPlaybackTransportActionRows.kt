@@ -44,6 +44,7 @@ import com.bag.audioandroid.ui.PlayerChromeColors
 import com.bag.audioandroid.ui.PlayerDetailBottomActions
 import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.playerSegmentedButtonColors
 
 @Composable
@@ -151,6 +152,7 @@ internal fun AudioPlaybackSecondaryActionsRow(
     onCyclePlaybackSpeed: () -> Unit,
     onToggleSpeedAdjustment: () -> Unit,
     onPlaybackSpeedSelected: (Float) -> Unit,
+    transportMode: TransportModeOption,
     bottomActions: PlayerDetailBottomActions,
     contentColor: androidx.compose.ui.graphics.Color,
 ) {
@@ -242,6 +244,7 @@ internal fun AudioPlaybackSecondaryActionsRow(
         if (showSpeedAdjustment) {
             PlaybackSpeedAdjustmentRow(
                 playbackSpeed = playbackSpeed,
+                transportMode = transportMode,
                 onPlaybackSpeedSelected = onPlaybackSpeedSelected,
                 contentColor = contentColor,
             )
@@ -405,6 +408,7 @@ private fun PlaybackSpeedControl(
 @Composable
 private fun PlaybackSpeedAdjustmentRow(
     playbackSpeed: Float,
+    transportMode: TransportModeOption,
     onPlaybackSpeedSelected: (Float) -> Unit,
     contentColor: androidx.compose.ui.graphics.Color,
 ) {
@@ -422,12 +426,12 @@ private fun PlaybackSpeedAdjustmentRow(
             color = contentColor,
         )
         PlaybackSpeedPresetRow(
-            options = PlaybackSpeedOption.slowerSpeeds,
+            options = PlaybackSpeedOption.slowerSpeedsForMode(transportMode),
             selectedSpeed = selectedSpeed,
             onPlaybackSpeedSelected = onPlaybackSpeedSelected,
         )
         PlaybackSpeedPresetRow(
-            options = PlaybackSpeedOption.fasterSpeeds,
+            options = PlaybackSpeedOption.fasterSpeedsForMode(transportMode),
             selectedSpeed = selectedSpeed,
             onPlaybackSpeedSelected = onPlaybackSpeedSelected,
         )

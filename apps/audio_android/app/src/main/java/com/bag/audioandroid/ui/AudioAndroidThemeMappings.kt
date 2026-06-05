@@ -107,7 +107,7 @@ internal fun appSegmentedButtonColors() =
 internal fun audioInputTextFieldColors(selectedThemeStyle: ThemeStyleOption): TextFieldColors {
     val visualTokens = appThemeVisualTokens()
     return when (selectedThemeStyle) {
-        ThemeStyleOption.BrandDualTone -> {
+        ThemeStyleOption.FactionTheme -> {
             OutlinedTextFieldDefaults.colors(
                 focusedTextColor = visualTokens.inputContentColor,
                 unfocusedTextColor = visualTokens.inputContentColor,
@@ -186,23 +186,23 @@ internal fun playbackLyricsAccentTextColor(): Color = appThemeAccentTokens().sel
 @Composable
 internal fun navigationBarItemColors(uiState: AudioAppUiState): NavigationBarItemColors =
     when (uiState.selectedThemeStyle) {
-        ThemeStyleOption.BrandDualTone -> {
-            val brandTheme = uiState.activeBrandTheme
-            // All dual-tone themes now blend the unselected foreground with the background
+        ThemeStyleOption.FactionTheme -> {
+            val factionTheme = uiState.activeFactionTheme
+            // All faction themes now blend the unselected foreground with the background
             // color. This ensures unselected tabs visually "sink" into the background,
             // making the flipped selection (with its accent indicator) much more prominent.
             val unselectedDualToneForeground =
                 lerp(
-                    brandTheme.secondaryColor,
-                    brandTheme.primaryColor,
+                    factionTheme.secondaryColor,
+                    factionTheme.primaryColor,
                     0.42f,
                 )
             NavigationBarItemDefaults.colors(
-                // Dual-tone navigation keeps selected/unselected states on the original
+                // Faction theme navigation keeps selected/unselected states on the original
                 // paired colors instead of relying on Material's derived alpha variants.
-                selectedIconColor = brandTheme.primaryColor,
-                selectedTextColor = brandTheme.secondaryColor,
-                indicatorColor = brandTheme.secondaryColor,
+                selectedIconColor = factionTheme.primaryColor,
+                selectedTextColor = factionTheme.secondaryColor,
+                indicatorColor = factionTheme.secondaryColor,
                 unselectedIconColor = unselectedDualToneForeground,
                 unselectedTextColor = unselectedDualToneForeground,
             )

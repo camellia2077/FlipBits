@@ -18,6 +18,7 @@ For app UI text, keep labels concise enough for Android buttons, tabs, segmented
 Follow existing project terms where present: аудио, символов, байт, правила ввода, Hex, Morse, payload, Token, nibble, низкая несущая, and высокая несущая.
 Do not turn short controls, visualizer mode labels, or transport labels into explanatory sentences.
 Keep product mode names mini, flash, pro, and ultra lowercase unless the string begins with a sentence that already capitalizes nearby product terms.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/ru_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere while writing fluent Russian.
@@ -27,3 +28,4 @@ Keep pro-mode sample strings strict ASCII when the key or context says pro/ASCII
 When filling missing entries, write Russian localization that matches the current XML terminology.
 Avoid literal English syntax in playback, input-rule, byte-count, and visualizer strings.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d символов • %2$d байт`.
+When working on theme or palette entries, prefer the Russian theme/color rules above over older verbose or overly literal wording.

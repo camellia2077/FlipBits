@@ -1,40 +1,43 @@
-# Android Translate Docs
+# Android Translate Tool Definition Docs
 
-This directory is the single definition entrypoint for the Android XML translation tool.
+这个目录现在只保留工具定义文档，不再承担项目级使用说明。
 
-Use this layer only for tool definition:
-- command surface
+这里应该放的是：
+
+- CLI / command surface
 - JSON contract
 - output directories
-- command-specific behavior
+- internal architecture
 
-Do not use this directory as the project workflow entry.
-- Project entry: [apps/audio_android/AGENTS.md](../../../../apps/audio_android/AGENTS.md)
-- Execution steps: [.agent/workflows/translations/README.md](../../../../.agent/workflows/translations/README.md)
+不要把这里当成日常操作入口。
+
+项目内实际使用说明统一看：
+
+- 项目入口： [apps/audio_android/AGENTS.md](../../../../apps/audio_android/AGENTS.md)
+- workflow 入口： [.agent/workflows/translations/README.md](../../../../.agent/workflows/translations/README.md)
+- 项目级命令说明： [docs/design/android/translation/README.md](../../../../docs/design/android/translation/README.md)
 
 ## Start Here
 
-- Tool overview and command map: [sop.md](sop.md)
 - Stable CLI and task JSON contract: [cli_contract.md](cli_contract.md)
 - Tool architecture: [architecture.md](architecture.md)
 
 ## Main Commands
 
-- `key-alignment`
-  - Missing or extra localized keys.
-  - See [check_translation_key_alignment.md](check_translation_key_alignment.md)
+命令本身仍然是这些：
+
 - `compare`
-  - EN vs localized review artifacts and task JSON.
-  - See [compare_translation_quality.md](compare_translation_quality.md)
-- `export-entries` / `build-export-replacements` / `replace`
-  - Narrow JSON-first edit/apply path.
-  - See [apply_translation_replacements.md](apply_translation_replacements.md)
-- `mixed-language` / `mixed-language-context-audit`
-  - Suspicious untranslated English discovery and triage.
-  - See [check_mixed_language.md](check_mixed_language.md)
+- `replace`
+- `replace-batch`
+- `key-alignment`
+- `mixed-language`
+- `mixed-language-context-audit`
 - `untranslated-equals-english`
-  - Exact `localized == EN` discovery for Latin-script locales.
-  - Use this when the main risk is full English leftovers rather than cross-script leakage.
+- `fix-resource-escapes`
+- `dump-xml-md`
+- `unused-keys`
+
+但“怎么在本仓库里使用这些命令”不再在这里展开，统一看项目 docs。
 
 ## JSON-First Contract
 
@@ -52,6 +55,7 @@ All generated tool outputs live under `temp/translations/`.
 - Key alignment: `temp/translations/key_alignment`
 - Mixed language: `temp/translations/mixed_language`
 - Mixed language audit: `temp/translations/mixed_language_audit`
+- Unused key reports: `temp/translations/unused_keys`
 - Entry exports: `temp/translations/entry_exports`
 - XML dump: `temp/translations/xml_dump`
 
@@ -66,4 +70,4 @@ All generated tool outputs live under `temp/translations/`.
 - `prompts/`
   - Shared prompt/profile definitions
 - `docs/`
-  - Tool definition and command docs
+  - Tool-definition-only docs

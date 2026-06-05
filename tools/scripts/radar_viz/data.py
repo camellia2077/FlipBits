@@ -41,20 +41,9 @@ def build_metrics(
 # [ 圣典模式数据定义 ]
 # ==========================================
 DATA_DICT = {
-    # 项目作者
-    "The Author": {
-        "name_en": "Project Creator",
-        "name_zh": "项目作者",
-        "vals": build_metrics(
-            transmission_speed=1, encoding_efficiency=3, transmission_stability=2,
-            compatibility=2, parsing_difficulty=0, electronic_feel=0,
-            emotional_richness=6, sense_of_ritual=2
-        ),
-    },
-
     # Flash BFSK 模式集 (建议限制在 10以内，为了和pro,mini,ultra区分开)
-    "Steady": {
-        "name_en": "Steady",
+    "Standard": {
+        "name_en": "Standard",
         "name_zh": "普通",
         "vals": build_metrics(
             transmission_speed=2, encoding_efficiency=3, transmission_stability=6,
@@ -73,7 +62,7 @@ DATA_DICT = {
     },
     "Litany": {
         "name_en": "Litany",
-        "name_zh": "崇高",
+        "name_zh": "崇敬",
         "vals": build_metrics(
             transmission_speed=1, encoding_efficiency=3, transmission_stability=10,
             compatibility=1, parsing_difficulty=1, electronic_feel=9,

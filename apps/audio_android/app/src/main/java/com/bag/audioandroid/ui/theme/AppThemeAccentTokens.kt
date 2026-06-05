@@ -7,7 +7,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import com.bag.audioandroid.R
-import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.FactionThemeOption
 
 @Immutable
 data class AppThemeAccentTokens(
@@ -39,15 +39,15 @@ fun materialAccentTokens(primary: Color): AppThemeAccentTokens =
         selectionBorderAccentTint = primary,
     )
 
-fun brandAccentTokens(theme: BrandThemeOption): AppThemeAccentTokens {
-    // Dual-tone themes split their strong state chrome by theme family:
+fun brandAccentTokens(theme: FactionThemeOption): AppThemeAccentTokens {
+    // Faction themes split their strong state chrome by theme family:
     // dark red rites should read as their original crimson accent instead of near-black, while the
     // dynasty themes keep a restrained energy accent instead of collapsing to the base metal.
     val strongStateTint =
         when {
             theme.id == "black_crimson_rite" ->
                 theme.secondaryColor
-            theme.groupTitleResId == R.string.config_dual_tone_group_ancient_dynasty ->
+            theme.groupTitleResId == R.string.config_faction_theme_group_ancient_dynasty ->
                 lerp(
                     theme.secondaryColor,
                     theme.colorScheme.onSurface,

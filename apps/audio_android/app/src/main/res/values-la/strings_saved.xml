@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="saved_audio_filter_empty">Nulla reliquia inventa in sectore.</string>
-    <string name="library_title">Reliquiarium</string>
     <string name="library_empty">Sectores memoriae vacui sunt.</string>
     <string name="library_action_import">Infer Datum</string>
     <string name="library_action_share">Transmite per Aethera</string>

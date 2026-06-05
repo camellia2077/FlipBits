@@ -1,22 +1,22 @@
 package com.bag.audioandroid.ui
 
-import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.FactionThemeOption
 import com.bag.audioandroid.ui.model.SampleFlavor
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.effectiveSampleFlavor
 import com.bag.audioandroid.ui.state.AudioAppUiState
 
 internal val AudioAppUiState.currentSampleFlavor: SampleFlavor
-    get() = effectiveSampleFlavor(selectedThemeStyle, activeBrandTheme)
+    get() = effectiveSampleFlavor(selectedThemeStyle, activeFactionTheme)
 
-internal fun AudioAppUiState.withSelectedBrandTheme(
-    brandTheme: BrandThemeOption,
+internal fun AudioAppUiState.withSelectedFactionTheme(
+    factionTheme: FactionThemeOption,
     sampleInputSessionUpdater: SampleInputSessionUpdater,
 ): AudioAppUiState {
-    if (selectedBrandTheme.id == brandTheme.id) {
+    if (selectedFactionTheme.id == factionTheme.id) {
         return this
     }
-    val newFlavor = effectiveSampleFlavor(selectedThemeStyle, brandTheme)
+    val newFlavor = effectiveSampleFlavor(selectedThemeStyle, factionTheme)
     val updatedSessions =
         if (currentSampleFlavor != newFlavor) {
             sampleInputSessionUpdater.refreshForFlavorChange(
@@ -29,7 +29,7 @@ internal fun AudioAppUiState.withSelectedBrandTheme(
             sessions
         }
     return copy(
-        selectedBrandTheme = brandTheme,
+        selectedFactionTheme = factionTheme,
         sessions = updatedSessions,
     )
 }
@@ -41,7 +41,7 @@ internal fun AudioAppUiState.withSelectedThemeStyle(
     if (selectedThemeStyle == themeStyle) {
         return this
     }
-    val newFlavor = effectiveSampleFlavor(themeStyle, activeBrandTheme)
+    val newFlavor = effectiveSampleFlavor(themeStyle, activeFactionTheme)
     val updatedSessions =
         if (currentSampleFlavor != newFlavor) {
             sampleInputSessionUpdater.refreshForFlavorChange(

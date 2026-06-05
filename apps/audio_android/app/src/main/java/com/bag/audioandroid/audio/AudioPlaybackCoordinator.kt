@@ -18,6 +18,12 @@ class AudioPlaybackCoordinator(
     private var activePlaybackKey: String? = null
 
     @Volatile
+    private var activePlaybackHandle: AudioPlayer.PlaybackHandle? = null
+
+    @Volatile
+    private var handoffPreviousPlaybackHandle: AudioPlayer.PlaybackHandle? = null
+
+    @Volatile
     private var playbackPaused = false
 
     fun hasActivePlaybackForOtherSource(sourceKey: String): Boolean = activePlaybackKey != null && activePlaybackKey != sourceKey
@@ -37,21 +43,52 @@ class AudioPlaybackCoordinator(
         sampleRateHz: Int,
         playbackSpeed: Float,
         startSampleIndex: Int,
+        renderContext: PlaybackRenderContext = PlaybackRenderContext.Empty,
+        handoffFromActivePlayback: Boolean = false,
         onStarted: () -> Unit,
         onProgressChanged: (Int, Int) -> Unit,
         onFinished: (String, PlaybackResult) -> Unit,
         onFailed: (String) -> Unit,
     ) {
+        val activeHandleBeforeStart = activePlaybackHandle
+        val handoffHandleBeforeStart = handoffPreviousPlaybackHandle
+        val previousPlaybackHandle =
+            if (handoffFromActivePlayback && activePlaybackKey == sourceKey) {
+                handoffHandleBeforeStart ?: activeHandleBeforeStart
+            } else {
+                null
+            }
+        val supersededPendingPlaybackHandle =
+            activeHandleBeforeStart
+                ?.takeIf { previousPlaybackHandle != null && it !== previousPlaybackHandle }
         if (activePlaybackRequestId != null) {
-            safeDebugLog(
-                PlaybackCoordinatorDiagTag,
-                "startPlaybackPreempt source=$sourceKey activeSource=${activePlaybackKey.orEmpty()} " +
-                    "activeRequestId=${activePlaybackRequestId ?: -1L}",
-            )
-            stopPlayback()
+            if (previousPlaybackHandle == null) {
+                safeDebugLog(
+                    PlaybackCoordinatorDiagTag,
+                    "startPlaybackPreempt source=$sourceKey activeSource=${activePlaybackKey.orEmpty()} " +
+                        "activeRequestId=${activePlaybackRequestId ?: -1L}",
+                )
+                stopPlayback()
+            } else {
+                safeDebugLog(
+                    PlaybackCoordinatorDiagTag,
+                    "startPlaybackHandoff source=$sourceKey activeRequestId=${activePlaybackRequestId ?: -1L} " +
+                        "previousHandle=${previousPlaybackHandle.debugHandleId()}",
+                )
+                handoffPreviousPlaybackHandle = previousPlaybackHandle
+                supersededPendingPlaybackHandle?.let { supersededHandle ->
+                    safeDebugLog(
+                        PlaybackCoordinatorDiagTag,
+                        "handoffStopSupersededPending source=$sourceKey handle=${supersededHandle.debugHandleId()}",
+                    )
+                    scope.launch(Dispatchers.IO) {
+                        audioPlayer.stop(supersededHandle)
+                    }
+                }
+            }
         }
         val playbackHandle = audioPlayer.prepareForNewPlayback()
-        val requestId = beginPlayback(sourceKey)
+        val requestId = beginPlayback(sourceKey, playbackHandle)
         safeDebugLog(
             PlaybackCoordinatorDiagTag,
             "startPlayback requestId=$requestId source=$sourceKey handle=${playbackHandle.debugHandleId()} " +
@@ -69,6 +106,16 @@ class AudioPlaybackCoordinator(
                             sampleRateHz = sampleRateHz,
                             playbackSpeed = playbackSpeed,
                             startSampleIndex = startSampleIndex,
+                            renderContext = renderContext,
+                            preferStreamingSpeedAdjustedPcm = handoffFromActivePlayback,
+                            onPlaybackStarted = {
+                                stopHandoffPreviousPlayback(
+                                    scope = scope,
+                                    requestId = requestId,
+                                    sourceKey = sourceKey,
+                                    previousPlaybackHandle = previousPlaybackHandle,
+                                )
+                            },
                         ) { playedSamples, reportedTotalSamples ->
                             if (isPlaybackActive(requestId, sourceKey)) {
                                 onProgressChanged(playedSamples, reportedTotalSamples)
@@ -82,6 +129,16 @@ class AudioPlaybackCoordinator(
                             totalSamples = totalSamples,
                             playbackSpeed = playbackSpeed,
                             startSampleIndex = startSampleIndex,
+                            renderContext = renderContext,
+                            preferStreamingSpeedAdjustedPcm = handoffFromActivePlayback,
+                            onPlaybackStarted = {
+                                stopHandoffPreviousPlayback(
+                                    scope = scope,
+                                    requestId = requestId,
+                                    sourceKey = sourceKey,
+                                    previousPlaybackHandle = previousPlaybackHandle,
+                                )
+                            },
                         ) { playedSamples, reportedTotalSamples ->
                             if (isPlaybackActive(requestId, sourceKey)) {
                                 onProgressChanged(playedSamples, reportedTotalSamples)
@@ -221,12 +278,14 @@ class AudioPlaybackCoordinator(
 
     fun stopPlayback(onStopped: (String) -> Unit = {}) {
         val playbackKey = activePlaybackKey ?: return
+        val previousPlaybackHandle = handoffPreviousPlaybackHandle
         safeDebugLog(
             PlaybackCoordinatorDiagTag,
             "stopPlayback source=$playbackKey requestId=${activePlaybackRequestId ?: -1L} paused=$playbackPaused",
         )
         clearActivePlayback()
         audioPlayer.stop()
+        previousPlaybackHandle?.let(audioPlayer::stop)
         onStopped(playbackKey)
     }
 
@@ -235,11 +294,16 @@ class AudioPlaybackCoordinator(
             PlaybackCoordinatorDiagTag,
             "release source=${activePlaybackKey.orEmpty()} requestId=${activePlaybackRequestId ?: -1L}",
         )
+        val previousPlaybackHandle = handoffPreviousPlaybackHandle
         clearActivePlayback()
         audioPlayer.stop()
+        previousPlaybackHandle?.let(audioPlayer::stop)
     }
 
-    private fun beginPlayback(sourceKey: String): Long {
+    private fun beginPlayback(
+        sourceKey: String,
+        playbackHandle: AudioPlayer.PlaybackHandle,
+    ): Long {
         val requestId = playbackRequestIds.incrementAndGet()
         safeDebugLog(
             PlaybackCoordinatorDiagTag,
@@ -248,6 +312,7 @@ class AudioPlaybackCoordinator(
         )
         activePlaybackRequestId = requestId
         activePlaybackKey = sourceKey
+        activePlaybackHandle = playbackHandle
         playbackPaused = false
         return requestId
     }
@@ -261,6 +326,8 @@ class AudioPlaybackCoordinator(
             )
             activePlaybackRequestId = null
             activePlaybackKey = null
+            activePlaybackHandle = null
+            handoffPreviousPlaybackHandle = null
             playbackPaused = false
         }
     }
@@ -269,6 +336,28 @@ class AudioPlaybackCoordinator(
         requestId: Long,
         sourceKey: String,
     ): Boolean = activePlaybackRequestId == requestId && activePlaybackKey == sourceKey
+
+    private fun stopHandoffPreviousPlayback(
+        scope: CoroutineScope,
+        requestId: Long,
+        sourceKey: String,
+        previousPlaybackHandle: AudioPlayer.PlaybackHandle?,
+    ) {
+        if (previousPlaybackHandle == null || !isPlaybackActive(requestId, sourceKey)) {
+            return
+        }
+        if (handoffPreviousPlaybackHandle !== previousPlaybackHandle) {
+            return
+        }
+        handoffPreviousPlaybackHandle = null
+        safeDebugLog(
+            PlaybackCoordinatorDiagTag,
+            "handoffStopPrevious requestId=$requestId source=$sourceKey handle=${previousPlaybackHandle.debugHandleId()}",
+        )
+        scope.launch(Dispatchers.IO) {
+            audioPlayer.stop(previousPlaybackHandle)
+        }
+    }
 }
 
 private const val PlaybackCoordinatorDiagTag = "PlaybackCoordDiag"

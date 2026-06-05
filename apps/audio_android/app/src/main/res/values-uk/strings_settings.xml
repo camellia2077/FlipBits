@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="config_title">Налаштування</string>
     <string name="config_language_title">Мова</string>
     <string name="config_language_subtitle">Виберіть мову застосунку</string>
     <string name="config_language_follow_system">Як у системі</string>
@@ -19,36 +18,33 @@
     <string name="config_language_polish">Polski</string>
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Розгорнути налаштування мови</string>
-    <string name="config_language_collapse">Згорнути налаштування мови</string>
     <string name="config_theme_mode_title">Режим теми</string>
     <string name="config_theme_mode_subtitle">Виберіть системний, світлий або темний режим.</string>
-    <string name="config_theme_mode_brand_fixed">Теми dual-tone мають фіксований вигляд.</string>
+    <string name="config_theme_mode_faction_theme_fixed">Теми фракцій використовують фіксований стиль.</string>
     <string name="config_theme_mode_follow_system">Як у системі</string>
     <string name="config_theme_mode_light">Світла</string>
     <string name="config_theme_mode_dark">Темна</string>
-    <string name="config_theme_mode_custom">Власна</string>
     <string name="config_theme_appearance_title">Вигляд теми</string>
-    <string name="config_theme_style_title">Стиль теми</string>
-    <string name="config_theme_style_subtitle">Виберіть Material або dual-tone.</string>
+    <string name="config_theme_style_subtitle">Виберіть Material або тему фракції.</string>
     <string name="config_theme_style_material">Material</string>
-    <string name="config_theme_style_brand_dual_tone">Двотонний</string>
+    <string name="config_theme_style_faction_theme">Тема фракції</string>
     <string name="config_theme_appearance_expand">Розгорнути налаштування вигляду теми</string>
     <string name="config_theme_appearance_collapse">Згорнути налаштування вигляду теми</string>
     <string name="config_palette_title">Кольорові палітри</string>
     <string name="config_palette_selected">Вибрано</string>
     <string name="config_palette_expand">Розгорнути палітри</string>
     <string name="config_palette_collapse">Згорнути палітри</string>
-    <string name="config_brand_theme_title">Двотонні теми</string>
-    <string name="config_brand_theme_description">Кожна тема dual-tone має фіксований вигляд із двокольоровим попереднім переглядом.</string>
-    <string name="config_dual_tone_group_sacred_machine">Священна машина</string>
+    <string name="config_faction_theme_title">Теми фракцій</string>
+    <string name="config_faction_theme_description">Кожна тема фракції зберігає фіксований вигляд із двоколірним попереднім переглядом.</string>
+    <string name="config_faction_theme_group_sacred_machine">Священна машина</string>
     <!-- CONTEXT: Group heading in the dual-tone theme list for user-created presets. Keep it short, like a section title. -->
-    <string name="config_dual_tone_group_custom">Власні</string>
-    <string name="config_dual_tone_group_ancient_dynasty">Давня династія</string>
-    <string name="config_dual_tone_group_immortal_rot">Безсмертна гнилизна</string>
-    <string name="config_dual_tone_group_scarlet_carnage">Багряна різанина</string>
-    <string name="config_dual_tone_group_exquisite_fall">Exquisite Fall</string>
-    <string name="config_dual_tone_group_labyrinth_of_mutability">Лабіринт мінливості</string>
-    <string name="palette_family_brand">Двотонний</string>
+    <string name="config_faction_theme_group_custom">Власні</string>
+    <string name="config_faction_theme_group_ancient_dynasty">Давня династія</string>
+    <string name="config_faction_theme_group_immortal_rot">Безсмертна гнилизна</string>
+    <string name="config_faction_theme_group_scarlet_carnage">Багряна різанина</string>
+    <string name="config_faction_theme_group_exquisite_fall">Вишуканий занепад</string>
+    <string name="config_faction_theme_group_labyrinth_of_mutability">Лабіринт мінливості</string>
+    <string name="palette_family_faction_theme">Тема фракції</string>
     <string name="palette_family_custom">Власна</string>
     <string name="palette_family_reds_pinks">Червоні</string>
     <string name="palette_family_oranges">Помаранчеві</string>
@@ -57,126 +53,127 @@
     <string name="palette_family_cyans_blues">Сині</string>
     <string name="palette_family_purples_magentas">Фіолетові</string>
     <string name="palette_family_neutrals">Нейтральні</string>
-    <string name="config_flash_style_title">Стиль flash</string>
-    <string name="config_flash_style_subtitle">Виберіть, як має звучати flash-аудіо.</string>
     <string name="config_flash_style_standard_label">Стандарт</string>
-    <string name="config_flash_style_standard_description">Чіткий стабільний машинний сигнал.</string>
+    <string name="config_flash_style_standard_description">Стабільний, чіткий.</string>
     <string name="config_flash_style_hostility_label">Ворожість</string>
-    <string name="config_flash_style_hostility_description">Пресет лютого наказу з коротшим і жорсткішим сигнальним таймінгом.</string>
+    <string name="config_flash_style_hostility_description">Агресивний, гнівний.</string>
     <string name="config_flash_style_litany_label">Літанія</string>
-    <string name="config_flash_style_litany_description">Пресет благоговійної молитви з повільнішою ритуальною каденцією.</string>
+    <string name="config_flash_style_litany_description">Благоговійний, ритуальний.</string>
     <string name="config_flash_style_collapse_label">Зрив</string>
-    <string name="config_flash_style_collapse_description">Пресет страху й руйнування; зараз використовує стандартну сигнальну оболонку.</string>
+    <string name="config_flash_style_collapse_description">Нестабільний, наляканий.</string>
     <string name="config_flash_style_zeal_label">Завзяття</string>
-    <string name="config_flash_style_zeal_description">Яскравий щільний пресет зі змінним швидким ритмом і паузами на пунктуації.</string>
+    <string name="config_flash_style_zeal_description">Нагальний, інтенсивний.</string>
     <string name="config_flash_style_void_label">Порожнеча</string>
-    <string name="config_flash_style_void_description">Низький розріджений пресет із повільнішою сигнальною каденцією.</string>
+    <string name="config_flash_style_void_description">Розріджений, порожній.</string>
     <string name="config_about_title">Про застосунок</string>
     <string name="config_about_subtitle">Автор, посилання на проєкт і ліцензії</string>
     <string name="palette_ruby_title">Рубін</string>
     <string name="palette_red_title">Material червоний</string>
     <string name="palette_mars_relic_title">Марс</string>
-    <string name="brand_theme_mars_relic_title">Реліквія Марса</string>
-    <string name="brand_theme_mars_relic_description">Глибокий червоний із пергаментом для церемоніального архівного вигляду.</string>
-    <string name="brand_theme_mars_relic_accessibility">Тема Реліквія Марса, глибокий червоний із пергаментно-бежевим.</string>
-    <string name="brand_theme_black_crimson_rite_title">Чорно-багряний ритуал</string>
-    <string name="brand_theme_black_crimson_rite_description">Сажистий чорний і ритуальний багряний для суворого настрою машинного святилища.</string>
-    <string name="brand_theme_black_crimson_rite_accessibility">Тема Чорно-багряний ритуал, майже чорний із яскравим багряно-червоним.</string>
-    <string name="brand_theme_xeno_code_title">Ксено-код</string>
-    <string name="brand_theme_xeno_code_description">Обсидіанові контури та неоновий зелений створюють пульс чужорідної машини.</string>
-    <string name="brand_theme_xeno_code_accessibility">Тема Ксено-код, темний мохово-чорний із неоновим зеленим і білим контуром.</string>
-    <string name="brand_theme_scarlet_guard_title">Попередження про небезпеку</string>
-    <string name="brand_theme_scarlet_guard_description">Блідий промисловий сірий, попереджувальний помаранчево-червоний і темний графіт створюють вигляд машинної тривоги.</string>
-    <string name="brand_theme_scarlet_guard_accessibility">Тема Попередження про небезпеку, блідо-сірий із попереджувальним помаранчево-червоним і темним графітовим контуром.</string>
-    <string name="brand_theme_dynasty_revival_title">Відродження династії</string>
-    <string name="brand_theme_dynasty_revival_description">Чорний метал гробниці та класичний реакторний зелений для ядра пробудженої династії.</string>
-    <string name="brand_theme_dynasty_revival_accessibility">Тема Відродження династії, глибокий чорний метал гробниці з яскравим реакторним зеленим.</string>
-    <string name="brand_theme_sepulcher_cyan_title">Склеповий ціан</string>
-    <string name="brand_theme_sepulcher_cyan_description">Холодна сталь склепу й стриманий ціан-зелений для тихішого королівського машинного сяйва.</string>
-    <string name="brand_theme_sepulcher_cyan_accessibility">Тема Склеповий ціан, холодна темна сталь із приглушеним ціан-зеленим.</string>
-    <string name="brand_theme_tomb_sigil_title">Сигіл гробниці</string>
-    <string name="brand_theme_tomb_sigil_description">Тепле криптове залізо й яскравий зелений відродження для церемоніального знака династії.</string>
-    <string name="brand_theme_tomb_sigil_accessibility">Тема Сигіл гробниці, темне криптове залізо з яскравим зеленим відродження.</string>
-    <string name="brand_theme_ancient_alloy_title">Давній сплав</string>
-    <string name="brand_theme_ancient_alloy_description">Тіні зношеного металу та холодна бірюза для сяйва гробничної кузні.</string>
-    <string name="brand_theme_ancient_alloy_accessibility">Тема Давній сплав, темний бронзово-сірий із яскравою бірюзою.</string>
-    <string name="brand_theme_immortal_rot_title">Токсичний Стік</string>
-    <string name="brand_theme_immortal_rot_description">Папоротево-зелений і цитриново-жовтий створюють вологу, зарослу палітру dual-tone.</string>
-    <string name="brand_theme_immortal_rot_accessibility">Тема Токсичний Стік, папоротево-зелений із цитриново-жовтим.</string>
-    <string name="brand_theme_plague_mire_title">Plague Mire</string>
-    <string name="brand_theme_plague_mire_description">Bog-black green, sickly lime, and a caustic orange outline churn into a plague-soaked dual-tone mire.</string>
-    <string name="brand_theme_plague_mire_accessibility">Plague Mire theme, bog-black green with sickly lime and a caustic orange outline.</string>
-    <string name="brand_theme_scarlet_carnage_title">Закривавлена Слонова Кістка</string>
-    <string name="brand_theme_scarlet_carnage_description">Темно-червоний і латунь творять жорстоку палітру dual-tone крові й бойового металу.</string>
-    <string name="brand_theme_scarlet_carnage_accessibility">Тема Закривавлена Слонова Кістка, темно-червоний із темною золотистою латунню.</string>
-    <string name="brand_theme_brass_forge_title">Brass Forge</string>
-    <string name="brand_theme_brass_forge_description">Near-black crimson, furnace brass, and a flame-orange outline cast a molten dual-tone forge of war metal.</string>
-    <string name="brand_theme_brass_forge_accessibility">Brass Forge theme, near-black crimson with furnace brass and a flame-orange outline.</string>
-    <string name="brand_theme_exquisite_fall_title">Оксамитовий Кошмар</string>
-    <string name="brand_theme_exquisite_fall_description">Опівнічний фіолетовий і яскравий рожевий з м\'яким персиковим контуром створюють декадентську палітру dual-tone марнославства й відчуття.</string>
-    <string name="brand_theme_exquisite_fall_accessibility">Тема Оксамитовий Кошмар, опівнічний фіолетовий з яскравим рожевим і м\'яким персиковим контуром.</string>
-    <string name="brand_theme_ecstatic_rapture_title">Ecstatic Rapture</string>
-    <string name="brand_theme_ecstatic_rapture_description">Orchid violet, blush pink, and a radiant gold outline bloom into a euphoric dual-tone fever dream.</string>
-    <string name="brand_theme_ecstatic_rapture_accessibility">Ecstatic Rapture theme, orchid violet with blush pink and a radiant gold outline.</string>
-    <string name="brand_theme_labyrinth_of_mutability_title">Таємнича Безодня</string>
-    <string name="brand_theme_labyrinth_of_mutability_description">Опівнічний темно-синій, електричний ціан і лавандовий контур утворюють мінливий dual-tone лабіринт холодного сигнального світла.</string>
-    <string name="brand_theme_labyrinth_of_mutability_accessibility">Тема Таємнича Безодня, опівнічний темно-синій з електричним ціаном і лавандовим контуром.</string>
-    <string name="brand_theme_fires_of_fate_title">Fires of Fate</string>
-    <string name="brand_theme_fires_of_fate_description">Fatefire blue, magenta flame, and a venom-lime outline ignite an omen-lit dual-tone blaze.</string>
-    <string name="brand_theme_fires_of_fate_accessibility">Fires of Fate theme, fatefire blue with magenta flame and a venom-lime outline.</string>
+    <string name="faction_theme_mars_relic_title">Реліквія Марса</string>
+    <string name="faction_theme_mars_relic_description">Глибокий червоний і пергаментний беж.</string>
+    <string name="faction_theme_mars_relic_accessibility">Тема Реліквія Марса, глибокий червоний із пергаментно-бежевим.</string>
+    <string name="faction_theme_black_crimson_rite_title">Чорно-багряний ритуал</string>
+    <string name="faction_theme_black_crimson_rite_description">Сажистий чорний і ритуальний багряний.</string>
+    <string name="faction_theme_black_crimson_rite_accessibility">Тема Чорно-багряний ритуал, майже чорний із яскравим багряно-червоним.</string>
+    <string name="faction_theme_xeno_code_title">Ксено-код</string>
+    <string name="faction_theme_xeno_code_description">Обсидіан і неоновий зелений.</string>
+    <string name="faction_theme_xeno_code_accessibility">Тема Ксено-код, темний мохово-чорний із неоновим зеленим і білим контуром.</string>
+    <string name="faction_theme_scarlet_guard_title">Попередження про небезпеку</string>
+    <string name="faction_theme_scarlet_guard_description">Блідий сірий, попереджувальний помаранчево-червоний і темний графіт.</string>
+    <string name="faction_theme_scarlet_guard_accessibility">Тема Попередження про небезпеку, блідо-сірий із попереджувальним помаранчево-червоним і темним графітовим контуром.</string>
+    <string name="faction_theme_dynasty_revival_title">Суверенна буря</string>
+    <string name="faction_theme_dynasty_revival_description">Глибокий нефрит, неоновий зелений і блідий сплав.</string>
+    <string name="faction_theme_dynasty_revival_accessibility">Тема Суверенна буря, глибокий нефрит із неоновим зеленим і контуром блідого сплаву.</string>
+    <string name="faction_theme_sepulcher_cyan_title">Тиха гегемонія</string>
+    <string name="faction_theme_sepulcher_cyan_description">Приглушена бронза, неоновий зелений і бліда слонова кістка.</string>
+    <string name="faction_theme_sepulcher_cyan_accessibility">Тема Тиха гегемонія, приглушена бронза з неоновим зеленим і контуром блідої слонової кістки.</string>
+    <string name="faction_theme_tomb_sigil_title">Позолочена апатія</string>
+    <string name="faction_theme_tomb_sigil_description">Поліроване золото, яскравий ціан і холодний сірий.</string>
+    <string name="faction_theme_tomb_sigil_accessibility">Тема Позолочена апатія, поліроване золото з яскравим ціаном і холодно-сірим контуром.</string>
+    <string name="faction_theme_ancient_alloy_title">Сонячне згасання</string>
+    <string name="faction_theme_ancient_alloy_description">Оливковий зелений, бурштиновий помаранчевий і попелястий сірий.</string>
+    <string name="faction_theme_ancient_alloy_accessibility">Тема Сонячне згасання, оливковий зелений із бурштиновим помаранчевим і попелясто-сірим контуром.</string>
+    <string name="faction_theme_void_fluctuation_title">Коливання порожнечі</string>
+    <string name="faction_theme_void_fluctuation_description">Глибокий синій, електричний ціан і сталевий синій.</string>
+    <string name="faction_theme_void_fluctuation_accessibility">Тема Коливання порожнечі, глибокий синій з електричним ціаном і сталево-синім контуром.</string>
+    <string name="faction_theme_crimson_decree_title">Багряний указ</string>
+    <string name="faction_theme_crimson_decree_description">Сланцевий сірий, темний багряний і сигнальний помаранчевий.</string>
+    <string name="faction_theme_crimson_decree_accessibility">Тема Багряний указ, сланцевий сірий із темним багряним і сигнально-помаранчевим контуром.</string>
+    <string name="faction_theme_immortal_rot_title">Токсичний Стік</string>
+    <string name="faction_theme_immortal_rot_description">Папоротево-зелений і цитриново-жовтий.</string>
+    <string name="faction_theme_immortal_rot_accessibility">Тема Токсичний Стік, папоротево-зелений із цитриново-жовтим.</string>
+    <string name="faction_theme_plague_mire_title">Морове багно</string>
+    <string name="faction_theme_plague_mire_description">Болотяний чорно-зелений, хворобливий лайм і їдкий помаранчевий.</string>
+    <string name="faction_theme_plague_mire_accessibility">Тема Морове багно, болотяний чорно-зелений із хворобливим лаймом і їдко-помаранчевим контуром.</string>
+    <string name="faction_theme_scarlet_carnage_title">Закривавлена Слонова Кістка</string>
+    <string name="faction_theme_scarlet_carnage_description">Темно-червоний і латунь.</string>
+    <string name="faction_theme_scarlet_carnage_accessibility">Тема Закривавлена Слонова Кістка, темно-червоний із темною золотистою латунню.</string>
+    <string name="faction_theme_brass_forge_title">Латунна кузня</string>
+    <string name="faction_theme_brass_forge_description">Майже чорний багряний, пічна латунь і полум’яно-помаранчевий.</string>
+    <string name="faction_theme_brass_forge_accessibility">Тема Латунна кузня, майже чорний багряний із пічною латунню та полум’яно-помаранчевим контуром.</string>
+    <string name="faction_theme_exquisite_fall_title">Оксамитовий кошмар</string>
+    <string name="faction_theme_exquisite_fall_description">Опівнічний фіолетовий, яскравий рожевий і м’який персиковий.</string>
+    <string name="faction_theme_exquisite_fall_accessibility">Тема Оксамитовий кошмар, опівнічний фіолетовий із яскравим рожевим і м’яким персиковим контуром.</string>
+    <string name="faction_theme_ecstatic_rapture_title">Екстатичний захват</string>
+    <string name="faction_theme_ecstatic_rapture_description">Орхідейний фіолетовий, ніжно-рожевий і сяйливе золото.</string>
+    <string name="faction_theme_ecstatic_rapture_accessibility">Тема Екстатичний захват, орхідейний фіолетовий із ніжно-рожевим і сяйливо-золотим контуром.</string>
+    <string name="faction_theme_labyrinth_of_mutability_title">Таємнича безодня</string>
+    <string name="faction_theme_labyrinth_of_mutability_description">Опівнічний темно-синій, електричний ціан і лаванда.</string>
+    <string name="faction_theme_labyrinth_of_mutability_accessibility">Тема Таємнича безодня, опівнічний темно-синій з електричним ціаном і лавандовим контуром.</string>
+    <string name="faction_theme_fires_of_fate_title">Вогні долі</string>
+    <string name="faction_theme_fires_of_fate_description">Фатальний синій, пурпурове полум’я і отруйний лайм.</string>
+    <string name="faction_theme_fires_of_fate_accessibility">Тема Вогні долі, фатальний синій із пурпуровим полум’ям і отруйно-лаймовим контуром.</string>
     <!-- CONTEXT: Display name for the built-in "custom" dual-tone theme option. This is the title shown in settings, not a button. -->
-    <string name="brand_theme_custom_title">Власна тема</string>
+    <string name="faction_theme_custom_title">Власна тема</string>
     <!-- CONTEXT: Short description under the custom dual-tone theme option. Explain that the user chooses colors but sample text still follows the Sacred Machine flavor. -->
-    <string name="brand_theme_custom_description">Ваші власні двоколірні кольори з прикладом тексту Sacred Machine.</string>
+    <string name="faction_theme_custom_description">Користувацькі кольори та назви теми.</string>
     <!-- CONTEXT: Accessibility label read for the custom dual-tone theme preview swatch. -->
-    <string name="brand_theme_custom_accessibility">Попередній перегляд власної двоколірної теми.</string>
+    <string name="faction_theme_custom_accessibility">Попередній перегляд власної теми фракції.</string>
     <!-- CONTEXT: Small action label for creating a new custom dual-tone preset. Keep it compact like a button or chip. -->
-    <string name="config_custom_brand_theme_add">Додати</string>
+    <string name="config_custom_faction_theme_add">Додати</string>
     <!-- CONTEXT: Action label for opening the editor for an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_edit">Змінити кольори</string>
+    <string name="config_custom_faction_theme_edit">Змінити кольори</string>
     <!-- CONTEXT: Generic dialog title for the custom dual-tone color editor. -->
-    <string name="config_custom_brand_theme_dialog_title">Власні кольори теми</string>
     <!-- CONTEXT: Dialog title when creating a brand-new custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_dialog_title_new">Нова власна тема</string>
+    <string name="config_custom_faction_theme_dialog_title_new">Нова власна тема фракції</string>
     <!-- CONTEXT: Dialog title when editing an existing custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_dialog_title_edit">Редагувати власну тему</string>
+    <string name="config_custom_faction_theme_dialog_title_edit">Редагувати власну тему фракції</string>
     <string name="config_custom_material_theme_dialog_title_new">Нові користувацькі кольори</string>
     <string name="config_custom_material_theme_dialog_title_edit">Змінити кольори</string>
     <!-- CONTEXT: Helper text inside the custom dual-tone editor. It explains the required hex format and that outline may be left empty. -->
-    <string name="config_custom_brand_theme_dialog_description">Введіть кольори у форматі #RRGGBB. Залиште контур порожнім, щоб використати акцентний колір.</string>
     <!-- CONTEXT: Button label that rolls a new random color combination for the custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_randomize">Випадкові кольори</string>
+    <string name="config_custom_faction_theme_randomize">Випадкові кольори</string>
     <!-- CONTEXT: Helper hint next to the dice/randomize action in the custom dual-tone editor. -->
-    <string name="config_custom_brand_theme_randomize_hint">Використовуйте кубики, щоб створити нове поєднання основного кольору, акценту та контуру.</string>
     <!-- CONTEXT: Form field label for the user-defined preset name. -->
-    <string name="config_custom_brand_theme_name_label">Назва пресета</string>
+    <string name="config_custom_faction_theme_name_label">Назва пресета</string>
     <!-- CONTEXT: Form field label for the main/background color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_background_label">Основний колір</string>
+    <string name="config_custom_faction_theme_background_label">Основний колір</string>
     <!-- CONTEXT: Form field label for the accent/secondary color of the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_accent_label">Вторинний колір</string>
+    <string name="config_custom_faction_theme_accent_label">Вторинний колір</string>
     <!-- CONTEXT: Form field label for the outline/stroke color used by the custom dual-tone theme. -->
-    <string name="config_custom_brand_theme_outline_label">Колір контуру</string>
+    <string name="config_custom_faction_theme_outline_label">Колір контуру</string>
     <!-- CONTEXT: Short marker shown beside the outline field to say the field may be left empty. Keep it very short. -->
-    <string name="config_custom_brand_theme_outline_optional">Необов’язково</string>
+    <string name="config_custom_faction_theme_outline_optional">Необов’язково</string>
     <!-- CONTEXT: Confirm button label for saving the custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_save">Зберегти</string>
+    <string name="config_custom_faction_theme_save">Зберегти</string>
     <!-- CONTEXT: Destructive action label for deleting a custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_delete">Видалити</string>
+    <string name="config_custom_faction_theme_delete">Видалити</string>
     <!-- CONTEXT: Confirmation dialog title shown before deleting a custom dual-tone preset. -->
-    <string name="config_custom_brand_theme_delete_title">Видалити власну тему</string>
+    <string name="config_custom_faction_theme_delete_title">Видалити власну тему фракції</string>
     <!-- CONTEXT: Confirmation dialog message before deleting a custom dual-tone preset. %1$s is the preset name. -->
-    <string name="config_custom_brand_theme_delete_message">Видалити пресет %1$s?</string>
+    <string name="config_custom_faction_theme_delete_message">Видалити пресет %1$s?</string>
     <string name="config_custom_material_theme_delete_title">Видалити користувацькі кольори</string>
     <string name="config_custom_material_theme_delete_message">Видалити пресет %1$s?</string>
     <!-- CONTEXT: Validation error shown when the preset name field is left empty. -->
-    <string name="config_custom_brand_theme_invalid_name">Введіть назву пресета.</string>
+    <string name="config_custom_faction_theme_invalid_name">Введіть назву пресета.</string>
     <!-- CONTEXT: Validation error shown when a color field is not in #RRGGBB format. Keep the literal format unchanged. -->
-    <string name="config_custom_brand_theme_invalid_hex">Використовуйте RRGGBB або #RRGGBB.</string>
+    <string name="config_custom_faction_theme_invalid_hex">Використовуйте RRGGBB або #RRGGBB.</string>
     <string name="palette_crimson_title">Багряний</string>
     <string name="palette_rose_title">Троянда</string>
     <string name="palette_sakura_title">Сакура</string>
     <string name="palette_raspberry_title">Малина</string>
-    <string name="palette_blush_title">Рум\\u0027янець</string>
+    <string name="palette_blush_title">Рум’янець</string>
     <string name="palette_orange_title">Помаранчевий</string>
     <string name="palette_coral_title">Корал</string>
     <string name="palette_tangerine_title">Мандарин</string>
@@ -192,7 +189,7 @@
     <string name="palette_lime_title">Лайм</string>
     <string name="palette_olive_title">Оливка</string>
     <string name="palette_emerald_title">Смарагд</string>
-    <string name="palette_mint_title">М\\u0027ята</string>
+    <string name="palette_mint_title">М’ята</string>
     <string name="palette_jade_title">Нефрит</string>
     <string name="palette_forest_title">Ліс</string>
     <string name="palette_teal_title">Синьо-зелений</string>
@@ -213,7 +210,6 @@
     <string name="palette_stone_title">Камінь</string>
     <string name="palette_graphite_title">Графіт</string>
     <string name="palette_ivory_title">Слонова кістка</string>
-
     <string name="config_sample_decoration_title">Оформлення зразка</string>
     <string name="config_sample_decoration_subtitle">Додає необов’язкові префіксні позначки до випадкового зразка тексту.</string>
     <string name="config_sample_text_title">Налаштування аудіо</string>
@@ -222,44 +218,38 @@
     <string name="config_sample_text_collapse">Згорнути налаштування аудіо</string>
     <string name="config_sample_text_expand">Розгорнути налаштування аудіо</string>
     <string name="config_sample_auto_fill_title">Автозаповнення зразком тексту</string>
-    <string name="config_demo_mode_title">Демо-режим</string>
-    <string name="config_demo_mode_subtitle">Показувати відгук на натискання та підказки дій клавіш для запису.</string>
-    <string name="config_custom_brand_theme_import_title">Імпорт власного dual-tone</string>
-    <string name="config_custom_brand_theme_import">Імпорт</string>
-    <string name="config_custom_brand_theme_copy_config">Копіювати</string>
+    <string name="config_custom_faction_theme_import_title">Імпорт власної теми фракції</string>
+    <string name="config_custom_faction_theme_import">Імпорт</string>
+    <string name="config_custom_faction_theme_copy_config">Копіювати</string>
     <string name="config_custom_theme_copy_all">Копіювати всі кольори</string>
-    <string name="config_custom_brand_theme_import_description">Вставте конфіг власної теми FlipBits.</string>
-    <string name="config_custom_brand_theme_import_config_label">Конфіг теми</string>
-    <string name="config_custom_brand_theme_import_invalid">Вставте коректний конфіг власної теми FlipBits.</string>
-    <string name="config_custom_brand_theme_import_duplicate_message">Ця назва збігається з наявною власною темою. Перезаписати її чи додати ще одну копію?</string>
-    <string name="config_custom_brand_theme_import_overwrite">Перезаписати</string>
-    <string name="config_custom_brand_theme_import_duplicate_title">Назва теми вже існує</string>
-    <string name="config_custom_brand_theme_import_add_copy">Додати копію</string>
-    <string name="config_custom_brand_theme_export_title">Експорт власних dual-tone</string>
-    <string name="config_custom_brand_theme_export_description">Виберіть, що копіювати: вибраний власний dual-tone чи всі власні dual-tones.</string>
-    <string name="config_custom_brand_theme_export_scope_selected">Вибраний</string>
-    <string name="config_custom_brand_theme_export_scope_all">Усі</string>
-    <string name="config_custom_brand_theme_batch_import_title">Імпорт власних dual-tone</string>
-    <string name="config_custom_brand_theme_batch_import_summary">Знайдено тем: %1$d. Нових: %2$d, з наявними назвами: %3$d.</string>
-    <string name="config_custom_brand_theme_batch_import_duplicate_note">Теми з наявними назвами буде перезаписано після підтвердження.</string>
+    <string name="config_custom_faction_theme_import_description">Вставте конфіг власної теми FlipBits.</string>
+    <string name="config_custom_faction_theme_import_config_label">Конфіг теми</string>
+    <string name="config_custom_faction_theme_import_duplicate_message">Ця назва збігається з наявною власною темою. Перезаписати її чи додати ще одну копію?</string>
+    <string name="config_custom_faction_theme_import_overwrite">Перезаписати</string>
+    <string name="config_custom_faction_theme_import_duplicate_title">Назва теми вже існує</string>
+    <string name="config_custom_faction_theme_import_add_copy">Додати копію</string>
+    <string name="config_custom_faction_theme_export_title">Експорт власних тем фракції</string>
+    <string name="config_custom_faction_theme_export_description">Виберіть, що копіювати: вибрану власну тему фракції чи всі власні теми фракції.</string>
+    <string name="config_custom_faction_theme_export_scope_selected">Вибраний</string>
+    <string name="config_custom_faction_theme_export_scope_all">Усі</string>
+    <string name="config_custom_faction_theme_batch_import_title">Імпорт власних тем фракції</string>
+    <string name="config_custom_faction_theme_batch_import_summary">Знайдено тем: %1$d. Нових: %2$d, з наявними назвами: %3$d.</string>
+    <string name="config_custom_faction_theme_batch_import_duplicate_note">Теми з наявними назвами буде перезаписано після підтвердження.</string>
     <string name="config_custom_material_theme_import_title">Імпорт користувацьких кольорів</string>
     <string name="config_custom_material_theme_import">Імпорт</string>
-    <string name="config_custom_material_theme_import_description">Вставте пресети користувацьких кольорів зі значеннями name і primary.</string>
+    <string name="config_custom_material_theme_import_description">Вставте пресети користувацьких кольорів із полями name і primary.</string>
     <string name="config_custom_material_theme_import_config_label">Конфігурація кольорів</string>
-    <string name="config_custom_material_theme_import_invalid">Вставте коректну конфігурацію користувацьких кольорів.</string>
     <string name="config_palette_custom_section_title">Власні палітри</string>
     <string name="config_palette_builtin_section_title">Вбудовані палітри</string>
     <string name="config_palette_custom_section_subtitle">Створюйте, називайте, імпортуйте та змінюйте порядок власних пресетів.</string>
     <string name="config_palette_builtin_section_subtitle">Переглядайте фіксовану колекцію палітр за родинами кольорів.</string>
-    <string name="config_custom_material_theme_expand">Розгорнути власні кольори</string>
-    <string name="config_custom_material_theme_collapse">Згорнути власні кольори</string>
     <string name="config_custom_theme_import_error_empty">Вставте принаймні один блок користувацького пресету.</string>
     <string name="config_custom_theme_import_error_malformed_line">Рядок %1$d має використовувати формат key=value.</string>
     <string name="config_custom_theme_import_error_unknown_field">Блок %1$d містить непідтримуване поле: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">У блоці %1$d поле %2$s повторюється.</string>
     <string name="config_custom_theme_import_error_missing_field">У блоці %1$d бракує %2$s.</string>
     <string name="config_custom_theme_import_error_invalid_hex">Блок %1$d містить недійсне шістнадцяткове значення кольору для %2$s: %3$s.</string>
-    <string name="config_custom_theme_import_error_wrong_target_dual_tone">Блок %1$d використовує поля користувацького dual-tone. Імпортуйте його через користувацький dual-tone.</string>
+    <string name="config_custom_theme_import_error_wrong_target_faction_theme">Блок %1$d використовує поля власної теми фракції. Імпортуйте його через власну тему фракції.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Блок %1$d використовує поля користувацьких кольорів. Імпортуйте його через користувацькі кольори.</string>
     <string name="config_custom_theme_import_field_name">назва</string>
     <string name="config_custom_theme_import_field_primary">основний</string>
@@ -268,4 +258,3 @@
     <string name="config_saved_playback_data_subtitle">Зберігає готовими супровід тексту й покращені візуальні ефекти для аудіо, збереженого в застосунку.</string>
     <string name="config_saved_playback_data_title">Зберігати деталі відтворення</string>
 </resources>
-

@@ -27,3 +27,45 @@
 - 同一天内如果有多轮 tooling 改动，优先合并到同一个日期文件，而不是按批次继续细分文件名
 - 如需写作规范，统一参考：
   - `<repo-root>/.agent/workflow/docs/tools-history-style-guide.md`
+
+## Flash speed audio analysis
+
+When investigating Flash playback-speed pitch or timbre reports, first run the host-side PCM analysis tool before changing the renderer:
+
+```powershell
+python tools/run.py artifact flash-speed-analysis --speed 0.1
+```
+
+The default run analyzes all six Flash styles: `standard`, `hostility`, `litany`, `collapse`, `zeal`, and `void`. It generates Flash source WAV files through the Rust CLI/core path, renders speed-adjusted PCM with a host mirror of Android `SpeedAdjustedPcmRenderer`, then writes `summary.md`, `metrics.json`, and `metrics.csv` under `build/test-artifacts/flash-speed-analysis/`.
+
+Use this output to compare source PCM against rendered PCM before treating subjective style reports as confirmed pitch changes. `hostility` and `zeal` are comparison samples only; they are not assumed to be known-good controls. If this PCM analysis looks stable while device playback still sounds wrong, inspect the Android playback/output chain next.
+
+## Android playback speed memory diagnostics
+
+Speed-adjusted Android playback emits debug-only `PlaybackSpeedMemory` logcat rows from the low-speed / high-speed render path. Use this when deciding whether playback memory is worth optimizing; do not start by changing renderer allocation strategy without before/after numbers.
+
+The log rows cover:
+
+- renderer type: `flash`, `mini_cw`, or `generic`
+- mode, playback speed, streaming vs pre-render, and file-backed vs in-memory source
+- source and rendered sample counts
+- estimated source/rendered PCM byte counts
+- Java heap before/after/delta
+- native heap before/after/delta
+- source file load time or render time
+
+Manual capture window:
+
+```powershell
+python tools/run.py android-debug capture-playback-speed --wait-ms 60000
+```
+
+During the capture window, start playback and select the speed/scenario being measured. The command writes raw logcat and a markdown summary under `temp/android-debug/`.
+
+To summarize an existing raw log:
+
+```powershell
+python tools/run.py android-debug playback-speed-summary temp\android-debug\<capture>\raw.log
+```
+
+The summary includes a `Memory Rows` table when `PlaybackSpeedMemory` events are present. Representative scenarios to collect before optimizing are Flash `0.1x`, Mini low-speed playback, generic pre-render, and generic streaming. If a capture has no memory rows, playback did not enter the speed-adjusted render path during that log window.

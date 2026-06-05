@@ -13,7 +13,7 @@ import os
 
 raw_data = {
     # --- Flash 模式 (基准 BFSK) ---
-    "Steady":   {"fs": 0.9375, "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
+    "Standard":   {"fs": 0.9375, "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
     "Hostility":  {"fs": 0.875,  "bps": 1,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},
     "Litany":   {"fs": 6.0,    "bps": 1,    "charset": 256, "silence": 2, "jitter": 0, "dtmf": 0},
     "Collapse": {"fs": 1.0,    "bps": 1,    "charset": 256, "silence": 0, "jitter": 5, "dtmf": 0},
@@ -32,16 +32,16 @@ results = {}
 
 # 1. 计算绝对值
 for mode, d in raw_data.items():
-    # 传输速度
+    # 速度
     speed = d["bps"] / d["fs"]
     
-    # 编码效率
+    # 效率
     efficiency = d["bps"]
     
-    # 传输稳定
+    # 稳定
     stability = d["fs"] + d["silence"] + d["dtmf"] - d["jitter"]
     
-    # 兼容性
+    # 兼容
     compatibility = 1.0 - (d["charset"] / 256.0)
     
     results[mode] = {
@@ -73,10 +73,10 @@ final_scores = {
 
 # 3. 构建全名 JSON 数据
 mapping = {
-    "TRANSMISSION_SPEED":     "传输速度",
-    "ENCODING_EFFICIENCY":    "编码效率",
-    "TRANSMISSION_STABILITY": "传输稳定",
-    "COMPATIBILITY":          "兼容性",
+    "TRANSMISSION_SPEED":     "速度",
+    "ENCODING_EFFICIENCY":    "效率",
+    "TRANSMISSION_STABILITY": "稳定",
+    "COMPATIBILITY":          "兼容",
 }
 
 ai_data = {}

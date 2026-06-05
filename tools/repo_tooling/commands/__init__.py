@@ -5,6 +5,7 @@ from .clean import cmd_clean
 from .cli import cmd_cli
 from .configure import cmd_configure
 from .export_apk import cmd_export_apk
+from .flash_speed_analysis import cmd_flash_speed_analysis
 from .file_name_prep import cmd_file_name_prep
 from .format import cmd_format
 from .history_prep import cmd_history_prep
@@ -27,6 +28,7 @@ __all__ = [
     "cmd_cli",
     "cmd_configure",
     "cmd_export_apk",
+    "cmd_flash_speed_analysis",
     "cmd_file_name_prep",
     "cmd_format",
     "cmd_history_prep",

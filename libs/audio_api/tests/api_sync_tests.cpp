@@ -167,6 +167,57 @@ double UltraCarrierFrequencyForNibble(int nibble) {
   return kUltraCarrierFreqsHz[static_cast<std::size_t>(nibble)];
 }
 
+double MiniCwToneEnvelopeGain(std::size_t sample_index,
+                              std::size_t sample_count, int sample_rate_hz) {
+  constexpr double kMiniCwToneEnvelopeSeconds = 0.005;
+  constexpr double kPi = 3.14159265358979323846;
+  const std::size_t ramp_samples = std::min(
+      static_cast<std::size_t>(std::lround(
+          static_cast<double>(sample_rate_hz) * kMiniCwToneEnvelopeSeconds)),
+      sample_count / static_cast<std::size_t>(2));
+  if (ramp_samples == 0 || sample_count == 0) {
+    return 1.0;
+  }
+  double gain = 1.0;
+  if (sample_index < ramp_samples) {
+    const double ratio =
+        static_cast<double>(sample_index) / static_cast<double>(ramp_samples);
+    gain = std::min(gain, 0.5 - 0.5 * std::cos(kPi * ratio));
+  }
+  const std::size_t samples_from_end = sample_count - sample_index - 1;
+  if (samples_from_end < ramp_samples) {
+    const double ratio = static_cast<double>(samples_from_end) /
+                         static_cast<double>(ramp_samples);
+    gain = std::min(gain, 0.5 - 0.5 * std::cos(kPi * ratio));
+  }
+  return gain;
+}
+
+int ExpectedMiniCwToneSample(std::size_t sample_index,
+                             std::size_t sample_count, int sample_rate_hz) {
+  constexpr double kMiniCwToneFrequencyHz = 700.0;
+  constexpr double kMiniCwToneAmplitude = 0.75;
+  constexpr double kPi = 3.14159265358979323846;
+  const double time =
+      static_cast<double>(sample_index) / static_cast<double>(sample_rate_hz);
+  const double sample =
+      kMiniCwToneAmplitude *
+      MiniCwToneEnvelopeGain(sample_index, sample_count, sample_rate_hz) *
+      std::sin(2.0 * kPi * kMiniCwToneFrequencyHz * time);
+  return static_cast<int>(std::lround(std::clamp(sample, -1.0, 1.0) * 32767.0));
+}
+
+int MaxAbsPcmRange(const bag_pcm16_result& pcm, std::size_t start,
+                   std::size_t end) {
+  int max_value = 0;
+  end = std::min(end, pcm.sample_count);
+  for (std::size_t index = start; index < end; ++index) {
+    max_value =
+        std::max(max_value, std::abs(static_cast<int>(pcm.samples[index])));
+  }
+  return max_value;
+}
+
 std::size_t UltraFramePayloadBeginSample(const test::ConfigCase& config_case) {
   constexpr std::size_t kUltraFrameV1PrefixBytes = 16;
   return kUltraFrameV1PrefixBytes * static_cast<std::size_t>(2) *
@@ -285,6 +336,49 @@ void TestApiMiniMorseRoundTripAcrossConfigs() {
       bag_free_pcm16_result(&pcm);
     }
   }
+}
+
+void TestApiMiniMorseAppliesToneEnvelope() {
+  const test::ConfigCase config_case{
+      .name = "48k-envelope",
+      .sample_rate_hz = 48000,
+      .frame_samples = 2400,
+  };
+  const auto encoder_config =
+      MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
+  const auto decoder_config =
+      MakeDecoderConfig(config_case, BAG_TRANSPORT_MINI);
+  bag_pcm16_result pcm{};
+  test::AssertEq(bag_encode_text(&encoder_config, "E", &pcm), BAG_OK,
+                 "Mini Morse envelope setup encode should succeed.");
+  test::AssertEq(pcm.sample_count, static_cast<std::size_t>(2400),
+                 "Single-dot mini Morse PCM should keep dot length.");
+
+  test::AssertEq(static_cast<int>(pcm.samples[0]), 0,
+                 "Mini Morse tone should start at zero after envelope.");
+  test::AssertEq(static_cast<int>(pcm.samples[pcm.sample_count - 1]), 0,
+                 "Mini Morse tone should end at zero after envelope.");
+  test::AssertEq(static_cast<int>(pcm.samples[120]),
+                 ExpectedMiniCwToneSample(120, pcm.sample_count,
+                                          config_case.sample_rate_hz),
+                 "Mini Morse attack should follow the shared envelope.");
+  test::AssertEq(static_cast<int>(pcm.samples[2280]),
+                 ExpectedMiniCwToneSample(2280, pcm.sample_count,
+                                          config_case.sample_rate_hz),
+                 "Mini Morse release should follow the shared envelope.");
+  test::AssertTrue(MaxAbsPcmRange(pcm, 1, 240) <
+                       MaxAbsPcmRange(pcm, 360, 720),
+                   "Mini Morse attack should ramp below full tone level.");
+  test::AssertTrue(MaxAbsPcmRange(pcm, 2160, 2399) <
+                       MaxAbsPcmRange(pcm, 360, 720),
+                   "Mini Morse release should ramp below full tone level.");
+
+  const auto decoded = DecodeViaApi(decoder_config, pcm);
+  test::AssertEq(decoded.code, BAG_OK,
+                 "Envelope-shaped mini Morse decode should succeed.");
+  test::AssertEq(decoded.text, std::string("E"),
+                 "Envelope-shaped mini Morse should still round-trip.");
+  bag_free_pcm16_result(&pcm);
 }
 
 void TestApiEncodeRejectsInvalidArguments() {
@@ -2643,6 +2737,8 @@ void RegisterApiSyncTests(test::Runner& runner) {
              TestApiUltraRoundTripAcrossCorpusAndConfigs);
   runner.Add("Api.MiniMorseRoundTripAcrossConfigs",
              TestApiMiniMorseRoundTripAcrossConfigs);
+  runner.Add("Api.MiniMorseAppliesToneEnvelope",
+             TestApiMiniMorseAppliesToneEnvelope);
   runner.Add("Api.EncodeRejectsInvalidArguments",
              TestApiEncodeRejectsInvalidArguments);
   runner.Add("Api.CreateDecoderRejectsInvalidArguments",

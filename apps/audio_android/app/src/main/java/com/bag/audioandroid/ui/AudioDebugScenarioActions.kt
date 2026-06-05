@@ -10,8 +10,8 @@ import com.bag.audioandroid.domain.GeneratedAudioMetadata
 import com.bag.audioandroid.domain.SavedAudioRepository
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
-import com.bag.audioandroid.ui.model.CustomBrandThemeImportParseResult
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeImportParseResult
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.CustomThemeImportMode
 import com.bag.audioandroid.ui.model.MorseSpeedOption
 import com.bag.audioandroid.ui.model.PlaybackSpeedOption
@@ -57,8 +57,8 @@ internal class AudioDebugScenarioActions(
     private val onOpenPlayerDetailSheet: () -> Unit,
     private val onTabSelected: (AppTab) -> Unit,
     private val onThemeStyleSelected: (ThemeStyleOption) -> Unit,
-    private val onCustomMaterialThemeSaved: (CustomBrandThemeSettings, String?) -> Unit,
-    private val onCustomMaterialThemesImported: (List<CustomBrandThemeSettings>) -> Unit,
+    private val onCustomMaterialThemeSaved: (CustomFactionThemeSettings, String?) -> Unit,
+    private val onCustomMaterialThemesImported: (List<CustomFactionThemeSettings>) -> Unit,
 ) {
     private var pendingSavedAudioDecodeJob: Job? = null
 
@@ -385,14 +385,14 @@ internal class AudioDebugScenarioActions(
         )
 
         when (val parsed = parseCustomMaterialThemeImportText(exportedText)) {
-            is CustomBrandThemeImportParseResult.Invalid -> {
+            is CustomFactionThemeImportParseResult.Invalid -> {
                 safeLogD(
                     SETTINGS_IMPORT_AUTOMATION_TAG,
                     "importInvalid requestId=$requestId reason=${parsed.error::class.simpleName}",
                 )
             }
 
-            is CustomBrandThemeImportParseResult.Valid -> {
+            is CustomFactionThemeImportParseResult.Valid -> {
                 val firstImported = parsed.settings.first()
                 safeLogD(
                     SETTINGS_IMPORT_AUTOMATION_TAG,

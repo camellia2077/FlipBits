@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -118,7 +118,7 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SelectedThemeStyleId] }
 
-    val selectedBrandThemeId: Flow<String?> =
+    val selectedFactionThemeId: Flow<String?> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -126,9 +126,9 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.SelectedBrandThemeId] }
+            }.map { preferences -> preferences[Keys.SelectedFactionThemeId] }
 
-    val customBrandThemePresets: Flow<List<CustomBrandThemeSettings>> =
+    val customFactionThemePresets: Flow<List<CustomFactionThemeSettings>> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -137,10 +137,10 @@ class AppSettingsRepository(
                     throw exception
                 }
             }.map { preferences ->
-                CustomBrandThemeSettingsStore.decode(preferences[Keys.CustomBrandThemePresetsJson])
+                CustomFactionThemeSettingsStore.decode(preferences[Keys.CustomFactionThemePresetsJson])
             }
 
-    val customMaterialThemePresets: Flow<List<CustomBrandThemeSettings>> =
+    val customMaterialThemePresets: Flow<List<CustomFactionThemeSettings>> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -148,7 +148,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> CustomBrandThemeSettingsStore.decode(preferences[Keys.CustomMaterialThemeJson]) }
+            }.map { preferences -> CustomFactionThemeSettingsStore.decode(preferences[Keys.CustomMaterialThemeJson]) }
 
     val selectedPlaybackSequenceModeId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -270,7 +270,7 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.ConfigMaterialNeutralsPaletteExpanded] ?: true }
 
-    val isConfigCustomBrandThemeExpanded: Flow<Boolean> =
+    val isConfigCustomFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -278,7 +278,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigCustomBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigCustomFactionThemeExpanded] ?: false }
 
     val isConfigSampleTextExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
@@ -290,7 +290,7 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.ConfigSampleTextExpanded] ?: false }
 
-    val isConfigSacredMachineBrandThemeExpanded: Flow<Boolean> =
+    val isConfigSacredMachineFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -298,9 +298,9 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigSacredMachineBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigSacredMachineFactionThemeExpanded] ?: false }
 
-    val isConfigAncientDynastyBrandThemeExpanded: Flow<Boolean> =
+    val isConfigAncientDynastyFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -308,9 +308,9 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigAncientDynastyBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigAncientDynastyFactionThemeExpanded] ?: false }
 
-    val isConfigImmortalRotBrandThemeExpanded: Flow<Boolean> =
+    val isConfigImmortalRotFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -318,9 +318,9 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigImmortalRotBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigImmortalRotFactionThemeExpanded] ?: false }
 
-    val isConfigScarletCarnageBrandThemeExpanded: Flow<Boolean> =
+    val isConfigScarletCarnageFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -328,9 +328,9 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigScarletCarnageBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigScarletCarnageFactionThemeExpanded] ?: false }
 
-    val isConfigExquisiteFallBrandThemeExpanded: Flow<Boolean> =
+    val isConfigExquisiteFallFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -338,9 +338,9 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigExquisiteFallBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigExquisiteFallFactionThemeExpanded] ?: false }
 
-    val isConfigLabyrinthOfMutabilityBrandThemeExpanded: Flow<Boolean> =
+    val isConfigLabyrinthOfMutabilityFactionThemeExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -348,7 +348,7 @@ class AppSettingsRepository(
                 } else {
                     throw exception
                 }
-            }.map { preferences -> preferences[Keys.ConfigLabyrinthOfMutabilityBrandThemeExpanded] ?: false }
+            }.map { preferences -> preferences[Keys.ConfigLabyrinthOfMutabilityFactionThemeExpanded] ?: false }
 
     val isConfigDebugExpanded: Flow<Boolean> =
         appContext.appSettingsDataStore.data
@@ -470,21 +470,21 @@ class AppSettingsRepository(
         }
     }
 
-    suspend fun setSelectedBrandThemeId(brandThemeId: String) {
+    suspend fun setSelectedFactionThemeId(factionThemeId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.SelectedBrandThemeId] = brandThemeId
+            preferences[Keys.SelectedFactionThemeId] = factionThemeId
         }
     }
 
-    suspend fun setCustomBrandThemePresets(settings: List<CustomBrandThemeSettings>) {
+    suspend fun setCustomFactionThemePresets(settings: List<CustomFactionThemeSettings>) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.CustomBrandThemePresetsJson] = CustomBrandThemeSettingsStore.encode(settings)
+            preferences[Keys.CustomFactionThemePresetsJson] = CustomFactionThemeSettingsStore.encode(settings)
         }
     }
 
-    suspend fun setCustomMaterialThemePresets(settings: List<CustomBrandThemeSettings>) {
+    suspend fun setCustomMaterialThemePresets(settings: List<CustomFactionThemeSettings>) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.CustomMaterialThemeJson] = CustomBrandThemeSettingsStore.encode(settings)
+            preferences[Keys.CustomMaterialThemeJson] = CustomFactionThemeSettingsStore.encode(settings)
         }
     }
 
@@ -560,9 +560,9 @@ class AppSettingsRepository(
         }
     }
 
-    suspend fun setConfigCustomBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigCustomFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigCustomBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigCustomFactionThemeExpanded] = expanded
         }
     }
 
@@ -572,39 +572,39 @@ class AppSettingsRepository(
         }
     }
 
-    suspend fun setConfigSacredMachineBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigSacredMachineFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigSacredMachineBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigSacredMachineFactionThemeExpanded] = expanded
         }
     }
 
-    suspend fun setConfigAncientDynastyBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigAncientDynastyFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigAncientDynastyBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigAncientDynastyFactionThemeExpanded] = expanded
         }
     }
 
-    suspend fun setConfigImmortalRotBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigImmortalRotFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigImmortalRotBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigImmortalRotFactionThemeExpanded] = expanded
         }
     }
 
-    suspend fun setConfigScarletCarnageBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigScarletCarnageFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigScarletCarnageBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigScarletCarnageFactionThemeExpanded] = expanded
         }
     }
 
-    suspend fun setConfigExquisiteFallBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigExquisiteFallFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigExquisiteFallBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigExquisiteFallFactionThemeExpanded] = expanded
         }
     }
 
-    suspend fun setConfigLabyrinthOfMutabilityBrandThemeExpanded(expanded: Boolean) {
+    suspend fun setConfigLabyrinthOfMutabilityFactionThemeExpanded(expanded: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
-            preferences[Keys.ConfigLabyrinthOfMutabilityBrandThemeExpanded] = expanded
+            preferences[Keys.ConfigLabyrinthOfMutabilityFactionThemeExpanded] = expanded
         }
     }
 
@@ -655,8 +655,8 @@ class AppSettingsRepository(
         val SelectedMaterialPaletteIdLight: Preferences.Key<String> = stringPreferencesKey("material_palette_id_light")
         val SelectedMaterialPaletteIdDark: Preferences.Key<String> = stringPreferencesKey("material_palette_id_dark")
         val SelectedThemeStyleId: Preferences.Key<String> = stringPreferencesKey("theme_style")
-        val SelectedBrandThemeId: Preferences.Key<String> = stringPreferencesKey("brand_theme_id")
-        val CustomBrandThemePresetsJson: Preferences.Key<String> = stringPreferencesKey("custom_brand_presets_json")
+        val SelectedFactionThemeId: Preferences.Key<String> = stringPreferencesKey("faction_theme_id")
+        val CustomFactionThemePresetsJson: Preferences.Key<String> = stringPreferencesKey("custom_faction_presets_json")
         val CustomMaterialThemeJson: Preferences.Key<String> = stringPreferencesKey("custom_material_theme_json")
         val SelectedPlaybackSequenceModeId: Preferences.Key<String> = stringPreferencesKey("playback_sequence_mode")
         val ConfigLanguageExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_language_expanded")
@@ -675,20 +675,20 @@ class AppSettingsRepository(
             booleanPreferencesKey("config_material_purples_palette_expanded")
         val ConfigMaterialNeutralsPaletteExpanded: Preferences.Key<Boolean> =
             booleanPreferencesKey("config_material_neutrals_palette_expanded")
-        val ConfigCustomBrandThemeExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_custom_brand_theme_expanded")
+        val ConfigCustomFactionThemeExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_custom_faction_theme_expanded")
         val ConfigSampleTextExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_sample_text_expanded")
-        val ConfigSacredMachineBrandThemeExpanded: Preferences.Key<Boolean> =
-            booleanPreferencesKey("config_sacred_machine_brand_theme_expanded")
-        val ConfigAncientDynastyBrandThemeExpanded: Preferences.Key<Boolean> =
-            booleanPreferencesKey("config_ancient_dynasty_brand_theme_expanded")
-        val ConfigImmortalRotBrandThemeExpanded: Preferences.Key<Boolean> =
-            booleanPreferencesKey("config_immortal_rot_brand_theme_expanded")
-        val ConfigScarletCarnageBrandThemeExpanded: Preferences.Key<Boolean> =
-            booleanPreferencesKey("config_scarlet_carnage_brand_theme_expanded")
-        val ConfigExquisiteFallBrandThemeExpanded: Preferences.Key<Boolean> =
-            booleanPreferencesKey("config_exquisite_fall_brand_theme_expanded")
-        val ConfigLabyrinthOfMutabilityBrandThemeExpanded: Preferences.Key<Boolean> =
-            booleanPreferencesKey("config_labyrinth_of_mutability_brand_theme_expanded")
+        val ConfigSacredMachineFactionThemeExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_sacred_machine_faction_theme_expanded")
+        val ConfigAncientDynastyFactionThemeExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_ancient_dynasty_faction_theme_expanded")
+        val ConfigImmortalRotFactionThemeExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_immortal_rot_faction_theme_expanded")
+        val ConfigScarletCarnageFactionThemeExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_scarlet_carnage_faction_theme_expanded")
+        val ConfigExquisiteFallFactionThemeExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_exquisite_fall_faction_theme_expanded")
+        val ConfigLabyrinthOfMutabilityFactionThemeExpanded: Preferences.Key<Boolean> =
+            booleanPreferencesKey("config_labyrinth_of_mutability_faction_theme_expanded")
         val ConfigDebugExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_debug_expanded")
         val DemoModeEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("demo_mode_enabled")
         val SampleAutoFillEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("sample_auto_fill_enabled")

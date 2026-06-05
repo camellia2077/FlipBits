@@ -37,8 +37,8 @@ enum class SavedAudioModeFilter(
 
         @StringRes
         fun labelResIdForModeWireName(modeWireName: String): Int =
-            TransportModeOption.entries
-                .firstOrNull { it.wireName == modeWireName }
+            TransportModeOption
+                .fromWireName(modeWireName)
                 ?.labelResId
                 ?: R.string.common_unknown
     }

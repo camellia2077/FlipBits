@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- CONTEXT: Title/tab label for the main audio workspace screen. Keep it short. -->
-    <string name="audio_title">Audio</string>
     <!-- CONTEXT: Section header and text-field label for the input text that will be converted into audio. -->
     <string name="audio_input_label">Input text</string>
     <!-- CONTEXT: Primary action button on the Audio screen that starts generating audio from the current input. -->
     <string name="audio_action_encode">Create</string>
     <!-- CONTEXT: Busy label for the primary create button while audio generation is running. -->
-    <string name="audio_action_encode_busy">Creating…</string>
     <!-- CONTEXT: Busy label for the primary create button while audio generation is running. %1$d is the integer progress percent. -->
     <string name="audio_action_encode_busy_progress">Creating… %1$d%%</string>
     <!-- CONTEXT: Short progress-stage label shown while the encoder prepares input before audio rendering starts. -->
@@ -49,14 +47,11 @@
     <!-- CONTEXT: Action/icon label for clearing the currently decoded/read result. -->
     <string name="audio_action_clear_result">Clear result</string>
     <!-- CONTEXT: Busy label shown while the decoded/read result is being cleared. -->
-    <string name="audio_action_clear_result_busy">Clearing…</string>
     <!-- CONTEXT: Action button/icon that saves the current generated audio into the app's own Saved library, not the device file system. -->
     <string name="audio_action_export">Save to library</string>
     <string name="audio_action_already_saved_to_library">Already saved to library</string>
     <!-- CONTEXT: Action/icon that exports the current audio through Android's file picker so the user can choose an exact destination file on the device. -->
     <string name="audio_action_export_to_file">Export to file</string>
-    <string name="audio_action_playback_speed_short">Speed</string>
-    <string name="audio_action_open_playback_speed_menu">Open playback speed menu</string>
     <string name="audio_action_toggle_playback_speed_slider">Toggle playback speed presets</string>
     <!-- CONTEXT: Accessibility label for the playback-speed button in the player controls. %1$s is the current speed, such as 1.0x or 0.75x. -->
     <string name="audio_action_cycle_playback_speed">Playback speed %1$s</string>
@@ -93,7 +88,6 @@
     <!-- CONTEXT: Confirm/close button in the input editor dialog. -->
     <string name="audio_input_editor_done">Done</string>
     <!-- CONTEXT: Character counter shown under the input editor text field. %1$d is the current character count. -->
-    <string name="audio_input_editor_count">%1$d characters</string>
     <!-- CONTEXT: Input counter shown for UTF-8-friendly transports. %1$d is the visible character count and %2$d is the UTF-8 byte count. -->
     <string name="audio_input_metrics">%1$d chars • %2$d bytes</string>
     <!-- CONTEXT: Compact one-line input summary for ASCII-only transports. %1$d is the visible character count and %2$d is the byte count. -->
@@ -111,9 +105,7 @@
     <!-- CONTEXT: Short visible label for the small helper control that collapses the result content area. -->
     <string name="audio_action_collapse_result_content_short">Hide</string>
     <!-- CONTEXT: Generic audio status wrapper where %1$s is a more specific status message. -->
-    <string name="audio_status">%1$s</string>
     <!-- CONTEXT: Technical summary showing the sample count of generated/loaded audio. %1$d is the number of audio samples, not text examples. -->
-    <string name="audio_sample_count">%1$d samples</string>
     <!-- CONTEXT: Header for the decoded/read-back result section on the main Audio screen. -->
     <string name="audio_result_title">Read result</string>
     <!-- CONTEXT: Empty-state text shown in the decoded/read-back result section before anything has been decoded yet. -->
@@ -257,9 +249,7 @@
     <!-- CONTEXT: Message in the token/text-follow area when text follow data failed to build. -->
     <string name="audio_follow_text_failed">Text follow could not be prepared for this audio.</string>
     <!-- CONTEXT: Tab label in the playback follow section for lyric/text-style following. -->
-    <string name="audio_follow_display_lyrics">Tokens</string>
     <!-- CONTEXT: Tab label in the playback follow section for data-oriented following. -->
-    <string name="audio_follow_display_data">Data</string>
     <!-- CONTEXT: View-mode label in the playback follow data section for hexadecimal output. -->
     <string name="audio_follow_view_hex">Hex</string>
     <!-- CONTEXT: View-mode label in the playback follow data section for binary output. -->
@@ -285,7 +275,6 @@
     <!-- CONTEXT: Label in saved-audio surfaces for the UTF-8 payload size that was encoded into the generated audio. -->
     <string name="audio_player_detail_saved_payload_bytes">Payload size</string>
     <!-- CONTEXT: Value formatter in saved-audio surfaces for the UTF-8 payload size. %1$d is the byte count. -->
-    <string name="audio_player_detail_saved_payload_bytes_value">%1$d bytes</string>
     <!-- CONTEXT: Value label for generated audio that came from text typed or pasted by the user. -->
     <string name="audio_generated_input_source_manual">Manual</string>
     <!-- CONTEXT: Value label for generated audio that came from the built-in sample library. -->
@@ -297,13 +286,13 @@
     <!-- CONTEXT: Short mode label in the flash visualizer for a low/high pitch step line. -->
     <string name="audio_flash_visualizer_mode_pitch">Pitch</string>
     <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
-    <string name="transport_mode_flash_label">flash</string>
+    <string name="transport_mode_flash_label">Flash</string>
     <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
-    <string name="transport_mode_pro_label">pro</string>
+    <string name="transport_mode_pro_label">Pro</string>
     <!-- CONTEXT: Transport mode label shown in selectors, status lines, and saved metadata. Keep lowercase to match the product style. -->
-    <string name="transport_mode_ultra_label">ultra</string>
+    <string name="transport_mode_ultra_label">Ultra</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. "mini" is the fixed product mode name and should remain lowercase. -->
-    <string name="transport_mode_mini_label">mini</string>
+    <string name="transport_mode_mini_label">Mini</string>
     <!-- CONTEXT: Short helper text shown under the input field when flash mode is selected. -->
     <string name="audio_transport_flash_hint">flash uses UTF-8 text.</string>
     <!-- CONTEXT: Example placeholder text shown for flash mode when the input is empty. -->
@@ -323,53 +312,32 @@
     <!-- CONTEXT: Morse speed preset label. Keep WPM as the protocol speed unit. -->
     <string name="audio_morse_speed_wpm20">20 WPM</string>
     <!-- CONTEXT: Mini/Morse input helper. %1$s is the normalized Morse-compatible text preview. -->
-    <string name="audio_morse_normalized_preview">Normalized Morse: %1$s</string>
     <!-- CONTEXT: Mini/Morse input helper. %1$s is the list of unsupported characters typed by the user. -->
     <string name="audio_morse_unsupported_characters">Unsupported Morse characters: %1$s</string>
     <!-- CONTEXT: Example placeholder text shown for ultra mode when the input is empty. -->
     <string name="audio_transport_ultra_example">The lamp keepers unseal the old star chart</string>
     <!-- CONTEXT: Example placeholder text shown for mini mode when the input is empty. It must remain plain ASCII because mini mode accepts Morse-compatible ASCII only. -->
-    <string name="audio_transport_mini_example">PRAISE THE OMNISSIAH</string>
     <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <string name="audio_sample_thematic_2">Deep in the bell tower, the sealed engine begins to hum</string>
     <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <string name="audio_sample_thematic_3">The seventh lamp is lit, yet the far gate stays silent</string>
     <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <string name="audio_sample_thematic_4">Beyond the ash harbor, a pilgrim vessel crosses the black water</string>
     <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <string name="audio_sample_thematic_5">When the iron bells answer, the outer lock still holds</string>
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
-    <string name="audio_sample_thematic_long_1">The bell tower ledger states that the east furnace answered before dawn, well before the roof lamps were due to rise. Three attendants turned the brass wheels by hand while soot drifted from the upper vents and settled across the steps. From behind the sealed hatch came a low, steady hum, held so long that the night clerks began tapping its measure into wax tablets. When the last note thinned away, no one touched the iron latch, yet every witness signed the same line: the machine below had woken of its own accord.</string>
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
-    <string name="audio_sample_thematic_long_2">At second watch the gatehouse lamps were trimmed, the outer bolts were tested again, and soot was scraped from the chain hinges. No signal came from the far corridor, but the stone floor kept trembling in short intervals, as though a heavy drive beneath the hall had resumed an unfinished labor. The wardens counted each tremor against the water clock and found the pattern returned whenever the western wall took the full weight of the wind. Before the watch was dismissed, fresh wax was pressed over the inner lock, and the report closed with a warning that the silence beyond the gate was now an occupied silence.</string>
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
-    <string name="audio_sample_thematic_long_3">The furnace chronicle records that the red lamps were raised one by one until the whole chamber glowed like banked coals behind smoke. When the final chain fell still, the signal clerks copied each pulse into wax tablets while the upper galleries answered with the scrape of iron hooks. Four slow returns came back through the rafters, each weaker than the last, yet none of the recorders agreed on which wall had carried the voice. The closing line notes that the bells were left unwound until dawn, because no one in the chamber wished to hear what might answer a fifth call.</string>
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
-    <string name="audio_sample_thematic_long_4">A voyage record from the ash coast tells of a night crossing under a broken moon and a sky dimmed by furnace dust. The hull lamps were hooded, the chart room kept silent, and only the slow pulse of the engine sanctum marked the hours below deck. Near midnight the helmsman ordered the prow turned three degrees after pale shapes were seen moving between the black swells, though no sound ever reached the rail. By morning the vessel found the harbor lights again, and the final entry says every lamp was rekindled in thanks except the one beside the sealed coffer.</string>
     <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_2">SEAL THE OUTER LOCK</string>
     <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_3">COPPER WARDENS STIR THE DRIVE</string>
     <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_4">SEVENTH LAMP LIT GATE STILL SILENT</string>
     <!-- CONTEXT: Built-in short pro-mode sample sentence inserted by the random-sample action. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_5">HOLD FORMATION BELOW IRON MASTS</string>
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_long_1">BELL TOWER LEDGER. EAST FURNACE ANSWERED BEFORE DAWN. THREE ATTENDANTS TURNED THE BRASS WHEELS BY HAND WHILE SOOT FELL THROUGH THE UPPER VENTS. A LOW STEADY HUM CAME THROUGH THE SEALED HATCH. FINAL LINE STATES THE MACHINE BELOW WOKE OF ITS OWN ACCORD.</string>
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
     <!-- CONTEXT: Status text shown on the Audio screen before any input is entered. User should type input and then press Create. -->
     <string name="status_ready_to_encode">Enter text and tap \"Create\"</string>
     <!-- CONTEXT: Status text shown on the Audio screen when the input field is empty. -->
-    <string name="status_input_empty">Input is empty.</string>
     <!-- CONTEXT: Generic busy status for audio generation. %1$s is the transport mode label such as flash/pro/ultra. -->
-    <string name="status_mode_audio_generating">Creating %1$s audio…</string>
     <!-- CONTEXT: Busy status for audio generation with progress. %1$s is the transport mode label and %2$d is the progress percent. -->
-    <string name="status_mode_audio_generating_progress">Creating %1$s audio… %2$d%%</string>
     <!-- CONTEXT: Busy status for the input-preparation phase of audio generation. %1$s is the transport mode label. -->
     <string name="status_mode_audio_generating_preparing_input">Preparing %1$s input…</string>
     <!-- CONTEXT: Busy status for the PCM rendering phase of audio generation. %1$s is the transport mode label. -->
@@ -400,7 +368,6 @@
     <!-- CONTEXT: Completion status shown after payload reading/decoding finishes. %1$s is the transport mode label. -->
     <string name="status_mode_decode_completed">%1$s read complete</string>
     <!-- CONTEXT: Status shown after clearing the currently generated audio for the active mode. -->
-    <string name="status_current_mode_cleared">Cleared current audio</string>
     <!-- CONTEXT: Status shown after clearing the decoded/read-back result text. -->
     <string name="status_result_cleared">Result cleared</string>
     <!-- CONTEXT: Status/snackbar shown after saving generated audio into the library. %1$s is the saved display name. -->
@@ -455,31 +422,18 @@
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s samples</string>
     <!-- CONTEXT: Short demo hint shown after the user enables demo mode. Keep it concise like a toast or chip label. -->
-    <string name="demo_hint_demo_mode_on">Demo mode enabled</string>
     <!-- CONTEXT: Short demo hint shown after the user switches to the Audio tab. "Audio" is the current bottom-tab label shown to the user. -->
-    <string name="demo_hint_tab_audio">Switched to Audio</string>
     <!-- CONTEXT: Short demo hint shown after the user switches to the Saved tab. "Saved" is the current bottom-tab label shown to the user. -->
-    <string name="demo_hint_tab_saved">Switched to Saved</string>
     <!-- CONTEXT: Short demo hint shown after the user switches to the Settings tab. "Settings" is the current bottom-tab label shown to the user. -->
-    <string name="demo_hint_tab_settings">Switched to Settings</string>
     <!-- CONTEXT: Short demo hint for the primary action that starts audio generation from the current text. Keep it concise like a button/action label. -->
-    <string name="demo_hint_generate_audio">Generate audio</string>
     <!-- CONTEXT: Short demo hint for the action that opens or runs audio decoding. Keep it concise like a button/action label. -->
-    <string name="demo_hint_decode_audio">Decode audio</string>
     <!-- CONTEXT: Short demo hint for the action that opens the mini player. "mini player" is the UI feature name and may stay partly English if the locale keeps that product wording. -->
-    <string name="demo_hint_open_mini_player">Open mini player</string>
     <!-- CONTEXT: Short demo hint shown after the user switches to the Tokens tab. "Tokens" is the current tab label and should remain the product term if the locale keeps it. -->
-    <string name="demo_hint_switch_to_lyrics">Switched to Tokens</string>
     <!-- CONTEXT: Short demo hint shown after the user switches to the Visual tab. "Visual" is the current tab label shown to the user. -->
-    <string name="demo_hint_switch_to_visual">Switched to Visual</string>
     <!-- CONTEXT: Short demo hint shown when playback starts. Keep it concise like a toast/status chip. -->
-    <string name="demo_hint_play">Playback started</string>
     <!-- CONTEXT: Short demo hint shown when playback pauses. Keep it concise like a toast/status chip. -->
-    <string name="demo_hint_pause">Playback paused</string>
     <!-- CONTEXT: Short demo hint shown after the user changes the app theme. Keep it concise like a toast/status chip. -->
-    <string name="demo_hint_theme_changed">Theme changed</string>
     <!-- CONTEXT: Short demo hint shown after the user changes app language and the sample text refreshes. Keep it concise but preserve both actions. -->
-    <string name="demo_hint_language_changed">Language changed and sample refreshed</string>
     <!-- CONTEXT: Shown in the Saved player detail sheet while the app decodes a saved clip to build reusable text/timing data. -->
     <string name="audio_saved_audio_decode_loading_title">Decoding saved audio…</string>
     <!-- CONTEXT: Body text shown while the app extracts saved-audio text and timing data before caching the reusable result. -->

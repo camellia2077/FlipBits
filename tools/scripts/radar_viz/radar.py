@@ -12,7 +12,7 @@ import config
 import config_fonts
 
 # Flash 模式使用 JetBrains Mono，其余使用 IBM Plex Mono
-_FLASH_MODES = {"Steady", "Hostility", "Litany", "Collapse", "Zeal", "Void"}
+_FLASH_MODES = {"Standard", "Hostility", "Litany", "Collapse", "Zeal", "Void"}
 
 
 class RadarChart:
@@ -68,11 +68,34 @@ class RadarChart:
         self.ax.add_patch(poly)
 
     def draw_grids(self):
-        """绘制内部红色参考网格（2 / 4 / 6 / 8 刻度）。"""
+        """绘制内部参考网格（2 / 4 / 6 / 8 刻度），采用对称分段以确保顶点连线上必有交点且完全轴对称。"""
+        fig_width = self.fig.get_figwidth()
+        scale_factor = fig_width / 10.0
+        grid_linewidth = 1.2 * scale_factor
+
         for g_val in [2, 4, 6, 8]:
-            gv = np.full_like(self.angles, g_val)
-            self.ax.plot(self.angles, gv, color=config.SECONDARY_COLOR,
-                         linewidth=1.2, linestyle='--', alpha=0.25, zorder=1)
+            # 每一层都分 3 段，加长中间直线段长度，并缩窄与两端折角线段之间的间隙
+            intervals = [(0.0, 0.23), (0.31, 0.69), (0.77, 1.0)]
+
+            for i in range(8):
+                theta_1 = self.angles[i]
+                theta_2 = self.angles[i+1]
+
+                # 顶点 1 与 顶点 2 在极坐标映射到 Cartesian 空间下的直角坐标
+                v1 = np.array([g_val * np.cos(theta_1), g_val * np.sin(theta_1)])
+                v2 = np.array([g_val * np.cos(theta_2), g_val * np.sin(theta_2)])
+
+                for s, e in intervals:
+                    # 在直角坐标空间线性插值 5 个点，保证每一段小虚线在视觉上都是绝对笔直的八边形边框
+                    t_vals = np.linspace(s, e, 5)
+                    pts = np.array([(1 - t) * v1 + t * v2 for t in t_vals])
+
+                    # 重新转换回极坐标系用于 matplotlib 极坐标轴绘图
+                    thetas = np.arctan2(pts[:, 1], pts[:, 0])
+                    rs = np.hypot(pts[:, 0], pts[:, 1])
+
+                    self.ax.plot(thetas, rs, color=config.GRID_COLOR,
+                                 linewidth=grid_linewidth, alpha=0.25, zorder=1)
 
     # ------------------------------------------------------------------
     # 数据层

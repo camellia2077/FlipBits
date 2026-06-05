@@ -324,6 +324,54 @@ class AndroidTranslateFlowTests(unittest.TestCase):
             self.assertEqual(payload["artifacts"]["output_dir"], str(output_dir))
             self.assertTrue((output_dir / "it" / "it_translation_tasks.md").exists())
 
+    def test_unused_keys_json_output_reports_suspicious_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            res_dir = temp_root / "res"
+            output_dir = temp_root / "unused"
+            self._write_fixture_resources(res_dir)
+            layout_dir = res_dir / "layout"
+            src_dir = temp_root / "src"
+            layout_dir.mkdir(parents=True, exist_ok=True)
+            src_dir.mkdir(parents=True, exist_ok=True)
+            (layout_dir / "player.xml").write_text(
+                (
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                    "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
+                    "    android:layout_width=\"match_parent\"\n"
+                    "    android:layout_height=\"wrap_content\">\n"
+                    "    <TextView android:text=\"@string/config_theme_mode_subtitle\" />\n"
+                    "</LinearLayout>\n"
+                ),
+                encoding="utf-8",
+            )
+            (src_dir / "Player.kt").write_text(
+                "val title = R.string.config_theme_mode_subtitle\n",
+                encoding="utf-8",
+            )
+
+            completed = self._run_cli(
+                "unused-keys",
+                "--res-dir",
+                str(res_dir),
+                "--repo-root",
+                str(temp_root),
+                "--output-dir",
+                str(output_dir),
+                "--json-output",
+            )
+
+            self.assertEqual(completed.returncode, 2, completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertFalse(payload["ok"])
+            self.assertEqual(payload["command"], "unused-keys")
+            self.assertGreaterEqual(payload["summary"]["suspicious_unused_key_count"], 1)
+            self.assertEqual(payload["artifacts"]["output_dir"], str(output_dir))
+            summary_json = json.loads((output_dir / "unused_translation_keys.json").read_text(encoding="utf-8"))
+            unused_names = {item["name"] for item in summary_json["items"]}
+            self.assertIn("audio_sample_sacred_machine_themed_caliper_oil_rite", unused_names)
+            self.assertNotIn("config_theme_mode_subtitle", unused_names)
+
     def _run_cli(self, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             [sys.executable, str(RUN_PY), *args],

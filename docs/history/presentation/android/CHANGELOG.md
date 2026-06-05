@@ -4,6 +4,22 @@
 
 User-facing Android release notes. For detailed engineering history, see `docs/history/presentation/android/v*/x.y.z.md`.
 
+## v0.5.6
+
+This update focuses on playback state persistence, clearer theme presentation, and more consistent localization, along with stability fixes for speed-adjusted playback and Ultra visualization.
+
+### Added
+* Transport mode selection is now persisted, so reopening the app or returning to playback restores the last mode you used instead of resetting to the default every time.
+* Theme-related settings have been consolidated under faction theme naming, with a cleaner flow across custom themes, theme mapping, and import/export behavior.
+* Localization and audio sample translations on Android have been refined, with more consistent wording across Settings, Saved, and faction theme related text.
+
+### Improved
+* The Audio page now uses a more consistent structure for input, result, and grouped sections, with improved fallback contrast for faction theme group backgrounds when nearby colors are too close.
+
+### Fixed
+* Fixed PCM handling and edge-transition issues in parts of the speed-adjusted playback path, especially in Flash and Mini CW modes, reducing playback risks when switching speeds or handling longer audio.
+* Fixed several edge cases in the Ultra visualization timeline and related playback analysis flow, improving sync stability between full-frame visuals and playback state.
+
 ## v0.5.4
 
 ### Added

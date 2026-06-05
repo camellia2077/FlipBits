@@ -18,7 +18,7 @@ python tools/run.py android assemble-release --clean
 ## Release adb install 
 
 ```powershell
-python tools/run.py android assemble-release
+ 
 
 adb install -r apps\audio_android\app\build\outputs\apk\release\FlipBits-release.apk
 ```
@@ -30,8 +30,16 @@ adb install apps\audio_android\app\build\outputs\apk\release\FlipBits-release.ap
 
 ## Debug 
 
+编译并且安装
+python tools/run.py android install-debug-fresh
+
+adb shell am start -n com.bag.audioandroid/.MainActivity
+
+
+逐步
 python tools/run.py android assemble-debug
 
 adb install -r apps/audio_android/app/build/outputs/apk/debug/app-debug.apk
 
 adb shell am start -n com.bag.audioandroid/.MainActivity
+

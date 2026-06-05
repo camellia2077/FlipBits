@@ -22,6 +22,10 @@ from commands.check_translation_key_alignment import (
     DEFAULT_OUTPUT_DIRECTORY as DEFAULT_KEY_ALIGNMENT_OUTPUT_DIRECTORY,
     run_translation_key_alignment_check,
 )
+from commands.check_unused_translation_keys import (
+    DEFAULT_OUTPUT_DIRECTORY as DEFAULT_UNUSED_KEYS_OUTPUT_DIRECTORY,
+    run_unused_translation_key_check,
+)
 from commands.compare_translation_quality import generate_comparisons_for_res
 from commands.dump_xml_text_md import generate_xml_text_dump
 from commands.build_replacements_from_suggestions import build_replacements_from_suggestions
@@ -52,21 +56,28 @@ from core.translation_cli_payloads import (
     key_alignment_payload,
     mixed_language_context_audit_payload,
     mixed_language_payload,
+    replace_batch_payload,
     replace_payload,
+    smoke_check_payload,
     untranslated_equals_english_payload,
+    unused_keys_payload,
     write_json_payload,
 )
 from core.translation_job_manifest import (
     build_compare_manifest_patch,
+    build_replace_batch_manifest_patch,
     build_replace_manifest_patch,
     update_job_manifest,
     normalize_path_string,
 )
+from core.android_resource_smoke_check import run_android_resource_smoke_check_with_options
+from core.translation_replacement_runner import run_replace_batch
 from core.translation_paths import (
     DEFAULT_RES_DIRECTORY,
     DEFAULT_TRANSLATION_KEY_ALIGNMENT_DIRECTORY,
     DEFAULT_TRANSLATION_LINT_BASELINE_FILE,
     DEFAULT_TRANSLATION_REVIEWS_DIRECTORY,
+    REPO_ROOT,
     DEFAULT_TRANSLATION_XML_DUMPS_DIRECTORY,
     TEXT_TYPES,
     get_review_groups_for_text_type,
@@ -409,6 +420,51 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Return non-zero when localized-only stale keys/files are detected.",
     )
+    unused_keys_parser = subparsers.add_parser(
+        "unused-keys",
+        help="Report English baseline string keys that appear to have no direct repo usage.",
+    )
+    unused_keys_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    unused_keys_parser.add_argument(
+        "--output-dir",
+        default=str(DEFAULT_UNUSED_KEYS_OUTPUT_DIRECTORY),
+        help="Override output directory for generated suspicious-unused-key reports.",
+    )
+    unused_keys_parser.add_argument(
+        "--repo-root",
+        default=str(REPO_ROOT),
+        help="Repository root to scan for direct R.string and @string references.",
+    )
+    unused_keys_parser.add_argument(
+        "--text-type",
+        default="",
+        choices=("", *TEXT_TYPES),
+        help="Optional text type scope: app_text or sample_text.",
+    )
+    unused_keys_parser.add_argument(
+        "--group",
+        default="",
+        help="Optional scope group such as strings_audio or sacred_machine.",
+    )
+    unused_keys_parser.add_argument(
+        "--key-pattern",
+        default="",
+        help="Optional regex filter applied to English baseline key names.",
+    )
+    unused_keys_parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress routine progress output.",
+    )
+    unused_keys_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
     replace_parser = subparsers.add_parser(
         "replace",
         help="Apply replacements from replacements.json into Android sample string XML files.",
@@ -424,9 +480,14 @@ def parse_args() -> argparse.Namespace:
         help="Path to the replacement JSON file.",
     )
     replace_parser.add_argument(
+        "--with-smoke-check",
+        action="store_true",
+        help="Run the post-replacement Android resource smoke check (:app:mergeDebugResources).",
+    )
+    replace_parser.add_argument(
         "--skip-smoke-check",
         action="store_true",
-        help="Skip the post-replacement Android resource smoke check (:app:mergeDebugResources).",
+        help="Legacy no-op compatibility flag. Replace no longer runs smoke check by default.",
     )
     replace_parser.add_argument(
         "--auto-fix-json",
@@ -452,6 +513,65 @@ def parse_args() -> argparse.Namespace:
         "--job-dir",
         default="",
         help="Optional agent job directory. When set, replace updates <job-dir>/job_manifest.json.",
+    )
+    replace_batch_parser = subparsers.add_parser(
+        "replace-batch",
+        help="Apply multiple replacement JSON files in one tracked batch and optionally run one final smoke check.",
+    )
+    replace_batch_parser.add_argument(
+        "--res-dir",
+        default=str(DEFAULT_RES_DIRECTORY),
+        help="Android res root. Defaults to apps/audio_android/app/src/main/res.",
+    )
+    replace_batch_parser.add_argument(
+        "--json",
+        nargs="+",
+        required=True,
+        help="One or more replacement JSON files to apply in order.",
+    )
+    replace_batch_parser.add_argument(
+        "--with-smoke-check",
+        action="store_true",
+        help="Run one Android resource smoke check after the full batch finishes writing.",
+    )
+    replace_batch_parser.add_argument(
+        "--auto-fix-json",
+        action="store_true",
+        help="Apply high-confidence JSON syntax repairs before running each replace.",
+    )
+    replace_batch_parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress routine progress output.",
+    )
+    replace_batch_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
+    replace_batch_parser.add_argument(
+        "--summary-out",
+        default="",
+        help="Optional path to write the structured replace-batch result JSON artifact.",
+    )
+    replace_batch_parser.add_argument(
+        "--job-dir",
+        default="",
+        help="Optional agent job directory. When set, replace-batch updates <job-dir>/job_manifest.json.",
+    )
+    smoke_check_parser = subparsers.add_parser(
+        "smoke-check",
+        help="Run the Android resource smoke check (:app:mergeDebugResources) without doing replacements.",
+    )
+    smoke_check_parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Emit machine-readable JSON instead of human-readable text.",
+    )
+    smoke_check_parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress routine progress output.",
     )
     build_replacements_parser = subparsers.add_parser(
         "build-replacements",
@@ -945,11 +1065,66 @@ def run() -> int:
         if json_output:
             emit_json_payload(key_alignment_payload(result))
         return result.exit_code
+    if command == "unused-keys":
+        if not quiet and not json_output:
+            print("[translate] Scanning repository for suspicious unused Android string keys")
+        try:
+            result = run_unused_translation_key_check(
+                res_dir=args.res_dir,
+                output_dir=args.output_dir,
+                repo_root=args.repo_root,
+                text_type=args.text_type,
+                group=args.group,
+                key_pattern=args.key_pattern,
+                quiet=quiet or json_output,
+                emit_text=not json_output,
+            )
+        except ValueError as exc:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "unused-keys",
+                        "exit_code": 2,
+                        "summary": {
+                            "suspicious_unused_key_count": 0,
+                            "scanned_file_count": 0,
+                            "scanned_string_reference_count": 0,
+                            "report_file_count": 0,
+                        },
+                        "artifacts": {
+                            "output_dir": args.output_dir or "",
+                            "summary_json_path": None,
+                        },
+                        "errors": [str(exc)],
+                    }
+                )
+            else:
+                print(str(exc))
+            return 2
+        if json_output:
+            emit_json_payload(unused_keys_payload(result))
+        return result.exit_code
     if command == "replace":
+        if args.with_smoke_check and args.skip_smoke_check:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "replace",
+                        "exit_code": 2,
+                        "summary": {},
+                        "artifacts": {},
+                        "errors": ["Use only one of --with-smoke-check or --skip-smoke-check."],
+                    }
+                )
+            else:
+                print("Use only one of --with-smoke-check or --skip-smoke-check.")
+            return 2
         result = apply_translation_replacements(
             res_dir=args.res_dir,
             json_path=args.json,
-            run_smoke_check=not args.skip_smoke_check,
+            run_smoke_check=args.with_smoke_check,
             auto_fix_json=args.auto_fix_json,
             quiet=quiet or json_output,
             emit_text=not json_output,
@@ -975,6 +1150,62 @@ def run() -> int:
         if json_output:
             emit_json_payload(payload)
         return result.exit_code
+    if command == "replace-batch":
+        result = run_replace_batch(
+            res_dir=args.res_dir,
+            json_paths=args.json,
+            run_smoke_check=args.with_smoke_check,
+            auto_fix_json=args.auto_fix_json,
+            quiet=quiet or json_output,
+            emit_text=not json_output,
+        )
+        payload = replace_batch_payload(
+            result,
+            json_paths=args.json,
+            summary_out=args.summary_out or None,
+            normalize_path=normalize_path_string,
+        )
+        if args.summary_out:
+            write_json_payload(args.summary_out, payload)
+        if args.job_dir:
+            manifest_path = update_job_manifest(
+                args.job_dir,
+                build_replace_batch_manifest_patch(
+                    json_paths=args.json,
+                    summary_out=args.summary_out or None,
+                    payload=payload,
+                ),
+            )
+            payload["artifacts"]["job_manifest"] = manifest_path
+        if json_output:
+            emit_json_payload(payload)
+        return result.exit_code
+    if command == "smoke-check":
+        try:
+            result = run_android_resource_smoke_check_with_options(quiet=quiet or json_output)
+        except FileNotFoundError as exc:
+            if json_output:
+                emit_json_payload(
+                    {
+                        "ok": False,
+                        "command": "smoke-check",
+                        "exit_code": 1,
+                        "summary": {
+                            "smoke_check_ran": False,
+                            "smoke_check_ok": False,
+                            "return_code": None,
+                        },
+                        "artifacts": {},
+                        "errors": [str(exc)],
+                    }
+                )
+            else:
+                print(str(exc))
+            return 1
+        payload = smoke_check_payload(result, normalize_path=normalize_path_string)
+        if json_output:
+            emit_json_payload(payload)
+        return payload["exit_code"]
     if command == "build-replacements":
         result = build_replacements_from_suggestions(
             input_path=args.input,

@@ -28,24 +28,26 @@
 - 如果改动涉及 XML 文案 / 本地化 / 样例文本 / 翻译检查失败，再按需读：
   - `.agent/workflows/translations/README.md`
   - `tools/repo_tooling/android_translate/docs/README.md`
+  - `docs/design/android/translation/README.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
   - `docs/architecture/android/android-ui-structure.md`
 - 如果改动涉及任何 Android 自动化、adb scenario、capture 命令、summary、稳定 test tag 或回归分层，统一先读：
   - `docs/architecture/android/android-automation-agent-index.md`
+- 如果改动涉及仓库工具、诊断命令、capture summary、artifact 产物或 `python tools/run.py` 入口，统一先读：
+  - `docs/tools/README.md`
+  - 然后用对应主命令查看可用参数，例如 `python tools/run.py android-debug --help` 或 `python tools/run.py artifact --help`
 - 如果改动涉及 Flash Visual、Lyrics 跟随、长音频可视化、动画卡顿/跳动或 debug 指标，再按需读：
   - `docs/architecture/android/android-flash-visual.md`
 
 ## Hard Rules
 
-- 现在 `apps/audio_android` 与 `libs/` 都默认允许不兼容重构；如果 `libs` 已提供新 contract，Android presentation / JNI / native bridge 必须直接切到新 contract，不要保留旧 API 名称、旧 DTO、旧 polling 协议或兼容分支。
-- 尤其是 encode lifecycle：Android 侧应直接消费 `encode operation`，不要保留双轨 fallback。
-
 - 优先按职责找入口，不要默认从最大文件开始搜。
 - 动画卡顿、跳动、闪烁或长音频 visual 性能问题，不要先靠猜测重构；先读 `docs/architecture/android/android-flash-visual.md`，再用 debug-only `FlashVisualPerf` 指标和 adb 日志确认瓶颈层级。
 - Android 真机自动化先从 `docs/architecture/android/android-automation-agent-index.md` 选分支，不要在 `AGENTS.md` 里平铺展开所有自动化专题。
+- 工具或诊断入口不要只靠代码搜索猜命令；先看 `docs/tools/README.md`，再用 `python tools/run.py <group> --help` 确认当前参数。
 - Flash 真机自动化优先使用对应自动化文档里的 debug scenario，不要默认走坐标点击、随机 sample 或无障碍服务。
 - 修改可见 XML 文案、本地化结构或样例文本时，必须先按 `.agent/workflows/translations/README.md` 选择 app text 或 sample text workflow；不要跳过 translation key alignment。
-- 查看翻译工具命令、JSON contract、产物目录时，不要再读工具侧 `AGENTS.md`；统一看 `tools/repo_tooling/android_translate/docs/README.md` 和其下专题文档。
+- 查看翻译工具命令、JSON contract、产物目录时，不要再读工具侧 `AGENTS.md`；工具定义看 `tools/repo_tooling/android_translate/docs/README.md`，项目级用法看 `docs/design/android/translation/README.md`。
 - 新增 XML 文案 key 时，必须使用脚手架：`python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`。
 - `strings-add` 默认只写英文 `values/` 基线，并生成 translation key alignment 报告；不要手工把英文原文复制到 `values-*` 当本地化。
 - 只有品牌名、协议 token、不可翻译 UI 符号等明确全语言共享的文本，才允许给 `strings-add` 传 `--localized`。

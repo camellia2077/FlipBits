@@ -52,15 +52,15 @@ class MessagePrepTests(unittest.TestCase):
         self.assertEqual(entry.release_date, "2026-05-11")
         self.assertEqual(entry.release_version, "TODO(agent): set release version")
         self.assertEqual(entry.component_name, "tools")
-        self.assertGreaterEqual(len(entry.added), 1)
         self.assertGreaterEqual(len(entry.changed), 1)
-        self.assertGreaterEqual(len(entry.fixed), 1)
+        self.assertEqual(entry.added, [])
+        self.assertEqual(entry.fixed, [])
 
         result = build_history_message_result(["docs/tools/history/2026-05-11.md"])
         rendered = render_result(result)
-        self.assertIn("[Added]", rendered)
         self.assertIn("[Changed & Refactored]", rendered)
-        self.assertIn("[Fixed]", rendered)
+        self.assertNotIn("[Added]", rendered)
+        self.assertNotIn("[Fixed]", rendered)
         self.assertIn("- tools: TODO(agent): set release version", rendered)
 
 

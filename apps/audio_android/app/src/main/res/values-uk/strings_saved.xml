@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="saved_audio_filter_empty">Нічого не знайдено.</string>
-    <string name="library_title">Збережене</string>
     <string name="library_empty">Поки нічого не збережено.</string>
     <string name="library_action_import">Імпорт</string>
     <string name="library_action_share">Поділитися</string>

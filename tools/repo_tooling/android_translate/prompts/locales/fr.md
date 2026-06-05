@@ -18,6 +18,7 @@ For app UI text, keep labels compact enough for Android buttons, tabs, segmented
 Follow French punctuation spacing used in the existing XML, including spaces before colon-like punctuation where present.
 Follow existing project terms where present: audio, caractères, octets, règles de saisie, Visual, Tokens, Hex, Morse, payload, token, nibble, porteuse basse, and porteuse haute.
 Do not over-translate protocol labels or visualizer labels into explanatory sentences.
+For theme and color translation tasks, also follow `tools/repo_tooling/android_translate/prompts/locales/fr_theme_colors.md`.
 
 [sample_text_rule]
 For built-in sample prose, preserve the dramatic audio-signal atmosphere while writing fluent French.
@@ -27,3 +28,4 @@ Keep pro-mode sample strings strict ASCII, without accents, when the key or cont
 When filling missing entries, write French localization that matches the current XML terminology.
 Preserve placeholders and French spacing around punctuation.
 For missing compact input summaries, preserve placeholders and mirror the established counter pattern around `%1$d caractères • %2$d octets`.
+When working on theme or palette entries, prefer the French theme/color rules above over older verbose or overly literal wording.

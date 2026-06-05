@@ -24,6 +24,14 @@ Do not use this directory as the project entry or tool-definition layer.
    - EN-baseline review and replacement pipeline
    - `compare` / `export-entries` / `build-replacements` / `replace`
 
+5. [find-unused-android-string-keys.md](find-unused-android-string-keys.md)
+   - Suspicious unused `strings*.xml` keys
+   - `unused-keys`
+
+6. [fix-android-resource-escapes.md](fix-android-resource-escapes.md)
+   - Repair Android XML resource escaping before or after translation edits
+   - `fix-resource-escapes`
+
 ## Shared Rule
 
 When generated task artifacts exist, use `*.task.json` first and markdown second.

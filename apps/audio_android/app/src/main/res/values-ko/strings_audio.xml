@@ -4,10 +4,8 @@
     <!-- Replace the English placeholder values below with Korean. -->
     <!-- Audio screen strings: actions, playback modes, player details, status messages. -->
     <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
-    <string name="audio_title">오디오</string>
     <string name="audio_input_label">입력 텍스트</string>
     <string name="audio_action_encode">생성</string>
-    <string name="audio_action_encode_busy">생성 중…</string>
     <string name="audio_action_encode_busy_progress">생성 중… %1$d%%</string>
     <string name="audio_encode_phase_preparing_input_label">입력 준비 중</string>
     <string name="audio_encode_phase_rendering_pcm_label">오디오 생성 중</string>
@@ -35,12 +33,9 @@
     <string name="audio_action_decode_busy">읽는 중…</string>
     <string name="audio_action_clear">지우기</string>
     <string name="audio_action_clear_result">결과 지우기</string>
-    <string name="audio_action_clear_result_busy">지우는 중…</string>
     <string name="audio_action_export">저장</string>
     <string name="audio_action_already_saved_to_library">라이브러리에 이미 저장됨</string>
     <string name="audio_action_export_to_file">파일로 내보내기</string>
-    <string name="audio_action_playback_speed_short">속도</string>
-    <string name="audio_action_open_playback_speed_menu">재생 속도 메뉴 열기</string>
     <string name="audio_action_toggle_playback_speed_slider">재생 속도 미세 조정 전환</string>
     <string name="audio_action_cycle_playback_speed">재생 속도 %1$s</string>
     <string name="audio_action_open_saved_audio_list">저장됨</string>
@@ -61,7 +56,6 @@
     <string name="audio_input_editor_title">입력 텍스트 편집</string>
     <string name="audio_input_editor_hint">오디오로 변환하기 전, 긴 문장이나 의식용 문구 등을 편집하려면 더 큰 편집기를 사용하세요.</string>
     <string name="audio_input_editor_done">완료</string>
-    <string name="audio_input_editor_count">%1$d자</string>
     <string name="audio_input_metrics">%1$d자 • %2$d바이트</string>
     <!-- CONTEXT: Compact one-line input summary for ASCII-only transports. %1$d is the visible character count and %2$d is the byte count. -->
     <string name="audio_input_ascii_metrics">ASCII 텍스트 • %1$d자 • %2$d바이트</string>
@@ -71,8 +65,6 @@
     <string name="audio_action_collapse_result_content">결과 텍스트 축소</string>
     <string name="audio_action_expand_result_content_short">표시</string>
     <string name="audio_action_collapse_result_content_short">숨기기</string>
-    <string name="audio_status">%1$s</string>
-    <string name="audio_sample_count">%1$d개 샘플</string>
     <!-- CONTEXT: Panel title for the text produced by reading audio back. Product term is 'Read result'. -->
     <string name="audio_result_title">읽기 결과</string>
     <string name="audio_result_empty">아직 결과가 없습니다.</string>
@@ -155,8 +147,6 @@
     <string name="audio_follow_text_unavailable">이 오디오의 텍스트 팔로우가 아직 준비되지 않았습니다.</string>
     <string name="audio_follow_visuals_failed">이 오디오의 향상된 시각화를 준비하지 못했습니다.</string>
     <string name="audio_follow_text_failed">이 오디오의 텍스트 팔로우를 준비하지 못했습니다.</string>
-    <string name="audio_follow_display_lyrics">Tokens</string>
-    <string name="audio_follow_display_data">데이터</string>
     <string name="audio_follow_view_hex">Hex</string>
     <string name="audio_follow_view_binary">Binary</string>
     <string name="audio_follow_view_morse">Morse</string>
@@ -169,19 +159,18 @@
     <string name="audio_player_detail_saved_sample_rate">샘플레이트</string>
     <string name="audio_player_detail_saved_file_size">파일 크기</string>
     <string name="audio_player_detail_saved_payload_bytes">페이로드 크기</string>
-    <string name="audio_player_detail_saved_payload_bytes_value">%1$d 바이트</string>
     <string name="audio_generated_input_source_manual">수동</string>
     <string name="audio_generated_input_source_sample">샘플</string>
     <string name="audio_flash_visualizer_mode_lanes">레인</string>
     <string name="audio_flash_visualizer_mode_pulse">펄스</string>
     <string name="audio_flash_visualizer_mode_pitch">피치</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. Do not translate flash/pro/ultra as ordinary adjectives. -->
-    <string name="transport_mode_flash_label">flash</string>
+    <string name="transport_mode_flash_label">Flash</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
-    <string name="transport_mode_pro_label">pro</string>
+    <string name="transport_mode_pro_label">Pro</string>
     <!-- CONTEXT: Transport mode name shown in tabs/chips. -->
-    <string name="transport_mode_ultra_label">ultra</string>
-    <string name="transport_mode_mini_label">mini</string>
+    <string name="transport_mode_ultra_label">Ultra</string>
+    <string name="transport_mode_mini_label">Mini</string>
     <string name="audio_transport_flash_hint">flash는 UTF-8 텍스트를 사용합니다.</string>
     <string name="audio_transport_flash_example">등지기들이 오래된 성문을 엽니다</string>
     <string name="audio_transport_pro_hint">pro는 ASCII 텍스트만 사용합니다.</string>
@@ -191,30 +180,9 @@
     <string name="audio_morse_speed_wpm10">10 WPM</string>
     <string name="audio_morse_speed_wpm15">15 WPM</string>
     <string name="audio_morse_speed_wpm20">20 WPM</string>
-    <string name="audio_morse_normalized_preview">정규화된 Morse: %1$s</string>
     <string name="audio_morse_unsupported_characters">지원되지 않는 Morse 문자: %1$s</string>
     <string name="audio_transport_ultra_example">등지기들이 오래된 성문을 엽니다</string>
-    <string name="audio_transport_mini_example">PRAISE THE OMNISSIAH</string>
-    <string name="audio_sample_thematic_2">종탑 깊은 곳에서 봉인된 엔진이 웅웅거리기 시작합니다</string>
-    <string name="audio_sample_thematic_3">일곱 번째 램프가 켜졌지만, 먼 쪽 성문은 여전히 침묵을 지킵니다</string>
-    <string name="audio_sample_thematic_4">잿빛 항구 너머로 순례선 한 척이 검은 바다를 건넙니다</string>
-    <string name="audio_sample_thematic_5">철제 종이 응답해도 외부 자물쇠는 여전히 버티고 있습니다</string>
-    <string name="audio_sample_thematic_long_1">종탑 장부에는 지붕 램프가 켜지기도 전인 새벽녘에 동쪽 화로가 응답했다고 기록되어 있습니다. 세 명의 관리인이 손으로 황동 바퀴를 돌리는 동안 위쪽 통풍구에서 그을음이 내려와 계단에 쌓였습니다. 봉인된 해치 뒤에서 낮고 일정한 웅웅거림이 들려왔고, 밤 근무 서기들이 그 리듬을 밀랍 판에 새기기 시작할 정도로 오랫동안 지속되었습니다. 마지막 음이 사라졌을 때 아무도 철제 빗장에 손을 대지 않았지만, 모든 목격자는 동일한 줄에 서명했습니다. 아래의 기계가 스스로 깨어났다고 말이죠.</string>
-    <string name="audio_sample_thematic_long_2">제2교대 근무 시간에 성문 램프를 정비하고, 외부 볼트를 다시 점검했으며, 체인 경첩의 그을음을 긁어냈습니다. 먼 복도에서 아무런 신호도 오지 않았지만, 전당 아래의 육중한 구동 장치가 미완성된 작업을 재개한 것처럼 석재 바닥이 짧은 간격으로 계속 떨렸습니다. 수위들은 물시계에 맞춰 각 진동을 측정했고, 서쪽 벽이 바람의 무게를 온전히 받을 때마다 일정한 패턴이 반복되는 것을 발견했습니다. 근무가 끝나기 전 내부 잠금장치 위에 새 밀랍을 눌러 봉인했으며, 성문 너머의 침묵은 이제 ‘무언가로 채워진 침묵’이라는 경고와 함께 보고가 마무리되었습니다.</string>
-    <string name="audio_sample_thematic_long_3">화로 연대기에는 연기 뒤에 쌓인 숯처럼 방 전체가 빛날 때까지 붉은 램프가 하나씩 올려졌다고 기록되어 있습니다. 마지막 사슬이 멈췄을 때 신호 서기들은 각 맥동을 밀랍 판에 기록했고, 위쪽 갤러리에서는 철제 갈고리가 긁히는 소리로 응답했습니다. 서까래를 통해 네 번의 느린 회신이 돌아왔는데, 매번 이전보다 약해졌지만 목소리를 전달한 벽이 어디인지에 대해서는 기록자 중 누구도 동의하지 않았습니다. 마지막 줄에는 다섯 번째 부름에 무엇이 응답할지 방 안의 누구도 듣고 싶어 하지 않았기에 새벽까지 종을 감지 않은 채로 두었다고 적혀 있습니다.</string>
-    <string name="audio_sample_thematic_long_4">잿빛 해안의 항해 기록에는 부서진 달과 화로 먼지로 흐려진 하늘 아래에서 밤에 바다를 건넌 이야기가 담겨 있습니다. 선체 램프는 덮개로 가려졌고, 해도실은 침묵을 지켰으며, 갑판 아래에서는 엔진 성소의 느린 박동만이 시간을 알렸습니다. 자정 무렵, 검은 파도 사이로 창백한 형체들이 움직이는 것이 목격된 후 조타수는 뱃머리를 3도 돌리라고 명령했지만, 난간까지 어떤 소리도 닿지 않았습니다. 아침이 되어 배는 다시 항구의 불빛을 찾았고, 마지막 기록에는 봉인된 상자 옆의 램프를 제외한 모든 램프를 감사의 뜻으로 다시 켰다고 적혀 있습니다.</string>
-    <string name="audio_sample_pro_2">SEAL THE OUTER LOCK</string>
-    <string name="audio_sample_pro_3">COPPER WARDENS STIR THE DRIVE</string>
-    <string name="audio_sample_pro_4">SEVENTH LAMP LIT GATE STILL SILENT</string>
-    <string name="audio_sample_pro_5">HOLD FORMATION BELOW IRON MASTS</string>
-    <string name="audio_sample_pro_long_1">BELL TOWER LEDGER. EAST FURNACE ANSWERED BEFORE DAWN. THREE ATTENDANTS TURNED THE BRASS WHEELS BY HAND WHILE SOOT FELL THROUGH THE UPPER VENTS. A LOW STEADY HUM CAME THROUGH THE SEALED HATCH. FINAL LINE STATES THE MACHINE BELOW WOKE OF ITS OWN ACCORD.</string>
-    <string name="audio_sample_pro_long_2">SECOND WATCH REPORT. GATEHOUSE LAMPS TRIMMED, OUTER BOLTS TESTED AGAIN, CHAIN HINGES SCRAPED CLEAN. NO SIGNAL CAME FROM THE FAR CORRIDOR, BUT THE FLOOR KEPT SHAKING IN SHORT INTERVALS ABOVE THE DRIVE HALL. FRESH WAX WAS PRESSED OVER THE INNER LOCK BEFORE DISMISSAL.</string>
-    <string name="audio_sample_pro_long_3">FURNACE CHRONICLE. RED LAMPS RAISED ONE BY ONE UNTIL THE CHAMBER GLOWED THROUGH THE SMOKE. SIGNAL CLERKS COPIED EACH PULSE INTO WAX TABLETS WHILE IRON HOOKS SCRAPED IN THE UPPER GALLERIES. FOUR SLOW RETURNS CAME BACK. BELLS LEFT UNWOUND UNTIL DAWN.</string>
-    <string name="audio_sample_pro_long_4">ASH COAST VOYAGE. HULL LAMPS HOODED, CHART ROOM SILENT, ENGINE SANCTUM MARKING THE HOURS BELOW DECK. PROW TURNED THREE DEGREES AFTER PALE SHAPES MOVED BETWEEN THE BLACK SWELLS. HARBOR LIGHTS RETURNED AT DAWN. ONE LAMP BESIDE THE SEALED COFFER STAYED DARK.</string>
-    <string name="status_ready_to_encode">텍스트를 입력하고 "생성"을 누르세요</string>
-    <string name="status_input_empty">입력 내용이 없습니다.</string>
-    <string name="status_mode_audio_generating">%1$s 오디오 생성 중…</string>
-    <string name="status_mode_audio_generating_progress">%1$s 오디오 생성 중… %2$d%%</string>
+    <string name="status_ready_to_encode">텍스트를 입력하고 \"생성\"을 누르세요</string>
     <string name="status_mode_audio_generating_preparing_input">%1$s 입력 준비 중…</string>
     <string name="status_mode_audio_generating_rendering_pcm">%1$s 오디오 생성 중…</string>
     <string name="status_mode_audio_generating_postprocessing">%1$s 오디오 다듬는 중…</string>
@@ -230,7 +198,6 @@
     <string name="status_playback_failed">재생 실패</string>
     <string name="status_mode_audio_decoding">%1$s 오디오 읽는 중…</string>
     <string name="status_mode_decode_completed">%1$s 읽기 완료</string>
-    <string name="status_current_mode_cleared">현재 오디오가 지워졌습니다</string>
     <string name="status_result_cleared">결과가 지워졌습니다</string>
     <string name="status_audio_saved">저장됨: %1$s</string>
     <string name="status_audio_save_failed">저장 실패</string>
@@ -260,19 +227,6 @@
     <string name="audio_info_flash_decode_path">디코드 경로</string>
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s개 샘플</string>
-    <string name="demo_hint_demo_mode_on">데모 모드가 켜졌습니다</string>
-    <string name="demo_hint_tab_audio">오디오로 전환됨</string>
-    <string name="demo_hint_tab_saved">저장됨으로 전환됨</string>
-    <string name="demo_hint_tab_settings">설정으로 전환됨</string>
-    <string name="demo_hint_generate_audio">오디오 생성</string>
-    <string name="demo_hint_decode_audio">오디오 디코드</string>
-    <string name="demo_hint_open_mini_player">mini 플레이어 열기</string>
-    <string name="demo_hint_switch_to_lyrics">Tokens로 전환됨</string>
-    <string name="demo_hint_switch_to_visual">비주얼로 전환됨</string>
-    <string name="demo_hint_play">재생 시작됨</string>
-    <string name="demo_hint_pause">재생 일시정지됨</string>
-    <string name="demo_hint_theme_changed">테마가 변경됨</string>
-    <string name="demo_hint_language_changed">언어가 바뀌고 샘플이 새로고침됨</string>
     <string name="audio_saved_audio_decode_loading_title">저장된 오디오 디코드 중…</string>
     <string name="audio_saved_audio_decode_loading_body">이 클립에서 텍스트와 타이밍 데이터를 추출하고 있습니다. 긴 오디오는 시간이 걸릴 수 있습니다.</string>
     <string name="audio_playback_view_mix">Mix</string>

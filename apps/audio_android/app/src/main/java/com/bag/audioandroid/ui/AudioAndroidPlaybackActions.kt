@@ -3,6 +3,8 @@ package com.bag.audioandroid.ui
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
+import com.bag.audioandroid.ui.model.PlaybackSpeedOption
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.util.safeDebugLog
 import kotlinx.coroutines.CoroutineScope
@@ -92,16 +94,23 @@ internal class AudioAndroidPlaybackActions(
         val source = current.currentPlaybackSource
         val sourceKey = playbackSourceCoordinator.sourceKey(source)
         val currentPlayback = current.currentPlayback
+        val transportMode =
+            current.currentPlaybackTransportMode
+                ?: when (source) {
+                    is AudioPlaybackSource.Generated -> source.mode
+                    is AudioPlaybackSource.Saved -> TransportModeOption.Flash
+                }
+        val resolvedPlaybackSpeed = PlaybackSpeedOption.coerceSpeedForMode(playbackSpeed, transportMode)
         safeDebugLog(
             PlaybackSpeedDiagTag,
-            "select source=$sourceKey requested=$playbackSpeed previous=${current.currentPlaybackSpeed} " +
+            "select source=$sourceKey requested=$playbackSpeed resolved=$resolvedPlaybackSpeed previous=${current.currentPlaybackSpeed} " +
                 "phase=${currentPlayback.phase} playing=${currentPlayback.isPlaying} " +
                 "sample=${currentPlayback.displayedSamples}/${currentPlayback.totalSamples}",
         )
         when (source) {
             is AudioPlaybackSource.Generated ->
                 sessionStateStore.updateSession(source.mode) {
-                    it.copy(playbackSpeed = playbackSpeed)
+                    it.copy(playbackSpeed = resolvedPlaybackSpeed)
                 }
 
             is AudioPlaybackSource.Saved ->
@@ -111,24 +120,34 @@ internal class AudioAndroidPlaybackActions(
                             ?.takeIf { it.item.itemId == source.itemId }
                             ?: return@update state
                     state.copy(
-                        selectedSavedAudio = selectedSavedAudio.copy(playbackSpeed = playbackSpeed),
+                        selectedSavedAudio = selectedSavedAudio.copy(playbackSpeed = resolvedPlaybackSpeed),
                     )
                 }
         }
         val updated = uiState.value
         safeDebugLog(
             PlaybackSpeedDiagTag,
-            "stateApplied source=$sourceKey requested=$playbackSpeed stored=${updated.currentPlaybackSpeed} " +
+            "stateApplied source=$sourceKey requested=$playbackSpeed resolved=$resolvedPlaybackSpeed " +
+                "stored=${updated.currentPlaybackSpeed} " +
                 "currentSource=${playbackSourceCoordinator.sourceKey(updated.currentPlaybackSource)}",
         )
         val applied =
             playbackCoordinator.setPlaybackSpeed(
                 sourceKey = sourceKey,
-                playbackSpeed = playbackSpeed,
+                playbackSpeed = resolvedPlaybackSpeed,
             )
+        val restarted =
+            if (!applied) {
+                commandActions.restartActivePlaybackForSpeedChange(
+                    source = source,
+                    wasPlaying = currentPlayback.isPlaying,
+                )
+            } else {
+                false
+            }
         safeDebugLog(
             PlaybackSpeedDiagTag,
-            "coordinatorApplied source=$sourceKey requested=$playbackSpeed applied=$applied",
+            "coordinatorApplied source=$sourceKey requested=$playbackSpeed resolved=$resolvedPlaybackSpeed applied=$applied restarted=$restarted",
         )
     }
 

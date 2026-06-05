@@ -70,5 +70,9 @@ class PlaybackSessionReducer(
             playback = playbackRuntimeGateway.stopped(session.playback),
         )
 
-    fun playingStatus(mode: TransportModeOption): UiText = UiText.Resource(R.string.status_playing_mode_audio, listOf(mode.wireName))
+    fun playingStatus(mode: TransportModeOption): UiText =
+        UiText.Resource(
+            R.string.status_playing_mode_audio,
+            listOf(mode.fixedEnglishLabel),
+        )
 }

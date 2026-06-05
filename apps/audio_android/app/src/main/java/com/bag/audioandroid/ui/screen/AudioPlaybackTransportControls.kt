@@ -295,10 +295,11 @@ internal fun AudioPlaybackTransportControls(
             showSpeedAdjustment = showSpeedAdjustment,
             onOpenAudioInfo = { showAudioInfo = true },
             onCyclePlaybackSpeed = {
-                onPlaybackSpeedSelected(PlaybackSpeedOption.nextSpeed(playbackSpeed))
+                onPlaybackSpeedSelected(PlaybackSpeedOption.nextSpeed(playbackSpeed, transportMode))
             },
             onToggleSpeedAdjustment = { showSpeedAdjustment = !showSpeedAdjustment },
             onPlaybackSpeedSelected = onPlaybackSpeedSelected,
+            transportMode = transportMode,
             bottomActions = bottomActions,
             contentColor = playerColors.neutralAction,
         )

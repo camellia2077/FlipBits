@@ -12,9 +12,9 @@ import com.bag.audioandroid.ui.LyricsNavigatorReadingModel
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
-import com.bag.audioandroid.ui.model.BrandThemeOption
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
-import com.bag.audioandroid.ui.model.DefaultCustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
+import com.bag.audioandroid.ui.model.DefaultCustomFactionThemeSettings
+import com.bag.audioandroid.ui.model.FactionThemeOption
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
 import com.bag.audioandroid.ui.model.MiniPlayerLeadingIcon
 import com.bag.audioandroid.ui.model.MiniPlayerSource
@@ -30,13 +30,13 @@ import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.screen.LONG_AUDIO_VISUALIZATION_SAMPLE_THRESHOLD
 import com.bag.audioandroid.ui.screen.formatDurationMillis
-import com.bag.audioandroid.ui.theme.DefaultBrandTheme
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
+import com.bag.audioandroid.ui.theme.DefaultFactionTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
 import com.bag.audioandroid.ui.theme.MaterialPalettes
-import com.bag.audioandroid.ui.theme.customBrandTheme
+import com.bag.audioandroid.ui.theme.customFactionTheme
 import com.bag.audioandroid.ui.theme.customMaterialPalette
-import com.bag.audioandroid.ui.theme.isCustomBrandThemeOptionId
+import com.bag.audioandroid.ui.theme.isCustomFactionThemeOptionId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 
 data class AudioAppUiState(
@@ -49,10 +49,10 @@ data class AudioAppUiState(
     val selectedPalette: PaletteOption = DefaultMaterialPalette,
     val selectedMaterialPaletteIdLight: String? = null,
     val selectedMaterialPaletteIdDark: String? = null,
-    val customMaterialThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomMaterialPaletteSettings),
-    val selectedBrandTheme: BrandThemeOption = DefaultBrandTheme,
-    val customBrandThemePresets: List<CustomBrandThemeSettings> = listOf(DefaultCustomBrandThemeSettings),
-    val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.BrandDualTone,
+    val customMaterialThemePresets: List<CustomFactionThemeSettings> = listOf(DefaultCustomMaterialPaletteSettings),
+    val selectedFactionTheme: FactionThemeOption = DefaultFactionTheme,
+    val customFactionThemePresets: List<CustomFactionThemeSettings> = listOf(DefaultCustomFactionThemeSettings),
+    val selectedThemeStyle: ThemeStyleOption = ThemeStyleOption.FactionTheme,
     val selectedThemeMode: ThemeModeOption = ThemeModeOption.FollowSystem,
     val isMaterialDarkThemeActive: Boolean = false,
     val isDemoModeEnabled: Boolean = false,
@@ -72,13 +72,13 @@ data class AudioAppUiState(
     val isConfigMaterialPurplesPaletteExpanded: Boolean = true,
     val isConfigMaterialNeutralsPaletteExpanded: Boolean = true,
     val isConfigSampleTextExpanded: Boolean = false,
-    val isConfigCustomBrandThemeExpanded: Boolean = false,
-    val isConfigSacredMachineBrandThemeExpanded: Boolean = false,
-    val isConfigAncientDynastyBrandThemeExpanded: Boolean = false,
-    val isConfigImmortalRotBrandThemeExpanded: Boolean = false,
-    val isConfigScarletCarnageBrandThemeExpanded: Boolean = false,
-    val isConfigExquisiteFallBrandThemeExpanded: Boolean = false,
-    val isConfigLabyrinthOfMutabilityBrandThemeExpanded: Boolean = false,
+    val isConfigCustomFactionThemeExpanded: Boolean = false,
+    val isConfigSacredMachineFactionThemeExpanded: Boolean = false,
+    val isConfigAncientDynastyFactionThemeExpanded: Boolean = false,
+    val isConfigImmortalRotFactionThemeExpanded: Boolean = false,
+    val isConfigScarletCarnageFactionThemeExpanded: Boolean = false,
+    val isConfigExquisiteFallFactionThemeExpanded: Boolean = false,
+    val isConfigLabyrinthOfMutabilityFactionThemeExpanded: Boolean = false,
     val isConfigDebugExpanded: Boolean = false,
     val isFlashVoicingEnabled: Boolean = true,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.Standard,
@@ -111,21 +111,21 @@ data class AudioAppUiState(
     val isExpandedQueueVisible: Boolean
         get() = playerShellState.isExpandedQueueVisible
 
-    val customBrandThemes: List<BrandThemeOption>
-        get() = customBrandThemePresets.map(::customBrandTheme)
+    val customFactionThemes: List<FactionThemeOption>
+        get() = customFactionThemePresets.map(::customFactionTheme)
 
-    val customMaterialThemeSettings: CustomBrandThemeSettings
+    val customMaterialThemeSettings: CustomFactionThemeSettings
         get() =
             customMaterialThemePresets
                 .firstOrNull { customMaterialPalette(it).id == selectedPalette.id }
                 ?: customMaterialThemePresets.first()
 
-    val activeBrandTheme: BrandThemeOption
+    val activeFactionTheme: FactionThemeOption
         get() =
-            if (isCustomBrandThemeOptionId(selectedBrandTheme.id)) {
-                customBrandThemes.firstOrNull { it.id == selectedBrandTheme.id } ?: customBrandThemes.first()
+            if (isCustomFactionThemeOptionId(selectedFactionTheme.id)) {
+                customFactionThemes.firstOrNull { it.id == selectedFactionTheme.id } ?: customFactionThemes.first()
             } else {
-                selectedBrandTheme
+                selectedFactionTheme
             }
 
     val currentSession: ModeAudioSessionState
@@ -310,7 +310,7 @@ data class AudioAppUiState(
                 is AudioPlaybackSource.Generated ->
                     UiText.Resource(
                         R.string.audio_decode_source_generated,
-                        listOf(source.mode.wireName),
+                        listOf(source.mode.fixedEnglishLabel),
                     )
                 is AudioPlaybackSource.Saved ->
                     UiText.Resource(

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.bag.audioandroid.ui.model.BrandThemeOption
+import com.bag.audioandroid.ui.model.FactionThemeOption
 
 @Immutable
 data class AudioEncodeGlyphColors(
@@ -28,11 +28,11 @@ val LocalAudioEncodeGlyphColors = staticCompositionLocalOf { DefaultAudioEncodeG
 @ReadOnlyComposable
 fun audioEncodeGlyphColors(): AudioEncodeGlyphColors = LocalAudioEncodeGlyphColors.current
 
-fun audioEncodeGlyphColorsForBrandTheme(theme: BrandThemeOption): AudioEncodeGlyphColors =
+fun audioEncodeGlyphColorsForFactionTheme(theme: FactionThemeOption): AudioEncodeGlyphColors =
     AudioEncodeGlyphColors(
-        // The encode glyph is part of the dual-tone surface language: the right split uses the
+        // The encode glyph is part of the faction theme surface language: the right split uses the
         // action/accent color, while the left split uses the dominant background color. Keep this
-        // generic so newly added dual-tone themes update the gear fill automatically.
+        // generic so newly added faction themes update the gear fill automatically.
         primarySplit = theme.secondaryColor,
         secondarySplit = theme.primaryColor,
         outline = theme.outlineColor,

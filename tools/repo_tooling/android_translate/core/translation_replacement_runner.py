@@ -4,6 +4,7 @@ import difflib
 from dataclasses import dataclass
 from pathlib import Path
 import sys
+from typing import Iterable
 
 from core.android_resource_smoke_check import run_android_resource_smoke_check_with_options
 from core.replacement_json_preflight import load_replacement_json_with_preflight
@@ -34,6 +35,7 @@ def configure_console_output() -> None:
 @dataclass(frozen=True)
 class ReplaceCommandResult:
     exit_code: int
+    json_path: str | None
     dir_name: str | None
     applied_replacements: int
     already_applied_count: int
@@ -42,11 +44,31 @@ class ReplaceCommandResult:
     failed_ambiguous_count: int
     failed_validation_count: int
     validation_error_count: int
+    write_completed: bool
+    write_ok: bool
     smoke_check_ran: bool
     smoke_check_ok: bool
     errors: tuple[str, ...]
+    touched_files: tuple[str, ...] = ()
+    applied_targets: tuple[str, ...] = ()
     auto_fix_applied: bool = False
     auto_fix_summary: str | None = None
+
+
+@dataclass(frozen=True)
+class ReplaceBatchCommandResult:
+    exit_code: int
+    file_count: int
+    processed_count: int
+    success_count: int
+    failure_count: int
+    write_completed_count: int
+    write_ok_count: int
+    smoke_check_requested: bool
+    smoke_check_ran: bool
+    smoke_check_ok: bool
+    results: tuple[ReplaceCommandResult, ...]
+    errors: tuple[str, ...] = ()
 
 
 SENTENCE_BREAK_CHARS = ".!?。！？;；\n"
@@ -141,11 +163,13 @@ def expand_to_sentence_boundary(
         end += 1
 
     return start, end
+
+
 def apply_translation_replacements(
     *,
     res_dir: Path | str = DEFAULT_RES_DIRECTORY,
     json_path: Path | str = DEFAULT_JSON_PATH,
-    run_smoke_check: bool = True,
+    run_smoke_check: bool = False,
     auto_fix_json: bool = False,
     quiet: bool = False,
     emit_text: bool = True,
@@ -159,6 +183,7 @@ def apply_translation_replacements(
             print(error, file=sys.stderr)
         return ReplaceCommandResult(
             exit_code=1,
+            json_path=str(json_path),
             dir_name=None,
             applied_replacements=0,
             already_applied_count=0,
@@ -167,6 +192,8 @@ def apply_translation_replacements(
             failed_ambiguous_count=0,
             failed_validation_count=0,
             validation_error_count=0,
+            write_completed=False,
+            write_ok=False,
             smoke_check_ran=False,
             smoke_check_ok=False,
             errors=(error,),
@@ -177,6 +204,7 @@ def apply_translation_replacements(
             print(error, file=sys.stderr)
         return ReplaceCommandResult(
             exit_code=1,
+            json_path=str(json_path),
             dir_name=None,
             applied_replacements=0,
             already_applied_count=0,
@@ -185,6 +213,8 @@ def apply_translation_replacements(
             failed_ambiguous_count=0,
             failed_validation_count=0,
             validation_error_count=0,
+            write_completed=False,
+            write_ok=False,
             smoke_check_ran=False,
             smoke_check_ok=False,
             errors=(error,),
@@ -197,6 +227,7 @@ def apply_translation_replacements(
             print(error, file=sys.stderr)
         return ReplaceCommandResult(
             exit_code=1,
+            json_path=str(json_path),
             dir_name=None,
             applied_replacements=0,
             already_applied_count=0,
@@ -205,6 +236,8 @@ def apply_translation_replacements(
             failed_ambiguous_count=0,
             failed_validation_count=0,
             validation_error_count=0,
+            write_completed=False,
+            write_ok=False,
             smoke_check_ran=False,
             smoke_check_ok=False,
             errors=(error,),
@@ -224,6 +257,7 @@ def apply_translation_replacements(
             print(error)
         return ReplaceCommandResult(
             exit_code=2,
+            json_path=str(json_path),
             dir_name=None,
             applied_replacements=0,
             already_applied_count=0,
@@ -232,6 +266,8 @@ def apply_translation_replacements(
             failed_ambiguous_count=0,
             failed_validation_count=1,
             validation_error_count=1,
+            write_completed=False,
+            write_ok=False,
             smoke_check_ran=False,
             smoke_check_ok=True,
             errors=(error,),
@@ -243,6 +279,7 @@ def apply_translation_replacements(
             print("No replacement entries found.")
         return ReplaceCommandResult(
             exit_code=0,
+            json_path=str(json_path),
             dir_name=replacement_batch.dir_name,
             applied_replacements=0,
             already_applied_count=0,
@@ -251,6 +288,8 @@ def apply_translation_replacements(
             failed_ambiguous_count=0,
             failed_validation_count=0,
             validation_error_count=0,
+            write_completed=True,
+            write_ok=True,
             smoke_check_ran=False,
             smoke_check_ok=True,
             errors=(),
@@ -286,6 +325,7 @@ def apply_translation_replacements(
                     print(error)
                 return ReplaceCommandResult(
                     exit_code=2,
+                    json_path=str(json_path),
                     dir_name=replacement_batch.dir_name if 'replacement_batch' in locals() else "values-ko",
                     applied_replacements=0,
                     already_applied_count=0,
@@ -294,6 +334,8 @@ def apply_translation_replacements(
                     failed_ambiguous_count=0,
                     failed_validation_count=len(guardrail_issues),
                     validation_error_count=len(guardrail_issues),
+                    write_completed=False,
+                    write_ok=False,
                     smoke_check_ran=False,
                     smoke_check_ok=True,
                     errors=(error,),
@@ -328,6 +370,7 @@ def apply_translation_replacements(
                 print(error)
         return ReplaceCommandResult(
             exit_code=2,
+            json_path=str(json_path),
             dir_name=replacement_batch.dir_name,
             applied_replacements=0,
             already_applied_count=0,
@@ -336,6 +379,8 @@ def apply_translation_replacements(
             failed_ambiguous_count=0,
             failed_validation_count=len(all_errors),
             validation_error_count=len(all_errors),
+            write_completed=False,
+            write_ok=False,
             smoke_check_ran=False,
             smoke_check_ok=True,
             errors=tuple(all_errors),
@@ -432,6 +477,13 @@ def apply_translation_replacements(
             quiet=True,
             emit_text=False,
         )
+    else:
+        touched_files = []
+
+    applied_targets = [
+        f"{replacement.xml_path}::{replacement.string_name}"
+        for replacement in applied_replacements
+    ]
 
     smoke_check_failed = False
     smoke_check_ran = run_smoke_check and applied_total > 0
@@ -444,6 +496,7 @@ def apply_translation_replacements(
                 print(error, file=sys.stderr)
             return ReplaceCommandResult(
                 exit_code=1,
+                json_path=str(json_path),
                 dir_name=replacement_batch.dir_name,
                 applied_replacements=applied_total,
                 already_applied_count=already_applied_total,
@@ -452,9 +505,13 @@ def apply_translation_replacements(
                 failed_ambiguous_count=failed_ambiguous_total,
                 failed_validation_count=len(all_errors),
                 validation_error_count=len(all_errors),
+                write_completed=True,
+                write_ok=len(all_errors) == 0,
                 smoke_check_ran=smoke_check_ran,
                 smoke_check_ok=False,
                 errors=tuple([*all_errors, error]),
+                touched_files=tuple(touched_files),
+                applied_targets=tuple(applied_targets),
                 auto_fix_applied=preflight_result.changed,
                 auto_fix_summary=preflight_result.fix_summary,
             )
@@ -475,6 +532,7 @@ def apply_translation_replacements(
                 print(error)
         return ReplaceCommandResult(
             exit_code=4 if smoke_check_failed else 2,
+            json_path=str(json_path),
             dir_name=replacement_batch.dir_name,
             applied_replacements=applied_total,
             already_applied_count=already_applied_total,
@@ -483,9 +541,13 @@ def apply_translation_replacements(
             failed_ambiguous_count=failed_ambiguous_total,
             failed_validation_count=len(all_errors),
             validation_error_count=len(all_errors),
+            write_completed=True,
+            write_ok=False,
             smoke_check_ran=smoke_check_ran,
             smoke_check_ok=not smoke_check_failed,
             errors=tuple(all_errors),
+            touched_files=tuple(touched_files),
+            applied_targets=tuple(applied_targets),
             auto_fix_applied=preflight_result.changed,
             auto_fix_summary=preflight_result.fix_summary,
         )
@@ -493,6 +555,7 @@ def apply_translation_replacements(
     if smoke_check_failed:
         return ReplaceCommandResult(
             exit_code=3,
+            json_path=str(json_path),
             dir_name=replacement_batch.dir_name,
             applied_replacements=applied_total,
             already_applied_count=already_applied_total,
@@ -501,9 +564,13 @@ def apply_translation_replacements(
             failed_ambiguous_count=failed_ambiguous_total,
             failed_validation_count=0,
             validation_error_count=0,
+            write_completed=True,
+            write_ok=True,
             smoke_check_ran=smoke_check_ran,
             smoke_check_ok=False,
             errors=("Smoke check failed: Android resource compilation did not pass after replacements.",),
+            touched_files=tuple(touched_files),
+            applied_targets=tuple(applied_targets),
             auto_fix_applied=preflight_result.changed,
             auto_fix_summary=preflight_result.fix_summary,
         )
@@ -512,6 +579,7 @@ def apply_translation_replacements(
         print("All replacements applied successfully.")
     return ReplaceCommandResult(
         exit_code=0,
+        json_path=str(json_path),
         dir_name=replacement_batch.dir_name,
         applied_replacements=applied_total,
         already_applied_count=already_applied_total,
@@ -520,9 +588,103 @@ def apply_translation_replacements(
         failed_ambiguous_count=failed_ambiguous_total,
         failed_validation_count=0,
         validation_error_count=0,
+        write_completed=True,
+        write_ok=True,
         smoke_check_ran=smoke_check_ran,
         smoke_check_ok=True,
         errors=(),
+        touched_files=tuple(touched_files),
+        applied_targets=tuple(applied_targets),
         auto_fix_applied=preflight_result.changed,
         auto_fix_summary=preflight_result.fix_summary,
+    )
+
+
+def run_replace_batch(
+    *,
+    res_dir: Path | str = DEFAULT_RES_DIRECTORY,
+    json_paths: Iterable[Path | str],
+    run_smoke_check: bool = False,
+    auto_fix_json: bool = False,
+    quiet: bool = False,
+    emit_text: bool = True,
+) -> ReplaceBatchCommandResult:
+    paths = [Path(path) for path in json_paths]
+    if not paths:
+        error = "replace-batch requires at least one replacement JSON path."
+        return ReplaceBatchCommandResult(
+            exit_code=2,
+            file_count=0,
+            processed_count=0,
+            success_count=0,
+            failure_count=1,
+            write_completed_count=0,
+            write_ok_count=0,
+            smoke_check_requested=run_smoke_check,
+            smoke_check_ran=False,
+            smoke_check_ok=not run_smoke_check,
+            results=(),
+            errors=(error,),
+        )
+
+    results: list[ReplaceCommandResult] = []
+    for index, path in enumerate(paths):
+        result = apply_translation_replacements(
+            res_dir=res_dir,
+            json_path=path,
+            run_smoke_check=False,
+            auto_fix_json=auto_fix_json,
+            quiet=quiet,
+            emit_text=emit_text,
+        )
+        results.append(result)
+        if emit_text and not quiet:
+            dir_label = result.dir_name or "<unknown-dir>"
+            print(
+                f"[replace-batch] {index + 1}/{len(paths)} {Path(path).name} -> "
+                f"{dir_label} exit={result.exit_code} write_ok={result.write_ok}"
+            )
+
+    any_applied = any(result.applied_replacements > 0 for result in results)
+    smoke_check_ran = False
+    smoke_check_ok = not run_smoke_check
+    batch_errors: list[str] = []
+    if run_smoke_check and any_applied:
+        smoke_check_ran = True
+        try:
+            smoke_result = run_android_resource_smoke_check_with_options(quiet=quiet)
+        except FileNotFoundError as exc:
+            smoke_check_ok = False
+            batch_errors.append(f"Smoke check setup error: {exc}")
+        else:
+            smoke_check_ok = smoke_result.ok
+            if not smoke_result.ok:
+                batch_errors.append(
+                    "Smoke check failed: Android resource compilation did not pass after batch replacements."
+                )
+
+    success_count = sum(1 for result in results if result.exit_code == 0)
+    failure_count = len(results) - success_count
+    write_completed_count = sum(1 for result in results if result.write_completed)
+    write_ok_count = sum(1 for result in results if result.write_ok)
+    if batch_errors:
+        exit_code = 3 if failure_count == 0 else 4
+    elif failure_count > 0:
+        exit_code = 2
+    else:
+        exit_code = 0
+
+    return ReplaceBatchCommandResult(
+        exit_code=exit_code,
+        file_count=len(paths),
+        processed_count=len(results),
+        success_count=success_count,
+        failure_count=failure_count,
+        write_completed_count=write_completed_count,
+        write_ok_count=write_ok_count,
+        smoke_check_requested=run_smoke_check,
+        smoke_check_ran=smoke_check_ran,
+        smoke_check_ok=smoke_check_ok,
+        results=tuple(results),
+        errors=tuple(batch_errors),
     )

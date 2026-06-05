@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import com.bag.audioandroid.R
-import com.bag.audioandroid.ui.model.CustomBrandThemeSettings
+import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.PaletteFamily
 import com.bag.audioandroid.ui.model.PaletteOption
 
@@ -111,8 +111,8 @@ internal fun darkSeed(
         tertiary = tertiary,
     )
 
-fun customMaterialPalette(settings: CustomBrandThemeSettings): PaletteOption {
-    val primary = brandThemeColorOrNull(settings.primaryHex) ?: Color(0xFF6750A4)
+fun customMaterialPalette(settings: CustomFactionThemeSettings): PaletteOption {
+    val primary = factionThemeColorOrNull(settings.primaryHex) ?: Color(0xFF6750A4)
     val seed = materialSingleColorSeed(primary)
     val secondary = seed.secondary
     val tertiary = seed.tertiary
@@ -175,8 +175,8 @@ fun customMaterialPaletteId(presetId: String): String =
 fun isCustomMaterialPaletteId(paletteId: String): Boolean =
     paletteId == CustomMaterialPaletteId || paletteId.startsWith("$CustomMaterialPaletteId$CustomMaterialPaletteIdSeparator")
 
-fun normalizeCustomMaterialThemeSettings(settings: CustomBrandThemeSettings): CustomBrandThemeSettings {
-    val normalizedPrimary = normalizeBrandThemeHex(settings.primaryHex) ?: DefaultCustomMaterialPaletteSettings.primaryHex
+fun normalizeCustomMaterialThemeSettings(settings: CustomFactionThemeSettings): CustomFactionThemeSettings {
+    val normalizedPrimary = normalizeFactionThemeHex(settings.primaryHex) ?: DefaultCustomMaterialPaletteSettings.primaryHex
     val seed = materialSingleColorSeed(parseMaterialHexColor(normalizedPrimary))
     return settings.copy(
         presetId = settings.presetId.ifBlank { DefaultCustomMaterialPaletteSettings.presetId },

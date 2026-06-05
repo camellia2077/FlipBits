@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="saved_audio_filter_empty">Nenhum resultado.</string>
-    <string name="library_title">Salvos</string>
     <string name="library_empty">Nada salvo ainda.</string>
     <string name="library_action_import">Importar</string>
     <string name="library_action_share">Compartilhar</string>

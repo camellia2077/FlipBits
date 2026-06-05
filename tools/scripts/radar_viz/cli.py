@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['axes.unicode_minus'] = False
 
 import data
-from radar import RadarChart
+from generator import RadarGenerator
 import exporter
 import legend
 import animator
@@ -35,16 +35,8 @@ def _resolve_langs(lang_arg: str) -> list[str]:
 
 def _render_single(mode_key: str, lang: str, out_dir: str):
     """渲染单个模式的单语言版本并保存。"""
-    mode_data = data.DATA_DICT[mode_key]
-    vals      = mode_data["vals"]
-
-    chart = RadarChart(vals)
-    chart.draw_armor()
-    chart.draw_grids()
-    chart.draw_data(vals)
-    chart.draw_labels(vals, mode_key, lang=lang)
-    exporter.save_and_title(chart.fig, mode_key, lang=lang, script_dir=out_dir)
-    chart.close()
+    with RadarGenerator(mode_key, lang=lang, out_dir=out_dir) as generator:
+        generator.generate_panel()
 
 
 # ==========================================
@@ -77,19 +69,10 @@ def cmd_generate_all(lang: str, out_dir: str):
     langs = _resolve_langs(lang)
     print(f"Generating all radar charts ({', '.join(l.upper() for l in langs)})...\n")
 
-    for mode_key, mode_data in tqdm(data.DATA_DICT.items(), desc="Generating Charts"):
-        vals = mode_data["vals"]
-
-        chart = RadarChart(vals)
-        chart.draw_armor()
-        chart.draw_grids()
-        chart.draw_data(vals)
-
+    for mode_key in tqdm(data.DATA_DICT.keys(), desc="Generating Charts"):
         for lg in langs:
-            chart.draw_labels(vals, mode_key, lang=lg)
-            exporter.save_and_title(chart.fig, mode_key, lang=lg, script_dir=out_dir)
-
-        chart.close()
+            with RadarGenerator(mode_key, lang=lg, out_dir=out_dir) as generator:
+                generator.generate_panel()
 
     for lg in langs:
         legend.generate_legend(lang=lg, out_dir=os.path.join(out_dir, lg))
@@ -133,7 +116,7 @@ def build_parser() -> argparse.ArgumentParser:
   python main.py --list
       查看所有模式与数字别名
 
-  python main.py --chart Steady --lang en
+  python main.py --chart Standard --lang en
   python main.py --chart 3 --lang zh --output ./out
       生成单个模式的雷达图
 
@@ -141,7 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
   python main.py --generate --lang en --output ./out
       生成全部模式的静态雷达图与图例
 
-  python main.py --animate Steady Litany --lang en
+  python main.py --animate Standard Litany --lang en
   python main.py --animate 1 3 --lang zh --output ./out
   python main.py --animate 0 9 --lang both --frames 90
       生成两个模式之间的过渡动画
