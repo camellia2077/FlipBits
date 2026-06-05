@@ -1,4 +1,4 @@
-import { DEFAULT_FRAME_SAMPLES, MINI_SPEED_FRAME_SAMPLES } from "./constants.js";
+import { DEFAULT_FRAME_SECONDS, MINI_SPEED_FRAME_SECONDS } from "./constants.js";
 
 export function stripNonAscii(text) {
   return Array.from(text).filter((char) => char.charCodeAt(0) <= 0x7f).join("");
@@ -16,10 +16,17 @@ export function sanitizeMiniInput(mode, text) {
   };
 }
 
-export function resolveFrameSamples(mode, miniSpeed) {
+function secondsToSamples(seconds, sampleRateHz) {
+  return Math.max(1, Math.round(seconds * sampleRateHz));
+}
+
+export function resolveFrameSamples(mode, miniSpeed, sampleRateHz) {
   if (mode === "mini") {
-    return MINI_SPEED_FRAME_SAMPLES[miniSpeed] ?? MINI_SPEED_FRAME_SAMPLES.wpm15;
+    return secondsToSamples(
+      MINI_SPEED_FRAME_SECONDS[miniSpeed] ?? MINI_SPEED_FRAME_SECONDS.wpm15,
+      sampleRateHz,
+    );
   }
 
-  return DEFAULT_FRAME_SAMPLES;
+  return secondsToSamples(DEFAULT_FRAME_SECONDS, sampleRateHz);
 }

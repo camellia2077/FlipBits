@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlipBits</title>
     <link rel="icon" type="image/svg+xml" href="./assets/flipbits-icon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260523b" />
+    <link rel="stylesheet" href="./styles.css?v=20260605a" />
   </head>
   <body>
     <main class="page-shell">
@@ -135,26 +135,59 @@
               <div class="generator-form">
                 <section class="workflow-section mode-options-panel">
                   <div class="mode-options-grid">
-                    <label class="field" id="flash-style-field">
-                      <span id="flash-style-label">Flash Style</span>
-                      <select id="flash-style-select">
-                        <option value="standard" selected>standard</option>
-                        <option value="litany">litany</option>
-                        <option value="hostility">hostility</option>
-                        <option value="collapse">collapse</option>
-                        <option value="zeal">zeal</option>
-                        <option value="void">void</option>
-                      </select>
-                    </label>
+                    <fieldset class="field option-field" id="flash-style-field">
+                      <legend id="flash-style-label">Flash Style</legend>
+                      <div class="flash-style-layout">
+                        <div class="option-grid option-grid-flash" role="radiogroup" aria-labelledby="flash-style-label">
+                          <label class="option-tile">
+                            <input id="flash-style-standard" name="flash-style" type="radio" value="standard" checked />
+                            <span>standard</span>
+                          </label>
+                          <label class="option-tile">
+                            <input id="flash-style-litany" name="flash-style" type="radio" value="litany" />
+                            <span>litany</span>
+                          </label>
+                          <label class="option-tile">
+                            <input id="flash-style-hostility" name="flash-style" type="radio" value="hostility" />
+                            <span>hostility</span>
+                          </label>
+                          <label class="option-tile">
+                            <input id="flash-style-collapse" name="flash-style" type="radio" value="collapse" />
+                            <span>collapse</span>
+                          </label>
+                          <label class="option-tile">
+                            <input id="flash-style-zeal" name="flash-style" type="radio" value="zeal" />
+                            <span>zeal</span>
+                          </label>
+                          <label class="option-tile">
+                            <input id="flash-style-void" name="flash-style" type="radio" value="void" />
+                            <span>void</span>
+                          </label>
+                        </div>
+                        <div class="flash-style-description-card" aria-live="polite">
+                          <span id="flash-style-description-label" class="flash-style-description-label">Style Description</span>
+                          <p id="flash-style-description" class="flash-style-description-copy">Stable, clear.</p>
+                        </div>
+                      </div>
+                    </fieldset>
 
-                    <label class="field" id="mini-speed-field" hidden>
-                      <span id="mini-speed-label">Morse Speed</span>
-                      <select id="mini-speed-select">
-                        <option value="wpm10">10 WPM</option>
-                        <option value="wpm15" selected>15 WPM</option>
-                        <option value="wpm20">20 WPM</option>
-                      </select>
-                    </label>
+                    <fieldset class="field option-field" id="mini-speed-field" hidden>
+                      <legend id="mini-speed-label">Morse Speed</legend>
+                      <div class="option-grid option-grid-mini" role="radiogroup" aria-labelledby="mini-speed-label">
+                        <label class="option-tile">
+                          <input id="mini-speed-wpm10" name="mini-speed" type="radio" value="wpm10" />
+                          <span>10 WPM</span>
+                        </label>
+                        <label class="option-tile">
+                          <input id="mini-speed-wpm15" name="mini-speed" type="radio" value="wpm15" checked />
+                          <span>15 WPM</span>
+                        </label>
+                        <label class="option-tile">
+                          <input id="mini-speed-wpm20" name="mini-speed" type="radio" value="wpm20" />
+                          <span>20 WPM</span>
+                        </label>
+                      </div>
+                    </fieldset>
                   </div>
                 </section>
 

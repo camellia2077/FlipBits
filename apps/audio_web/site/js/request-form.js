@@ -6,6 +6,10 @@ function setFieldVisibility(field, visible) {
   field.style.display = visible ? "" : "none";
 }
 
+function checkedValue(inputs, fallbackValue = "") {
+  return inputs.find((input) => input.checked)?.value ?? fallbackValue;
+}
+
 export function syncModeFields(elements, ui, mode) {
   setFieldVisibility(elements.flashStyleField, mode === "flash");
   setFieldVisibility(elements.miniSpeedField, mode === "mini");
@@ -25,13 +29,14 @@ export function sanitizeModeText(elements, mode) {
   return true;
 }
 
-export function readEncodeRequest(elements, mode) {
+export function readEncodeRequest(elements, mode, sampleRateHz = DEFAULT_SAMPLE_RATE_HZ) {
+  const miniSpeed = checkedValue(elements.miniSpeedInputs, "wpm15");
   return {
     text: elements.inputText.value,
     mode,
-    flashStyle: elements.flashStyleSelect.value,
-    miniSpeed: elements.miniSpeedSelect.value,
-    sampleRateHz: DEFAULT_SAMPLE_RATE_HZ,
-    frameSamples: resolveFrameSamples(mode, elements.miniSpeedSelect.value),
+    flashStyle: checkedValue(elements.flashStyleInputs, "standard"),
+    miniSpeed,
+    sampleRateHz,
+    frameSamples: resolveFrameSamples(mode, miniSpeed, sampleRateHz),
   };
 }

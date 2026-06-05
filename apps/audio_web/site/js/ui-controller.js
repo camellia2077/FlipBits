@@ -2,14 +2,14 @@ import { ENCODE_PROGRESS_PHASES } from "./constants.js";
 import { TRANSLATIONS, getTranslation } from "./i18n.js";
 
 function appendAboutParagraphContent(element, paragraph) {
-  const normalized = paragraph.replaceAll("`flash`", "flash");
-  const segments = normalized.split(/(flash)/g);
+  const normalized = paragraph.replaceAll("`Flash`", "Flash");
+  const segments = normalized.split(/(Flash)/g);
 
   for (const segment of segments) {
     if (!segment) {
       continue;
     }
-    if (segment === "flash") {
+    if (segment === "Flash") {
       const token = document.createElement("strong");
       token.className = "about-mode-token";
       token.textContent = segment;
@@ -42,6 +42,10 @@ export class UiController {
     this.elements.inputText.placeholder = copy.inputPlaceholder;
     this.elements.modeSummaryTitle.textContent = getTranslation(this.currentLocale, "mode.summaryTitle");
     this.elements.flashStyleLabel.textContent = copy.flashStyleLabel;
+    this.elements.flashStyleDescriptionLabel.textContent = getTranslation(
+      this.currentLocale,
+      "flashStyleDescriptionLabel",
+    );
     this.elements.miniSpeedLabel.textContent = copy.miniSpeedLabel;
     this.elements.generateButton.textContent = copy.generateButton;
     this.elements.downloadLink.textContent = copy.downloadLink;
@@ -52,6 +56,7 @@ export class UiController {
     this.elements.resultDurationLabel.textContent = getTranslation(this.currentLocale, "result.duration");
     this.elements.resultSampleRateLabel.textContent = getTranslation(this.currentLocale, "result.sampleRate");
     this.renderModeCards();
+    this.renderFlashStyleDescription();
     this.renderStatus();
     this.renderProgress();
     this.renderResultSummary();
@@ -111,6 +116,15 @@ export class UiController {
     this.elements.modeCardFlash.classList.toggle("is-active", mode === "flash");
     this.elements.modeCardPro.classList.toggle("is-active", mode === "pro");
     this.elements.modeCardUltra.classList.toggle("is-active", mode === "ultra");
+  }
+
+  renderFlashStyleDescription() {
+    const selectedStyle =
+      this.elements.flashStyleInputs.find((input) => input.checked)?.value ?? "standard";
+    this.elements.flashStyleDescription.textContent = getTranslation(
+      this.currentLocale,
+      `flashStyle.description.${selectedStyle}`,
+    );
   }
 
   setStatusKey(key, params = {}) {

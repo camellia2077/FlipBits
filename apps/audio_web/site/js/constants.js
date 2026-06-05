@@ -1,10 +1,10 @@
 export const DEFAULT_SAMPLE_RATE_HZ = 44100;
-export const DEFAULT_FRAME_SAMPLES = 2205;
+export const DEFAULT_FRAME_SECONDS = 0.05;
 
-export const MINI_SPEED_FRAME_SAMPLES = {
-  wpm10: 5292,
-  wpm15: 3528,
-  wpm20: 2646,
+export const MINI_SPEED_FRAME_SECONDS = {
+  wpm10: 0.12,
+  wpm15: 0.08,
+  wpm20: 0.06,
 };
 
 export const MODE_OPTIONS = [

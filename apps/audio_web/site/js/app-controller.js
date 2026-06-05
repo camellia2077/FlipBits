@@ -1,5 +1,6 @@
 import { pcm16ToWavBlob } from "./audio-utils.js";
 import { resolveInitialLocale } from "./browser-locale.js";
+import { DEFAULT_SAMPLE_RATE_HZ } from "./constants.js";
 import { readEncodeRequest, sanitizeModeText, syncModeFields } from "./request-form.js";
 import { buildResultSummaryViewModel } from "./result-summary-view-model.js";
 
@@ -13,6 +14,7 @@ export class AppController {
     this.sampleController = sampleController;
     this.sampleView = sampleView;
     this.currentAudioUrl = null;
+    this.audioContext = null;
     this.currentMode = DEFAULT_MODE;
     this.isGenerating = false;
   }
@@ -74,6 +76,12 @@ export class AppController {
       }
     });
 
+    for (const input of this.elements.flashStyleInputs) {
+      input.addEventListener("change", () => {
+        this.ui.renderFlashStyleDescription();
+      });
+    }
+
     this.elements.generateButton.addEventListener("click", () => {
       void this.generateAudio();
     });
@@ -115,6 +123,15 @@ export class AppController {
     this.elements.player.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  resolvePlaybackSampleRateHz() {
+    const AudioContextClass = globalThis.AudioContext ?? globalThis.webkitAudioContext;
+    if (!AudioContextClass) {
+      return DEFAULT_SAMPLE_RATE_HZ;
+    }
+    this.audioContext ??= new AudioContextClass();
+    return this.audioContext.sampleRate || DEFAULT_SAMPLE_RATE_HZ;
+  }
+
   async applyMode(mode) {
     if (!mode) {
       return;
@@ -130,7 +147,8 @@ export class AppController {
   }
 
   async generateAudio() {
-    const request = readEncodeRequest(this.elements, this.currentMode);
+    const sampleRateHz = this.resolvePlaybackSampleRateHz();
+    const request = readEncodeRequest(this.elements, this.currentMode, sampleRateHz);
     if (!request.text.trim()) {
       this.ui.setStatusKey("validation.emptyText");
       return;
