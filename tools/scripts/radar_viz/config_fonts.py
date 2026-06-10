@@ -17,19 +17,6 @@ FONT_ZH_PATH = r"C:\Users\17596\Downloads\Noto_Sans_SC\static\NotoSansSC-Bold.tt
 # [ 字体大小配置 - Font Size Configuration ]
 # ==========================================
 
-
-
-# 数值变大：标题向上移（远离图表中心）
-# 数值变小：标题向下移（靠近图表中心）
-# 1.0是标题文本正好在八边形线段上方
-SIZE_RADAR_TITLE_ZH = 56    # 中文主标题大小
-POS_Y_RADAR_TITLE_ZH = 1.1 # 中文主标题垂直位置
-
-SIZE_RADAR_TITLE_EN = 30    # 英文主标题大小
-POS_Y_RADAR_TITLE_EN = 1.12 # 英文主标题垂直位置
-
-
-# 2. 图例说明书 (Legend Panel)
 SIZE_LEGEND_TITLE_ZH = 32  # 中文图例主标题
 SIZE_LEGEND_LABEL_ZH = 30  # 中文图例维度标签
 SIZE_LEGEND_DESC_ZH = 20   # 中文图例说明正文
@@ -74,6 +61,18 @@ RADAR_LABEL_RADIUS_OFFSETS_ZH = {
     PARSING_DIFFICULTY:      0.50, # 解析难度
 }
 
+# --- 左右微调（X 轴偏移：正值向右，负值向左） ---
+RADAR_LABEL_X_OFFSETS_ZH = {
+    TRANSMISSION_SPEED:      0.0,
+    ENCODING_EFFICIENCY:     0.0,
+    TRANSMISSION_STABILITY:  0.0,
+    COMPATIBILITY:           0.0,
+    PARSING_DIFFICULTY:      0.0,
+    ELECTRONIC_FEEL:         0.0,
+    EMOTIONAL_RICHNESS:      0.0,
+    SENSE_OF_RITUAL:         0.0,
+}
+
 RADAR_LABEL_ANGLE_OFFSETS_ZH = {
     TRANSMISSION_SPEED: 0.0, ENCODING_EFFICIENCY: 0.0, TRANSMISSION_STABILITY: 0.0,
     COMPATIBILITY: 0.0, PARSING_DIFFICULTY: 0.0, ELECTRONIC_FEEL: 0.0,
@@ -82,17 +81,43 @@ RADAR_LABEL_ANGLE_OFFSETS_ZH = {
 
 
 
-SIZE_RADAR_LABEL_EN = 24    # 英文维度标签大小
+SIZE_RADAR_LABEL_EN = 56    # 英文维度标签大小
 # --- 英文版微调 (English Offsets) ---
+# 值增大：远离圆心；值减小：靠近圆心
 RADAR_LABEL_RADIUS_OFFSETS_EN = {
-    TRANSMISSION_SPEED:      -0.10,
+    
     ENCODING_EFFICIENCY:      0.40,
     TRANSMISSION_STABILITY:   0.40,
-    COMPATIBILITY:           -0.10,
-    PARSING_DIFFICULTY:      -0.10,
+
     ELECTRONIC_FEEL:          0.40,
     EMOTIONAL_RICHNESS:       0.40,
-    SENSE_OF_RITUAL:         -0.10,
+    
+    # --- 垂直维度 (Vertical) ---
+    # 上
+    TRANSMISSION_SPEED:      0.10,
+    SENSE_OF_RITUAL:         0.10,
+    # 下
+    COMPATIBILITY:           0.2,
+    PARSING_DIFFICULTY:      0.2,
+
+}
+
+# --- 左右微调（X 轴偏移：正值向右，负值向左） ---
+RADAR_LABEL_X_OFFSETS_EN = {
+    
+    ENCODING_EFFICIENCY:     0.0,
+    TRANSMISSION_STABILITY:  0.0,
+
+    ELECTRONIC_FEEL:         0.0,
+    EMOTIONAL_RICHNESS:      0.0,
+    
+# --- 垂直维度 (Vertical) ---
+    # 上
+    TRANSMISSION_SPEED:      -1.0,
+    SENSE_OF_RITUAL:         1.0,
+    # 下
+    COMPATIBILITY:           -2.0,#compatibility
+    PARSING_DIFFICULTY:      2.0,# Complexity
 }
 
 RADAR_LABEL_ANGLE_OFFSETS_EN = {

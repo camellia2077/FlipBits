@@ -22,8 +22,6 @@ EXPORT_DPI_LEGEND = 300        # 导出分辨率
 # [ 维度常量映射 ] - 8 bits = 1 byte
 # ==========================================
 # 布局逻辑：左脑机理 vs 右脑感知 (Rational Left vs Emotional Right)
-# 设计意图：从大众传播的文化符号出发，"左脑理性、右脑感性"能让观众以极低的理解成本
-#           get 到雷达图的对抗张力。
 # 左半球 (Machine/Rational): 负责客观的数据量化
 # 右半球 (Spirit/Emotional): 负责主观的听感与叙事评价
 
@@ -40,14 +38,14 @@ SENSE_OF_RITUAL         = 7  # 仪式感 (Right-Top)
 # [ 维度标题定义 ]
 # ==========================================
 LABELS_EN = np.array([
-    'Transmission Speed',
-    'Encoding Efficiency',
-    'Transmission Stability',
+    'Speed',
+    'Efficiency',
+    'Stability',
     'Compatibility',
-    'Parsing Difficulty',
-    'Electronic Feel',
-    'Emotional Richness',
-    'Sense of Ritual'
+    'Complexity',
+    'Digital',
+    'Emotion',
+    'Ritual'
 ])
 
 LABELS_ZH = np.array([
@@ -62,14 +60,14 @@ LABELS_ZH = np.array([
 ])
 
 DESC_EN = {
-    'Transmission Speed': 'Throughput & Physical Layer Baud Rate',
-    'Encoding Efficiency': 'Effective Bits per Symbol',
-    'Transmission Stability': 'Signal Continuity, Robustness & Jitter Resistance',
+    'Speed': 'Throughput & Physical Layer Baud Rate',
+    'Efficiency': 'Effective Bits per Symbol',
+    'Stability': 'Signal Continuity, Robustness & Jitter Resistance',
     'Compatibility': 'Strictness of Charset & Payload Constraints',
-    'Parsing Difficulty': 'Human or Machine Decoding Complexity',
-    'Electronic Feel': 'Degree of Digitalization & Mechanical Variance',
-    'Emotional Richness': 'Emotional Depth & Spectral Expression',
-    'Sense of Ritual': 'Structural Rhythm, Cadence & Formatting'
+    'Complexity': 'Human or Machine Decoding Complexity',
+    'Digital': 'Degree of Digitalization & Mechanical Variance',
+    'Emotion': 'Emotional Depth & Spectral Expression',
+    'Ritual': 'Structural Rhythm, Cadence & Formatting'
 }
 
 DESC_ZH = {

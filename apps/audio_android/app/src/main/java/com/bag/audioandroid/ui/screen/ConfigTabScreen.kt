@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -104,6 +103,8 @@ fun ConfigTabScreen(
     onDebugExpandedChanged: (Boolean) -> Unit,
     isDemoModeEnabled: Boolean,
     onDemoModeEnabledChange: (Boolean) -> Unit,
+    isDualThemeAnimationEnabled: Boolean,
+    onDualThemeAnimationEnabledChange: (Boolean) -> Unit,
     isSampleAutoFillEnabled: Boolean,
     onSampleAutoFillEnabledChange: (Boolean) -> Unit,
     isSampleDecorationEnabled: Boolean,
@@ -212,15 +213,15 @@ fun ConfigTabScreen(
             ) {
                 ExpandableCardHeader(
                     accentTokens = accentTokens,
-                    title = "Debug",
-                    subtitle = "Demo playback aids and visual diagnostics.",
+                    title = stringResource(R.string.config_debug_title),
+                    subtitle = stringResource(R.string.config_debug_subtitle),
                     expanded = isDebugExpanded,
                     onToggleExpanded = { onDebugExpandedChanged(!isDebugExpanded) },
                     contentDescription =
                         if (isDebugExpanded) {
-                            "Collapse debug settings"
+                            stringResource(R.string.config_debug_collapse)
                         } else {
-                            "Expand debug settings"
+                            stringResource(R.string.config_debug_expand)
                         },
                 )
                 if (isDebugExpanded) {
@@ -233,10 +234,10 @@ fun ConfigTabScreen(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
-                            Text("Demo mode", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.config_demo_mode_title), fontWeight = FontWeight.SemiBold)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    "Show tap feedback and key action hints for recording.",
+                                    stringResource(R.string.config_demo_mode_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
@@ -255,7 +256,7 @@ fun ConfigTabScreen(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
-                            Text("Visual perf overlay", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.config_visual_perf_overlay_title), fontWeight = FontWeight.SemiBold)
                         }
                         IconButton(
                             onClick = { onFlashVisualPerfOverlayEnabledChange(!isFlashVisualPerfOverlayEnabled) },
@@ -277,6 +278,14 @@ fun ConfigTabScreen(
                             )
                         }
                     }
+                    DebugAnimationSection(
+                        accentTokens = accentTokens,
+                        selectedThemeStyle = selectedThemeStyle,
+                        factionThemes = factionThemes,
+                        selectedFactionTheme = selectedFactionTheme,
+                        isDualThemeAnimationEnabled = isDualThemeAnimationEnabled,
+                        onDualThemeAnimationEnabledChange = onDualThemeAnimationEnabledChange,
+                    )
                 }
             }
         }

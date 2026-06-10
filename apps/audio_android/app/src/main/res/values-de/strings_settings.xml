@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">Block %1$d enthält ein nicht unterstütztes Feld: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">Block %1$d enthält %2$s mehrfach.</string>
     <string name="config_custom_theme_import_error_missing_field">In Block %1$d fehlt %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">Block %1$d enthält eine ungültige Hex-Farbe für %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Block %1$d enthält eine ungültige Hex color für %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Block %1$d verwendet Felder für benutzerdefinierte Fraktionsthemen. Importieren Sie ihn stattdessen über benutzerdefinierte Fraktionsthemen.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Block %1$d verwendet Felder für benutzerdefinierte Farben. Importieren Sie ihn stattdessen über benutzerdefinierte Farben.</string>
     <string name="config_custom_theme_import_field_name">Name</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">Kontur</string>
     <string name="config_saved_playback_data_subtitle">Hält Textfolge und erweiterte Visuals für in der App gespeichertes Audio bereit.</string>
     <string name="config_saved_playback_data_title">Wiedergabedetails speichern</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode und visuelle Diagnose.</string>
+    <string name="config_debug_expand">Debug-Einstellungen erweitern</string>
+    <string name="config_debug_collapse">Debug-Einstellungen reduzieren</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Zeigt Tipp-Hinweise für Aufnahmen.</string>
+    <string name="config_visual_perf_overlay_title">Visual-Perf-Overlay</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Führt die Zahnradvorschau für eine feste Zeit aus.</string>
+    <string name="config_animation_duration_label">Sekunden</string>
+    <string name="config_animation_start">Start</string>
+    <string name="config_animation_stop">Stopp</string>
+    <string name="config_animation_mode_title">Animation-Modus</string>
+    <string name="config_animation_mode_single">Ein Thema</string>
+    <string name="config_animation_mode_dual">Zwei Themen</string>
+    <string name="config_animation_theme_label">Thema</string>
+    <string name="config_animation_dual_theme_title">Zwei Themenfarben</string>
+    <string name="config_animation_first_part_label">Erster Teil</string>
+    <string name="config_animation_theme_a_label">Thema A</string>
+    <string name="config_animation_theme_b_label">Thema B</string>
 </resources>

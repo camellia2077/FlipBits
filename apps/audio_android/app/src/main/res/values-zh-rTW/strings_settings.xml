@@ -15,7 +15,7 @@
     <string name="config_language_korean">한국어</string>
     <string name="config_language_french">Français</string>
     <string name="config_language_italian">Italiano</string>
-    <string name="config_language_polish">波蘭語</string>
+    <string name="config_language_polish">Polski</string>
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">展開語言設定</string>
     <string name="config_theme_mode_title">主題模式</string>
@@ -235,7 +235,7 @@
     <string name="config_custom_theme_import_error_unknown_field">第 %1$d 組包含不支援的欄位：%2$s。</string>
     <string name="config_custom_theme_import_error_duplicate_field">第 %1$d 組重複了 %2$s。</string>
     <string name="config_custom_theme_import_error_missing_field">第 %1$d 組缺少 %2$s。</string>
-    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 組中的 %2$s 十六進位色彩無效：%3$s。</string>
+    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 組中的 %2$s Hex 色彩無效：%3$s。</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">第 %1$d 組使用的是自訂陣營主題欄位，請改從自訂陣營主題匯入。</string>
     <string name="config_custom_theme_import_error_wrong_target_material">第 %1$d 組使用的是自訂顏色欄位，請改從自訂顏色匯入。</string>
     <string name="config_custom_theme_import_field_name">名稱</string>
@@ -244,4 +244,24 @@
     <string name="config_custom_theme_import_field_outline">描邊</string>
     <string name="config_saved_playback_data_subtitle">讓 App 內儲存的音訊隨時可用文字跟隨和強化視覺效果。</string>
     <string name="config_saved_playback_data_title">儲存播放詳細資料</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode 與視覺診斷。</string>
+    <string name="config_debug_expand">展開 Debug 設定</string>
+    <string name="config_debug_collapse">收合 Debug 設定</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">顯示錄製用點按提示。</string>
+    <string name="config_visual_perf_overlay_title">視覺效能疊層</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">以固定時間執行齒輪預覽。</string>
+    <string name="config_animation_duration_label">秒數</string>
+    <string name="config_animation_start">開始</string>
+    <string name="config_animation_stop">停止</string>
+    <string name="config_animation_mode_title">Animation 模式</string>
+    <string name="config_animation_mode_single">單主題</string>
+    <string name="config_animation_mode_dual">雙主題</string>
+    <string name="config_animation_theme_label">主題</string>
+    <string name="config_animation_dual_theme_title">雙主題顏色</string>
+    <string name="config_animation_first_part_label">前半段</string>
+    <string name="config_animation_theme_a_label">主題A</string>
+    <string name="config_animation_theme_b_label">主題B</string>
 </resources>

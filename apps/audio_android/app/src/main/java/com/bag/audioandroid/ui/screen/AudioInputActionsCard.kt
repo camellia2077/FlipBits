@@ -158,8 +158,11 @@ internal fun AudioInputActionsCard(
                 }
 
                 AudioEncodeStatusSection(
+                    glyphProgressDisplay =
+                        encodeProgressDisplay.toGlyphProgressDisplayModel(
+                            isEncodingBusy = renderState.isEncodingBusy,
+                        ),
                     encodeProgressDisplay = encodeProgressDisplay,
-                    isEncodingBusy = renderState.isEncodingBusy,
                 )
 
                 if (renderState.isEncodingBusy) {

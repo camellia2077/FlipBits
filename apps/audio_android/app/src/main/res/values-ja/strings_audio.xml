@@ -114,12 +114,12 @@
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">バイト完了</string>
     <!-- CONTEXT: Teaching text in the Pro visualizer. Keep Token / byte / ASCII protocol terms stable and concise. -->
-    <string name="audio_pro_visual_token_mapping">トークン #%1$d \"%2$s\" -&gt; バイト %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; バイト %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">次のシンボル周波数: %1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">これは2番目のニブルです。終了後、プレイヤーは次のバイトに進みます。</string>
     <string name="audio_pro_visual_ascii_byte">ASCIIバイト %1$d</string>
-    <string name="audio_pro_visual_token_byte">トークン #%1$d • バイト %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_token_byte">Token #%1$d • バイト %2$d/%3$d</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">バイト位置</string>
     <string name="audio_pro_visual_then">その後</string>
     <string name="audio_info_dialog_title">情報</string>
@@ -214,7 +214,7 @@
     <string name="audio_input_encoding_rules_title">入力ルール</string>
     <string name="audio_input_encoding_rules">入力ルール</string>
     <string name="audio_input_encoding_rules_done">完了</string>
-    <string name="audio_input_encoding_rules_pro">Pro は ASCII テキストのみ対応しています。CJK テキスト、絵文字、多くのアクセント付き文字などの非 ASCII 文字は pro ではエンコードできません。</string>
+    <string name="audio_input_encoding_rules_pro">Pro は ASCII テキストのみ対応しています。CJK テキスト、Emoji、多くのアクセント付き文字などの非 ASCII 文字は pro ではエンコードできません。</string>
     <string name="audio_input_encoding_rules_unrestricted">このモードは現在のテキストを UTF-8/プレーンテキストのバイトとして扱います。Mini と pro にはより厳しい入力規則があります。</string>
     <string name="audio_input_encoding_rules_mini">Mini は A-Z、0-9、スペース、一般的な Morse 句読点に対応しています。小文字は大文字としてエンコードされ、連続するスペースはまとめられます。</string>
     <string name="audio_pro_unsupported_characters">pro で未対応の文字: %1$s</string>
@@ -233,4 +233,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">縦向き</string>
     <string name="audio_morse_visualizer_mode_horizontal">横向き</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

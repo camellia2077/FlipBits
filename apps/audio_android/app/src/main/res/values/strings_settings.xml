@@ -28,7 +28,7 @@
     <!-- CONTEXT: Language picker option label for Italian. This is the native language name shown inside the app language list. -->
     <string name="config_language_italian">Italiano</string>
     <!-- CONTEXT: Language picker option label for Polish. This is the language name shown inside the app language list. -->
-    <string name="config_language_polish">Polish</string>
+    <string name="config_language_polish">Polski</string>
     <!-- CONTEXT: Language picker option label for the custom High Gothic locale. Keep this stylized display name rather than translating it as ordinary prose. -->
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Expand language settings</string>
@@ -351,4 +351,44 @@
     <string name="config_custom_theme_import_field_outline">outline</string>
     <string name="config_saved_playback_data_subtitle">Keep text follow and enhanced visuals ready for audio saved in the app.</string>
     <string name="config_saved_playback_data_title">Save playback details</string>
+    <!-- CONTEXT: Settings card title for developer-facing diagnostics. Keep Debug as the exact English term in every locale. -->
+    <string name="config_debug_title">Debug</string>
+    <!-- CONTEXT: Short subtitle under the Debug settings card title. Keep Demo mode as the exact English term in every locale. -->
+    <string name="config_debug_subtitle">Demo mode and visual diagnostics.</string>
+    <!-- CONTEXT: Accessibility/action label for expanding the Debug settings card. Keep Debug as the exact English term in every locale. -->
+    <string name="config_debug_expand">Expand Debug settings</string>
+    <!-- CONTEXT: Accessibility/action label for collapsing the Debug settings card. Keep Debug as the exact English term in every locale. -->
+    <string name="config_debug_collapse">Collapse Debug settings</string>
+    <!-- CONTEXT: Toggle row title in Settings. Keep Demo mode as the exact English term in every locale. -->
+    <string name="config_demo_mode_title">Demo mode</string>
+    <!-- CONTEXT: Short helper text under the Demo mode toggle in Settings. Keep Demo mode as the exact English term in every locale if repeated. -->
+    <string name="config_demo_mode_subtitle">Show tap hints for recording.</string>
+    <!-- CONTEXT: Toggle row title in Settings for the optional performance overlay. Keep it compact. -->
+    <string name="config_visual_perf_overlay_title">Visual perf overlay</string>
+    <!-- CONTEXT: Small section title in the Debug settings card for the gear preview timer. Keep Animation as the exact English term in every locale. -->
+    <string name="config_animation_title">Animation</string>
+    <!-- CONTEXT: Short helper text under the Animation debug section. It explains that the gear preview runs for a fixed duration. -->
+    <string name="config_animation_subtitle">Run the gear preview for a fixed time.</string>
+    <!-- CONTEXT: Text field label in the Animation debug section for the preview duration in seconds. Keep it very short. -->
+    <string name="config_animation_duration_label">Seconds</string>
+    <!-- CONTEXT: Text field label in the Animation debug section for how many seconds the first theme color should stay active before switching to the second theme. Keep it short. -->
+    <string name="config_animation_first_part_label">First part</string>
+    <!-- CONTEXT: Short label in the Animation debug section for the first faction theme color selection. Keep it compact. -->
+    <string name="config_animation_theme_a_label">Theme A</string>
+    <!-- CONTEXT: Short label in the Animation debug section for the second faction theme color selection. Keep it compact. -->
+    <string name="config_animation_theme_b_label">Theme B</string>
+    <!-- CONTEXT: Button label in the Animation debug section that starts the timed gear preview. Keep it compact. -->
+    <string name="config_animation_start">Start</string>
+    <!-- CONTEXT: Button label in the Animation debug section that stops the timed gear preview early. Keep it compact. -->
+    <string name="config_animation_stop">Stop</string>
+    <!-- CONTEXT: Short section label in the Animation debug section for choosing between the one-theme preview and the two-theme preview. Keep it compact. -->
+    <string name="config_animation_mode_title">Animation mode</string>
+    <!-- CONTEXT: Segmented option in the Animation debug section for previewing a single theme for the full duration. Keep it compact. -->
+    <string name="config_animation_mode_single">One theme</string>
+    <!-- CONTEXT: Segmented option in the Animation debug section for previewing two themes in sequence. Keep it compact. -->
+    <string name="config_animation_mode_dual">Two themes</string>
+    <!-- CONTEXT: Short label in the Animation debug section for the single-theme selector when the one-theme preview mode is active. Keep it compact. -->
+    <string name="config_animation_theme_label">Theme</string>
+    <!-- CONTEXT: Toggle row title in the Animation debug section for enabling the two-part theme color switch. Keep it compact. -->
+    <string name="config_animation_dual_theme_title">Dual theme colors</string>
 </resources>

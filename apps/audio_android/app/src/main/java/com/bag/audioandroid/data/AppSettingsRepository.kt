@@ -370,6 +370,16 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.DemoModeEnabled] ?: false }
 
+    val isDualThemeAnimationEnabled: Flow<Boolean> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.DualThemeAnimationEnabled] ?: false }
+
     val isSampleDecorationEnabled: Flow<Boolean> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -620,6 +630,12 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setDualThemeAnimationEnabled(enabled: Boolean) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.DualThemeAnimationEnabled] = enabled
+        }
+    }
+
     suspend fun setSampleDecorationEnabled(enabled: Boolean) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SampleDecorationEnabled] = enabled
@@ -691,6 +707,7 @@ class AppSettingsRepository(
             booleanPreferencesKey("config_labyrinth_of_mutability_faction_theme_expanded")
         val ConfigDebugExpanded: Preferences.Key<Boolean> = booleanPreferencesKey("config_debug_expanded")
         val DemoModeEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("demo_mode_enabled")
+        val DualThemeAnimationEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("dual_theme_animation_enabled")
         val SampleAutoFillEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("sample_auto_fill_enabled")
         val SampleDecorationEnabled: Preferences.Key<Boolean> = booleanPreferencesKey("sample_decoration_enabled")
         val SavedAudioPlaybackDataStorageEnabled: Preferences.Key<Boolean> =

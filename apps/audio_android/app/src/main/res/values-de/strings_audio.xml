@@ -104,7 +104,7 @@
     <string name="audio_pro_visual_next_byte_advance">Dies ist das zweite Nibble, daher springt der Player danach zum nächsten Byte weiter.</string>
     <string name="audio_pro_visual_ascii_byte">ASCII-Byte %1$d</string>
     <string name="audio_pro_visual_token_byte">Token #%1$d • Byte %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Byte-Position</string>
     <string name="audio_pro_visual_then">Dann</string>
     <string name="audio_info_dialog_title">Info</string>
@@ -193,7 +193,7 @@
     <string name="audio_input_encoding_rules_title">Eingaberegeln</string>
     <string name="audio_input_encoding_rules">Eingaberegeln</string>
     <string name="audio_input_encoding_rules_done">Fertig</string>
-    <string name="audio_input_encoding_rules_pro">Pro akzeptiert nur ASCII-Text. Nicht-ASCII-Zeichen wie CJK-Text, Emojis und viele Buchstaben mit Akzenten können in pro nicht codiert werden.</string>
+    <string name="audio_input_encoding_rules_pro">Pro akzeptiert nur ASCII-Text. Nicht-ASCII-Zeichen wie CJK-Text, Emoji und viele Buchstaben mit Akzenten können in pro nicht codiert werden.</string>
     <string name="audio_input_encoding_rules_unrestricted">Dieser Modus übernimmt den aktuellen Text als UTF-8-/Klartext-Bytes. Mini und pro haben strengere Eingaberegeln.</string>
     <string name="audio_input_encoding_rules_mini">Mini akzeptiert A-Z, 0-9, Leerzeichen und gängige Morse-Satzzeichen. Kleinbuchstaben werden als Großbuchstaben codiert, wiederholte Leerzeichen werden zusammengeführt.</string>
     <string name="audio_pro_unsupported_characters">Nicht unterstützte pro-Zeichen: %1$s</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Vertikal</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

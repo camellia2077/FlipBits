@@ -10,18 +10,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.domain.AudioEncodePhase
+import com.bag.audioandroid.ui.theme.AudioEncodeGlyphColors
 
 @Composable
 internal fun AudioEncodeStatusSection(
+    glyphProgressDisplay: GlyphProgressDisplayModel?,
     encodeProgressDisplay: EncodeProgressDisplayModel?,
-    isEncodingBusy: Boolean,
+    glyphBaseSize: Dp = 108.dp,
+    showGlyphCropGuide: Boolean = false,
+    glyphColorsOverride: AudioEncodeGlyphColors? = null,
     modifier: Modifier = Modifier,
 ) {
-    val progress = encodeProgressDisplay?.progress0To1 ?: 0f
+    val progress = glyphProgressDisplay?.progress0To1 ?: 0f
+    val isGlyphActive = glyphProgressDisplay?.isActive == true
+    val showIdleCoreRing = glyphProgressDisplay?.showIdleCoreRing ?: true
+    val isEncodingBusy = encodeProgressDisplay != null && isGlyphActive
+    val glyphCropGuideBackgroundColor = glyphColorsOverride?.secondarySplit ?: MaterialTheme.colorScheme.surface
+    val glyphCropGuideColor =
+        if (showGlyphCropGuide) {
+            cropGuideContrastColor(glyphCropGuideBackgroundColor)
+        } else {
+            Color.Unspecified
+        }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -34,7 +51,13 @@ internal fun AudioEncodeStatusSection(
         ) {
             AudioEncodeGlyph(
                 encodeProgress = progress,
-                isEncodingBusy = isEncodingBusy,
+                isEncodingBusy = isGlyphActive,
+                baseSize = glyphBaseSize,
+                showCropGuide = showGlyphCropGuide,
+                cropGuideColor = glyphCropGuideColor,
+                cropGuideBackgroundColor = glyphCropGuideBackgroundColor,
+                showIdleCoreRing = showIdleCoreRing,
+                glyphColorsOverride = glyphColorsOverride,
             )
         }
         if (isEncodingBusy) {
@@ -42,7 +65,7 @@ internal fun AudioEncodeStatusSection(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                encodeProgressDisplay?.phase?.let { phase ->
+                encodeProgressDisplay.phase.let { phase ->
                     Text(
                         text = stringResource(phase.labelResId),
                         style = MaterialTheme.typography.bodySmall,
@@ -57,6 +80,13 @@ internal fun AudioEncodeStatusSection(
         }
     }
 }
+
+private fun cropGuideContrastColor(backgroundColor: Color): Color =
+    if (backgroundColor.luminance() < 0.42f) {
+        Color.White
+    } else {
+        Color.Black
+    }
 
 private val AudioEncodePhase.labelResId: Int
     get() =

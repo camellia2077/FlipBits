@@ -244,7 +244,7 @@
     <string name="config_custom_theme_import_error_unknown_field">Le bloc %1$d contient un champ non pris en charge : %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">Le bloc %1$d répète %2$s.</string>
     <string name="config_custom_theme_import_error_missing_field">Le bloc %1$d ne contient pas %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">Le bloc %1$d contient une couleur hexadécimale invalide pour %2$s : %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Le bloc %1$d contient une couleur Hex invalide pour %2$s : %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Le bloc %1$d utilise des champs de theme de faction personnalise. Importez-le plutot depuis le theme de faction personnalise.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Le bloc %1$d utilise des champs de couleurs personnalisées. Importez-le plutôt depuis couleurs personnalisées.</string>
     <string name="config_custom_theme_import_field_name">nom</string>
@@ -253,4 +253,24 @@
     <string name="config_custom_theme_import_field_outline">contour</string>
     <string name="config_saved_playback_data_subtitle">Garde le suivi du texte et les visuels enrichis prêts pour l’audio enregistré dans l’app.</string>
     <string name="config_saved_playback_data_title">Enregistrer les détails de lecture</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode et diagnostic visuel.</string>
+    <string name="config_debug_expand">Développer les réglages Debug</string>
+    <string name="config_debug_collapse">Réduire les réglages Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Affiche des repères tactiles pour l’enregistrement.</string>
+    <string name="config_visual_perf_overlay_title">Overlay de perf visuelle</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Lance l’aperçu des engrenages pendant une durée fixe.</string>
+    <string name="config_animation_duration_label">Secondes</string>
+    <string name="config_animation_start">Démarrer</string>
+    <string name="config_animation_stop">Arrêter</string>
+    <string name="config_animation_mode_title">Mode d’animation</string>
+    <string name="config_animation_mode_single">Un thème</string>
+    <string name="config_animation_mode_dual">Deux thèmes</string>
+    <string name="config_animation_theme_label">Thème</string>
+    <string name="config_animation_dual_theme_title">Couleurs double theme</string>
+    <string name="config_animation_first_part_label">Premiere partie</string>
+    <string name="config_animation_theme_a_label">Theme A</string>
+    <string name="config_animation_theme_b_label">Theme B</string>
 </resources>

@@ -365,12 +365,6 @@ tasks.named("check").configure {
 }
 
 tasks.withType<Test>().configureEach {
-    // Android/Gradle defaults have intermittently hit Windows filesystem races
-    // while finalizing in-progress binary test result files. Use explicit,
-    // task-scoped output locations to keep result directories isolated.
-    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/binary/$name"))
-    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/xml/$name"))
-    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/$name"))
     maxParallelForks = 1
 }
 

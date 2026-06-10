@@ -8,7 +8,7 @@
     </g>
   <g id="data-core">
     <!-- Center dashed core ring with inverted per-side color via currentColor -->
-    <circle cx="128" cy="128" r="40" fill="none" stroke="currentColor" stroke-width="3.5" pathLength="8" stroke-dasharray="0.5 0.5" stroke-dashoffset="0.25" />
+    <path d="M 120.1964 88.7686 A 40 40 0 0 1 135.8036 88.7686 M 150.2228 94.7412 A 40 40 0 0 1 161.2588 105.7772 M 167.2314 120.1964 A 40 40 0 0 1 167.2314 135.8036 M 161.2588 150.2228 A 40 40 0 0 1 150.2228 161.2588 M 135.8036 167.2314 A 40 40 0 0 1 120.1964 167.2314 M 105.7772 161.2588 A 40 40 0 0 1 94.7412 150.2228 M 88.7686 135.8036 A 40 40 0 0 1 88.7686 120.1964 M 94.7412 105.7772 A 40 40 0 0 1 105.7772 94.7412" fill="none" stroke="currentColor" stroke-width="3.5" />
   </g>
   </defs>
 

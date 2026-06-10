@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">Блок %1$d містить непідтримуване поле: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">У блоці %1$d поле %2$s повторюється.</string>
     <string name="config_custom_theme_import_error_missing_field">У блоці %1$d бракує %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">Блок %1$d містить недійсне шістнадцяткове значення кольору для %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Блок %1$d містить недійсне Hex-значення кольору для %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Блок %1$d використовує поля власної теми фракції. Імпортуйте його через власну тему фракції.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Блок %1$d використовує поля користувацьких кольорів. Імпортуйте його через користувацькі кольори.</string>
     <string name="config_custom_theme_import_field_name">назва</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">контур</string>
     <string name="config_saved_playback_data_subtitle">Зберігає готовими супровід тексту й покращені візуальні ефекти для аудіо, збереженого в застосунку.</string>
     <string name="config_saved_playback_data_title">Зберігати деталі відтворення</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode і візуальна діагностика.</string>
+    <string name="config_debug_expand">Розгорнути налаштування Debug</string>
+    <string name="config_debug_collapse">Згорнути налаштування Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Показує підказки дотиків для запису.</string>
+    <string name="config_visual_perf_overlay_title">Оверлей продуктивності Visual</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Запускає попередній перегляд шестерень на фіксований час.</string>
+    <string name="config_animation_duration_label">Секунди</string>
+    <string name="config_animation_start">Старт</string>
+    <string name="config_animation_stop">Стоп</string>
+    <string name="config_animation_mode_title">Режим Animation</string>
+    <string name="config_animation_mode_single">Одна тема</string>
+    <string name="config_animation_mode_dual">Дві теми</string>
+    <string name="config_animation_theme_label">Тема</string>
+    <string name="config_animation_dual_theme_title">Кольори двох тем</string>
+    <string name="config_animation_first_part_label">Перша частина</string>
+    <string name="config_animation_theme_a_label">Тема A</string>
+    <string name="config_animation_theme_b_label">Тема B</string>
 </resources>

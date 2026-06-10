@@ -114,12 +114,12 @@
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">字节完成</string>
     <!-- CONTEXT: Teaching text in the Pro visualizer. Keep Token / byte / ASCII protocol terms stable and concise. -->
-    <string name="audio_pro_visual_token_mapping">令牌 #%1$d \"%2$s\" -&gt; 字节 %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; 字节 %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">下个符号频率：%1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">这是第二个半字节，结束后播放器将推进到下个字节。</string>
     <string name="audio_pro_visual_ascii_byte">ASCII 字节 %1$d</string>
-    <string name="audio_pro_visual_token_byte">令牌 #%1$d • 字节 %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_token_byte">Token #%1$d • 字节 %2$d/%3$d</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">字节位置</string>
     <string name="audio_pro_visual_then">然后</string>
     <string name="audio_info_dialog_title">信息</string>
@@ -233,4 +233,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">纵向</string>
     <string name="audio_morse_visualizer_mode_horizontal">横向</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

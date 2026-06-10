@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">Il blocco %1$d contiene un campo non supportato: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">Il blocco %1$d ripete %2$s.</string>
     <string name="config_custom_theme_import_error_missing_field">Nel blocco %1$d manca %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">Il blocco %1$d contiene un colore esadecimale non valido per %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Il blocco %1$d contiene un colore Hex non valido per %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Il blocco %1$d usa campi del tema di fazione personalizzato. Importalo invece dal tema di fazione personalizzato.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Il blocco %1$d usa campi colore personalizzati. Importalo invece da colori personalizzati.</string>
     <string name="config_custom_theme_import_field_name">nome</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">contorno</string>
     <string name="config_saved_playback_data_subtitle">Tiene pronti il testo sincronizzato e le visualizzazioni avanzate per l’audio salvato nell’app.</string>
     <string name="config_saved_playback_data_title">Salva dettagli di riproduzione</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode e diagnostica visiva.</string>
+    <string name="config_debug_expand">Espandi impostazioni Debug</string>
+    <string name="config_debug_collapse">Comprimi impostazioni Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Mostra suggerimenti di tocco per la registrazione.</string>
+    <string name="config_visual_perf_overlay_title">Overlay prestazioni visuali</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Esegue l’anteprima degli ingranaggi per un tempo fisso.</string>
+    <string name="config_animation_duration_label">Secondi</string>
+    <string name="config_animation_start">Avvia</string>
+    <string name="config_animation_stop">Ferma</string>
+    <string name="config_animation_mode_title">Modalità Animation</string>
+    <string name="config_animation_mode_single">Un tema</string>
+    <string name="config_animation_mode_dual">Due temi</string>
+    <string name="config_animation_theme_label">Tema</string>
+    <string name="config_animation_dual_theme_title">Colori doppio tema</string>
+    <string name="config_animation_first_part_label">Prima parte</string>
+    <string name="config_animation_theme_a_label">Tema A</string>
+    <string name="config_animation_theme_b_label">Tema B</string>
 </resources>

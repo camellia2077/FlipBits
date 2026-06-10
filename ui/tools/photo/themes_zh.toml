@@ -1,0 +1,109 @@
+# 中文 Faction Themes 配置，按阵营归类
+
+[[火星圣物]]
+name = "火星圣物"
+primary = "#E8E2D0"
+secondary = "#9E1B1B"
+outline = "#C78C25"
+
+[[火星圣物]]
+name = "危险警示"
+primary = "#E0E0E0"
+secondary = "#D64011"
+outline = "#3B444B"
+
+[[火星圣物]]
+name = "黑红仪式"
+primary = "#1A1A1A"
+secondary = "#D52112"
+outline = "#00FFFF"
+
+[[火星圣物]]
+name = "异形代码"
+primary = "#1B241D"
+secondary = "#00FF7F"
+outline = "#FFFFFF"
+
+[[血色杀戮]]
+name = "血色杀戮"
+primary = "#870A0A"
+secondary = "#E6A100"
+outline = "#D4C4A8"
+
+[[血色杀戮]]
+name = "黄铜熔炉"
+primary = "#381010"
+secondary = "#FFAB38"
+outline = "#FF4500"
+
+[[宿命之火]]
+name = "宿命之火"
+primary = "#0D4087"
+secondary = "#FF007F"
+outline = "#CCFF00"
+
+[[宿命之火]]
+name = "奥术深渊"
+primary = "#002133"
+secondary = "#00E5FF"
+outline = "#C399FF"
+
+[[狂喜狂欢]]
+name = "狂喜狂欢"
+primary = "#701D6E"
+secondary = "#FFB7D5"
+outline = "#FFD700"
+
+[[狂喜狂欢]]
+name = "天鹅绒梦魇"
+primary = "#2E1140"
+secondary = "#FF3399"
+outline = "#ECB1AC"
+
+[[永恒腐败]]
+name = "永恒腐败"
+primary = "#2F4827"
+secondary = "#E1CD0A"
+outline = "#8CFF1A"
+
+[[永恒腐败]]
+name = "瘟疫泥潭"
+primary = "#162210"
+secondary = "#9ACD32"
+outline = "#FF8C00"
+
+[[皇权风暴]]
+name = "皇权风暴"
+primary = "#31443E"
+secondary = "#00FF7F"
+outline = "#A0B3AC"
+
+[[皇权风暴]]
+name = "寂静霸权"
+primary = "#845A4D"
+secondary = "#00FF7F"
+outline = "#EAE6DF"
+
+[[皇权风暴]]
+name = "镀金淡漠"
+primary = "#A5712C"
+secondary = "#99FFFF"
+outline = "#9AA4A8"
+
+[[皇权风暴]]
+name = "恒星湮灭"
+primary = "#60742F"
+secondary = "#FF8C00"
+outline = "#A1A29D"
+
+[[皇权风暴]]
+name = "虚空涨落"
+primary = "#2E465A"
+secondary = "#00E5FF"
+outline = "#56738A"
+
+[[皇权风暴]]
+name = "绯红法令"
+primary = "#616B70"
+secondary = "#861D21"
+outline = "#FF7800"

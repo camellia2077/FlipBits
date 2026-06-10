@@ -20,7 +20,7 @@
     <string name="config_language_korean">한국어</string>
     <string name="config_language_french">Français</string>
     <string name="config_language_italian">Italiano</string>
-    <string name="config_language_polish">Polish</string>
+    <string name="config_language_polish">Polski</string>
     <!-- CONTEXT: Style-English locale option name. It is a language/style name, not normal UI prose. Keep the intended display strategy. -->
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">언어 설정 확장</string>
@@ -268,4 +268,24 @@
     <string name="config_custom_theme_import_field_outline">윤곽선</string>
     <string name="config_saved_playback_data_subtitle">앱에 저장한 오디오에서 텍스트 따라가기와 향상된 시각 효과를 바로 사용할 수 있게 유지합니다.</string>
     <string name="config_saved_playback_data_title">재생 세부 정보 저장</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode 및 시각 진단.</string>
+    <string name="config_debug_expand">Debug 설정 펼치기</string>
+    <string name="config_debug_collapse">Debug 설정 접기</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">녹화용 탭 힌트를 표시합니다.</string>
+    <string name="config_visual_perf_overlay_title">Visual 성능 오버레이</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">기어 미리보기를 정해진 시간 동안 실행합니다.</string>
+    <string name="config_animation_duration_label">초</string>
+    <string name="config_animation_start">시작</string>
+    <string name="config_animation_stop">중지</string>
+    <string name="config_animation_mode_title">Animation 모드</string>
+    <string name="config_animation_mode_single">단일 테마</string>
+    <string name="config_animation_mode_dual">2개 테마</string>
+    <string name="config_animation_theme_label">테마</string>
+    <string name="config_animation_dual_theme_title">이중 테마 색상</string>
+    <string name="config_animation_first_part_label">전반부</string>
+    <string name="config_animation_theme_a_label">테마 A</string>
+    <string name="config_animation_theme_b_label">테마 B</string>
 </resources>

@@ -1,0 +1,109 @@
+# English Faction Themes Configurations grouped by Faction
+
+[[mars_relic]]
+name = "Mars Relic"
+primary = "#E8E2D0"
+secondary = "#9E1B1B"
+outline = "#C78C25"
+
+[[mars_relic]]
+name = "Hazard Warning"
+primary = "#E0E0E0"
+secondary = "#D64011"
+outline = "#3B444B"
+
+[[mars_relic]]
+name = "Black Crimson Rite"
+primary = "#1A1A1A"
+secondary = "#D52112"
+outline = "#00FFFF"
+
+[[mars_relic]]
+name = "Xeno Code"
+primary = "#1B241D"
+secondary = "#00FF7F"
+outline = "#FFFFFF"
+
+[[blood_soaked_ivory]]
+name = "Blood-Soaked Ivory"
+primary = "#870A0A"
+secondary = "#E6A100"
+outline = "#D4C4A8"
+
+[[blood_soaked_ivory]]
+name = "Brass Forge"
+primary = "#381010"
+secondary = "#FFAB38"
+outline = "#FF4500"
+
+[[fires_of_fate]]
+name = "Fires of Fate"
+primary = "#0D4087"
+secondary = "#FF007F"
+outline = "#CCFF00"
+
+[[fires_of_fate]]
+name = "Arcane Abyss"
+primary = "#002133"
+secondary = "#00E5FF"
+outline = "#C399FF"
+
+[[ecstatic_rapture]]
+name = "Ecstatic Rapture"
+primary = "#701D6E"
+secondary = "#FFB7D5"
+outline = "#FFD700"
+
+[[ecstatic_rapture]]
+name = "Velvet Nightmare"
+primary = "#2E1140"
+secondary = "#FF3399"
+outline = "#ECB1AC"
+
+[[toxic_effluence]]
+name = "Toxic Effluence"
+primary = "#2F4827"
+secondary = "#E1CD0A"
+outline = "#8CFF1A"
+
+[[toxic_effluence]]
+name = "Plague Mire"
+primary = "#162210"
+secondary = "#9ACD32"
+outline = "#FF8C00"
+
+[[dynasty_revival]]
+name = "Sovereign Tempest"
+primary = "#31443E"
+secondary = "#00FF7F"
+outline = "#A0B3AC"
+
+[[dynasty_revival]]
+name = "Silent Hegemony"
+primary = "#845A4D"
+secondary = "#00FF7F"
+outline = "#EAE6DF"
+
+[[dynasty_revival]]
+name = "Gilded Apathy"
+primary = "#A5712C"
+secondary = "#99FFFF"
+outline = "#9AA4A8"
+
+[[dynasty_revival]]
+name = "Solar Extinction"
+primary = "#60742F"
+secondary = "#FF8C00"
+outline = "#A1A29D"
+
+[[dynasty_revival]]
+name = "Void Fluctuation"
+primary = "#2E465A"
+secondary = "#00E5FF"
+outline = "#56738A"
+
+[[dynasty_revival]]
+name = "Crimson Decree"
+primary = "#616B70"
+secondary = "#861D21"
+outline = "#FF7800"

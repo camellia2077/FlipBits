@@ -436,6 +436,8 @@ internal fun AudioAndroidMainScaffold(
                     onDebugExpandedChanged = viewModel::onConfigDebugExpandedChanged,
                     isDemoModeEnabled = uiState.isDemoModeEnabled,
                     onDemoModeEnabledChange = viewModel::onDemoModeEnabledChanged,
+                    isDualThemeAnimationEnabled = uiState.isDualThemeAnimationEnabled,
+                    onDualThemeAnimationEnabledChange = viewModel::onDualThemeAnimationEnabledChanged,
                     isSampleAutoFillEnabled = uiState.isSampleAutoFillEnabled,
                     onSampleAutoFillEnabledChange = viewModel::onSampleAutoFillEnabledChanged,
                     isSampleDecorationEnabled = uiState.isSampleDecorationEnabled,

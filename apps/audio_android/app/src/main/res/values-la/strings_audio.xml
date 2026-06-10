@@ -104,7 +104,7 @@
     <string name="audio_pro_visual_next_byte_advance">Hoc est alterum nibble, itaque ludi cursor post hoc ad byte sequentem procedet.</string>
     <string name="audio_pro_visual_ascii_byte">Byte ASCII %1$d</string>
     <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d ex %3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Positio byte</string>
     <string name="audio_pro_visual_then">Deinde</string>
     <string name="audio_info_dialog_title">Notitia</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Verticalis</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontalis</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

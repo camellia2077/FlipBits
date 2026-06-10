@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">В блоке %1$d есть неподдерживаемое поле: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">В блоке %1$d поле %2$s повторяется.</string>
     <string name="config_custom_theme_import_error_missing_field">В блоке %1$d отсутствует %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">В блоке %1$d недопустимое шестнадцатеричное значение цвета для %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">В блоке %1$d недопустимое Hex-значение цвета для %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Блок %1$d использует поля пользовательской темы фракции. Импортируйте его через пользовательскую тему фракции.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Блок %1$d использует поля пользовательских цветов. Импортируйте его через пользовательские цвета.</string>
     <string name="config_custom_theme_import_field_name">имя</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">контур</string>
     <string name="config_saved_playback_data_subtitle">Сохраняет готовыми текстовое сопровождение и улучшенную визуализацию для аудио, сохраненного в приложении.</string>
     <string name="config_saved_playback_data_title">Сохранять детали воспроизведения</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode и визуальная диагностика.</string>
+    <string name="config_debug_expand">Развернуть настройки Debug</string>
+    <string name="config_debug_collapse">Свернуть настройки Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Показывает подсказки касаний для записи.</string>
+    <string name="config_visual_perf_overlay_title">Оверлей производительности Visual</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Запускает предпросмотр шестерёнок на фиксированное время.</string>
+    <string name="config_animation_duration_label">Секунды</string>
+    <string name="config_animation_start">Старт</string>
+    <string name="config_animation_stop">Стоп</string>
+    <string name="config_animation_mode_title">Режим Animation</string>
+    <string name="config_animation_mode_single">Одна тема</string>
+    <string name="config_animation_mode_dual">Две темы</string>
+    <string name="config_animation_theme_label">Тема</string>
+    <string name="config_animation_dual_theme_title">Цвета двух тем</string>
+    <string name="config_animation_first_part_label">Первая часть</string>
+    <string name="config_animation_theme_a_label">Тема A</string>
+    <string name="config_animation_theme_b_label">Тема B</string>
 </resources>

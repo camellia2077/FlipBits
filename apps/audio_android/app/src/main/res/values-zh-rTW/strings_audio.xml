@@ -104,7 +104,7 @@
     <string name="audio_pro_visual_next_byte_advance">這是第二個 nibble，因此播放器在它之後會前進到下一個位元組。</string>
     <string name="audio_pro_visual_ascii_byte">ASCII 位元組 %1$d</string>
     <string name="audio_pro_visual_token_byte">Token #%1$d • 位元組 %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">位元組位置</string>
     <string name="audio_pro_visual_then">接著</string>
     <string name="audio_info_dialog_title">資訊</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">縱向</string>
     <string name="audio_morse_visualizer_mode_horizontal">橫向</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

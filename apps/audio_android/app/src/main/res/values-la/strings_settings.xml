@@ -16,7 +16,7 @@
     <string name="config_language_french">Français</string>
     <string name="config_language_italian">Italiano</string>
     <string name="config_language_polish">Polski</string>
-    <string name="config_language_high_gothic">Lingua Sacra</string>
+    <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Expande ritum linguae sanctae</string>
     <string name="config_theme_mode_title">Ritus thematis</string>
     <string name="config_theme_mode_subtitle">Modum systematis, lucis aut tenebrarum elige.</string>
@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">Blocus %1$d campum non sustentatum habet: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">Blocus %1$d %2$s repetit.</string>
     <string name="config_custom_theme_import_error_missing_field">In bloco %1$d %2$s deest.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">Blocus %1$d colorem hexadecimalem invalidum pro %2$s habet: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Blocus %1$d colorem Hex invalidum pro %2$s habet: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Blocus %1$d campos Thematis Factionis Proprii utitur. Ex Themate Factionis Proprio eum importa.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Blocus %1$d campos colorum propriorum utitur. Ex coloribus propriis eum importa.</string>
     <string name="config_custom_theme_import_field_name">nomen</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">limbus</string>
     <string name="config_saved_playback_data_subtitle">Servat sequelam textus et visus auctos paratos pro audio in app servato.</string>
     <string name="config_saved_playback_data_title">Serva singula reproductionis</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode et diagnostica visualia.</string>
+    <string name="config_debug_expand">Expandere occasus Debug</string>
+    <string name="config_debug_collapse">Contrahere occasus Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Monstra signa tactus ad capturam.</string>
+    <string name="config_visual_perf_overlay_title">Visual perf overlay</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Praevisum rotarum per tempus statutum currit.</string>
+    <string name="config_animation_duration_label">Secundae</string>
+    <string name="config_animation_start">Incipe</string>
+    <string name="config_animation_stop">Siste</string>
+    <string name="config_animation_mode_title">Modus Animation</string>
+    <string name="config_animation_mode_single">Unum Thema</string>
+    <string name="config_animation_mode_dual">Duo Themata</string>
+    <string name="config_animation_theme_label">Thema</string>
+    <string name="config_animation_dual_theme_title">Colores thematis gemini</string>
+    <string name="config_animation_first_part_label">Pars prior</string>
+    <string name="config_animation_theme_a_label">Thema A</string>
+    <string name="config_animation_theme_b_label">Thema B</string>
 </resources>

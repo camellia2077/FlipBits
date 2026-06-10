@@ -57,7 +57,7 @@ DATA_DICT = {
         "vals": build_metrics(
             transmission_speed=3, encoding_efficiency=3, transmission_stability=6,
             compatibility=1, parsing_difficulty=8, electronic_feel=8,
-            emotional_richness=6, sense_of_ritual=0
+            emotional_richness=8, sense_of_ritual=0
         ),
     },
     "Litany": {
@@ -65,8 +65,8 @@ DATA_DICT = {
         "name_zh": "崇敬",
         "vals": build_metrics(
             transmission_speed=1, encoding_efficiency=3, transmission_stability=10,
-            compatibility=1, parsing_difficulty=1, electronic_feel=9,
-            emotional_richness=8, sense_of_ritual=10
+            compatibility=1, parsing_difficulty=1, electronic_feel=0,
+            emotional_richness=5, sense_of_ritual=10
         ),
     },
     "Collapse": {
@@ -74,7 +74,7 @@ DATA_DICT = {
         "name_zh": "崩溃",
         "vals": build_metrics(
             transmission_speed=2, encoding_efficiency=3, transmission_stability=1,
-            compatibility=1, parsing_difficulty=7, electronic_feel=8,
+            compatibility=1, parsing_difficulty=7, electronic_feel=4,
             emotional_richness=7, sense_of_ritual=0
         ),
     },
@@ -82,18 +82,18 @@ DATA_DICT = {
         "name_en": "Zeal",
         "name_zh": "狂热",
         "vals": build_metrics(
-            transmission_speed=4, encoding_efficiency=3, transmission_stability=3,
+            transmission_speed=7, encoding_efficiency=3, transmission_stability=3,
             compatibility=1, parsing_difficulty=10, electronic_feel=10,
-            emotional_richness=10, sense_of_ritual=8
+            emotional_richness=10, sense_of_ritual=7
         ),
     },
     "Void": {
         "name_en": "Void",
         "name_zh": "虚空",
         "vals": build_metrics(
-            transmission_speed=1, encoding_efficiency=3, transmission_stability=8,
-            compatibility=1, parsing_difficulty=2, electronic_feel=9,
-            emotional_richness=2, sense_of_ritual=0
+            transmission_speed=2, encoding_efficiency=3, transmission_stability=5,
+            compatibility=1, parsing_difficulty=2, electronic_feel=3,
+            emotional_richness=0, sense_of_ritual=0
         ),
     },
 

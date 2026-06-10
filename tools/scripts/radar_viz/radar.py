@@ -148,15 +148,29 @@ class RadarChart:
         if lang == 'zh':
             radius_map = config_fonts.RADAR_LABEL_RADIUS_OFFSETS_ZH
             angle_map  = config_fonts.RADAR_LABEL_ANGLE_OFFSETS_ZH
+            x_offset_map = config_fonts.RADAR_LABEL_X_OFFSETS_ZH
         else:
             radius_map = config_fonts.RADAR_LABEL_RADIUS_OFFSETS_EN
             angle_map  = config_fonts.RADAR_LABEL_ANGLE_OFFSETS_EN
+            x_offset_map = config_fonts.RADAR_LABEL_X_OFFSETS_EN
 
         for i, angle in enumerate(self.angles[:-1]):
             r_offset     = radius_map.get(i, 0.0)
             a_offset_deg = angle_map.get(i, 0.0)
             theta        = angle + np.deg2rad(a_offset_deg)
             r            = self.VIEW_LIMIT + r_offset
+
+            # Apply X-axis offset in Cartesian space (keeps Y/vertical position constant)
+            x_offset = x_offset_map.get(i, 0.0)
+            if x_offset != 0.0:
+                theta_offset = 5 * np.pi / 8
+                alpha = theta + theta_offset
+                cx = r * np.cos(alpha)
+                cy = r * np.sin(alpha)
+                cx += x_offset
+                r = np.hypot(cx, cy)
+                alpha_new = np.arctan2(cy, cx)
+                theta = alpha_new - theta_offset
 
             curr_label   = labels[i]
             curr_val_str = f"{vals[i]}"
@@ -202,16 +216,12 @@ class RadarChart:
 
     @staticmethod
     def _get_font_props(mode_key, weight='regular', size=None):
-        """根据 mode 动态选择英文字体（Flash → JetBrains Mono，其余 → IBM Plex Mono）。"""
+        """始终选择 IBM Plex Mono 作为英文字体。"""
         if size is None:
             size = config_fonts.SIZE_RADAR_LABEL_EN
 
-        if mode_key in _FLASH_MODES:
-            path = (config_fonts.FONT_JETBRAINS_BOLD if weight == 'bold'
-                    else config_fonts.FONT_JETBRAINS_REGULAR)
-        else:
-            path = (config_fonts.FONT_IBM_PLEX_BOLD if weight == 'bold'
-                    else config_fonts.FONT_IBM_PLEX_REGULAR)
+        path = (config_fonts.FONT_IBM_PLEX_BOLD if weight == 'bold'
+                else config_fonts.FONT_IBM_PLEX_REGULAR)
 
         return FontProperties(fname=path, size=size)
 

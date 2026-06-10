@@ -99,12 +99,12 @@
     <string name="audio_pro_visual_next">Próximo</string>
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">Byte concluído</string>
-    <string name="audio_pro_visual_token_mapping">Token nº %1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">Próximas frequências do símbolo: %1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">Este é o segundo nibble, então o player avançará para o próximo byte depois dele.</string>
     <string name="audio_pro_visual_ascii_byte">Byte ASCII %1$d</string>
-    <string name="audio_pro_visual_token_byte">Token nº %1$d • byte %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d/%3$d</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Posição do byte</string>
     <string name="audio_pro_visual_then">Depois</string>
     <string name="audio_info_dialog_title">Informações</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Vertical</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

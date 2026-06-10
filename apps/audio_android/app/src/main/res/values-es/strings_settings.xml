@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">El bloque %1$d tiene un campo no compatible: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">El bloque %1$d repite %2$s.</string>
     <string name="config_custom_theme_import_error_missing_field">Al bloque %1$d le falta %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">El bloque %1$d tiene un color hexadecimal no válido en %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">El bloque %1$d tiene un Hex color no válido en %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">El bloque %1$d usa campos de tema de facción personalizado. Impórtalo desde tema de facción personalizado.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">El bloque %1$d usa campos de colores personalizados. Impórtalo desde colores personalizados.</string>
     <string name="config_custom_theme_import_field_name">nombre</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">contorno</string>
     <string name="config_saved_playback_data_subtitle">Mantiene el seguimiento de texto y los visuales mejorados listos para el audio guardado en la app.</string>
     <string name="config_saved_playback_data_title">Guardar detalles de reproducción</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode y diagnósticos visuales.</string>
+    <string name="config_debug_expand">Expandir ajustes de Debug</string>
+    <string name="config_debug_collapse">Contraer ajustes de Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Muestra pistas de toque para grabación.</string>
+    <string name="config_visual_perf_overlay_title">Superposición de rendimiento visual</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Ejecuta la vista previa del engranaje durante un tiempo fijo.</string>
+    <string name="config_animation_duration_label">Segundos</string>
+    <string name="config_animation_start">Iniciar</string>
+    <string name="config_animation_stop">Detener</string>
+    <string name="config_animation_mode_title">Modo Animation</string>
+    <string name="config_animation_mode_single">Un tema</string>
+    <string name="config_animation_mode_dual">Dos temas</string>
+    <string name="config_animation_theme_label">Tema</string>
+    <string name="config_animation_dual_theme_title">Colores de dos temas</string>
+    <string name="config_animation_first_part_label">Primera parte</string>
+    <string name="config_animation_theme_a_label">Tema A</string>
+    <string name="config_animation_theme_b_label">Tema B</string>
 </resources>

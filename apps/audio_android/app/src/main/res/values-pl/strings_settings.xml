@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">Blok %1$d zawiera nieobsługiwane pole: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">Blok %1$d powtarza %2$s.</string>
     <string name="config_custom_theme_import_error_missing_field">W bloku %1$d brakuje %2$s.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">Blok %1$d zawiera nieprawidłowy kolor szesnastkowy dla %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">Blok %1$d zawiera nieprawidłowy kolor Hex dla %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">Blok %1$d używa pól własnego motywu frakcji. Zaimportuj go z własnego motywu frakcji.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">Blok %1$d używa pól własnych kolorów. Zaimportuj go z własnych kolorów.</string>
     <string name="config_custom_theme_import_field_name">nazwa</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">obrys</string>
     <string name="config_saved_playback_data_subtitle">Utrzymuje śledzenie tekstu i ulepszone wizualizacje gotowe dla audio zapisanego w aplikacji.</string>
     <string name="config_saved_playback_data_title">Zapisuj szczegóły odtwarzania</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode i diagnostyka wizualna.</string>
+    <string name="config_debug_expand">Rozwiń ustawienia Debug</string>
+    <string name="config_debug_collapse">Zwiń ustawienia Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Pokazuje wskazówki dotykowe do nagrywania.</string>
+    <string name="config_visual_perf_overlay_title">Nakładka wydajności Visual</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Uruchamia podgląd kół zębatych na stały czas.</string>
+    <string name="config_animation_duration_label">Sekundy</string>
+    <string name="config_animation_start">Start</string>
+    <string name="config_animation_stop">Stop</string>
+    <string name="config_animation_mode_title">Tryb Animation</string>
+    <string name="config_animation_mode_single">Jeden motyw</string>
+    <string name="config_animation_mode_dual">Dwa motywy</string>
+    <string name="config_animation_theme_label">Motyw</string>
+    <string name="config_animation_dual_theme_title">Kolory dwoch motywow</string>
+    <string name="config_animation_first_part_label">Pierwsza czesc</string>
+    <string name="config_animation_theme_a_label">Motyw A</string>
+    <string name="config_animation_theme_b_label">Motyw B</string>
 </resources>

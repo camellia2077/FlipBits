@@ -104,7 +104,7 @@
     <string name="audio_pro_visual_next_byte_advance">Il s’agit du deuxième nibble, le lecteur passera donc à l’octet suivant après celui-ci.</string>
     <string name="audio_pro_visual_ascii_byte">Octet ASCII %1$d</string>
     <string name="audio_pro_visual_token_byte">Token #%1$d • octet %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Position de l’octet</string>
     <string name="audio_pro_visual_then">Puis</string>
     <string name="audio_info_dialog_title">Infos</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Vertical</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

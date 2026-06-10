@@ -14,14 +14,18 @@ HEX_LITERAL_PATTERN = re.compile(r"#RRGGBB")
 PLACEHOLDER_PATTERN = re.compile(r"%\d+\$[sdf]")
 
 
+def _is_ascii_alpha_term(term: str) -> bool:
+    return term.isascii() and term.isalpha()
+
+
 def _contains_locked_term(source_text: str, term: str) -> bool:
-    if term.isalpha() and term.islower():
+    if _is_ascii_alpha_term(term):
         return re.search(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])", source_text, flags=re.IGNORECASE) is not None
     return term in source_text
 
 
 def _missing_locked_term(localized_text: str, term: str) -> bool:
-    if term.isalpha() and term.islower():
+    if _is_ascii_alpha_term(term):
         return re.search(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])", localized_text, flags=re.IGNORECASE) is None
     return term not in localized_text
 

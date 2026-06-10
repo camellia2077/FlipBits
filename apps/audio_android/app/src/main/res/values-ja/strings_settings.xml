@@ -20,7 +20,7 @@
     <string name="config_language_korean">한국어</string>
     <string name="config_language_french">Français</string>
     <string name="config_language_italian">Italiano</string>
-    <string name="config_language_polish">Polish</string>
+    <string name="config_language_polish">Polski</string>
     <!-- CONTEXT: Style-English locale option name. It is a language/style name, not normal UI prose. Keep the intended display strategy. -->
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">言語設定を展開</string>
@@ -246,7 +246,7 @@
     <string name="config_custom_theme_import_error_unknown_field">ブロック %1$d に未対応のフィールドがあります: %2$s。</string>
     <string name="config_custom_theme_import_error_duplicate_field">ブロック %1$d で %2$s が重複しています。</string>
     <string name="config_custom_theme_import_error_missing_field">ブロック %1$d に %2$s がありません。</string>
-    <string name="config_custom_theme_import_error_invalid_hex">ブロック %1$d の %2$s の16進カラー値が無効です: %3$s。</string>
+    <string name="config_custom_theme_import_error_invalid_hex">ブロック %1$d の %2$s の Hex カラー値が無効です: %3$s。</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">ブロック %1$d はカスタムファクションテーマの項目を使っています。カスタムファクションテーマからインポートしてください。</string>
     <string name="config_custom_theme_import_error_wrong_target_material">ブロック %1$d はカスタムカラーの項目を使っています。カスタムカラーからインポートしてください。</string>
     <string name="config_custom_theme_import_field_name">名前</string>
@@ -255,4 +255,24 @@
     <string name="config_custom_theme_import_field_outline">アウトライン</string>
     <string name="config_saved_playback_data_subtitle">アプリに保存したオーディオで、テキスト追従と強化ビジュアルをすぐ使えるようにします。</string>
     <string name="config_saved_playback_data_title">再生詳細を保存</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode と表示診断。</string>
+    <string name="config_debug_expand">Debug 設定を展開</string>
+    <string name="config_debug_collapse">Debug 設定を折りたたむ</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">収録用のタップヒントを表示します。</string>
+    <string name="config_visual_perf_overlay_title">Visual パフォーマンスオーバーレイ</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">ギアプレビューを一定時間実行します。</string>
+    <string name="config_animation_duration_label">秒</string>
+    <string name="config_animation_start">開始</string>
+    <string name="config_animation_stop">停止</string>
+    <string name="config_animation_mode_title">Animation モード</string>
+    <string name="config_animation_mode_single">1テーマ</string>
+    <string name="config_animation_mode_dual">2テーマ</string>
+    <string name="config_animation_theme_label">テーマ</string>
+    <string name="config_animation_dual_theme_title">2テーマ色</string>
+    <string name="config_animation_first_part_label">前半</string>
+    <string name="config_animation_theme_a_label">テーマA</string>
+    <string name="config_animation_theme_b_label">テーマB</string>
 </resources>

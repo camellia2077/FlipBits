@@ -15,7 +15,7 @@
     <string name="config_language_korean">한국어</string>
     <string name="config_language_french">Français</string>
     <string name="config_language_italian">Italiano</string>
-    <string name="config_language_polish">Polonês</string>
+    <string name="config_language_polish">Polski</string>
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">Expandir configurações de idioma</string>
     <string name="config_theme_mode_title">Modo do tema</string>
@@ -248,7 +248,7 @@
     <string name="config_custom_theme_import_error_unknown_field">O bloco %1$d tem um campo não suportado: %2$s.</string>
     <string name="config_custom_theme_import_error_duplicate_field">O bloco %1$d repete %2$s.</string>
     <string name="config_custom_theme_import_error_missing_field">Falta %2$s no bloco %1$d.</string>
-    <string name="config_custom_theme_import_error_invalid_hex">O bloco %1$d tem uma cor hexadecimal inválida em %2$s: %3$s.</string>
+    <string name="config_custom_theme_import_error_invalid_hex">O bloco %1$d tem uma cor Hex inválida em %2$s: %3$s.</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">O bloco %1$d usa campos de tema de facção personalizado. Importe-o a partir de tema de facção personalizado.</string>
     <string name="config_custom_theme_import_error_wrong_target_material">O bloco %1$d usa campos de cores personalizadas. Importe-o a partir de cores personalizadas.</string>
     <string name="config_custom_theme_import_field_name">nome</string>
@@ -257,4 +257,24 @@
     <string name="config_custom_theme_import_field_outline">contorno</string>
     <string name="config_saved_playback_data_subtitle">Mantém o acompanhamento de texto e os visuais aprimorados prontos para áudios salvos no app.</string>
     <string name="config_saved_playback_data_title">Salvar detalhes da reprodução</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode e diagnósticos visuais.</string>
+    <string name="config_debug_expand">Expandir ajustes de Debug</string>
+    <string name="config_debug_collapse">Recolher ajustes de Debug</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">Mostra dicas de toque para gravação.</string>
+    <string name="config_visual_perf_overlay_title">Overlay de desempenho visual</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">Executa a prévia das engrenagens por um tempo fixo.</string>
+    <string name="config_animation_duration_label">Segundos</string>
+    <string name="config_animation_start">Iniciar</string>
+    <string name="config_animation_stop">Parar</string>
+    <string name="config_animation_mode_title">Modo Animation</string>
+    <string name="config_animation_mode_single">Um tema</string>
+    <string name="config_animation_mode_dual">Dois temas</string>
+    <string name="config_animation_theme_label">Tema</string>
+    <string name="config_animation_dual_theme_title">Cores de dois temas</string>
+    <string name="config_animation_first_part_label">Primeira parte</string>
+    <string name="config_animation_theme_a_label">Tema A</string>
+    <string name="config_animation_theme_b_label">Tema B</string>
 </resources>

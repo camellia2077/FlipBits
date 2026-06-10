@@ -495,6 +495,13 @@ internal class AudioAndroidPreferencesActions(
         }
     }
 
+    fun onDualThemeAnimationEnabledChanged(enabled: Boolean) {
+        uiState.update { it.copy(isDualThemeAnimationEnabled = enabled) }
+        scope.launch {
+            appSettingsRepository.setDualThemeAnimationEnabled(enabled)
+        }
+    }
+
     fun onSampleDecorationEnabledChanged(enabled: Boolean) {
         uiState.update { state ->
             state.withSampleDecoration(isDecorationEnabled = enabled)

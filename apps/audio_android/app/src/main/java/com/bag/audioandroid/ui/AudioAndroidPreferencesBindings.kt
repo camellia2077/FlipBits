@@ -74,6 +74,7 @@ internal class AudioAndroidPreferencesBindings(
         observeConfigLabyrinthOfMutabilityFactionThemeExpanded()
         observeConfigDebugExpanded()
         observeDemoModeEnabled()
+        observeDualThemeAnimationEnabled()
         observeSampleAutoFillEnabled()
         observeSampleDecorationEnabled()
         observeSavedAudioPlaybackDataStorageEnabled()
@@ -690,6 +691,22 @@ internal class AudioAndroidPreferencesBindings(
                             state
                         } else {
                             state.copy(isDemoModeEnabled = enabled)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeDualThemeAnimationEnabled() {
+        scope.launch {
+            appSettingsRepository.isDualThemeAnimationEnabled
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    uiState.update { state ->
+                        if (state.isDualThemeAnimationEnabled == enabled) {
+                            state
+                        } else {
+                            state.copy(isDualThemeAnimationEnabled = enabled)
                         }
                     }
                 }

@@ -417,6 +417,10 @@ class AudioAndroidViewModel(
         preferencesActions.onDemoModeEnabledChanged(enabled)
     }
 
+    fun onDualThemeAnimationEnabledChanged(enabled: Boolean) {
+        preferencesActions.onDualThemeAnimationEnabledChanged(enabled)
+    }
+
     fun onSampleDecorationEnabledChanged(enabled: Boolean) {
         preferencesActions.onSampleDecorationEnabledChanged(enabled)
     }

@@ -81,6 +81,7 @@ data class AudioAppUiState(
     val isConfigLabyrinthOfMutabilityFactionThemeExpanded: Boolean = false,
     val isConfigDebugExpanded: Boolean = false,
     val isFlashVoicingEnabled: Boolean = true,
+    val isDualThemeAnimationEnabled: Boolean = false,
     val selectedFlashVoicingStyle: FlashVoicingStyleOption = FlashVoicingStyleOption.Standard,
     val selectedMorseSpeed: MorseSpeedOption = MorseSpeedOption.default,
     val selectedSampleInputLength: SampleInputLengthOption = SampleInputLengthOption.Short,

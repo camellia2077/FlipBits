@@ -104,7 +104,7 @@
     <string name="audio_pro_visual_next_byte_advance">Это второй nibble, поэтому после него плеер перейдёт к следующему байту.</string>
     <string name="audio_pro_visual_ascii_byte">Байт ASCII %1$d</string>
     <string name="audio_pro_visual_token_byte">Token #%1$d • байт %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Позиция байта</string>
     <string name="audio_pro_visual_then">Затем</string>
     <string name="audio_info_dialog_title">Инфо</string>
@@ -193,7 +193,7 @@
     <string name="audio_input_encoding_rules_title">Правила ввода</string>
     <string name="audio_input_encoding_rules">Правила ввода</string>
     <string name="audio_input_encoding_rules_done">Готово</string>
-    <string name="audio_input_encoding_rules_pro">Pro принимает только текст ASCII. Не-ASCII символы, например текст CJK, эмодзи и многие буквы с диакритикой, нельзя закодировать в pro.</string>
+    <string name="audio_input_encoding_rules_pro">Pro принимает только текст ASCII. Не-ASCII символы, например текст CJK, Emoji и многие буквы с диакритикой, нельзя закодировать в pro.</string>
     <string name="audio_input_encoding_rules_unrestricted">Этот режим принимает текущий текст как байты UTF-8/обычного текста. У mini и pro более строгие правила ввода.</string>
     <string name="audio_input_encoding_rules_mini">Mini принимает A-Z, 0-9, пробелы и распространённую пунктуацию Morse. Строчные буквы кодируются как прописные, повторяющиеся пробелы объединяются.</string>
     <string name="audio_pro_unsupported_characters">Неподдерживаемые символы pro: %1$s</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Вертикально</string>
     <string name="audio_morse_visualizer_mode_horizontal">Горизонтально</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

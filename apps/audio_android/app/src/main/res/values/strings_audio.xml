@@ -188,7 +188,7 @@
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <!-- CONTEXT: Fallback text in the pro guide card when both nibble steps for the current byte are complete. -->
     <string name="audio_pro_visual_byte_complete">Byte complete</string>
-    <!-- CONTEXT: Mapping line in the pro guide card. %1$d is token index, %2$s token text, %3$d byte position within token, %4$d total byte count. -->
+    <!-- CONTEXT: Mapping line in the pro guide card. %1$d is the token index, %2$s is the token text, %3$d is the byte position within the token, and %4$d is the total byte count. Keep Token as the exact English protocol term in every locale. -->
     <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
     <!-- CONTEXT: Line in the pro guide card showing the next symbol's low and high frequencies. -->
     <string name="audio_pro_visual_next_frequencies">Next symbol frequencies: %1$d + %2$d Hz</string>
@@ -196,10 +196,10 @@
     <string name="audio_pro_visual_next_byte_advance">This is the second nibble, so the player will advance to the next byte after it.</string>
     <!-- CONTEXT: Label in the pro byte explanation view for an ASCII byte. %1$d is the byte index number. -->
     <string name="audio_pro_visual_ascii_byte">ASCII byte %1$d</string>
-    <!-- CONTEXT: Label in the pro byte explanation view mapping a token index to a byte position. -->
+    <!-- CONTEXT: Label in the pro byte explanation view mapping a token index to a byte position. Keep Token as the exact English protocol term in every locale. -->
     <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d/%3$d</string>
-    <!-- CONTEXT: Byte explanation line showing one byte in hex and binary. %1$s is the hex byte and %2$s is the binary string. -->
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <!-- CONTEXT: Byte explanation line showing one byte in hex and binary. %1$s is the hex byte and %2$s is the binary string. Keep Hex as the exact English protocol term in every locale. -->
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <!-- CONTEXT: Small section heading in the pro byte explanation view for the current byte's position info. -->
     <string name="audio_pro_visual_byte_position">Byte position</string>
     <!-- CONTEXT: Small section heading in the pro byte explanation view introducing what happens next after the current byte. -->
@@ -447,4 +447,6 @@
     <!-- CONTEXT: Short mode label in the mini/Morse visualizer for the new left-to-right playback strip. -->
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
     <string name="audio_action_collapse_player_detail">Collapse player</string>
+    <!-- CONTEXT: Label in the pro compact visualizer showing the current byte in hexadecimal. Keep Hex as the exact English protocol term in every locale. -->
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

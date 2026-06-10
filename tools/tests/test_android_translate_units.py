@@ -34,6 +34,7 @@ from core.replacement_entries import load_replacement_entries
 from core.replacement_json_preflight import load_replacement_json_with_preflight
 from core.translation_cli_payloads import compare_error_payload, compare_payload, replace_payload
 from core.translation_job_manifest import build_compare_manifest_patch, build_replace_manifest_patch, update_job_manifest
+from core.translation_lint import run_translation_lint
 from core.translation_paths import get_faction_from_filename, get_review_groups_for_text_type
 from core.xml_string_replacement import load_localized_directory_index, resolve_string_name_path
 
@@ -331,6 +332,44 @@ class MixedLanguageDetectionTests(unittest.TestCase):
             describe_detection_strategy("la"),
             (False, "Style-English Skip (仅保留 Pro ASCII 检查)"),
         )
+
+
+class TranslationLintLockedTermTests(unittest.TestCase):
+    def test_language_self_names_are_locked_terms(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            res_dir = Path(tmp_dir) / "res"
+            values_dir = res_dir / "values"
+            values_zh_dir = res_dir / "values-zh"
+            values_dir.mkdir(parents=True, exist_ok=True)
+            values_zh_dir.mkdir(parents=True, exist_ok=True)
+
+            (values_dir / "strings_settings.xml").write_text(
+                (
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                    "<resources>\n"
+                    "    <string name=\"config_language_polish\">Polski</string>\n"
+                    "    <string name=\"config_language_high_gothic\">Altum Gothicum</string>\n"
+                    "</resources>\n"
+                ),
+                encoding="utf-8",
+            )
+            (values_zh_dir / "strings_settings.xml").write_text(
+                (
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                    "<resources>\n"
+                    "    <string name=\"config_language_polish\">波兰语</string>\n"
+                    "    <string name=\"config_language_high_gothic\">高哥特语</string>\n"
+                    "</resources>\n"
+                ),
+                encoding="utf-8",
+            )
+
+            result = run_translation_lint(res_dir=str(res_dir), lang="zh")
+
+            locked_term_issues = [issue for issue in result.issues if issue.rule == "locked_term_missing"]
+            self.assertEqual(len(locked_term_issues), 2)
+            self.assertTrue(any(issue.key == "config_language_polish" and "Polski" in issue.message for issue in locked_term_issues))
+            self.assertTrue(any(issue.key == "config_language_high_gothic" and "Altum Gothicum" in issue.message for issue in locked_term_issues))
 
 
 class ApplyReplacementInStringTests(unittest.TestCase):

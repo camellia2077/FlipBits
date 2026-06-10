@@ -99,12 +99,12 @@
     <string name="audio_pro_visual_next">Siguiente</string>
     <string name="audio_pro_visual_symbol_summary">%1$s %2$s</string>
     <string name="audio_pro_visual_byte_complete">Byte completo</string>
-    <string name="audio_pro_visual_token_mapping">Token n.º %1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
+    <string name="audio_pro_visual_token_mapping">Token #%1$d \"%2$s\" -&gt; byte %3$d/%4$d</string>
     <string name="audio_pro_visual_next_frequencies">Frecuencias del siguiente símbolo: %1$d + %2$d Hz</string>
     <string name="audio_pro_visual_next_byte_advance">Este es el segundo nibble, así que el reproductor avanzará al siguiente byte después.</string>
     <string name="audio_pro_visual_ascii_byte">Byte ASCII %1$d</string>
-    <string name="audio_pro_visual_token_byte">Token n.º %1$d • byte %2$d/%3$d</string>
-    <string name="audio_pro_visual_byte_binary">0x%1$s -&gt; %2$s</string>
+    <string name="audio_pro_visual_token_byte">Token #%1$d • byte %2$d/%3$d</string>
+    <string name="audio_pro_visual_byte_binary">Hex %1$s -&gt; %2$s</string>
     <string name="audio_pro_visual_byte_position">Posición del byte</string>
     <string name="audio_pro_visual_then">Luego</string>
     <string name="audio_info_dialog_title">Información</string>
@@ -193,7 +193,7 @@
     <string name="audio_input_encoding_rules_title">Reglas de entrada</string>
     <string name="audio_input_encoding_rules">Reglas de entrada</string>
     <string name="audio_input_encoding_rules_done">Listo</string>
-    <string name="audio_input_encoding_rules_pro">Pro solo acepta texto ASCII. Los caracteres que no son ASCII, como texto CJK, emojis y muchas letras acentuadas, no se pueden codificar en pro.</string>
+    <string name="audio_input_encoding_rules_pro">Pro solo acepta texto ASCII. Los caracteres que no son ASCII, como texto CJK, Emoji y muchas letras acentuadas, no se pueden codificar en pro.</string>
     <string name="audio_input_encoding_rules_unrestricted">Este modo acepta el texto actual como bytes UTF-8/texto plano. Mini y pro tienen reglas de entrada más estrictas.</string>
     <string name="audio_input_encoding_rules_mini">Mini acepta A-Z, 0-9, espacios y puntuación Morse común. Las minúsculas se codifican como mayúsculas y los espacios repetidos se agrupan.</string>
     <string name="audio_pro_unsupported_characters">Caracteres pro no admitidos: %1$s</string>
@@ -212,4 +212,5 @@
     <string name="audio_flash_visualizer_mode_hz">Hz</string>
     <string name="audio_morse_visualizer_mode_vertical">Vertical</string>
     <string name="audio_morse_visualizer_mode_horizontal">Horizontal</string>
+    <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
 </resources>

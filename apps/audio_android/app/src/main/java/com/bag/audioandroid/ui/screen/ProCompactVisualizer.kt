@@ -105,7 +105,7 @@ private fun ProCurrentMappingCard(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = "0x${byteExplanation.byteHex}",
+                        text = stringResource(R.string.audio_pro_visual_byte_hex_value, byteExplanation.byteHex),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )

@@ -15,10 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.unit.dp
+import com.bag.audioandroid.ui.theme.AudioEncodeGlyphColors
 import com.bag.audioandroid.ui.theme.audioEncodeGlyphColors
 
 @Composable
@@ -27,8 +31,16 @@ internal fun AudioEncodeGlyph(
     isEncodingBusy: Boolean,
     modifier: Modifier = Modifier,
     baseSize: androidx.compose.ui.unit.Dp = 108.dp,
+    showCropGuide: Boolean = false,
+    cropGuideColor: Color = Color.Unspecified,
+    cropGuideBackgroundColor: Color = Color.Unspecified,
+    showIdleCoreRing: Boolean = true,
+    glyphColorsOverride: AudioEncodeGlyphColors? = null,
 ) {
-    val glyphColors = audioEncodeGlyphColors()
+    val glyphColors = glyphColorsOverride ?: audioEncodeGlyphColors()
+    val normalizedProgress = encodeProgress.coerceIn(0f, 1f)
+    val isInnerRotationActive = isEncodingBusy && normalizedProgress >= InnerRotationStartProgressThreshold
+    val isOuterRotationActive = isEncodingBusy && normalizedProgress >= OuterRotationStartProgressThreshold
     var isGlyphExpanded by rememberSaveable { mutableStateOf(false) }
     val glyphScale by animateFloatAsState(
         targetValue = if (isGlyphExpanded) ExpandedGlyphScale else 1f,
@@ -39,11 +51,30 @@ internal fun AudioEncodeGlyph(
             ),
         label = "audioEncodeGlyphScale",
     )
-    val busyElapsedMillis by produceState(
+    val innerRotationElapsedMillis by produceState(
         initialValue = 0L,
         key1 = isEncodingBusy,
+        key2 = isInnerRotationActive,
     ) {
-        if (!isEncodingBusy) {
+        if (!isEncodingBusy || !isInnerRotationActive) {
+            value = 0L
+            return@produceState
+        }
+
+        val startedAtNanos = withFrameNanos { it }
+        while (true) {
+            value =
+                withFrameNanos { frameTimeNanos ->
+                    ((frameTimeNanos - startedAtNanos) / 1_000_000L).coerceAtLeast(0L)
+                }
+        }
+    }
+    val outerRotationElapsedMillis by produceState(
+        initialValue = 0L,
+        key1 = isEncodingBusy,
+        key2 = isOuterRotationActive,
+    ) {
+        if (!isEncodingBusy || !isOuterRotationActive) {
             value = 0L
             return@produceState
         }
@@ -57,17 +88,18 @@ internal fun AudioEncodeGlyph(
         }
     }
     val outerRotation =
-        if (isEncodingBusy) {
-            ((busyElapsedMillis % OuterRotationDurationMs).toFloat() / OuterRotationDurationMs) * 360f
+        if (isOuterRotationActive) {
+            (
+                (outerRotationElapsedMillis % OuterRotationDurationMs).toFloat() /
+                    OuterRotationDurationMs
+            ) * 360f
         } else {
             0f
         }
-    // Start the outer gear first, then let the inner gear catch up later so the glyph
-    // reads like a heavy mechanism waking up instead of two spinners starting in sync.
     val innerRotation =
-        if (isEncodingBusy && busyElapsedMillis > InnerRotationDelayMs) {
+        if (isInnerRotationActive) {
             -(
-                ((busyElapsedMillis - InnerRotationDelayMs) % InnerRotationDurationMs).toFloat() /
+                (innerRotationElapsedMillis % InnerRotationDurationMs).toFloat() /
                     InnerRotationDurationMs
             ) * 360f
         } else {
@@ -88,6 +120,29 @@ internal fun AudioEncodeGlyph(
                 .clickable { isGlyphExpanded = !isGlyphExpanded }
                 .size((baseSize * glyphScale)),
     ) {
+        if (showCropGuide) {
+            val guideInset = size.minDimension * CropGuideInsetFraction
+            val guideSide = size.minDimension - (guideInset * 2f)
+            if (cropGuideBackgroundColor != Color.Unspecified) {
+                drawRect(
+                    color = cropGuideBackgroundColor,
+                    topLeft = Offset(guideInset, guideInset),
+                    size = Size(guideSide, guideSide),
+                )
+            }
+        }
+
+        if (showCropGuide && cropGuideColor != Color.Unspecified) {
+            val guideInset = size.minDimension * CropGuideInsetFraction
+            val guideSide = size.minDimension - (guideInset * 2f)
+            drawRect(
+                color = cropGuideColor,
+                topLeft = Offset(guideInset, guideInset),
+                size = Size(guideSide, guideSide),
+                style = Stroke(width = CropGuideStrokeWidth.toPx()),
+            )
+        }
+
         val iconScale = size.minDimension / IconViewportSize
         val iconWidth = IconViewportSize * iconScale
         val iconHeight = IconViewportSize * iconScale
@@ -103,6 +158,7 @@ internal fun AudioEncodeGlyph(
                     innerRotation = if (isEncodingBusy) innerRotation else 0f,
                     encodeProgress = encodeProgress,
                     isEncodingBusy = isEncodingBusy,
+                    showIdleCoreRing = showIdleCoreRing,
                     glyphColors = glyphColors,
                 )
             }
@@ -112,8 +168,11 @@ internal fun AudioEncodeGlyph(
 
 private const val OuterRotationDurationMs = 9800L
 private const val InnerRotationDurationMs = 8200L
-private const val InnerRotationDelayMs = 900L
 private const val ExpandedGlyphScale = 1.75f
+private const val CropGuideInsetFraction = 0.01f
+private val CropGuideStrokeWidth = 2.dp
+private const val InnerRotationStartProgressThreshold = 1f / 8f
+private const val OuterRotationStartProgressThreshold = 2f / 8f
 
 private const val OuterGearPathData =
     "M 242.02 112.99 L 242.02 143.01 L 236.33 147.10 A 110 110 0 0 1 231.37 165.62 " +

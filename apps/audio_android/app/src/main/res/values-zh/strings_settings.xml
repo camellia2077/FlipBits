@@ -20,7 +20,7 @@
     <string name="config_language_korean">한국어</string>
     <string name="config_language_french">Français</string>
     <string name="config_language_italian">Italiano</string>
-    <string name="config_language_polish">波兰语</string>
+    <string name="config_language_polish">Polski</string>
     <!-- CONTEXT: Style-English locale option name. It is a language/style name, not normal UI prose. Keep the intended display strategy. -->
     <string name="config_language_high_gothic">Altum Gothicum</string>
     <string name="config_language_expand">展开语言设置</string>
@@ -108,9 +108,9 @@
     <string name="faction_theme_crimson_decree_title">绯红法令</string>
     <string name="faction_theme_crimson_decree_description">石板灰、深绯红与信号橙。</string>
     <string name="faction_theme_crimson_decree_accessibility">绯红法令主题，石板灰配深绯红色，并带信号橙描边。</string>
-    <string name="faction_theme_immortal_rot_title">永恒腐败</string>
+    <string name="faction_theme_immortal_rot_title">剧毒溢流</string>
     <string name="faction_theme_immortal_rot_description">蕨绿、柠晶黄。</string>
-    <string name="faction_theme_immortal_rot_accessibility">永恒腐败主题，蕨绿搭配柠晶黄。</string>
+    <string name="faction_theme_immortal_rot_accessibility">剧毒溢流主题，蕨绿搭配柠晶黄。</string>
     <string name="faction_theme_plague_mire_title">瘟疫泥潭</string>
     <string name="faction_theme_plague_mire_description">沼泽黑绿、病态酸绿、灼橙。</string>
     <string name="faction_theme_plague_mire_accessibility">瘟疫泥潭主题，沼泽黑绿配病态酸绿与灼橙描边。</string>
@@ -244,7 +244,7 @@
     <string name="config_custom_theme_import_error_unknown_field">第 %1$d 组包含不支持的字段：%2$s。</string>
     <string name="config_custom_theme_import_error_duplicate_field">第 %1$d 组重复了 %2$s。</string>
     <string name="config_custom_theme_import_error_missing_field">第 %1$d 组缺少 %2$s。</string>
-    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 组中的 %2$s 十六进制颜色无效：%3$s。</string>
+    <string name="config_custom_theme_import_error_invalid_hex">第 %1$d 组中的 %2$s Hex 颜色无效：%3$s。</string>
     <string name="config_custom_theme_import_error_wrong_target_faction_theme">第 %1$d 组使用的是自定义阵营主题字段，请改为从自定义阵营主题导入。</string>
     <string name="config_custom_theme_import_error_wrong_target_material">第 %1$d 组使用的是自定义颜色字段，请改为从自定义颜色导入。</string>
     <string name="config_custom_theme_import_field_name">名称</string>
@@ -253,4 +253,24 @@
     <string name="config_custom_theme_import_field_outline">描边</string>
     <string name="config_saved_playback_data_subtitle">让应用内保存的音频随时可用文本跟随和增强视觉效果。</string>
     <string name="config_saved_playback_data_title">保存播放详情</string>
+    <string name="config_debug_title">Debug</string>
+    <string name="config_debug_subtitle">Demo mode 与视觉诊断。</string>
+    <string name="config_debug_expand">展开 Debug 设置</string>
+    <string name="config_debug_collapse">收起 Debug 设置</string>
+    <string name="config_demo_mode_title">Demo mode</string>
+    <string name="config_demo_mode_subtitle">显示录制用点击提示。</string>
+    <string name="config_visual_perf_overlay_title">视觉性能叠层</string>
+    <string name="config_animation_title">Animation</string>
+    <string name="config_animation_subtitle">按固定时长运行齿轮预览。</string>
+    <string name="config_animation_duration_label">秒数</string>
+    <string name="config_animation_start">开始</string>
+    <string name="config_animation_stop">停止</string>
+    <string name="config_animation_mode_title">Animation 模式</string>
+    <string name="config_animation_mode_single">单主题</string>
+    <string name="config_animation_mode_dual">双主题</string>
+    <string name="config_animation_theme_label">主题</string>
+    <string name="config_animation_dual_theme_title">双主题颜色</string>
+    <string name="config_animation_first_part_label">前半段</string>
+    <string name="config_animation_theme_a_label">主题A</string>
+    <string name="config_animation_theme_b_label">主题B</string>
 </resources>
