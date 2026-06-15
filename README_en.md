@@ -76,7 +76,7 @@
 ## Download / Install
 The Android APK will be published via GitHub Releases.
 
-Under the current reference build, the installation package is approximately `6.47 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
+Under the current reference build, the installation package is approximately `6.71 MB`(decimal-based, as reported by Android). These numbers will vary depending on the version, ABI, and build configurations.
 
 ## Live Demo
 
@@ -116,7 +116,7 @@ The Android app currently maintains a lightweight, native approach: fast cold st
 It is not just a shell for generating WAV files. It also carries much of the project's visual character:
 
 * **Dual follow views**: Visual is for watching signal, frequency, rhythm, and timeline motion; Lyrics is for watching how tokens, UTF-8 bytes, hex / binary / bits progress during playback.
-* **Theme expression**: Alongside `Material`, the app includes more atmospheric dual-tone themes designed for spectacle and mood, so different modes and styles can carry a stronger visual identity.
+* **Theme expression**: Alongside `Material`, the app includes more atmospheric tri-color themes (primary, secondary, and outline colors) designed for spectacle and mood, so different modes and styles can carry a stronger visual identity.
 * **Learning and presentation together**: The app is meant to help people understand encoding structure while also looking and sounding compelling, so UI, themes, animation, and visualization are part of the product rather than decoration.
 
 ## Design Boundaries

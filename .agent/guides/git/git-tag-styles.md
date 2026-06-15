@@ -25,18 +25,16 @@ vX.Y.Z
 
 ## Annotated Message Template
 
-最小形式：
+标签注释信息（Annotated Message）必须保持简洁，只包含版本号或特定平台的版本前缀，与历史标签风格一致（例如 `v0.4.14` 或 `Android v0.4.16`）。
 
 ```text
 vX.Y.Z
 ```
 
-带正文形式：
+或特定平台/组件前缀形式：
 
 ```text
-vX.Y.Z
-
-Release for vX.Y.Z.
+<Platform> vX.Y.Z
 ```
 
 ## Command Template

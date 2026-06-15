@@ -3,7 +3,7 @@
     <!-- CONTEXT: Title/tab label for the main audio workspace screen. Keep it short. -->
     <!-- CONTEXT: Section header and text-field label for the input text that will be converted into audio. -->
     <string name="audio_input_label">Input text</string>
-    <!-- CONTEXT: Primary action button on the Audio screen that starts generating audio from the current input. -->
+    <!-- CONTEXT: Primary action button on the Data screen that starts generating audio from the current input. -->
     <string name="audio_action_encode">Create</string>
     <!-- CONTEXT: Busy label for the primary create button while audio generation is running. -->
     <!-- CONTEXT: Busy label for the primary create button while audio generation is running. %1$d is the integer progress percent. -->
@@ -55,7 +55,7 @@
     <string name="audio_action_toggle_playback_speed_slider">Toggle playback speed presets</string>
     <!-- CONTEXT: Accessibility label for the playback-speed button in the player controls. %1$s is the current speed, such as 1.0x or 0.75x. -->
     <string name="audio_action_cycle_playback_speed">Playback speed %1$s</string>
-    <!-- CONTEXT: Action/icon label that opens the saved-audio list or picker from the audio screen/mini player. -->
+    <!-- CONTEXT: Action/icon label that opens the saved-audio list or picker from the Data screen/mini player. -->
     <string name="audio_action_open_saved_audio_list">Saved</string>
     <!-- CONTEXT: Small status line showing the source display name for a decoded result that came from freshly generated audio. %1$s is the source label/name. -->
     <string name="audio_decode_source_generated">Source: %1$s</string>
@@ -106,7 +106,7 @@
     <string name="audio_action_collapse_result_content_short">Hide</string>
     <!-- CONTEXT: Generic audio status wrapper where %1$s is a more specific status message. -->
     <!-- CONTEXT: Technical summary showing the sample count of generated/loaded audio. %1$d is the number of audio samples, not text examples. -->
-    <!-- CONTEXT: Header for the decoded/read-back result section on the main Audio screen. -->
+    <!-- CONTEXT: Header for the decoded/read-back result section on the main Data screen. -->
     <string name="audio_result_title">Read result</string>
     <!-- CONTEXT: Empty-state text shown in the decoded/read-back result section before anything has been decoded yet. -->
     <string name="audio_result_empty">No result yet.</string>
@@ -317,10 +317,10 @@
     <!-- CONTEXT: Example placeholder text shown for ultra mode when the input is empty. -->
     <string name="audio_transport_ultra_example">The lamp keepers unseal the old star chart</string>
     <!-- CONTEXT: Example placeholder text shown for mini mode when the input is empty. It must remain plain ASCII because mini mode accepts Morse-compatible ASCII only. -->
-    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
-    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Audio screen. -->
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Data screen. -->
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Data screen. -->
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Data screen. -->
+    <!-- CONTEXT: Built-in short thematic sample sentence that can be inserted by the random-sample action on the Data screen. -->
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
     <!-- CONTEXT: Built-in long thematic sample paragraph used by the random-sample action when Long is selected. -->
@@ -333,9 +333,9 @@
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
     <!-- CONTEXT: Built-in long pro-mode sample paragraph inserted by the random-sample action when Long is selected. Must stay strict ASCII because pro mode allows ASCII only. -->
-    <!-- CONTEXT: Status text shown on the Audio screen before any input is entered. User should type input and then press Create. -->
+    <!-- CONTEXT: Status text shown on the Data screen before any input is entered. User should type input and then press Create. -->
     <string name="status_ready_to_encode">Enter text and tap \"Create\"</string>
-    <!-- CONTEXT: Status text shown on the Audio screen when the input field is empty. -->
+    <!-- CONTEXT: Status text shown on the Data screen when the input field is empty. -->
     <!-- CONTEXT: Generic busy status for audio generation. %1$s is the transport mode label such as flash/pro/ultra. -->
     <!-- CONTEXT: Busy status for audio generation with progress. %1$s is the transport mode label and %2$d is the progress percent. -->
     <!-- CONTEXT: Busy status for the input-preparation phase of audio generation. %1$s is the transport mode label. -->
@@ -413,16 +413,16 @@
     <string name="audio_input_encoding_valid_pro">Pro input is ready. All characters are ASCII.</string>
     <string name="audio_info_flash_low_carrier">Low carrier</string>
     <string name="audio_info_flash_high_carrier">High carrier</string>
-    <!-- CONTEXT: Label on the Audio screen for the flash mode bit duration setting/value. "Bit" is the protocol term and may remain partly English in locales that keep the term. -->
+    <!-- CONTEXT: Label on the Data screen for the flash mode bit duration setting/value. "Bit" is the protocol term and may remain partly English in locales that keep the term. -->
     <string name="audio_info_flash_bit_duration">Bit duration</string>
-    <!-- CONTEXT: Label on the Audio screen for the silent gap inserted between flash payload segments. "Payload" is the protocol term and may remain partly English in locales that keep the term. -->
+    <!-- CONTEXT: Label on the Data screen for the silent gap inserted between flash payload segments. "Payload" is the protocol term and may remain partly English in locales that keep the term. -->
     <string name="audio_info_flash_payload_silence">Payload silence</string>
     <string name="audio_info_flash_decode_path">Decode path</string>
-    <!-- CONTEXT: Value formatter on the Audio screen for the flash carrier frequency. %1$s is the numeric frequency and Hz should remain the unit label. -->
+    <!-- CONTEXT: Value formatter on the Data screen for the flash carrier frequency. %1$s is the numeric frequency and Hz should remain the unit label. -->
     <string name="audio_info_flash_carrier_hz_value">%1$s Hz</string>
     <string name="audio_info_flash_bit_duration_samples_value">%1$s samples</string>
     <!-- CONTEXT: Short demo hint shown after the user enables demo mode. Keep it concise like a toast or chip label. -->
-    <!-- CONTEXT: Short demo hint shown after the user switches to the Audio tab. "Audio" is the current bottom-tab label shown to the user. -->
+    <!-- CONTEXT: Short demo hint shown after the user switches to the Data tab. "Data" is the current bottom-tab label shown to the user. -->
     <!-- CONTEXT: Short demo hint shown after the user switches to the Saved tab. "Saved" is the current bottom-tab label shown to the user. -->
     <!-- CONTEXT: Short demo hint shown after the user switches to the Settings tab. "Settings" is the current bottom-tab label shown to the user. -->
     <!-- CONTEXT: Short demo hint for the primary action that starts audio generation from the current text. Keep it concise like a button/action label. -->
@@ -449,4 +449,91 @@
     <string name="audio_action_collapse_player_detail">Collapse player</string>
     <!-- CONTEXT: Label in the pro compact visualizer showing the current byte in hexadecimal. Keep Hex as the exact English protocol term in every locale. -->
     <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
+    <!-- CONTEXT: Card title for the offline voice recording controls on the Voice tab. -->
+    <string name="voice_record_title">Record voice</string>
+    <!-- CONTEXT: Helper text shown when the Voice tab cannot record until RECORD_AUDIO permission is granted. -->
+    <string name="voice_record_permission_required">Microphone permission is required before recording.</string>
+    <!-- CONTEXT: Primary action button that requests microphone permission for the Voice tab. -->
+    <string name="voice_action_grant_permission">Grant microphone access</string>
+    <!-- CONTEXT: Primary action button that stops the current offline voice recording. -->
+    <string name="voice_action_stop_recording">Stop recording</string>
+    <!-- CONTEXT: Primary action button that starts offline voice recording on the Voice tab. -->
+    <string name="voice_action_start_recording">Start recording</string>
+    <!-- CONTEXT: Status text shown after a voice recording is captured. %1$s is the clip duration. -->
+    <!-- CONTEXT: Busy label shown while the recorded voice clip is being processed. -->
+    <string name="voice_action_process_busy">Processing…</string>
+    <!-- CONTEXT: Primary action button that applies the selected Voice effect to the input clip. -->
+    <string name="voice_action_process">Process</string>
+    <!-- CONTEXT: Card title for the processed wet-only preview section on the Voice tab. -->
+    <string name="voice_result_title">Result</string>
+    <!-- CONTEXT: Status text shown after voice processing succeeds. %1$s is the processed clip duration. -->
+    <string name="voice_result_ready">Wet preview ready: %1$s</string>
+    <!-- CONTEXT: Empty-state text shown before the Voice tab has a processed wet preview. -->
+    <string name="voice_result_empty">No processed voice yet.</string>
+    <!-- CONTEXT: Playback control that stops the Voice tab wet preview. -->
+    <string name="voice_action_stop_preview">Stop</string>
+    <!-- CONTEXT: Live status text shown while the Voice tab is capturing a recording. -->
+    <string name="voice_status_recording">Recording… tap Stop when finished.</string>
+    <!-- CONTEXT: Status text shown when the Voice tab is waiting for microphone permission. -->
+    <string name="voice_status_permission_needed">Grant microphone access to record a clip.</string>
+    <!-- CONTEXT: Status text shown after voice processing returns an error. -->
+    <string name="voice_status_processing_failed">Processing failed. Record again and retry.</string>
+    <!-- CONTEXT: Idle status text shown on the Voice tab before recording starts. -->
+    <string name="voice_status_ready">Ready to record a dry clip for voice processing.</string>
+    <string name="voice_effect_title">Voice effect</string>
+    <string name="voice_workflow_title">Mode</string>
+    <string name="voice_workflow_clip">Clip</string>
+    <string name="voice_workflow_live">Live</string>
+    <string name="voice_voicing_style_title">Voicing style</string>
+    <string name="voice_action_select_voicing_style">Select voicing style</string>
+    <string name="voice_voicing_style_sheet_title">Voicing style</string>
+    <string name="voice_binharic_title">Binharic</string>
+    <string name="voice_binharic_summary">Voice with an added flash-style background track.</string>
+    <!-- CONTEXT: CONTEXT: Title of the Signal Cant voice preset. Keep it short like the other Voice preset names. -->
+    <!-- CONTEXT: CONTEXT: Short description of the Signal Cant preset on the Voice tab. It should read as a distinct effect, not just a heavier Machine Voice. -->
+    <!-- CONTEXT: Voice preset title for a general-purpose robot and metallic echo voice effect. -->
+    <!-- CONTEXT: Voice preset summary for a general-purpose robot voice effect with metallic short echo. -->
+    <string name="voice_action_choose_upload">Choose audio file</string>
+    <string name="voice_action_start_live">Start live</string>
+    <string name="voice_action_stop_live">Stop live</string>
+    <string name="voice_input_source_record">Record</string>
+    <string name="voice_status_import_unsupported">Use a supported audio clip such as WAV, MP3, or M4A.</string>
+    <string name="voice_input_source_title">Source</string>
+    <string name="voice_input_source_upload">Upload</string>
+    <string name="voice_record_processing_mode_title">Processing mode</string>
+    <string name="voice_record_processing_after_recording">After recording</string>
+    <string name="voice_record_processing_while_recording">While recording</string>
+    <string name="voice_action_save_result">Save WAV</string>
+    <string name="voice_status_importing">Importing clip…</string>
+    <string name="voice_status_import_failed">Import failed. Choose another clip and retry.</string>
+    <string name="voice_status_upload_ready">Choose an audio clip to process.</string>
+    <string name="voice_status_live_ready">Ready for live voice preview.</string>
+    <string name="voice_status_live_running">Live voice preview is running.</string>
+    <string name="voice_status_live_failed">Live preview stopped. Check your device audio path and retry.</string>
+    <string name="voice_live_route_active">Input: %1$s • Output: %2$s</string>
+    <string name="voice_live_route_requested_fallback">Preferred live output unavailable. Input: %1$s • Actual output: %2$s</string>
+    <string name="voice_live_route_unknown">System default</string>
+    <string name="voice_live_note">Live prefers the phone mic for input and a connected Bluetooth speaker for output. If no Bluetooth output is available, it falls back to the phone speaker.</string>
+    <string name="voice_input_title">Input clip</string>
+    <string name="voice_process_hint_needs_input">Record or upload audio before processing.</string>
+    <string name="voice_process_hint_processing">Processing the selected preset…</string>
+    <string name="voice_track_mode_single">Single track</string>
+    <string name="voice_track_mode_dual">Dual track</string>
+    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_summary">Original voice with a constant flash-style background track.</string>
+    <string name="voice_metal_title">Metal</string>
+    <string name="voice_metal_summary">Metallic voice on one track.</string>
+    <string name="voice_code_title">Code</string>
+    <string name="voice_code_summary">Machine voice with short coded sounds between lines.</string>
+    <string name="voice_robot_title">Robot</string>
+    <string name="voice_robot_summary">Clean robot voice with a short metallic echo.</string>
+    <string name="voice_preset_title">Preset</string>
+    <string name="voice_live_preview_dialog_title">Live mode preview</string>
+    <string name="voice_live_preview_dialog_body">Live mode is currently in early preview. Audio quality and latency may vary as independent development and active optimization remain ongoing. Clip mode is recommended for best results.</string>
+    <string name="voice_live_preview_dialog_use_clip">Use Clip</string>
+    <string name="voice_live_preview_dialog_try_live">Try Live</string>
+    <string name="voice_result_input_track">Input</string>
+    <string name="voice_result_output_track">Output</string>
+    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_summary">Original voice with a flash-style background track that opens only when voice is present.</string>
 </resources>

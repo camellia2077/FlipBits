@@ -35,6 +35,8 @@ internal fun AudioAndroidAppShell(
     debugMorseVisualizationModeRequest: DebugMorseVisualizationModeRequest? = null,
     onDebugMorseVisualizationModeHandled: (Long) -> Unit = {},
     onImportAudio: () -> Unit,
+    onImportVoiceAudio: () -> Unit,
+    onRequestVoiceRecordPermission: () -> Unit,
     viewModel: AudioAndroidViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -111,6 +113,8 @@ internal fun AudioAndroidAppShell(
                         debugMorseVisualizationModeRequest = debugMorseVisualizationModeRequest,
                         onDebugMorseVisualizationModeHandled = onDebugMorseVisualizationModeHandled,
                         onImportAudio = onImportAudio,
+                        onImportVoiceAudio = onImportVoiceAudio,
+                        onRequestVoiceRecordPermission = onRequestVoiceRecordPermission,
                         modifier = modifier,
                     )
                 }

@@ -19,7 +19,7 @@
 ## File Roles
 
 - `strings_common.xml`：App 名、通用按钮、底部 tab。要求最短、最稳定。
-- `strings_audio.xml`：Audio 页动作、播放模式、状态、结果、详情。要求像主流音乐 app。
+- `strings_audio.xml`：Data 页动作、播放模式、状态、结果、详情。要求像主流音乐 app。
 - `strings_saved.xml`：Saved 页、导入、分享、重命名、删除、移动、文件夹。要求像媒体库或文件管理。
 - `strings_settings.xml`：语言、主题、dual-tone、palette、flash style、about 入口。要求像系统设置页。
 - `strings_about.xml`：作者、版本、GitHub、开源许可。要求信息型、简短。

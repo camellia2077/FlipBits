@@ -3,6 +3,7 @@ package com.bag.audioandroid
 import com.bag.audioandroid.domain.DecodedAudioPayloadResult
 import com.bag.audioandroid.domain.EncodedAudioPayloadResult
 import com.bag.audioandroid.domain.FlashSignalInfo
+import com.bag.audioandroid.domain.VoiceFxNativeResult
 
 object NativeBagBridge {
     init {
@@ -112,6 +113,30 @@ object NativeBagBridge {
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
     ): Int
+
+    external fun nativeApplyVoiceFx(
+        pcm: ShortArray,
+        sampleRateHz: Int,
+        preset: Int,
+        enableDiagnostics: Int,
+        subvoiceStyle: Int,
+    ): VoiceFxNativeResult
+
+    external fun nativeCreateVoiceFxProcessor(
+        sampleRateHz: Int,
+        preset: Int,
+        enableDiagnostics: Int,
+        subvoiceStyle: Int,
+    ): Long
+
+    external fun nativeProcessVoiceFxBlock(
+        handle: Long,
+        pcm: ShortArray,
+    ): VoiceFxNativeResult
+
+    external fun nativeFlushVoiceFxProcessor(handle: Long): VoiceFxNativeResult
+
+    external fun nativeDestroyVoiceFxProcessor(handle: Long)
 
     external fun nativeGetCoreVersion(): String
 }

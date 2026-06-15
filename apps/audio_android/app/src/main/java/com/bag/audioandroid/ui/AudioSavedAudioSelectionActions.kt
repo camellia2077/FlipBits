@@ -421,7 +421,7 @@ internal class AudioSavedAudioSelectionActions(
             measureElapsedMs {
                 uiState.update { state ->
                     state.copy(
-                        selectedTab = if (switchToAudioTab) AppTab.Audio else state.selectedTab,
+                        selectedTab = if (switchToAudioTab) AppTab.Data else state.selectedTab,
                         playerShellState =
                             if (closeSavedAudioSheet || switchToAudioTab) {
                                 state.playerShellState.reduce(

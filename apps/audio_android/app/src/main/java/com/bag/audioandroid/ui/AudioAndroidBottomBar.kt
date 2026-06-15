@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.state.AudioAppUiState
 
-private val AudioAndroidNavigationTabs = listOf(AppTab.Config, AppTab.Audio, AppTab.Library)
+private val AudioAndroidNavigationTabs = listOf(AppTab.Config, AppTab.Data, AppTab.Voice, AppTab.Library)
 
 @Composable
 internal fun AudioAndroidBottomBar(
@@ -39,20 +39,21 @@ internal fun AudioAndroidBottomBar(
     navigationBarColors: NavigationBarItemColors,
     onTabSelected: (AppTab) -> Unit,
 ) {
+    val dockContainerColor = playerDockContainerColor(uiState)
     Surface(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
         shape = RoundedCornerShape(26.dp),
-        color = playerDockContainerColor(uiState),
+        color = dockContainerColor,
         tonalElevation = 0.dp,
         shadowElevation = 6.dp,
     ) {
         NavigationBar(
             modifier = Modifier.height(60.dp),
             windowInsets = WindowInsets(0, 0, 0, 0),
-            containerColor = playerDockContainerColor(uiState),
+            containerColor = dockContainerColor,
             // Force 0.dp tonal elevation to match the MiniPlayer and ensure pure color.
             tonalElevation = 0.dp,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -106,7 +107,12 @@ private fun RowScope.AudioAndroidBottomTabItem(
                     Modifier
                         .size(width = 32.dp, height = 24.dp)
                         .background(
-                            color = if (selected) selectedIndicatorColor else Color.Transparent,
+                            color =
+                                if (selected) {
+                                    selectedIndicatorColor
+                                } else {
+                                    Color.Transparent
+                                },
                             shape = RoundedCornerShape(13.dp),
                         ),
                 contentAlignment = Alignment.Center,

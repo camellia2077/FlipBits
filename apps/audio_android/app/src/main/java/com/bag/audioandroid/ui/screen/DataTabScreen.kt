@@ -28,7 +28,7 @@ import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 
 @Composable
-fun AudioTabScreen(
+fun DataTabScreen(
     selectedThemeStyle: ThemeStyleOption,
     transportMode: TransportModeOption,
     isCodecBusy: Boolean,

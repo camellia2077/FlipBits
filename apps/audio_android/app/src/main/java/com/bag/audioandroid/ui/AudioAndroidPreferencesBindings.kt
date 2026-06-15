@@ -1,6 +1,7 @@
 package com.bag.audioandroid.ui
 
 import com.bag.audioandroid.data.AppSettingsRepository
+import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.DefaultCustomFactionThemeSettings
 import com.bag.audioandroid.ui.model.FlashVoicingStyleOption
@@ -9,6 +10,10 @@ import com.bag.audioandroid.ui.model.PlaybackSequenceMode
 import com.bag.audioandroid.ui.model.SampleInputLengthOption
 import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
+import com.bag.audioandroid.ui.model.VoiceInputSourceOption
+import com.bag.audioandroid.ui.model.VoiceTrackModeOption
+import com.bag.audioandroid.ui.model.VoiceWorkflowModeOption
+import com.bag.audioandroid.ui.model.defaultPreset
 import com.bag.audioandroid.ui.state.AudioAppUiState
 import com.bag.audioandroid.ui.state.materialPaletteIdForMode
 import com.bag.audioandroid.ui.state.resolveMaterialPaletteById
@@ -40,6 +45,10 @@ internal class AudioAndroidPreferencesBindings(
     private val scope: CoroutineScope,
 ) {
     fun startObserving() {
+        observeSelectedTab()
+        observeSelectedVoiceWorkflowMode()
+        observeSelectedVoiceTrackMode()
+        observeSelectedVoiceInputSource()
         observeSelectedPalette()
         observeSelectedThemeMode()
         observeSelectedMaterialPaletteIdLight()
@@ -79,6 +88,102 @@ internal class AudioAndroidPreferencesBindings(
         observeSampleDecorationEnabled()
         observeSavedAudioPlaybackDataStorageEnabled()
         observeFlashVisualPerfOverlayEnabled()
+    }
+
+    private fun observeSelectedTab() {
+        scope.launch {
+            appSettingsRepository.selectedTabId
+                .distinctUntilChanged()
+                .collect { tabId ->
+                    if (tabId == null) {
+                        return@collect
+                    }
+                    val selectedTab = AppTab.fromAutomationId(tabId)
+                    uiState.update { state ->
+                        if (state.selectedTab == selectedTab) {
+                            state
+                        } else {
+                            state.copy(selectedTab = selectedTab)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSelectedVoiceWorkflowMode() {
+        scope.launch {
+            appSettingsRepository.selectedVoiceWorkflowModeId
+                .distinctUntilChanged()
+                .collect { modeId ->
+                    if (modeId == null) {
+                        return@collect
+                    }
+                    val selectedMode = VoiceWorkflowModeOption.fromId(modeId)
+                    uiState.update { state ->
+                        if (state.voiceSession.selectedWorkflowMode == selectedMode) {
+                            state
+                        } else {
+                            state.copy(
+                                voiceSession = state.voiceSession.copy(selectedWorkflowMode = selectedMode),
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSelectedVoiceInputSource() {
+        scope.launch {
+            appSettingsRepository.selectedVoiceInputSourceId
+                .distinctUntilChanged()
+                .collect { sourceId ->
+                    if (sourceId == null) {
+                        return@collect
+                    }
+                    val selectedSource = VoiceInputSourceOption.fromId(sourceId)
+                    uiState.update { state ->
+                        if (state.voiceSession.selectedInputSource == selectedSource) {
+                            state
+                        } else {
+                            state.copy(
+                                voiceSession = state.voiceSession.copy(selectedInputSource = selectedSource),
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun observeSelectedVoiceTrackMode() {
+        scope.launch {
+            appSettingsRepository.selectedVoiceTrackModeId
+                .distinctUntilChanged()
+                .collect { modeId ->
+                    if (modeId == null) {
+                        return@collect
+                    }
+                    val selectedMode = VoiceTrackModeOption.fromId(modeId)
+                    uiState.update { state ->
+                        if (state.voiceSession.selectedTrackMode == selectedMode) {
+                            state
+                        } else {
+                            val nextPreset =
+                                if (state.voiceSession.selectedPreset.trackMode == selectedMode) {
+                                    state.voiceSession.selectedPreset
+                                } else {
+                                    selectedMode.defaultPreset()
+                                }
+                            state.copy(
+                                voiceSession =
+                                    state.voiceSession.copy(
+                                        selectedTrackMode = selectedMode,
+                                        selectedPreset = nextPreset,
+                                    ),
+                            )
+                        }
+                    }
+                }
+        }
     }
 
     private fun observeSelectedPalette() {

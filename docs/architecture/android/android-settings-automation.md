@@ -53,7 +53,8 @@ Current settings-aware adb extras:
     - `com.bag.audioandroid.DEBUG_APP_TAB_SCENARIO`
 - `wb.tab`
   - Optional app tab target for navigation-only automation.
-  - Accepted values: `audio`, `saved`, `settings`.
+  - Accepted values: `settings`, `data`, `voice`, `saved`.
+  - Compatibility aliases: `library` -> `saved`, `config` -> `settings`.
   - Available in:
     - `com.bag.audioandroid.DEBUG_APP_TAB_SCENARIO`
 - `wb.import.confirm`
@@ -85,7 +86,8 @@ Navigation scenario commands:
 ```powershell
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_APP_TAB_SCENARIO --es wb.tab settings
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_APP_TAB_SCENARIO --es wb.tab saved --es wb.lang ja
-python tools/run.py android-debug capture-tab --tab audio
+python tools/run.py android-debug capture-tab --tab data
+python tools/run.py android-debug capture-tab --tab voice
 python tools/run.py android-debug capture-tab --tab settings --lang en
 adb shell am start -n com.bag.audioandroid/.MainActivity -a com.bag.audioandroid.DEBUG_SETTINGS_IMPORT_SCENARIO --es wb.import.confirm overwrite
 python tools/run.py android-debug capture-settings-import --confirm none --scope current --lang en
@@ -119,7 +121,7 @@ Current logs:
 - `FlashAutomation languageApplied ... language=<tag>`
 - `MiniAutomation languageApplied ... language=<tag>`
 - `EncodeProgressAutomation languageApplied ... language=<tag>`
-- `TabAutomation received ... tab=<audio|saved|settings>`
+- `TabAutomation received ... tab=<settings|data|voice|saved>`
 - `TabAutomation tabSelected ... requested=<...> selected=<...>`
 - `SettingsImportAutomation received ... confirm=<none|overwrite|copy>`
 - `SettingsImportAutomation copyResolved ... scope=<current|all> presetCount=<n>`

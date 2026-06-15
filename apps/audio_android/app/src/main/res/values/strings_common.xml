@@ -10,10 +10,12 @@
     <string name="common_all">All</string>
     <!-- CONTEXT: Fallback label shown when a value such as version or mode is unavailable or blank. -->
     <string name="common_unknown">Unknown</string>
-    <!-- CONTEXT: Bottom navigation tab label for the main audio encode/decode workspace. Keep it short. -->
-    <string name="tab_audio">Audio</string>
+    <!-- CONTEXT: Bottom navigation tab label for the main data encode/decode workspace. Keep it short. -->
+    <string name="tab_data">Data</string>
     <!-- CONTEXT: Bottom navigation tab label for the saved audio library screen. Keep it short. -->
     <string name="tab_library">Saved</string>
     <!-- CONTEXT: Bottom navigation tab label for the settings/configuration screen. Keep it short. -->
     <string name="tab_config">Settings</string>
+    <!-- CONTEXT: Bottom navigation tab label for the offline voice effect screen. Keep it short. -->
+    <string name="tab_voice">Voice</string>
 </resources>

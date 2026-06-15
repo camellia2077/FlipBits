@@ -11,6 +11,12 @@ interface AudioShareGateway {
         metadata: GeneratedAudioMetadata,
     ): Boolean = false
 
+    fun shareRawPcmAudio(
+        displayName: String,
+        pcm: ShortArray,
+        sampleRateHz: Int,
+    ): Boolean = false
+
     fun shareAudio(
         displayName: String,
         uriString: String,

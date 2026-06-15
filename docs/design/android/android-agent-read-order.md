@@ -14,7 +14,7 @@
 
 适用场景：
 - 改页面结构、组件职责、交互流、播放器布局
-- 改 Audio / Saved / Settings 页入口或共享 UI helper
+- 改 Settings / Data / Voice / Saved 页入口或共享 UI helper
 
 先读：
 - [android-player-ui.md](android-player-ui.md)

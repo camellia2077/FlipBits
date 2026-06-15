@@ -29,11 +29,13 @@ def find_high_risk_android_string_resource_patterns(raw_text: str) -> list[str]:
     patterns that frequently make aapt reject the resource.
     """
     xml_unescaped = unescape(raw_text)
+    is_quoted_literal = len(xml_unescaped) >= 2 and xml_unescaped[0] == '"' and xml_unescaped[-1] == '"'
+    scan_text = _strip_android_quoted_literal(xml_unescaped)
     risks: list[str] = []
     index = 0
-    while index < len(xml_unescaped):
-        char = xml_unescaped[index]
-        if char == "'":
+    while index < len(scan_text):
+        char = scan_text[index]
+        if char == "'" and not is_quoted_literal:
             risks.append("contains raw ASCII apostrophe; write plain text in JSON and persist as \\' in XML")
             index += 1
             continue
@@ -42,13 +44,13 @@ def find_high_risk_android_string_resource_patterns(raw_text: str) -> list[str]:
             index += 1
             continue
 
-        if index == len(xml_unescaped) - 1:
+        if index == len(scan_text) - 1:
             risks.append("ends with a trailing backslash")
             break
 
-        next_char = xml_unescaped[index + 1]
+        next_char = scan_text[index + 1]
         if next_char == "u":
-            code_point = xml_unescaped[index + 2 : index + 6]
+            code_point = scan_text[index + 2 : index + 6]
             if len(code_point) != 4 or any(ch not in string.hexdigits for ch in code_point):
                 risks.append("contains an invalid \\u escape sequence")
                 index += 2

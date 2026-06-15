@@ -2,7 +2,7 @@
 <resources>
     <!-- Japanese rewrite scaffold. -->
     <!-- Replace the English placeholder values below with Japanese. -->
-    <!-- Audio screen strings: actions, playback modes, player details, status messages. -->
+    <!-- Data screen strings: actions, playback modes, player details, status messages. -->
     <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
     <string name="audio_input_label">入力テキスト</string>
     <string name="audio_action_encode">作成</string>
@@ -27,7 +27,7 @@
     <string name="audio_action_repeat_one">1曲リピート</string>
     <!-- CONTEXT: Playback mode option. Repeat the whole list / repeat all. -->
     <string name="audio_action_repeat_list">全曲リピート</string>
-    <!-- CONTEXT: Main action on Audio screen. Reads audio back into text/result. Product term is Read. -->
+    <!-- CONTEXT: Main action on Data screen. Reads audio back into text/result. Product term is Read. -->
     <string name="audio_action_decode">読み取り</string>
     <!-- CONTEXT: Busy label for the Read action. -->
     <string name="audio_action_decode_busy">読み取り中…</string>
@@ -234,4 +234,71 @@
     <string name="audio_morse_visualizer_mode_vertical">縦向き</string>
     <string name="audio_morse_visualizer_mode_horizontal">横向き</string>
     <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
+    <string name="voice_record_title">音声を録音</string>
+    <string name="voice_record_permission_required">録音する前にマイクの権限が必要です。</string>
+    <string name="voice_action_grant_permission">マイク権限を許可</string>
+    <string name="voice_action_stop_recording">録音を停止</string>
+    <string name="voice_action_start_recording">録音を開始</string>
+    <string name="voice_action_process_busy">処理中…</string>
+    <string name="voice_action_process">処理</string>
+    <string name="voice_result_title">結果</string>
+    <string name="voice_result_ready">処理後プレビューの準備ができました: %1$s</string>
+    <string name="voice_result_empty">まだ処理済みの音声はありません。</string>
+    <string name="voice_action_stop_preview">停止</string>
+    <string name="voice_status_recording">録音中…終わったら「停止」をタップしてください。</string>
+    <string name="voice_status_permission_needed">クリップを録音するにはマイク権限を許可してください。</string>
+    <string name="voice_status_processing_failed">処理に失敗しました。録音し直してもう一度お試しください。</string>
+    <string name="voice_status_ready">音声処理用のドライクリップを録音する準備ができています。</string>
+    <string name="voice_effect_title">音声エフェクト</string>
+    <string name="voice_voicing_style_title">音声スタイル</string>
+    <string name="voice_action_select_voicing_style">音声スタイルを選択</string>
+    <string name="voice_voicing_style_sheet_title">音声スタイル</string>
+    <string name="voice_binharic_title">Binharic</string>
+    <string name="voice_binharic_summary">人声に flash 風の背景トラックを追加します。</string>
+    <string name="voice_input_title">入力クリップ</string>
+    <string name="voice_input_source_title">入力方法</string>
+    <string name="voice_input_source_record">録音</string>
+    <string name="voice_input_source_upload">アップロード</string>
+    <string name="voice_record_processing_mode_title">処理モード</string>
+    <string name="voice_record_processing_after_recording">録音後</string>
+    <string name="voice_record_processing_while_recording">録音中</string>
+    <string name="voice_action_choose_upload">音声ファイルを選択</string>
+    <string name="voice_status_importing">クリップを読み込み中…</string>
+    <string name="voice_status_import_failed">読み込みに失敗しました。別のクリップを選んで再試行してください。</string>
+    <string name="voice_status_import_unsupported">WAV、MP3、M4A などの対応音声クリップを使用してください。</string>
+    <string name="voice_status_upload_ready">処理する音声クリップを選択してください。</string>
+    <string name="voice_action_save_result">WAV を保存</string>
+    <string name="voice_workflow_title">モード</string>
+    <string name="voice_workflow_clip">クリップ</string>
+    <string name="voice_workflow_live">ライブ</string>
+    <string name="voice_action_start_live">ライブ開始</string>
+    <string name="voice_action_stop_live">ライブ停止</string>
+    <string name="voice_status_live_ready">ライブ音声プレビューの準備ができました。</string>
+    <string name="voice_status_live_running">ライブ音声プレビューを実行中です。</string>
+    <string name="voice_status_live_failed">ライブプレビューが停止しました。デバイスの音声経路を確認して再試行してください。</string>
+    <string name="voice_live_route_active">入力: %1$s • 出力: %2$s</string>
+    <string name="voice_live_route_requested_fallback">優先するライブ出力が利用できません。入力: %1$s • 実際の出力: %2$s</string>
+    <string name="voice_live_route_unknown">システム既定</string>
+    <string name="voice_live_note">ライブでは入力にスマートフォンのマイク、出力に接続済みの Bluetooth スピーカーを優先します。Bluetooth 出力が使えない場合はスマートフォンのスピーカーに切り替わります。</string>
+    <string name="voice_process_hint_needs_input">処理する前に音声を録音またはアップロードしてください。</string>
+    <string name="voice_process_hint_processing">選択したプリセットを処理中…</string>
+    <string name="voice_track_mode_single">シングルトラック</string>
+    <string name="voice_track_mode_dual">デュアルトラック</string>
+    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_summary">元の声に一定の flash 風背景トラックを追加します。</string>
+    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_summary">声があるときだけ開く flash 風背景トラックを元の声に追加します。</string>
+    <string name="voice_metal_title">メタル</string>
+    <string name="voice_metal_summary">1 本のトラックに金属的な声をのせます。</string>
+    <string name="voice_code_title">コード</string>
+    <string name="voice_code_summary">文のあいだに短い符号音が入る機械音声です。</string>
+    <string name="voice_robot_title">ロボット</string>
+    <string name="voice_robot_summary">短い金属エコーが入るクリーンなロボット音声です。</string>
+    <string name="voice_preset_title">プリセット</string>
+    <string name="voice_live_preview_dialog_title">Liveモードのプレビュー</string>
+    <string name="voice_live_preview_dialog_body">Liveモードは現在、初期プレビューです。個人開発と継続的な最適化が進行中のため、音質や遅延が変わることがあります。最も安定した結果にはClipモードをおすすめします。</string>
+    <string name="voice_live_preview_dialog_use_clip">Clipを使う</string>
+    <string name="voice_live_preview_dialog_try_live">Liveを試す</string>
+    <string name="voice_result_input_track">入力</string>
+    <string name="voice_result_output_track">出力</string>
 </resources>

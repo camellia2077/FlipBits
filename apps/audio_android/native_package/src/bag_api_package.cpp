@@ -15,6 +15,7 @@
 #include "android_bag/transport/facade.h"
 #include "android_bag/flash/codec.h"
 #include "android_bag/flash/signal.h"
+#include "android_bag/voice/fx.h"
 
 #if defined(FLIPBITS_ANDROID_MODULES_SMOKE)
 import bag.common.version;

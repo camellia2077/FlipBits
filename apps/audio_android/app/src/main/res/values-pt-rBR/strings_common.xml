@@ -5,7 +5,8 @@
     <string name="common_cancel">Cancelar</string>
     <string name="common_all">Tudo</string>
     <string name="common_unknown">Desconhecido</string>
-    <string name="tab_audio">Áudio</string>
+    <string name="tab_data">Data</string>
     <string name="tab_library">Salvos</string>
     <string name="tab_config">Configurações</string>
+    <string name="tab_voice">Voice</string>
 </resources>

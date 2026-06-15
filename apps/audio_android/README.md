@@ -82,12 +82,14 @@
   - `app/src/main/java/com/bag/audioandroid/ui/AudioSessionExportActions.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/AudioSessionEditingActions.kt`
 - 主要页面与组件：
-  - `app/src/main/java/com/bag/audioandroid/ui/screen/AudioTabScreen.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/screen/DataTabScreen.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/LibraryTabScreen.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/ConfigTabScreen.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/screen/VoiceTabScreen.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidBottomBar.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/MiniPlayerBar.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/PlayerDetailSheet.kt`
-- Audio 页输入/结果卡片：
+- Data 页输入/结果卡片：
   - `app/src/main/java/com/bag/audioandroid/ui/screen/AudioInputActionsCard.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/AudioResultCard.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/FlashVoicingSelectorSection.kt`
@@ -138,6 +140,7 @@
 - 播放区 UI：
   - 先读 `docs/design/android/android-player-ui.md` 的 detail page code map。
   - `PlayerScaffold.kt` -> `PlayerSurfaceHost.kt` -> `PlayerDetailSheet.kt`
+  - bottom tab 胶囊：`AudioAndroidBottomBar.kt`，规则看 `docs/design/android/android-player-ui.md` 的 `Dock System`
   - display 区：`AudioPlaybackDisplayBlock.kt` -> `PlaybackDisplaySection.kt` -> `PlaybackDisplayLayoutModel.kt`
   - bottom dock：`AudioPlaybackTimelineBlock.kt` -> `AudioPlaybackTransportControls.kt`
 - mini / flash / pro / ultra 可视化：
@@ -149,7 +152,7 @@
   - 先用 debug 指标和 `adb logcat FlashVisualPerf:D *:S` 判断是 draw、Compose、window、raw playback position、smoother reset 还是视觉密度问题，再决定改哪个层级。
 - 主题、palette、glyph：
   - `BrandThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
-- Audio 页输入卡、随机样例、示例文本：
+- Data 页输入卡、随机样例、示例文本：
   - `AudioInputActionsCard.kt` -> `AudioSessionEditingActions.kt` -> `SampleInputSessionUpdater.kt` -> `AndroidSampleInputTextProvider.kt`
   - `mini` 输入辅助由 `ui/model/MorseCode.kt` 提供 normalization、unsupported character 提示、dot/dash 预览与 `10 WPM / 15 WPM / 20 WPM` speed preset。
 - XML 文案与本地化资源：
@@ -174,7 +177,7 @@
 - 新增或修改可见 XML 文案时，需要同步更新对应语言目录下的 `strings*.xml`，避免语言版本漂移。
 - UI 设计细则不要继续堆在 `README.md` 或 `AGENTS.md` 里；优先写进 `docs/design/android/`，再由这里做导航。
 - 代码职责、颜色入口、共享 helper 等结构性说明，优先写进 `docs/architecture/`，再由这里做导航。
-- 当前底部 tab 用户文案以 `Audio / Saved / Settings` 为准；代码入口文件仍沿用历史命名，如 `LibraryTabScreen.kt`、`ConfigTabScreen.kt`。
+- 当前底部 tab 用户文案以 `Settings / Data / Voice / Saved` 为准；automation id 为 `settings / data / voice / saved`。代码入口文件部分仍沿用历史命名，如 `LibraryTabScreen.kt`、`ConfigTabScreen.kt`。
 
 ## Build Variants
 

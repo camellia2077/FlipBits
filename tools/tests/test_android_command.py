@@ -45,6 +45,37 @@ class AndroidCommandTests(unittest.TestCase):
         )
         self.assertEqual(android_command.ANDROID_GRADLE_ROOT, mock_run.call_args.kwargs["cwd"])
 
+    def test_android_actions_run_resource_escape_autofix_before_gradle(self) -> None:
+        with (
+            patch.object(android_command, "gradle_wrapper", return_value=["gradlew"]),
+            patch.object(android_command, "run") as mock_run,
+        ):
+            android_command.cmd_android(
+                argparse.Namespace(
+                    action="assemble-debug",
+                    clean=False,
+                    tests=[],
+                ),
+            )
+
+        self.assertEqual(
+            [
+                "python",
+                "tools/repo_tooling/android_translate/run.py",
+                "fix-resource-escapes",
+                "--res-dir",
+                "apps/audio_android/app/src/main/res",
+                "--quiet",
+            ],
+            mock_run.call_args_list[0].args[0],
+        )
+        self.assertEqual(android_command.ROOT_DIR, mock_run.call_args_list[0].kwargs["cwd"])
+        self.assertEqual(
+            ["gradlew", ":app:assembleDebug"],
+            mock_run.call_args_list[1].args[0],
+        )
+        self.assertEqual(android_command.ANDROID_GRADLE_ROOT, mock_run.call_args_list[1].kwargs["cwd"])
+
     def test_non_test_debug_rejects_tests_filters(self) -> None:
         with self.assertRaises(ToolError):
             android_command.cmd_android(

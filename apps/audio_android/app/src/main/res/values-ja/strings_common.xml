@@ -9,7 +9,8 @@
     <string name="common_cancel">キャンセル</string>
     <string name="common_all">すべて</string>
     <string name="common_unknown">不明</string>
-    <string name="tab_audio">オーディオ</string>
+    <string name="tab_data">Data</string>
     <string name="tab_library">保存済み</string>
     <string name="tab_config">設定</string>
+    <string name="tab_voice">音声</string>
 </resources>

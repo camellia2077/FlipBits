@@ -29,6 +29,7 @@ set(bag_android_native_package_source_files
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_transport_transport.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_ultra_codec.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/audio_core_ultra_phy_clean.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/audio_core_voice_fx.cpp"
     "${FLIPBITS_ROOT}/libs/audio_io/src/audio_io_api.cpp"
     "${FLIPBITS_ROOT}/libs/audio_io/src/wav_io.cpp"
     "${FLIPBITS_ROOT}/libs/audio_io/src/wav_metadata_parse_rules.cpp"

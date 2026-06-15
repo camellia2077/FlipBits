@@ -87,6 +87,17 @@ class DefaultSavedAudioRepository(
             metadata = metadata,
         )
 
+    override fun shareRawPcmAudio(
+        displayName: String,
+        pcm: ShortArray,
+        sampleRateHz: Int,
+    ): Boolean =
+        audioShareGateway.shareRawPcmAudio(
+            displayName = displayName,
+            pcm = pcm,
+            sampleRateHz = sampleRateHz,
+        )
+
     override fun shareAudio(
         displayName: String,
         uriString: String,

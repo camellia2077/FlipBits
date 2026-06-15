@@ -77,6 +77,18 @@ Responsibilities:
 - host bottom playback dock
 - keep mini player and bottom nav visually aligned
 - provide layout padding so page content can coexist with the dock
+- keep the bottom tab navigation in a single shared floating capsule
+
+Ownership rules:
+
+- `PlayerScaffold.kt` owns bottom overlay placement, navigation-bar inset handling, and
+  the `contentPadding` passed to tab screens.
+- `AudioAndroidBottomBar.kt` owns the bottom tab capsule `Surface`, `NavigationBar`,
+  shared tab list, and selected-item indicator.
+- Individual tab screens own only their content layout above the dock. They should not
+  change bottom dock color, elevation, shape, or background based on the selected tab.
+- When adding a tab, update the shared tab list and the main screen switch. Do not add
+  tab-specific transparent dock containers or alternate bottom-bar wrappers.
 
 ### Player detail and playback area
 

@@ -10,6 +10,10 @@ import com.bag.audioandroid.domain.GeneratedAudioCacheGateway
 import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
 import com.bag.audioandroid.domain.SavedAudioRepository
+import com.bag.audioandroid.domain.VoiceAudioFileGateway
+import com.bag.audioandroid.domain.VoiceFxGateway
+import com.bag.audioandroid.domain.VoiceLiveGateway
+import com.bag.audioandroid.domain.VoiceRecordingGateway
 
 class AudioAndroidViewModelFactory(
     private val audioCodecGateway: AudioCodecGateway,
@@ -17,6 +21,10 @@ class AudioAndroidViewModelFactory(
     private val sampleInputTextProvider: SampleInputTextProvider,
     private val appSettingsRepository: AppSettingsRepository,
     private val playbackRuntimeGateway: PlaybackRuntimeGateway,
+    private val voiceFxGateway: VoiceFxGateway,
+    private val voiceRecordingGateway: VoiceRecordingGateway,
+    private val voiceLiveGateway: VoiceLiveGateway,
+    private val voiceAudioFileGateway: VoiceAudioFileGateway,
     private val savedAudioRepository: SavedAudioRepository,
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
     private val savedAudioDecodeCacheGateway: SavedAudioDecodeCacheGateway,
@@ -30,6 +38,10 @@ class AudioAndroidViewModelFactory(
                 sampleInputTextProvider,
                 appSettingsRepository,
                 playbackRuntimeGateway,
+                voiceFxGateway,
+                voiceRecordingGateway,
+                voiceLiveGateway,
+                voiceAudioFileGateway,
                 savedAudioRepository,
                 generatedAudioCacheGateway,
                 savedAudioDecodeCacheGateway,

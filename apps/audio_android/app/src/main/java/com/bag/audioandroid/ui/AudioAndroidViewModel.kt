@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.bag.audioandroid.BuildConfig
 import com.bag.audioandroid.R
 import com.bag.audioandroid.audio.AudioPlaybackCoordinator
+import com.bag.audioandroid.audio.VoicePreviewPlayer
 import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.data.SampleInputTextProvider
 import com.bag.audioandroid.domain.AudioCodecGateway
@@ -15,6 +16,10 @@ import com.bag.audioandroid.domain.PlaybackRuntimeGateway
 import com.bag.audioandroid.domain.SavedAudioDecodeCacheGateway
 import com.bag.audioandroid.domain.SavedAudioItem
 import com.bag.audioandroid.domain.SavedAudioRepository
+import com.bag.audioandroid.domain.VoiceAudioFileGateway
+import com.bag.audioandroid.domain.VoiceFxGateway
+import com.bag.audioandroid.domain.VoiceLiveGateway
+import com.bag.audioandroid.domain.VoiceRecordingGateway
 import com.bag.audioandroid.ui.model.AppLanguageOption
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
@@ -29,10 +34,15 @@ import com.bag.audioandroid.ui.model.ThemeModeOption
 import com.bag.audioandroid.ui.model.ThemeStyleOption
 import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.model.UiText
+import com.bag.audioandroid.ui.model.VoiceTrackModeOption
+import com.bag.audioandroid.ui.model.defaultPreset
 import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.state.AudioAppUiState
+import com.bag.audioandroid.ui.state.AudioDocumentExportSource
+import com.bag.audioandroid.ui.state.DefaultVoiceTrackMode
 import com.bag.audioandroid.ui.state.QueueSheetValue
+import com.bag.audioandroid.ui.state.VoiceSessionState
 import com.bag.audioandroid.ui.theme.DefaultCustomMaterialPaletteSettings
 import com.bag.audioandroid.ui.theme.DefaultFactionTheme
 import com.bag.audioandroid.ui.theme.DefaultMaterialPalette
@@ -46,6 +56,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Suppress("LargeClass")
@@ -55,6 +66,10 @@ class AudioAndroidViewModel(
     private val sampleInputTextProvider: SampleInputTextProvider,
     appSettingsRepository: AppSettingsRepository,
     playbackRuntimeGateway: PlaybackRuntimeGateway,
+    voiceFxGateway: VoiceFxGateway,
+    voiceRecordingGateway: VoiceRecordingGateway,
+    voiceLiveGateway: VoiceLiveGateway,
+    voiceAudioFileGateway: VoiceAudioFileGateway,
     savedAudioRepository: SavedAudioRepository,
     private val generatedAudioCacheGateway: GeneratedAudioCacheGateway,
     private val savedAudioDecodeCacheGateway: SavedAudioDecodeCacheGateway,
@@ -75,6 +90,7 @@ class AudioAndroidViewModel(
     private val playbackSourceCoordinator = PlaybackSourceCoordinator(SAMPLE_RATE_HZ)
     private val playbackSessionReducer = PlaybackSessionReducer(playbackRuntimeGateway, SAMPLE_RATE_HZ)
     private val playbackSequenceNavigator = PlaybackSequenceNavigator()
+    private val voicePreviewPlayer = VoicePreviewPlayer()
     private val followDataWindowActions =
         FollowDataWindowActions(
             uiState = uiStateFlow,
@@ -151,6 +167,36 @@ class AudioAndroidViewModel(
     private val navigationActions =
         AudioAndroidNavigationActions(
             uiState = uiStateFlow,
+            appSettingsRepository = appSettingsRepository,
+            scope = viewModelScope,
+        )
+    private val voiceSessionActions =
+        VoiceSessionActions(
+            uiState = uiStateFlow,
+            scope = viewModelScope,
+            voiceFxGateway = voiceFxGateway,
+            voiceRecordingGateway = voiceRecordingGateway,
+            voiceLiveGateway = voiceLiveGateway,
+            voiceAudioFileGateway = voiceAudioFileGateway,
+            voicePreviewPlayer = voicePreviewPlayer,
+            savedAudioRepository = savedAudioRepository,
+            stopGlobalPlayback = playbackActions::stopPlayback,
+            onPersistWorkflowModeSelected = { mode ->
+                viewModelScope.launch {
+                    appSettingsRepository.setSelectedVoiceWorkflowModeId(mode.id)
+                }
+            },
+            onPersistTrackModeSelected = { mode ->
+                viewModelScope.launch {
+                    appSettingsRepository.setSelectedVoiceTrackModeId(mode.id)
+                }
+            },
+            onPersistInputSourceSelected = { source ->
+                viewModelScope.launch {
+                    appSettingsRepository.setSelectedVoiceInputSourceId(source.id)
+                }
+            },
+            workerDispatcher = Dispatchers.IO,
         )
     private val preferencesActions =
         AudioAndroidPreferencesActions(
@@ -230,6 +276,10 @@ class AudioAndroidViewModel(
     }
 
     fun onTabSelected(tab: AppTab) {
+        val previousTab = uiStateFlow.value.selectedTab
+        if (previousTab == AppTab.Voice && tab != AppTab.Voice) {
+            voiceSessionActions.onLeaveVoiceTab()
+        }
         navigationActions.onTabSelected(tab, libraryActions::refreshSavedAudioItems)
     }
 
@@ -552,12 +602,14 @@ class AudioAndroidViewModel(
     }
 
     fun onTogglePlayback() {
+        voiceSessionActions.stopPreviewForExternalPlayback()
         playbackActions.onTogglePlayback()
     }
 
     fun pauseCurrentPlaybackIfPlaying(): Boolean = playbackActions.pauseCurrentPlaybackIfPlaying()
 
     fun stopPlayback() {
+        voiceSessionActions.stopPreviewForExternalPlayback()
         playbackActions.stopPlayback()
     }
 
@@ -577,6 +629,7 @@ class AudioAndroidViewModel(
     }
 
     fun onSkipToPreviousTrack() {
+        voiceSessionActions.stopPreviewForExternalPlayback()
         safeDebugLog(
             SavedAudioPlaybackDiagTag,
             "skipPrevious requested currentSource=${uiStateFlow.value.currentPlaybackSource} " +
@@ -591,6 +644,7 @@ class AudioAndroidViewModel(
     }
 
     fun onSkipToNextTrack() {
+        voiceSessionActions.stopPreviewForExternalPlayback()
         safeDebugLog(
             SavedAudioPlaybackDiagTag,
             "skipNext requested currentSource=${uiStateFlow.value.currentPlaybackSource} " +
@@ -653,10 +707,14 @@ class AudioAndroidViewModel(
     }
 
     fun onDocumentExportPicked(uriString: String?) {
-        documentExportActions.onDocumentExportPicked(uriString)
+        when (uiStateFlow.value.pendingDocumentExportRequest?.source) {
+            AudioDocumentExportSource.Voice -> voiceSessionActions.onDocumentExportPicked(uriString)
+            else -> documentExportActions.onDocumentExportPicked(uriString)
+        }
     }
 
     override fun onCleared() {
+        voiceSessionActions.release()
         playbackActions.release()
         uiStateFlow.value.sessions.values.forEach { session ->
             generatedAudioCacheGateway.deleteCachedFile(session.generatedPcmFilePath)
@@ -682,6 +740,7 @@ class AudioAndroidViewModel(
     }
 
     fun onSavedAudioSelected(itemId: String) {
+        voiceSessionActions.stopPreviewForExternalPlayback()
         libraryActions.onSavedAudioSelected(itemId)
     }
 
@@ -690,7 +749,87 @@ class AudioAndroidViewModel(
     }
 
     fun onShellSavedAudioSelected(itemId: String) {
+        voiceSessionActions.stopPreviewForExternalPlayback()
         libraryActions.onShellSavedAudioSelected(itemId)
+    }
+
+    fun onVoiceRecordPermissionChanged(granted: Boolean) {
+        voiceSessionActions.onRecordPermissionChanged(granted)
+    }
+
+    fun onStartVoiceRecording() {
+        voiceSessionActions.onStartRecording()
+    }
+
+    fun onStopVoiceRecording() {
+        voiceSessionActions.onStopRecording()
+    }
+
+    fun onVoiceInputSourceSelected(source: com.bag.audioandroid.ui.model.VoiceInputSourceOption) {
+        voiceSessionActions.onInputSourceSelected(source)
+    }
+
+    fun onVoiceRecordProcessingModeSelected(mode: com.bag.audioandroid.ui.model.VoiceRecordProcessingModeOption) {
+        voiceSessionActions.onRecordProcessingModeSelected(mode)
+    }
+
+    fun onVoiceWorkflowModeSelected(mode: com.bag.audioandroid.ui.model.VoiceWorkflowModeOption) {
+        voiceSessionActions.onWorkflowModeSelected(mode)
+    }
+
+    fun onVoiceTrackModeSelected(mode: com.bag.audioandroid.ui.model.VoiceTrackModeOption) {
+        voiceSessionActions.onTrackModeSelected(mode)
+    }
+
+    fun onImportVoiceAudio(uriString: String) {
+        voiceSessionActions.onImportAudio(uriString)
+    }
+
+    fun onProcessVoiceRecording() {
+        voiceSessionActions.onProcessRecording()
+    }
+
+    fun onStartLiveVoice() {
+        voiceSessionActions.onStartLive()
+    }
+
+    fun onStopLiveVoice() {
+        voiceSessionActions.onStopLive()
+    }
+
+    fun onToggleVoicePreview() {
+        voiceSessionActions.onTogglePreview()
+    }
+
+    fun onToggleVoicePreviewTrack(track: com.bag.audioandroid.ui.model.VoicePreviewTrackOption) {
+        voiceSessionActions.onTogglePreviewTrack(track)
+    }
+
+    fun onVoicePreviewTrackSeek(
+        track: com.bag.audioandroid.ui.model.VoicePreviewTrackOption,
+        targetSamples: Int,
+    ) {
+        voiceSessionActions.onPreviewTrackSeek(track, targetSamples)
+    }
+
+    fun onRequestExportVoiceAudioToDocument() {
+        voiceSessionActions.onRequestExportProcessedAudioToDocument()
+    }
+
+    fun onShareVoiceOutput() {
+        voiceSessionActions.onShareProcessedAudio()
+    }
+
+    fun onClearVoice() {
+        voiceSessionActions.onClear()
+    }
+
+    fun onVoicePresetSelected(preset: com.bag.audioandroid.ui.model.VoiceFxPresetOption) {
+        voiceSessionActions.onPresetSelected(preset)
+    }
+
+    fun onVoiceSubvoiceStyleSelected(style: com.bag.audioandroid.ui.model.VoiceFxSubvoiceStyleOption) {
+        voiceSessionActions.onSubvoiceStyleSelected(style)
     }
 
     fun onEnterLibrarySelection(itemId: String) {
@@ -844,6 +983,9 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
         val selectedTransportMode =
             TransportModeOption.fromWireName(appSettingsRepository.selectedTransportModeId.first())
                 ?: TransportModeOption.Flash
+        val selectedVoiceTrackMode =
+            VoiceTrackModeOption.fromIdOrNull(appSettingsRepository.selectedVoiceTrackModeId.first())
+                ?: DefaultVoiceTrackMode
         val selectedPaletteId =
             if (isMaterialDarkThemeActive) {
                 selectedMaterialPaletteIdDark ?: selectedMaterialPaletteIdLight ?: appSettingsRepository.selectedPaletteId.first()
@@ -873,8 +1015,15 @@ private fun loadInitialUiState(appSettingsRepository: AppSettingsRepository): Au
             selectedSampleInputLength = selectedSampleInputLength,
             transportMode = selectedTransportMode,
             currentPlaybackSource = AudioPlaybackSource.Generated(selectedTransportMode),
+            voiceSession = defaultInitialVoiceSessionState(selectedVoiceTrackMode),
         )
     }
+
+private fun defaultInitialVoiceSessionState(selectedTrackMode: VoiceTrackModeOption): VoiceSessionState =
+    VoiceSessionState(
+        selectedTrackMode = selectedTrackMode,
+        selectedPreset = selectedTrackMode.defaultPreset(),
+    )
 
 private fun BrandNewOrBuiltInMaterialPalette(selectedPaletteId: String): PaletteOption =
     com.bag.audioandroid.ui.theme.MaterialPalettes

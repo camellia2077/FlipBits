@@ -28,14 +28,15 @@ import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.MiniPlayerSource
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.asString
-import com.bag.audioandroid.ui.screen.AudioTabScreen
 import com.bag.audioandroid.ui.screen.ConfigTabScreen
+import com.bag.audioandroid.ui.screen.DataTabScreen
 import com.bag.audioandroid.ui.screen.DebugMorseVisualizationModeRequest
 import com.bag.audioandroid.ui.screen.DebugPlaybackDisplayModeRequest
 import com.bag.audioandroid.ui.screen.LibraryTabScreen
 import com.bag.audioandroid.ui.screen.MiniPlayerBar
 import com.bag.audioandroid.ui.screen.PlaybackFollowViewMode
 import com.bag.audioandroid.ui.screen.SavedAudioPickerSheet
+import com.bag.audioandroid.ui.screen.VoiceTabScreen
 import com.bag.audioandroid.ui.screen.formatDurationMillis
 import com.bag.audioandroid.ui.screen.samplesToMillis
 import com.bag.audioandroid.ui.screen.toEncodeProgressDisplayModel
@@ -52,6 +53,8 @@ internal fun AudioAndroidMainScaffold(
     materialPalettes: List<com.bag.audioandroid.ui.model.PaletteOption>,
     factionThemes: List<com.bag.audioandroid.ui.model.FactionThemeOption>,
     onImportAudio: () -> Unit,
+    onImportVoiceAudio: () -> Unit,
+    onRequestVoiceRecordPermission: () -> Unit,
     viewModel: AudioAndroidViewModel,
     debugScenario: FlashDebugScenario? = null,
     debugExpandLyricsRequestId: Long? = null,
@@ -459,8 +462,8 @@ internal fun AudioAndroidMainScaffold(
                             .padding(horizontal = 16.dp, vertical = 16.dp),
                 )
 
-            AppTab.Audio ->
-                AudioTabScreen(
+            AppTab.Data ->
+                DataTabScreen(
                     selectedThemeStyle = uiState.selectedThemeStyle,
                     transportMode = uiState.transportMode,
                     isCodecBusy = uiState.audioTabCodecBusy,
@@ -485,6 +488,36 @@ internal fun AudioAndroidMainScaffold(
                     onDecode = viewModel::onDecode,
                     onClear = viewModel::onClear,
                     onClearResult = viewModel::onClearResult,
+                    contentPadding = contentPadding,
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                )
+
+            AppTab.Voice ->
+                VoiceTabScreen(
+                    selectedThemeStyle = uiState.selectedThemeStyle,
+                    session = uiState.voiceSession,
+                    onRequestRecordPermission = onRequestVoiceRecordPermission,
+                    onWorkflowModeSelected = viewModel::onVoiceWorkflowModeSelected,
+                    onTrackModeSelected = viewModel::onVoiceTrackModeSelected,
+                    onInputSourceSelected = viewModel::onVoiceInputSourceSelected,
+                    onRecordProcessingModeSelected = viewModel::onVoiceRecordProcessingModeSelected,
+                    onPresetSelected = viewModel::onVoicePresetSelected,
+                    onSubvoiceStyleSelected = viewModel::onVoiceSubvoiceStyleSelected,
+                    onImportAudio = onImportVoiceAudio,
+                    onStartRecording = viewModel::onStartVoiceRecording,
+                    onStopRecording = viewModel::onStopVoiceRecording,
+                    onStartLive = viewModel::onStartLiveVoice,
+                    onStopLive = viewModel::onStopLiveVoice,
+                    onProcess = viewModel::onProcessVoiceRecording,
+                    onTogglePreview = viewModel::onToggleVoicePreview,
+                    onTogglePreviewTrack = viewModel::onToggleVoicePreviewTrack,
+                    onPreviewTrackSeek = viewModel::onVoicePreviewTrackSeek,
+                    onExportResult = viewModel::onRequestExportVoiceAudioToDocument,
+                    onShareOutput = viewModel::onShareVoiceOutput,
+                    onClear = viewModel::onClearVoice,
                     contentPadding = contentPadding,
                     modifier =
                         Modifier

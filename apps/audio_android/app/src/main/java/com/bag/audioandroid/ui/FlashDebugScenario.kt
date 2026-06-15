@@ -400,7 +400,7 @@ data class SavedAudioDebugScenario(
 }
 
 data class AppTabDebugScenario(
-    val tab: AppTab = AppTab.Audio,
+    val tab: AppTab = AppTab.Data,
     val languageOverride: AppLanguageOption? = null,
     val settingsImportConfirmAction: SettingsImportConfirmAction? = null,
     val settingsImportCopyScope: SettingsImportCopyScope? = null,

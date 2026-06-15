@@ -13,6 +13,8 @@ sealed interface AudioDocumentExportSource {
         val mode: TransportModeOption,
     ) : AudioDocumentExportSource
 
+    data object Voice : AudioDocumentExportSource
+
     data class Saved(
         val itemId: String,
     ) : AudioDocumentExportSource

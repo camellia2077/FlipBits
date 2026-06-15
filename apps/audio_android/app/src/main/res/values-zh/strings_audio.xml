@@ -2,7 +2,7 @@
 <resources>
     <!-- Simplified Chinese rewrite scaffold. -->
     <!-- Replace the English placeholder values below with Simplified Chinese. -->
-    <!-- Audio screen strings: actions, playback modes, player details, status messages. -->
+    <!-- Data screen strings: actions, playback modes, player details, status messages. -->
     <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
     <string name="audio_input_label">输入文本</string>
     <string name="audio_action_encode">创建</string>
@@ -27,7 +27,7 @@
     <string name="audio_action_repeat_one">单曲循环</string>
     <!-- CONTEXT: Playback mode option. Repeat the whole list / repeat all. -->
     <string name="audio_action_repeat_list">全部循环</string>
-    <!-- CONTEXT: Main action on Audio screen. Reads audio back into text/result. Product term is Read. -->
+    <!-- CONTEXT: Main action on Data screen. Reads audio back into text/result. Product term is Read. -->
     <string name="audio_action_decode">读取</string>
     <!-- CONTEXT: Busy label for the Read action. -->
     <string name="audio_action_decode_busy">正在读取…</string>
@@ -234,4 +234,71 @@
     <string name="audio_morse_visualizer_mode_vertical">纵向</string>
     <string name="audio_morse_visualizer_mode_horizontal">横向</string>
     <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
+    <string name="voice_record_title">录制语音</string>
+    <string name="voice_record_permission_required">录音前需要麦克风权限。</string>
+    <string name="voice_action_grant_permission">授予麦克风权限</string>
+    <string name="voice_action_stop_recording">停止录音</string>
+    <string name="voice_action_start_recording">开始录音</string>
+    <string name="voice_action_process_busy">处理中…</string>
+    <string name="voice_action_process">处理</string>
+    <string name="voice_result_title">结果</string>
+    <string name="voice_result_ready">处理后预览已就绪：%1$s</string>
+    <string name="voice_result_empty">尚无处理后的语音。</string>
+    <string name="voice_action_stop_preview">停止</string>
+    <string name="voice_status_recording">录音中…完成后点击“停止”。</string>
+    <string name="voice_status_permission_needed">请授予麦克风权限以录制音频。</string>
+    <string name="voice_status_processing_failed">处理失败。请重新录制后再试。</string>
+    <string name="voice_status_ready">已准备好录制用于语音处理的干声片段。</string>
+    <string name="voice_effect_title">语音效果</string>
+    <string name="voice_voicing_style_title">发声风格</string>
+    <string name="voice_action_select_voicing_style">选择发声风格</string>
+    <string name="voice_voicing_style_sheet_title">发声风格</string>
+    <string name="voice_binharic_title">Binharic</string>
+    <string name="voice_binharic_summary">人声加上一条 flash 风格背景音轨。</string>
+    <string name="voice_input_title">输入音频</string>
+    <string name="voice_input_source_title">来源</string>
+    <string name="voice_input_source_record">录音</string>
+    <string name="voice_input_source_upload">上传</string>
+    <string name="voice_record_processing_mode_title">处理模式</string>
+    <string name="voice_record_processing_after_recording">录音后</string>
+    <string name="voice_record_processing_while_recording">录音时</string>
+    <string name="voice_action_choose_upload">选择音频文件</string>
+    <string name="voice_status_importing">正在导入音频…</string>
+    <string name="voice_status_import_failed">导入失败。请选择其他音频后重试。</string>
+    <string name="voice_status_import_unsupported">请使用受支持的音频文件，如 WAV、MP3 或 M4A。</string>
+    <string name="voice_status_upload_ready">请选择要处理的音频文件。</string>
+    <string name="voice_action_save_result">保存 WAV</string>
+    <string name="voice_workflow_title">模式</string>
+    <string name="voice_workflow_clip">片段</string>
+    <string name="voice_workflow_live">实时</string>
+    <string name="voice_action_start_live">开始实时</string>
+    <string name="voice_action_stop_live">停止实时</string>
+    <string name="voice_status_live_ready">已准备好进行实时语音预览。</string>
+    <string name="voice_status_live_running">实时语音预览正在运行。</string>
+    <string name="voice_status_live_failed">实时预览已停止。请检查设备音频路由后重试。</string>
+    <string name="voice_live_route_active">输入：%1$s • 输出：%2$s</string>
+    <string name="voice_live_route_requested_fallback">首选实时输出不可用。输入：%1$s • 实际输出：%2$s</string>
+    <string name="voice_live_route_unknown">系统默认</string>
+    <string name="voice_live_note">实时模式会优先使用手机麦克风作为输入，并优先使用已连接的蓝牙音箱作为输出。如果没有可用的蓝牙输出，则回退到手机扬声器。</string>
+    <string name="voice_process_hint_needs_input">请先录音或上传音频，再进行处理。</string>
+    <string name="voice_process_hint_processing">正在处理所选预设…</string>
+    <string name="voice_track_mode_single">单轨</string>
+    <string name="voice_track_mode_dual">双轨</string>
+    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_summary">原始人声加上一条持续播放的 flash 风格背景音轨。</string>
+    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_summary">原始人声加上一条仅在人声出现时打开的 flash 风格背景音轨。</string>
+    <string name="voice_metal_title">金属</string>
+    <string name="voice_metal_summary">单轨金属人声。</string>
+    <string name="voice_code_title">编码</string>
+    <string name="voice_code_summary">机械人声，句子之间会插入短促的编码音。</string>
+    <string name="voice_robot_title">机器人</string>
+    <string name="voice_robot_summary">干净的机器人音色，带一点短促的金属回声。</string>
+    <string name="voice_preset_title">预设</string>
+    <string name="voice_live_preview_dialog_title">Live 模式预览</string>
+    <string name="voice_live_preview_dialog_body">Live 模式目前仍处于早期预览阶段。由于独立开发和持续优化仍在进行，音质和延迟可能会不稳定。为了获得最佳效果，建议先使用 Clip 模式。</string>
+    <string name="voice_live_preview_dialog_use_clip">使用 Clip</string>
+    <string name="voice_live_preview_dialog_try_live">尝试 Live</string>
+    <string name="voice_result_input_track">输入</string>
+    <string name="voice_result_output_track">输出</string>
 </resources>

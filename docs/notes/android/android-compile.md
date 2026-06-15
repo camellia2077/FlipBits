@@ -42,4 +42,3 @@ python tools/run.py android assemble-debug
 adb install -r apps/audio_android/app/build/outputs/apk/debug/app-debug.apk
 
 adb shell am start -n com.bag.audioandroid/.MainActivity
-

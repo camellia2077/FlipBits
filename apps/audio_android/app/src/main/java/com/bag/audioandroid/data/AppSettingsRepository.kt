@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.CustomFactionThemeSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -15,6 +16,7 @@ import java.io.IOException
 
 private val Context.appSettingsDataStore by preferencesDataStore(name = "app_settings")
 
+@Suppress("LargeClass")
 class AppSettingsRepository(
     private val appContext: Context,
 ) {
@@ -28,6 +30,16 @@ class AppSettingsRepository(
                 }
             }.map { preferences -> preferences[Keys.SelectedPaletteId] }
 
+    val selectedTabId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedTabId] }
+
     val selectedFlashVoicingStyleId: Flow<String?> =
         appContext.appSettingsDataStore.data
             .catch { exception ->
@@ -37,6 +49,36 @@ class AppSettingsRepository(
                     throw exception
                 }
             }.map { preferences -> preferences[Keys.SelectedFlashVoicingStyleId] }
+
+    val selectedVoiceWorkflowModeId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedVoiceWorkflowModeId] }
+
+    val selectedVoiceTrackModeId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedVoiceTrackModeId] }
+
+    val selectedVoiceInputSourceId: Flow<String?> =
+        appContext.appSettingsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences -> preferences[Keys.SelectedVoiceInputSourceId] }
 
     val selectedMorseSpeedStyleId: Flow<String?> =
         appContext.appSettingsDataStore.data
@@ -426,9 +468,33 @@ class AppSettingsRepository(
         }
     }
 
+    suspend fun setSelectedTab(tab: AppTab) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedTabId] = tab.automationId
+        }
+    }
+
     suspend fun setSelectedFlashVoicingStyleId(styleId: String) {
         appContext.appSettingsDataStore.edit { preferences ->
             preferences[Keys.SelectedFlashVoicingStyleId] = styleId
+        }
+    }
+
+    suspend fun setSelectedVoiceWorkflowModeId(modeId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedVoiceWorkflowModeId] = modeId
+        }
+    }
+
+    suspend fun setSelectedVoiceTrackModeId(modeId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedVoiceTrackModeId] = modeId
+        }
+    }
+
+    suspend fun setSelectedVoiceInputSourceId(sourceId: String) {
+        appContext.appSettingsDataStore.edit { preferences ->
+            preferences[Keys.SelectedVoiceInputSourceId] = sourceId
         }
     }
 
@@ -662,7 +728,11 @@ class AppSettingsRepository(
 
     private object Keys {
         val SelectedPaletteId: Preferences.Key<String> = stringPreferencesKey("palette_id")
+        val SelectedTabId: Preferences.Key<String> = stringPreferencesKey("selected_tab")
         val SelectedFlashVoicingStyleId: Preferences.Key<String> = stringPreferencesKey("flash_voicing_style")
+        val SelectedVoiceWorkflowModeId: Preferences.Key<String> = stringPreferencesKey("voice_workflow_mode")
+        val SelectedVoiceTrackModeId: Preferences.Key<String> = stringPreferencesKey("voice_track_mode")
+        val SelectedVoiceInputSourceId: Preferences.Key<String> = stringPreferencesKey("voice_input_source")
         val SelectedMorseSpeedStyleId: Preferences.Key<String> = stringPreferencesKey("mini_speed_style")
         val SelectedTransportModeId: Preferences.Key<String> = stringPreferencesKey("transport_mode")
         val SelectedSampleInputLengthId: Preferences.Key<String> = stringPreferencesKey("sample_input_length")

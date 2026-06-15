@@ -1,5 +1,6 @@
 package com.bag.audioandroid.ui
 
+import com.bag.audioandroid.data.AppSettingsRepository
 import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.UiText
 import com.bag.audioandroid.ui.state.AudioAppUiState
@@ -8,11 +9,15 @@ import com.bag.audioandroid.ui.state.PlayerShellEvent
 import com.bag.audioandroid.ui.state.QueueSheetValue
 import com.bag.audioandroid.ui.state.SnackbarMessage
 import com.bag.audioandroid.ui.state.reduce
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 internal class AudioAndroidNavigationActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
+    private val appSettingsRepository: AppSettingsRepository,
+    private val scope: CoroutineScope,
 ) {
     fun onTabSelected(
         tab: AppTab,
@@ -31,6 +36,9 @@ internal class AudioAndroidNavigationActions(
                         LibrarySelectionUiState()
                     },
             )
+        }
+        scope.launch {
+            appSettingsRepository.setSelectedTab(tab)
         }
     }
 

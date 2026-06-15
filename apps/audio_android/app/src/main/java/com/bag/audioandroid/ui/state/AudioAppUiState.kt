@@ -40,7 +40,7 @@ import com.bag.audioandroid.ui.theme.isCustomFactionThemeOptionId
 import com.bag.audioandroid.ui.theme.isCustomMaterialPaletteId
 
 data class AudioAppUiState(
-    val selectedTab: AppTab = AppTab.Audio,
+    val selectedTab: AppTab = AppTab.Data,
     val selectedLanguage: AppLanguageOption = AppLanguageOption.FollowSystem,
     val showAboutPage: Boolean = false,
     val showLicensesPage: Boolean = false,
@@ -87,6 +87,7 @@ data class AudioAppUiState(
     val selectedSampleInputLength: SampleInputLengthOption = SampleInputLengthOption.Short,
     val transportMode: TransportModeOption = TransportModeOption.Flash,
     val sessions: Map<TransportModeOption, ModeAudioSessionState> = defaultModeSessions(),
+    val voiceSession: VoiceSessionState = VoiceSessionState(),
     val currentPlaybackSource: AudioPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),
     val playbackSequenceMode: PlaybackSequenceMode = PlaybackSequenceMode.Normal,
     val selectedSavedAudio: SavedAudioPlaybackSelection? = null,

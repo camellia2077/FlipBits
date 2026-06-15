@@ -4,9 +4,11 @@ import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.LibraryMusic
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.bag.audioandroid.R
@@ -17,11 +19,17 @@ enum class AppTab(
     val unselectedIcon: ImageVector,
     val automationId: String,
 ) {
-    Audio(
-        labelResId = R.string.tab_audio,
+    Data(
+        labelResId = R.string.tab_data,
         selectedIcon = Icons.Filled.GraphicEq,
         unselectedIcon = Icons.Outlined.GraphicEq,
-        automationId = "audio",
+        automationId = "data",
+    ),
+    Voice(
+        labelResId = R.string.tab_voice,
+        selectedIcon = Icons.Filled.Mic,
+        unselectedIcon = Icons.Outlined.Mic,
+        automationId = "voice",
     ),
     Library(
         labelResId = R.string.tab_library,
@@ -40,10 +48,11 @@ enum class AppTab(
     companion object {
         fun fromAutomationId(id: String?): AppTab =
             when (id?.trim()?.lowercase()) {
-                "audio" -> Audio
+                "data" -> Data
+                "voice" -> Voice
                 "saved", "library" -> Library
                 "settings", "config" -> Config
-                else -> Audio
+                else -> Data
             }
     }
 }

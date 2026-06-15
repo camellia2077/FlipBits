@@ -173,7 +173,7 @@ internal fun savedAudioPickerColors(): SavedAudioPickerColors {
 internal fun utilityActionIconButtonColors(): IconButtonColors {
     val actionTint = appThemeAccentTokens().selectionLabelAccentTint
     return IconButtonDefaults.iconButtonColors(
-        // Utility action icons across Settings / Audio / Saved should all follow the same
+        // Utility action icons across Settings / Data / Saved should all follow the same
         // accent lane instead of each screen inventing its own hard-coded tint behavior.
         contentColor = actionTint,
         disabledContentColor = actionTint.copy(alpha = 0.38f),

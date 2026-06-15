@@ -251,6 +251,23 @@ jint NativeValidateDecodeConfig(JNIEnv* env,
                                 jint flash_signal_profile,
                                 jint flash_voicing_flavor);
 
+jobject NativeApplyVoiceFx(JNIEnv* env,
+                           jshortArray pcm,
+                           jint sample_rate_hz,
+                           jint preset,
+                           jint enable_diagnostics,
+                           jint subvoice_style);
+jlong NativeCreateVoiceFxProcessor(JNIEnv* env,
+                                   jint sample_rate_hz,
+                                   jint preset,
+                                   jint enable_diagnostics,
+                                   jint subvoice_style);
+jobject NativeProcessVoiceFxBlock(JNIEnv* env,
+                                  jlong handle,
+                                  jshortArray pcm);
+jobject NativeFlushVoiceFxProcessor(JNIEnv* env, jlong handle);
+void NativeDestroyVoiceFxProcessor(jlong handle);
+
 jstring NativeGetCoreVersion(JNIEnv* env);
 
 jlong NativeCreateEncodeOperation(JNIEnv* env,

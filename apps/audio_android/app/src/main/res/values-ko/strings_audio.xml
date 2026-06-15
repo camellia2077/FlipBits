@@ -2,7 +2,7 @@
 <resources>
     <!-- Korean rewrite scaffold. -->
     <!-- Replace the English placeholder values below with Korean. -->
-    <!-- Audio screen strings: actions, playback modes, player details, status messages. -->
+    <!-- Data screen strings: actions, playback modes, player details, status messages. -->
     <!-- Keep placeholders such as %1$s, %2$d, and %% unchanged. -->
     <string name="audio_input_label">입력 텍스트</string>
     <string name="audio_action_encode">생성</string>
@@ -27,7 +27,7 @@
     <string name="audio_action_repeat_one">한 곡 반복</string>
     <!-- CONTEXT: Playback mode option. Repeat the whole list / repeat all. -->
     <string name="audio_action_repeat_list">전체 반복</string>
-    <!-- CONTEXT: Main action on Audio screen. Reads audio back into text/result. Product term is Read. -->
+    <!-- CONTEXT: Main action on Data screen. Reads audio back into text/result. Product term is Read. -->
     <string name="audio_action_decode">읽기</string>
     <!-- CONTEXT: Busy label for the Read action. -->
     <string name="audio_action_decode_busy">읽는 중…</string>
@@ -182,7 +182,7 @@
     <string name="audio_morse_speed_wpm20">20 WPM</string>
     <string name="audio_morse_unsupported_characters">지원되지 않는 Morse 문자: %1$s</string>
     <string name="audio_transport_ultra_example">등지기들이 오래된 성문을 엽니다</string>
-    <string name="status_ready_to_encode">텍스트를 입력하고 \"생성\"을 누르세요</string>
+    <string name="status_ready_to_encode">텍스트를 입력하고 &amp;quot;생성&amp;quot;을 누르세요</string>
     <string name="status_mode_audio_generating_preparing_input">%1$s 입력 준비 중…</string>
     <string name="status_mode_audio_generating_rendering_pcm">%1$s 오디오 생성 중…</string>
     <string name="status_mode_audio_generating_postprocessing">%1$s 오디오 다듬는 중…</string>
@@ -234,4 +234,71 @@
     <string name="audio_morse_visualizer_mode_vertical">세로</string>
     <string name="audio_morse_visualizer_mode_horizontal">가로</string>
     <string name="audio_pro_visual_byte_hex_value">Hex %1$s</string>
+    <string name="voice_record_title">음성 녹음</string>
+    <string name="voice_record_permission_required">녹음 전에 마이크 권한이 필요합니다.</string>
+    <string name="voice_action_grant_permission">마이크 권한 허용</string>
+    <string name="voice_action_stop_recording">녹음 중지</string>
+    <string name="voice_action_start_recording">녹음 시작</string>
+    <string name="voice_action_process_busy">처리 중…</string>
+    <string name="voice_action_process">처리</string>
+    <string name="voice_result_title">결과</string>
+    <string name="voice_result_ready">처리된 미리 듣기 준비됨: %1$s</string>
+    <string name="voice_result_empty">아직 처리된 음성이 없습니다.</string>
+    <string name="voice_action_stop_preview">중지</string>
+    <string name="voice_status_recording">녹음 중… 끝나면 &amp;quot;중지&amp;quot;를 누르세요.</string>
+    <string name="voice_status_permission_needed">클립을 녹음하려면 마이크 권한을 허용하세요.</string>
+    <string name="voice_status_processing_failed">처리에 실패했습니다. 다시 녹음한 뒤 재시도하세요.</string>
+    <string name="voice_status_ready">음성 처리를 위한 드라이 클립을 녹음할 준비가 되었습니다.</string>
+    <string name="voice_effect_title">음성 효과</string>
+    <string name="voice_voicing_style_title">음성 스타일</string>
+    <string name="voice_action_select_voicing_style">음성 스타일 선택</string>
+    <string name="voice_voicing_style_sheet_title">음성 스타일</string>
+    <string name="voice_binharic_title">Binharic</string>
+    <string name="voice_binharic_summary">음성에 flash 스타일 배경 트랙을 추가합니다.</string>
+    <string name="voice_input_title">입력 클립</string>
+    <string name="voice_input_source_title">소스</string>
+    <string name="voice_input_source_record">녹음</string>
+    <string name="voice_input_source_upload">업로드</string>
+    <string name="voice_record_processing_mode_title">처리 모드</string>
+    <string name="voice_record_processing_after_recording">녹음 후</string>
+    <string name="voice_record_processing_while_recording">녹음 중</string>
+    <string name="voice_action_choose_upload">오디오 파일 선택</string>
+    <string name="voice_status_importing">클립 가져오는 중…</string>
+    <string name="voice_status_import_failed">가져오기에 실패했습니다. 다른 클립을 선택한 뒤 다시 시도하세요.</string>
+    <string name="voice_status_import_unsupported">WAV, MP3, M4A 같은 지원되는 오디오 클립을 사용하세요.</string>
+    <string name="voice_status_upload_ready">처리할 오디오 클립을 선택하세요.</string>
+    <string name="voice_action_save_result">WAV 저장</string>
+    <string name="voice_workflow_title">모드</string>
+    <string name="voice_workflow_clip">클립</string>
+    <string name="voice_workflow_live">라이브</string>
+    <string name="voice_action_start_live">라이브 시작</string>
+    <string name="voice_action_stop_live">라이브 중지</string>
+    <string name="voice_status_live_ready">라이브 음성 미리 들을 준비가 되었습니다.</string>
+    <string name="voice_status_live_running">라이브 음성 미리 듣기가 실행 중입니다.</string>
+    <string name="voice_status_live_failed">라이브 미리 듣기가 중지되었습니다. 기기의 오디오 경로를 확인한 뒤 다시 시도하세요.</string>
+    <string name="voice_live_route_active">입력: %1$s • 출력: %2$s</string>
+    <string name="voice_live_route_requested_fallback">선호하는 라이브 출력이 사용할 수 없습니다. 입력: %1$s • 실제 출력: %2$s</string>
+    <string name="voice_live_route_unknown">시스템 기본값</string>
+    <string name="voice_live_note">라이브는 입력으로 휴대폰 마이크를, 출력으로 연결된 Bluetooth 스피커를 우선 사용합니다. Bluetooth 출력이 없으면 휴대폰 스피커로 돌아갑니다.</string>
+    <string name="voice_process_hint_needs_input">처리하기 전에 오디오를 녹음하거나 업로드하세요.</string>
+    <string name="voice_process_hint_processing">선택한 프리셋을 처리 중…</string>
+    <string name="voice_track_mode_single">싱글 트랙</string>
+    <string name="voice_track_mode_dual">듀얼 트랙</string>
+    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_summary">원래 음성에 일정한 flash 스타일 배경 트랙을 추가합니다.</string>
+    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_summary">음성이 있을 때만 열리는 flash 스타일 배경 트랙을 원래 음성에 추가합니다.</string>
+    <string name="voice_metal_title">메탈</string>
+    <string name="voice_metal_summary">한 트랙에 금속성 음성을 얹습니다.</string>
+    <string name="voice_code_title">코드</string>
+    <string name="voice_code_summary">문장 사이에 짧은 코드 음이 들어가는 기계 음성입니다.</string>
+    <string name="voice_robot_title">로봇</string>
+    <string name="voice_robot_summary">짧은 금속성 에코가 있는 깔끔한 로봇 음성입니다.</string>
+    <string name="voice_preset_title">프리셋</string>
+    <string name="voice_live_preview_dialog_title">Live 모드 미리보기</string>
+    <string name="voice_live_preview_dialog_body">Live 모드는 현재 초기 미리보기 기능입니다. 독립 개발과 지속적인 최적화가 진행 중이므로 오디오 품질과 지연 시간이 달라질 수 있습니다. 가장 안정적인 결과를 원하면 Clip 모드를 권장합니다.</string>
+    <string name="voice_live_preview_dialog_use_clip">Clip 사용</string>
+    <string name="voice_live_preview_dialog_try_live">Live 시도</string>
+    <string name="voice_result_input_track">입력</string>
+    <string name="voice_result_output_track">출력</string>
 </resources>

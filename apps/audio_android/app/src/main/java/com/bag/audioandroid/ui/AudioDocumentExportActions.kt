@@ -79,6 +79,7 @@ internal class AudioDocumentExportActions(
                 withContext(workerDispatcher) {
                     when (val source = request.source) {
                         is AudioDocumentExportSource.Generated -> exportGeneratedAudioToDocument(source.mode, uriString)
+                        AudioDocumentExportSource.Voice -> false
                         is AudioDocumentExportSource.Saved ->
                             savedAudioRepository.exportSavedAudioToDocument(source.itemId, uriString)
                     }

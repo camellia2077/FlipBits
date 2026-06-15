@@ -274,7 +274,7 @@
     <string name="config_debug_collapse">Debug 설정 접기</string>
     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">녹화용 탭 힌트를 표시합니다.</string>
-    <string name="config_visual_perf_overlay_title">Visual 성능 오버레이</string>
+    <string name="config_visual_perf_overlay_title">시각 성능 오버레이</string>
     <string name="config_animation_title">Animation</string>
     <string name="config_animation_subtitle">기어 미리보기를 정해진 시간 동안 실행합니다.</string>
     <string name="config_animation_duration_label">초</string>

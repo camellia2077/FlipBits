@@ -1,6 +1,6 @@
 # Android Player UI
 
-更新时间：2026-05-21
+更新时间：2026-06-11
 
 ## Purpose
 
@@ -106,9 +106,21 @@ Rules:
 - Both must use the same dock container color source.
 - Layer separation should come from shadow, spacing, and controls, not from unrelated base colors.
 - Mini player should stay fully opaque so text remains readable over scrolling content.
+- Bottom tab navigation must stay inside one shared floating capsule. Do not branch the
+  dock container color, elevation, or shape by selected tab.
+- A new app tab should only be added to the shared tab list and screen switch. It should
+  not introduce a selected-tab-specific transparent `NavigationBar`, alternate `Surface`,
+  or icon-only shadow treatment.
+- Page content should use the `PlayerScaffold` `contentPadding` contract: apply top and
+  horizontal padding to the page container, then keep bottom dock avoidance inside the
+  scrollable content as a trailing spacer or `LazyColumn` content padding. Do not apply
+  the full `contentPadding` directly to a whole scroll container if it creates a solid
+  bottom band behind the floating capsule.
 
 Code truth:
 
+- `AudioAndroidBottomBar.kt` owns the bottom tab capsule.
+- `PlayerScaffold.kt` owns bottom overlay placement and page `contentPadding`.
 - `playerDockContainerColor(uiState)` in `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
 
 ## Player Control Colors

@@ -4,6 +4,25 @@
 
 User-facing Android release notes. For detailed engineering history, see `docs/history/presentation/android/v*/x.y.z.md`.
 
+## v0.6.0
+### Release Notes
+
+This update adds the new Android `Voice` page for audio-to-audio voice effects. It supports both traditional single-track voice conversion and a new dual-track flow, where one track processes the input voice while a second track reuses Flash voicing styles as a mechanical companion layer before both are mixed into the final output.
+
+### New and Improved
+
+- Added the `Voice` page with both `Clip` and `Live` workflows. You can record or import audio, apply a voice effect, preview the result, share it, or export it.
+- Added `Single track` mode for direct voice conversion, including `Metal`, `Code`, and `Robot` presets.
+- Added `Dual track` mode for mixing a processed main voice with a generated second track, including `Binharic`, `Voice Trigger`, and `Raw Constant`.
+- Dual track effects now support `Standard`, `Litany`, `Hostility`, `Collapse`, `Zeal`, and `Void` voicing styles for different mechanical companion voices.
+- The first Voice session now starts with `Dual track` / `Binharic`, while later sessions continue to restore the user's saved track mode.
+- Added Voice diagnostic preview tracks, so input, final output, main voice, second track, and signal overlay can be previewed separately when available.
+
+### Fixes
+
+- Fixed playback state conflicts between Voice preview, global playback, leaving the Voice page, and selecting saved audio, reducing cases where multiple audio sources could play at once.
+- Fixed Live mode preset and voicing-style forwarding so processing uses the selections currently shown in the UI.
+
 ## v0.5.6
 
 This update focuses on playback state persistence, clearer theme presentation, and more consistent localization, along with stability fixes for speed-adjusted playback and Ultra visualization.

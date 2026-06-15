@@ -1,5 +1,7 @@
 package com.bag.audioandroid.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,9 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bag.audioandroid.BuildConfig
+import com.bag.audioandroid.ui.model.AppTab
 import com.bag.audioandroid.ui.model.AudioPlaybackSource
 import com.bag.audioandroid.ui.model.SavedAudioModeFilter
 import com.bag.audioandroid.ui.model.TransportModeOption
@@ -49,6 +53,18 @@ fun AudioAndroidApp(
         ) { uri ->
             uri?.let { viewModel.onImportAudio(it.toString()) }
         }
+    val importVoiceAudioLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            uri?.let { viewModel.onImportVoiceAudio(it.toString()) }
+        }
+    val recordAudioPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { granted ->
+            viewModel.onVoiceRecordPermissionChanged(granted)
+        }
     val exportAudioLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.CreateDocument("audio/wav"),
@@ -74,6 +90,17 @@ fun AudioAndroidApp(
     LaunchedEffect(uiState.isQueueVisible, uiState.currentPlaybackSource, uiState.transportMode) {
         if (uiState.isQueueVisible) {
             savedAudioFilter = defaultSavedAudioFilter(uiState)
+        }
+    }
+
+    LaunchedEffect(uiState.selectedTab) {
+        if (uiState.selectedTab == AppTab.Voice) {
+            viewModel.onVoiceRecordPermissionChanged(
+                ContextCompat.checkSelfPermission(
+                    appContext,
+                    Manifest.permission.RECORD_AUDIO,
+                ) == PackageManager.PERMISSION_GRANTED,
+            )
         }
     }
 
@@ -529,6 +556,10 @@ fun AudioAndroidApp(
         debugMorseVisualizationModeRequest = debugMorseVisualizationModeRequest,
         onDebugMorseVisualizationModeHandled = viewModel::onDebugMorseVisualizationModeHandled,
         onImportAudio = { importAudioLauncher.launch(arrayOf("audio/*")) },
+        onImportVoiceAudio = { importVoiceAudioLauncher.launch(arrayOf("audio/wav", "audio/x-wav", "audio/*")) },
+        onRequestVoiceRecordPermission = {
+            recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        },
         viewModel = viewModel,
     )
 }

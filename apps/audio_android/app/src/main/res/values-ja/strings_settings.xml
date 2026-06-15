@@ -261,7 +261,7 @@
     <string name="config_debug_collapse">Debug 設定を折りたたむ</string>
     <string name="config_demo_mode_title">Demo mode</string>
     <string name="config_demo_mode_subtitle">収録用のタップヒントを表示します。</string>
-    <string name="config_visual_perf_overlay_title">Visual パフォーマンスオーバーレイ</string>
+    <string name="config_visual_perf_overlay_title">表示パフォーマンスオーバーレイ</string>
     <string name="config_animation_title">Animation</string>
     <string name="config_animation_subtitle">ギアプレビューを一定時間実行します。</string>
     <string name="config_animation_duration_label">秒</string>

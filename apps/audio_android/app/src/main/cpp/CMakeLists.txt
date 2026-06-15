@@ -40,6 +40,7 @@ add_library(audio_android_jni SHARED
     jni_bridge_follow_marshalling.cpp
     jni_bridge_helpers.cpp
     jni_bridge_lifecycle.cpp
+    jni_bridge_voice.cpp
     playback_runtime_jni.cpp
 )
 

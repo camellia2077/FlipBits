@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 
+from ..constants import ROOT_DIR
 from ..android_install import install_debug_fresh
 from ..android_sdk import install_android_sdk_components
 from ..android_signing import (
@@ -74,6 +75,20 @@ def _extra_gradle_args(args: argparse.Namespace) -> list[str]:
         gradle_args.extend(["--tests", test_filter])
     return gradle_args
 
+
+def _run_android_resource_escape_autofix() -> None:
+    run(
+        [
+            "python",
+            "tools/repo_tooling/android_translate/run.py",
+            "fix-resource-escapes",
+            "--res-dir",
+            "apps/audio_android/app/src/main/res",
+            "--quiet",
+        ],
+        cwd=ROOT_DIR,
+    )
+
 def _add_android_string_key(args: argparse.Namespace) -> None:
     missing_args = [
         option
@@ -145,6 +160,8 @@ def cmd_android(args: argparse.Namespace) -> None:
 
     if args.action == "assemble-release":
         ensure_release_signing_config_exists()
+
+    _run_android_resource_escape_autofix()
 
     command = gradle_wrapper()
     if args.clean:

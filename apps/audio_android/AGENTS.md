@@ -63,7 +63,7 @@
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/ConfigThemeAppearanceSection.kt`
   - `data/AndroidSampleInputTextProvider.kt` and matching `audio_samples_*` resources
-- 用户可见底部 tab 文案当前以 `Audio / Saved / Settings` 为准；如果文档里要提界面名，优先用最新 UI 文案，不要直接把历史代码名 `Library / Config` 当成用户文案复述。
+- 用户可见底部 tab 文案当前以 `Settings / Data / Voice / Saved` 为准；自动化 id 为 `settings / data / voice / saved`。如果文档里要提界面名，优先用最新 UI 文案，不要直接把历史代码名 `Library / Config` 当成用户文案复述。
 - 如果改动涉及保存音频识别，不要再从文件名设计新解析逻辑；优先看 WAV metadata 链路。
 - 如果要修改 Android presentation 版本号，优先改 `apps/audio_android/gradle.properties`。
 

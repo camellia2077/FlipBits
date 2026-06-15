@@ -4,6 +4,25 @@
 
 面向用户的 Android 版本更新摘要。详细工程历史请继续参考 `docs/history/presentation/android/v*/x.y.z.md`。
 
+## v0.6.0
+### 更新说明
+
+这次更新新增了 Android `Voice` 变声器页面，重点是把输入音频直接转换成新的声音效果。除了传统的单轨变声，也加入了双音频轨道玩法：一条轨道处理输入人声，另一条轨道复用 Flash 的 voicing style 生成机械化副声，再混合成最终输出。
+
+### 新增与优化
+
+- 新增 `Voice` 页面，支持 `Clip` 和 `Live` 两种工作流。可以录音或导入音频，选择效果后处理、试听、分享或导出结果。
+- 新增 `Single track` 模式，用于直接转换输入人声本身，包含 `Metal`、`Code`、`Robot` 等单轨变声 preset。
+- 新增 `Dual track` 模式，用于生成主轨和第二轨后混合输出，包含 `Binharic`、`Voice Trigger`、`Raw Constant`。
+- Dual track 现在可以选择 `Standard`、`Litany`、`Hostility`、`Collapse`、`Zeal`、`Void` 等 voicing style，让第二轨拥有不同的机械副声风格。
+- Voice 首次进入默认使用 `Dual track` / `Binharic`，后续会继续保留用户自己的 track mode 选择。
+- 增加 Voice 调试试听轨道，可分别试听输入、最终输出、主轨、第二轨或 signal overlay。
+
+### 修复
+
+- 修复 Voice preview 与全局播放、离开 Voice 页面、保存音频选择之间的播放状态冲突，避免多个音频源同时播放。
+- 修复 Live 模式下 preset 和 voicing style 传递不一致的问题，确保实际处理使用当前界面选择。
+
 ## v0.5.6
 
 这次更新主要围绕播放页状态持久化、主题显示层级和多语言文案一致性展开，也补上了几处与倍速播放和 Ultra 可视化相关的稳定性问题。

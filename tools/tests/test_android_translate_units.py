@@ -238,6 +238,11 @@ class AndroidStringTextTests(unittest.TestCase):
         self.assertTrue(any("raw ASCII apostrophe" in risk for risk in risks))
         self.assertTrue(any("invalid \\u escape sequence" in risk for risk in risks))
 
+    def test_high_risk_patterns_ignore_apostrophe_inside_quoted_android_literal(self) -> None:
+        risks = find_high_risk_android_string_resource_patterns('"Source d\'entrée"')
+
+        self.assertEqual(risks, [])
+
     def test_normalize_android_string_resource_text_wraps_ascii_apostrophes_in_quotes(self) -> None:
         normalized = normalize_android_string_resource_text("Необов'язково")
 
