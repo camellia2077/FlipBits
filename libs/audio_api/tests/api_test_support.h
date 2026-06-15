@@ -55,5 +55,6 @@ void AssertRoundTripAcrossCorpus(const std::vector<test::CorpusCase>& corpus,
 void RegisterApiSyncTests(test::Runner& runner);
 void RegisterApiAsyncTests(test::Runner& runner);
 void RegisterApiFlashTests(test::Runner& runner);
+void RegisterApiVoiceFxTests(test::Runner& runner);
 
 }  // namespace api_tests

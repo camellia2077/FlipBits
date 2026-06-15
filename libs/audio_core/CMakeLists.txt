@@ -34,6 +34,7 @@ set(bag_core_sources
     src/ultra/codec.cpp
     src/ultra/phy_clean.cpp
     src/ultra/phy_compat.cpp
+    src/voice/fx.cpp
     src/pipeline/pipeline.cpp
 )
 
@@ -78,6 +79,7 @@ target_sources(
             modules/bag/ultra/codec.cppm
             modules/bag/ultra/phy_clean.cppm
             modules/bag/ultra/phy_compat.cppm
+            modules/bag/voice/fx.cppm
             modules/bag/pipeline/pipeline.cppm
 )
 

@@ -62,6 +62,7 @@ flipbits_add_host_test(test_modules_leaf
         modules/leaf_module_smoke_audio_io.cpp
         modules/leaf_module_smoke_flash.cpp
         modules/leaf_module_smoke_transport.cpp
+        modules/leaf_module_smoke_voice.cpp
     LIBS bag_core audio_io
     MODULE_TEST
 )

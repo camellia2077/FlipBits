@@ -27,6 +27,7 @@ if(BUILD_TESTING)
             tests/api_sync_tests.cpp
             tests/api_async_tests.cpp
             tests/api_flash_tests.cpp
+            tests/api_voice_fx_tests.cpp
         LIBS bag_api
     )
 endif()

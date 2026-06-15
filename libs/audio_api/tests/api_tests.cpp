@@ -6,5 +6,6 @@ int main() {
   api_tests::RegisterApiSyncTests(runner);
   api_tests::RegisterApiAsyncTests(runner);
   api_tests::RegisterApiFlashTests(runner);
+  api_tests::RegisterApiVoiceFxTests(runner);
   return runner.Run();
 }

@@ -11,6 +11,7 @@ import bag.flash.phy_clean;
 import bag.pro.codec;
 import bag.transport.compat.frame_codec;
 import bag.ultra.codec;
+import bag.voice.fx;
 
 #include "leaf_module_smoke_support.h"
 
@@ -19,5 +20,6 @@ int main() {
     modules_leaf_smoke::RegisterLeafAudioIoTests(runner);
     modules_leaf_smoke::RegisterLeafFlashTests(runner);
     modules_leaf_smoke::RegisterLeafTransportTests(runner);
+    modules_leaf_smoke::RegisterLeafVoiceTests(runner);
     return runner.Run();
 }

@@ -8,6 +8,10 @@
 - 让 `docs/design/transports.md` 退回“总览 / 对比 / 跳转”职责，而不是继续承载全部细节。
 
 ## 模式入口
+- [`voice/README.md`](voice/README.md)
+  - `Voice` 页 `audio -> audio` 效果器 preset 的总说明。
+- [`voice/`](voice/)
+  - `Single track / Dual track` 分类，以及 `Metal / Code / Robot / Binharic / Voice Trigger / Raw Constant` 的设计说明。
 - [`flash/README.md`](flash/README.md)
   - 风格化 BFSK / bit-by-bit signaling 的主说明。
 - [`flash/voicing-emotions.md`](flash/voicing-emotions.md)

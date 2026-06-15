@@ -22,5 +22,6 @@ std::vector<std::uint8_t> AsBytes(const std::string& text);
 void RegisterLeafAudioIoTests(test::Runner& runner);
 void RegisterLeafFlashTests(test::Runner& runner);
 void RegisterLeafTransportTests(test::Runner& runner);
+void RegisterLeafVoiceTests(test::Runner& runner);
 
 }  // namespace modules_leaf_smoke

@@ -23,6 +23,24 @@ typedef enum bag_transport_mode {
   BAG_TRANSPORT_ULTRA = 3
 } bag_transport_mode;
 
+typedef enum bag_voice_fx_preset {
+  BAG_VOICE_FX_MACHINE_VOICE = 0,
+  BAG_VOICE_FX_BINHARIC = 1,
+  BAG_VOICE_FX_SIGNAL_CANT = 2,
+  BAG_VOICE_FX_ROBOT_VOX = 3,
+  BAG_VOICE_FX_RAW_CONSTANT = 4,
+  BAG_VOICE_FX_VOICE_TRIGGER = 5
+} bag_voice_fx_preset;
+
+typedef enum bag_voice_fx_subvoice_style {
+  BAG_VOICE_FX_SUBVOICE_STYLE_STANDARD = 0,
+  BAG_VOICE_FX_SUBVOICE_STYLE_LITANY = 1,
+  BAG_VOICE_FX_SUBVOICE_STYLE_HOSTILITY = 3,
+  BAG_VOICE_FX_SUBVOICE_STYLE_COLLAPSE = 4,
+  BAG_VOICE_FX_SUBVOICE_STYLE_ZEAL = 5,
+  BAG_VOICE_FX_SUBVOICE_STYLE_VOID = 6
+} bag_voice_fx_subvoice_style;
+
 typedef enum bag_flash_signal_profile {
   BAG_FLASH_SIGNAL_PROFILE_STANDARD = 0,
   BAG_FLASH_SIGNAL_PROFILE_LITANY = 1,
@@ -60,6 +78,7 @@ typedef enum bag_validation_issue {
 typedef struct bag_decoder bag_decoder;
 typedef struct bag_encode_operation bag_encode_operation;
 typedef struct bag_decode_operation bag_decode_operation;
+typedef struct bag_voice_fx_processor bag_voice_fx_processor;
 
 typedef struct bag_encoder_config {
   int sample_rate_hz;
@@ -80,6 +99,14 @@ typedef struct bag_decoder_config {
   bag_flash_voicing_flavor flash_voicing_flavor;
   int reserved;
 } bag_decoder_config;
+
+typedef struct bag_voice_fx_config {
+  int sample_rate_hz;
+  int enable_diagnostics;
+  bag_voice_fx_preset preset;
+  bag_voice_fx_subvoice_style subvoice_style;
+  int reserved;
+} bag_voice_fx_config;
 
 typedef struct bag_text_result {
   char* buffer;
@@ -306,6 +333,13 @@ typedef struct bag_pcm16_result {
   size_t sample_count;
 } bag_pcm16_result;
 
+typedef struct bag_voice_fx_result {
+  bag_pcm16_result final_mix;
+  bag_pcm16_result main_voice;
+  bag_pcm16_result subvoice;
+  bag_pcm16_result signal_overlay;
+} bag_voice_fx_result;
+
 // Encode results combine owned PCM output with optional caller-owned raw/follow
 // buffers. `samples` is allocated by the API on success and must be released
 // via bag_free_encode_result. Raw/follow buffers are never allocated by the
@@ -490,6 +524,22 @@ const char* bag_error_code_message(bag_error_code code);
 
 bag_error_code bag_encode_text(const bag_encoder_config* config,
                                const char* text, bag_pcm16_result* out_result);
+bag_error_code bag_apply_voice_fx(const bag_voice_fx_config* config,
+                                  const int16_t* samples,
+                                  size_t sample_count,
+                                  bag_voice_fx_result* out_result);
+bag_error_code bag_create_voice_fx_processor(
+    const bag_voice_fx_config* config,
+    bag_voice_fx_processor** out_processor);
+bag_error_code bag_process_voice_fx_block(
+    bag_voice_fx_processor* processor,
+    const int16_t* samples,
+    size_t sample_count,
+    bag_voice_fx_result* out_result);
+bag_error_code bag_flush_voice_fx_processor(
+    bag_voice_fx_processor* processor,
+    bag_voice_fx_result* out_result);
+void bag_destroy_voice_fx_processor(bag_voice_fx_processor* processor);
 bag_error_code bag_encode_text_with_follow(const bag_encoder_config* config,
                                            const char* text,
                                            bag_encode_result* out_result);
@@ -521,6 +571,7 @@ bag_error_code bag_describe_flash_signal(const bag_encoder_config* config,
                                          const char* text,
                                          bag_flash_signal_info* out_info);
 void bag_free_pcm16_result(bag_pcm16_result* result);
+void bag_free_voice_fx_result(bag_voice_fx_result* result);
 void bag_free_encode_result(bag_encode_result* result);
 
 bag_error_code bag_create_decoder(const bag_decoder_config* config,
