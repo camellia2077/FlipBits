@@ -135,6 +135,12 @@
 - 编码进度、取消、结果落态：
   - `AudioSessionEncodeActions.kt` -> `data/NativeAudioCodecGateway.kt` -> `app/src/main/cpp/jni_bridge.cpp`
   - adb 采集与进度条 phase 诊断看 `docs/architecture/android/android-encode-progress-automation.md`
+- Voice FX / audio-to-audio：
+  - UI/action 入口：`app/src/main/java/com/bag/audioandroid/ui/VoiceSessionActions.kt`
+  - gateway 入口：`app/src/main/java/com/bag/audioandroid/data/NativeAudioCodecGateway.kt`
+  - JNI 入口：`app/src/main/cpp/jni_bridge_voice.cpp`
+  - 文件/离线生成必须走 `NativeApplyVoiceFx` -> libs `bag_apply_voice_fx`，这是 Android/Web 对齐的 canonical path。
+  - `NativeCreateVoiceFxProcessor` / `NativeProcessVoiceFxBlock` / `NativeFlushVoiceFxProcessor` 只用于 streaming/live path，不作为文件生成一致性基准。
 - 导出 WAV、文件元数据、媒体库识别：
   - `MediaStoreAudioExportGateway.kt` -> `MediaStoreSavedAudioLibraryGateway.kt` -> `NativeAudioIoGateway.kt` / `audio_io_jni.cpp` -> `libs/audio_io/`
 - 播放区 UI：

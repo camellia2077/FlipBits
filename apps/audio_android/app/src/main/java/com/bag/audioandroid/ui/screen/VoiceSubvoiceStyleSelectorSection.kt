@@ -17,7 +17,7 @@ import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.VoiceFxSubvoiceStyleOption
 
 @Composable
-internal fun BinharicVoicingSelectorSection(
+internal fun VoiceSubvoiceStyleSelectorSection(
     enabled: Boolean,
     selectedStyle: VoiceFxSubvoiceStyleOption,
     onStyleSelected: (VoiceFxSubvoiceStyleOption) -> Unit,
@@ -31,7 +31,7 @@ internal fun BinharicVoicingSelectorSection(
             title = stringResource(R.string.voice_voicing_style_title),
             value = stringResource(selectedStyle.labelResId),
             contentDescription = stringResource(R.string.voice_action_select_voicing_style),
-            testTag = "binharic-voicing-style-selector",
+            testTag = "binaric-cant-voicing-style-selector",
             enabled = enabled,
             onClick = { isSheetOpen = true },
         )
@@ -39,12 +39,12 @@ internal fun BinharicVoicingSelectorSection(
             text = stringResource(selectedStyle.descriptionResId),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.testTag("binharic-voicing-style-description"),
+            modifier = Modifier.testTag("binaric-cant-voicing-style-description"),
         )
     }
 
     if (isSheetOpen) {
-        BinharicVoicingPickerSheet(
+        VoiceSubvoiceStylePickerSheet(
             selectedStyle = selectedStyle,
             onStyleSelected = { option ->
                 onStyleSelected(option)

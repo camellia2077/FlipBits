@@ -253,8 +253,8 @@
     <string name="voice_voicing_style_title">音声スタイル</string>
     <string name="voice_action_select_voicing_style">音声スタイルを選択</string>
     <string name="voice_voicing_style_sheet_title">音声スタイル</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">人声に flash 風の背景トラックを追加します。</string>
+    <string name="voice_binaric_cant_title">バイナリック・キャント</string>
+    <string name="voice_binaric_cant_summary">人声に、Flash の音声スタイルに追従する背景トラックを加えます。</string>
     <string name="voice_input_title">入力クリップ</string>
     <string name="voice_input_source_title">入力方法</string>
     <string name="voice_input_source_record">録音</string>
@@ -284,9 +284,9 @@
     <string name="voice_process_hint_processing">選択したプリセットを処理中…</string>
     <string name="voice_track_mode_single">シングルトラック</string>
     <string name="voice_track_mode_dual">デュアルトラック</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">常時Raw</string>
     <string name="voice_raw_summary">元の声に一定の flash 風背景トラックを追加します。</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">音声トリガー</string>
     <string name="voice_voice_trigger_summary">声があるときだけ開く flash 風背景トラックを元の声に追加します。</string>
     <string name="voice_metal_title">メタル</string>
     <string name="voice_metal_summary">1 本のトラックに金属的な声をのせます。</string>
@@ -302,3 +302,4 @@
     <string name="voice_result_input_track">入力</string>
     <string name="voice_result_output_track">出力</string>
 </resources>
+

@@ -76,10 +76,10 @@ class VoiceSessionActionsTest {
                     workerDispatcher = StandardTestDispatcher(testScheduler),
                 )
 
-            actions.onPresetSelected(VoiceFxPresetOption.Binharic)
+            actions.onPresetSelected(VoiceFxPresetOption.BinaricCant)
 
             val session = uiState.value.voiceSession
-            assertEquals(VoiceFxPresetOption.Binharic, session.selectedPreset)
+            assertEquals(VoiceFxPresetOption.BinaricCant, session.selectedPreset)
             assertEquals(VoiceTrackModeOption.Dual, session.selectedTrackMode)
             assertTrue(session.inputPcm.isNotEmpty())
             assertTrue(session.processedPcm.isEmpty())
@@ -100,7 +100,7 @@ class VoiceSessionActionsTest {
                                 hasRecordPermission = true,
                                 inputPcm = shortArrayOf(11, 12, 13, 14),
                                 sampleRateHz = 44100,
-                                selectedPreset = VoiceFxPresetOption.Binharic,
+                                selectedPreset = VoiceFxPresetOption.BinaricCant,
                             ),
                     ),
                 )
@@ -153,7 +153,7 @@ class VoiceSessionActionsTest {
                                 inputPcm = shortArrayOf(1, 2, 3),
                                 processedPcm = shortArrayOf(4, 5, 6),
                                 debugSubvoicePcm = shortArrayOf(7, 8),
-                                selectedPreset = VoiceFxPresetOption.Binharic,
+                                selectedPreset = VoiceFxPresetOption.BinaricCant,
                             ),
                     ),
                 )
@@ -212,7 +212,7 @@ class VoiceSessionActionsTest {
 
             val session = uiState.value.voiceSession
             assertEquals(VoiceTrackModeOption.Dual, session.selectedTrackMode)
-            assertEquals(VoiceFxPresetOption.Binharic, session.selectedPreset)
+            assertEquals(VoiceFxPresetOption.BinaricCant, session.selectedPreset)
             assertTrue(session.processedPcm.isEmpty())
             assertTrue(session.debugSubvoicePcm.isEmpty())
         }
@@ -516,7 +516,7 @@ class VoiceSessionActionsTest {
 
             val request = uiState.value.pendingDocumentExportRequest
             assertEquals(AudioDocumentExportSource.Voice, request?.source)
-            assertEquals("binharic_vox_input.wav", request?.suggestedFileName)
+            assertEquals("binaric_cant_vox_input.wav", request?.suggestedFileName)
         }
 
     @Test
@@ -553,7 +553,7 @@ class VoiceSessionActionsTest {
 
             assertEquals(0, repository.shareGeneratedAudioCalls)
             assertEquals(1, repository.shareRawPcmAudioCalls)
-            assertEquals("binharic_recorded_voice.wav", repository.lastSharedDisplayName)
+            assertEquals("binaric_cant_recorded_voice.wav", repository.lastSharedDisplayName)
             assertArrayEquals(shortArrayOf(1, 2, 3, 4), repository.lastSharedPcm)
             assertEquals(44100, repository.lastSharedSampleRateHz)
         }
@@ -671,7 +671,7 @@ class VoiceSessionActionsTest {
         }
 
     @Test
-    fun startLiveAcceptsBinharicPreset() =
+    fun startLiveAcceptsBinaricCantPreset() =
         runTest {
             val liveGateway = FakeVoiceLiveGateway()
             val uiState =
@@ -682,7 +682,7 @@ class VoiceSessionActionsTest {
                                 hasRecordPermission = true,
                                 selectedWorkflowMode = VoiceWorkflowModeOption.Live,
                                 selectedTrackMode = VoiceTrackModeOption.Dual,
-                                selectedPreset = VoiceFxPresetOption.Binharic,
+                                selectedPreset = VoiceFxPresetOption.BinaricCant,
                                 selectedSubvoiceStyle = VoiceFxSubvoiceStyleOption.Litany,
                             ),
                     ),
@@ -704,7 +704,7 @@ class VoiceSessionActionsTest {
 
             assertTrue(uiState.value.voiceSession.isLiveActive)
             assertEquals(1, liveGateway.startCalls)
-            assertEquals(VoiceFxPresetOption.Binharic, liveGateway.lastConfig?.preset)
+            assertEquals(VoiceFxPresetOption.BinaricCant, liveGateway.lastConfig?.preset)
             assertEquals(VoiceFxSubvoiceStyleOption.Litany, liveGateway.lastConfig?.subvoiceStyle)
         }
 

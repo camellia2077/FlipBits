@@ -253,8 +253,8 @@
     <string name="voice_voicing_style_title">음성 스타일</string>
     <string name="voice_action_select_voicing_style">음성 스타일 선택</string>
     <string name="voice_voicing_style_sheet_title">음성 스타일</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">음성에 flash 스타일 배경 트랙을 추가합니다.</string>
+    <string name="voice_binaric_cant_title">바이너릭 챈트</string>
+    <string name="voice_binaric_cant_summary">음성에 Flash의 음성 스타일을 따라가는 배경 트랙을 추가합니다.</string>
     <string name="voice_input_title">입력 클립</string>
     <string name="voice_input_source_title">소스</string>
     <string name="voice_input_source_record">녹음</string>
@@ -284,9 +284,9 @@
     <string name="voice_process_hint_processing">선택한 프리셋을 처리 중…</string>
     <string name="voice_track_mode_single">싱글 트랙</string>
     <string name="voice_track_mode_dual">듀얼 트랙</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">상시 Raw</string>
     <string name="voice_raw_summary">원래 음성에 일정한 flash 스타일 배경 트랙을 추가합니다.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">음성 트리거</string>
     <string name="voice_voice_trigger_summary">음성이 있을 때만 열리는 flash 스타일 배경 트랙을 원래 음성에 추가합니다.</string>
     <string name="voice_metal_title">메탈</string>
     <string name="voice_metal_summary">한 트랙에 금속성 음성을 얹습니다.</string>
@@ -302,3 +302,4 @@
     <string name="voice_result_input_track">입력</string>
     <string name="voice_result_output_track">출력</string>
 </resources>
+

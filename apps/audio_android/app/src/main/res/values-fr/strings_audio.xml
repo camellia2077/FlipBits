@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Style vocal</string>
     <string name="voice_action_select_voicing_style">Choisir le style vocal</string>
     <string name="voice_voicing_style_sheet_title">Style vocal</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Voix avec une piste de fond ajoutée au style flash.</string>
+    <string name="voice_binaric_cant_title">Cantique binaire</string>
+    <string name="voice_binaric_cant_summary">Voix avec une piste de fond qui suit le style de voix flash.</string>
     <string name="voice_input_title">Clip d’entrée</string>
     <string name="voice_input_source_title">Source</string>
     <string name="voice_input_source_record">Enregistrer</string>
@@ -263,11 +263,11 @@
     <string name="voice_process_hint_processing">Traitement du preset sélectionné…</string>
     <string name="voice_track_mode_single">Piste unique</string>
     <string name="voice_track_mode_dual">Double piste</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Brut constant</string>
     <string name="voice_raw_summary">Voix d origine avec une piste de fond constante au style flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Déclencheur vocal</string>
     <string name="voice_voice_trigger_summary">Voix d origine avec une piste de fond au style flash qui s ouvre seulement quand une voix est presente.</string>
-    <string name="voice_metal_title">Metal</string>
+    <string name="voice_metal_title">Métal</string>
     <string name="voice_metal_summary">Voix métallique sur une seule piste.</string>
     <string name="voice_code_title">Code</string>
     <string name="voice_code_summary">Voix mécanique avec de courts sons codés entre les lignes.</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Entrée</string>
     <string name="voice_result_output_track">Sortie</string>
 </resources>
+

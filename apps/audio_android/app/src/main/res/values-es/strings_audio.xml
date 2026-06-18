@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Estilo de voz</string>
     <string name="voice_action_select_voicing_style">Seleccionar estilo de voz</string>
     <string name="voice_voicing_style_sheet_title">Estilo de voz</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Voz con una pista de fondo extra en estilo flash.</string>
+    <string name="voice_binaric_cant_title">Canto binárico</string>
+    <string name="voice_binaric_cant_summary">Voz con una pista de fondo que sigue el estilo de voz de flash.</string>
     <string name="voice_input_title">Clip de entrada</string>
     <string name="voice_input_source_title">Fuente</string>
     <string name="voice_input_source_record">Grabar</string>
@@ -263,13 +263,13 @@
     <string name="voice_process_hint_processing">Procesando el preset seleccionado…</string>
     <string name="voice_track_mode_single">Pista única</string>
     <string name="voice_track_mode_dual">Pista dual</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Constante raw</string>
     <string name="voice_raw_summary">Voz original con una pista de fondo constante en estilo flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Disparador de voz</string>
     <string name="voice_voice_trigger_summary">Voz original con una pista de fondo en estilo flash que se abre solo cuando hay voz.</string>
     <string name="voice_metal_title">Metal</string>
     <string name="voice_metal_summary">Voz metálica en una sola pista.</string>
-    <string name="voice_code_title">Codigo</string>
+    <string name="voice_code_title">Código</string>
     <string name="voice_code_summary">Voz mecánica con sonidos codificados cortos entre líneas.</string>
     <string name="voice_robot_title">Robot</string>
     <string name="voice_robot_summary">Voz de robot limpia con un eco metálico corto.</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Entrada</string>
     <string name="voice_result_output_track">Salida</string>
 </resources>
+

@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Stile voce</string>
     <string name="voice_action_select_voicing_style">Seleziona stile voce</string>
     <string name="voice_voicing_style_sheet_title">Stile voce</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Voce con una traccia di sottofondo extra in stile flash.</string>
+    <string name="voice_binaric_cant_title">Canto binarico</string>
+    <string name="voice_binaric_cant_summary">Voce con una traccia di sottofondo che segue lo stile vocale flash.</string>
     <string name="voice_input_title">Clip di input</string>
     <string name="voice_input_source_title">Sorgente</string>
     <string name="voice_input_source_record">Registra</string>
@@ -263,17 +263,17 @@
     <string name="voice_process_hint_processing">Elaborazione del preset selezionato…</string>
     <string name="voice_track_mode_single">Traccia singola</string>
     <string name="voice_track_mode_dual">Doppia traccia</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Grezzo costante</string>
     <string name="voice_raw_summary">Voce originale con una traccia di sottofondo costante in stile flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Attivazione vocale</string>
     <string name="voice_voice_trigger_summary">Voce originale con una traccia di sottofondo in stile flash che si apre solo quando e presente la voce.</string>
-    <string name="voice_metal_title">Metal</string>
+    <string name="voice_metal_title">Metallo</string>
     <string name="voice_metal_summary">Voce metallica su una sola traccia.</string>
     <string name="voice_code_title">Codice</string>
     <string name="voice_code_summary">Voce meccanica con brevi suoni codificati tra le frasi.</string>
     <string name="voice_robot_title">Robot</string>
     <string name="voice_robot_summary">Voce robotica pulita con un breve eco metallico.</string>
-    <string name="voice_preset_title">Preset</string>
+    <string name="voice_preset_title">Predefinito</string>
     <string name="voice_live_preview_dialog_title">Anteprima modalità Live</string>
     <string name="voice_live_preview_dialog_body">La modalità Live è attualmente in anteprima iniziale. La qualità audio e la latenza possono variare perché lo sviluppo indipendente e l’ottimizzazione attiva sono ancora in corso. Per risultati migliori, consigliamo la modalità Clip.</string>
     <string name="voice_live_preview_dialog_use_clip">Usa Clip</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Input</string>
     <string name="voice_result_output_track">Output</string>
 </resources>
+

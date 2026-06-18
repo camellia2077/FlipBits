@@ -19,22 +19,22 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BinharicVoicingSelectorSectionTest {
+class VoiceSubvoiceStyleSelectorSectionTest {
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun `selector row shows current style and description`() {
         composeRule.setContent {
-            BinharicVoicingSelectorSection(
+            VoiceSubvoiceStyleSelectorSection(
                 enabled = true,
                 selectedStyle = VoiceFxSubvoiceStyleOption.Standard,
                 onStyleSelected = {},
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertIsDisplayed()
-        composeRule.onNodeWithTag("binharic-voicing-style-description").assertIsDisplayed()
+        composeRule.onNodeWithTag("binaric-cant-voicing-style-selector").assertIsDisplayed()
+        composeRule.onNodeWithTag("binaric-cant-voicing-style-description").assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.voice_voicing_style_title)).assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(VoiceFxSubvoiceStyleOption.Standard.labelResId)).assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(VoiceFxSubvoiceStyleOption.Standard.descriptionResId)).assertIsDisplayed()
@@ -44,7 +44,7 @@ class BinharicVoicingSelectorSectionTest {
     fun `picker sheet shows all voicing styles and selection callback fires`() {
         var selected = VoiceFxSubvoiceStyleOption.Standard
         composeRule.setContent {
-            BinharicVoicingPickerSheet(
+            VoiceSubvoiceStylePickerSheet(
                 selectedStyle = selected,
                 onStyleSelected = { selected = it },
                 onDismiss = {},
@@ -52,20 +52,20 @@ class BinharicVoicingSelectorSectionTest {
         }
 
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.voice_voicing_style_sheet_title)).assertIsDisplayed()
-        composeRule.onAllNodesWithTag("binharic-voicing-style-standard", useUnmergedTree = true).assertCountEquals(1)
-        composeRule.onAllNodesWithTag("binharic-voicing-style-litany", useUnmergedTree = true).assertCountEquals(1)
-        composeRule.onAllNodesWithTag("binharic-voicing-style-hostility", useUnmergedTree = true).assertCountEquals(1)
-        composeRule.onAllNodesWithTag("binharic-voicing-style-collapse", useUnmergedTree = true).assertCountEquals(1)
+        composeRule.onAllNodesWithTag("binaric-cant-voicing-style-standard", useUnmergedTree = true).assertCountEquals(1)
+        composeRule.onAllNodesWithTag("binaric-cant-voicing-style-litany", useUnmergedTree = true).assertCountEquals(1)
+        composeRule.onAllNodesWithTag("binaric-cant-voicing-style-hostility", useUnmergedTree = true).assertCountEquals(1)
+        composeRule.onAllNodesWithTag("binaric-cant-voicing-style-collapse", useUnmergedTree = true).assertCountEquals(1)
         composeRule
-            .onNodeWithTag("binharic-voicing-style-list")
-            .performScrollToNode(hasTestTag("binharic-voicing-style-zeal"))
-        composeRule.onAllNodesWithTag("binharic-voicing-style-zeal", useUnmergedTree = true).assertCountEquals(1)
+            .onNodeWithTag("binaric-cant-voicing-style-list")
+            .performScrollToNode(hasTestTag("binaric-cant-voicing-style-zeal"))
+        composeRule.onAllNodesWithTag("binaric-cant-voicing-style-zeal", useUnmergedTree = true).assertCountEquals(1)
         composeRule
-            .onNodeWithTag("binharic-voicing-style-list")
-            .performScrollToNode(hasTestTag("binharic-voicing-style-void"))
-        composeRule.onAllNodesWithTag("binharic-voicing-style-void", useUnmergedTree = true).assertCountEquals(1)
+            .onNodeWithTag("binaric-cant-voicing-style-list")
+            .performScrollToNode(hasTestTag("binaric-cant-voicing-style-void"))
+        composeRule.onAllNodesWithTag("binaric-cant-voicing-style-void", useUnmergedTree = true).assertCountEquals(1)
 
-        composeRule.onNodeWithTag("binharic-voicing-style-hostility", useUnmergedTree = true).performClick()
+        composeRule.onNodeWithTag("binaric-cant-voicing-style-hostility", useUnmergedTree = true).performClick()
 
         assertEquals(VoiceFxSubvoiceStyleOption.Hostility, selected)
     }

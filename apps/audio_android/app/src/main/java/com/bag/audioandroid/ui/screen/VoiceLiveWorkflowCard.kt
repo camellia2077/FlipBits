@@ -16,6 +16,7 @@ import com.bag.audioandroid.ui.model.VoiceFxPresetOption
 import com.bag.audioandroid.ui.model.VoiceFxSubvoiceStyleOption
 import com.bag.audioandroid.ui.model.VoiceTrackModeOption
 import com.bag.audioandroid.ui.model.availablePresets
+import com.bag.audioandroid.ui.model.usesSubvoiceStyle
 import com.bag.audioandroid.ui.state.VoiceSessionState
 
 @Composable
@@ -59,8 +60,8 @@ internal fun VoiceLiveWorkflowCard(
                 text = stringResource(session.selectedPreset.descriptionResId),
                 style = MaterialTheme.typography.bodyMedium,
             )
-            if (session.selectedTrackMode == VoiceTrackModeOption.Dual) {
-                BinharicVoicingSelectorSection(
+            if (session.selectedTrackMode.usesSubvoiceStyle) {
+                VoiceSubvoiceStyleSelectorSection(
                     enabled = configControlsEnabled,
                     selectedStyle = session.selectedSubvoiceStyle,
                     onStyleSelected = onSubvoiceStyleSelected,

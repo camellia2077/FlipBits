@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Styl głosu</string>
     <string name="voice_action_select_voicing_style">Wybierz styl głosu</string>
     <string name="voice_voicing_style_sheet_title">Styl głosu</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Glos z dodana backgroundowa sciezka w stylu flash.</string>
+    <string name="voice_binaric_cant_title">Śpiew binarny</string>
+    <string name="voice_binaric_cant_summary">Głos z tłem, które podąża za stylem głosu Flash.</string>
     <string name="voice_input_title">Klip wejściowy</string>
     <string name="voice_input_source_title">Źródło</string>
     <string name="voice_input_source_record">Nagraj</string>
@@ -263,9 +263,9 @@
     <string name="voice_process_hint_processing">Przetwarzanie wybranego presetu…</string>
     <string name="voice_track_mode_single">Pojedyncza ścieżka</string>
     <string name="voice_track_mode_dual">Podwójna ścieżka</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Stały raw</string>
     <string name="voice_raw_summary">Oryginalny glos ze stala sciezka tla w stylu flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Wyzwalacz głosu</string>
     <string name="voice_voice_trigger_summary">Oryginalny glos ze sciezka tla w stylu flash, ktora wlacza sie tylko przy obecnosci glosu.</string>
     <string name="voice_metal_title">Metal</string>
     <string name="voice_metal_summary">Metaliczny glos na jednej sciezce.</string>
@@ -273,7 +273,7 @@
     <string name="voice_code_summary">Mechaniczny glos z krotkimi kodowanymi dzwiekami miedzy zdaniami.</string>
     <string name="voice_robot_title">Robot</string>
     <string name="voice_robot_summary">Czysty glos robota z krotkim metalicznym echem.</string>
-    <string name="voice_preset_title">Preset</string>
+    <string name="voice_preset_title">Ustawienie</string>
     <string name="voice_live_preview_dialog_title">Podglad trybu Live</string>
     <string name="voice_live_preview_dialog_body">Tryb Live jest obecnie wczesnym podgladem. Jakosc dzwieku i opoznienia moga sie roznic, poniewaz niezalezny rozwoj i aktywna optymalizacja nadal trwaja. Aby uzyskac najlepsze wyniki, zalecany jest tryb Clip.</string>
     <string name="voice_live_preview_dialog_use_clip">Uzyj Clip</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Wejscie</string>
     <string name="voice_result_output_track">Wyjscie</string>
 </resources>
+

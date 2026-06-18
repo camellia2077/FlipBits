@@ -5,7 +5,7 @@
     <string name="common_cancel">取消</string>
     <string name="common_all">全部</string>
     <string name="common_unknown">未知</string>
-    <string name="tab_data">Data</string>
+    <string name="tab_data">資料</string>
     <string name="tab_library">已儲存</string>
     <string name="tab_config">設定</string>
     <string name="tab_voice">語音</string>

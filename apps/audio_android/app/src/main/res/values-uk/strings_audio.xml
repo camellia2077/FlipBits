@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Стиль голосу</string>
     <string name="voice_action_select_voicing_style">Вибрати стиль голосу</string>
     <string name="voice_voicing_style_sheet_title">Стиль голосу</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Голос із доданою фоновою доріжкою у стилі flash.</string>
+    <string name="voice_binaric_cant_title">Бінарний кант</string>
+    <string name="voice_binaric_cant_summary">Голос із фоновою доріжкою, що слідує стилю озвучення Flash.</string>
     <string name="voice_input_title">Вхідний кліп</string>
     <string name="voice_input_source_title">Джерело</string>
     <string name="voice_input_source_record">Запис</string>
@@ -263,9 +263,9 @@
     <string name="voice_process_hint_processing">Обробка вибраного пресета…</string>
     <string name="voice_track_mode_single">Одна доріжка</string>
     <string name="voice_track_mode_dual">Дві доріжки</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Постійний raw</string>
     <string name="voice_raw_summary">Початковий голос із постійною фоновою доріжкою у стилі flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Голосовий тригер</string>
     <string name="voice_voice_trigger_summary">Початковий голос із фоновою доріжкою у стилі flash, що відкривається лише за наявності голосу.</string>
     <string name="voice_metal_title">Метал</string>
     <string name="voice_metal_summary">Металевий голос на одній доріжці.</string>
@@ -273,7 +273,7 @@
     <string name="voice_code_summary">Механічний голос із короткими кодованими звуками між рядками.</string>
     <string name="voice_robot_title">Робот</string>
     <string name="voice_robot_summary">Чистий роботизований голос із коротким металевим відлунням.</string>
-    <string name="voice_preset_title">Пресет</string>
+    <string name="voice_preset_title">Передустановка</string>
     <string name="voice_live_preview_dialog_title">Попередній перегляд режиму Live</string>
     <string name="voice_live_preview_dialog_body">Режим Live зараз є раннім попереднім переглядом. Якість звуку й затримка можуть змінюватися, оскільки незалежна розробка та активна оптимізація тривають. Для найкращих результатів рекомендовано режим Clip.</string>
     <string name="voice_live_preview_dialog_use_clip">Використати Clip</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Вхід</string>
     <string name="voice_result_output_track">Вихід</string>
 </resources>
+

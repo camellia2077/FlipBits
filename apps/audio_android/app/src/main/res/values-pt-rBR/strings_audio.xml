@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Estilo de voz</string>
     <string name="voice_action_select_voicing_style">Selecionar estilo de voz</string>
     <string name="voice_voicing_style_sheet_title">Estilo de voz</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Voz com uma faixa de fundo extra em estilo flash.</string>
+    <string name="voice_binaric_cant_title">Canto binárico</string>
+    <string name="voice_binaric_cant_summary">Voz com uma faixa de fundo que acompanha o estilo de voz do flash.</string>
     <string name="voice_input_title">Clipe de entrada</string>
     <string name="voice_input_source_title">Fonte</string>
     <string name="voice_input_source_record">Gravar</string>
@@ -263,15 +263,15 @@
     <string name="voice_process_hint_processing">Processando o preset selecionado…</string>
     <string name="voice_track_mode_single">Faixa única</string>
     <string name="voice_track_mode_dual">Faixa dupla</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Raw constante</string>
     <string name="voice_raw_summary">Voz original com uma faixa de fundo constante em estilo flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Gatilho de voz</string>
     <string name="voice_voice_trigger_summary">Voz original com uma faixa de fundo em estilo flash que abre somente quando ha voz.</string>
     <string name="voice_metal_title">Metal</string>
     <string name="voice_metal_summary">Voz metálica em uma faixa só.</string>
-    <string name="voice_code_title">Codigo</string>
+    <string name="voice_code_title">Código</string>
     <string name="voice_code_summary">Voz mecânica com sons codificados curtos entre as frases.</string>
-    <string name="voice_robot_title">Robot</string>
+    <string name="voice_robot_title">Robô</string>
     <string name="voice_robot_summary">Voz de robô limpa com um eco metálico curto.</string>
     <string name="voice_preset_title">Predefinição</string>
     <string name="voice_live_preview_dialog_title">Prévia do modo Live</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Entrada</string>
     <string name="voice_result_output_track">Saída</string>
 </resources>
+

@@ -68,13 +68,11 @@ internal class VoiceSessionActions(
         }
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                selectedWorkflowMode = mode,
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    selectedWorkflowMode = mode,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).resetPreviewSelection()
         }
         onPersistWorkflowModeSelected(mode)
     }
@@ -93,18 +91,13 @@ internal class VoiceSessionActions(
                 } else {
                     mode.defaultPreset()
                 }
-            it.copy(
-                selectedTrackMode = mode,
-                selectedPreset = nextPreset,
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    selectedTrackMode = mode,
+                    selectedPreset = nextPreset,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
         onPersistTrackModeSelected(mode)
     }
@@ -116,28 +109,23 @@ internal class VoiceSessionActions(
         }
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                selectedInputSource = source,
-                isRecording = false,
-                isLoadingInput = false,
-                isProcessing = false,
-                inputPcm = shortArrayOf(),
-                inputDisplayName = "",
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                sampleRateHz =
-                    if (source == VoiceInputSourceOption.Record) {
-                        RECORDING_SAMPLE_RATE_HZ
-                    } else {
-                        it.sampleRateHz
-                    },
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    selectedInputSource = source,
+                    isRecording = false,
+                    isLoadingInput = false,
+                    isProcessing = false,
+                    inputPcm = shortArrayOf(),
+                    inputDisplayName = "",
+                    sampleRateHz =
+                        if (source == VoiceInputSourceOption.Record) {
+                            RECORDING_SAMPLE_RATE_HZ
+                        } else {
+                            it.sampleRateHz
+                        },
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
         onPersistInputSourceSelected(source)
     }
@@ -149,17 +137,12 @@ internal class VoiceSessionActions(
         }
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                selectedRecordProcessingMode = mode,
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    selectedRecordProcessingMode = mode,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
     }
 
@@ -167,18 +150,13 @@ internal class VoiceSessionActions(
         stopLiveInternal()
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                selectedPreset = preset,
-                selectedTrackMode = preset.trackMode,
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    selectedPreset = preset,
+                    selectedTrackMode = preset.trackMode,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
     }
 
@@ -186,17 +164,12 @@ internal class VoiceSessionActions(
         stopLiveInternal()
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                selectedSubvoiceStyle = subvoiceStyle,
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    selectedSubvoiceStyle = subvoiceStyle,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
     }
 
@@ -245,21 +218,16 @@ internal class VoiceSessionActions(
             return
         }
         updateVoiceSession {
-            it.copy(
-                isRecording = true,
-                isLoadingInput = false,
-                isProcessing = false,
-                inputPcm = shortArrayOf(),
-                inputDisplayName = "",
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    isRecording = true,
+                    isLoadingInput = false,
+                    isProcessing = false,
+                    inputPcm = shortArrayOf(),
+                    inputDisplayName = "",
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
     }
 
@@ -282,27 +250,24 @@ internal class VoiceSessionActions(
         val streamedProcessedPcm = streamedResult?.finalMix ?: shortArrayOf()
         val streamedErrorCode = streamedResult?.errorCode ?: BagApiCodes.ERROR_OK
         updateVoiceSession {
-            it.copy(
-                isRecording = false,
-                isLoadingInput = false,
-                isProcessing =
-                    recorded.isNotEmpty() &&
-                        session.selectedRecordProcessingMode == VoiceRecordProcessingModeOption.AfterRecording,
-                inputPcm = recorded,
-                inputDisplayName = "",
-                processedPcm = streamedProcessedPcm,
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                lastErrorCode =
-                    when {
-                        recorded.isEmpty() -> BagApiCodes.ERROR_INTERNAL
-                        session.selectedRecordProcessingMode == VoiceRecordProcessingModeOption.WhileRecording &&
-                            streamedProcessedPcm.isEmpty() -> streamedErrorCode
-                        else -> BagApiCodes.ERROR_OK
-                    },
-            )
+            it
+                .copy(
+                    isRecording = false,
+                    isLoadingInput = false,
+                    isProcessing =
+                        recorded.isNotEmpty() &&
+                            session.selectedRecordProcessingMode == VoiceRecordProcessingModeOption.AfterRecording,
+                    inputPcm = recorded,
+                    inputDisplayName = "",
+                    lastErrorCode =
+                        when {
+                            recorded.isEmpty() -> BagApiCodes.ERROR_INTERNAL
+                            session.selectedRecordProcessingMode == VoiceRecordProcessingModeOption.WhileRecording &&
+                                streamedProcessedPcm.isEmpty() -> streamedErrorCode
+                            else -> BagApiCodes.ERROR_OK
+                        },
+                ).replaceVoiceOutputWithoutDiagnostics(streamedProcessedPcm)
+                .stopPreviewPlayback()
         }
         if (recorded.isNotEmpty() && session.selectedRecordProcessingMode == VoiceRecordProcessingModeOption.AfterRecording) {
             processRecordedBatch(
@@ -322,68 +287,54 @@ internal class VoiceSessionActions(
         stopGlobalPlayback()
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                isLoadingInput = true,
-                isRecording = false,
-                isProcessing = false,
-                inputPcm = shortArrayOf(),
-                inputDisplayName = "",
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    isLoadingInput = true,
+                    isRecording = false,
+                    isProcessing = false,
+                    inputPcm = shortArrayOf(),
+                    inputDisplayName = "",
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
         scope.launch(workerDispatcher) {
             when (val result = voiceAudioFileGateway.importVoiceAudio(uriString)) {
                 is VoiceAudioImportResult.Success ->
                     updateVoiceSession {
-                        it.copy(
-                            isLoadingInput = false,
-                            inputPcm = result.audio.pcm,
-                            inputDisplayName = result.audio.displayName,
-                            sampleRateHz = result.audio.sampleRateHz,
-                            processedPcm = shortArrayOf(),
-                            debugMainVoicePcm = shortArrayOf(),
-                            debugSubvoicePcm = shortArrayOf(),
-                            debugSignalOverlayPcm = shortArrayOf(),
-                            isPreviewPlaying = false,
-                            lastErrorCode = BagApiCodes.ERROR_OK,
-                        )
+                        it
+                            .copy(
+                                isLoadingInput = false,
+                                inputPcm = result.audio.pcm,
+                                inputDisplayName = result.audio.displayName,
+                                sampleRateHz = result.audio.sampleRateHz,
+                                lastErrorCode = BagApiCodes.ERROR_OK,
+                            ).clearVoiceOutput()
+                            .stopPreviewPlayback()
                     }
 
                 VoiceAudioImportResult.UnsupportedFormat ->
                     updateVoiceSession {
-                        it.copy(
-                            isLoadingInput = false,
-                            inputPcm = shortArrayOf(),
-                            inputDisplayName = "",
-                            processedPcm = shortArrayOf(),
-                            debugMainVoicePcm = shortArrayOf(),
-                            debugSubvoicePcm = shortArrayOf(),
-                            debugSignalOverlayPcm = shortArrayOf(),
-                            isPreviewPlaying = false,
-                            lastErrorCode = AudioIoWavCodes.STATUS_UNSUPPORTED_FORMAT,
-                        )
+                        it
+                            .copy(
+                                isLoadingInput = false,
+                                inputPcm = shortArrayOf(),
+                                inputDisplayName = "",
+                                lastErrorCode = AudioIoWavCodes.STATUS_UNSUPPORTED_FORMAT,
+                            ).clearVoiceOutput()
+                            .stopPreviewPlayback()
                     }
 
                 VoiceAudioImportResult.Failed ->
                     updateVoiceSession {
-                        it.copy(
-                            isLoadingInput = false,
-                            inputPcm = shortArrayOf(),
-                            inputDisplayName = "",
-                            processedPcm = shortArrayOf(),
-                            debugMainVoicePcm = shortArrayOf(),
-                            debugSubvoicePcm = shortArrayOf(),
-                            debugSignalOverlayPcm = shortArrayOf(),
-                            isPreviewPlaying = false,
-                            lastErrorCode = AudioIoWavCodes.STATUS_INVALID_HEADER,
-                        )
+                        it
+                            .copy(
+                                isLoadingInput = false,
+                                inputPcm = shortArrayOf(),
+                                inputDisplayName = "",
+                                lastErrorCode = AudioIoWavCodes.STATUS_INVALID_HEADER,
+                            ).clearVoiceOutput()
+                            .stopPreviewPlayback()
                     }
             }
         }
@@ -397,17 +348,12 @@ internal class VoiceSessionActions(
         stopGlobalPlayback()
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                isProcessing = true,
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    isProcessing = true,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
         val inputPcm = session.inputPcm.copyOf()
         val sampleRateHz = session.sampleRateHz
@@ -445,17 +391,15 @@ internal class VoiceSessionActions(
                             "ratio=${formatRecordRatio(result.finalMix.size, pcm.size)}",
                     )
                     updateVoiceSession {
-                        it.copy(
-                            isProcessing = false,
-                            processedPcm = result.finalMix,
-                            debugMainVoicePcm = result.mainVoice,
-                            debugSubvoicePcm = result.subvoice,
-                            debugSignalOverlayPcm = result.signalOverlay,
-                            isPreviewPlaying = false,
-                            previewTrack = null,
-                            previewPositionSamples = 0,
-                            lastErrorCode = BagApiCodes.ERROR_OK,
-                        )
+                        it
+                            .copy(
+                                isProcessing = false,
+                                processedPcm = result.finalMix,
+                                debugMainVoicePcm = result.mainVoice,
+                                debugSubvoicePcm = result.subvoice,
+                                debugSignalOverlayPcm = result.signalOverlay,
+                                lastErrorCode = BagApiCodes.ERROR_OK,
+                            ).resetPreviewSelection()
                     }
                 }
 
@@ -465,17 +409,12 @@ internal class VoiceSessionActions(
                             "input=${pcm.size} error=${result.errorCode}",
                     )
                     updateVoiceSession {
-                        it.copy(
-                            isProcessing = false,
-                            processedPcm = shortArrayOf(),
-                            debugMainVoicePcm = shortArrayOf(),
-                            debugSubvoicePcm = shortArrayOf(),
-                            debugSignalOverlayPcm = shortArrayOf(),
-                            isPreviewPlaying = false,
-                            previewTrack = null,
-                            previewPositionSamples = 0,
-                            lastErrorCode = result.errorCode,
-                        )
+                        it
+                            .copy(
+                                isProcessing = false,
+                                lastErrorCode = result.errorCode,
+                            ).clearVoiceOutput()
+                            .resetPreviewSelection()
                     }
                 }
             }
@@ -582,20 +521,18 @@ internal class VoiceSessionActions(
         stopGlobalPlayback()
         stopPreviewInternal()
         updateVoiceSession {
-            it.copy(
-                isRecording = false,
-                isLoadingInput = false,
-                isProcessing = false,
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                isLiveActive = true,
-                liveInputRouteLabel = "",
-                liveOutputRouteLabel = "",
-                liveSpeakerOutRequested = true,
-                liveSpeakerOutActive = false,
-                lastErrorCode = BagApiCodes.ERROR_OK,
-            )
+            it
+                .copy(
+                    isRecording = false,
+                    isLoadingInput = false,
+                    isProcessing = false,
+                    isLiveActive = true,
+                    liveInputRouteLabel = "",
+                    liveOutputRouteLabel = "",
+                    liveSpeakerOutRequested = true,
+                    liveSpeakerOutActive = false,
+                    lastErrorCode = BagApiCodes.ERROR_OK,
+                ).resetPreviewSelection()
         }
         val started =
             voiceLiveGateway.start(
@@ -786,20 +723,15 @@ internal class VoiceSessionActions(
         val recorded = voiceRecordingGateway.stopRecording()
         resetRecordProcessingSession()
         updateVoiceSession {
-            it.copy(
-                isRecording = false,
-                isLoadingInput = false,
-                inputPcm = recorded,
-                inputDisplayName = "",
-                processedPcm = shortArrayOf(),
-                debugMainVoicePcm = shortArrayOf(),
-                debugSubvoicePcm = shortArrayOf(),
-                debugSignalOverlayPcm = shortArrayOf(),
-                isPreviewPlaying = false,
-                previewTrack = null,
-                previewPositionSamples = 0,
-                lastErrorCode = if (recorded.isNotEmpty()) BagApiCodes.ERROR_OK else BagApiCodes.ERROR_INTERNAL,
-            )
+            it
+                .copy(
+                    isRecording = false,
+                    isLoadingInput = false,
+                    inputPcm = recorded,
+                    inputDisplayName = "",
+                    lastErrorCode = if (recorded.isNotEmpty()) BagApiCodes.ERROR_OK else BagApiCodes.ERROR_INTERNAL,
+                ).clearVoiceOutput()
+                .resetPreviewSelection()
         }
     }
 
@@ -834,6 +766,31 @@ internal class VoiceSessionActions(
     }
 
     private fun VoiceSessionState.isVoiceTransitionBlocked(): Boolean = isRecording || isLoadingInput || isProcessing || isLiveActive
+
+    private fun VoiceSessionState.clearVoiceOutput(): VoiceSessionState =
+        copy(
+            processedPcm = shortArrayOf(),
+            debugMainVoicePcm = shortArrayOf(),
+            debugSubvoicePcm = shortArrayOf(),
+            debugSignalOverlayPcm = shortArrayOf(),
+        )
+
+    private fun VoiceSessionState.replaceVoiceOutputWithoutDiagnostics(processed: ShortArray): VoiceSessionState =
+        copy(
+            processedPcm = processed,
+            debugMainVoicePcm = shortArrayOf(),
+            debugSubvoicePcm = shortArrayOf(),
+            debugSignalOverlayPcm = shortArrayOf(),
+        )
+
+    private fun VoiceSessionState.resetPreviewSelection(): VoiceSessionState =
+        copy(
+            isPreviewPlaying = false,
+            previewTrack = null,
+            previewPositionSamples = 0,
+        )
+
+    private fun VoiceSessionState.stopPreviewPlayback(): VoiceSessionState = copy(isPreviewPlaying = false)
 
     private fun stopLiveInternal() {
         val wasActive = uiState.value.voiceSession.isLiveActive

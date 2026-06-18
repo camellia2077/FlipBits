@@ -1,7 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "android_bag/flash/signal.h"
@@ -38,15 +40,37 @@ struct FlashVoicingStepProgress {
     bool finished = false;
 };
 
+struct FlashVoicingDiagnostics {
+    double payload_prepare_ms = 0.0;
+    double payload_sample_setup_ms = 0.0;
+    double payload_envelope_ms = 0.0;
+    double payload_articulation_ms = 0.0;
+    double payload_harmonic_ms = 0.0;
+    double payload_metallic_ms = 0.0;
+    double payload_chant_resonance_ms = 0.0;
+    double payload_chant_drone_ms = 0.0;
+    double payload_mechanical_throat_ms = 0.0;
+    double payload_standard_low_voice_ms = 0.0;
+    double payload_hostility_edge_ms = 0.0;
+    double payload_boundary_click_ms = 0.0;
+    double payload_modulation_ms = 0.0;
+    double payload_mix_shape_store_ms = 0.0;
+    std::uint64_t payload_voiced_samples = 0;
+    std::uint64_t payload_silence_samples = 0;
+    std::uint64_t payload_profiled_samples = 0;
+};
+
 class FlashVoicingStepper {
  public:
     FlashVoicingStepper(const std::vector<std::int16_t>& clean_payload_pcm,
                         const FlashPayloadLayout& payload_layout,
                         FlashVoicingFlavor flavor,
-                        const FlashVoicingConfig& config = {});
+                        const FlashVoicingConfig& config = {},
+                        bool enable_diagnostics = false);
     ~FlashVoicingStepper();
 
     const FlashVoicingResult& Result() const;
+    FlashVoicingDiagnostics Diagnostics() const;
     std::size_t TotalWork() const;
     bool Finished() const;
     FlashVoicingStepProgress Pump(std::size_t work_budget);

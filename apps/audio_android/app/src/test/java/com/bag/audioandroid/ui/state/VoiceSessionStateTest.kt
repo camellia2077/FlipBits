@@ -20,7 +20,7 @@ class VoiceSessionStateTest {
         assertFalse(initial.canStartLive)
         assertEquals(VoiceRecordProcessingModeOption.AfterRecording, initial.selectedRecordProcessingMode)
         assertEquals(VoiceTrackModeOption.Dual, initial.selectedTrackMode)
-        assertEquals(VoiceFxPresetOption.Binharic, initial.selectedPreset)
+        assertEquals(VoiceFxPresetOption.BinaricCant, initial.selectedPreset)
 
         val readyToRecord = initial.copy(hasRecordPermission = true)
         assertTrue(readyToRecord.canStartRecording)
@@ -32,12 +32,12 @@ class VoiceSessionStateTest {
             )
         assertTrue(readyToGoLive.canStartLive)
 
-        val binharicLive =
+        val binaricCantLive =
             readyToGoLive.copy(
                 selectedTrackMode = VoiceTrackModeOption.Dual,
-                selectedPreset = VoiceFxPresetOption.Binharic,
+                selectedPreset = VoiceFxPresetOption.BinaricCant,
             )
-        assertTrue(binharicLive.canStartLive)
+        assertTrue(binaricCantLive.canStartLive)
 
         val rawDualTrackLive =
             readyToGoLive.copy(
@@ -53,12 +53,12 @@ class VoiceSessionStateTest {
             )
         assertTrue(voiceTriggerDualTrackLive.canStartLive)
 
-        val binharicLiveWrongTrack =
+        val binaricCantLiveWrongTrack =
             readyToGoLive.copy(
                 selectedTrackMode = VoiceTrackModeOption.Single,
-                selectedPreset = VoiceFxPresetOption.Binharic,
+                selectedPreset = VoiceFxPresetOption.BinaricCant,
             )
-        assertFalse(binharicLiveWrongTrack.canStartLive)
+        assertFalse(binaricCantLiveWrongTrack.canStartLive)
 
         val signalCantLive =
             readyToGoLive.copy(

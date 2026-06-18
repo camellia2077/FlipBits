@@ -7,6 +7,7 @@ enum class VoiceFxPresetOption(
     val id: String,
     val nativeValue: Int,
     val trackMode: VoiceTrackModeOption,
+    val supportsLivePreview: Boolean = true,
     @param:StringRes val labelResId: Int,
     @param:StringRes val descriptionResId: Int,
 ) {
@@ -17,12 +18,12 @@ enum class VoiceFxPresetOption(
         labelResId = R.string.voice_metal_title,
         descriptionResId = R.string.voice_metal_summary,
     ),
-    Binharic(
-        id = "binharic",
+    BinaricCant(
+        id = "binaric_cant",
         nativeValue = 1,
         trackMode = VoiceTrackModeOption.Dual,
-        labelResId = R.string.voice_binharic_title,
-        descriptionResId = R.string.voice_binharic_summary,
+        labelResId = R.string.voice_binaric_cant_title,
+        descriptionResId = R.string.voice_binaric_cant_summary,
     ),
     VoiceTrigger(
         id = "voice_trigger",

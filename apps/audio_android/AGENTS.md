@@ -22,6 +22,10 @@
   - `docs/design/android/android-dual-tone-theme.md`
 - 如果改动涉及 JNI / native 编解码 / WAV metadata / release-only native 问题，再按需读：
   - `docs/architecture/android/android-native-strategy.md`
+- 如果改动涉及 Voice FX / audio-to-audio / Web 听感一致性，再按需读：
+  - `libs/AGENTS.md` 的 “Voice FX / audio-to-audio 契约”
+  - `apps/audio_android/README.md` 的 “Voice FX / audio-to-audio”
+  - `app/src/main/cpp/jni_bridge_voice.cpp`
 - 如果改动涉及 flash voicing 选择器、preset、emotion 文案或 `{signalProfileValue, voicingFlavorValue}` 接线，再按需读：
   - `docs/design/modes/flash/voicing-emotions.md`
   - 具体 preset 细节看 `docs/design/modes/flash/<preset>.md`
@@ -66,6 +70,8 @@
 - 用户可见底部 tab 文案当前以 `Settings / Data / Voice / Saved` 为准；自动化 id 为 `settings / data / voice / saved`。如果文档里要提界面名，优先用最新 UI 文案，不要直接把历史代码名 `Library / Config` 当成用户文案复述。
 - 如果改动涉及保存音频识别，不要再从文件名设计新解析逻辑；优先看 WAV metadata 链路。
 - 如果要修改 Android presentation 版本号，优先改 `apps/audio_android/gradle.properties`。
+- Voice FX 文件处理必须继续走 JNI `NativeApplyVoiceFx` -> libs `bag_apply_voice_fx`。不要把文件上传/离线生成迁到 `bag_process_voice_fx_block`，除非任务明确是实时 streaming Voice FX，并且文档同时说明它不承诺与离线结果逐样本一致。
+- Voice FX 没有 libs 生成进度契约；Android UI 不应为 Voice FX 新增基于本地估算的百分比生成进度。
 
 ## Player UI Rules
 

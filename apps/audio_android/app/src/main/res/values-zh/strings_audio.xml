@@ -253,8 +253,8 @@
     <string name="voice_voicing_style_title">发声风格</string>
     <string name="voice_action_select_voicing_style">选择发声风格</string>
     <string name="voice_voicing_style_sheet_title">发声风格</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">人声加上一条 flash 风格背景音轨。</string>
+    <string name="voice_binaric_cant_title">二进圣咏</string>
+    <string name="voice_binaric_cant_summary">人声会叠加一条跟随 Flash 发声风格变化的背景音轨。</string>
     <string name="voice_input_title">输入音频</string>
     <string name="voice_input_source_title">来源</string>
     <string name="voice_input_source_record">录音</string>
@@ -284,9 +284,9 @@
     <string name="voice_process_hint_processing">正在处理所选预设…</string>
     <string name="voice_track_mode_single">单轨</string>
     <string name="voice_track_mode_dual">双轨</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">恒定原声</string>
     <string name="voice_raw_summary">原始人声加上一条持续播放的 flash 风格背景音轨。</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">语音触发</string>
     <string name="voice_voice_trigger_summary">原始人声加上一条仅在人声出现时打开的 flash 风格背景音轨。</string>
     <string name="voice_metal_title">金属</string>
     <string name="voice_metal_summary">单轨金属人声。</string>
@@ -302,3 +302,4 @@
     <string name="voice_result_input_track">输入</string>
     <string name="voice_result_output_track">输出</string>
 </resources>
+

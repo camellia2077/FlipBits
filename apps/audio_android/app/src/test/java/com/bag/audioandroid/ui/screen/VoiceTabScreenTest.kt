@@ -13,6 +13,7 @@ import com.bag.audioandroid.ui.model.VoiceInputSourceOption
 import com.bag.audioandroid.ui.model.VoiceRecordProcessingModeOption
 import com.bag.audioandroid.ui.model.VoiceTrackModeOption
 import com.bag.audioandroid.ui.model.VoiceWorkflowModeOption
+import com.bag.audioandroid.ui.model.defaultPreset
 import com.bag.audioandroid.ui.state.VoiceSessionState
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -27,15 +28,16 @@ class VoiceTabScreenTest {
 
     @Test
     fun `clip mode shows merged workflow card and result card`() {
+        val session =
+            VoiceSessionState(
+                hasRecordPermission = true,
+                inputPcm = shortArrayOf(1, 2, 3, 4),
+                processedPcm = shortArrayOf(5, 6, 7, 8),
+            )
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
-                session =
-                    VoiceSessionState(
-                        hasRecordPermission = true,
-                        inputPcm = shortArrayOf(1, 2, 3, 4),
-                        processedPcm = shortArrayOf(5, 6, 7, 8),
-                    ),
+                session = session,
                 onRequestRecordPermission = {},
                 onWorkflowModeSelected = {},
                 onTrackModeSelected = {},
@@ -65,7 +67,7 @@ class VoiceTabScreenTest {
         composeRule.onNodeWithTag("voice-result-download-button").assertExists()
         composeRule.onNodeWithTag("voice-preset-selector").assertExists()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.voice_preset_title)).assertIsDisplayed()
-        composeRule.onNodeWithText(composeRule.activity.getString(VoiceFxPresetOption.Binharic.labelResId)).assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.activity.getString(session.selectedPreset.labelResId)).assertIsDisplayed()
         composeRule.onNodeWithTag("voice-process-button").assertExists()
         composeRule.onNodeWithTag("voice-process-hint").assertDoesNotExist()
         composeRule.onNodeWithTag("voice-record-processing-mode-selector").assertExists()
@@ -260,7 +262,7 @@ class VoiceTabScreenTest {
     }
 
     @Test
-    fun `binharic clip mode shows voicing selector`() {
+    fun `dual track clip mode shows subvoice style selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -268,7 +270,7 @@ class VoiceTabScreenTest {
                     VoiceSessionState(
                         hasRecordPermission = true,
                         selectedTrackMode = VoiceTrackModeOption.Dual,
-                        selectedPreset = VoiceFxPresetOption.Binharic,
+                        selectedPreset = VoiceTrackModeOption.Dual.defaultPreset(),
                     ),
                 onRequestRecordPermission = {},
                 onWorkflowModeSelected = {},
@@ -289,12 +291,12 @@ class VoiceTabScreenTest {
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertExists()
-        composeRule.onNodeWithTag("binharic-voicing-style-description").assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleDescriptionTag).assertExists()
     }
 
     @Test
-    fun `binharic live mode shows voicing selector`() {
+    fun `dual track live mode shows subvoice style selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -303,7 +305,7 @@ class VoiceTabScreenTest {
                         hasRecordPermission = true,
                         selectedWorkflowMode = VoiceWorkflowModeOption.Live,
                         selectedTrackMode = VoiceTrackModeOption.Dual,
-                        selectedPreset = VoiceFxPresetOption.Binharic,
+                        selectedPreset = VoiceTrackModeOption.Dual.defaultPreset(),
                     ),
                 onRequestRecordPermission = {},
                 onWorkflowModeSelected = {},
@@ -324,12 +326,12 @@ class VoiceTabScreenTest {
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertExists()
-        composeRule.onNodeWithTag("binharic-voicing-style-description").assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleDescriptionTag).assertExists()
     }
 
     @Test
-    fun `raw constant dual track preset shows voicing selector`() {
+    fun `raw constant dual track preset shows subvoice style selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -358,12 +360,12 @@ class VoiceTabScreenTest {
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertExists()
-        composeRule.onNodeWithTag("binharic-voicing-style-description").assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleDescriptionTag).assertExists()
     }
 
     @Test
-    fun `voice trigger dual track preset shows voicing selector`() {
+    fun `voice trigger dual track preset shows subvoice style selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -392,12 +394,12 @@ class VoiceTabScreenTest {
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertExists()
-        composeRule.onNodeWithTag("binharic-voicing-style-description").assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertExists()
+        composeRule.onNodeWithTag(SubvoiceStyleDescriptionTag).assertExists()
     }
 
     @Test
-    fun `non binharic clip mode hides voicing selector`() {
+    fun `single track clip mode hides subvoice style selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -426,11 +428,11 @@ class VoiceTabScreenTest {
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertDoesNotExist()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertDoesNotExist()
     }
 
     @Test
-    fun `non binharic live mode hides voicing selector`() {
+    fun `single track live mode hides subvoice style selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -460,11 +462,11 @@ class VoiceTabScreenTest {
             )
         }
 
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertDoesNotExist()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertDoesNotExist()
     }
 
     @Test
-    fun `single track mode hides binharic controls and shows selector`() {
+    fun `single track mode hides subvoice controls and shows track selector`() {
         composeRule.setContent {
             VoiceTabScreen(
                 selectedThemeStyle = ThemeStyleOption.FactionTheme,
@@ -496,6 +498,11 @@ class VoiceTabScreenTest {
         composeRule.onNodeWithTag("voice-track-mode-selector").assertExists()
         composeRule.onNodeWithTag("voice-track-mode-single").assertExists()
         composeRule.onNodeWithTag("voice-track-mode-dual").assertExists()
-        composeRule.onNodeWithTag("binharic-voicing-style-selector").assertDoesNotExist()
+        composeRule.onNodeWithTag(SubvoiceStyleSelectorTag).assertDoesNotExist()
+    }
+
+    private companion object {
+        const val SubvoiceStyleSelectorTag = "binaric-cant-voicing-style-selector"
+        const val SubvoiceStyleDescriptionTag = "binaric-cant-voicing-style-description"
     }
 }

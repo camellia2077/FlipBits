@@ -487,8 +487,8 @@
     <string name="voice_voicing_style_title">Voicing style</string>
     <string name="voice_action_select_voicing_style">Select voicing style</string>
     <string name="voice_voicing_style_sheet_title">Voicing style</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Voice with an added flash-style background track.</string>
+    <string name="voice_binaric_cant_title">Binaric Cant</string>
+    <string name="voice_binaric_cant_summary">Voice with an added flash-style background track.</string>
     <!-- CONTEXT: CONTEXT: Title of the Signal Cant voice preset. Keep it short like the other Voice preset names. -->
     <!-- CONTEXT: CONTEXT: Short description of the Signal Cant preset on the Voice tab. It should read as a distinct effect, not just a heavier Machine Voice. -->
     <!-- CONTEXT: Voice preset title for a general-purpose robot and metallic echo voice effect. -->
@@ -537,3 +537,4 @@
     <string name="voice_voice_trigger_title">Voice Trigger</string>
     <string name="voice_voice_trigger_summary">Original voice with a flash-style background track that opens only when voice is present.</string>
 </resources>
+

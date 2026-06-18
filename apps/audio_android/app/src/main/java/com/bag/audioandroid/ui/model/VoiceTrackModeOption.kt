@@ -27,3 +27,6 @@ enum class VoiceTrackModeOption(
 fun VoiceTrackModeOption.availablePresets(): List<VoiceFxPresetOption> = VoiceFxPresetOption.entries.filter { it.trackMode == this }
 
 fun VoiceTrackModeOption.defaultPreset(): VoiceFxPresetOption = availablePresets().first()
+
+val VoiceTrackModeOption.usesSubvoiceStyle: Boolean
+    get() = this == VoiceTrackModeOption.Dual

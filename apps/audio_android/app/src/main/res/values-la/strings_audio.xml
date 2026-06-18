@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Vox Style</string>
     <string name="voice_action_select_voicing_style">Elige Vox Style</string>
     <string name="voice_voicing_style_sheet_title">Vox Style</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Vox cum addita semita postica stili flash.</string>
+    <string name="voice_binaric_cant_title">Cantus Binaricus</string>
+    <string name="voice_binaric_cant_summary">Vox cum semita postica quae stilum vocis Flash sequitur.</string>
     <string name="voice_input_title">Clipa introitus</string>
     <string name="voice_input_source_title">Fons</string>
     <string name="voice_input_source_record">Recitare</string>
@@ -263,17 +263,17 @@
     <string name="voice_process_hint_processing">Praescriptum electum tractatur…</string>
     <string name="voice_track_mode_single">Semita simplex</string>
     <string name="voice_track_mode_dual">Semita duplex</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Rudis constans</string>
     <string name="voice_raw_summary">Vox originalis cum semita postica constanti stili flash.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Excitor vocis</string>
     <string name="voice_voice_trigger_summary">Vox originalis cum semita postica stili flash quae aperitur tantum cum vox adest.</string>
-    <string name="voice_metal_title">Metal</string>
+    <string name="voice_metal_title">Metallum</string>
     <string name="voice_metal_summary">Vox metallica in una semita.</string>
     <string name="voice_code_title">Codex</string>
     <string name="voice_code_summary">Vox machinalis cum brevibus sonis codatis inter versus.</string>
-    <string name="voice_robot_title">Robot</string>
+    <string name="voice_robot_title">Automaton</string>
     <string name="voice_robot_summary">Vox automatica munda cum brevi echo metallica.</string>
-    <string name="voice_preset_title">Praeparatio</string>
+    <string name="voice_preset_title">Praedefinitum</string>
     <string name="voice_live_preview_dialog_title">Praevisio modi Live</string>
     <string name="voice_live_preview_dialog_body">Modus Live nunc est praevisio prima. Qualitas soni et mora variari possunt, quia evolutio independens et activa optimizatio adhuc pergunt. Ad optimos eventus, modus Clip commendatur.</string>
     <string name="voice_live_preview_dialog_use_clip">Utere Clip</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Inputum</string>
     <string name="voice_result_output_track">Exitus</string>
 </resources>
+

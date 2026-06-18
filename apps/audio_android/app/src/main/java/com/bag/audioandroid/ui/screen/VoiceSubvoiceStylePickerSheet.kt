@@ -31,7 +31,7 @@ import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BinharicVoicingPickerSheet(
+internal fun VoiceSubvoiceStylePickerSheet(
     selectedStyle: VoiceFxSubvoiceStyleOption,
     onStyleSelected: (VoiceFxSubvoiceStyleOption) -> Unit,
     onDismiss: () -> Unit,
@@ -58,13 +58,13 @@ internal fun BinharicVoicingPickerSheet(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .testTag("binharic-voicing-style-list")
+                        .testTag("binaric-cant-voicing-style-list")
                         .heightIn(max = 520.dp),
                 contentPadding = PaddingValues(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(VoiceFxSubvoiceStyleOption.entries) { option ->
-                    BinharicVoicingOptionRow(
+                    VoiceSubvoiceStyleOptionRow(
                         option = option,
                         selected = option == selectedStyle,
                         onClick = { onStyleSelected(option) },
@@ -76,7 +76,7 @@ internal fun BinharicVoicingPickerSheet(
 }
 
 @Composable
-private fun BinharicVoicingOptionRow(
+private fun VoiceSubvoiceStyleOptionRow(
     option: VoiceFxSubvoiceStyleOption,
     selected: Boolean,
     onClick: () -> Unit,
@@ -108,7 +108,7 @@ private fun BinharicVoicingOptionRow(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .testTag("binharic-voicing-style-${option.id}")
+                .testTag("binaric-cant-voicing-style-${option.id}")
                 .clickable(onClick = onClick),
     ) {
         Row(

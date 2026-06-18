@@ -25,6 +25,9 @@ interface VoiceFxProcessorSession {
 }
 
 interface VoiceFxGateway {
+    /**
+     * Offline/canonical path for imported files and after-recording processing.
+     */
     suspend fun applyVoiceFx(
         preset: VoiceFxPresetOption,
         subvoiceStyle: VoiceFxSubvoiceStyleOption,
@@ -32,6 +35,9 @@ interface VoiceFxGateway {
         sampleRateHz: Int,
     ): VoiceFxProcessResult
 
+    /**
+     * Streaming path for live preview and while-recording processing only.
+     */
     fun createProcessor(
         preset: VoiceFxPresetOption,
         subvoiceStyle: VoiceFxSubvoiceStyleOption,

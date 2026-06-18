@@ -117,15 +117,6 @@ data class VoiceSessionState(
         get() = pcmDurationMillis(processedPcm.size, sampleRateHz)
 }
 
-val VoiceFxPresetOption.supportsLivePreview: Boolean
-    get() =
-        this == VoiceFxPresetOption.MachineVoice ||
-            this == VoiceFxPresetOption.Binharic ||
-            this == VoiceFxPresetOption.VoiceTrigger ||
-            this == VoiceFxPresetOption.RawConstant ||
-            this == VoiceFxPresetOption.SignalCant ||
-            this == VoiceFxPresetOption.RobotVox
-
 private fun pcmDurationMillis(
     sampleCount: Int,
     sampleRateHz: Int,

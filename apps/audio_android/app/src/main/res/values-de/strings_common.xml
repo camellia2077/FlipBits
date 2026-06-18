@@ -5,7 +5,7 @@
     <string name="common_cancel">Abbrechen</string>
     <string name="common_all">Alle</string>
     <string name="common_unknown">Unbekannt</string>
-    <string name="tab_data">Data</string>
+    <string name="tab_data">Daten</string>
     <string name="tab_library">Gespeichert</string>
     <string name="tab_config">Einstellungen</string>
     <string name="tab_voice">Voice</string>

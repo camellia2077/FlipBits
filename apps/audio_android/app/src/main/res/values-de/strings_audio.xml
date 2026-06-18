@@ -232,8 +232,8 @@
     <string name="voice_voicing_style_title">Stimmstil</string>
     <string name="voice_action_select_voicing_style">Stimmstil auswählen</string>
     <string name="voice_voicing_style_sheet_title">Stimmstil</string>
-    <string name="voice_binharic_title">Binharic</string>
-    <string name="voice_binharic_summary">Stimme mit zusaetzlicher Hintergrundspur im flash-Stil.</string>
+    <string name="voice_binaric_cant_title">Binarischer Gesang</string>
+    <string name="voice_binaric_cant_summary">Stimme mit einer Hintergrundspur, die dem Flash-Stimmstil folgt.</string>
     <string name="voice_input_title">Eingabeclip</string>
     <string name="voice_input_source_title">Quelle</string>
     <string name="voice_input_source_record">Aufnehmen</string>
@@ -263,17 +263,17 @@
     <string name="voice_process_hint_processing">Das ausgewählte Preset wird verarbeitet…</string>
     <string name="voice_track_mode_single">Einzelspur</string>
     <string name="voice_track_mode_dual">Doppelspur</string>
-    <string name="voice_raw_title">Raw Constant</string>
+    <string name="voice_raw_title">Roh konstant</string>
     <string name="voice_raw_summary">Originalstimme mit konstanter Hintergrundspur im flash-Stil.</string>
-    <string name="voice_voice_trigger_title">Voice Trigger</string>
+    <string name="voice_voice_trigger_title">Sprachtrigger</string>
     <string name="voice_voice_trigger_summary">Originalstimme mit einer Hintergrundspur im flash-Stil, die sich nur bei vorhandener Stimme oeffnet.</string>
-    <string name="voice_metal_title">Metal</string>
+    <string name="voice_metal_title">Metall</string>
     <string name="voice_metal_summary">Metallische Stimme auf einer Spur.</string>
     <string name="voice_code_title">Code</string>
     <string name="voice_code_summary">Maschinenstimme mit kurzen codierten Tönen zwischen den Zeilen.</string>
-    <string name="voice_robot_title">Robot</string>
+    <string name="voice_robot_title">Roboter</string>
     <string name="voice_robot_summary">Klare Roboterstimme mit kurzem metallischem Echo.</string>
-    <string name="voice_preset_title">Preset</string>
+    <string name="voice_preset_title">Voreinstellung</string>
     <string name="voice_live_preview_dialog_title">Live-Modus-Vorschau</string>
     <string name="voice_live_preview_dialog_body">Der Live-Modus befindet sich derzeit in einer fruhen Vorschau. Audioqualitat und Latenz konnen variieren, da unabhangige Entwicklung und aktive Optimierung weiterlaufen. Fur die besten Ergebnisse wird der Clip-Modus empfohlen.</string>
     <string name="voice_live_preview_dialog_use_clip">Clip verwenden</string>
@@ -281,3 +281,4 @@
     <string name="voice_result_input_track">Eingang</string>
     <string name="voice_result_output_track">Ausgang</string>
 </resources>
+
