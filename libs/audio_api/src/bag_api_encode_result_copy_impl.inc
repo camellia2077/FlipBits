@@ -105,6 +105,48 @@ void FillEncodeOperationWorkPlan(
   out_work_plan->segment_count = work_plan.segment_count;
 }
 
+void FillEncodeOperationDiagnostics(
+    const bag::EncodeOperationDiagnostics& diagnostics,
+    bag_encode_operation_diagnostics* out_diagnostics) {
+  if (out_diagnostics == nullptr) {
+    return;
+  }
+  out_diagnostics->flash_payload_prepare_ms =
+      diagnostics.flash_payload_prepare_ms;
+  out_diagnostics->flash_payload_sample_setup_ms =
+      diagnostics.flash_payload_sample_setup_ms;
+  out_diagnostics->flash_payload_envelope_ms =
+      diagnostics.flash_payload_envelope_ms;
+  out_diagnostics->flash_payload_articulation_ms =
+      diagnostics.flash_payload_articulation_ms;
+  out_diagnostics->flash_payload_harmonic_ms =
+      diagnostics.flash_payload_harmonic_ms;
+  out_diagnostics->flash_payload_metallic_ms =
+      diagnostics.flash_payload_metallic_ms;
+  out_diagnostics->flash_payload_chant_resonance_ms =
+      diagnostics.flash_payload_chant_resonance_ms;
+  out_diagnostics->flash_payload_chant_drone_ms =
+      diagnostics.flash_payload_chant_drone_ms;
+  out_diagnostics->flash_payload_mechanical_throat_ms =
+      diagnostics.flash_payload_mechanical_throat_ms;
+  out_diagnostics->flash_payload_standard_low_voice_ms =
+      diagnostics.flash_payload_standard_low_voice_ms;
+  out_diagnostics->flash_payload_hostility_edge_ms =
+      diagnostics.flash_payload_hostility_edge_ms;
+  out_diagnostics->flash_payload_boundary_click_ms =
+      diagnostics.flash_payload_boundary_click_ms;
+  out_diagnostics->flash_payload_modulation_ms =
+      diagnostics.flash_payload_modulation_ms;
+  out_diagnostics->flash_payload_mix_shape_store_ms =
+      diagnostics.flash_payload_mix_shape_store_ms;
+  out_diagnostics->flash_payload_voiced_samples =
+      diagnostics.flash_payload_voiced_samples;
+  out_diagnostics->flash_payload_silence_samples =
+      diagnostics.flash_payload_silence_samples;
+  out_diagnostics->flash_payload_profiled_samples =
+      diagnostics.flash_payload_profiled_samples;
+}
+
 bag_error_code CopyStructuredEncodeResultToApi(
     const bag::EncodedPcmFollowResult& result, bag_encode_result* out_result) {
   if (out_result == nullptr) {

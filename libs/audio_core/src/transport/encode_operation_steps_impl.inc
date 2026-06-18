@@ -1,6 +1,8 @@
 namespace bag {
 namespace {
 
+constexpr std::size_t kRenderPumpWorkBudget = 2048;
+
 std::string TextFollowSourceForPayload(
     TransportMode mode, const std::string& text,
     const std::vector<std::uint8_t>& payload) {
@@ -81,7 +83,8 @@ bool PumpPrepareFlash(const CoreConfig& config, const std::string& text,
         state->flash_payload_layout.payload_sample_count, 1);
     state->flash_voicing_stepper = std::make_unique<flash::FlashVoicingStepper>(
         state->stage_pcm, state->flash_payload_layout,
-        state->flash_voicing_flavor, state->flash_voicing_config);
+        state->flash_voicing_flavor, state->flash_voicing_config,
+        config.enable_diagnostics);
     work_plan->postprocessing_work_units =
         std::max<std::uint64_t>(state->flash_voicing_stepper->TotalWork(), 1);
     work_plan->total_work_units = work_plan->preparing_input_work_units +
@@ -253,7 +256,7 @@ bool PumpRenderFlash(const EncodeWorkPlan& work_plan,
         chunk, state->flash_signal_config, &state->stage_pcm);
   }
   const flash::FlashChunkRenderProgress progress =
-      state->flash_chunk_renderer->Pump(256);
+      state->flash_chunk_renderer->Pump(kRenderPumpWorkBudget);
   state->render_completed_units = std::min<std::uint64_t>(
       work_plan.rendering_pcm_work_units,
       static_cast<std::uint64_t>(chunk.sample_offset +
@@ -291,7 +294,7 @@ bool PumpRenderPro(const EncodeWorkPlan& work_plan,
     }
   }
   const pro::SymbolRenderProgress progress =
-      state->pro_symbol_renderer->Pump(256);
+      state->pro_symbol_renderer->Pump(kRenderPumpWorkBudget);
   state->render_completed_units = std::min<std::uint64_t>(
       work_plan.rendering_pcm_work_units,
       static_cast<std::uint64_t>(write_offset + progress.completed_work));
@@ -328,7 +331,7 @@ bool PumpRenderUltra(const EncodeWorkPlan& work_plan,
     }
   }
   const ultra::SymbolRenderProgress progress =
-      state->ultra_symbol_renderer->Pump(256);
+      state->ultra_symbol_renderer->Pump(kRenderPumpWorkBudget);
   state->render_completed_units = std::min<std::uint64_t>(
       work_plan.rendering_pcm_work_units,
       static_cast<std::uint64_t>(write_offset + progress.completed_work));
@@ -364,7 +367,7 @@ bool PumpRenderMini(const EncodeWorkPlan& work_plan,
   const std::size_t chunk_start_offset =
       state->stage_pcm.size() - state->mini_tone_renderer->TotalWork();
   const mini_mode::ToneUnitRenderProgress progress =
-      state->mini_tone_renderer->Pump(256);
+      state->mini_tone_renderer->Pump(kRenderPumpWorkBudget);
   state->render_completed_units = std::min<std::uint64_t>(
       work_plan.rendering_pcm_work_units,
       static_cast<std::uint64_t>(chunk_start_offset + progress.completed_work));
@@ -407,16 +410,21 @@ bool PumpPostprocessStep(const CoreConfig& config,
   if (state->flash_voicing_stepper == nullptr) {
     state->flash_voicing_stepper = std::make_unique<flash::FlashVoicingStepper>(
         state->stage_pcm, state->flash_payload_layout,
-        state->flash_voicing_flavor, state->flash_voicing_config);
+        state->flash_voicing_flavor, state->flash_voicing_config,
+        config.enable_diagnostics);
   }
   const flash::FlashVoicingStepProgress progress =
-      state->flash_voicing_stepper->Pump(256);
+      state->flash_voicing_stepper->Pump(kRenderPumpWorkBudget);
   state->postprocess_completed_units = std::min<std::uint64_t>(
       work_plan.postprocessing_work_units, progress.completed_work);
   host->UpdatePhaseProgress(EncodeProgressPhase::kPostprocessing,
                             state->postprocess_completed_units);
   if (progress.finished || state->flash_voicing_stepper->Finished()) {
     result->pcm = state->flash_voicing_stepper->Result().pcm;
+    if (config.enable_diagnostics) {
+      host->SetFlashVoicingDiagnostics(
+          state->flash_voicing_stepper->Diagnostics());
+    }
     state->stage = EncodeOperationInternalStage::kFinalizing;
   }
   return true;

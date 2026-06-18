@@ -71,6 +71,23 @@ bag_error_code bag_get_encode_operation_work_plan(
   }
 }
 
+bag_error_code bag_get_encode_operation_diagnostics(
+    const bag_encode_operation* operation,
+    bag_encode_operation_diagnostics* out_diagnostics) {
+  if (operation == nullptr || !operation->operation ||
+      out_diagnostics == nullptr) {
+    return BAG_INVALID_ARGUMENT;
+  }
+  try {
+    FillEncodeOperationDiagnostics(operation->operation->Diagnostics(),
+                                   out_diagnostics);
+    return BAG_OK;
+  } catch (...) {
+    *out_diagnostics = {};
+    return BAG_INTERNAL;
+  }
+}
+
 bag_error_code bag_pump_encode_operation(
     bag_encode_operation* operation, bag_encode_operation_pump_budget budget,
     int* out_did_progress) {

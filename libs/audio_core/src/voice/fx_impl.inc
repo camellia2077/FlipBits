@@ -290,7 +290,7 @@ MainVoiceTuning MainTuningForPreset(const bag::VoiceFxPreset preset) {
                 .transient_soften_ms = 2.8,
                 .transient_soften_mix = 0.24,
             };
-        case bag::VoiceFxPreset::kBinharic:
+        case bag::VoiceFxPreset::kBinaricCant:
             return MainVoiceTuning{
                 .high_pass_hz = 320.0,
                 .low_pass_hz = 2550.0,
@@ -509,7 +509,7 @@ GatedFlashSubvoiceTuning GatedFlashSubvoiceStandardTuning() {
     };
 }
 
-GatedFlashSubvoiceTuning GatedFlashSubvoiceBinharicTuning() {
+GatedFlashSubvoiceTuning GatedFlashSubvoiceBinaricCantTuning() {
     return GatedFlashSubvoiceTuning{
         .attack_ms = 3.0,
         .release_ms = 54.0,
@@ -586,7 +586,7 @@ std::vector<double> ToNormalizedPcm(const std::vector<std::int16_t>& input_pcm) 
     return output;
 }
 
-std::vector<double> MixBinharicVoices(
+std::vector<double> MixBinaricCantVoices(
     const std::vector<double>& main_voice,
     const std::vector<double>& subvoice) {
     std::vector<double> mixed(main_voice.size(), 0.0);
@@ -597,7 +597,7 @@ std::vector<double> MixBinharicVoices(
     return mixed;
 }
 
-std::vector<double> MixBinharicLitanyVoices(
+std::vector<double> MixBinaricCantLitanyVoices(
     const std::vector<double>& main_voice,
     const std::vector<double>& subvoice,
     const int sample_rate_hz) {
@@ -672,9 +672,9 @@ std::vector<double> MixDualTrackVoices(
         return MixRawVoices(main_voice, subvoice);
     }
     if (config.subvoice_style == bag::VoiceFxSubvoiceStyle::kLitany) {
-        return MixBinharicLitanyVoices(main_voice, subvoice, config.sample_rate_hz);
+        return MixBinaricCantLitanyVoices(main_voice, subvoice, config.sample_rate_hz);
     }
-    return MixBinharicVoices(main_voice, subvoice);
+    return MixBinaricCantVoices(main_voice, subvoice);
 }
 
 void ClearVoiceFxResult(bag::VoiceFxResult* out_result) {
@@ -692,7 +692,7 @@ bag::ErrorCode ValidateVoiceFxConfig(const bag::VoiceFxConfig& config) {
         return bag::ErrorCode::kInvalidArgument;
     }
     if (config.preset != bag::VoiceFxPreset::kMachineVoice &&
-        config.preset != bag::VoiceFxPreset::kBinharic &&
+        config.preset != bag::VoiceFxPreset::kBinaricCant &&
         config.preset != bag::VoiceFxPreset::kSignalCant &&
         config.preset != bag::VoiceFxPreset::kRobotVox &&
         config.preset != bag::VoiceFxPreset::kRawConstant &&
@@ -808,8 +808,8 @@ bag::ErrorCode ProcessVoiceFxWindow(
                 ExtractVoiceEnvelope(input_pcm, config.sample_rate_hz),
                 config.sample_rate_hz,
                 config.subvoice_style,
-                config.preset == bag::VoiceFxPreset::kBinharic
-                    ? GatedFlashSubvoiceBinharicTuning()
+                config.preset == bag::VoiceFxPreset::kBinaricCant
+                    ? GatedFlashSubvoiceBinaricCantTuning()
                     : GatedFlashSubvoiceStandardTuning());
     const std::vector<double> final_mix =
         MixDualTrackVoices(config, main_voice, subvoice);

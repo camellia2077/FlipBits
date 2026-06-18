@@ -276,30 +276,30 @@ void TestApiVoiceFxMachineVoiceDiagnosticsContract() {
   bag_free_voice_fx_result(&repeat);
 }
 
-void TestApiVoiceFxBinharicReturnsDualLayerTracks() {
+void TestApiVoiceFxBinaricCantReturnsDualLayerTracks() {
   const int sample_rate_hz = 44100;
   const std::vector<std::int16_t> input = BuildVoiceInputPcm(sample_rate_hz);
   bag_voice_fx_config config{};
   config.sample_rate_hz = sample_rate_hz;
   config.enable_diagnostics = 1;
-  config.preset = BAG_VOICE_FX_BINHARIC;
+  config.preset = BAG_VOICE_FX_BINARIC_CANT;
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_STANDARD;
   config.reserved = 0;
 
-  bag_voice_fx_result binharic{};
+  bag_voice_fx_result binaric_cant{};
   test::AssertEq(
-      bag_apply_voice_fx(&config, input.data(), input.size(), &binharic), BAG_OK,
-      "Binharic should process valid PCM.");
-  AssertVoiceTrackLooksValid(binharic.final_mix, input.size(),
-                             "Binharic final mix");
-  AssertVoiceTrackLooksValid(binharic.main_voice, input.size(),
-                             "Binharic main voice");
-  AssertVoiceTrackLooksValid(binharic.subvoice, input.size(),
-                             "Binharic subvoice");
-  test::AssertEq(binharic.signal_overlay.sample_count, std::size_t{0},
-                 "Binharic should leave signal overlay empty in VNext.");
-  test::AssertTrue(DiffersBetweenTracks(binharic.main_voice, binharic.subvoice),
-                   "Binharic subvoice should not duplicate the main voice track.");
+      bag_apply_voice_fx(&config, input.data(), input.size(), &binaric_cant), BAG_OK,
+      "Binaric Cant should process valid PCM.");
+  AssertVoiceTrackLooksValid(binaric_cant.final_mix, input.size(),
+                             "Binaric Cant final mix");
+  AssertVoiceTrackLooksValid(binaric_cant.main_voice, input.size(),
+                             "Binaric Cant main voice");
+  AssertVoiceTrackLooksValid(binaric_cant.subvoice, input.size(),
+                             "Binaric Cant subvoice");
+  test::AssertEq(binaric_cant.signal_overlay.sample_count, std::size_t{0},
+                 "Binaric Cant should leave signal overlay empty in VNext.");
+  test::AssertTrue(DiffersBetweenTracks(binaric_cant.main_voice, binaric_cant.subvoice),
+                   "Binaric Cant subvoice should not duplicate the main voice track.");
 
   bag_voice_fx_config machine_config = config;
   machine_config.preset = BAG_VOICE_FX_MACHINE_VOICE;
@@ -308,8 +308,8 @@ void TestApiVoiceFxBinharicReturnsDualLayerTracks() {
       bag_apply_voice_fx(&machine_config, input.data(), input.size(), &machine),
       BAG_OK,
       "Machine Voice should still succeed for comparison.");
-  test::AssertTrue(DiffersBetweenTracks(binharic.final_mix, machine.final_mix),
-                   "Binharic should not be only a louder Machine Voice.");
+  test::AssertTrue(DiffersBetweenTracks(binaric_cant.final_mix, machine.final_mix),
+                   "Binaric Cant should not be only a louder Machine Voice.");
 
   bag_voice_fx_config no_diagnostics = config;
   no_diagnostics.enable_diagnostics = 0;
@@ -317,65 +317,65 @@ void TestApiVoiceFxBinharicReturnsDualLayerTracks() {
   test::AssertEq(bag_apply_voice_fx(&no_diagnostics, input.data(), input.size(),
                                     &no_debug),
                  BAG_OK,
-                 "Binharic without diagnostics should still succeed.");
+                 "Binaric Cant without diagnostics should still succeed.");
   AssertVoiceTrackLooksValid(no_debug.final_mix, input.size(),
-                             "Binharic final mix without diagnostics");
+                             "Binaric Cant final mix without diagnostics");
   test::AssertEq(no_debug.main_voice.sample_count, std::size_t{0},
-                 "Binharic should omit diagnostics main track when disabled.");
+                 "Binaric Cant should omit diagnostics main track when disabled.");
   test::AssertEq(no_debug.subvoice.sample_count, std::size_t{0},
-                 "Binharic should omit diagnostics subvoice when disabled.");
+                 "Binaric Cant should omit diagnostics subvoice when disabled.");
   test::AssertEq(no_debug.signal_overlay.sample_count, std::size_t{0},
-                 "Binharic should omit signal overlay when diagnostics are disabled.");
+                 "Binaric Cant should omit signal overlay when diagnostics are disabled.");
 
-  bag_free_voice_fx_result(&binharic);
+  bag_free_voice_fx_result(&binaric_cant);
   bag_free_voice_fx_result(&machine);
   bag_free_voice_fx_result(&no_debug);
 }
 
-void TestApiVoiceFxBinharicSupportsSelectedSubvoiceStyles() {
+void TestApiVoiceFxBinaricCantSupportsSelectedSubvoiceStyles() {
   const int sample_rate_hz = 44100;
   const std::vector<std::int16_t> input = BuildVoiceInputPcm(sample_rate_hz);
   bag_voice_fx_config config{};
   config.sample_rate_hz = sample_rate_hz;
   config.enable_diagnostics = 1;
-  config.preset = BAG_VOICE_FX_BINHARIC;
+  config.preset = BAG_VOICE_FX_BINARIC_CANT;
   config.reserved = 0;
 
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_STANDARD;
   bag_voice_fx_result standard{};
   test::AssertEq(
       bag_apply_voice_fx(&config, input.data(), input.size(), &standard), BAG_OK,
-      "Binharic standard subvoice should succeed.");
+      "Binaric Cant standard subvoice should succeed.");
 
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_LITANY;
   bag_voice_fx_result litany{};
   test::AssertEq(
       bag_apply_voice_fx(&config, input.data(), input.size(), &litany), BAG_OK,
-      "Binharic litany subvoice should succeed.");
+      "Binaric Cant litany subvoice should succeed.");
 
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_HOSTILITY;
   bag_voice_fx_result hostility{};
   test::AssertEq(
       bag_apply_voice_fx(&config, input.data(), input.size(), &hostility), BAG_OK,
-      "Binharic hostility subvoice should succeed.");
+      "Binaric Cant hostility subvoice should succeed.");
 
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_COLLAPSE;
   bag_voice_fx_result collapse{};
   test::AssertEq(
       bag_apply_voice_fx(&config, input.data(), input.size(), &collapse), BAG_OK,
-      "Binharic collapse subvoice should succeed.");
+      "Binaric Cant collapse subvoice should succeed.");
 
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_ZEAL;
   bag_voice_fx_result zeal{};
   test::AssertEq(
       bag_apply_voice_fx(&config, input.data(), input.size(), &zeal), BAG_OK,
-      "Binharic zeal subvoice should succeed.");
+      "Binaric Cant zeal subvoice should succeed.");
 
   config.subvoice_style = BAG_VOICE_FX_SUBVOICE_STYLE_VOID;
   bag_voice_fx_result void_style{};
   test::AssertEq(
       bag_apply_voice_fx(&config, input.data(), input.size(), &void_style), BAG_OK,
-      "Binharic void subvoice should succeed.");
+      "Binaric Cant void subvoice should succeed.");
 
   test::AssertTrue(DiffersBetweenTracks(standard.subvoice, litany.subvoice),
                    "Litany subvoice should differ from standard.");
@@ -529,7 +529,7 @@ void TestApiVoiceFxSignalCantReturnsOverlayTrack() {
   AssertVoiceTrackLooksValid(signal_cant.signal_overlay, input.size(),
                              "Signal Cant overlay");
   test::AssertEq(signal_cant.subvoice.sample_count, std::size_t{0},
-                 "Signal Cant should not return a Binharic-style subvoice track.");
+                 "Signal Cant should not return a Binaric Cant-style subvoice track.");
   test::AssertTrue(HasNonZeroSamples(signal_cant.signal_overlay),
                    "Signal Cant overlay should contain inserted machine-language bursts.");
   test::AssertTrue(
@@ -615,10 +615,10 @@ void RegisterApiVoiceFxTests(test::Runner& runner) {
              TestApiVoiceFxProcessorStreamsBlockOutput);
   runner.Add("Api.VoiceFxMachineVoiceDiagnosticsContract",
              TestApiVoiceFxMachineVoiceDiagnosticsContract);
-  runner.Add("Api.VoiceFxBinharicReturnsDualLayerTracks",
-             TestApiVoiceFxBinharicReturnsDualLayerTracks);
-  runner.Add("Api.VoiceFxBinharicSupportsSelectedSubvoiceStyles",
-             TestApiVoiceFxBinharicSupportsSelectedSubvoiceStyles);
+  runner.Add("Api.VoiceFxBinaricCantReturnsDualLayerTracks",
+             TestApiVoiceFxBinaricCantReturnsDualLayerTracks);
+  runner.Add("Api.VoiceFxBinaricCantSupportsSelectedSubvoiceStyles",
+             TestApiVoiceFxBinaricCantSupportsSelectedSubvoiceStyles);
   runner.Add("Api.VoiceFxRawConstantReturnsDryPlusSubvoiceTracks",
              TestApiVoiceFxRawConstantReturnsDryPlusSubvoiceTracks);
   runner.Add("Api.VoiceFxVoiceTriggerReturnsDryPlusGatedSubvoiceTracks",

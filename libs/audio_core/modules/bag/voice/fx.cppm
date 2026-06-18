@@ -21,7 +21,7 @@ export namespace bag {
 
 enum class VoiceFxPreset {
     kMachineVoice = 0,
-    kBinharic = 1,
+    kBinaricCant = 1,
     kSignalCant = 2,
     kRobotVox = 3,
     kRawConstant = 4,

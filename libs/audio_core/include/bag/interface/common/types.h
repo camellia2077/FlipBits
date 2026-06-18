@@ -215,6 +215,26 @@ struct EncodeWorkPlan {
   std::size_t segment_count = 1;
 };
 
+struct EncodeOperationDiagnostics {
+  double flash_payload_prepare_ms = 0.0;
+  double flash_payload_sample_setup_ms = 0.0;
+  double flash_payload_envelope_ms = 0.0;
+  double flash_payload_articulation_ms = 0.0;
+  double flash_payload_harmonic_ms = 0.0;
+  double flash_payload_metallic_ms = 0.0;
+  double flash_payload_chant_resonance_ms = 0.0;
+  double flash_payload_chant_drone_ms = 0.0;
+  double flash_payload_mechanical_throat_ms = 0.0;
+  double flash_payload_standard_low_voice_ms = 0.0;
+  double flash_payload_hostility_edge_ms = 0.0;
+  double flash_payload_boundary_click_ms = 0.0;
+  double flash_payload_modulation_ms = 0.0;
+  double flash_payload_mix_shape_store_ms = 0.0;
+  std::uint64_t flash_payload_voiced_samples = 0;
+  std::uint64_t flash_payload_silence_samples = 0;
+  std::uint64_t flash_payload_profiled_samples = 0;
+};
+
 enum class EncodeOperationState {
   kQueued = 0,
   kRunning = 1,

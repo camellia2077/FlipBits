@@ -34,6 +34,9 @@ void FillEncodeOperationProgress(const bag::EncodeProgressSnapshot& snapshot,
                                  bag_encode_operation_progress* out_progress);
 void FillEncodeOperationWorkPlan(const bag::EncodeWorkPlan& work_plan,
                                  bag_encode_operation_work_plan* out_work_plan);
+void FillEncodeOperationDiagnostics(
+    const bag::EncodeOperationDiagnostics& diagnostics,
+    bag_encode_operation_diagnostics* out_diagnostics);
 bag_error_code CopyStructuredDecodeResultToApi(
     const bag::DecodeResult& result, bag_decode_result* out_result);
 bag_error_code BuildEncodeFollowDataResult(const bag::CoreConfig& core_config,

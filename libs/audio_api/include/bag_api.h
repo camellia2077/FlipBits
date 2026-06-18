@@ -25,7 +25,7 @@ typedef enum bag_transport_mode {
 
 typedef enum bag_voice_fx_preset {
   BAG_VOICE_FX_MACHINE_VOICE = 0,
-  BAG_VOICE_FX_BINHARIC = 1,
+  BAG_VOICE_FX_BINARIC_CANT = 1,
   BAG_VOICE_FX_SIGNAL_CANT = 2,
   BAG_VOICE_FX_ROBOT_VOX = 3,
   BAG_VOICE_FX_RAW_CONSTANT = 4,
@@ -460,6 +460,26 @@ typedef struct bag_encode_operation_work_plan {
   size_t segment_count;
 } bag_encode_operation_work_plan;
 
+typedef struct bag_encode_operation_diagnostics {
+  double flash_payload_prepare_ms;
+  double flash_payload_sample_setup_ms;
+  double flash_payload_envelope_ms;
+  double flash_payload_articulation_ms;
+  double flash_payload_harmonic_ms;
+  double flash_payload_metallic_ms;
+  double flash_payload_chant_resonance_ms;
+  double flash_payload_chant_drone_ms;
+  double flash_payload_mechanical_throat_ms;
+  double flash_payload_standard_low_voice_ms;
+  double flash_payload_hostility_edge_ms;
+  double flash_payload_boundary_click_ms;
+  double flash_payload_modulation_ms;
+  double flash_payload_mix_shape_store_ms;
+  uint64_t flash_payload_voiced_samples;
+  uint64_t flash_payload_silence_samples;
+  uint64_t flash_payload_profiled_samples;
+} bag_encode_operation_diagnostics;
+
 typedef struct bag_encode_operation_pump_budget {
   uint64_t max_work_units;
   uint32_t max_wall_time_ms;
@@ -554,6 +574,9 @@ bag_error_code bag_cancel_encode_operation(bag_encode_operation* operation);
 bag_error_code bag_get_encode_operation_work_plan(
     const bag_encode_operation* operation,
     bag_encode_operation_work_plan* out_work_plan);
+bag_error_code bag_get_encode_operation_diagnostics(
+    const bag_encode_operation* operation,
+    bag_encode_operation_diagnostics* out_diagnostics);
 bag_error_code bag_pump_encode_operation(
     bag_encode_operation* operation, bag_encode_operation_pump_budget budget,
     int* out_did_progress);

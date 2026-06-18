@@ -145,48 +145,48 @@ void TestVoiceFxProcessorSmoke() {
                      "Voice-fx processor output should differ from dry input.");
 }
 
-void TestVoiceFxBinharicSmoke() {
+void TestVoiceFxBinaricCantSmoke() {
     const std::vector<std::int16_t> input = BuildInputPcm();
     bag::VoiceFxConfig config{};
     config.sample_rate_hz = 44100;
     config.enable_diagnostics = true;
-    config.preset = bag::VoiceFxPreset::kBinharic;
+    config.preset = bag::VoiceFxPreset::kBinaricCant;
     config.subvoice_style = bag::VoiceFxSubvoiceStyle::kStandard;
     bag::VoiceFxResult output;
     test::AssertEq(
         bag::ApplyVoiceFx(config, input, &output), bag::ErrorCode::kOk,
-        "Binharic should accept valid mono PCM.");
+        "Binaric Cant should accept valid mono PCM.");
     test::AssertEq(output.final_mix.size(), input.size(),
-                   "Binharic final mix should preserve PCM length.");
+                   "Binaric Cant final mix should preserve PCM length.");
     test::AssertEq(output.main_voice.size(), input.size(),
-                   "Binharic main voice should preserve PCM length.");
+                   "Binaric Cant main voice should preserve PCM length.");
     test::AssertEq(output.subvoice.size(), input.size(),
-                   "Binharic subvoice should preserve PCM length.");
+                   "Binaric Cant subvoice should preserve PCM length.");
     test::AssertTrue(output.signal_overlay.empty(),
-                     "Binharic signal overlay should remain empty for now.");
+                     "Binaric Cant signal overlay should remain empty for now.");
     test::AssertTrue(Differs(output.subvoice, output.main_voice),
-                     "Binharic subvoice should be distinct from the main voice.");
+                     "Binaric Cant subvoice should be distinct from the main voice.");
     test::AssertTrue(Differs(output.final_mix, output.main_voice),
-                     "Binharic final mix should not collapse to the main track.");
+                     "Binaric Cant final mix should not collapse to the main track.");
     test::AssertTrue(PeakAbs(output.final_mix) <= 32767,
-                     "Binharic final mix should stay inside int16 range.");
+                     "Binaric Cant final mix should stay inside int16 range.");
 
     bag::VoiceFxResult repeat;
     test::AssertEq(
         bag::ApplyVoiceFx(config, input, &repeat), bag::ErrorCode::kOk,
-        "Repeated Binharic processing should succeed.");
+        "Repeated Binaric Cant processing should succeed.");
     test::AssertEq(repeat.final_mix, output.final_mix,
-                   "Binharic final mix should stay deterministic.");
+                   "Binaric Cant final mix should stay deterministic.");
     test::AssertEq(repeat.subvoice, output.subvoice,
-                   "Binharic subvoice should stay deterministic.");
+                   "Binaric Cant subvoice should stay deterministic.");
 }
 
-void TestVoiceFxBinharicSelectableSubvoiceStylesSmoke() {
+void TestVoiceFxBinaricCantSelectableSubvoiceStylesSmoke() {
     const std::vector<std::int16_t> input = BuildInputPcm();
     bag::VoiceFxConfig standard_config{};
     standard_config.sample_rate_hz = 44100;
     standard_config.enable_diagnostics = true;
-    standard_config.preset = bag::VoiceFxPreset::kBinharic;
+    standard_config.preset = bag::VoiceFxPreset::kBinaricCant;
     standard_config.subvoice_style = bag::VoiceFxSubvoiceStyle::kStandard;
 
     bag::VoiceFxConfig litany_config = standard_config;
@@ -208,22 +208,22 @@ void TestVoiceFxBinharicSelectableSubvoiceStylesSmoke() {
     bag::VoiceFxResult void_style;
     test::AssertEq(
         bag::ApplyVoiceFx(standard_config, input, &standard), bag::ErrorCode::kOk,
-        "Binharic standard style should succeed.");
+        "Binaric Cant standard style should succeed.");
     test::AssertEq(
         bag::ApplyVoiceFx(litany_config, input, &litany), bag::ErrorCode::kOk,
-        "Binharic litany style should succeed.");
+        "Binaric Cant litany style should succeed.");
     test::AssertEq(
         bag::ApplyVoiceFx(hostility_config, input, &hostility), bag::ErrorCode::kOk,
-        "Binharic hostility style should succeed.");
+        "Binaric Cant hostility style should succeed.");
     test::AssertEq(
         bag::ApplyVoiceFx(collapse_config, input, &collapse), bag::ErrorCode::kOk,
-        "Binharic collapse style should succeed.");
+        "Binaric Cant collapse style should succeed.");
     test::AssertEq(
         bag::ApplyVoiceFx(zeal_config, input, &zeal), bag::ErrorCode::kOk,
-        "Binharic zeal style should succeed.");
+        "Binaric Cant zeal style should succeed.");
     test::AssertEq(
         bag::ApplyVoiceFx(void_config, input, &void_style), bag::ErrorCode::kOk,
-        "Binharic void style should succeed.");
+        "Binaric Cant void style should succeed.");
     test::AssertTrue(Differs(standard.subvoice, litany.subvoice),
                      "Litany subvoice should differ from standard.");
     test::AssertTrue(Differs(standard.subvoice, hostility.subvoice),
@@ -366,10 +366,10 @@ void RegisterLeafVoiceTests(test::Runner& runner) {
                TestVoiceFxMachineVoiceSmoke);
     runner.Add("ModulesLeaf.VoiceFxProcessorSmoke",
                TestVoiceFxProcessorSmoke);
-    runner.Add("ModulesLeaf.VoiceFxBinharicSmoke",
-               TestVoiceFxBinharicSmoke);
-    runner.Add("ModulesLeaf.VoiceFxBinharicSelectableSubvoiceStylesSmoke",
-               TestVoiceFxBinharicSelectableSubvoiceStylesSmoke);
+    runner.Add("ModulesLeaf.VoiceFxBinaricCantSmoke",
+               TestVoiceFxBinaricCantSmoke);
+    runner.Add("ModulesLeaf.VoiceFxBinaricCantSelectableSubvoiceStylesSmoke",
+               TestVoiceFxBinaricCantSelectableSubvoiceStylesSmoke);
     runner.Add("ModulesLeaf.VoiceFxRawConstantSmoke",
                TestVoiceFxRawConstantSmoke);
     runner.Add("ModulesLeaf.VoiceFxVoiceTriggerSmoke",

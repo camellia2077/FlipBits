@@ -30,6 +30,7 @@ class IEncodeOperation {
   virtual ErrorCode Cancel() = 0;
   virtual EncodeWorkPlan WorkPlan() const = 0;
   virtual EncodeProgressSnapshot Snapshot() const = 0;
+  virtual EncodeOperationDiagnostics Diagnostics() const = 0;
   virtual ErrorCode TakeResult(EncodedPcmFollowResult* out_result) = 0;
 };
 

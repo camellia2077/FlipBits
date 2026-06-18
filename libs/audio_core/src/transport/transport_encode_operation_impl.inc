@@ -95,6 +95,10 @@ class EncodeOperation final : public IEncodeOperation {
 
   EncodeWorkPlan WorkPlan() const override { return work_plan_; }
 
+  EncodeOperationDiagnostics Diagnostics() const override {
+    return diagnostics_;
+  }
+
   EncodeProgressSnapshot Snapshot() const override {
     EncodeProgressSnapshot snapshot{};
     snapshot.state = snapshot_.state.load();
@@ -245,6 +249,40 @@ class EncodeOperation final : public IEncodeOperation {
     step_state_.stage = EncodeOperationInternalStage::kDone;
   }
 
+  void SetFlashVoicingDiagnostics(
+      const flash::FlashVoicingDiagnostics& diagnostics) {
+    diagnostics_.flash_payload_prepare_ms = diagnostics.payload_prepare_ms;
+    diagnostics_.flash_payload_sample_setup_ms =
+        diagnostics.payload_sample_setup_ms;
+    diagnostics_.flash_payload_envelope_ms = diagnostics.payload_envelope_ms;
+    diagnostics_.flash_payload_articulation_ms =
+        diagnostics.payload_articulation_ms;
+    diagnostics_.flash_payload_harmonic_ms = diagnostics.payload_harmonic_ms;
+    diagnostics_.flash_payload_metallic_ms = diagnostics.payload_metallic_ms;
+    diagnostics_.flash_payload_chant_resonance_ms =
+        diagnostics.payload_chant_resonance_ms;
+    diagnostics_.flash_payload_chant_drone_ms =
+        diagnostics.payload_chant_drone_ms;
+    diagnostics_.flash_payload_mechanical_throat_ms =
+        diagnostics.payload_mechanical_throat_ms;
+    diagnostics_.flash_payload_standard_low_voice_ms =
+        diagnostics.payload_standard_low_voice_ms;
+    diagnostics_.flash_payload_hostility_edge_ms =
+        diagnostics.payload_hostility_edge_ms;
+    diagnostics_.flash_payload_boundary_click_ms =
+        diagnostics.payload_boundary_click_ms;
+    diagnostics_.flash_payload_modulation_ms =
+        diagnostics.payload_modulation_ms;
+    diagnostics_.flash_payload_mix_shape_store_ms =
+        diagnostics.payload_mix_shape_store_ms;
+    diagnostics_.flash_payload_voiced_samples =
+        diagnostics.payload_voiced_samples;
+    diagnostics_.flash_payload_silence_samples =
+        diagnostics.payload_silence_samples;
+    diagnostics_.flash_payload_profiled_samples =
+        diagnostics.payload_profiled_samples;
+  }
+
   class StepHost final : public IEncodeOperationStepHost {
    public:
     explicit StepHost(EncodeOperation* operation) : operation_(operation) {}
@@ -256,6 +294,11 @@ class EncodeOperation final : public IEncodeOperation {
     void UpdatePhaseProgress(EncodeProgressPhase phase,
                              std::uint64_t phase_completed_units) override {
       operation_->UpdatePhaseProgress(phase, phase_completed_units);
+    }
+
+    void SetFlashVoicingDiagnostics(
+        const flash::FlashVoicingDiagnostics& diagnostics) override {
+      operation_->SetFlashVoicingDiagnostics(diagnostics);
     }
 
     void MarkFailed(ErrorCode code) override { operation_->MarkFailed(code); }
@@ -280,6 +323,7 @@ class EncodeOperation final : public IEncodeOperation {
   std::string text_;
   EncodeWorkPlan work_plan_;
   EncodedPcmFollowResult result_;
+  EncodeOperationDiagnostics diagnostics_{};
   AtomicSnapshotState snapshot_{};
   std::atomic<bool> cancel_requested_{false};
   EncodeOperationStepState step_state_{};

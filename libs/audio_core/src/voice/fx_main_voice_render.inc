@@ -13,12 +13,12 @@ std::vector<double> RenderMainVoiceBranch(
     const std::size_t slap_delay_samples =
         DelaySamplesForRate(sample_rate_hz, tuning.slap_delay_ms);
     const bool use_chamber_reflections =
-        preset == bag::VoiceFxPreset::kBinharic;
+        preset == bag::VoiceFxPreset::kBinaricCant;
     const std::array<double, 4> chamber_delay_ms = {5.5, 9.5, 14.0, 23.0};
     const std::array<double, 4> chamber_feedback = {0.09, 0.075, 0.06, 0.045};
     const std::array<double, 4> chamber_gain = {0.17, -0.13, 0.11, -0.085};
     const bool use_mechanical_flutter =
-        preset == bag::VoiceFxPreset::kBinharic;
+        preset == bag::VoiceFxPreset::kBinaricCant;
     const double mechanical_flutter_mix =
         use_mechanical_flutter ? 1.0 : 0.0;
     const std::vector<double> tracked_pitch_hz =

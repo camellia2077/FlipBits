@@ -57,6 +57,7 @@ struct EncodeOperationStepState {
   flash::FlashPayloadLayout flash_payload_layout{};
   std::unique_ptr<flash::FlashChunkRenderer> flash_chunk_renderer;
   std::unique_ptr<flash::FlashVoicingStepper> flash_voicing_stepper;
+  flash::FlashVoicingDiagnostics flash_voicing_diagnostics{};
   std::unique_ptr<pro::SymbolRenderer> pro_symbol_renderer;
   std::unique_ptr<ultra::SymbolRenderer> ultra_symbol_renderer;
   std::unique_ptr<mini_mode::ToneUnitRenderer> mini_tone_renderer;
@@ -71,6 +72,8 @@ class IEncodeOperationStepHost {
   virtual std::uint64_t PhaseCompletedWorkUnits() const = 0;
   virtual void UpdatePhaseProgress(EncodeProgressPhase phase,
                                    std::uint64_t phase_completed_units) = 0;
+  virtual void SetFlashVoicingDiagnostics(
+      const flash::FlashVoicingDiagnostics& diagnostics) = 0;
   virtual void MarkFailed(ErrorCode code) = 0;
   virtual void MarkSucceeded() = 0;
 };

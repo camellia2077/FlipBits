@@ -22,6 +22,16 @@
 - `bag_api` 入口看 `libs/audio_api/src/bag_api.cpp`
 - 稳定边界与兼容层说明看 `docs/architecture/compatibility-layer-inventory.md`
 
+如果是改 Voice FX / audio-to-audio / Android-Web 结果一致性：
+- 先看 `libs/AGENTS.md` 的 “Voice FX / audio-to-audio 契约”。
+- 离线文件处理的 canonical API 是 `bag_apply_voice_fx`：
+  - 声明：`libs/audio_api/include/bag_api.h`
+  - 实现：`libs/audio_api/src/bag_api_voice_fx_entrypoints_impl.inc`
+  - 覆盖：`libs/audio_api/tests/api_voice_fx_tests.cpp`
+- streaming/live API 是 `bag_create_voice_fx_processor` / `bag_process_voice_fx_block` / `bag_flush_voice_fx_processor`。它只用于实时或分块场景，不用于验证 Android/Web 文件生成一致性。
+- Android 离线入口看 `apps/audio_android/app/src/main/cpp/jni_bridge_voice.cpp` 的 `NativeApplyVoiceFx`。
+- Web 离线入口看 `apps/audio_web/src/flipbits_web_bridge.cpp` 的 `flipbits_web_apply_voice_fx_pcm_bytes`。
+
 如果是改生成进度 / Android 或 Web 生成显示：
 - 当前权威契约是 encode operation：
   - `bag_create_encode_operation`

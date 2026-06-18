@@ -2,7 +2,7 @@ namespace {
 
 bool IsValidVoiceFxPreset(const bag_voice_fx_preset preset) {
   return preset == BAG_VOICE_FX_MACHINE_VOICE ||
-         preset == BAG_VOICE_FX_BINHARIC ||
+         preset == BAG_VOICE_FX_BINARIC_CANT ||
          preset == BAG_VOICE_FX_SIGNAL_CANT ||
          preset == BAG_VOICE_FX_ROBOT_VOX ||
          preset == BAG_VOICE_FX_RAW_CONSTANT ||
@@ -21,8 +21,8 @@ bool IsValidVoiceFxSubvoiceStyle(
 
 bag::VoiceFxPreset ToCoreVoiceFxPreset(const bag_voice_fx_preset preset) {
   switch (preset) {
-    case BAG_VOICE_FX_BINHARIC:
-      return bag::VoiceFxPreset::kBinharic;
+    case BAG_VOICE_FX_BINARIC_CANT:
+      return bag::VoiceFxPreset::kBinaricCant;
     case BAG_VOICE_FX_SIGNAL_CANT:
       return bag::VoiceFxPreset::kSignalCant;
     case BAG_VOICE_FX_ROBOT_VOX:
