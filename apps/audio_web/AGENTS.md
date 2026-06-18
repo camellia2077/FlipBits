@@ -13,6 +13,10 @@
 - 不要兼容旧的进度显示用法。旧的 callback、旧的 job 命名、旧的 percent 计算方式、旧的 polling DTO、旧的 phase 映射都应直接删除，不保留兼容分支。
 - 如果 `libs` 的 encode contract 发生不兼容变更，Web presentation 应直接迁移到新 contract，而不是在 `site/js/` 或 wasm bridge 里叠加适配层。
 - Web UI 展示的进度、phase、可完成态和失败态，必须以 `libs` snapshot 为唯一事实来源，不允许本地伪造“看起来更平滑”的旧式进度状态机。
+- Voice FX / audio-to-audio 没有 libs 生成进度契约；Web 不显示 Voice 生成百分比进度，也不在 worker/UI 中伪造 voice progress event。
+- Web 文件型 Voice FX 必须使用离线 canonical path：`flipbits_web_apply_voice_fx_pcm_bytes` -> libs `bag_apply_voice_fx`。不要用 `bag_process_voice_fx_block` 做上传文件处理或 Android/Web 听感一致性验证。
+- `bag_create_voice_fx_processor` / `bag_process_voice_fx_block` / `bag_flush_voice_fx_processor` 只保留给 streaming/live 场景；它不承诺和离线 `bag_apply_voice_fx` 逐样本一致。
+- Web 上传音频进入 Voice FX 前必须对齐到 mono PCM16 / 48 kHz，再调用离线 Voice FX API；不要直接依赖浏览器设备采样率。
 
 ## First Read
 
@@ -49,6 +53,13 @@
 - 改 WebAssembly bridge 或 Web presentation/native 边界，先看：
   - `src/flipbits_web_bridge.cpp`
   - `CMakeLists.txt`
+- 改 Voice FX / audio-to-audio 或 Android-Web 听感一致性，先看：
+  - `libs/AGENTS.md` 的 “Voice FX / audio-to-audio 契约”
+  - `site/js/audio-utils.js`
+  - `site/js/app-controller.js`
+  - `site/js/encode-worker.js`
+  - `site/wasm/flipbits_web.js`
+  - `src/flipbits_web_bridge.cpp`
 - 改生成进度、encode lifecycle、player 出现时机或 wasm encode contract，先看：
   - `site/js/app-controller.js`
   - `site/js/ui-controller.js`

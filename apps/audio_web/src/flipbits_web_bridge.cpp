@@ -24,11 +24,20 @@ int g_last_sample_rate_hz = kDefaultSampleRateHz;
 bag_encode_operation* g_current_operation = nullptr;
 bag_encode_operation_progress g_current_progress{};
 bag_encode_operation_work_plan g_current_work_plan{};
+bag_encode_operation_diagnostics g_current_diagnostics{};
+bag_encode_operation_diagnostics g_last_diagnostics{};
+bag_voice_fx_processor* g_current_voice_fx_processor = nullptr;
 
 void ResetLastResult() {
   g_last_samples.clear();
   g_last_error.clear();
   g_last_sample_rate_hz = kDefaultSampleRateHz;
+  g_last_diagnostics = {};
+}
+
+const bag_encode_operation_diagnostics& ActiveDiagnostics() {
+  return g_current_operation != nullptr ? g_current_diagnostics
+                                        : g_last_diagnostics;
 }
 
 void DestroyCurrentOperation() {
@@ -38,6 +47,14 @@ void DestroyCurrentOperation() {
   }
   g_current_progress = {};
   g_current_work_plan = {};
+  g_current_diagnostics = {};
+}
+
+void DestroyCurrentVoiceFxProcessor() {
+  if (g_current_voice_fx_processor != nullptr) {
+    bag_destroy_voice_fx_processor(g_current_voice_fx_processor);
+    g_current_voice_fx_processor = nullptr;
+  }
 }
 
 int NormalizeSampleRate(int sample_rate_hz) {
@@ -93,11 +110,12 @@ bag_flash_voicing_flavor ToFlashVoicingFlavor(int flash_style) {
 }
 
 bag_encoder_config MakeEncoderConfig(int mode, int flash_style,
-                                     int sample_rate_hz, int frame_samples) {
+                                     int sample_rate_hz, int frame_samples,
+                                     int enable_diagnostics) {
   bag_encoder_config config{};
   config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
   config.frame_samples = NormalizeFrameSamples(sample_rate_hz, frame_samples);
-  config.enable_diagnostics = 0;
+  config.enable_diagnostics = enable_diagnostics != 0 ? 1 : 0;
   config.mode = static_cast<bag_transport_mode>(mode);
   config.flash_signal_profile = ToFlashSignalProfile(flash_style);
   config.flash_voicing_flavor = ToFlashVoicingFlavor(flash_style);
@@ -115,15 +133,90 @@ void SetEncodeError(bag_error_code code) {
   g_last_error = message != nullptr ? message : "Encoding failed.";
 }
 
+bag_voice_fx_preset ToVoiceFxPreset(int preset) {
+  switch (preset) {
+    case BAG_VOICE_FX_MACHINE_VOICE:
+      return BAG_VOICE_FX_MACHINE_VOICE;
+    case BAG_VOICE_FX_BINARIC_CANT:
+      return BAG_VOICE_FX_BINARIC_CANT;
+    case BAG_VOICE_FX_SIGNAL_CANT:
+      return BAG_VOICE_FX_SIGNAL_CANT;
+    case BAG_VOICE_FX_ROBOT_VOX:
+      return BAG_VOICE_FX_ROBOT_VOX;
+    case BAG_VOICE_FX_RAW_CONSTANT:
+      return BAG_VOICE_FX_RAW_CONSTANT;
+    case BAG_VOICE_FX_VOICE_TRIGGER:
+      return BAG_VOICE_FX_VOICE_TRIGGER;
+    default:
+      return static_cast<bag_voice_fx_preset>(-1);
+  }
+}
+
+bag_voice_fx_subvoice_style ToVoiceFxSubvoiceStyle(int subvoice_style) {
+  switch (subvoice_style) {
+    case BAG_VOICE_FX_SUBVOICE_STYLE_STANDARD:
+      return BAG_VOICE_FX_SUBVOICE_STYLE_STANDARD;
+    case BAG_VOICE_FX_SUBVOICE_STYLE_LITANY:
+      return BAG_VOICE_FX_SUBVOICE_STYLE_LITANY;
+    case BAG_VOICE_FX_SUBVOICE_STYLE_HOSTILITY:
+      return BAG_VOICE_FX_SUBVOICE_STYLE_HOSTILITY;
+    case BAG_VOICE_FX_SUBVOICE_STYLE_COLLAPSE:
+      return BAG_VOICE_FX_SUBVOICE_STYLE_COLLAPSE;
+    case BAG_VOICE_FX_SUBVOICE_STYLE_ZEAL:
+      return BAG_VOICE_FX_SUBVOICE_STYLE_ZEAL;
+    case BAG_VOICE_FX_SUBVOICE_STYLE_VOID:
+      return BAG_VOICE_FX_SUBVOICE_STYLE_VOID;
+    default:
+      return static_cast<bag_voice_fx_subvoice_style>(-1);
+  }
+}
+
+bag_voice_fx_config MakeVoiceFxConfig(int preset, int subvoice_style,
+                                      int sample_rate_hz) {
+  bag_voice_fx_config config{};
+  config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
+  config.enable_diagnostics = 0;
+  config.preset = ToVoiceFxPreset(preset);
+  config.subvoice_style = ToVoiceFxSubvoiceStyle(subvoice_style);
+  config.reserved = 0;
+  return config;
+}
+
+std::vector<std::int16_t> PcmBytesToSamples(const unsigned char* pcm_bytes,
+                                            int byte_count) {
+  std::vector<std::int16_t> samples;
+  if (pcm_bytes == nullptr || byte_count <= 0) {
+    return samples;
+  }
+
+  samples.reserve(static_cast<std::size_t>(byte_count / 2));
+  for (int index = 0; index + 1 < byte_count; index += 2) {
+    const auto low = static_cast<std::uint16_t>(pcm_bytes[index]);
+    const auto high = static_cast<std::uint16_t>(pcm_bytes[index + 1]) << 8;
+    samples.push_back(static_cast<std::int16_t>(low | high));
+  }
+  return samples;
+}
+
+void AppendVoiceFxResult(const bag_voice_fx_result& result) {
+  if (result.final_mix.samples == nullptr || result.final_mix.sample_count == 0) {
+    return;
+  }
+  g_last_samples.insert(
+      g_last_samples.end(), result.final_mix.samples,
+      result.final_mix.samples + result.final_mix.sample_count);
+}
+
 }  // namespace
 
 extern "C" {
 
 EMSCRIPTEN_KEEPALIVE int flipbits_web_begin_encode_operation(
     const char* text, int mode, int flash_style, int sample_rate_hz,
-    int frame_samples) {
+    int frame_samples, int enable_diagnostics) {
   ResetLastResult();
   DestroyCurrentOperation();
+  DestroyCurrentVoiceFxProcessor();
 
   if (text == nullptr) {
     g_last_error = "Text is required.";
@@ -131,7 +224,8 @@ EMSCRIPTEN_KEEPALIVE int flipbits_web_begin_encode_operation(
   }
 
   const bag_encoder_config config =
-      MakeEncoderConfig(mode, flash_style, sample_rate_hz, frame_samples);
+      MakeEncoderConfig(mode, flash_style, sample_rate_hz, frame_samples,
+                        enable_diagnostics);
   const bag_validation_issue validation =
       bag_validate_encode_request(&config, text);
   if (validation != BAG_VALIDATION_OK) {
@@ -150,6 +244,13 @@ EMSCRIPTEN_KEEPALIVE int flipbits_web_begin_encode_operation(
   if (bag_get_encode_operation_work_plan(g_current_operation,
                                          &g_current_work_plan) != BAG_OK) {
     g_last_error = "Failed to query encode work plan.";
+    DestroyCurrentOperation();
+    return 0;
+  }
+
+  if (bag_get_encode_operation_diagnostics(g_current_operation,
+                                           &g_current_diagnostics) != BAG_OK) {
+    g_last_error = "Failed to query encode diagnostics.";
     DestroyCurrentOperation();
     return 0;
   }
@@ -192,6 +293,22 @@ EMSCRIPTEN_KEEPALIVE int flipbits_web_pump_encode_operation(
     return static_cast<int>(poll_code);
   }
 
+  const bag_error_code plan_code =
+      bag_get_encode_operation_work_plan(g_current_operation,
+                                         &g_current_work_plan);
+  if (plan_code != BAG_OK) {
+    SetEncodeError(plan_code);
+    return static_cast<int>(plan_code);
+  }
+
+  const bag_error_code diagnostics_code =
+      bag_get_encode_operation_diagnostics(g_current_operation,
+                                            &g_current_diagnostics);
+  if (diagnostics_code != BAG_OK) {
+    SetEncodeError(diagnostics_code);
+    return static_cast<int>(diagnostics_code);
+  }
+
   return static_cast<int>(BAG_OK);
 }
 
@@ -210,6 +327,7 @@ EMSCRIPTEN_KEEPALIVE int flipbits_web_take_encode_operation_result() {
     return 0;
   }
 
+  g_last_diagnostics = g_current_diagnostics;
   g_last_samples.assign(result.samples, result.samples + result.sample_count);
   bag_free_encode_result(&result);
   DestroyCurrentOperation();
@@ -226,6 +344,123 @@ EMSCRIPTEN_KEEPALIVE void flipbits_web_abort_encode_operation() {
     SetEncodeError(cancel_code);
   }
   DestroyCurrentOperation();
+}
+
+EMSCRIPTEN_KEEPALIVE int flipbits_web_begin_voice_fx(
+    int preset, int subvoice_style, int sample_rate_hz) {
+  ResetLastResult();
+  DestroyCurrentOperation();
+  DestroyCurrentVoiceFxProcessor();
+
+  const bag_voice_fx_config config =
+      MakeVoiceFxConfig(preset, subvoice_style, sample_rate_hz);
+  g_last_sample_rate_hz = config.sample_rate_hz;
+
+  const bag_error_code create_code =
+      bag_create_voice_fx_processor(&config, &g_current_voice_fx_processor);
+  if (create_code != BAG_OK) {
+    g_current_voice_fx_processor = nullptr;
+    SetEncodeError(create_code);
+    return 0;
+  }
+
+  return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE int flipbits_web_apply_voice_fx_pcm_bytes(
+    int preset, int subvoice_style, int sample_rate_hz,
+    const unsigned char* pcm_bytes, int byte_count) {
+  ResetLastResult();
+  DestroyCurrentOperation();
+  DestroyCurrentVoiceFxProcessor();
+
+  if (pcm_bytes == nullptr || byte_count <= 0 || (byte_count % 2) != 0) {
+    g_last_error = "PCM16 audio input is required.";
+    return 0;
+  }
+
+  const std::vector<std::int16_t> input =
+      PcmBytesToSamples(pcm_bytes, byte_count);
+  if (input.empty()) {
+    g_last_error = "PCM16 audio input is required.";
+    return 0;
+  }
+
+  const bag_voice_fx_config config =
+      MakeVoiceFxConfig(preset, subvoice_style, sample_rate_hz);
+  g_last_sample_rate_hz = config.sample_rate_hz;
+
+  bag_voice_fx_result result{};
+  const bag_error_code process_code =
+      bag_apply_voice_fx(&config, input.data(), input.size(), &result);
+  if (process_code != BAG_OK) {
+    SetEncodeError(process_code);
+    bag_free_voice_fx_result(&result);
+    return 0;
+  }
+
+  AppendVoiceFxResult(result);
+  bag_free_voice_fx_result(&result);
+  return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE int flipbits_web_process_voice_fx_pcm_bytes(
+    const unsigned char* pcm_bytes, int byte_count) {
+  if (g_current_voice_fx_processor == nullptr) {
+    g_last_error = "Voice FX processor is not ready.";
+    return 0;
+  }
+  if (pcm_bytes == nullptr || byte_count <= 0 || (byte_count % 2) != 0) {
+    g_last_error = "PCM16 audio input is required.";
+    return 0;
+  }
+
+  const std::vector<std::int16_t> input =
+      PcmBytesToSamples(pcm_bytes, byte_count);
+  if (input.empty()) {
+    g_last_error = "PCM16 audio input is required.";
+    return 0;
+  }
+
+  bag_voice_fx_result result{};
+  const bag_error_code process_code = bag_process_voice_fx_block(
+      g_current_voice_fx_processor, input.data(), input.size(), &result);
+  if (process_code != BAG_OK) {
+    SetEncodeError(process_code);
+    bag_free_voice_fx_result(&result);
+    DestroyCurrentVoiceFxProcessor();
+    return 0;
+  }
+
+  AppendVoiceFxResult(result);
+  bag_free_voice_fx_result(&result);
+  return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE int flipbits_web_finish_voice_fx() {
+  if (g_current_voice_fx_processor == nullptr) {
+    g_last_error = "Voice FX processor is not ready.";
+    return 0;
+  }
+
+  bag_voice_fx_result result{};
+  const bag_error_code flush_code =
+      bag_flush_voice_fx_processor(g_current_voice_fx_processor, &result);
+  if (flush_code != BAG_OK) {
+    SetEncodeError(flush_code);
+    bag_free_voice_fx_result(&result);
+    DestroyCurrentVoiceFxProcessor();
+    return 0;
+  }
+
+  AppendVoiceFxResult(result);
+  bag_free_voice_fx_result(&result);
+  DestroyCurrentVoiceFxProcessor();
+  return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE void flipbits_web_abort_voice_fx() {
+  DestroyCurrentVoiceFxProcessor();
 }
 
 EMSCRIPTEN_KEEPALIVE int flipbits_web_current_operation_state() {
@@ -320,6 +555,91 @@ flipbits_web_current_operation_plan_payload_byte_count() {
 EMSCRIPTEN_KEEPALIVE double
 flipbits_web_current_operation_plan_segment_count() {
   return static_cast<double>(g_current_work_plan.segment_count);
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_prepare_ms() {
+  return ActiveDiagnostics().flash_payload_prepare_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_sample_setup_ms() {
+  return ActiveDiagnostics().flash_payload_sample_setup_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_envelope_ms() {
+  return ActiveDiagnostics().flash_payload_envelope_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_articulation_ms() {
+  return ActiveDiagnostics().flash_payload_articulation_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_harmonic_ms() {
+  return ActiveDiagnostics().flash_payload_harmonic_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_metallic_ms() {
+  return ActiveDiagnostics().flash_payload_metallic_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_chant_resonance_ms() {
+  return ActiveDiagnostics().flash_payload_chant_resonance_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_chant_drone_ms() {
+  return ActiveDiagnostics().flash_payload_chant_drone_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_mechanical_throat_ms() {
+  return ActiveDiagnostics().flash_payload_mechanical_throat_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_standard_low_voice_ms() {
+  return ActiveDiagnostics().flash_payload_standard_low_voice_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_hostility_edge_ms() {
+  return ActiveDiagnostics().flash_payload_hostility_edge_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_boundary_click_ms() {
+  return ActiveDiagnostics().flash_payload_boundary_click_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_modulation_ms() {
+  return ActiveDiagnostics().flash_payload_modulation_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_mix_shape_store_ms() {
+  return ActiveDiagnostics().flash_payload_mix_shape_store_ms;
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_voiced_samples() {
+  return static_cast<double>(ActiveDiagnostics().flash_payload_voiced_samples);
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_silence_samples() {
+  return static_cast<double>(ActiveDiagnostics().flash_payload_silence_samples);
+}
+
+EMSCRIPTEN_KEEPALIVE double
+flipbits_web_current_operation_diagnostics_flash_payload_profiled_samples() {
+  return static_cast<double>(ActiveDiagnostics().flash_payload_profiled_samples);
 }
 
 EMSCRIPTEN_KEEPALIVE const char* flipbits_web_last_error_message() {

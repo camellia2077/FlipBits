@@ -26,6 +26,15 @@
 - WebAssembly bridge：
   - `src/flipbits_web_bridge.cpp`
   - `CMakeLists.txt`
+- Voice FX / audio-to-audio：
+  - 文件输入解码与 48 kHz 对齐：`site/js/audio-utils.js`
+  - Voice UI/action：`site/js/app-controller.js`
+  - worker 调用：`site/js/encode-worker.js`
+  - wasm wrapper：`site/wasm/flipbits_web.js`
+  - native bridge：`src/flipbits_web_bridge.cpp`
+  - 上传文件必须走 `flipbits_web_apply_voice_fx_pcm_bytes` -> libs `bag_apply_voice_fx`，这是和 Android 对齐的离线 canonical path。
+  - streaming/block Voice FX 只用于 live path，不用于文件生成一致性验证。
+  - Voice FX 不显示生成百分比进度，因为 libs 当前没有 Voice FX progress contract。
 - 构建 / 部署 / sample 导出工具：
   - `tools/`
 

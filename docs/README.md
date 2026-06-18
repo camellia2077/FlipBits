@@ -1,6 +1,6 @@
 # FlipBits 文档索引
 
-更新时间：2026-05-22
+更新时间：2026-06-18
 
 ## 先看这里
 - 修改 `libs/` 下的共享库代码前，优先阅读：
@@ -38,6 +38,10 @@
 ## 持续门禁与追踪
 - 构建命令速记：
   - `docs/notes/build-commands.md`
+- Web 本地构建 / 预览命令：
+  - `docs/notes/web/cmd.md`
+- Web WASM Release 编译参数性能实验：
+  - `docs/notes/web/wasm-release-optimization-benchmarks.md`
 - 仓库级 toolchain capability contract：
   - `docs/notes/toolchain-capabilities.md`
   - 改 `audio_core / audio_api / audio_io` 的标准库入口时，先以这份 contract 为准，不要直接新增平台特判

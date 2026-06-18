@@ -167,6 +167,37 @@ body {
   gap: 18px;
 }
 
+.workflow-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 4px;
+  width: min(420px, 100%);
+  min-height: 52px;
+  padding: 4px;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  background: rgba(255, 251, 243, 0.82);
+}
+
+.workflow-tab {
+  min-height: 42px;
+  padding: 0 18px;
+  color: var(--accent-strong);
+  background: transparent;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.workflow-tab.is-active {
+  color: var(--primary);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  box-shadow: 0 10px 20px rgba(var(--secondary-rgb), 0.16);
+}
+
+.workflow-panel[hidden] {
+  display: none;
+}
+
 .generator-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
@@ -314,6 +345,12 @@ body {
 }
 
 .option-grid-flash {
+  grid-template-columns: repeat(3, minmax(84px, 1fr));
+  align-items: stretch;
+}
+
+.option-grid-voice-fx,
+.option-grid-voice-style {
   grid-template-columns: repeat(3, minmax(84px, 1fr));
   align-items: stretch;
 }
@@ -525,7 +562,8 @@ button,
 }
 
 textarea,
-select {
+select,
+input[type="file"] {
   width: 100%;
   border: 1px solid var(--outline);
   border-radius: 16px;
@@ -537,6 +575,75 @@ select {
 textarea {
   resize: vertical;
   min-height: 220px;
+}
+
+.voice-fx-section {
+  margin-top: 8px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(197, 160, 89, 0.55);
+}
+
+.data-workflow-section {
+  margin-top: 8px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(197, 160, 89, 0.55);
+}
+
+.voice-fx-heading {
+  align-items: flex-start;
+}
+
+.voice-fx-file-name {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.voice-record-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--outline);
+  border-radius: 14px;
+  background: rgba(255, 251, 243, 0.7);
+}
+
+.voice-record-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+  flex: 1 1 260px;
+}
+
+.voice-record-label {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.voice-record-actions {
+  display: flex;
+  align-items: center;
+}
+
+.voice-record-panel .secondary-button.is-recording {
+  color: #8f1f1f;
+  border-color: rgba(143, 31, 31, 0.28);
+  background: rgba(143, 31, 31, 0.14);
+}
+
+.voice-fx-options-grid {
+  grid-template-columns: 1fr;
+}
+
+.voice-track-field {
+  width: min(420px, 100%);
+}
+
+.voice-track-pills {
+  width: 100%;
 }
 
 .sample-tools {
@@ -804,6 +911,8 @@ button {
 
   .mode-cards,
   .mode-options-grid,
+  .option-grid-voice-fx,
+  .option-grid-voice-style,
   .grid,
   .result-grid {
     grid-template-columns: 1fr;

@@ -13,6 +13,12 @@ test.describe("audio_web static app", () => {
     await expect(page.locator("#sample-length-select")).toHaveCount(0);
     await expect(page.locator("#sample-length-short")).toBeChecked();
     await expect(page.locator("#generate-button")).toBeEnabled();
+    await expect(page.locator("#workflow-tab-data")).toHaveText("Data");
+    await expect(page.locator("#workflow-tab-voice")).toHaveText("Voice");
+    await expect(page.locator("#workflow-tab-data")).toHaveClass(/is-active/);
+    await expect(page.locator("#workflow-panel-data")).toBeVisible();
+    await expect(page.locator("#workflow-panel-voice")).toBeHidden();
+    await expect(page.locator("#voice-fx-file")).toHaveCount(1);
     await expect(page.locator(".about-links .hero-link-chip")).toHaveCount(2);
     await expect(page.locator(".about-links").getByText("Repo", { exact: true })).toBeVisible();
     await expect(page.locator(".about-links").getByText("Android APK", { exact: true })).toBeVisible();
@@ -21,6 +27,81 @@ test.describe("audio_web static app", () => {
     await expect(page.locator("#progress-section")).toBeHidden();
     await expect(page.locator("#result-summary")).toBeHidden();
     await expect(page.locator("#download-link")).toHaveClass(/is-disabled/);
+  });
+
+  test("switches Data and Voice workflows with track-specific voice controls", async ({ page }) => {
+    await page.goto("/");
+
+    await page.locator("#workflow-tab-voice").click();
+    await expect(page.locator("#workflow-tab-voice")).toHaveClass(/is-active/);
+    await expect(page.locator("#workflow-panel-data")).toBeHidden();
+    await expect(page.locator("#workflow-panel-voice")).toBeVisible();
+    await expect(page.locator("#voice-fx-title")).toHaveText("Audio to Voice Effect");
+    await expect(page.locator("#voice-fx-file")).toBeVisible();
+    await expect(page.locator("#voice-record-button")).toBeVisible();
+    await expect(page.locator("#voice-record-status")).toContainText("No recording captured");
+    await expect(page.locator("#voice-fx-process-button")).toBeEnabled();
+    await expect(page.locator("#voice-track-single")).toBeChecked();
+    await expect(page.locator("#voice-fx-style-field")).toBeHidden();
+    await expect(page.getByRole("radio", { name: "Machine Voice" })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Binaric Cant" })).toBeHidden();
+
+    await page.locator("#voice-track-dual").check();
+    await expect(page.locator("#voice-track-dual")).toBeChecked();
+    await expect(page.locator("#voice-fx-style-field")).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Machine Voice" })).toBeHidden();
+    await expect(page.getByRole("radio", { name: "Binaric Cant" })).toBeVisible();
+  });
+
+  test("records audio as a Voice input source", async ({ page }) => {
+    await page.addInitScript(() => {
+      class MockMediaRecorder extends EventTarget {
+        constructor(stream, options = {}) {
+          super();
+          this.stream = stream;
+          this.mimeType = options.mimeType || "audio/webm";
+        }
+
+        start() {}
+
+        stop() {
+          const dataEvent = new Event("dataavailable");
+          Object.defineProperty(dataEvent, "data", {
+            value: new Blob(["mock audio"], { type: this.mimeType }),
+          });
+          this.dispatchEvent(dataEvent);
+          this.dispatchEvent(new Event("stop"));
+        }
+
+        static isTypeSupported() {
+          return true;
+        }
+      }
+
+      Object.defineProperty(window, "MediaRecorder", {
+        value: MockMediaRecorder,
+        configurable: true,
+      });
+      Object.defineProperty(navigator, "mediaDevices", {
+        value: {
+          getUserMedia: async () => ({
+            getTracks: () => [{ stop() {} }],
+          }),
+        },
+        configurable: true,
+      });
+    });
+
+    await page.goto("/");
+    await page.locator("#workflow-tab-voice").click();
+    await page.locator("#voice-record-button").click();
+    await expect(page.locator("#voice-record-button")).toHaveText("Stop Recording");
+    await expect(page.locator("#voice-record-status")).toContainText("Recording");
+
+    await page.locator("#voice-record-button").click();
+    await expect(page.locator("#voice-record-button")).toHaveText("Start Recording");
+    await expect(page.locator("#voice-record-status")).toContainText("Recording ready");
+    await expect(page.locator("#voice-fx-file-name")).toContainText("No audio file selected");
   });
 
   test("keeps mode, options, input, and generate in one workflow", async ({ page }) => {
@@ -46,8 +127,10 @@ test.describe("audio_web static app", () => {
     await page.goto("/");
 
     await page.locator("#language-select").selectOption("zh-CN");
+    await expect(page.locator("#workflow-tab-data")).toHaveText("数据");
+    await expect(page.locator("#workflow-tab-voice")).toHaveText("语音");
     await expect(page.locator("#input-text-label")).toContainText("输入文本");
-    await expect(page.locator("#mode-summary-title")).toContainText("模式概览");
+    await expect(page.locator("#mode-summary-title")).toContainText("文本转音频");
     await expect(page.locator("#mode-card-copy-mini")).toContainText("Morse code");
     await expect(page.locator("#mode-card-copy-mini")).not.toContainText("Morse-like");
 
@@ -60,6 +143,7 @@ test.describe("audio_web static app", () => {
     await expect(page.locator("#mode-card-flash")).toHaveClass(/is-active/);
     await expect(page.locator("#flash-style-field")).toBeVisible();
     await expect(page.locator("#mini-speed-field")).toBeHidden();
+    await expect(page.locator("#voice-fx-file-name")).not.toBeEmpty();
   });
 
   test("switches sample length with exclusive pills", async ({ page }) => {

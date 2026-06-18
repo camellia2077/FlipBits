@@ -40,3 +40,13 @@ export function readEncodeRequest(elements, mode, sampleRateHz = DEFAULT_SAMPLE_
     frameSamples: resolveFrameSamples(mode, miniSpeed, sampleRateHz),
   };
 }
+
+export function readVoiceFxRequest(elements, samples, sampleRateHz = DEFAULT_SAMPLE_RATE_HZ) {
+  return {
+    samples,
+    sampleRateHz,
+    trackMode: checkedValue(elements.voiceTrackInputs, "single"),
+    preset: checkedValue(elements.voiceFxPresetInputs, "machine_voice"),
+    subvoiceStyle: checkedValue(elements.voiceFxStyleInputs, "standard"),
+  };
+}

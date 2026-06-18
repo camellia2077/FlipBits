@@ -69,229 +69,219 @@
 
       <section class="panel generator-panel">
         <div class="generator-workbench">
-          <section class="workflow-section mode-workflow-section">
-            <div class="section-heading">
-              <div class="mode-heading-copy">
-                <span class="hero-prompt-label">Start Here</span>
-                <h2 id="mode-summary-title">Mode Overview</h2>
-                <p class="workflow-copy">
-                  Pick a mode, enter text, and generate audio first.
-                </p>
+          <div class="workflow-tabs" role="tablist" aria-label="FlipBits workflows">
+            <button id="workflow-tab-data" class="workflow-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="workflow-panel-data" data-workflow-tab="data">Data</button>
+            <button id="workflow-tab-voice" class="workflow-tab" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel-voice" data-workflow-tab="voice">Voice</button>
+          </div>
+
+          <section id="workflow-panel-data" class="workflow-panel is-active" data-workflow-panel="data" role="tabpanel" aria-labelledby="workflow-tab-data">
+            <section class="workflow-section mode-workflow-section data-workflow-section">
+              <div class="section-heading">
+                <div class="mode-heading-copy">
+                  <h2 id="mode-summary-title">Text to Audio</h2>
+                  <p id="data-workflow-copy" class="workflow-copy">
+                    Pick a mode, enter text, and generate audio.
+                  </p>
+                </div>
+                <p id="mode-summary-copy" class="mode-summary-copy"></p>
               </div>
-              <p id="mode-summary-copy" class="mode-summary-copy"></p>
-            </div>
-            <div id="mode-cards" class="mode-cards" data-active-mode="flash">
-              <article
-                id="mode-card-mini"
-                class="mode-card"
-                data-mode-card="mini"
-                role="button"
-                tabindex="0"
-              >
-                <span class="mode-card-kicker">mini</span>
-                <p id="mode-card-copy-mini" class="mode-card-copy">
-                  Morse code beeps with a clear dot-dash rhythm. Best for short text and readable pacing.
-                </p>
-              </article>
-              <article
-                id="mode-card-flash"
-                class="mode-card"
-                data-mode-card="flash"
-                role="button"
-                tabindex="0"
-              >
-                <span class="mode-card-kicker">flash</span>
-                <p id="mode-card-copy-flash" class="mode-card-copy">
-                  Bit-by-bit pulses with the strongest personality. Best for hearing the transmission itself.
-                </p>
-              </article>
-              <article
-                id="mode-card-pro"
-                class="mode-card"
-                data-mode-card="pro"
-                role="button"
-                tabindex="0"
-              >
-                <span class="mode-card-kicker">pro</span>
-                <p id="mode-card-copy-pro" class="mode-card-copy">
-                  Telephone-keypad-like dual tones. More compact than flash and easier to compare symbol structure.
-                </p>
-              </article>
-              <article
-                id="mode-card-ultra"
-                class="mode-card"
-                data-mode-card="ultra"
-                role="button"
-                tabindex="0"
-              >
-                <span class="mode-card-kicker">ultra</span>
-                <p id="mode-card-copy-ultra" class="mode-card-copy">
-                  Dense 16-FSK tones for faster, shorter audio. Best when you want compact transmission.
-                </p>
-              </article>
-            </div>
+              <div id="mode-cards" class="mode-cards" data-active-mode="flash">
+                <article id="mode-card-mini" class="mode-card" data-mode-card="mini" role="button" tabindex="0">
+                  <span class="mode-card-kicker">mini</span>
+                  <p id="mode-card-copy-mini" class="mode-card-copy">Morse code beeps with a clear dot-dash rhythm. Best for short text and readable pacing.</p>
+                </article>
+                <article id="mode-card-flash" class="mode-card" data-mode-card="flash" role="button" tabindex="0">
+                  <span class="mode-card-kicker">flash</span>
+                  <p id="mode-card-copy-flash" class="mode-card-copy">Bit-by-bit pulses with the strongest personality. Best for hearing the transmission itself.</p>
+                </article>
+                <article id="mode-card-pro" class="mode-card" data-mode-card="pro" role="button" tabindex="0">
+                  <span class="mode-card-kicker">pro</span>
+                  <p id="mode-card-copy-pro" class="mode-card-copy">Telephone-keypad-like dual tones. More compact than flash and easier to compare symbol structure.</p>
+                </article>
+                <article id="mode-card-ultra" class="mode-card" data-mode-card="ultra" role="button" tabindex="0">
+                  <span class="mode-card-kicker">ultra</span>
+                  <p id="mode-card-copy-ultra" class="mode-card-copy">Dense 16-FSK tones for faster, shorter audio. Best when you want compact transmission.</p>
+                </article>
+              </div>
 
-            <div class="generator-layout">
-              <div class="generator-form">
-                <section class="workflow-section mode-options-panel">
-                  <div class="mode-options-grid">
-                    <fieldset class="field option-field" id="flash-style-field">
-                      <legend id="flash-style-label">Flash Style</legend>
-                      <div class="flash-style-layout">
-                        <div class="option-grid option-grid-flash" role="radiogroup" aria-labelledby="flash-style-label">
-                          <label class="option-tile">
-                            <input id="flash-style-standard" name="flash-style" type="radio" value="standard" checked />
-                            <span>standard</span>
-                          </label>
-                          <label class="option-tile">
-                            <input id="flash-style-litany" name="flash-style" type="radio" value="litany" />
-                            <span>litany</span>
-                          </label>
-                          <label class="option-tile">
-                            <input id="flash-style-hostility" name="flash-style" type="radio" value="hostility" />
-                            <span>hostility</span>
-                          </label>
-                          <label class="option-tile">
-                            <input id="flash-style-collapse" name="flash-style" type="radio" value="collapse" />
-                            <span>collapse</span>
-                          </label>
-                          <label class="option-tile">
-                            <input id="flash-style-zeal" name="flash-style" type="radio" value="zeal" />
-                            <span>zeal</span>
-                          </label>
-                          <label class="option-tile">
-                            <input id="flash-style-void" name="flash-style" type="radio" value="void" />
-                            <span>void</span>
-                          </label>
-                        </div>
-                        <div class="flash-style-description-card" aria-live="polite">
-                          <span id="flash-style-description-label" class="flash-style-description-label">Style Description</span>
-                          <p id="flash-style-description" class="flash-style-description-copy">Stable, clear.</p>
-                        </div>
-                      </div>
-                    </fieldset>
-
-                    <fieldset class="field option-field" id="mini-speed-field" hidden>
-                      <legend id="mini-speed-label">Morse Speed</legend>
-                      <div class="option-grid option-grid-mini" role="radiogroup" aria-labelledby="mini-speed-label">
-                        <label class="option-tile">
-                          <input id="mini-speed-wpm10" name="mini-speed" type="radio" value="wpm10" />
-                          <span>10 WPM</span>
-                        </label>
-                        <label class="option-tile">
-                          <input id="mini-speed-wpm15" name="mini-speed" type="radio" value="wpm15" checked />
-                          <span>15 WPM</span>
-                        </label>
-                        <label class="option-tile">
-                          <input id="mini-speed-wpm20" name="mini-speed" type="radio" value="wpm20" />
-                          <span>20 WPM</span>
-                        </label>
-                      </div>
-                    </fieldset>
-                  </div>
-                </section>
-
-                <label class="field">
-                  <div class="field-header">
-                    <div class="field-header-row">
-                      <div class="input-title-row">
-                        <span id="input-text-label">输入文本</span>
-                        <span id="input-hint" class="field-hint"></span>
-                      </div>
-                    </div>
-                    <div class="sample-tools">
-                      <fieldset class="sample-length-field" id="sample-length-field">
-                        <span id="sample-length-label">Sample Length</span>
-                        <div class="sample-length-pills" role="radiogroup" aria-labelledby="sample-length-label">
-                          <label class="sample-length-pill">
-                            <input id="sample-length-short" name="sample-length" type="radio" value="short" checked />
-                            <span id="sample-length-short-label">Short</span>
-                          </label>
-                          <label class="sample-length-pill">
-                            <input id="sample-length-long" name="sample-length" type="radio" value="long" />
-                            <span id="sample-length-long-label">Long</span>
-                          </label>
+              <div class="generator-layout">
+                <div class="generator-form">
+                  <section class="workflow-section mode-options-panel">
+                    <div class="mode-options-grid">
+                      <fieldset class="field option-field" id="flash-style-field">
+                        <legend id="flash-style-label">Flash Style</legend>
+                        <div class="flash-style-layout">
+                          <div class="option-grid option-grid-flash" role="radiogroup" aria-labelledby="flash-style-label">
+                            <label class="option-tile"><input id="flash-style-standard" name="flash-style" type="radio" value="standard" checked /><span>standard</span></label>
+                            <label class="option-tile"><input id="flash-style-litany" name="flash-style" type="radio" value="litany" /><span>litany</span></label>
+                            <label class="option-tile"><input id="flash-style-hostility" name="flash-style" type="radio" value="hostility" /><span>hostility</span></label>
+                            <label class="option-tile"><input id="flash-style-collapse" name="flash-style" type="radio" value="collapse" /><span>collapse</span></label>
+                            <label class="option-tile"><input id="flash-style-zeal" name="flash-style" type="radio" value="zeal" /><span>zeal</span></label>
+                            <label class="option-tile"><input id="flash-style-void" name="flash-style" type="radio" value="void" /><span>void</span></label>
+                          </div>
+                          <div class="flash-style-description-card" aria-live="polite">
+                            <span id="flash-style-description-label" class="flash-style-description-label">Style Description</span>
+                            <p id="flash-style-description" class="flash-style-description-copy">Stable, clear.</p>
+                          </div>
                         </div>
                       </fieldset>
-                      <label
-                        class="sample-toggle-field"
-                        id="sample-add-emoji-field"
-                        for="sample-add-emoji-toggle"
-                      >
-                        <input id="sample-add-emoji-toggle" type="checkbox" checked />
-                        <span id="sample-add-emoji-label">Add Emoji</span>
-                      </label>
-                      <button id="random-sample-button" class="secondary-button dice-button" type="button">
-                        <span class="dice-button-face" aria-hidden="true">
-                          <span class="dice-pip pip-top-left"></span>
-                          <span class="dice-pip pip-center"></span>
-                          <span class="dice-pip pip-bottom-right"></span>
-                        </span>
-                        <span id="random-sample-button-text">Random Text</span>
-                      </button>
-                    </div>
-                  </div>
-                  <textarea
-                    id="input-text"
-                    rows="8"
-                    placeholder="例如：github"
-                  >github</textarea>
-                </label>
 
-                <div class="actions">
-                  <button id="generate-button" type="button">生成音频</button>
+                      <fieldset class="field option-field" id="mini-speed-field" hidden>
+                        <legend id="mini-speed-label">Morse Speed</legend>
+                        <div class="option-grid option-grid-mini" role="radiogroup" aria-labelledby="mini-speed-label">
+                          <label class="option-tile"><input id="mini-speed-wpm10" name="mini-speed" type="radio" value="wpm10" /><span>10 WPM</span></label>
+                          <label class="option-tile"><input id="mini-speed-wpm15" name="mini-speed" type="radio" value="wpm15" checked /><span>15 WPM</span></label>
+                          <label class="option-tile"><input id="mini-speed-wpm20" name="mini-speed" type="radio" value="wpm20" /><span>20 WPM</span></label>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </section>
+
+                  <label class="field">
+                    <div class="field-header">
+                      <div class="field-header-row">
+                        <div class="input-title-row">
+                          <span id="input-text-label">输入文本</span>
+                          <span id="input-hint" class="field-hint"></span>
+                        </div>
+                      </div>
+                      <div class="sample-tools">
+                        <fieldset class="sample-length-field" id="sample-length-field">
+                          <span id="sample-length-label">Sample Length</span>
+                          <div class="sample-length-pills" role="radiogroup" aria-labelledby="sample-length-label">
+                            <label class="sample-length-pill"><input id="sample-length-short" name="sample-length" type="radio" value="short" checked /><span id="sample-length-short-label">Short</span></label>
+                            <label class="sample-length-pill"><input id="sample-length-long" name="sample-length" type="radio" value="long" /><span id="sample-length-long-label">Long</span></label>
+                          </div>
+                        </fieldset>
+                        <label class="sample-toggle-field" id="sample-add-emoji-field" for="sample-add-emoji-toggle">
+                          <input id="sample-add-emoji-toggle" type="checkbox" checked />
+                          <span id="sample-add-emoji-label">Add Emoji</span>
+                        </label>
+                        <button id="random-sample-button" class="secondary-button dice-button" type="button">
+                          <span class="dice-button-face" aria-hidden="true"><span class="dice-pip pip-top-left"></span><span class="dice-pip pip-center"></span><span class="dice-pip pip-bottom-right"></span></span>
+                          <span id="random-sample-button-text">Random Text</span>
+                        </button>
+                      </div>
+                    </div>
+                    <textarea id="input-text" rows="8" placeholder="例如：github">github</textarea>
+                  </label>
+
+                  <div class="actions">
+                    <button id="generate-button" type="button">生成音频</button>
+                  </div>
+                </div>
+
+                <section class="result-stage" id="data-result-stage">
+                  <div class="result-stage-header">
+                    <h2 id="data-preview-title" class="result-stage-title">Data Preview</h2>
+                    <a id="download-link" class="download-link is-disabled" download="flipbits-demo.wav">下载 WAV</a>
+                  </div>
+                  <p id="status" class="status" aria-live="polite">正在等待 WebAssembly 编码器接入。</p>
+                  <section id="progress-section" class="progress-section" hidden>
+                    <div class="progress-header"><span id="progress-label">生成进度</span><span id="progress-value"></span></div>
+                    <div class="progress-track" aria-hidden="true"><div id="progress-bar" class="progress-bar"></div></div>
+                  </section>
+                  <section id="result-summary" class="result-summary" hidden>
+                    <h2 id="result-summary-title">Result Summary</h2>
+                    <div class="result-grid">
+                      <div class="result-item"><span id="result-mode-label" class="result-label">Mode</span><span id="result-mode-value" class="result-value"></span></div>
+                      <div class="result-item"><span id="result-profile-label" class="result-label">Profile</span><span id="result-profile-value" class="result-value"></span></div>
+                      <div class="result-item"><span id="result-duration-label" class="result-label">Duration</span><span id="result-duration-value" class="result-value"></span></div>
+                      <div class="result-item"><span id="result-sample-rate-label" class="result-label">Sample Rate</span><span id="result-sample-rate-value" class="result-value"></span></div>
+                    </div>
+                  </section>
+                  <div class="player-shell"><audio id="player" class="player" controls></audio></div>
+                </section>
+              </div>
+            </section>
+          </section>
+
+          <section id="workflow-panel-voice" class="workflow-panel" data-workflow-panel="voice" role="tabpanel" aria-labelledby="workflow-tab-voice" hidden>
+            <section class="workflow-section voice-workflow-section">
+              <div class="section-heading voice-fx-heading">
+                <div class="mode-heading-copy">
+                  <h2 id="voice-fx-title">Audio to Voice Effect</h2>
+                  <p id="voice-fx-copy" class="workflow-copy">Upload a browser-decodable audio file, then apply a voice preset to the decoded PCM.</p>
                 </div>
               </div>
 
-              <section class="result-stage">
-                <div class="result-stage-header">
-                  <h2 class="result-stage-title">Preview</h2>
-                  <a id="download-link" class="download-link is-disabled" download="flipbits-demo.wav">
-                    下载 WAV
-                  </a>
+              <div class="generator-layout">
+                <div class="generator-form">
+                  <label class="field voice-fx-file-field" for="voice-fx-file">
+                    <span id="voice-fx-file-label">Input Audio</span>
+                    <span id="voice-fx-file-hint" class="field-hint">The browser will decode the file to mono PCM before processing.</span>
+                    <input id="voice-fx-file" type="file" accept="audio/*" />
+                    <span id="voice-fx-file-name" class="voice-fx-file-name">No audio file selected.</span>
+                  </label>
+                  <div class="voice-record-panel">
+                    <div class="voice-record-copy">
+                      <span id="voice-record-label" class="voice-record-label">Record Audio</span>
+                      <span id="voice-record-hint" class="field-hint">Use your microphone as the Voice input source.</span>
+                    </div>
+                    <div class="voice-record-actions">
+                      <button id="voice-record-button" class="secondary-button" type="button">Start Recording</button>
+                    </div>
+                    <span id="voice-record-status" class="voice-fx-file-name">No recording captured.</span>
+                  </div>
+
+                  <fieldset class="sample-length-field voice-track-field" id="voice-track-field">
+                    <span id="voice-track-label">Track Mode</span>
+                    <div class="sample-length-pills voice-track-pills" role="radiogroup" aria-labelledby="voice-track-label">
+                      <label class="sample-length-pill"><input id="voice-track-single" name="voice-track-mode" type="radio" value="single" checked /><span id="voice-track-single-label">Single Track</span></label>
+                      <label class="sample-length-pill"><input id="voice-track-dual" name="voice-track-mode" type="radio" value="dual" /><span id="voice-track-dual-label">Dual Track</span></label>
+                    </div>
+                  </fieldset>
+
+                  <div class="mode-options-grid voice-fx-options-grid">
+                    <fieldset class="field option-field" id="voice-fx-preset-field">
+                      <legend id="voice-fx-preset-label">Voice Preset</legend>
+                      <div class="option-grid option-grid-voice-fx" role="radiogroup" aria-labelledby="voice-fx-preset-label">
+                        <label class="option-tile" data-voice-track="single"><input id="voice-fx-preset-machine-voice" name="voice-fx-preset" type="radio" value="machine_voice" checked /><span>Machine Voice</span></label>
+                        <label class="option-tile" data-voice-track="single"><input id="voice-fx-preset-signal-cant" name="voice-fx-preset" type="radio" value="signal_cant" /><span>Signal Cant</span></label>
+                        <label class="option-tile" data-voice-track="single"><input id="voice-fx-preset-robot-vox" name="voice-fx-preset" type="radio" value="robot_vox" /><span>Robot Vox</span></label>
+                        <label class="option-tile" data-voice-track="dual"><input id="voice-fx-preset-binaric-cant" name="voice-fx-preset" type="radio" value="binaric_cant" /><span>Binaric Cant</span></label>
+                        <label class="option-tile" data-voice-track="dual"><input id="voice-fx-preset-voice-trigger" name="voice-fx-preset" type="radio" value="voice_trigger" /><span>Voice Trigger</span></label>
+                        <label class="option-tile" data-voice-track="dual"><input id="voice-fx-preset-raw-constant" name="voice-fx-preset" type="radio" value="raw_constant" /><span>Raw Constant</span></label>
+                      </div>
+                    </fieldset>
+
+                    <fieldset class="field option-field" id="voice-fx-style-field" hidden>
+                      <legend id="voice-fx-style-label">Voicing Style</legend>
+                      <div class="option-grid option-grid-voice-style" role="radiogroup" aria-labelledby="voice-fx-style-label">
+                        <label class="option-tile"><input id="voice-fx-style-standard" name="voice-fx-style" type="radio" value="standard" checked /><span>standard</span></label>
+                        <label class="option-tile"><input id="voice-fx-style-litany" name="voice-fx-style" type="radio" value="litany" /><span>litany</span></label>
+                        <label class="option-tile"><input id="voice-fx-style-hostility" name="voice-fx-style" type="radio" value="hostility" /><span>hostility</span></label>
+                        <label class="option-tile"><input id="voice-fx-style-collapse" name="voice-fx-style" type="radio" value="collapse" /><span>collapse</span></label>
+                        <label class="option-tile"><input id="voice-fx-style-zeal" name="voice-fx-style" type="radio" value="zeal" /><span>zeal</span></label>
+                        <label class="option-tile"><input id="voice-fx-style-void" name="voice-fx-style" type="radio" value="void" /><span>void</span></label>
+                      </div>
+                    </fieldset>
+                  </div>
+
+                  <div class="actions">
+                    <button id="voice-fx-process-button" type="button">Process Audio</button>
+                  </div>
                 </div>
 
-                <p id="status" class="status" aria-live="polite">
-                  正在等待 WebAssembly 编码器接入。
-                </p>
-
-                <section id="progress-section" class="progress-section" hidden>
-                  <div class="progress-header">
-                    <span id="progress-label">生成进度</span>
-                    <span id="progress-value"></span>
+                <section class="result-stage" id="voice-result-stage">
+                  <div class="result-stage-header">
+                    <h2 id="voice-preview-title" class="result-stage-title">Voice Preview</h2>
+                    <a id="voice-download-link" class="download-link is-disabled" download="flipbits-voice.wav">Download WAV</a>
                   </div>
-                  <div class="progress-track" aria-hidden="true">
-                    <div id="progress-bar" class="progress-bar"></div>
-                  </div>
+                  <p id="voice-status" class="status" aria-live="polite">Waiting for the WebAssembly encoder.</p>
+                  <section id="voice-result-summary" class="result-summary" hidden>
+                    <h2 id="voice-result-summary-title">Result Summary</h2>
+                    <div class="result-grid">
+                      <div class="result-item"><span id="voice-result-mode-label" class="result-label">Mode</span><span id="voice-result-mode-value" class="result-value"></span></div>
+                      <div class="result-item"><span id="voice-result-profile-label" class="result-label">Profile</span><span id="voice-result-profile-value" class="result-value"></span></div>
+                      <div class="result-item"><span id="voice-result-duration-label" class="result-label">Duration</span><span id="voice-result-duration-value" class="result-value"></span></div>
+                      <div class="result-item"><span id="voice-result-sample-rate-label" class="result-label">Sample Rate</span><span id="voice-result-sample-rate-value" class="result-value"></span></div>
+                    </div>
+                  </section>
+                  <div class="player-shell"><audio id="voice-player" class="player" controls></audio></div>
                 </section>
-
-                <section id="result-summary" class="result-summary" hidden>
-                  <h2 id="result-summary-title">Result Summary</h2>
-                  <div class="result-grid">
-                    <div class="result-item">
-                      <span id="result-mode-label" class="result-label">Mode</span>
-                      <span id="result-mode-value" class="result-value"></span>
-                    </div>
-                    <div class="result-item">
-                      <span id="result-profile-label" class="result-label">Profile</span>
-                      <span id="result-profile-value" class="result-value"></span>
-                    </div>
-                    <div class="result-item">
-                      <span id="result-duration-label" class="result-label">Duration</span>
-                      <span id="result-duration-value" class="result-value"></span>
-                    </div>
-                    <div class="result-item">
-                      <span id="result-sample-rate-label" class="result-label">Sample Rate</span>
-                      <span id="result-sample-rate-value" class="result-value"></span>
-                    </div>
-                  </div>
-                </section>
-
-                <div class="player-shell">
-                  <audio id="player" class="player" controls></audio>
-                </div>
-              </section>
-            </div>
+              </div>
+            </section>
           </section>
         </div>
       </section>

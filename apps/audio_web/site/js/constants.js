@@ -34,11 +34,43 @@ export const SAMPLE_LENGTH_OPTIONS = [
   { value: "long", label: "Long" },
 ];
 
+export const WORKFLOW_OPTIONS = {
+  data: "data",
+  voice: "voice",
+};
+
+export const VOICE_TRACK_MODE_OPTIONS = {
+  single: "single",
+  dual: "dual",
+};
+
+export const VOICE_FX_PRESET_OPTIONS = [
+  { value: "machine_voice", label: "Machine Voice", trackMode: "single" },
+  { value: "signal_cant", label: "Signal Cant", trackMode: "single" },
+  { value: "robot_vox", label: "Robot Vox", trackMode: "single" },
+  { value: "binaric_cant", label: "Binaric Cant", trackMode: "dual" },
+  { value: "voice_trigger", label: "Voice Trigger", trackMode: "dual" },
+  { value: "raw_constant", label: "Raw Constant", trackMode: "dual" },
+];
+
+export const VOICE_FX_SUBVOICE_STYLE_OPTIONS = [
+  { value: "standard", label: "standard" },
+  { value: "litany", label: "litany" },
+  { value: "hostility", label: "hostility" },
+  { value: "collapse", label: "collapse" },
+  { value: "zeal", label: "zeal" },
+  { value: "void", label: "void" },
+];
+
 export const ENCODE_PROGRESS_PHASES = {
   0: "preparing",
   1: "rendering",
   2: "postprocessing",
   3: "finalizing",
+};
+
+export const LINEAR_PROGRESS_PHASES = {
+  voiceProcessing: "voiceProcessing",
 };
 
 export const ENCODE_OPERATION_STATES = {

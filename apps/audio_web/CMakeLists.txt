@@ -49,19 +49,101 @@ set_target_properties(
     )
 
 set(
+    FLIPBITS_WEB_WASM_OPT_LEVEL
+    "O3"
+    CACHE STRING
+    "Emscripten/Binaryen optimization level used when linking the WebAssembly runtime."
+)
+set_property(
+    CACHE FLIPBITS_WEB_WASM_OPT_LEVEL
+    PROPERTY STRINGS O0 O1 O2 O3 Os Oz
+)
+
+set(
+    FLIPBITS_WEB_MALLOC
+    "dlmalloc"
+    CACHE STRING
+    "Emscripten malloc implementation for the WebAssembly runtime."
+)
+set_property(
+    CACHE FLIPBITS_WEB_MALLOC
+    PROPERTY STRINGS dlmalloc emmalloc mimalloc none
+)
+
+set(
+    FLIPBITS_WEB_LTO
+    OFF
+    CACHE BOOL
+    "Enable link-time optimization for the WebAssembly runtime."
+)
+
+set(
+    FLIPBITS_WEB_ENABLE_SIMD
+    OFF
+    CACHE BOOL
+    "Enable wasm simd128 code generation for the WebAssembly runtime."
+)
+
+set(
+    FLIPBITS_WEB_ALLOW_MEMORY_GROWTH
+    ON
+    CACHE BOOL
+    "Allow the WebAssembly heap to grow at runtime."
+)
+
+set(
+    FLIPBITS_WEB_INITIAL_MEMORY
+    ""
+    CACHE STRING
+    "Optional Emscripten INITIAL_MEMORY value in bytes for the WebAssembly runtime."
+)
+
+set(FLIPBITS_WEB_RELEASE_COMPILE_FLAGS "")
+set(FLIPBITS_WEB_RELEASE_LINK_FLAGS "-${FLIPBITS_WEB_WASM_OPT_LEVEL}")
+
+if(FLIPBITS_WEB_WASM_OPT_LEVEL MATCHES "^O[0-3]$")
+    list(APPEND FLIPBITS_WEB_RELEASE_COMPILE_FLAGS "-${FLIPBITS_WEB_WASM_OPT_LEVEL}")
+endif()
+
+if(FLIPBITS_WEB_LTO)
+    list(APPEND FLIPBITS_WEB_RELEASE_COMPILE_FLAGS "-flto")
+    string(APPEND FLIPBITS_WEB_RELEASE_LINK_FLAGS " -flto")
+endif()
+
+if(FLIPBITS_WEB_ENABLE_SIMD)
+    list(APPEND FLIPBITS_WEB_RELEASE_COMPILE_FLAGS "-msimd128")
+    string(APPEND FLIPBITS_WEB_RELEASE_LINK_FLAGS " -msimd128")
+endif()
+
+if(FLIPBITS_WEB_MALLOC AND NOT FLIPBITS_WEB_MALLOC STREQUAL "dlmalloc")
+    string(APPEND FLIPBITS_WEB_RELEASE_LINK_FLAGS " -sMALLOC=${FLIPBITS_WEB_MALLOC}")
+endif()
+
+if(FLIPBITS_WEB_ALLOW_MEMORY_GROWTH)
+    string(APPEND FLIPBITS_WEB_RELEASE_LINK_FLAGS " -sALLOW_MEMORY_GROWTH=1")
+else()
+    string(APPEND FLIPBITS_WEB_RELEASE_LINK_FLAGS " -sALLOW_MEMORY_GROWTH=0")
+endif()
+
+if(FLIPBITS_WEB_INITIAL_MEMORY)
+    string(APPEND FLIPBITS_WEB_RELEASE_LINK_FLAGS " -sINITIAL_MEMORY=${FLIPBITS_WEB_INITIAL_MEMORY}")
+endif()
+
+add_compile_options($<$<CONFIG:Release>:${FLIPBITS_WEB_RELEASE_COMPILE_FLAGS}>)
+
+set(
     FLIPBITS_WEB_LINK_FLAGS
     "--no-entry \
-    -O3 \
+    ${FLIPBITS_WEB_RELEASE_LINK_FLAGS} \
     -sWASM=1 \
     -sMODULARIZE=1 \
     -sEXPORT_ES6=1 \
     -sEXPORT_NAME=createFlipBitsRuntime \
     -sENVIRONMENT=web,worker \
-    -sALLOW_MEMORY_GROWTH=1 \
     -sFILESYSTEM=0 \
     -sNO_EXIT_RUNTIME=1 \
-    -sEXPORTED_FUNCTIONS=['_flipbits_web_begin_encode_operation','_flipbits_web_pump_encode_operation','_flipbits_web_take_encode_operation_result','_flipbits_web_abort_encode_operation','_flipbits_web_current_operation_state','_flipbits_web_current_operation_phase','_flipbits_web_current_operation_overall_progress','_flipbits_web_current_operation_phase_progress','_flipbits_web_current_operation_completed_work_units','_flipbits_web_current_operation_total_work_units','_flipbits_web_current_operation_phase_completed_work_units','_flipbits_web_current_operation_phase_total_work_units','_flipbits_web_current_operation_terminal_code','_flipbits_web_current_operation_estimated_pcm_sample_count','_flipbits_web_current_operation_payload_byte_count','_flipbits_web_current_operation_segment_count','_flipbits_web_current_operation_current_segment_index','_flipbits_web_current_operation_plan_preparing_work_units','_flipbits_web_current_operation_plan_rendering_work_units','_flipbits_web_current_operation_plan_postprocessing_work_units','_flipbits_web_current_operation_plan_finalizing_work_units','_flipbits_web_current_operation_plan_total_work_units','_flipbits_web_current_operation_plan_estimated_pcm_sample_count','_flipbits_web_current_operation_plan_payload_byte_count','_flipbits_web_current_operation_plan_segment_count','_flipbits_web_error_message_from_code','_flipbits_web_last_error_message','_flipbits_web_last_sample_count','_flipbits_web_last_sample_rate_hz','_flipbits_web_last_samples_ptr','_flipbits_web_last_sample_at'] \
-    -sEXPORTED_RUNTIME_METHODS=['ccall']"
+    -sEXPORTED_FUNCTIONS=['_malloc','_free','_flipbits_web_begin_encode_operation','_flipbits_web_pump_encode_operation','_flipbits_web_take_encode_operation_result','_flipbits_web_abort_encode_operation','_flipbits_web_begin_voice_fx','_flipbits_web_apply_voice_fx_pcm_bytes','_flipbits_web_process_voice_fx_pcm_bytes','_flipbits_web_finish_voice_fx','_flipbits_web_abort_voice_fx','_flipbits_web_current_operation_state','_flipbits_web_current_operation_phase','_flipbits_web_current_operation_overall_progress','_flipbits_web_current_operation_phase_progress','_flipbits_web_current_operation_completed_work_units','_flipbits_web_current_operation_total_work_units','_flipbits_web_current_operation_phase_completed_work_units','_flipbits_web_current_operation_phase_total_work_units','_flipbits_web_current_operation_terminal_code','_flipbits_web_current_operation_estimated_pcm_sample_count','_flipbits_web_current_operation_payload_byte_count','_flipbits_web_current_operation_segment_count','_flipbits_web_current_operation_current_segment_index','_flipbits_web_current_operation_plan_preparing_work_units','_flipbits_web_current_operation_plan_rendering_work_units','_flipbits_web_current_operation_plan_postprocessing_work_units','_flipbits_web_current_operation_plan_finalizing_work_units','_flipbits_web_current_operation_plan_total_work_units','_flipbits_web_current_operation_plan_estimated_pcm_sample_count','_flipbits_web_current_operation_plan_payload_byte_count','_flipbits_web_current_operation_plan_segment_count','_flipbits_web_current_operation_diagnostics_flash_payload_prepare_ms','_flipbits_web_current_operation_diagnostics_flash_payload_sample_setup_ms','_flipbits_web_current_operation_diagnostics_flash_payload_envelope_ms','_flipbits_web_current_operation_diagnostics_flash_payload_articulation_ms','_flipbits_web_current_operation_diagnostics_flash_payload_harmonic_ms','_flipbits_web_current_operation_diagnostics_flash_payload_metallic_ms','_flipbits_web_current_operation_diagnostics_flash_payload_chant_resonance_ms','_flipbits_web_current_operation_diagnostics_flash_payload_chant_drone_ms','_flipbits_web_current_operation_diagnostics_flash_payload_mechanical_throat_ms','_flipbits_web_current_operation_diagnostics_flash_payload_standard_low_voice_ms','_flipbits_web_current_operation_diagnostics_flash_payload_hostility_edge_ms','_flipbits_web_current_operation_diagnostics_flash_payload_boundary_click_ms','_flipbits_web_current_operation_diagnostics_flash_payload_modulation_ms','_flipbits_web_current_operation_diagnostics_flash_payload_mix_shape_store_ms','_flipbits_web_current_operation_diagnostics_flash_payload_voiced_samples','_flipbits_web_current_operation_diagnostics_flash_payload_silence_samples','_flipbits_web_current_operation_diagnostics_flash_payload_profiled_samples','_flipbits_web_error_message_from_code','_flipbits_web_last_error_message','_flipbits_web_last_sample_count','_flipbits_web_last_sample_rate_hz','_flipbits_web_last_samples_ptr','_flipbits_web_last_sample_at'] \
+    -sEXPORTED_RUNTIME_METHODS=['ccall','HEAP16','HEAPU8']"
 )
 
 set_property(TARGET flipbits_web_bridge PROPERTY LINK_FLAGS "${FLIPBITS_WEB_LINK_FLAGS}")

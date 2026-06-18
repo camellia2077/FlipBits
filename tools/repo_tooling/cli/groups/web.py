@@ -17,6 +17,7 @@ def register_web_group(subparsers: argparse._SubParsersAction[argparse.ArgumentP
             "- export-sample-texts: export Android sample XML into site/data/sample-texts.json.\n"
             "- prepare-pages-site: export samples, build WASM, and validate Pages artifacts.\n"
             "- serve-site: serve apps/audio_web/site locally with no-cache headers.\n"
+            "- perf-data: run a Playwright Data-generation perf capture against the site.\n"
             "- test: run JS syntax checks and Web tool unit tests."
         ),
         formatter_class=RAW_FORMATTER,
@@ -28,6 +29,7 @@ def register_web_group(subparsers: argparse._SubParsersAction[argparse.ArgumentP
             "export-sample-texts",
             "prepare-pages-site",
             "serve-site",
+            "perf-data",
             "test",
         ],
         help="Web tooling action.",

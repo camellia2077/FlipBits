@@ -32,6 +32,16 @@ export class EncoderClient {
     });
   }
 
+  async processVoiceFx(request, callbacks = {}) {
+    await this.ready();
+    const id = this.requestId++;
+
+    return new Promise((resolve, reject) => {
+      this.pending.set(id, { resolve, reject, callbacks });
+      this.worker.postMessage({ type: "voice-fx", id, request }, [request.samples.buffer]);
+    });
+  }
+
   handleMessage(message) {
     if (message.type === "ready") {
       this.readyResolve?.();
@@ -55,6 +65,9 @@ export class EncoderClient {
 
     if (message.type === "result") {
       this.pending.delete(message.id);
+      if (message.diagnostics && message.result && typeof message.result === "object") {
+        message.result.diagnostics = message.diagnostics;
+      }
       pendingRequest.resolve(message.result);
       return;
     }

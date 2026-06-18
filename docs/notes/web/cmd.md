@@ -25,7 +25,7 @@ python tools/run.py web serve-site
 
 http://127.0.0.1:4173
 
-依赖：
+依赖：·
 
 ```powershell
 python --version
@@ -36,3 +36,7 @@ em++ --version
 ```
 
 只要 `emcmake` 和 `em++` 正常，`python tools/run.py web build-wasm` 就可以直接跑。
+
+WASM Release 编译参数的性能实验记录见：
+
+- `docs/notes/web/wasm-release-optimization-benchmarks.md`

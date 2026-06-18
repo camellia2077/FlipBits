@@ -5,6 +5,7 @@ import argparse
 from ..constants import ROOT_DIR
 from ..errors import ToolError
 from ..web.build import build_wasm, prepare_pages_site
+from ..web.perf import run_data_perf
 from ..web.sample_texts import export_sample_texts
 from ..web.server import serve_site
 from ..web.tests import run_web_tests
@@ -24,6 +25,9 @@ def cmd_web(args: argparse.Namespace) -> None:
         return
     if action == "serve-site":
         serve_site(port=args.port)
+        return
+    if action == "perf-data":
+        run_data_perf()
         return
     if action == "test":
         run_web_tests()
