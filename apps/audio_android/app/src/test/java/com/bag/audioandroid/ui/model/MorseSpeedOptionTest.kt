@@ -27,4 +27,11 @@ class MorseSpeedOptionTest {
         assertEquals(MorseSpeedOption.Wpm15, MorseSpeedOption.fromFrameSamples(3528))
         assertEquals(MorseSpeedOption.Wpm20, MorseSpeedOption.fromFrameSamples(2646))
     }
+
+    @Test
+    fun `ultra speed presets use MFSK16 symbol boundaries`() {
+        assertEquals(listOf(MorseSpeedOption.Wpm15, MorseSpeedOption.Wpm20), MorseSpeedOption.ultraOptions)
+        assertEquals(2822, MorseSpeedOption.Wpm15.ultraFrameSamples(44100))
+        assertEquals(1411, MorseSpeedOption.Wpm20.ultraFrameSamples(44100))
+    }
 }

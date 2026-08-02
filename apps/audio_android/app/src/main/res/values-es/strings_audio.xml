@@ -280,5 +280,10 @@
     <string name="voice_live_preview_dialog_try_live">Probar Live</string>
     <string name="voice_result_input_track">Entrada</string>
     <string name="voice_result_output_track">Salida</string>
+    <string name="audio_ultra_speed_15_625_bd">15.625 Bd</string>
+    <string name="audio_ultra_speed_31_25_bd">31.25 Bd</string>
+    <string name="audio_action_select_ultra_speed">Seleccionar velocidad MFSK16</string>
+    <string name="audio_ultra_speed_title">Velocidad MFSK16</string>
+    <string name="audio_ultra_speed_hint">Se aplica al próximo audio generado. El audio ya generado conserva la velocidad MFSK16 con la que se creó.</string>
 </resources>
 

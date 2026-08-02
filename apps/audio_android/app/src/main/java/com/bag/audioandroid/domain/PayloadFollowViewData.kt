@@ -29,7 +29,7 @@ enum class UltraFrameSection(
     Flags(3),
     PayloadLength(4),
     Payload(5),
-    Crc16(6),
+    Tail(6),
     ;
 
     companion object {

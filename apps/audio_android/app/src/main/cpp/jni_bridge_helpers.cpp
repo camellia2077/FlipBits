@@ -33,7 +33,9 @@ int NormalizeFrameSamples(int sample_rate_hz, int frame_samples) {
         return frame_samples;
     }
     const int normalized_sample_rate = NormalizeSampleRate(sample_rate_hz);
-    return normalized_sample_rate > 0 ? normalized_sample_rate / 20 : kDefaultFrameSamples;
+    return normalized_sample_rate > 0
+               ? normalized_sample_rate / kCurrentBaseFramesPerSecond
+               : kDefaultFrameSamples;
 }
 
 bag_encoder_config MakeEncoderConfig(int sample_rate_hz,
@@ -57,7 +59,12 @@ bag_decoder_config MakeDecoderConfig(int sample_rate_hz,
                                      int flash_voicing_flavor) {
     bag_decoder_config config{};
     config.sample_rate_hz = NormalizeSampleRate(sample_rate_hz);
-    config.frame_samples = NormalizeFrameSamples(sample_rate_hz, frame_samples);
+    // Zero is the mini/Flash/Pro/Ultra decoder auto-timing sentinel. Preserve
+    // it through the JNI boundary so the core can resolve timing and, for
+    // Flash, the voicing candidate.
+    config.frame_samples = frame_samples == 0
+                               ? 0
+                               : NormalizeFrameSamples(sample_rate_hz, frame_samples);
     config.enable_diagnostics = 0;
     config.mode = BAG_TRANSPORT_FLASH;
     config.flash_signal_profile = static_cast<bag_flash_signal_profile>(flash_signal_profile);

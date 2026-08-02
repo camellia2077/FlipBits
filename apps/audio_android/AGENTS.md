@@ -9,7 +9,7 @@
 
 - 这里的入口职责固定为：
   - 项目入口看 `apps/audio_android/AGENTS.md`
-  - 执行步骤看 `.agent/workflows/`
+  - 执行步骤看 `agents/workflows/`
   - 工具定义看 `tools/repo_tooling/android_translate/docs/`
 - 先判断当前任务属于哪一类，只展开当前分支需要的文档。
 
@@ -30,7 +30,7 @@
   - `docs/design/modes/flash/voicing-emotions.md`
   - 具体 preset 细节看 `docs/design/modes/flash/<preset>.md`
 - 如果改动涉及 XML 文案 / 本地化 / 样例文本 / 翻译检查失败，再按需读：
-  - `.agent/workflows/translations/README.md`
+  - `agents/workflows/translations/README.md`
   - `tools/repo_tooling/android_translate/docs/README.md`
   - `docs/design/android/translation/README.md`
 - 如果改动涉及 UI 职责拆分或入口归属，再按需读：
@@ -50,7 +50,7 @@
 - Android 真机自动化先从 `docs/architecture/android/android-automation-agent-index.md` 选分支，不要在 `AGENTS.md` 里平铺展开所有自动化专题。
 - 工具或诊断入口不要只靠代码搜索猜命令；先看 `docs/tools/README.md`，再用 `python tools/run.py <group> --help` 确认当前参数。
 - Flash 真机自动化优先使用对应自动化文档里的 debug scenario，不要默认走坐标点击、随机 sample 或无障碍服务。
-- 修改可见 XML 文案、本地化结构或样例文本时，必须先按 `.agent/workflows/translations/README.md` 选择 app text 或 sample text workflow；不要跳过 translation key alignment。
+- 修改可见 XML 文案、本地化结构或样例文本时，必须先按 `agents/workflows/translations/README.md` 选择 app text 或 sample text workflow；不要跳过 translation key alignment。
 - 查看翻译工具命令、JSON contract、产物目录时，不要再读工具侧 `AGENTS.md`；工具定义看 `tools/repo_tooling/android_translate/docs/README.md`，项目级用法看 `docs/design/android/translation/README.md`。
 - 新增 XML 文案 key 时，必须使用脚手架：`python tools/run.py android strings-add --file <strings_*.xml> --key <name> --en "<English text>"`。
 - `strings-add` 默认只写英文 `values/` 基线，并生成 translation key alignment 报告；不要手工把英文原文复制到 `values-*` 当本地化。
@@ -60,7 +60,7 @@
   - `ui/SampleInputSessionUpdater.kt`
 - 如果要了解 sample text 的命名规则、`short/long` 语义、key alignment、
   Web 导出依赖或具体处理流程，统一去看：
-  - `.agent/workflows/translations/android-sample-text.md`
+  - `agents/workflows/translations/android-sample-text.md`
 - For dual-tone lineup/theme color/sample changes, also check:
   - `docs/design/android/android-dual-tone-theme.md`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`

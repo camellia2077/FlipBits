@@ -50,6 +50,7 @@ import org.junit.Test
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@Suppress("LargeClass")
 class AudioSessionDecodeActionsTest {
     @Test
     fun `decode stores text and raw payload for generated audio`() =
@@ -114,6 +115,84 @@ class AudioSessionDecodeActionsTest {
             assertEquals(expectedFollow, session.followData)
             assertFalse(session.isCodecBusy)
             assertResId(session.statusText, R.string.status_mode_decode_completed)
+        }
+
+    @Test
+    fun `mini generated decode without metadata forwards auto frame sentinel`() =
+        runTest {
+            val gateway = FakeDecodeAudioCodecGateway()
+            val fixture = createFixture(gateway = gateway, testScope = this)
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions +
+                            (
+                                TransportModeOption.Mini to
+                                    fixture.uiState.value.sessions.getValue(TransportModeOption.Mini).copy(
+                                        generatedPcm = shortArrayOf(1, 2, 3),
+                                        generatedAudioMetadata = null,
+                                    )
+                            ),
+                    currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Mini),
+                    transportMode = TransportModeOption.Mini,
+                )
+
+            fixture.actions.onDecode()
+            advanceUntilIdle()
+
+            assertEquals(listOf(0), gateway.decodeCalls.map { it.frameSamples })
+        }
+
+    @Test
+    fun `ultra generated decode without metadata forwards auto frame sentinel`() =
+        runTest {
+            val gateway = FakeDecodeAudioCodecGateway()
+            val fixture = createFixture(gateway = gateway, testScope = this)
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions +
+                            (
+                                TransportModeOption.Ultra to
+                                    fixture.uiState.value.sessions.getValue(TransportModeOption.Ultra).copy(
+                                        generatedPcm = shortArrayOf(1, 2, 3),
+                                        generatedAudioMetadata = null,
+                                    )
+                            ),
+                    currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Ultra),
+                    transportMode = TransportModeOption.Ultra,
+                )
+
+            fixture.actions.onDecode()
+            advanceUntilIdle()
+
+            assertEquals(listOf(0), gateway.decodeCalls.map { it.frameSamples })
+        }
+
+    @Test
+    fun `pro generated decode without metadata forwards auto frame sentinel`() =
+        runTest {
+            val gateway = FakeDecodeAudioCodecGateway()
+            val fixture = createFixture(gateway = gateway, testScope = this)
+            fixture.uiState.value =
+                fixture.uiState.value.copy(
+                    sessions =
+                        fixture.uiState.value.sessions +
+                            (
+                                TransportModeOption.Pro to
+                                    fixture.uiState.value.sessions.getValue(TransportModeOption.Pro).copy(
+                                        generatedPcm = shortArrayOf(1, 2, 3),
+                                        generatedAudioMetadata = null,
+                                    )
+                            ),
+                    currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Pro),
+                    transportMode = TransportModeOption.Pro,
+                )
+
+            fixture.actions.onDecode()
+            advanceUntilIdle()
+
+            assertEquals(listOf(0), gateway.decodeCalls.map { it.frameSamples })
         }
 
     @Test
@@ -534,7 +613,7 @@ class AudioSessionDecodeActionsTest {
     }
 
     @Test
-    fun `flash decode falls back to other styles until text succeeds`() =
+    fun `flash generated decode delegates style resolution to core`() =
         runTest {
             val successful =
                 DecodedAudioPayloadResult(
@@ -596,19 +675,7 @@ class AudioSessionDecodeActionsTest {
                                 TransportModeOption.Flash to
                                     fixture.uiState.value.sessions.getValue(TransportModeOption.Flash).copy(
                                         generatedPcm = shortArrayOf(1, 2, 3),
-                                        generatedAudioMetadata =
-                                            GeneratedAudioMetadata(
-                                                mode = TransportModeOption.Flash,
-                                                createdAtIsoUtc = "2026-04-27T00:00:00Z",
-                                                durationMs = 10,
-                                                sampleRateHz = 44_100,
-                                                frameSamples = 2205,
-                                                pcmSampleCount = 3,
-                                                payloadByteCount = 7,
-                                                inputSourceKind = GeneratedAudioInputSourceKind.Manual,
-                                                appVersion = "test",
-                                                coreVersion = "test",
-                                            ),
+                                        generatedAudioMetadata = null,
                                     )
                             ),
                     currentPlaybackSource = AudioPlaybackSource.Generated(TransportModeOption.Flash),
@@ -622,7 +689,11 @@ class AudioSessionDecodeActionsTest {
                 fixture.uiState.value.sessions
                     .getValue(TransportModeOption.Flash)
             assertEquals("decoded by fallback", session.decodedPayload.text)
-            assertEquals(listOf(1, 0), (fixture.actionsGateway as FakeDecodeAudioCodecGateway).decodeSignalProfiles)
+            val decodeGateway = fixture.actionsGateway as FakeDecodeAudioCodecGateway
+            assertEquals(
+                listOf(DecodeCall(frameSamples = 0, signalProfile = 0, voicingFlavor = 0)),
+                decodeGateway.decodeCalls,
+            )
         }
 
     private fun createFixture(
@@ -685,6 +756,12 @@ class AudioSessionDecodeActionsTest {
     )
 }
 
+private data class DecodeCall(
+    val frameSamples: Int,
+    val signalProfile: Int,
+    val voicingFlavor: Int,
+)
+
 private class FakeDecodeAudioCodecGateway(
     private val decodedResult: DecodedAudioPayloadResult =
         DecodedAudioPayloadResult(
@@ -700,7 +777,7 @@ private class FakeDecodeAudioCodecGateway(
     private val decodeResultsQueue: ArrayDeque<DecodedAudioPayloadResult> = ArrayDeque(),
     private val decodeResultBySignalProfile: Map<Int, DecodedAudioPayloadResult> = emptyMap(),
 ) : AudioCodecGateway {
-    val decodeSignalProfiles = mutableListOf<Int>()
+    val decodeCalls = mutableListOf<DecodeCall>()
 
     override fun validateEncodeRequest(
         text: String,
@@ -755,7 +832,12 @@ private class FakeDecodeAudioCodecGateway(
         flashVoicingFlavor: Int,
         onProgress: (com.bag.audioandroid.domain.DecodeProgressUpdate) -> Unit,
     ): DecodedAudioPayloadResult {
-        decodeSignalProfiles += flashSignalProfile
+        decodeCalls +=
+            DecodeCall(
+                frameSamples = frameSamples,
+                signalProfile = flashSignalProfile,
+                voicingFlavor = flashVoicingFlavor,
+            )
         return decodeResultBySignalProfile[flashSignalProfile]
             ?: decodeResultsQueue.removeFirstOrNull()
             ?: decodedResult
@@ -770,10 +852,17 @@ private class FakeDecodeAudioCodecGateway(
         mode: Int,
         flashSignalProfile: Int,
         flashVoicingFlavor: Int,
-    ): DecodedAudioPayloadResult =
-        decodeResultBySignalProfile[flashSignalProfile]
+    ): DecodedAudioPayloadResult {
+        decodeCalls +=
+            DecodeCall(
+                frameSamples = frameSamples,
+                signalProfile = flashSignalProfile,
+                voicingFlavor = flashVoicingFlavor,
+            )
+        return decodeResultBySignalProfile[flashSignalProfile]
             ?: decodeResultsQueue.removeFirstOrNull()
             ?: decodedResult
+    }
 
     override fun getCoreVersion(): String = "test"
 }

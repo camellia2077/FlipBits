@@ -280,5 +280,10 @@
     <string name="voice_live_preview_dialog_try_live">試用 Live</string>
     <string name="voice_result_input_track">輸入</string>
     <string name="voice_result_output_track">輸出</string>
+    <string name="audio_ultra_speed_15_625_bd">15.625 Bd</string>
+    <string name="audio_ultra_speed_31_25_bd">31.25 Bd</string>
+    <string name="audio_action_select_ultra_speed">選擇 MFSK16 速度</string>
+    <string name="audio_ultra_speed_title">MFSK16 速度</string>
+    <string name="audio_ultra_speed_hint">套用到下一段產生的音訊。已產生的音訊會保留建立時使用的 MFSK16 速度。</string>
 </resources>
 

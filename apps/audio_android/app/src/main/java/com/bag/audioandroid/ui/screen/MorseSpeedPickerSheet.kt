@@ -32,7 +32,11 @@ import com.bag.audioandroid.ui.theme.appThemeVisualTokens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MorseSpeedPickerSheet(
+    titleResId: Int,
+    options: List<MorseSpeedOption>,
     selectedStyle: MorseSpeedOption,
+    labelFor: (MorseSpeedOption) -> Int,
+    testTagPrefix: String,
     onStyleSelected: (MorseSpeedOption) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -50,7 +54,7 @@ internal fun MorseSpeedPickerSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = stringResource(R.string.audio_mini_speed_style_sheet_title),
+                text = stringResource(titleResId),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -62,10 +66,12 @@ internal fun MorseSpeedPickerSheet(
                 contentPadding = PaddingValues(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                items(MorseSpeedOption.entries) { option ->
+                items(options) { option ->
                     MorseSpeedOptionRow(
                         option = option,
                         selected = option == selectedStyle,
+                        labelResId = labelFor(option),
+                        testTagPrefix = testTagPrefix,
                         onClick = { onStyleSelected(option) },
                     )
                 }
@@ -78,6 +84,8 @@ internal fun MorseSpeedPickerSheet(
 private fun MorseSpeedOptionRow(
     option: MorseSpeedOption,
     selected: Boolean,
+    labelResId: Int,
+    testTagPrefix: String,
     onClick: () -> Unit,
 ) {
     val accentTokens = appThemeAccentTokens()
@@ -107,7 +115,7 @@ private fun MorseSpeedOptionRow(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .testTag("mini-speed-style-${option.id}")
+                .testTag("$testTagPrefix-${option.id}")
                 .clickable(onClick = onClick),
     ) {
         Row(
@@ -119,7 +127,7 @@ private fun MorseSpeedOptionRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(option.labelResId),
+                text = stringResource(labelResId),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 color = contentColor,

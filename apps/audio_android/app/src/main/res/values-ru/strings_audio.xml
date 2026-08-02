@@ -280,5 +280,10 @@
     <string name="voice_live_preview_dialog_try_live">Попробовать Live</string>
     <string name="voice_result_input_track">Вход</string>
     <string name="voice_result_output_track">Выход</string>
+    <string name="audio_ultra_speed_15_625_bd">15.625 Bd</string>
+    <string name="audio_ultra_speed_31_25_bd">31.25 Bd</string>
+    <string name="audio_action_select_ultra_speed">Выбрать скорость MFSK16</string>
+    <string name="audio_ultra_speed_title">Скорость MFSK16</string>
+    <string name="audio_ultra_speed_hint">Применяется к следующему созданному аудио. Уже созданное аудио сохраняет скорость MFSK16, использованную при создании.</string>
 </resources>
 

@@ -480,24 +480,24 @@ private val ProHighFreqsHz = listOf(1209.0, 1336.0, 1477.0, 1633.0)
 internal val UltraFreqsHz =
     listOf(
         1000.0,
-        1140.0,
-        1280.0,
-        1420.0,
-        1560.0,
-        1700.0,
-        1840.0,
-        1980.0,
-        2120.0,
-        2260.0,
-        2400.0,
-        2540.0,
-        2680.0,
-        2820.0,
-        2960.0,
-        3100.0,
+        1015.625,
+        1031.25,
+        1046.875,
+        1062.5,
+        1078.125,
+        1093.75,
+        1109.375,
+        1125.0,
+        1140.625,
+        1156.25,
+        1171.875,
+        1187.5,
+        1203.125,
+        1218.75,
+        1234.375,
     )
 
 internal const val SymbolEnvelopePlayheadAnchorRatio = 0.40f
-private const val SymbolEnvelopeBucketSymbolCount = 2
+private const val SymbolEnvelopeBucketSymbolCount = 1
 private const val SymbolEnvelopeSmoothingRadius = 1
 private const val SymbolEnvelopeMinimumAnalysisSamples = 96

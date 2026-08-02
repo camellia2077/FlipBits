@@ -19,7 +19,30 @@ enum class MorseSpeedOption(
     fun frameSamples(defaultFrameSamples: Int): Int =
         ((defaultFrameSamples * frameSampleNumerator) / frameSampleDenominator).coerceAtLeast(1)
 
+    fun ultraFrameSamples(sampleRateHz: Int): Int =
+        when (this) {
+            Wpm15, Wpm10 ->
+                kotlin.math
+                    .round(sampleRateHz / 15.625)
+                    .toInt()
+                    .coerceAtLeast(1)
+            Wpm20 ->
+                kotlin.math
+                    .round(sampleRateHz / 31.25)
+                    .toInt()
+                    .coerceAtLeast(1)
+        }
+
+    @get:StringRes
+    val ultraLabelResId: Int
+        get() =
+            when (this) {
+                Wpm15, Wpm10 -> R.string.audio_ultra_speed_15_625_bd
+                Wpm20 -> R.string.audio_ultra_speed_31_25_bd
+            }
+
     companion object {
+        val ultraOptions: List<MorseSpeedOption> = listOf(Wpm15, Wpm20)
         val default: MorseSpeedOption = Wpm15
 
         fun fromFrameSamples(

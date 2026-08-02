@@ -48,7 +48,7 @@ class SymbolEnvelopeVisualizationAnalysisTest {
             buildTonePcm(
                 sampleRateHz = 44_100,
                 sampleCount = 44_100,
-                frequenciesHz = listOf(2260.0),
+                frequenciesHz = listOf(1140.625),
             )
 
         val buckets =
@@ -56,7 +56,7 @@ class SymbolEnvelopeVisualizationAnalysisTest {
                 pcm = pcm,
                 sampleRateHz = 44_100,
                 currentSample = 22_050f,
-                symbolSamples = 2_205,
+                symbolSamples = 2_822,
                 targetBucketCount = 24,
                 transportMode = TransportModeOption.Ultra,
             )
@@ -65,21 +65,21 @@ class SymbolEnvelopeVisualizationAnalysisTest {
         assertTrue(buckets.maxOf { it.upperEnergy } > 0.2f)
         assertTrue(buckets.all { kotlin.math.abs(it.upperEnergy - it.lowerEnergy) < 0.0001f })
         assertTrue(buckets.any { it.dominantLaneIndex == 9 })
-        assertTrue(buckets.any { it.dominantFrequencyHz == 2260 })
+        assertTrue(buckets.any { it.dominantFrequencyHz == 1140 })
     }
 
     @Test
     fun `ultra visualization state exposes current and next frequencies`() {
         val sampleRateHz = 44_100
-        val frameSamples = 2_205
+        val frameSamples = 2_822
         val pcm =
             ShortArray(frameSamples * 8) { index ->
                 val frequency =
                     when (index / (frameSamples * 2)) {
                         0 -> 1000.0
-                        1 -> 1560.0
-                        2 -> 2260.0
-                        else -> 2820.0
+                        1 -> 1062.5
+                        2 -> 1140.625
+                        else -> 1203.125
                     }
                 toneSample(index, sampleRateHz, frequency)
             }
@@ -103,8 +103,8 @@ class SymbolEnvelopeVisualizationAnalysisTest {
     @Test
     fun `ultra visualization state omits next bucket at playback tail`() {
         val sampleRateHz = 44_100
-        val frameSamples = 2_205
-        val pcm = buildTonePcm(sampleRateHz = sampleRateHz, sampleCount = frameSamples * 4, frequenciesHz = listOf(2820.0))
+        val frameSamples = 2_822
+        val pcm = buildTonePcm(sampleRateHz = sampleRateHz, sampleCount = frameSamples * 4, frequenciesHz = listOf(1203.125))
 
         val state =
             buildUltraSymbolStepVisualizationState(
@@ -143,8 +143,8 @@ class SymbolEnvelopeVisualizationAnalysisTest {
                                     sampleCount = 10,
                                     frameByteIndex = 0,
                                     nibbleIndexInByte = 0,
-                                    nibbleValue = 15,
-                                    carrierFrequencyHz = 3100f,
+                                    nibbleValue = 8,
+                                    carrierFrequencyHz = 1234.375f,
                                     sectionCode = UltraFrameSection.Preamble.wireValue,
                                     isPayload = false,
                                     payloadByteIndex = -1,
@@ -157,10 +157,10 @@ class SymbolEnvelopeVisualizationAnalysisTest {
             )
 
         assertNotNull(state)
-        assertEquals(3100, state?.currentBucket?.dominantFrequencyHz)
+        assertEquals(1234, state?.currentBucket?.dominantFrequencyHz)
         assertEquals(UltraFrameSection.Preamble, state?.currentBucket?.ultraFrameSection)
         assertFalse(state?.currentBucket?.isUltraPayloadSymbol ?: true)
-        assertEquals(15, state?.currentBucket?.ultraNibbleValue)
+        assertEquals(8, state?.currentBucket?.ultraNibbleValue)
     }
 
     @Test

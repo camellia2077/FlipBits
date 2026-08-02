@@ -51,9 +51,10 @@ struct EncodeOperationStepState {
   std::unique_ptr<flash::FlashChunkRenderer> flash_chunk_renderer;
   std::unique_ptr<flash::FlashVoicingStepper> flash_voicing_stepper;
   flash::FlashVoicingDiagnostics flash_voicing_diagnostics{};
-  std::unique_ptr<pro::SymbolRenderer> pro_symbol_renderer;
-  std::unique_ptr<ultra::SymbolRenderer> ultra_symbol_renderer;
-  std::unique_ptr<mini_mode::ToneUnitRenderer> mini_tone_renderer;
+    std::unique_ptr<pro::SymbolRenderer> pro_symbol_renderer;
+    std::unique_ptr<ultra::SymbolRenderer> ultra_symbol_renderer;
+    double ultra_phase = 0.0;
+    std::unique_ptr<mini_mode::ToneUnitRenderer> mini_tone_renderer;
   pro::DualToneConfig pro_config{};
   ultra::Mfsk16Config ultra_config{};
   mini_mode::MorseToneConfig mini_config{};

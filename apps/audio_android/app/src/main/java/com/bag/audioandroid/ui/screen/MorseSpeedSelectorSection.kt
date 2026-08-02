@@ -26,29 +26,50 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bag.audioandroid.R
 import com.bag.audioandroid.ui.model.MorseSpeedOption
+import com.bag.audioandroid.ui.model.TransportModeOption
 import com.bag.audioandroid.ui.theme.appThemeAccentTokens
 
 @Composable
 internal fun MorseSpeedSelectorSection(
     enabled: Boolean,
+    transportMode: TransportModeOption,
     selectedMorseSpeed: MorseSpeedOption,
     onMorseSpeedSelected: (MorseSpeedOption) -> Unit,
 ) {
     var isSpeedStyleSheetOpen by rememberSaveable { mutableStateOf(false) }
+    val isUltra = transportMode == TransportModeOption.Ultra
+    val availableOptions =
+        if (isUltra) MorseSpeedOption.ultraOptions else MorseSpeedOption.entries
+    val selectedOption =
+        selectedMorseSpeed.takeIf { it in availableOptions } ?: MorseSpeedOption.default
+    val titleResId =
+        if (isUltra) R.string.audio_ultra_speed_title else R.string.audio_mini_speed_style_title
+    val hintResId =
+        if (isUltra) R.string.audio_ultra_speed_hint else R.string.audio_mini_speed_style_hint
+    val selectedLabelResId =
+        if (isUltra) selectedOption.ultraLabelResId else selectedOption.labelResId
+    val actionDescriptionResId =
+        if (isUltra) {
+            R.string.audio_action_select_ultra_speed
+        } else {
+            R.string.audio_action_select_mini_speed_style
+        }
+    val selectorTestTag =
+        if (isUltra) "ultra-speed-style-selector" else "mini-speed-style-selector"
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MorseSpeedEntryRow(
-            title = stringResource(R.string.audio_mini_speed_style_title),
-            value = stringResource(selectedMorseSpeed.labelResId),
-            contentDescription = stringResource(R.string.audio_action_select_mini_speed_style),
-            testTag = "mini-speed-style-selector",
+            title = stringResource(titleResId),
+            value = stringResource(selectedLabelResId),
+            contentDescription = stringResource(actionDescriptionResId),
+            testTag = selectorTestTag,
             enabled = enabled,
             onClick = { isSpeedStyleSheetOpen = true },
         )
         Text(
-            text = stringResource(R.string.audio_mini_speed_style_hint),
+            text = stringResource(hintResId),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -56,7 +77,11 @@ internal fun MorseSpeedSelectorSection(
 
     if (isSpeedStyleSheetOpen) {
         MorseSpeedPickerSheet(
-            selectedStyle = selectedMorseSpeed,
+            titleResId = titleResId,
+            options = availableOptions,
+            selectedStyle = selectedOption,
+            labelFor = { option -> if (isUltra) option.ultraLabelResId else option.labelResId },
+            testTagPrefix = if (isUltra) "ultra-speed-style" else "mini-speed-style",
             onStyleSelected = { option ->
                 onMorseSpeedSelected(option)
                 isSpeedStyleSheetOpen = false

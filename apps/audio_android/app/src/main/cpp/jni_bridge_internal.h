@@ -12,7 +12,9 @@
 namespace jni_bridge {
 
 inline constexpr int kDefaultSampleRateHz = 44100;
-inline constexpr int kDefaultFrameSamples = 2205;
+inline constexpr int kCurrentBaseFramesPerSecond = 20;
+inline constexpr int kDefaultFrameSamples =
+    kDefaultSampleRateHz / kCurrentBaseFramesPerSecond;
 inline constexpr jint kBagErrorOk = 0;
 inline constexpr jint kBagErrorInternal = 4;
 inline constexpr jint kBagErrorEncodedAudioTooLarge = 6;

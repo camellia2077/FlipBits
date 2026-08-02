@@ -536,5 +536,10 @@
     <string name="voice_result_output_track">Output</string>
     <string name="voice_voice_trigger_title">Voice Trigger</string>
     <string name="voice_voice_trigger_summary">Original voice with a flash-style background track that opens only when voice is present.</string>
+    <string name="audio_action_select_ultra_speed">Select MFSK16 speed</string>
+    <string name="audio_ultra_speed_title">MFSK16 speed</string>
+    <string name="audio_ultra_speed_hint">Applies to the next generated audio. Existing generated audio keeps the MFSK16 speed it was created with.</string>
+    <string name="audio_ultra_speed_15_625_bd">15.625 Bd</string>
+    <string name="audio_ultra_speed_31_25_bd">31.25 Bd</string>
 </resources>
 

@@ -126,6 +126,7 @@ internal fun AudioInputActionsCard(
                 if (renderState.selectorState.showMorseSpeedSelector) {
                     MorseSpeedSelectorSection(
                         enabled = renderState.enabled,
+                        transportMode = transportMode,
                         selectedMorseSpeed = selectedMorseSpeed,
                         onMorseSpeedSelected = onMorseSpeedSelected,
                     )
@@ -201,7 +202,9 @@ private fun audioInputActionRenderState(
         selectorState =
             AudioInputActionSelectorState(
                 showFlashVoicingSelector = transportMode == TransportModeOption.Flash,
-                showMorseSpeedSelector = transportMode == TransportModeOption.Mini,
+                showMorseSpeedSelector =
+                    transportMode == TransportModeOption.Mini ||
+                        transportMode == TransportModeOption.Ultra,
             ),
     )
 }

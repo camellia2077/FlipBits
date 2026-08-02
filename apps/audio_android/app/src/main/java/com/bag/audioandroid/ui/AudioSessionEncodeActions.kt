@@ -57,7 +57,7 @@ internal class AudioSessionEncodeActions(
     workerDispatcher: CoroutineDispatcher,
     generatedAudioCacheGateway: GeneratedAudioCacheGateway,
 ) {
-    private val requestFactory = EncodeRequestFactory(frameSamples)
+    private val requestFactory = EncodeRequestFactory(sampleRateHz, frameSamples)
     private val stateReducer =
         EncodeStateReducer(
             uiState = uiState,
@@ -240,6 +240,7 @@ private fun safeLogE(
 }
 
 private class EncodeRequestFactory(
+    private val sampleRateHz: Int,
     private val defaultFrameSamples: Int,
 ) {
     fun build(current: AudioAppUiState): EncodeRequest {
@@ -264,6 +265,8 @@ private class EncodeRequestFactory(
                 frameSamples =
                     if (current.transportMode == TransportModeOption.Mini) {
                         current.selectedMorseSpeed.frameSamples(defaultFrameSamples)
+                    } else if (current.transportMode == TransportModeOption.Ultra) {
+                        current.selectedMorseSpeed.ultraFrameSamples(sampleRateHz)
                     } else {
                         defaultFrameSamples
                     },

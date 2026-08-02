@@ -23,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.LinkedHashSet
 
 internal class AudioSessionDecodeActions(
     private val uiState: MutableStateFlow<AudioAppUiState>,
@@ -141,12 +140,10 @@ internal class AudioSessionDecodeActions(
         )
         val request =
             requestFactory.buildGenerated(
-                current = current,
                 mode = mode,
                 generatedPcm = session.generatedPcm,
                 generatedPcmFilePath = session.generatedPcmFilePath,
                 metadata = session.generatedAudioMetadata,
-                fallbackFlashStyle = current.selectedFlashVoicingStyle,
             )
         launchGeneratedDecode(request)
     }
@@ -222,10 +219,8 @@ internal class AudioSessionDecodeActions(
                     val startedNanos = System.nanoTime()
                     val builtRequest =
                         requestFactory.buildSaved(
-                            current = current,
                             mode = mode,
                             savedAudio = selectedSavedAudio,
-                            fallbackFlashStyle = current.selectedFlashVoicingStyle,
                             onPcmLoadProgress = progressReporter::reportAudioDataLoading,
                         )
                     safeLogE(
@@ -302,6 +297,7 @@ internal class AudioSessionDecodeActions(
 
 private const val LONG_AUDIO_LOG_TAG = "FlipBitsLongAudio"
 private const val SAVED_DECODE_PROGRESS_LOG_TAG = "SavedAudioDecodeProgress"
+private const val AUTO_FRAME_SAMPLES = 0
 
 private fun elapsedMsSince(startedNanos: Long): Long = (System.nanoTime() - startedNanos).coerceAtLeast(0L) / 1_000_000L
 
@@ -321,12 +317,10 @@ private class DecodeRequestFactory(
     private val frameSamples: Int,
 ) {
     fun buildGenerated(
-        current: AudioAppUiState,
         mode: TransportModeOption,
         generatedPcm: ShortArray,
         generatedPcmFilePath: String?,
         metadata: com.bag.audioandroid.domain.GeneratedAudioMetadata?,
-        fallbackFlashStyle: FlashVoicingStyleOption,
     ): DecodeRequest {
         val segmentedPcm =
             when {
@@ -351,23 +345,15 @@ private class DecodeRequestFactory(
             generatedPcm = generatedPcm,
             generatedPcmFilePath = generatedPcmFilePath,
             sampleRateHz = sampleRateHz,
-            frameSamples = metadata?.frameSamples ?: frameSamples,
+            frameSamples = decodeFrameSamples(mode, metadata?.frameSamples),
             segmentedPcm = segmentedPcm,
-            flashPresets =
-                flashPresetCandidates(
-                    mode = mode,
-                    preferred = current.sessions.getValue(mode).generatedFlashVoicingStyle,
-                    fallback = fallbackFlashStyle,
-                ),
-            expectedPayloadByteCount = metadata?.payloadByteCount,
+            flashPreset = FlashVoicingStyleOption.Standard,
         )
     }
 
     fun buildSaved(
-        current: AudioAppUiState,
         mode: TransportModeOption,
         savedAudio: SavedAudioPlaybackSelection,
-        fallbackFlashStyle: FlashVoicingStyleOption,
         onPcmLoadProgress: (completedSamples: Int, totalSamples: Int) -> Unit = { _, _ -> },
     ): DecodeRequest {
         val segmentSampleCounts =
@@ -401,34 +387,28 @@ private class DecodeRequestFactory(
             generatedPcm = savedAudio.pcm,
             generatedPcmFilePath = savedAudio.pcmFilePath,
             sampleRateHz = savedAudio.sampleRateHz,
-            frameSamples = savedAudio.metadata?.frameSamples ?: frameSamples,
+            frameSamples = decodeFrameSamples(mode, savedAudio.metadata?.frameSamples),
             segmentedPcm = segmentedPcm,
             fileBackedSegmentSampleCounts = fileBackedSegmentSampleCounts,
             onPcmLoadProgress = onPcmLoadProgress,
-            flashPresets =
-                flashPresetCandidates(
-                    mode = mode,
-                    preferred = savedAudio.item.flashVoicingStyle,
-                    fallback = fallbackFlashStyle,
-                ),
-            expectedPayloadByteCount = savedAudio.metadata?.payloadByteCount,
+            flashPreset = FlashVoicingStyleOption.Standard,
         )
     }
 
-    private fun flashPresetCandidates(
+    private fun decodeFrameSamples(
         mode: TransportModeOption,
-        preferred: FlashVoicingStyleOption?,
-        fallback: FlashVoicingStyleOption,
-    ): List<FlashVoicingStyleOption> {
-        if (mode != TransportModeOption.Flash) {
-            return listOf(FlashVoicingStyleOption.Standard)
-        }
-        val ordered = LinkedHashSet<FlashVoicingStyleOption>()
-        preferred?.let(ordered::add)
-        ordered += fallback
-        ordered += FlashVoicingStyleOption.entries
-        return ordered.toList()
-    }
+        metadataFrameSamples: Int?,
+    ): Int =
+        metadataFrameSamples
+            ?: if (mode == TransportModeOption.Mini ||
+                mode == TransportModeOption.Flash ||
+                mode == TransportModeOption.Pro ||
+                mode == TransportModeOption.Ultra
+            ) {
+                AUTO_FRAME_SAMPLES
+            } else {
+                frameSamples
+            }
 }
 
 private class DecodeRunner(
@@ -456,14 +436,14 @@ private class DecodeRunner(
                     request.sampleRateHz,
                     request.frameSamples,
                     request.mode.nativeValue,
-                    request.flashPresets.first().signalProfileValue,
-                    request.flashPresets.first().voicingFlavorValue,
+                    request.flashPreset.signalProfileValue,
+                    request.flashPreset.voicingFlavorValue,
                 )
             if (validationIssue != BagApiCodes.VALIDATION_OK) {
                 return@withContext DecodeResult.ValidationFailure(validationIssue)
             }
 
-            val decoded = decodeWithFallback(request, onProgress)
+            val decoded = decodeWithPreset(request, request.flashPreset, onProgress)
             val decodedText = decoded.decodedPayload.text
             safeLogE(
                 LONG_AUDIO_LOG_TAG,
@@ -479,35 +459,6 @@ private class DecodeRunner(
 
             DecodeResult.Success(decoded)
         }
-
-    private suspend fun decodeWithFallback(
-        request: DecodeRequest,
-        onProgress: (DecodeProgressUpdate) -> Unit,
-    ): DecodedAudioPayloadResult {
-        if (request.mode != TransportModeOption.Flash) {
-            return decodeWithPreset(request, request.flashPresets.first(), onProgress)
-        }
-        val attempts = mutableListOf<DecodeAttempt>()
-        request.flashPresets.forEach { preset ->
-            safeLogE(
-                LONG_AUDIO_LOG_TAG,
-                "decodeRunner:attempt mode=${request.mode.wireName} preset=${preset.id} expectedPayloadBytes=${request.expectedPayloadByteCount ?: -1}",
-            )
-            val attempt =
-                DecodeAttempt(
-                    preset = preset,
-                    result = decodeWithPreset(request, preset, onProgress),
-                )
-            attempts += attempt
-            if (isStrongDecodeMatch(attempt, request.expectedPayloadByteCount)) {
-                return attempt.result
-            }
-        }
-        return attempts
-            .maxWithOrNull(compareBy<DecodeAttempt> { scoreDecodeAttempt(it, request.expectedPayloadByteCount) })
-            ?.result
-            ?: decodeWithPreset(request, FlashVoicingStyleOption.Standard, onProgress)
-    }
 
     private suspend fun decodeWithPreset(
         request: DecodeRequest,
@@ -614,53 +565,6 @@ private class DecodeRunner(
                 ),
             )
         }
-
-    private fun scoreDecodeAttempt(
-        attempt: DecodeAttempt,
-        expectedPayloadByteCount: Int?,
-    ): Int {
-        val payloadByteCount =
-            attempt.result.decodedPayload.rawBytesHex
-                .split(' ')
-                .filter { it.isNotBlank() }
-                .size
-        val payloadMatchBonus =
-            if (expectedPayloadByteCount != null && payloadByteCount == expectedPayloadByteCount) {
-                100
-            } else {
-                0
-            }
-        val textBonus =
-            if (attempt.result.decodedPayload.hasTextResult) {
-                10
-            } else {
-                0
-            }
-        val rawBonus =
-            if (attempt.result.decodedPayload.rawPayloadAvailable) {
-                1
-            } else {
-                0
-            }
-        return payloadMatchBonus + textBonus + rawBonus
-    }
-
-    private fun isStrongDecodeMatch(
-        attempt: DecodeAttempt,
-        expectedPayloadByteCount: Int?,
-    ): Boolean {
-        if (!attempt.result.decodedPayload.hasTextResult) {
-            return false
-        }
-        if (expectedPayloadByteCount == null) {
-            return true
-        }
-        val payloadByteCount =
-            attempt.result.decodedPayload.rawBytesHex
-                .split(' ')
-                .count { it.isNotBlank() }
-        return payloadByteCount == expectedPayloadByteCount
-    }
 }
 
 private class DecodeStateReducer(
@@ -892,11 +796,10 @@ private data class DecodeRequest(
     val generatedPcmFilePath: String? = null,
     val sampleRateHz: Int,
     val frameSamples: Int,
-    val flashPresets: List<FlashVoicingStyleOption>,
+    val flashPreset: FlashVoicingStyleOption,
     val segmentedPcm: List<ShortArray>? = null,
     val fileBackedSegmentSampleCounts: List<Int>? = null,
     val onPcmLoadProgress: (completedSamples: Int, totalSamples: Int) -> Unit = { _, _ -> },
-    val expectedPayloadByteCount: Int? = null,
 ) {
     val segmentCount: Int
         get() = segmentedPcm?.size ?: fileBackedSegmentSampleCounts?.size ?: 0
@@ -904,11 +807,6 @@ private data class DecodeRequest(
     val totalFileBackedSamples: Int
         get() = fileBackedSegmentSampleCounts?.sum() ?: 0
 }
-
-private data class DecodeAttempt(
-    val preset: FlashVoicingStyleOption,
-    val result: DecodedAudioPayloadResult,
-)
 
 private sealed interface DecodeResult {
     data class ValidationFailure(
