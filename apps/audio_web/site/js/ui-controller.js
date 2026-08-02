@@ -55,6 +55,7 @@ export class UiController {
       "flashStyleDescriptionLabel",
     );
     this.elements.miniSpeedLabel.textContent = copy.miniSpeedLabel;
+    this.elements.ultraSpeedLabel.textContent = copy.ultraSpeedLabel;
     this.elements.generateButton.textContent = copy.generateButton;
     this.elements.dataPreviewTitle.textContent = getTranslation(this.currentLocale, "data.previewTitle");
     this.elements.voiceFxTitle.textContent = getTranslation(this.currentLocale, "voiceFx.title");

@@ -13,6 +13,7 @@ function checkedValue(inputs, fallbackValue = "") {
 export function syncModeFields(elements, ui, mode) {
   setFieldVisibility(elements.flashStyleField, mode === "flash");
   setFieldVisibility(elements.miniSpeedField, mode === "mini");
+  setFieldVisibility(elements.ultraSpeedField, mode === "ultra");
   ui.setInputHint(mode);
 }
 
@@ -31,13 +32,15 @@ export function sanitizeModeText(elements, mode) {
 
 export function readEncodeRequest(elements, mode, sampleRateHz = DEFAULT_SAMPLE_RATE_HZ) {
   const miniSpeed = checkedValue(elements.miniSpeedInputs, "wpm15");
+  const ultraSpeed = checkedValue(elements.ultraSpeedInputs, "bd15_625");
   return {
     text: elements.inputText.value,
     mode,
     flashStyle: checkedValue(elements.flashStyleInputs, "standard"),
     miniSpeed,
+    ultraSpeed,
     sampleRateHz,
-    frameSamples: resolveFrameSamples(mode, miniSpeed, sampleRateHz),
+    frameSamples: resolveFrameSamples(mode, miniSpeed, ultraSpeed, sampleRateHz),
   };
 }
 

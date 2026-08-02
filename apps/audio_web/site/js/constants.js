@@ -11,7 +11,7 @@ export const MODE_OPTIONS = [
   { value: "mini", label: "mini: Morse code" },
   { value: "flash", label: "flash: Bit-by-bit BFSK" },
   { value: "pro", label: "pro: DTMF-like dual-tone mapping" },
-  { value: "ultra", label: "ultra: 16-FSK" },
+  { value: "ultra", label: "ultra: MFSK16" },
 ];
 
 export const FLASH_STYLE_OPTIONS = [

@@ -100,7 +100,7 @@
                 </article>
                 <article id="mode-card-ultra" class="mode-card" data-mode-card="ultra" role="button" tabindex="0">
                   <span class="mode-card-kicker">ultra</span>
-                  <p id="mode-card-copy-ultra" class="mode-card-copy">Dense 16-FSK tones for faster, shorter audio. Best when you want compact transmission.</p>
+                  <p id="mode-card-copy-ultra" class="mode-card-copy">MFSK16 tones at 15.625 Bd for compact, clear audio transmission.</p>
                 </article>
               </div>
 
@@ -132,6 +132,13 @@
                           <label class="option-tile"><input id="mini-speed-wpm10" name="mini-speed" type="radio" value="wpm10" /><span>10 WPM</span></label>
                           <label class="option-tile"><input id="mini-speed-wpm15" name="mini-speed" type="radio" value="wpm15" checked /><span>15 WPM</span></label>
                           <label class="option-tile"><input id="mini-speed-wpm20" name="mini-speed" type="radio" value="wpm20" /><span>20 WPM</span></label>
+                        </div>
+                      </fieldset>
+
+                      <fieldset class="field option-field" id="ultra-speed-field" hidden>
+                        <legend id="ultra-speed-label">MFSK16 Speed</legend>
+                        <div class="option-grid option-grid-ultra" role="radiogroup" aria-labelledby="ultra-speed-label">
+                          <label class="option-tile"><input id="ultra-speed-15-625-bd" name="ultra-speed" type="radio" value="bd15_625" checked /><span>15.625 Bd</span></label>
                         </div>
                       </fieldset>
                     </div>

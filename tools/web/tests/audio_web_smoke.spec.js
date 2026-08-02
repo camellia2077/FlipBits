@@ -143,6 +143,12 @@ test.describe("audio_web static app", () => {
     await expect(page.locator("#mode-card-flash")).toHaveClass(/is-active/);
     await expect(page.locator("#flash-style-field")).toBeVisible();
     await expect(page.locator("#mini-speed-field")).toBeHidden();
+
+    await page.locator("#mode-card-ultra").click();
+    await expect(page.locator("#ultra-speed-field")).toBeVisible();
+    await expect(page.locator("#ultra-speed-15-625-bd")).toBeChecked();
+    await expect(page.locator("#ultra-speed-15-625-bd + span")).toHaveText("15.625 Bd");
+    await expect(page.locator("#flash-style-field")).toBeHidden();
     await expect(page.locator("#voice-fx-file-name")).not.toBeEmpty();
   });
 

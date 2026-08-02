@@ -74,7 +74,7 @@
 ## Cross-Project Pointers
 
 - Web sample 文本来源于 Android XML；如果要改 sample key、`short/long` 语义或 sample text workflow，统一去看：
-  - `.agent/workflows/translations/android-sample-text.md`
+  - `agents/workflows/translations/android-sample-text.md`
   - `apps/audio_android/AGENTS.md`
 - GitHub Pages workflow 入口在：
   - `.github/workflows/deploy-pages-demo.yml`

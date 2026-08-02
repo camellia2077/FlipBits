@@ -344,6 +344,10 @@ body {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.option-grid-ultra {
+  grid-template-columns: minmax(140px, 220px);
+}
+
 .option-grid-flash {
   grid-template-columns: repeat(3, minmax(84px, 1fr));
   align-items: stretch;
