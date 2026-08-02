@@ -55,5 +55,5 @@ python tools/run.py history validate docs/history/presentation/android
 - 如果需要把上下文拆给 agent 分块读取，可配合 `--out-dir` 与 `--split-by bucket` 写到根目录 `temp/`。
 - `history validate` 只负责结构与硬规则，不负责判断文案质量。
 - 更完整的 agent 工作流说明见：
-  - `.agent/workflows/docs/history-style-guide.md`
+  - `agents/workflows/docs/history-style-guide.md`
   - `docs/notes/message-workflow.md`

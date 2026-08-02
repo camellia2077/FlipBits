@@ -131,13 +131,11 @@
   - `libs/audio_core/src/ultra/codec.cpp`
   - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
   - `libs/audio_core/src/ultra/phy_clean.cpp`
-  - `libs/audio_core/modules/bag/ultra/phy_compat.cppm`
-  - `libs/audio_core/src/ultra/phy_compat.cpp`
 - 当前语义：
   - UTF-8 payload
-  - `Ultra clean frame v1`: `preamble | sync | version | flags | payload_length | payload | crc16`
-  - frame byte -> nibble -> clean `16-FSK`
-  - Text follow / Binary / Hex 正文语义只覆盖 payload，不把 frame metadata 当成用户文本
+  - MFSK16：固定 `15.625 Bd`、16 tones、15.625 Hz spacing、Gray mapping
+  - Varicode -> convolutional FEC -> diagonal interleaver -> continuous-phase MFSK
+  - Text follow / Binary / Hex 正文语义只覆盖 payload，不把 preamble/tail 当成用户文本
 
 ### `mini`
 - 先看：

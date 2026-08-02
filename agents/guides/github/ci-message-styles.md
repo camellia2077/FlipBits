@@ -8,7 +8,7 @@ description: Agent 专用 CI / tooling / libs 提交消息写法
 
 - `.github/workflows/**`
 - `tools/**`
-- `.agent/**` 中与 repo workflow 直接相关的规则
+- `agents/**` 中与 repo workflow 直接相关的规则
 - `libs/**` 中以基础设施、构建、验证、边界收口为主的工程改动
 
 它不是仓库 CI 地图；CI 当前职责与触发范围统一看：

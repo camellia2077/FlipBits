@@ -14,7 +14,7 @@
 项目内实际使用说明统一看：
 
 - 项目入口： [apps/audio_android/AGENTS.md](../../../../apps/audio_android/AGENTS.md)
-- workflow 入口： [.agent/workflows/translations/README.md](../../../../.agent/workflows/translations/README.md)
+- workflow 入口： [agents/workflows/translations/README.md](../../../../agents/workflows/translations/README.md)
 - 项目级命令说明： [docs/design/android/translation/README.md](../../../../docs/design/android/translation/README.md)
 
 ## Start Here

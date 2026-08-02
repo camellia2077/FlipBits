@@ -161,32 +161,40 @@ bool PumpPrepareUltra(const CoreConfig& config, const std::string& text,
   }
   if (state->prepare_substage ==
       EncodeOperationPrepareSubstage::kLayoutOrFrame) {
-    if (ultra::EncodePayloadToFrame(state->raw_payload_bytes,
-                                    &state->frame_bytes) != ErrorCode::kOk) {
-      host->MarkFailed(ErrorCode::kInvalidArgument);
-      return false;
-    }
+    state->frame_bytes = state->raw_payload_bytes;
     state->prepare_completed_units = std::max<std::uint64_t>(
         state->prepare_completed_units + 1,
         std::min<std::uint64_t>(
             work_plan->preparing_input_work_units,
-            std::max<std::size_t>(state->frame_bytes.size(), 1)));
+            std::max<std::size_t>(state->raw_payload_bytes.size(), 1)));
     host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
                               state->prepare_completed_units);
     state->prepare_substage = EncodeOperationPrepareSubstage::kSymbols;
     return true;
   }
   if (state->prepare_substage == EncodeOperationPrepareSubstage::kSymbols) {
+    state->ultra_config = ultra::MakeMfsk16Config(config);
     if (ultra::EncodePayloadToSymbols(
-            state->frame_bytes, &state->render_symbols) != ErrorCode::kOk) {
+            state->raw_payload_bytes, state->ultra_config,
+            &state->render_symbols) != ErrorCode::kOk) {
       host->MarkFailed(ErrorCode::kInvalidArgument);
       return false;
     }
-    state->ultra_config = ultra::MakeMfsk16Config(config);
-    state->stage_pcm.assign(state->render_symbols.size() *
-                                static_cast<std::size_t>(std::max(
-                                    state->ultra_config.symbol_samples, 0)),
-                            0);
+    const std::size_t total_sample_count = ultra::TotalSamplesForSymbols(
+        state->ultra_config.sample_rate_hz, state->render_symbols.size(),
+        state->ultra_config.symbol_rate_baud);
+    if (!state->render_symbols.empty() && total_sample_count == 0) {
+      host->MarkFailed(ErrorCode::kInvalidArgument);
+      return false;
+    }
+    state->stage_pcm.assign(total_sample_count, 0);
+    work_plan->rendering_pcm_work_units =
+        std::max<std::size_t>(total_sample_count, 1);
+    work_plan->estimated_pcm_sample_count = total_sample_count;
+    work_plan->total_work_units =
+        work_plan->preparing_input_work_units +
+        work_plan->rendering_pcm_work_units +
+        work_plan->finalizing_work_units;
     state->prepare_completed_units = work_plan->preparing_input_work_units;
     host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
                               state->prepare_completed_units);
@@ -318,13 +326,21 @@ bool PumpRenderUltra(const EncodeWorkPlan& work_plan,
     return true;
   }
   const std::uint8_t symbol = state->render_symbols[state->render_index];
-  const std::size_t write_offset =
-      state->render_index *
-      static_cast<std::size_t>(state->ultra_config.symbol_samples);
+  const std::size_t write_offset = ultra::SymbolBoundarySample(
+      state->ultra_config.sample_rate_hz, state->render_index,
+      state->ultra_config.symbol_rate_baud);
+  const std::size_t next_boundary = ultra::SymbolBoundarySample(
+      state->ultra_config.sample_rate_hz, state->render_index + 1U,
+      state->ultra_config.symbol_rate_baud);
+  if (next_boundary <= write_offset) {
+    host->MarkFailed(ErrorCode::kInvalidArgument);
+    return false;
+  }
   if (state->ultra_symbol_renderer == nullptr) {
     try {
       state->ultra_symbol_renderer = std::make_unique<ultra::SymbolRenderer>(
-          symbol, write_offset, state->ultra_config, &state->stage_pcm);
+          symbol, write_offset, state->ultra_config, &state->stage_pcm,
+          next_boundary - write_offset, state->ultra_phase);
     } catch (const std::invalid_argument&) {
       host->MarkFailed(ErrorCode::kInvalidArgument);
       return false;
@@ -338,6 +354,7 @@ bool PumpRenderUltra(const EncodeWorkPlan& work_plan,
   host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
                             state->render_completed_units);
   if (progress.finished || state->ultra_symbol_renderer->Finished()) {
+    state->ultra_phase = state->ultra_symbol_renderer->FinalPhase();
     state->ultra_symbol_renderer.reset();
     ++state->render_index;
   }

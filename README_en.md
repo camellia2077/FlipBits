@@ -148,4 +148,4 @@ For the fuller distribution notice, trademark boundaries, and icon usage notes, 
 - Live demo: [`FlipBits Pages`](https://camellia2077.github.io/FlipBits/)
 - APK: published through GitHub Releases
 
-If you are a developer or AI / agent, start from [`.agent/AGENTS.md`](.agent/AGENTS.md). Android, CLI, and libs build/test/editing conventions now live in their subsystem `AGENTS.md` files instead of being expanded in this public README.
+If you are a developer or AI / agent, start from [`agents/AGENTS.md`](agents/AGENTS.md). Android, CLI, and libs build/test/editing conventions now live in their subsystem `AGENTS.md` files instead of being expanded in this public README.

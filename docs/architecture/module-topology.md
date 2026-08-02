@@ -49,7 +49,6 @@
 - `bag.pro.phy_clean`
 - `bag.pro.phy_compat`
 - `bag.ultra.phy_clean`
-- `bag.ultra.phy_compat`
 
 ### Layer 4：汇聚层
 - `bag.transport.facade`
@@ -138,7 +137,6 @@
   - `libs/audio_core/modules/bag/pro/phy_compat.cppm`
   - `libs/audio_core/modules/bag/ultra/codec.cppm`
   - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
-  - `libs/audio_core/modules/bag/ultra/phy_compat.cppm`
   - `libs/audio_core/modules/bag/mini/codec.cppm`
   - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
   - `libs/audio_core/modules/bag/transport/compat/frame_codec.cppm`

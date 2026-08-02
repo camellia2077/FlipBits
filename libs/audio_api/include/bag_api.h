@@ -92,6 +92,8 @@ typedef struct bag_encoder_config {
 
 typedef struct bag_decoder_config {
   int sample_rate_hz;
+  // Decoder-only auto-timing sentinel. When zero, the selected transport may
+  // resolve timing from the PCM; encoders still require a positive value.
   int frame_samples;
   int enable_diagnostics;
   bag_transport_mode mode;
@@ -147,7 +149,7 @@ typedef enum bag_ultra_frame_section {
   BAG_ULTRA_FRAME_SECTION_FLAGS = 3,
   BAG_ULTRA_FRAME_SECTION_PAYLOAD_LENGTH = 4,
   BAG_ULTRA_FRAME_SECTION_PAYLOAD = 5,
-  BAG_ULTRA_FRAME_SECTION_CRC16 = 6
+  BAG_ULTRA_FRAME_SECTION_TAIL = 6
 } bag_ultra_frame_section;
 
 typedef struct bag_ultra_frame_symbol_entry {

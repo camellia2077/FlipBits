@@ -8,7 +8,7 @@ description: Agent 专用 tools-history 工作流
 
 ## Default Workflow
 
-1. 检查 `tools/`、`.agent/`、`docs/notes/` 的改动。
+1. 检查 `tools/`、`agents/`、`docs/notes/` 的改动。
 2. 判断是否改变了命令入口、默认工作流、校验口径、agent 使用路径。
 3. 若值得沉淀，写入 `docs/tools/history/YYYY-MM-DD.md`。
 4. 同一天多轮改动合并到同一文件。
@@ -20,7 +20,7 @@ description: Agent 专用 tools-history 工作流
 - `tools/repo_tooling/` 架构或路径变化。
 - `history`/`message`/`file-name` 等 agent workflow 变化。
 - `verify`/policy/validate/artifact/Android build orchestration 体验变化。
-- `.agent` 下与 repo workflow 直接相关的正式规则变化。
+- `agents/` 下与 repo workflow 直接相关的正式规则变化。
 
 不适合写入：
 - 纯产品功能变化且 tooling 无可感知变化。
@@ -52,7 +52,7 @@ description: Agent 专用 tools-history 工作流
 - 若仅内部搬家且入口不变，谨慎落盘。
 - 变更默认入口/输出路径/工作流/验证方式时，写清旧口径与新口径。
 - 变更 `history prep` 这类 agent workflow 命令时，写清推荐调用方式，例如 `history prep --format markdown --scope <repo-path> --target <history-file.md>`。
-- 同时改 `tools/` 与 `.agent`/`docs/notes/` 时，按“工具入口 -> 工作流 -> 规则口径”归纳。
+- 同时改 `tools/` 与 `agents/`/`docs/notes/` 时，按“工具入口 -> 工作流 -> 规则口径”归纳。
 
 ## Usage Note
 

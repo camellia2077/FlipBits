@@ -55,7 +55,7 @@ def render_result(result: FileNamePrepResult) -> str:
     sections.extend(_render_candidate_files(result))
     sections.append("")
     sections.append("## Suggested Reading")
-    sections.append("- `.agent/guides/file-name-styles.md`")
+    sections.append("- `agents/guides/file-name-styles.md`")
     if result.candidates:
         for candidate in result.candidates:
             sections.extend(_render_suggested_reading(candidate))

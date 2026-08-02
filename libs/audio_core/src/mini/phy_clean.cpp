@@ -13,4 +13,5 @@ module bag.mini.phy_clean;
 import bag.mini.codec;
 import bag.transport.follow;
 
+// Mini decode also supports the first-stage auto speed contract and element gaps.
 #include "phy_clean_impl.inc"

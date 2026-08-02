@@ -10,4 +10,6 @@ import std;
 
 module bag.transport.encode_work_plan;
 
+import bag.ultra.phy_clean;
+
 #include "encode_work_plan_impl.inc"

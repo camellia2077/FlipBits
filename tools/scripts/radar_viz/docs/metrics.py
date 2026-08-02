@@ -31,7 +31,7 @@ RAW_DATA = {
     "Mini":     {"fs": 5.0,    "bps": 0.25, "charset": 40,  "silence": 4, "jitter": 0, "dtmf": 0},  # Morse，低单符密度
     # 高阶协议
     "Pro":      {"fs": 1.5,    "bps": 4,    "charset": 128, "silence": 0, "jitter": 0, "dtmf": 6},  # DTMF 双频抗干扰
-    "Ultra":    {"fs": 0.5,    "bps": 4,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},  # 16-FSK
+    "Ultra":    {"fs": 0.5,    "bps": 4,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0},  # MFSK16
 }
 
 

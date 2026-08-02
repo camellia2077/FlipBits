@@ -152,6 +152,40 @@ void TestFormalLitanyDecodesWithConfiguredTrim() {
     test::AssertEq(decoded_text, std::string("Decode"), "configured litany decode should roundtrip text.");
 }
 
+void TestExplicitDecodeRejectsInvalidFlashSelection() {
+    const auto config = MakeCoreConfig();
+    std::vector<std::int16_t> pcm;
+    const auto encode_code = bag::flash::EncodeTextToPcm16(
+        config,
+        "InvalidSelection",
+        &pcm);
+    test::AssertEq(encode_code, bag::ErrorCode::kOk, "invalid-selection fixture encode should succeed.");
+
+    std::string decoded_text;
+    const auto invalid_profile_code =
+        bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
+            config,
+            pcm,
+            static_cast<bag::FlashSignalProfile>(99),
+            bag::FlashVoicingFlavor::kStandard,
+            &decoded_text);
+    const auto invalid_flavor_code =
+        bag::flash::DecodePcm16ToTextWithSignalProfileAndFlavor(
+            config,
+            pcm,
+            bag::FlashSignalProfile::kStandard,
+            static_cast<bag::FlashVoicingFlavor>(99),
+            &decoded_text);
+    test::AssertEq(
+        invalid_profile_code,
+        bag::ErrorCode::kInvalidArgument,
+        "explicit decode should reject an invalid signal profile before normalization.");
+    test::AssertEq(
+        invalid_flavor_code,
+        bag::ErrorCode::kInvalidArgument,
+        "explicit decode should reject an invalid voicing flavor before normalization.");
+}
+
 void TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor() {
     const auto config = MakeAndroidSizedCoreConfig();
     const auto signal_profile = bag::FlashSignalProfile::kStandard;
@@ -325,6 +359,8 @@ void RegisterFlashVoicingFormalTests(test::Runner& runner) {
                TestFormalLitanyHasLongerShellThanStandard);
     runner.Add("FlashVoicing.FormalLitanyDecodesWithConfiguredTrim",
                TestFormalLitanyDecodesWithConfiguredTrim);
+    runner.Add("FlashVoicing.ExplicitDecodeRejectsInvalidFlashSelection",
+               TestExplicitDecodeRejectsInvalidFlashSelection);
     runner.Add("FlashVoicing.ExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor",
                TestExplicitSignalProfileDecouplesPayloadTimingFromVoicingFlavor);
     runner.Add("FlashVoicing.ExplicitSignalProfileAndFlavorMatchDefaultExplicitPath",

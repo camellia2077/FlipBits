@@ -13,4 +13,5 @@ module bag.pro.phy_clean;
 import bag.pro.codec;
 import bag.transport.follow;
 
+// Pro decode also supports the current fixed-timing auto sentinel.
 #include "phy_clean_impl.inc"

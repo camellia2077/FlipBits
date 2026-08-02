@@ -3,15 +3,15 @@
 更新时间：2026-05-21
 
 ## 定位
-Multi-tone FSK 是未来计划加入的高速传输模式，不是当前 `ultra` 的替代实现。
+Multi-tone FSK 是独立于当前 `ultra` MFSK16 的未来高速传输模式，不是当前协议的替代实现。
 
 它的目标是在近距离、低干扰、设备频响相对稳定的环境下提高数据吞吐量。它可以使用更多并行 tone、更多 bits per symbol，或更短 symbol duration 来换速度；这些选择天然会降低抗混响、抗窄带干扰、抗设备频响凹陷和复杂声学拓扑的余量。
 
 ## 和 `ultra` 的关系
-- `ultra` 当前使用 clean `16-FSK`，定位是低速、清晰、可视化友好、参数保守。
+- `ultra` 当前使用真实 MFSK16：固定 `15.625 Bd`、16 tones、15.625 Hz spacing，定位是低速、清晰、可视化友好、参数保守。
 - Multi-tone FSK 的定位是更高吞吐量，适合近距离、低干扰环境。
 - 两者不是同一协议的参数档位；应作为不同 mode 或明确不同 profile 管理。
-- `ultra` 的 clean frame v1 可以作为 frame / CRC / payload boundary 的参考，但 Multi-tone FSK 不应默认复用 `ultra` 的全部 PHY 参数。
+- `ultra` 的 MFSK16 Varicode/FEC/interleaver/tail 可以作为独立协议参考，但 Multi-tone FSK 不应默认复用 `ultra` 的全部 PHY 参数。
 
 ## 设计取舍
 Multi-tone FSK 可以从以下方向提高速度：
@@ -32,20 +32,20 @@ Multi-tone FSK 可以从以下方向提高速度：
 ## 非目标
 - 不以长距离、高混响、多路径、强噪声或复杂声学拓扑作为主目标。
 - 不承诺兼容外部 MFSK 标准。
-- 不在当前阶段替换 `ultra` clean `16-FSK` baseline。
-- 不为了速度牺牲 frame boundary、CRC 和可验证 decode 结果。
+- 不在当前阶段替换 `ultra` MFSK16 baseline。
+- 不为了速度牺牲协议边界和可验证 decode 结果。
 
 ## 建议协议方向
 正式实现前应先定义独立 baseline，而不是直接把 `ultra` 参数改快：
 
 - 明确 mode/profile 名称。
-- 明确 frame layout 是否复用 `Ultra clean frame v1` 的字段语义，或定义新 frame version。
+- 明确是否复用 MFSK16 的 Varicode/FEC 语义，或定义独立的信息层。
 - 明确 symbol duration、tone table、tone spacing、并行 tone 数量和组合映射。
 - 明确 visual timeline：Android 不应猜测并行 tone 的语义，应由 libs 提供 frame section、symbol group 和 payload byte range。
 - 明确 decode failure 行为：CRC 或 frame validation 失败时不输出不可信 payload。
 
 ## 推荐推进顺序
-1. 保持 `ultra` 作为 clean `16-FSK` 稳定基线。
+1. 保持 `ultra` 作为真实 MFSK16 `15.625 Bd` 稳定基线。
 2. 在文档中先定义 Multi-tone FSK baseline 和可视化契约。
 3. 在 libs 中实现独立 codec / PHY / tests。
 4. 再接 Android visual 和 token follow，不让 Android 反推协议细节。

@@ -7,6 +7,7 @@ import bag.flash.voicing;
 import bag.pro.codec;
 import bag.transport.compat.frame_codec;
 import bag.ultra.codec;
+import bag.ultra.phy_clean;
 
 #include "leaf_module_smoke_support.h"
 
@@ -103,98 +104,84 @@ void TestUltraCodecModule() {
         bag::ErrorCode::kOk,
         "Ultra codec module should encode UTF-8 payload.");
 
-    std::vector<std::uint8_t> frame;
+    std::vector<std::uint8_t> bits;
     test::AssertEq(
-        bag::ultra::EncodePayloadToFrame(payload, &frame),
+        bag::ultra::EncodePayloadToVaricodeBits(payload, &bits),
         bag::ErrorCode::kOk,
-        "Ultra codec module should encode payload into a clean frame.");
-    const std::vector<std::uint8_t> expected_prefix = {
-        0xA5, 0x5A, 0xA5, 0x5A, 0xA5, 0x5A, 0xA5, 0x5A, 0xD3, 0x91,
-        0x01, 0x00};
-    test::AssertTrue(
-        frame.size() == payload.size() + bag::ultra::kCleanFrameV1FixedByteCount,
-        "Ultra clean frame should add fixed v1 metadata and CRC bytes.");
-    const std::vector<std::uint8_t> actual_prefix(
-        frame.begin(), frame.begin() + static_cast<std::ptrdiff_t>(expected_prefix.size()));
-    test::AssertTrue(
-        actual_prefix == expected_prefix,
-        "Ultra clean frame should start with preamble, sync, version, and flags.");
-    test::AssertEq(
-        frame[12],
-        static_cast<std::uint8_t>((payload.size() >> 24) & 0xFFu),
-        "Ultra clean frame length byte 0 should be big-endian.");
-    test::AssertEq(
-        frame[13],
-        static_cast<std::uint8_t>((payload.size() >> 16) & 0xFFu),
-        "Ultra clean frame length byte 1 should be big-endian.");
-    test::AssertEq(
-        frame[14],
-        static_cast<std::uint8_t>((payload.size() >> 8) & 0xFFu),
-        "Ultra clean frame length byte 2 should be big-endian.");
-    test::AssertEq(
-        frame[15],
-        static_cast<std::uint8_t>(payload.size() & 0xFFu),
-        "Ultra clean frame length byte 3 should be big-endian.");
-    const std::vector<std::uint8_t> actual_payload(
-        frame.begin() + static_cast<std::ptrdiff_t>(16),
-        frame.begin() + static_cast<std::ptrdiff_t>(16 + payload.size()));
-    test::AssertTrue(
-        actual_payload == payload,
-        "Ultra clean frame should keep UTF-8 payload after the v1 header.");
-    std::vector<std::uint8_t> decoded_frame_payload;
-    test::AssertEq(
-        bag::ultra::DecodeFrameToPayload(frame, &decoded_frame_payload),
-        bag::ErrorCode::kOk,
-        "Ultra codec module should decode a valid clean frame.");
-    test::AssertEq(
-        decoded_frame_payload,
-        payload,
-        "Ultra codec module should extract only payload bytes from a clean frame.");
-
-    std::vector<std::uint8_t> bad_frame = frame;
-    bad_frame[0] ^= 0xFF;
-    test::AssertEq(
-        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
-        bag::ErrorCode::kInvalidArgument,
-        "Ultra codec module should reject a bad clean frame preamble.");
-    bad_frame = frame;
-    bad_frame[10] = 0x02;
-    test::AssertEq(
-        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
-        bag::ErrorCode::kInvalidArgument,
-        "Ultra codec module should reject an unsupported clean frame version.");
-    bad_frame = frame;
-    bad_frame[15] ^= 0x01;
-    test::AssertEq(
-        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
-        bag::ErrorCode::kInvalidArgument,
-        "Ultra codec module should reject a mismatched clean frame payload length.");
-    bad_frame = frame;
-    bad_frame[frame.size() - 1] ^= 0x01;
-    test::AssertEq(
-        bag::ultra::DecodeFrameToPayload(bad_frame, &decoded_frame_payload),
-        bag::ErrorCode::kInvalidArgument,
-        "Ultra codec module should reject a bad clean frame CRC.");
-
-    std::vector<std::uint8_t> symbols;
-    test::AssertEq(
-        bag::ultra::EncodePayloadToSymbols(payload, &symbols),
-        bag::ErrorCode::kOk,
-        "Ultra codec module should encode payload symbols.");
+        "Ultra codec module should encode MFSK16 Varicode bits.");
 
     std::vector<std::uint8_t> decoded_payload;
     test::AssertEq(
-        bag::ultra::DecodeSymbolsToPayload(symbols, &decoded_payload),
+        bag::ultra::DecodeVaricodeBits(bits, &decoded_payload),
         bag::ErrorCode::kOk,
-        "Ultra codec module should decode symbols back to payload.");
-    test::AssertEq(decoded_payload, payload, "Ultra codec module should roundtrip payload symbols.");
+        "Ultra codec module should decode MFSK16 Varicode bits.");
+    test::AssertEq(decoded_payload, payload, "Ultra Varicode should roundtrip payload.");
 
     std::string decoded;
     test::AssertEq(
         bag::ultra::DecodePayloadToText(decoded_payload, &decoded),
         bag::ErrorCode::kOk,
-        "Ultra codec module should decode UTF-8 payload.");
+        "Ultra codec module should decode UTF-8 payload bytes.");
     test::AssertEq(decoded, text, "Ultra codec module should roundtrip UTF-8 text.");
+}
+
+void TestUltraMfsk16StandardVectors() {
+    // These expectations were calculated independently from the IZ8BLY table
+    // and the MFSK16 NASA K=7 encoder/interleaver. Do not derive them from the
+    // production encoder in this test: the purpose is to catch symmetric bugs
+    // in the encode/decode round-trip.
+    // Reference: https://www.qsl.net/zl1bpu/MFSK/Varicode.htm
+    const std::vector<std::uint8_t> payload = {'A', ' ', 'e'};
+    const std::vector<std::uint8_t> expected_varicode_bits = {
+        1, 0, 1, 1, 1, 1, 0, 0,  // A: 10111100
+        1, 0, 0,                    // space: 100
+        1, 0, 0, 0,                 // e: 1000
+        1                            // finite-record look-ahead bit
+    };
+
+    std::vector<std::uint8_t> actual_varicode_bits;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToVaricodeBits(payload,
+                                                &actual_varicode_bits),
+        bag::ErrorCode::kOk,
+        "Ultra MFSK16 vector Varicode encoding should succeed.");
+    test::AssertEq(
+        actual_varicode_bits, expected_varicode_bits,
+        "Ultra MFSK16 Varicode bits should match the independent standard vector.");
+
+    const std::vector<std::uint8_t> expected_symbols = {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        15, 0, 15, 0, 15, 0, 15, 0,
+        0, 0, 7, 0, 7, 0, 7, 0, 7, 0,
+        0, 0, 0, 3, 3, 3, 0, 3,
+        0, 0, 0, 0, 1, 1, 0, 0,
+        0, 1, 1, 1, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0
+    };
+
+    bag::CoreConfig config{};
+    config.sample_rate_hz = 16000;
+    config.mode = bag::TransportMode::kUltra;
+    const auto mfsk_config = bag::ultra::MakeMfsk16Config(config);
+    std::vector<std::uint8_t> actual_symbols;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols(payload, mfsk_config,
+                                           &actual_symbols),
+        bag::ErrorCode::kOk,
+        "Ultra MFSK16 vector symbol encoding should succeed.");
+    test::AssertEq(
+        actual_symbols, expected_symbols,
+        "Ultra MFSK16 symbols should match the independent FEC/interleaver vector.");
+
+    std::vector<std::uint8_t> decoded_payload;
+    test::AssertEq(
+        bag::ultra::DecodeSymbolsToPayload(expected_symbols, &decoded_payload),
+        bag::ErrorCode::kOk,
+        "Ultra MFSK16 standard symbol vector should decode.");
+    test::AssertEq(
+        decoded_payload, payload,
+        "Ultra MFSK16 standard symbol vector should recover the payload.");
 }
 
 void TestCompatFrameCodecModule() {
@@ -304,6 +291,8 @@ void RegisterLeafTransportTests(test::Runner& runner) {
     runner.Add("ModulesLeaf.ProCodecModule", TestProCodecModule);
     runner.Add("ModulesLeaf.ProCodecRejectsInvalidInput", TestProCodecRejectsInvalidInput);
     runner.Add("ModulesLeaf.UltraCodecModule", TestUltraCodecModule);
+    runner.Add("ModulesLeaf.UltraMfsk16StandardVectors",
+               TestUltraMfsk16StandardVectors);
     runner.Add("ModulesLeaf.CompatFrameCodecModule", TestCompatFrameCodecModule);
     runner.Add("ModulesLeaf.CompatFrameCodecProRoundTrip", TestCompatFrameCodecProRoundTrip);
     runner.Add("ModulesLeaf.CompatFrameCodecRejectsMalformedFrames",

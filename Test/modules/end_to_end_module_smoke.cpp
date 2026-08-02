@@ -215,6 +215,13 @@ void TestTransportFacadeValidation() {
         bag::TransportValidationIssue::kInvalidMode,
         "Transport facade module should reject unknown modes.");
 
+    config = MakeCoreConfig(bag::TransportMode::kUltra);
+    config.sample_rate_hz = 8;
+    test::AssertEq(
+        bag::ValidateEncodeRequest(config, "A"),
+        bag::TransportValidationIssue::kInvalidSampleRate,
+        "Transport facade module should reject Ultra rates that cannot provide one sample per symbol.");
+
     config = MakeCoreConfig(bag::TransportMode::kFlash);
     test::AssertEq(
         bag::ValidateEncodeRequest(config, std::string(513, 'F')),
@@ -301,18 +308,63 @@ void TestUltraTextCodecRoundTrip() {
         "Ultra codec module payload decode should succeed.");
     test::AssertEq(decoded, input, "Ultra codec module payload decode should preserve UTF-8 bytes.");
 
-    std::vector<std::uint8_t> symbols;
+    std::vector<std::uint8_t> bits;
     test::AssertEq(
-        bag::ultra::EncodePayloadToSymbols(payload, &symbols),
+        bag::ultra::EncodePayloadToVaricodeBits(payload, &bits),
         bag::ErrorCode::kOk,
-        "Ultra codec module payload-to-symbol encode should succeed.");
+        "Ultra codec module Varicode encode should succeed.");
 
     std::vector<std::uint8_t> decoded_payload;
     test::AssertEq(
+        bag::ultra::DecodeVaricodeBits(bits, &decoded_payload),
+        bag::ErrorCode::kOk,
+        "Ultra codec module Varicode decode should succeed.");
+    test::AssertEq(decoded_payload, payload, "Ultra Varicode decode should recover UTF-8 bytes.");
+
+    std::vector<std::uint8_t> symbols;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols(
+            payload, bag::ultra::MakeMfsk16Config(MakeCoreConfig(bag::TransportMode::kUltra)),
+            &symbols),
+        bag::ErrorCode::kOk,
+        "Ultra symbol codec should encode MFSK16 symbols.");
+    decoded_payload.clear();
+    test::AssertEq(
         bag::ultra::DecodeSymbolsToPayload(symbols, &decoded_payload),
         bag::ErrorCode::kOk,
-        "Ultra codec module symbol decode should succeed.");
-    test::AssertEq(decoded_payload, payload, "Ultra codec module symbol decode should recover UTF-8 bytes.");
+        "Ultra symbol codec should decode MFSK16 symbols.");
+    test::AssertEq(decoded_payload, payload,
+                   "Ultra symbol codec should roundtrip payload.");
+
+    const std::string punctuation_input = "FlipBits: encode & decode!";
+    std::vector<std::uint8_t> punctuation_payload;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPayload(punctuation_input,
+                                        &punctuation_payload),
+        bag::ErrorCode::kOk,
+        "Ultra punctuation setup should encode payload.");
+    std::vector<std::uint8_t> punctuation_symbols;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols(
+            punctuation_payload,
+            bag::ultra::MakeMfsk16Config(MakeCoreConfig(bag::TransportMode::kUltra)),
+            &punctuation_symbols),
+        bag::ErrorCode::kOk,
+        "Ultra punctuation setup should encode symbols.");
+    std::vector<std::uint8_t> punctuation_decoded;
+    test::AssertEq(
+        bag::ultra::DecodeSymbolsToPayload(punctuation_symbols,
+                                           &punctuation_decoded),
+        bag::ErrorCode::kOk,
+        "Ultra punctuation symbols should decode.");
+    std::string punctuation_text;
+    test::AssertEq(
+        bag::ultra::DecodePayloadToText(punctuation_decoded,
+                                        &punctuation_text),
+        bag::ErrorCode::kOk,
+        "Ultra punctuation payload should decode to text.");
+    test::AssertEq(punctuation_text, punctuation_input,
+                   "Ultra punctuation should preserve the terminal exclamation mark.");
 }
 
 void TestUltraPhyCleanRoundTrip() {
@@ -323,12 +375,20 @@ void TestUltraPhyCleanRoundTrip() {
         bag::ultra::EncodeTextToPcm16(config, input, &pcm),
         bag::ErrorCode::kOk,
         "Ultra clean module encode should succeed.");
+    std::vector<std::uint8_t> payload;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPayload(input, &payload), bag::ErrorCode::kOk,
+        "Ultra PCM length setup should encode payload.");
+    std::vector<std::uint8_t> symbols;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols(
+            payload, bag::ultra::MakeMfsk16Config(config), &symbols),
+        bag::ErrorCode::kOk,
+        "Ultra PCM length setup should encode MFSK16 symbols.");
     test::AssertEq(
         pcm.size(),
-        (std::vector<std::uint8_t>(input.begin(), input.end()).size() +
-         bag::ultra::kCleanFrameV1FixedByteCount) *
-            bag::ultra::kSymbolsPerPayloadByte * static_cast<std::size_t>(config.frame_samples),
-        "Ultra clean module PCM length should be frame byte count * 2 symbols * frame size.");
+        bag::ultra::TotalSamplesForSymbols(44100, symbols.size()),
+        "Ultra MFSK16 PCM length should match the cumulative symbol boundaries.");
 
     std::string decoded;
     test::AssertEq(
@@ -336,6 +396,318 @@ void TestUltraPhyCleanRoundTrip() {
         bag::ErrorCode::kOk,
         "Ultra clean module decode should succeed.");
     test::AssertEq(decoded, input, "Ultra clean module should roundtrip UTF-8 text.");
+}
+
+void TestUltraFractionalSymbolBoundaries() {
+    test::AssertEq(
+        bag::ultra::NominalSymbolSamples(44100), 2822,
+        "Ultra nominal symbol width should remain an informational rounded value.");
+    test::AssertEq(
+        bag::ultra::SymbolBoundarySample(44100, 1), static_cast<std::size_t>(2822),
+        "Ultra first 44.1 kHz symbol boundary should use the rational rate.");
+    test::AssertEq(
+        bag::ultra::SymbolBoundarySample(44100, 2), static_cast<std::size_t>(5645),
+        "Ultra second 44.1 kHz symbol boundary should accumulate fractional samples.");
+    test::AssertEq(
+        bag::ultra::SymbolBoundarySample(44100, 3), static_cast<std::size_t>(8467),
+        "Ultra third 44.1 kHz symbol boundary should accumulate fractional samples.");
+    test::AssertEq(
+        bag::ultra::TotalSamplesForSymbols(16000, 7), static_cast<std::size_t>(7168),
+        "Ultra integral-rate boundaries should remain exactly one kilohertz-grid symbol wide.");
+
+    const auto config = MakeCoreConfig(bag::TransportMode::kUltra);
+    const std::string input = "fractional-boundary";
+    std::vector<std::int16_t> pcm;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPcm16(config, input, &pcm),
+        bag::ErrorCode::kOk,
+        "Ultra fractional-boundary encode should succeed.");
+    std::vector<std::uint8_t> payload;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPayload(input, &payload), bag::ErrorCode::kOk,
+        "Ultra fractional-boundary payload setup should succeed.");
+    std::vector<std::uint8_t> symbols;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols(
+            payload, bag::ultra::MakeMfsk16Config(config), &symbols),
+        bag::ErrorCode::kOk,
+        "Ultra fractional-boundary symbol setup should succeed.");
+    test::AssertEq(
+        pcm.size(), bag::ultra::TotalSamplesForSymbols(44100, symbols.size()),
+        "Ultra fractional-boundary PCM should end exactly at the final boundary.");
+    std::string decoded;
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToText(config, pcm, &decoded),
+        bag::ErrorCode::kOk,
+        "Ultra fractional-boundary decode should succeed.");
+    test::AssertEq(
+        decoded, input,
+        "Ultra fractional-boundary PCM should roundtrip through the clean decoder.");
+}
+
+void TestUltra31_25BdRoundTrip() {
+    const auto core_config = MakeCoreConfig(bag::TransportMode::kUltra);
+    const auto speed = bag::ultra::Mfsk16Speed::k31_25Bd;
+    const auto config = bag::ultra::MakeMfsk16Config(core_config, speed);
+    test::AssertEq(config.symbol_rate_baud, 31.25,
+                   "Ultra fast config should use 31.25 Bd.");
+    test::AssertEq(config.freqs_hz[1], 1031.25,
+                   "Ultra fast config should use 31.25 Hz tone spacing.");
+    test::AssertEq(config.freqs_hz[15], 1468.75,
+                   "Ultra fast config should generate all 16 tones on the fast grid.");
+    test::AssertEq(config.symbol_samples, 1411,
+                   "Ultra fast nominal symbol width should be rounded for 44.1 kHz.");
+    test::AssertEq(
+        bag::ultra::SymbolBoundarySample(44100, 1, 31.25),
+        static_cast<std::size_t>(1411),
+        "Ultra fast first symbol boundary should use the 31.25 Bd rate.");
+    test::AssertEq(
+        bag::ultra::SymbolBoundarySample(44100, 2, 31.25),
+        static_cast<std::size_t>(2822),
+        "Ultra fast second symbol boundary should accumulate exact samples.");
+    test::AssertEq(
+        bag::ultra::SymbolBoundarySample(44100, 3, 31.25),
+        static_cast<std::size_t>(4234),
+        "Ultra fast third symbol boundary should retain the fractional remainder.");
+
+    const std::string input = "core-only 31.25 Bd";
+    std::vector<std::int16_t> pcm;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPcm16(core_config, input, &pcm, speed),
+        bag::ErrorCode::kOk,
+        "Ultra fast clean module encode should succeed.");
+    std::string decoded;
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToText(core_config, pcm, &decoded, speed),
+        bag::ErrorCode::kOk,
+        "Ultra fast clean module decode should succeed.");
+    test::AssertEq(decoded, input,
+                   "Ultra fast clean module should roundtrip core-only text.");
+
+    auto transport_config = core_config;
+    transport_config.frame_samples = config.symbol_samples;
+    std::vector<std::int16_t> transport_pcm;
+    test::AssertEq(
+        bag::EncodeTextToPcm16(transport_config, input, &transport_pcm),
+        bag::ErrorCode::kOk,
+        "Ultra fast transport facade encode should use the selected frame rate.");
+    test::AssertEq(transport_pcm.size(), pcm.size(),
+                   "Ultra fast transport facade should preserve PCM duration.");
+    auto transport_decoder = bag::CreateTransportDecoder(transport_config);
+    test::AssertTrue(transport_decoder != nullptr,
+                     "Ultra fast transport facade should create a decoder.");
+    bag::PcmBlock block{};
+    block.samples = transport_pcm.data();
+    block.sample_count = transport_pcm.size();
+    test::AssertEq(transport_decoder->PushPcm(block), bag::ErrorCode::kOk,
+                   "Ultra fast transport decoder should accept complete PCM.");
+    bag::TextResult transport_result{};
+    test::AssertEq(transport_decoder->PollTextResult(&transport_result),
+                   bag::ErrorCode::kOk,
+                   "Ultra fast transport decoder should decode complete PCM.");
+    test::AssertEq(transport_result.text, input,
+                   "Ultra fast transport facade should roundtrip core-only text.");
+
+    const auto auto_decode_config = [&]() {
+        auto value = core_config;
+        value.frame_samples = 0;
+        return value;
+    }();
+    const auto assert_auto_decode = [&](const std::vector<std::int16_t>& audio,
+                                        const std::string& expected,
+                                        const char* label) {
+        auto decoder = bag::CreateTransportDecoder(auto_decode_config);
+        test::AssertTrue(decoder != nullptr, label);
+        bag::PcmBlock auto_block{};
+        auto_block.samples = audio.data();
+        auto_block.sample_count = audio.size();
+        test::AssertEq(decoder->PushPcm(auto_block), bag::ErrorCode::kOk, label);
+        bag::TextResult auto_result{};
+        test::AssertEq(decoder->PollTextResult(&auto_result), bag::ErrorCode::kOk,
+                       label);
+        test::AssertEq(auto_result.text, expected, label);
+    };
+
+    std::vector<std::int16_t> slow_pcm;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPcm16(core_config, input, &slow_pcm),
+        bag::ErrorCode::kOk,
+        "Ultra slow PCM should be available for automatic-rate decoding.");
+    assert_auto_decode(
+        slow_pcm, input,
+        "Ultra decoder should infer 15.625 Bd from mode and sample rate only.");
+    assert_auto_decode(
+        transport_pcm, input,
+        "Ultra decoder should infer 31.25 Bd from mode and sample rate only.");
+
+    std::string direct_auto_decoded;
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToText(auto_decode_config, slow_pcm,
+                                       &direct_auto_decoded),
+        bag::ErrorCode::kOk,
+        "Direct Ultra decode should auto-select the slow rate.");
+    test::AssertEq(direct_auto_decoded, input,
+                   "Direct Ultra slow auto decode should preserve text.");
+    direct_auto_decoded.clear();
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToText(auto_decode_config, transport_pcm,
+                                       &direct_auto_decoded),
+        bag::ErrorCode::kOk,
+        "Direct Ultra decode should auto-select the fast rate.");
+    test::AssertEq(direct_auto_decoded, input,
+                   "Direct Ultra fast auto decode should preserve text.");
+
+    auto encode_operation = bag::CreateEncodeOperation(transport_config, input);
+    test::AssertTrue(encode_operation != nullptr,
+                     "Ultra fast encode operation should be created.");
+    test::AssertEq(encode_operation->Run(), bag::ErrorCode::kOk,
+                   "Ultra fast encode operation should complete.");
+    bag::EncodedPcmFollowResult operation_result{};
+    test::AssertEq(encode_operation->TakeResult(&operation_result),
+                   bag::ErrorCode::kOk,
+                   "Ultra fast encode operation should expose its result.");
+    test::AssertEq(operation_result.pcm.size(), pcm.size(),
+                   "Ultra fast encode operation should use fast symbol boundaries.");
+}
+
+void TestUltraRejectsInvalidInputs() {
+    const auto config = MakeCoreConfig(bag::TransportMode::kUltra);
+    const auto mfsk_config = bag::ultra::MakeMfsk16Config(config);
+    std::vector<std::uint8_t> output_payload;
+    std::vector<std::uint8_t> output_symbols;
+
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols({}, mfsk_config, &output_symbols),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject an empty payload for symbol encoding.");
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols({static_cast<std::uint8_t>('A')},
+                                           mfsk_config, nullptr),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject a null symbol output.");
+    test::AssertEq(
+        bag::ultra::DecodeVaricodeBits({2}, &output_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject Varicode bits outside 0 and 1.");
+    test::AssertEq(
+        bag::ultra::DecodeVaricodeBits({1, 0}, &output_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject an incomplete Varicode codeword.");
+    test::AssertEq(
+        bag::ultra::DecodeVaricodeBits({1}, nullptr),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject a null Varicode output.");
+    test::AssertEq(
+        bag::ultra::DecodeSymbolsToPayload({}, &output_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject an empty symbol stream.");
+
+    const std::vector<std::uint8_t> payload = {'A'};
+    test::AssertEq(
+        bag::ultra::EncodePayloadToSymbols(payload, mfsk_config,
+                                           &output_symbols),
+        bag::ErrorCode::kOk,
+        "Ultra invalid-input setup should encode symbols.");
+    auto bad_preamble = output_symbols;
+    bad_preamble[0] = 1;
+    test::AssertEq(
+        bag::ultra::DecodeSymbolsToPayload(bad_preamble, &output_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject a symbol stream with a bad preamble.");
+    auto bad_tail = output_symbols;
+    bad_tail.back() = 1;
+    test::AssertEq(
+        bag::ultra::DecodeSymbolsToPayload(bad_tail, &output_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject a symbol stream with a bad tail.");
+    test::AssertEq(
+        bag::ultra::DecodeSymbolsToPayload({16}, &output_payload),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject a tone index outside the 16-tone range.");
+
+    std::vector<std::int16_t> pcm;
+    test::AssertEq(
+        bag::ultra::EncodePayloadToPcm16(payload, mfsk_config, &pcm),
+        bag::ErrorCode::kOk,
+        "Ultra invalid-PCM setup should encode PCM.");
+    std::vector<std::int16_t> truncated_pcm(pcm.begin(), pcm.end() - 1);
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToSymbols(truncated_pcm, mfsk_config,
+                                         &output_symbols),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject PCM truncated at a non-boundary sample.");
+    auto extra_pcm = pcm;
+    extra_pcm.push_back(0);
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToText(config, extra_pcm, nullptr),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject PCM with an unaligned trailing sample.");
+    test::AssertEq(
+        bag::ultra::EncodeTextToPcm16(config, std::string(), &pcm),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject empty text encoding.");
+
+    auto invalid_rate_config = mfsk_config;
+    invalid_rate_config.sample_rate_hz = 8;
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToSymbols(pcm, invalid_rate_config,
+                                          &output_symbols),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject a sample rate below the boundary contract.");
+
+    auto unsupported_symbol_rate_config = mfsk_config;
+    unsupported_symbol_rate_config.symbol_rate_baud = 20.0;
+    test::AssertEq(
+        bag::ultra::DecodePcm16ToSymbols(
+            pcm, unsupported_symbol_rate_config, &output_symbols),
+        bag::ErrorCode::kInvalidArgument,
+        "Ultra should reject symbol rates outside the supported core speeds.");
+}
+
+void TestUltraDecoderRequiresWholeRecording() {
+    const auto config = MakeCoreConfig(bag::TransportMode::kUltra);
+    const std::string input = "whole-recording-only";
+    std::vector<std::int16_t> pcm;
+    test::AssertEq(
+        bag::ultra::EncodeTextToPcm16(config, input, &pcm),
+        bag::ErrorCode::kOk,
+        "Ultra whole-recording decoder setup should encode PCM.");
+
+    auto decoder = bag::ultra::CreateDecoder(config);
+    test::AssertTrue(decoder != nullptr,
+                     "Ultra whole-recording decoder should be created.");
+    const std::size_t first_block_samples =
+        bag::ultra::SymbolBoundarySample(config.sample_rate_hz, 4);
+    bag::PcmBlock first_block{
+        .samples = pcm.data(),
+        .sample_count = first_block_samples,
+        .timestamp_ms = 0,
+    };
+    test::AssertEq(
+        decoder->PushPcm(first_block), bag::ErrorCode::kOk,
+        "Ultra decoder should accept the first recording block.");
+    bag::TextResult result{};
+    test::AssertEq(
+        decoder->PollTextResult(&result), bag::ErrorCode::kNotReady,
+        "Ultra decoder should not emit text from a partial recording.");
+    test::AssertTrue(!result.complete,
+                     "Ultra partial-recording result should not be complete.");
+
+    bag::PcmBlock remaining_block{
+        .samples = pcm.data() + first_block_samples,
+        .sample_count = pcm.size() - first_block_samples,
+        .timestamp_ms = static_cast<std::int64_t>(first_block_samples),
+    };
+    test::AssertEq(
+        decoder->PushPcm(remaining_block), bag::ErrorCode::kOk,
+        "Ultra decoder should accept the remaining recording block.");
+    test::AssertEq(
+        decoder->PollTextResult(&result), bag::ErrorCode::kOk,
+        "Ultra decoder should decode after the whole recording arrives.");
+    test::AssertEq(result.text, input,
+                   "Ultra whole-recording decoder should recover the input.");
+    test::AssertTrue(result.complete,
+                     "Ultra whole-recording result should be complete.");
 }
 
 void TestUltraPayloadUsesUtf8Bytes() {
@@ -481,6 +853,14 @@ int main() {
     runner.Add("ModulesEndToEnd.ProPayloadUsesRawAsciiBytes", TestProPayloadUsesRawAsciiBytes);
     runner.Add("ModulesEndToEnd.UltraTextCodecRoundTrip", TestUltraTextCodecRoundTrip);
     runner.Add("ModulesEndToEnd.UltraPhyCleanRoundTrip", TestUltraPhyCleanRoundTrip);
+    runner.Add("ModulesEndToEnd.UltraFractionalSymbolBoundaries",
+               TestUltraFractionalSymbolBoundaries);
+    runner.Add("ModulesEndToEnd.Ultra31_25BdRoundTrip",
+               TestUltra31_25BdRoundTrip);
+    runner.Add("ModulesEndToEnd.UltraRejectsInvalidInputs",
+               TestUltraRejectsInvalidInputs);
+    runner.Add("ModulesEndToEnd.UltraDecoderRequiresWholeRecording",
+               TestUltraDecoderRequiresWholeRecording);
     runner.Add("ModulesEndToEnd.UltraPayloadUsesUtf8Bytes", TestUltraPayloadUsesUtf8Bytes);
     runner.Add("ModulesEndToEnd.PipelinePushPollLifecycle", TestPipelinePushPollLifecycle);
     runner.Add("ModulesEndToEnd.PipelineResetClearsPendingState", TestPipelineResetClearsPendingState);

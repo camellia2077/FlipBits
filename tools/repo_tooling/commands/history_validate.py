@@ -13,6 +13,8 @@ from ..errors import ToolError
 _VERSION_HEADING_RE = re.compile(r"^\[(v\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})$")
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ALLOWED_SECTION_HEADINGS = [
+    "改动意图",
+    "关联版本",
     "新增功能 (Added)",
     "技术改进/重构 (Changed/Refactor)",
     "修复 (Fixed)",

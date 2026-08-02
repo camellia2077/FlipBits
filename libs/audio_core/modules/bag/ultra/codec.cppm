@@ -16,26 +16,29 @@ export import bag.common.error_code;
 
 export namespace bag::ultra {
 
-inline constexpr std::size_t kSymbolsPerPayloadByte = 2;
-inline constexpr std::array<std::uint8_t, 8> kCleanFrameV1Preamble = {
-    0xA5, 0x5A, 0xA5, 0x5A, 0xA5, 0x5A, 0xA5, 0x5A};
-inline constexpr std::array<std::uint8_t, 2> kCleanFrameV1Sync = {0xD3, 0x91};
-inline constexpr std::uint8_t kCleanFrameV1Version = 0x01;
-inline constexpr std::uint8_t kCleanFrameV1Flags = 0x00;
-inline constexpr std::size_t kCleanFrameV1FixedByteCount =
-    kCleanFrameV1Preamble.size() + kCleanFrameV1Sync.size() + 1 + 1 + 4 + 2;
+inline constexpr double kMfsK16SymbolRateBaud = 15.625;
+inline constexpr double kMfsK16ToneSpacingHz = 15.625;
+inline constexpr double kMfsK16FastSymbolRateBaud = 31.25;
+inline constexpr double kMfsK16FastToneSpacingHz = 31.25;
+
+enum class Mfsk16Speed : std::uint8_t {
+    k15_625Bd = 0,
+    k31_25Bd = 1,
+};
+inline constexpr std::size_t kMfsK16PreambleSymbolCount = 8;
+inline constexpr std::size_t kMfsK16TailSymbolCount = 4;
+inline constexpr std::array<std::uint8_t, 16> kMfsK16ToneToNibble = {
+    0x0, 0x1, 0x3, 0x2, 0x6, 0x7, 0x5, 0x4,
+    0xC, 0xD, 0xF, 0xE, 0xA, 0xB, 0x9, 0x8};
 
 ErrorCode EncodeTextToPayload(const std::string& text,
                               std::vector<std::uint8_t>* out_payload);
 ErrorCode DecodePayloadToText(const std::vector<std::uint8_t>& payload,
                               std::string* out_text);
-ErrorCode EncodePayloadToFrame(const std::vector<std::uint8_t>& payload,
-                               std::vector<std::uint8_t>* out_frame);
-ErrorCode DecodeFrameToPayload(const std::vector<std::uint8_t>& frame,
-                               std::vector<std::uint8_t>* out_payload);
-ErrorCode EncodePayloadToSymbols(const std::vector<std::uint8_t>& payload,
-                                 std::vector<std::uint8_t>* out_symbols);
-ErrorCode DecodeSymbolsToPayload(const std::vector<std::uint8_t>& symbols,
-                                 std::vector<std::uint8_t>* out_payload);
+ErrorCode EncodePayloadToVaricodeBits(
+    const std::vector<std::uint8_t>& payload,
+    std::vector<std::uint8_t>* out_bits);
+ErrorCode DecodeVaricodeBits(const std::vector<std::uint8_t>& bits,
+                             std::vector<std::uint8_t>* out_payload);
 
 }  // namespace bag::ultra

@@ -4,6 +4,10 @@ using std::int16_t;
 using std::size_t;
 using std::uint8_t;
 
+ErrorCode DecodePcm16ToPayloadWithResolvedUnit(
+    const std::vector<int16_t>& pcm, const DualToneConfig& config,
+    std::vector<uint8_t>* out_payload, int* out_unit_samples);
+
 namespace {
 
 constexpr double kPi = 3.14159265358979323846;
@@ -177,9 +181,10 @@ class ProDecoder final : public ITransportDecoder {
       return ErrorCode::kNotReady;
     }
 
-    const ErrorCode payload_code =
-        DecodePcm16ToPayload(buffered_pcm_, MakeDualToneConfig(config_),
-                             &out_result->raw_payload_bytes);
+    int resolved_unit_samples = config_.frame_samples;
+    const ErrorCode payload_code = DecodePcm16ToPayloadWithResolvedUnit(
+        buffered_pcm_, MakeDualToneConfig(config_),
+        &out_result->raw_payload_bytes, &resolved_unit_samples);
     if (payload_code != ErrorCode::kOk) {
       out_result->text.clear();
       out_result->raw_payload_bytes.clear();
@@ -196,8 +201,10 @@ class ProDecoder final : public ITransportDecoder {
     }
 
     out_result->raw_payload_available = true;
+    CoreConfig resolved_config = config_;
+    resolved_config.frame_samples = resolved_unit_samples;
     out_result->follow_data =
-        BuildPayloadFollowData(config_, out_result->raw_payload_bytes);
+        BuildPayloadFollowData(resolved_config, out_result->raw_payload_bytes);
     out_result->follow_available = out_result->follow_data.available;
     out_result->text.clear();
     const ErrorCode text_code =
@@ -445,9 +452,9 @@ ErrorCode EncodePayloadToPcm16(const std::vector<uint8_t>& payload,
   return EncodeSymbolsToPcm16(symbols, config, out_pcm);
 }
 
-ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
-                               const DualToneConfig& config,
-                               std::vector<uint8_t>* out_payload) {
+ErrorCode DecodePcm16ToPayloadForUnit(const std::vector<int16_t>& pcm,
+                                      const DualToneConfig& config,
+                                      std::vector<uint8_t>* out_payload) {
   if (out_payload == nullptr) {
     return ErrorCode::kInvalidArgument;
   }
@@ -458,6 +465,48 @@ ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
     return symbols_code;
   }
   return DecodeSymbolsToPayload(symbols, out_payload);
+}
+
+int ProDefaultSymbolSamples(int sample_rate_hz) {
+  if (sample_rate_hz <= 0) {
+    return 0;
+  }
+  // Pro keeps its current fixed 50 ms symbol timing. This is the same
+  // sample-rate-derived default used by the existing Android/native boundary.
+  return sample_rate_hz / kCurrentBaseFramesPerSecond;
+}
+
+ErrorCode DecodePcm16ToPayloadWithResolvedUnit(
+    const std::vector<int16_t>& pcm, const DualToneConfig& config,
+    std::vector<uint8_t>* out_payload, int* out_unit_samples) {
+  if (out_payload == nullptr || out_unit_samples == nullptr ||
+      config.sample_rate_hz <= 0 || config.symbol_samples < 0) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  DualToneConfig resolved_config = config;
+  if (resolved_config.symbol_samples == 0) {
+    resolved_config.symbol_samples =
+        ProDefaultSymbolSamples(resolved_config.sample_rate_hz);
+  }
+  if (resolved_config.symbol_samples <= 0) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  const ErrorCode code = DecodePcm16ToPayloadForUnit(
+      pcm, resolved_config, out_payload);
+  if (code == ErrorCode::kOk) {
+    *out_unit_samples = resolved_config.symbol_samples;
+  }
+  return code;
+}
+
+ErrorCode DecodePcm16ToPayload(const std::vector<int16_t>& pcm,
+                               const DualToneConfig& config,
+                               std::vector<uint8_t>* out_payload) {
+  int resolved_unit_samples = config.symbol_samples;
+  return DecodePcm16ToPayloadWithResolvedUnit(
+      pcm, config, out_payload, &resolved_unit_samples);
 }
 
 ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
@@ -531,8 +580,9 @@ ErrorCode DecodePcm16ToText(const CoreConfig& config,
   }
 
   std::vector<uint8_t> payload;
-  const ErrorCode payload_code =
-      DecodePcm16ToPayload(pcm, MakeDualToneConfig(config), &payload);
+  int resolved_unit_samples = config.frame_samples;
+  const ErrorCode payload_code = DecodePcm16ToPayloadWithResolvedUnit(
+      pcm, MakeDualToneConfig(config), &payload, &resolved_unit_samples);
   if (payload_code != ErrorCode::kOk) {
     return payload_code;
   }

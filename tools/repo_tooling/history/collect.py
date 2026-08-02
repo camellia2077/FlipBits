@@ -164,7 +164,7 @@ def bucket_name(path: str) -> str:
         return "tools"
     if path.startswith("Test/"):
         return "tests"
-    if path.startswith(".agent/"):
+    if path.startswith("agents/"):
         return "agent-guides"
     return "repo-root/other"
 

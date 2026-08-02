@@ -14,15 +14,18 @@ import std;
 
 export import bag.common.types;
 export import bag.transport.decoder;
+export import bag.ultra.codec;
 
 export namespace bag::ultra {
 
 struct Mfsk16Config {
   std::array<double, 16> freqs_hz = {
-      1000.0, 1140.0, 1280.0, 1420.0, 1560.0, 1700.0, 1840.0, 1980.0,
-      2120.0, 2260.0, 2400.0, 2540.0, 2680.0, 2820.0, 2960.0, 3100.0};
+      1000.000, 1015.625, 1031.250, 1046.875, 1062.500, 1078.125,
+      1093.750, 1109.375, 1125.000, 1140.625, 1156.250, 1171.875,
+      1187.500, 1203.125, 1218.750, 1234.375};
   int sample_rate_hz = 44100;
-  int symbol_samples = 2205;
+  int symbol_samples = 2822;
+  double symbol_rate_baud = kMfsK16SymbolRateBaud;
   double amplitude = 0.8;
 };
 
@@ -34,13 +37,20 @@ struct SymbolRenderProgress {
 
 class SymbolRenderer {
  public:
-  SymbolRenderer(std::uint8_t symbol, std::size_t write_offset,
-                 const Mfsk16Config& config,
-                 std::vector<std::int16_t>* out_pcm);
+    SymbolRenderer(std::uint8_t symbol, std::size_t write_offset,
+                   const Mfsk16Config& config,
+                   std::vector<std::int16_t>* out_pcm,
+                   double initial_phase = 0.0);
+    SymbolRenderer(std::uint8_t symbol, std::size_t write_offset,
+                   const Mfsk16Config& config,
+                   std::vector<std::int16_t>* out_pcm,
+                   std::size_t symbol_sample_count,
+                   double initial_phase);
   ~SymbolRenderer();
 
   std::size_t TotalWork() const;
   bool Finished() const;
+  double FinalPhase() const;
   SymbolRenderProgress Pump(std::size_t work_budget);
 
  private:
@@ -49,6 +59,24 @@ class SymbolRenderer {
 };
 
 Mfsk16Config MakeMfsk16Config(const CoreConfig& config);
+Mfsk16Config MakeMfsk16Config(const CoreConfig& config, Mfsk16Speed speed);
+int NominalSymbolSamples(int sample_rate_hz,
+                         double symbol_rate_baud = kMfsK16SymbolRateBaud);
+std::size_t SymbolBoundarySample(int sample_rate_hz,
+                                 std::size_t symbol_index,
+                                 double symbol_rate_baud =
+                                     kMfsK16SymbolRateBaud);
+std::size_t TotalSamplesForSymbols(int sample_rate_hz,
+                                   std::size_t symbol_count,
+                                   double symbol_rate_baud =
+                                       kMfsK16SymbolRateBaud);
+ErrorCode EncodePayloadToSymbols(
+    const std::vector<std::uint8_t>& payload,
+    const Mfsk16Config& config,
+    std::vector<std::uint8_t>* out_symbols);
+ErrorCode DecodeSymbolsToPayload(
+    const std::vector<std::uint8_t>& symbols,
+    std::vector<std::uint8_t>* out_payload);
 
 ErrorCode EncodeSymbolsToPcm16(
     const std::vector<std::uint8_t>& symbols, const Mfsk16Config& config,
@@ -70,10 +98,20 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
                             std::vector<std::int16_t>* out_pcm);
 ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
                             std::vector<std::int16_t>* out_pcm,
+                            Mfsk16Speed speed);
+ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
+                            std::vector<std::int16_t>* out_pcm,
                             const EncodeProgressSink* progress_sink);
+ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
+                            std::vector<std::int16_t>* out_pcm,
+                            const EncodeProgressSink* progress_sink,
+                            Mfsk16Speed speed);
 ErrorCode DecodePcm16ToText(const CoreConfig& config,
                             const std::vector<std::int16_t>& pcm,
                             std::string* out_text);
+ErrorCode DecodePcm16ToText(const CoreConfig& config,
+                            const std::vector<std::int16_t>& pcm,
+                            std::string* out_text, Mfsk16Speed speed);
 std::unique_ptr<ITransportDecoder> CreateDecoder(const CoreConfig& config);
 
 }  // namespace bag::ultra

@@ -17,7 +17,7 @@
 - `docs/design/modes/pro.md`
   - `pro` 的 ASCII-only 结构、`DTMF-like` clean PHY 与主链路文件。
 - `docs/design/modes/ultra.md`
-  - `ultra` 的 UTF-8 payload、`Ultra clean frame v1`、clean `16-FSK` baseline 与主链路文件。
+- `ultra` 的 MFSK16 固定速率、Varicode/FEC/interleaver 与主链路文件。
 - `docs/design/modes/multi-tone-fsk.md`
   - 未来 Multi-tone FSK 的高速传输定位、与 `ultra` 的取舍关系和推进顺序。
 - `docs/design/modes/flash/README.md`

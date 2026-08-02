@@ -13,4 +13,5 @@ module bag.ultra.phy_clean;
 import bag.ultra.codec;
 import bag.transport.follow;
 
+// Ultra decode also supports the first-stage auto speed contract.
 #include "phy_clean_impl.inc"

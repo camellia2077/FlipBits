@@ -54,7 +54,7 @@ class FileNamePrepTests(unittest.TestCase):
                 # so this test only validates pure basename-level checks.
                 review = build_candidate_review(
                     "libs/audio_io/audio_common.hpp",
-                    suggested_reading=["`.agent/guides/file-name-styles.md`"],
+                    suggested_reading=["`agents/guides/file-name-styles.md`"],
                 )
             finally:
                 _ = current

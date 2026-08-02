@@ -1,7 +1,8 @@
 PayloadFollowData BuildPayloadFollowData(
     const CoreConfig& config,
     const std::vector<std::uint8_t>& raw_payload_bytes) {
-  if (config.sample_rate_hz <= 0 || config.frame_samples <= 0 ||
+  if (config.sample_rate_hz <= 0 ||
+      (config.frame_samples <= 0 && config.mode != TransportMode::kUltra) ||
       !IsValidTransportMode(config.mode) ||
       !IsValidFlashSignalProfile(config.flash_signal_profile) ||
       !IsValidFlashVoicingFlavor(config.flash_voicing_flavor)) {

@@ -55,8 +55,9 @@
 | `15 WPM` | `80 ms` | `3528` | 常见练习速度，建议作为默认档 |
 | `20 WPM` | `60 ms` | `2646` | 较快但仍然保留 Morse 可听性和可视化清晰度 |
 
-- WAV metadata 会保存实际使用的 `frame_samples`，这样保存后的音频重新加载时仍能按当时的 Morse speed 对齐播放、visual 与 decode。
-- decode 应按 PCM timing 和 Morse tone/silence 结构解析，不依赖 metadata、follow data 或 UI speed label 直接给出文本。
+- 生成侧仍提供上述三档 preset；clean decode 在 `frame_samples = 0` 时会从 PCM 的 tone/silence run 长度估计 unit，因此不要求 metadata 提供速度。
+- WAV metadata 会保存实际使用的 `frame_samples`，用于保存后播放、visual 与 decode 的快速对齐路径；metadata 缺失时，clean decode 仍可回退到 PCM timing 估计。
+- 当前的自动估计只面向项目生成器输出的无干扰 PCM，不承诺录音环境下的噪声容错或同步恢复。
 
 ## Follow / Visual
 - `BuildPayloadFollowData` 对 `mini` 发布两层 timeline：

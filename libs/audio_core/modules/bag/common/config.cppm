@@ -39,6 +39,24 @@ enum class FlashVoicingFlavor : std::uint8_t {
   kVoid = 6,
 };
 
+inline constexpr int kAutoFrameSamples = 0;
+inline constexpr int kCurrentBaseFramesPerSecond = 20;
+
+struct FlashAutoDecodeCandidate {
+  FlashSignalProfile signal_profile = FlashSignalProfile::kStandard;
+  FlashVoicingFlavor voicing_flavor = FlashVoicingFlavor::kStandard;
+};
+
+inline constexpr std::array<FlashAutoDecodeCandidate, 6>
+    kFlashAutoDecodeCandidates = {{
+        {FlashSignalProfile::kStandard, FlashVoicingFlavor::kStandard},
+        {FlashSignalProfile::kHostility, FlashVoicingFlavor::kHostility},
+        {FlashSignalProfile::kLitany, FlashVoicingFlavor::kLitany},
+        {FlashSignalProfile::kCollapse, FlashVoicingFlavor::kCollapse},
+        {FlashSignalProfile::kZeal, FlashVoicingFlavor::kZeal},
+        {FlashSignalProfile::kVoid, FlashVoicingFlavor::kVoid},
+    }};
+
 inline constexpr bool IsValidTransportMode(TransportMode mode) {
   switch (mode) {
     case TransportMode::kMini:
@@ -54,6 +72,11 @@ inline constexpr bool IsValidTransportMode(TransportMode mode) {
 inline constexpr bool IsFramedTransportMode(TransportMode mode) {
   return mode == TransportMode::kMini || mode == TransportMode::kPro ||
          mode == TransportMode::kUltra;
+}
+
+inline constexpr bool SupportsAutoFrameSamples(TransportMode mode) {
+  return mode == TransportMode::kMini || mode == TransportMode::kFlash ||
+         mode == TransportMode::kPro || mode == TransportMode::kUltra;
 }
 
 inline constexpr bool IsValidFlashSignalProfile(FlashSignalProfile profile) {

@@ -8,7 +8,7 @@
 
 真正入口统一是：
 - 项目入口： [apps/audio_android/AGENTS.md](../../../apps/audio_android/AGENTS.md)
-- 执行步骤： [.agent/workflows/translations/README.md](../../../.agent/workflows/translations/README.md)
+- 执行步骤： [agents/workflows/translations/README.md](../../../agents/workflows/translations/README.md)
 - 工具定义： [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md)
 
 ## Why This Exists

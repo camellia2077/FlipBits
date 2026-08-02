@@ -66,7 +66,7 @@
   - 这不是对外 consumer boundary，也不是 shared bridge headers 或 `bag/internal/**` 的回流
   - 这层是 intentional、长期保留的仓库内部声明边界，只承接预留接口头仍需保留的 `common/*` 声明
   - 主仓 `bag/internal/**` owner 已为 `0`
-  - `bag.common.version`、`bag.transport.facade`、`bag.flash.signal`、`bag.flash.voicing`、`flash/pro/ultra` clean/codec、`bag.pipeline`、`bag.pro.phy_compat`、`bag.ultra.phy_compat` 与 `bag.transport.compat.frame_codec` 已切到 modules-only host 主线，不再通过主仓 `bag/internal/**` 暴露 fallback declarations
+  - `bag.common.version`、`bag.transport.facade`、`bag.flash.signal`、`bag.flash.voicing`、`flash/pro/ultra` clean/codec、`bag.pipeline`、`bag.pro.phy_compat` 与 `bag.transport.compat.frame_codec` 已切到 modules-only host 主线，不再通过主仓 `bag/internal/**` 暴露 fallback declarations
   - `compatibility_policy.py` 当前锁定它的存在性、allowed-owner 集合、include-based 形态，以及不新增 `bag.interface.*` module mirror
   - 当前直接使用它的路径包括：
     - `libs/audio_core/include/bag/link/link_layer.h`
@@ -99,7 +99,6 @@
 - `libs/audio_core/include/bag/transport/compat/frame_codec.h`
 - `libs/audio_core/include/bag/transport/transport.h`
 - `libs/audio_core/include/bag/ultra/codec.h`
-- `libs/audio_core/include/bag/ultra/phy_compat.h`
 - `libs/audio_core/include/bag/ultra/phy_clean.h`
 - 说明：
   - 这批头已完成 owner 切分、consumer evacuation 与最终退休

@@ -176,7 +176,7 @@ line text 的重建依赖 `joiner_after`，所以：
 - `ultra`
   - UTF-8
   - CJK 常见为 3-byte character
-  - 音频层使用 `Ultra clean frame v1`，但 text follow 的正文语义只覆盖 frame 内的 payload bytes
+  - 音频层使用 Ultra MFSK16 的 preamble/payload/tail，但 text follow 的正文语义只覆盖 payload bytes
   - frame metadata, including preamble / sync / version / flags / length / CRC, must not appear as user text tokens
 - `mini`
   - text follow 仍按 token/character/byte 组织

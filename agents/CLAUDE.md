@@ -18,7 +18,7 @@
 - 如需生成或导出可见产物，优先先看 `python tools/run.py artifact --help`。
 - 如需处理 release history，优先先看 `python tools/run.py history --help`。
 - 如需准备 git commit message，优先先看 `python tools/run.py message --help`，并默认走“先 history、后 message”的链路。
-- `.agent/AGENTS.md` 只保留总原则与高频入口；工具细节统一看 `<repo-root>/tools/README.md`，专题流程统一看 `<repo-root>/docs/notes/tooling-overview.md`。
+- `agents/AGENTS.md` 只保留总原则与高频入口；工具细节统一看 `<repo-root>/tools/README.md`，专题流程统一看 `<repo-root>/docs/notes/tooling-overview.md`。
 
 ## Subsystems
 

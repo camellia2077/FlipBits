@@ -10,6 +10,13 @@ namespace {
 
 using namespace api_tests;
 
+std::size_t Mfsk16BoundarySamples(int sample_rate_hz,
+                                  std::size_t symbol_index) {
+  return (static_cast<std::size_t>(sample_rate_hz) * 8U * symbol_index +
+          62U) /
+         125U;
+}
+
 std::vector<std::string> SplitSpaceSeparatedTokens(const std::string& value) {
   std::vector<std::string> tokens;
   std::string current;
@@ -160,13 +167,6 @@ int HexNibbleValue(const char ch) {
   return -1;
 }
 
-double UltraCarrierFrequencyForNibble(int nibble) {
-  static constexpr std::array<double, 16> kUltraCarrierFreqsHz = {
-      1000.0, 1140.0, 1280.0, 1420.0, 1560.0, 1700.0, 1840.0, 1980.0,
-      2120.0, 2260.0, 2400.0, 2540.0, 2680.0, 2820.0, 2960.0, 3100.0};
-  return kUltraCarrierFreqsHz[static_cast<std::size_t>(nibble)];
-}
-
 double MiniCwToneEnvelopeGain(std::size_t sample_index,
                               std::size_t sample_count, int sample_rate_hz) {
   constexpr double kMiniCwToneEnvelopeSeconds = 0.005;
@@ -218,20 +218,6 @@ int MaxAbsPcmRange(const bag_pcm16_result& pcm, std::size_t start,
   return max_value;
 }
 
-std::size_t UltraFramePayloadBeginSample(const test::ConfigCase& config_case) {
-  constexpr std::size_t kUltraFrameV1PrefixBytes = 16;
-  return kUltraFrameV1PrefixBytes * static_cast<std::size_t>(2) *
-         static_cast<std::size_t>(config_case.frame_samples);
-}
-
-std::size_t UltraFrameTotalSampleCount(const test::ConfigCase& config_case,
-                                       std::size_t payload_byte_count) {
-  constexpr std::size_t kUltraFrameV1FixedBytes = 18;
-  return (payload_byte_count + kUltraFrameV1FixedBytes) *
-         static_cast<std::size_t>(2) *
-         static_cast<std::size_t>(config_case.frame_samples);
-}
-
 void AssertFollowTimelineIsContinuous(
     const bag_payload_follow_data& follow_data,
     const std::vector<bag_payload_follow_binary_group_entry>& binary_entries,
@@ -242,12 +228,23 @@ void AssertFollowTimelineIsContinuous(
   if (binary_entries.empty()) {
     return;
   }
+  const bool has_nonpayload_prefix =
+      allow_payload_gaps &&
+      binary_entries.front().start_sample < follow_data.payload_begin_sample;
 
-  test::AssertEq(binary_entries.front().start_sample,
-                 follow_data.payload_begin_sample,
-                 "Binary timeline should begin at the payload start sample.");
+  if (allow_payload_gaps) {
+    test::AssertTrue(
+        binary_entries.front().start_sample <= follow_data.payload_begin_sample,
+        "Binary timeline should begin no later than the payload start sample.");
+  } else {
+    test::AssertEq(binary_entries.front().start_sample,
+                   follow_data.payload_begin_sample,
+                   "Binary timeline should begin at the payload start sample.");
+  }
   std::size_t covered_samples = 0;
-  std::size_t expected_start = follow_data.payload_begin_sample;
+  std::size_t expected_start = allow_payload_gaps
+                                   ? binary_entries.front().start_sample
+                                   : follow_data.payload_begin_sample;
   bool saw_gap = false;
   for (const auto& entry : binary_entries) {
     if (allow_payload_gaps) {
@@ -264,16 +261,18 @@ void AssertFollowTimelineIsContinuous(
     covered_samples += entry.sample_count;
   }
   if (allow_payload_gaps) {
-    test::AssertTrue(
-        saw_gap,
-        "Binary timeline should expose transport silence as payload gaps.");
-    test::AssertTrue(
-        covered_samples < follow_data.payload_sample_count,
-        "Binary timeline should leave transport silence outside bit entries.");
-    test::AssertTrue(
-        expected_start <=
-            follow_data.payload_begin_sample + follow_data.payload_sample_count,
-        "Binary timeline entries should stay inside the payload sample range.");
+    if (!has_nonpayload_prefix) {
+      test::AssertTrue(
+          saw_gap,
+          "Binary timeline should expose transport silence as payload gaps.");
+      test::AssertTrue(
+          covered_samples < follow_data.payload_sample_count,
+          "Binary timeline should leave transport silence outside bit entries.");
+      test::AssertTrue(
+          expected_start <=
+              follow_data.payload_begin_sample + follow_data.payload_sample_count,
+          "Binary timeline entries should stay inside the payload sample range.");
+    }
   } else {
     test::AssertEq(
         covered_samples, follow_data.payload_sample_count,
@@ -381,6 +380,72 @@ void TestApiMiniMorseAppliesToneEnvelope() {
   bag_free_pcm16_result(&pcm);
 }
 
+void TestApiMiniAutoDecodePublishesResolvedFollowData() {
+  const test::ConfigCase config_case{
+      .name = "48k-mini-auto-follow",
+      .sample_rate_hz = 48000,
+      .frame_samples = 2400,
+  };
+  const std::string text = "SOS 123";
+  auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_MINI);
+  encoder_config.frame_samples = 4800;
+  auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_MINI);
+  decoder_config.frame_samples = 0;
+
+  test::AssertEq(bag_validate_decoder_config(&decoder_config),
+                 BAG_VALIDATION_OK,
+                 "Mini API decoder should accept zero frame_samples.");
+
+  bag_pcm16_result pcm{};
+  test::AssertEq(bag_encode_text(&encoder_config, text.c_str(), &pcm), BAG_OK,
+                 "Mini API auto-timing setup encode should succeed.");
+
+  bag_decoder* decoder = nullptr;
+  test::AssertEq(bag_create_decoder(&decoder_config, &decoder), BAG_OK,
+                 "Mini API auto-timing decoder creation should succeed.");
+  test::AssertEq(bag_push_pcm(decoder, pcm.samples, pcm.sample_count, 0),
+                 BAG_OK,
+                 "Mini API auto-timing decoder should accept generated PCM.");
+
+  std::array<char, 128> text_buffer{};
+  std::array<char, 128> raw_bytes_hex_buffer{};
+  std::array<char, 1024> raw_bits_binary_buffer{};
+  std::array<bag_payload_follow_byte_entry, 32> byte_timeline{};
+  std::array<bag_payload_follow_binary_group_entry, 128>
+      binary_group_timeline{};
+  bag_decode_result result{};
+  result.text_buffer = text_buffer.data();
+  result.text_buffer_size = text_buffer.size();
+  result.raw_bytes_hex_buffer = raw_bytes_hex_buffer.data();
+  result.raw_bytes_hex_buffer_size = raw_bytes_hex_buffer.size();
+  result.raw_bits_binary_buffer = raw_bits_binary_buffer.data();
+  result.raw_bits_binary_buffer_size = raw_bits_binary_buffer.size();
+  result.follow_data.byte_timeline_buffer = byte_timeline.data();
+  result.follow_data.byte_timeline_buffer_count = byte_timeline.size();
+  result.follow_data.binary_group_timeline_buffer = binary_group_timeline.data();
+  result.follow_data.binary_group_timeline_buffer_count =
+      binary_group_timeline.size();
+
+  test::AssertEq(bag_poll_decode_result(decoder, &result), BAG_OK,
+                 "Mini API auto-timing decode should succeed.");
+  test::AssertEq(std::string(text_buffer.data(), result.text_size), text,
+                 "Mini API auto-timing decode should preserve text.");
+  test::AssertEq(result.mode, BAG_TRANSPORT_MINI,
+                 "Mini API auto-timing decode should preserve mode.");
+  test::AssertEq(result.follow_data.available, 1,
+                 "Mini API auto-timing decode should publish follow data.");
+  test::AssertEq(result.follow_data.total_pcm_sample_count, pcm.sample_count,
+                 "Resolved Mini timing should cover the original PCM.");
+  test::AssertEq(result.follow_data.byte_timeline_status,
+                 BAG_DECODE_CONTENT_STATUS_OK,
+                 "Mini API byte timeline should be copied successfully.");
+  test::AssertTrue(result.follow_data.byte_timeline_count > 0,
+                   "Mini API byte timeline should contain decoded payload.");
+
+  bag_destroy_decoder(decoder);
+  bag_free_pcm16_result(&pcm);
+}
+
 void TestApiEncodeRejectsInvalidArguments() {
   const auto config_case = test::ConfigCases().front();
   const auto encoder_config = MakeEncoderConfig(config_case);
@@ -430,9 +495,16 @@ void TestApiCreateDecoderRejectsInvalidArguments() {
 
   invalid_config = decoder_config;
   invalid_config.frame_samples = 0;
+  invalid_config.mode = BAG_TRANSPORT_FLASH;
+  test::AssertEq(bag_create_decoder(&invalid_config, &decoder), BAG_OK,
+                 "Flash decoder should accept zero frame size as the auto sentinel.");
+  bag_destroy_decoder(decoder);
+  decoder = nullptr;
+
+  invalid_config.frame_samples = -1;
   test::AssertEq(bag_create_decoder(&invalid_config, &decoder),
                  BAG_INVALID_ARGUMENT,
-                 "Zero decoder frame size should be rejected.");
+                 "Negative decoder frame size should be rejected.");
 
   invalid_config = decoder_config;
   invalid_config.mode = static_cast<bag_transport_mode>(99);
@@ -781,6 +853,8 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
               ? hex_tokens.size() * static_cast<std::size_t>(8)
           : item.mode == BAG_TRANSPORT_MINI
               ? MorseToneElementCountForText(item.text)
+          : item.mode == BAG_TRANSPORT_ULTRA
+              ? result.follow_data.ultra_frame_timeline_count
               : hex_tokens.size() * static_cast<std::size_t>(2);
       test::AssertEq(result.follow_data.byte_timeline_count, hex_tokens.size(),
                      "Byte timeline count should match payload byte count.");
@@ -806,62 +880,47 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
                          "sample_count, not bit_count.");
       }
       if (item.mode == BAG_TRANSPORT_ULTRA) {
-        const std::size_t expected_ultra_frame_symbol_count =
-            (hex_tokens.size() + static_cast<std::size_t>(18)) *
-            static_cast<std::size_t>(2);
         test::AssertEq(result.follow_data.ultra_frame_timeline_count,
-                       expected_ultra_frame_symbol_count,
-                       "Ultra frame timeline should cover every clean frame "
-                       "nibble symbol.");
+                       result.follow_data.binary_group_timeline_count,
+                       "MFSK16 timeline should publish one group per tone "
+                       "symbol.");
         test::AssertEq(
             ultra_frame_entries[0].section, BAG_ULTRA_FRAME_SECTION_PREAMBLE,
-            "Ultra frame timeline should start with preamble symbols.");
-        test::AssertEq(ultra_frame_entries[16].section,
-                       BAG_ULTRA_FRAME_SECTION_SYNC,
-                       "Ultra frame timeline should mark sync symbols after "
-                       "the preamble.");
-        test::AssertEq(
-            ultra_frame_entries[20].section, BAG_ULTRA_FRAME_SECTION_VERSION,
-            "Ultra frame timeline should mark the version byte symbols.");
-        test::AssertEq(
-            ultra_frame_entries[22].section, BAG_ULTRA_FRAME_SECTION_FLAGS,
-            "Ultra frame timeline should mark the flags byte symbols.");
-        test::AssertEq(
-            ultra_frame_entries[24].section,
-            BAG_ULTRA_FRAME_SECTION_PAYLOAD_LENGTH,
-            "Ultra frame timeline should mark payload-length byte symbols.");
-        test::AssertEq(ultra_frame_entries[32].section,
+            "MFSK16 timeline should start with the lowest-tone preamble.");
+        test::AssertEq(ultra_frame_entries[8].section,
                        BAG_ULTRA_FRAME_SECTION_PAYLOAD,
-                       "Ultra frame timeline should mark payload symbols after "
-                       "the v1 header.");
+                       "MFSK16 timeline should mark data symbols after the "
+                       "preamble.");
         test::AssertTrue(
-            ultra_frame_entries[32].is_payload != 0,
-            "Ultra frame payload symbols should be flagged as payload.");
+            ultra_frame_entries[8].is_payload != 0,
+            "MFSK16 data symbols should be flagged as payload.");
         test::AssertEq(
-            ultra_frame_entries[32].payload_byte_index,
+            ultra_frame_entries[8].payload_byte_index,
             static_cast<std::size_t>(0),
-            "Ultra first payload symbol should reference payload byte 0.");
-        const std::size_t crc_symbol_index =
-            (static_cast<std::size_t>(16) + hex_tokens.size()) *
-            static_cast<std::size_t>(2);
+            "MFSK16 first data symbol should reference payload byte 0.");
+        const std::size_t tail_symbol_index =
+            result.follow_data.ultra_frame_timeline_count - 4;
         test::AssertEq(
-            ultra_frame_entries[crc_symbol_index].section,
-            BAG_ULTRA_FRAME_SECTION_CRC16,
-            "Ultra frame timeline should mark CRC symbols after payload.");
+            ultra_frame_entries[tail_symbol_index].section,
+            BAG_ULTRA_FRAME_SECTION_TAIL,
+            "MFSK16 timeline should mark the idle tail symbols.");
         test::AssertEq(result.follow_data.payload_begin_sample,
-                       UltraFramePayloadBeginSample(config_case),
-                       "Ultra payload follow should start after the clean "
-                       "frame metadata prefix.");
+                       Mfsk16BoundarySamples(config_case.sample_rate_hz, 8),
+                       "MFSK16 payload follow should start after the "
+                       "preamble.");
         test::AssertEq(
             result.follow_data.payload_sample_count,
-            hex_tokens.size() * static_cast<std::size_t>(2) *
-                static_cast<std::size_t>(config_case.frame_samples),
-            "Ultra payload follow should cover payload symbols only.");
+            Mfsk16BoundarySamples(
+                config_case.sample_rate_hz,
+                result.follow_data.ultra_frame_timeline_count - 4) -
+                Mfsk16BoundarySamples(config_case.sample_rate_hz, 8),
+            "MFSK16 payload follow should cover data symbols only.");
         test::AssertEq(
             result.follow_data.total_pcm_sample_count,
-            UltraFrameTotalSampleCount(config_case, hex_tokens.size()),
-            "Ultra follow total sample count should cover the full clean "
-            "frame.");
+            Mfsk16BoundarySamples(
+                config_case.sample_rate_hz,
+                result.follow_data.ultra_frame_timeline_count),
+            "MFSK16 follow total sample count should cover all symbols.");
         if (result.follow_data.byte_timeline_count > 0) {
           test::AssertEq(byte_entries[0].start_sample,
                          result.follow_data.payload_begin_sample,
@@ -871,16 +930,10 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
         for (std::size_t index = 0;
              index < result.follow_data.binary_group_timeline_count; ++index) {
           const auto& entry = binary_entries[index];
-          const std::size_t byte_index = index / static_cast<std::size_t>(2);
-          const std::size_t nibble_index = index % static_cast<std::size_t>(2);
-          const std::string& hex_token = hex_tokens.at(byte_index);
-          const int nibble = HexNibbleValue(hex_token.at(nibble_index));
-          test::AssertTrue(nibble >= 0,
-                           "Ultra raw hex should contain valid nibbles.");
           test::AssertTrue(
-              std::abs(entry.carrier_freq_hz -
-                       UltraCarrierFrequencyForNibble(nibble)) < 0.001,
-              "Ultra binary group follow should publish the encoded symbol "
+              entry.carrier_freq_hz >= 1000.0 &&
+                  entry.carrier_freq_hz <= 1234.375,
+              "MFSK16 binary groups should publish a configured tone "
               "carrier.");
         }
       }
@@ -890,11 +943,12 @@ void TestApiStructuredEncodePublishesFollowAcrossModes() {
               binary_entries.begin(),
               binary_entries.begin() +
                   result.follow_data.binary_group_timeline_count),
-          (item.mode == BAG_TRANSPORT_FLASH &&
-           (item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY ||
-            item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_COLLAPSE ||
-            item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_VOID)) ||
-              item.mode == BAG_TRANSPORT_MINI);
+              (item.mode == BAG_TRANSPORT_FLASH &&
+               (item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_LITANY ||
+                item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_COLLAPSE ||
+                item.voicing_flavor == BAG_FLASH_VOICING_FLAVOR_VOID)) ||
+              item.mode == BAG_TRANSPORT_MINI ||
+              item.mode == BAG_TRANSPORT_ULTRA);
 
       bag_free_encode_result(&result);
     }
@@ -2739,6 +2793,8 @@ void RegisterApiSyncTests(test::Runner& runner) {
              TestApiMiniMorseRoundTripAcrossConfigs);
   runner.Add("Api.MiniMorseAppliesToneEnvelope",
              TestApiMiniMorseAppliesToneEnvelope);
+  runner.Add("Api.MiniAutoDecodePublishesResolvedFollowData",
+             TestApiMiniAutoDecodePublishesResolvedFollowData);
   runner.Add("Api.EncodeRejectsInvalidArguments",
              TestApiEncodeRejectsInvalidArguments);
   runner.Add("Api.CreateDecoderRejectsInvalidArguments",

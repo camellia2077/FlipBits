@@ -67,7 +67,6 @@ _AUDIO_CORE_SINGLE_LANE_REQUIRED_TOKENS: tuple[str, ...] = (
     "src/transport/transport.cpp",
     "src/ultra/codec.cpp",
     "src/ultra/phy_clean.cpp",
-    "src/ultra/phy_compat.cpp",
     "FILE_SET cxx_modules TYPE CXX_MODULES",
 )
 _ANDROID_NATIVE_PACKAGE_CMAKE_PATH = ROOT_DIR / "apps" / "audio_android" / "native_package" / "CMakeLists.txt"

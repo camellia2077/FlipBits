@@ -45,6 +45,9 @@ TransportValidationIssue ValidateCommonConfig(const CoreConfig& config) {
   if (!IsValidTransportMode(config.mode)) {
     return TransportValidationIssue::kInvalidMode;
   }
+  if (config.mode == TransportMode::kUltra && config.sample_rate_hz < 16) {
+    return TransportValidationIssue::kInvalidSampleRate;
+  }
   if (!IsValidFlashSignalProfile(config.flash_signal_profile)) {
     return TransportValidationIssue::kInvalidFlashSignalProfile;
   }
@@ -84,6 +87,14 @@ TransportValidationIssue ValidateEncodeRequest(const CoreConfig& config,
 }
 
 TransportValidationIssue ValidateDecoderConfig(const CoreConfig& config) {
+  // The zero frame sentinel is decoder-only. Its mode capability is defined
+  // with the transport configuration contract, rather than duplicated here.
+  if (SupportsAutoFrameSamples(config.mode) &&
+      config.frame_samples == kAutoFrameSamples) {
+    CoreConfig normalized_config = config;
+    normalized_config.frame_samples = 1;
+    return ValidateCommonConfig(normalized_config);
+  }
   return ValidateCommonConfig(config);
 }
 
@@ -109,8 +120,12 @@ ErrorCode EncodeTextToPcm16(const CoreConfig& config, const std::string& text,
     case TransportMode::kPro:
       return bag::pro::EncodeTextToPcm16(config, text, out_pcm, progress_sink);
     case TransportMode::kUltra:
-      return bag::ultra::EncodeTextToPcm16(config, text, out_pcm,
-                                           progress_sink);
+      return bag::ultra::EncodeTextToPcm16(
+          config, text, out_pcm, progress_sink,
+          bag::ultra::MakeMfsk16Config(config).symbol_rate_baud ==
+                  bag::ultra::kMfsK16FastSymbolRateBaud
+              ? bag::ultra::Mfsk16Speed::k31_25Bd
+              : bag::ultra::Mfsk16Speed::k15_625Bd);
     case TransportMode::kMini:
       return bag::mini_mode::EncodeTextToPcm16(config, text, out_pcm,
                                                progress_sink);

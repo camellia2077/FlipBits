@@ -11,6 +11,8 @@
     "Hex",
     "Binary",
     "Morse",
+    "MFSK16",
+    "Bd",
     "Emoji",
     "Token",
     "Tokens",

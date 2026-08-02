@@ -10,7 +10,6 @@ import bag.fsk.codec;
 import bag.pro.phy_compat;
 import bag.pro.phy_clean;
 import bag.transport.compat.frame_codec;
-import bag.ultra.phy_compat;
 import bag.ultra.phy_clean;
 
 namespace {
@@ -183,19 +182,19 @@ void TestProCompatRoundTrip() {
     PushAndPollExpectingText(bag::pro::CreateCompatDecoder(config), pcm, bag::TransportMode::kPro, input);
 }
 
-void TestUltraCompatRoundTrip() {
+void TestUltraCleanRoundTrip() {
     const auto config = MakeUltraConfig();
     const std::string input = test::Utf8Literal(u8"compat-ultra");
 
     std::vector<std::int16_t> pcm;
     test::AssertEq(
-        bag::ultra::EncodeTextToPcm16Compat(config, input, &pcm),
+        bag::ultra::EncodeTextToPcm16(config, input, &pcm),
         bag::ErrorCode::kOk,
-        "Ultra phy_compat module should encode framed text to PCM.");
-    test::AssertTrue(!pcm.empty(), "Ultra phy_compat module should emit PCM.");
+        "Ultra MFSK16 module should encode text to PCM.");
+    test::AssertTrue(!pcm.empty(), "Ultra MFSK16 module should emit PCM.");
 
     PushAndPollExpectingText(
-        bag::ultra::CreateCompatDecoder(config),
+        bag::ultra::CreateDecoder(config),
         pcm,
         bag::TransportMode::kUltra,
         input);
@@ -237,7 +236,6 @@ int main() {
     runner.Add("ModulesMidLayer.UltraDecoderContractRoundTrip", TestUltraDecoderContractRoundTrip);
     runner.Add("ModulesMidLayer.FskCodecRoundTrip", TestFskCodecRoundTrip);
     runner.Add("ModulesMidLayer.ProCompatRoundTrip", TestProCompatRoundTrip);
-    runner.Add("ModulesMidLayer.UltraCompatRoundTrip", TestUltraCompatRoundTrip);
     runner.Add("ModulesMidLayer.CompatFrameBytesBridge", TestCompatFrameBytesBridge);
     return runner.Run();
 }

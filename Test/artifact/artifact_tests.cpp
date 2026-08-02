@@ -84,6 +84,65 @@ DecodeOutcome DecodeFromVector(const bag_decoder_config& config, const std::vect
     return out;
 }
 
+bag_error_code PollDecodeCodeFromVector(const bag_decoder_config& config,
+                                        const std::vector<int16_t>& pcm) {
+    bag_decoder* decoder = nullptr;
+    const auto create_code = bag_create_decoder(&config, &decoder);
+    test::AssertEq(create_code, BAG_OK, "Artifact decoder creation should succeed.");
+    test::AssertTrue(decoder != nullptr, "Artifact decoder should not be null.");
+
+    const auto push_code = bag_push_pcm(decoder, pcm.data(), pcm.size(), 0);
+    test::AssertEq(push_code, BAG_OK, "Artifact push should succeed.");
+
+    char text_buffer[16] = {};
+    bag_text_result result{};
+    result.buffer = text_buffer;
+    result.buffer_size = sizeof(text_buffer);
+    const auto poll_code = bag_poll_result(decoder, &result);
+    bag_destroy_decoder(decoder);
+    return poll_code;
+}
+
+struct AutoDecodeCase {
+    bag_transport_mode mode;
+    int encoder_frame_samples;
+    bag_flash_signal_profile signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD;
+    bag_flash_voicing_flavor voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD;
+    const char* name = "auto decode";
+};
+
+void AssertGeneratedAutoDecode(const test::ConfigCase& config_case,
+                               const std::string& text,
+                               const AutoDecodeCase& auto_case) {
+    auto decoder_config = MakeDecoderConfig(config_case, auto_case.mode);
+    decoder_config.frame_samples = 0;
+    test::AssertEq(
+        bag_validate_decoder_config(&decoder_config),
+        BAG_VALIDATION_OK,
+        std::string(auto_case.name) +
+            " decoder should accept zero frame_samples as the auto sentinel.");
+
+    auto encoder_config = MakeEncoderConfig(
+        config_case,
+        auto_case.mode,
+        auto_case.signal_profile,
+        auto_case.voicing_flavor);
+    encoder_config.frame_samples = auto_case.encoder_frame_samples > 0
+                                       ? auto_case.encoder_frame_samples
+                                       : config_case.frame_samples;
+    const auto pcm = EncodeToVector(encoder_config, text);
+    const auto decoded = DecodeFromVector(decoder_config, pcm);
+    test::AssertEq(
+        decoded.text,
+        text,
+        std::string(auto_case.name) +
+            " should recover generated PCM without timing metadata.");
+    test::AssertEq(
+        decoded.mode,
+        auto_case.mode,
+        std::string(auto_case.name) + " should preserve the selected mode.");
+}
+
 bool IsUtf8ContinuationByte(unsigned char value) {
     return (value & 0xC0U) == 0x80U;
 }
@@ -210,9 +269,7 @@ size_t ExpectedPcmSampleCount(const std::string& text,
         return text.size() * 2 * static_cast<size_t>(config_case.frame_samples);
     }
     if (mode == BAG_TRANSPORT_ULTRA) {
-        constexpr size_t kUltraCleanFrameV1FixedByteCount = 18;
-        return (text.size() + kUltraCleanFrameV1FixedByteCount) * 2 *
-               static_cast<size_t>(config_case.frame_samples);
+        return 0;
     }
 
     test::Fail("Artifact expected-length helper received an unsupported transport mode.");
@@ -225,9 +282,15 @@ void AssertPcmProperties(const std::vector<int16_t>& pcm,
                          const test::ConfigCase& config_case,
                          bag_flash_signal_profile flash_signal_profile = BAG_FLASH_SIGNAL_PROFILE_STANDARD,
                          bag_flash_voicing_flavor flash_voicing_flavor = BAG_FLASH_VOICING_FLAVOR_STANDARD) {
-    const auto expected_length =
-        ExpectedPcmSampleCount(text, mode, config_case, flash_signal_profile, flash_voicing_flavor);
-    test::AssertEq(pcm.size(), expected_length, "PCM length should match the selected mode's symbol layout.");
+    if (mode == BAG_TRANSPORT_ULTRA) {
+        test::AssertTrue(
+            !pcm.empty(),
+            "MFSK16 PCM should contain a non-empty cumulative symbol timeline.");
+    } else {
+        const auto expected_length =
+            ExpectedPcmSampleCount(text, mode, config_case, flash_signal_profile, flash_voicing_flavor);
+        test::AssertEq(pcm.size(), expected_length, "PCM length should match the selected mode's symbol layout.");
+    }
 
     const auto [min_it, max_it] = std::minmax_element(pcm.begin(), pcm.end());
     test::AssertTrue(min_it != pcm.end(), "PCM should not be empty for non-empty artifact corpus.");
@@ -382,6 +445,109 @@ void TestArtifactFlashLitanyRoundTrip() {
     test::AssertEq(decoded.mode, BAG_TRANSPORT_FLASH, "Artifact litany flash should preserve mode.");
 }
 
+void TestArtifactMiniAutoDecodeInfersUnit() {
+    const auto config_case = test::ConfigCases().front();
+    const std::string text = "SOS 123";
+    const int unit_samples[] = {
+        static_cast<int>(std::lround(static_cast<double>(config_case.sample_rate_hz) * 0.12)),
+        static_cast<int>(std::lround(static_cast<double>(config_case.sample_rate_hz) * 0.08)),
+        static_cast<int>(std::lround(static_cast<double>(config_case.sample_rate_hz) * 0.06)),
+        static_cast<int>(std::lround(static_cast<double>(config_case.sample_rate_hz) * 0.10)),
+    };
+
+    auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_MINI);
+    decoder_config.frame_samples = 0;
+    test::AssertEq(
+        bag_validate_decoder_config(&decoder_config),
+        BAG_VALIDATION_OK,
+        "Mini decoder should accept zero frame_samples as the auto sentinel.");
+
+    auto invalid_frame_decoder_config = decoder_config;
+    invalid_frame_decoder_config.frame_samples = -1;
+    test::AssertTrue(
+        bag_validate_decoder_config(&invalid_frame_decoder_config) != BAG_VALIDATION_OK,
+        "Decoder configs should reject negative frame_samples.");
+
+    for (const int unit_sample_count : unit_samples) {
+        AssertGeneratedAutoDecode(
+            config_case,
+            text,
+            {BAG_TRANSPORT_MINI,
+             unit_sample_count,
+             BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+             BAG_FLASH_VOICING_FLAVOR_STANDARD,
+             "Mini auto decode"});
+    }
+}
+
+void TestArtifactFlashAutoDecodeAcrossVoicingStyles() {
+    const AutoDecodeCase styles[] = {
+        {BAG_TRANSPORT_FLASH, 0, BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+         BAG_FLASH_VOICING_FLAVOR_STANDARD, "Flash standard auto decode"},
+        {BAG_TRANSPORT_FLASH, 0, BAG_FLASH_SIGNAL_PROFILE_HOSTILITY,
+         BAG_FLASH_VOICING_FLAVOR_HOSTILITY, "Flash hostility auto decode"},
+        {BAG_TRANSPORT_FLASH, 0, BAG_FLASH_SIGNAL_PROFILE_LITANY,
+         BAG_FLASH_VOICING_FLAVOR_LITANY, "Flash litany auto decode"},
+        {BAG_TRANSPORT_FLASH, 0, BAG_FLASH_SIGNAL_PROFILE_COLLAPSE,
+         BAG_FLASH_VOICING_FLAVOR_COLLAPSE, "Flash collapse auto decode"},
+        {BAG_TRANSPORT_FLASH, 0, BAG_FLASH_SIGNAL_PROFILE_ZEAL,
+         BAG_FLASH_VOICING_FLAVOR_ZEAL, "Flash zeal auto decode"},
+        {BAG_TRANSPORT_FLASH, 0, BAG_FLASH_SIGNAL_PROFILE_VOID,
+         BAG_FLASH_VOICING_FLAVOR_VOID, "Flash void auto decode"},
+    };
+
+    const std::string text = "F";
+    for (const auto& config_case : test::ConfigCases()) {
+        for (const AutoDecodeCase& style : styles) {
+            AssertGeneratedAutoDecode(config_case, text, style);
+        }
+    }
+}
+
+void TestArtifactFlashAutoDecodeRejectsMutatedPcm() {
+    const auto config_case = test::ConfigCases().front();
+    auto decoder_config = MakeDecoderConfig(config_case, BAG_TRANSPORT_FLASH);
+    decoder_config.frame_samples = 0;
+    const auto encoder_config = MakeEncoderConfig(config_case, BAG_TRANSPORT_FLASH);
+    auto pcm = EncodeToVector(encoder_config, "F");
+    test::AssertTrue(!pcm.empty(), "Flash mutation test should start with PCM.");
+
+    const auto mutation_index = pcm.size() / 2;
+    pcm[mutation_index] = static_cast<int16_t>(pcm[mutation_index] ^ 1);
+    const auto poll_code = PollDecodeCodeFromVector(decoder_config, pcm);
+    test::AssertTrue(
+        poll_code != BAG_OK,
+        "Flash auto decode should reject PCM that is not an exact clean-generated candidate.");
+}
+
+void TestArtifactProAutoDecodeCurrentTiming() {
+    const std::string text = "PRO CURRENT";
+    for (const auto& config_case : test::ConfigCases()) {
+        AssertGeneratedAutoDecode(
+            config_case,
+            text,
+            {BAG_TRANSPORT_PRO,
+             config_case.frame_samples,
+             BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+             BAG_FLASH_VOICING_FLAVOR_STANDARD,
+             "Pro auto decode"});
+    }
+}
+
+void TestArtifactUltraAutoDecodeAtFixedRate() {
+    const std::string text = "ULTRA MFSK16";
+    for (const auto& config_case : test::ConfigCases()) {
+        AssertGeneratedAutoDecode(
+            config_case,
+            text,
+            {BAG_TRANSPORT_ULTRA,
+             0,
+             BAG_FLASH_SIGNAL_PROFILE_STANDARD,
+             BAG_FLASH_VOICING_FLAVOR_STANDARD,
+             "MFSK16 fixed-rate auto decode"});
+    }
+}
+
 }  // namespace
 
 int main() {
@@ -391,6 +557,11 @@ int main() {
     runner.Add("Artifact.ModeSpecificLongRoundTrip", TestArtifactModeSpecificLongRoundTrip);
     runner.Add("Artifact.DecodeUnderGainDrop", TestArtifactDecodeUnderGainDrop);
     runner.Add("Artifact.FlashLitanyRoundTrip", TestArtifactFlashLitanyRoundTrip);
+    runner.Add("Artifact.FlashAutoDecodeAcrossVoicingStyles", TestArtifactFlashAutoDecodeAcrossVoicingStyles);
+    runner.Add("Artifact.FlashAutoDecodeRejectsMutatedPcm", TestArtifactFlashAutoDecodeRejectsMutatedPcm);
+    runner.Add("Artifact.MiniAutoDecodeInfersUnit", TestArtifactMiniAutoDecodeInfersUnit);
+    runner.Add("Artifact.ProAutoDecodeCurrentTiming", TestArtifactProAutoDecodeCurrentTiming);
+    runner.Add("Artifact.UltraAutoDecodeAtFixedRate", TestArtifactUltraAutoDecodeAtFixedRate);
     runner.Add("Artifact.VersionMatchesRelease", TestArtifactVersionMatchesRelease);
     return runner.Run();
 }

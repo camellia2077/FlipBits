@@ -14,6 +14,173 @@ ErrorCode DecodePcm16ToTextWithSignalProfileAndFlavor(
 
 namespace {
 
+struct FlashDecodeSelection {
+  int frame_samples = 0;
+  FlashSignalProfile signal_profile = FlashSignalProfile::kStandard;
+  FlashVoicingFlavor voicing_flavor = FlashVoicingFlavor::kStandard;
+};
+
+struct FlashResolvedDecode {
+  FlashDecodeSelection selection;
+  std::vector<uint8_t> bytes;
+};
+
+int CurrentFlashFrameSamples(int sample_rate_hz) {
+  return sample_rate_hz > 0
+             ? std::max(1, sample_rate_hz / kCurrentBaseFramesPerSecond)
+             : 0;
+}
+
+CoreConfig ConfigForSelection(const CoreConfig& input_config,
+                              const FlashDecodeSelection& selection) {
+  CoreConfig config = input_config;
+  config.frame_samples = selection.frame_samples;
+  config.flash_signal_profile = selection.signal_profile;
+  config.flash_voicing_flavor = selection.voicing_flavor;
+  return config;
+}
+
+ErrorCode DecodeFlashPcmWithSelection(
+    const CoreConfig& input_config, const FlashDecodeSelection& selection,
+    const std::vector<int16_t>& pcm, std::vector<uint8_t>* out_bytes) {
+  if (out_bytes == nullptr || pcm.empty() || selection.frame_samples <= 0 ||
+      !IsValidFlashSignalProfile(selection.signal_profile) ||
+      !IsValidFlashVoicingFlavor(selection.voicing_flavor)) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  try {
+    const CoreConfig config = ConfigForSelection(input_config, selection);
+    const std::vector<int16_t> trimmed_payload_pcm =
+        TrimFormalPayloadPcmForFlavor(config, selection.voicing_flavor, pcm);
+    *out_bytes = DecodeFormalPayloadBytes(
+        config, selection.signal_profile, selection.voicing_flavor,
+        trimmed_payload_pcm);
+    return ErrorCode::kOk;
+  } catch (...) {
+    return ErrorCode::kInvalidArgument;
+  }
+}
+
+// This validator is deliberately isolated from candidate decoding. The
+// current clean-audio phase can require exact PCM regeneration, while a
+// future real-environment decoder can replace this policy without changing
+// timing, trimming, or candidate enumeration.
+bool ValidateCleanGeneratedFlashCandidate(
+    const CoreConfig& config, const FlashDecodeSelection& selection,
+    const std::vector<int16_t>& pcm, const std::vector<uint8_t>& bytes) {
+  std::string decoded_text;
+  if (DecodeBytesToText(bytes, &decoded_text) != ErrorCode::kOk) {
+    return false;
+  }
+
+  // Flash has no frame length, sync, or CRC field. In this clean-audio
+  // phase, validate a candidate by regenerating the exact PCM that its
+  // decoded bytes would produce. This keeps auto decode deterministic
+  // without adding an audio-side hint or accepting arbitrary false bytes
+  // from a wrong timing/profile candidate.
+  const CoreConfig selected_config = ConfigForSelection(config, selection);
+  std::vector<int16_t> regenerated_pcm;
+  if (EncodeTextToPcm16WithSignalProfileAndFlavor(
+          selected_config, decoded_text, selection.signal_profile,
+          selection.voicing_flavor, &regenerated_pcm) != ErrorCode::kOk ||
+      regenerated_pcm != pcm) {
+    return false;
+  }
+
+  return true;
+}
+
+bool TryDecodeGeneratedFlashCandidate(
+    const CoreConfig& config, const std::vector<int16_t>& pcm,
+    FlashSignalProfile signal_profile, FlashVoicingFlavor voicing_flavor,
+    std::vector<uint8_t>* out_bytes) {
+  const FlashDecodeSelection selection{
+      config.frame_samples,
+      NormalizeFormalSignalProfile(signal_profile),
+      NormalizeFormalVoicingFlavor(voicing_flavor),
+  };
+  std::vector<uint8_t> bytes;
+  if (DecodeFlashPcmWithSelection(config, selection, pcm, &bytes) !=
+      ErrorCode::kOk ||
+      !ValidateCleanGeneratedFlashCandidate(config, selection, pcm, bytes)) {
+    return false;
+  }
+
+  if (out_bytes != nullptr) {
+    *out_bytes = std::move(bytes);
+  }
+  return true;
+}
+
+ErrorCode ResolveFlashDecode(const CoreConfig& input_config,
+                             const std::vector<int16_t>& pcm,
+                             FlashResolvedDecode* out_decode) {
+  if (out_decode == nullptr || pcm.empty() || input_config.sample_rate_hz <= 0 ||
+      input_config.frame_samples < 0) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  if (input_config.frame_samples > 0) {
+    if (!IsValidFlashSignalProfile(input_config.flash_signal_profile) ||
+        !IsValidFlashVoicingFlavor(input_config.flash_voicing_flavor)) {
+      return ErrorCode::kInvalidArgument;
+    }
+
+    const FlashDecodeSelection selection{
+        input_config.frame_samples,
+        NormalizeFormalSignalProfile(input_config.flash_signal_profile),
+        NormalizeFormalVoicingFlavor(input_config.flash_voicing_flavor),
+    };
+    const ErrorCode decode_code = DecodeFlashPcmWithSelection(
+        input_config, selection, pcm, &out_decode->bytes);
+    if (decode_code == ErrorCode::kOk) {
+      out_decode->selection = selection;
+    }
+    return decode_code;
+  }
+
+  CoreConfig candidate_config = input_config;
+  candidate_config.frame_samples =
+      CurrentFlashFrameSamples(input_config.sample_rate_hz);
+  if (candidate_config.frame_samples <= 0) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  FlashResolvedDecode resolved_decode{};
+  std::size_t successful_candidates = 0;
+  for (const FlashAutoDecodeCandidate& candidate :
+       kFlashAutoDecodeCandidates) {
+    candidate_config.flash_signal_profile = candidate.signal_profile;
+    candidate_config.flash_voicing_flavor = candidate.voicing_flavor;
+
+    std::vector<uint8_t> candidate_bytes;
+    if (!TryDecodeGeneratedFlashCandidate(
+            candidate_config, pcm, candidate.signal_profile,
+            candidate.voicing_flavor, &candidate_bytes)) {
+      continue;
+    }
+
+    ++successful_candidates;
+    resolved_decode.selection = {
+        candidate_config.frame_samples,
+        candidate.signal_profile,
+        candidate.voicing_flavor,
+    };
+    resolved_decode.bytes = std::move(candidate_bytes);
+    if (successful_candidates > 1) {
+      return ErrorCode::kInvalidArgument;
+    }
+  }
+
+  if (successful_candidates != 1) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  *out_decode = std::move(resolved_decode);
+  return ErrorCode::kOk;
+}
+
 class FlashDecoder final : public ITransportDecoder {
  public:
   explicit FlashDecoder(CoreConfig config) : config_(config) {}
@@ -48,19 +215,30 @@ class FlashDecoder final : public ITransportDecoder {
     }
 
     try {
-      const FlashSignalProfile normalized_signal_profile =
-          NormalizeFormalSignalProfile(config_.flash_signal_profile);
-      const FlashVoicingFlavor normalized_flavor =
-          NormalizeFormalVoicingFlavor(config_.flash_voicing_flavor);
-      const std::vector<int16_t> trimmed_payload_pcm =
-          TrimFormalPayloadPcmForFlavor(config_, normalized_flavor,
-                                        buffered_pcm_);
-      const std::vector<uint8_t> bytes =
-          DecodeFormalPayloadBytes(config_, normalized_signal_profile,
-                                   normalized_flavor, trimmed_payload_pcm);
+      FlashResolvedDecode resolved_decode{};
+      const ErrorCode decode_code =
+          ResolveFlashDecode(config_, buffered_pcm_, &resolved_decode);
+      if (decode_code != ErrorCode::kOk) {
+        out_result->text.clear();
+        out_result->raw_payload_bytes.clear();
+        out_result->raw_payload_available = false;
+        out_result->follow_data = PayloadFollowData{};
+        out_result->follow_available = false;
+        out_result->text_follow_data = TextFollowData{};
+        out_result->text_follow_available = false;
+        out_result->complete = false;
+        out_result->confidence = 0.0f;
+        out_result->mode = TransportMode::kFlash;
+        out_result->text_status = DecodeContentStatus::kInvalidTextPayload;
+        return decode_code;
+      }
+
+      const std::vector<uint8_t>& bytes = resolved_decode.bytes;
       out_result->raw_payload_bytes = bytes;
       out_result->raw_payload_available = true;
-      out_result->follow_data = BuildPayloadFollowData(config_, bytes);
+      out_result->follow_data =
+          BuildPayloadFollowData(
+              ConfigForSelection(config_, resolved_decode.selection), bytes);
       out_result->follow_available = out_result->follow_data.available;
       out_result->text.clear();
       const ErrorCode text_code = DecodeBytesToText(bytes, &out_result->text);
@@ -251,9 +429,17 @@ ErrorCode EncodeTextToPcm16WithSignalProfileAndFlavor(
 ErrorCode DecodePcm16ToText(const CoreConfig& config,
                             const std::vector<int16_t>& pcm,
                             std::string* out_text) {
-  return DecodePcm16ToTextWithSignalProfileAndFlavor(
-      config, pcm, config.flash_signal_profile, config.flash_voicing_flavor,
-      out_text);
+  if (out_text == nullptr) {
+    return ErrorCode::kInvalidArgument;
+  }
+
+  FlashResolvedDecode resolved_decode{};
+  const ErrorCode decode_code =
+      ResolveFlashDecode(config, pcm, &resolved_decode);
+  if (decode_code != ErrorCode::kOk) {
+    return decode_code;
+  }
+  return DecodeBytesToText(resolved_decode.bytes, out_text);
 }
 
 ErrorCode DecodePcm16ToTextWithSignalProfileAndFlavor(
@@ -270,20 +456,18 @@ ErrorCode DecodePcm16ToTextWithSignalProfileAndFlavor(
     return ErrorCode::kInvalidArgument;
   }
 
-  try {
-    const FlashSignalProfile normalized_signal_profile =
-        NormalizeFormalSignalProfile(signal_profile);
-    const FlashVoicingFlavor normalized_flavor =
-        NormalizeFormalVoicingFlavor(flavor);
-    const std::vector<int16_t> trimmed_payload_pcm =
-        TrimFormalPayloadPcmForFlavor(config, normalized_flavor, pcm);
-    const std::vector<uint8_t> bytes =
-        DecodeFormalPayloadBytes(config, normalized_signal_profile,
-                                 normalized_flavor, trimmed_payload_pcm);
-    return DecodeBytesToText(bytes, out_text);
-  } catch (...) {
-    return ErrorCode::kInvalidArgument;
+  const FlashDecodeSelection selection{
+      config.frame_samples,
+      NormalizeFormalSignalProfile(signal_profile),
+      NormalizeFormalVoicingFlavor(flavor),
+  };
+  std::vector<uint8_t> bytes;
+  const ErrorCode decode_code =
+      DecodeFlashPcmWithSelection(config, selection, pcm, &bytes);
+  if (decode_code != ErrorCode::kOk) {
+    return decode_code;
   }
+  return DecodeBytesToText(bytes, out_text);
 }
 
 std::unique_ptr<ITransportDecoder> CreateDecoder(const CoreConfig& config) {

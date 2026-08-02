@@ -27,7 +27,7 @@ def register_file_name_group(subparsers: argparse._SubParsersAction[argparse.Arg
             "Prepare file-name guidance for the current working tree.\n\n"
             "Behavior:\n"
             "- Reads `git status --short` and keeps newly added or renamed files as candidates.\n"
-            "- Runs only high-confidence mechanical checks from `.agent/guides/file-name-styles.md`.\n"
+            "- Runs only high-confidence mechanical checks from `agents/guides/file-name-styles.md`.\n"
             "- Separates semantic naming questions into an agent-judgment section.\n"
             "- Writes the draft note to `temp/file-name/message.txt` using UTF-8."
         ),

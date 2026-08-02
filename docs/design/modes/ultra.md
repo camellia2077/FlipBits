@@ -1,163 +1,98 @@
 # `ultra` Mode Design
 
-更新时间：2026-05-21
+更新时间：2026-08-01
 
 ## 定位
-- `ultra` 是面向 UTF-8 文本字节忠实传输的正式模式。
-- 它使用低速、清晰、可视化友好、参数保守的 clean `16-FSK`，作为后续更高阶多频模式的基线。
-- 它的设计目标是在传输速度、信息密度、长距离声学传播和抗干扰性之间取保守平衡；相比未来的 Multi-tone FSK，它优先保留更大的抗混响、抗窄带干扰和抗设备频响凹陷余量。
-- 从命名上看它不是 `pro` 的线性升级，而是并列的 UTF-8 / `16-FSK` mode。
-- `ultra` 不承诺兼容任何外部 `16-FSK` / `MFSK` 协议；它是 FlipBits 内部的 clean baseline。
-- 当前项目目标仍是“encode 生成音频 -> decode 同项目生成音频”的闭环，不承诺真实录音、远距离声学信道、混响或高噪声环境下的接收能力。
 
-## 输入与字符集边界
-- 输入文本直接按 UTF-8 byte 处理。
-- 面向 UTF-8 文本，不再沿用 `pro` 的 ASCII-only 约束。
-- 不额外做人类语义转换；核心语义是“把 UTF-8 字节按 nibble 拆开，再映射到固定频点”。
+`ultra` 是 MFSK16 clean 路径，当前目标是“项目生成的无损 PCM/WAV -> 项目解析”。core 支持默认 `15.625 Bd` 和新增的 `31.25 Bd` 两档；本轮只接入 core，Android/Web 仍使用原有默认路径。这里的“无 metadata”仅表示解码不依赖项目自定义的 frame header、payload length 或 CRC；解码仍需要调用方提供 PCM 的采样率。
 
-## 信息层
-- 原始文本先按 UTF-8 转为 payload bytes。
-- payload bytes 会进入 `Ultra clean frame v1`。
-- frame bytes 再按 byte 拆成两个 nibble。
-- 每个 nibble 映射成一个独立 symbol。
-- 因此 `1 byte = 2 symbol`，但音频层承载的是 frame bytes，不只是裸 payload bytes。
-- 它和 `flash` 的差别在于：
-  - `flash` 逐 bit 发 low/high BFSK
-  - `ultra` 逐 nibble 发单频 `16-FSK` symbol，并用 frame header / CRC 固定 payload 边界
-- 它和 `pro` 的差别在于：
-  - `pro` 每个 symbol 是一对低/高双音
-  - `ultra` 每个 symbol 只发一个固定频点
+它不再使用项目自定义的 16-FSK frame、payload length 或 CRC，也不兼容旧的 Ultra 音频。协议层只依赖：`mode=ultra`、固定 MFSK16 参数，以及音频本身的符号内容。
 
-## Clean 16-FSK baseline
-`Ultra clean 16-FSK baseline` 是项目内基线，不是外部标准协议。
+## MFSK16 参数
 
-| 参数 | v1 baseline |
-| --- | --- |
-| Sample rate | `44100 Hz` |
-| Symbol samples | `2205` |
-| Symbol duration | `50 ms` |
-| Symbol rate | `20 symbols/s` |
-| Bits per symbol | `4` |
-| Raw symbol bitrate | `80 bit/s` |
+| 参数 | 当前值 |
+| --- | ---: |
+| Sample rate | 输入 PCM 的采样率 |
+| Symbol rate | 默认 `15.625 Bd`；core 可选 `31.25 Bd` |
+| Symbol duration | 默认 `64 ms`；`31.25 Bd` 为 `32 ms` |
 | Tone count | `16` |
-| Tone start | `1000 Hz` |
-| Tone spacing | `140 Hz` |
-| Tone end | `3100 Hz` |
-| Amplitude | `0.8` |
-| Mapping | nibble `0x0`..`0xF` -> tone index `0`..`15` |
+| Tone spacing | 默认 `15.625 Hz`；`31.25 Bd` 档为 `31.25 Hz` |
+| Tone range | 默认 `1000.000 .. 1234.375 Hz`；快速档 `1000.000 .. 1468.750 Hz` |
+| Bits per symbol | `4` |
+| Tone mapping | MFSK16 Gray mapping |
+| FEC | convolutional `R=1/2, K=7` |
+| Interleaver | 10-stage diagonal `4x4` (`160` bit delay) |
+| Character coding | IZ8BLY MFSK Varicode |
 
-频点表：
-
-```text
-0: 1000 Hz
-1: 1140 Hz
-2: 1280 Hz
-3: 1420 Hz
-4: 1560 Hz
-5: 1700 Hz
-6: 1840 Hz
-7: 1980 Hz
-8: 2120 Hz
-9: 2260 Hz
-A: 2400 Hz
-B: 2540 Hz
-C: 2680 Hz
-D: 2820 Hz
-E: 2960 Hz
-F: 3100 Hz
-```
-
-这个 baseline 的优先级是：
-- 可解释性优先于吞吐量
-- 可视化清晰度优先于压缩到最短 symbol
-- 稳定 symbol 判别优先于短音节速度
-- 保守频点间隔优先于极限频谱利用率
-- 项目内 frame contract 优先于外部协议互通
-
-当前不做：
-- FEC
-- interleaving
-- 多帧重组
-- 频偏估计
-- timing recovery
-- 录音环境同步搜索
-
-## Frame layout v1
-`Ultra clean frame v1` 是当前 `ultra` 正式协议。它用固定 header 和 CRC 把裸 UTF-8 payload 包成可校验 frame；实现不需要兼容旧的裸 payload ultra 音频。
+Tone index 到 nibble 的 Gray mapping 是：
 
 ```text
-preamble | sync | version | flags | payload_length | payload | crc16
+0  1  3  2  6  7  5  4  C  D  F  E  A  B  9  8
 ```
 
-字段按 byte 组织，再拆 nibble 进入 `16-FSK` symbol stream。
+每个 symbol 连续发一个 tone，不插入项目自定义的 symbol gap。渲染器使用连续相位；各 tone 的频率差与所选 symbol rate 对齐到对应的 MFSK16 网格。
 
-| Field | Size | Encoding | Purpose |
-| --- | ---: | --- | --- |
-| `preamble` | 8 bytes | fixed alternating pattern | 给后续真实接收预留能量检测、粗 symbol 对齐和 tone table 观测入口 |
-| `sync` | 2 bytes | fixed word | 标记 frame 正式开始，降低把 payload 误判为 header 的概率 |
-| `version` | 1 byte | `0x01` | frame layout 版本 |
-| `flags` | 1 byte | bit field, v1 must be `0x00` | 预留后续 FEC、interleaving、多帧等能力 |
-| `payload_length` | 4 bytes | unsigned big-endian | UTF-8 payload byte count |
-| `payload` | variable | raw UTF-8 bytes | 用户输入文本的原始 UTF-8 byte 序列 |
-| `crc16` | 2 bytes | CRC-16/CCITT-FALSE over `version | flags | payload_length | payload`, unsigned big-endian | 检测 frame header/payload 是否被破坏 |
+core 通过 `Mfsk16Speed::k15_625Bd`（默认）和 `Mfsk16Speed::k31_25Bd` 选择速率。`MakeMfsk16Config()`、文本编解码 speed overload 和底层 PCM API 支持该选择；Android 复用 mini 的 speed selector，并通过 `frame_samples` 传递两档速率。Web 本轮仍未接入。
 
-v1 固定值：
+## Clean 解码契约
+
+当前 clean decoder 是整段音频解码器，不是实时信道接收器。调用方必须保证：
+
+- 输入为单声道、16-bit PCM，且采样率通过 `CoreConfig.sample_rate_hz` 正确提供；
+- 音频从第一个 preamble symbol 的第一个采样点开始，没有前导或尾随的未对齐样本；
+- PCM 长度必须等于最后一个 symbol 边界 `B(N)`，其中 `N` 是 symbol 数，不能包含未对齐的额外样本；
+  - 载波从 `1000 Hz` 起始，tone spacing 和 symbol rate 使用所选速率对应的值；
+- 录音过程中没有载波频偏、采样时钟漂移、噪声、混响或多径。
+
+`UltraDecoder` 会缓存已推送的 PCM，并在拥有完整 recording（包括完整 symbol 边界和 4-symbol tail）后一次性解码；它不会在 recording 未结束时输出增量字符，也不会搜索任意起始位置。对尚未形成完整 recording 的 `Poll` 返回 `kNotReady`；需要对单段 PCM 做严格异常检查时，使用 `DecodePcm16ToSymbols`/`DecodePcm16ToText` 等 batch API。
+
+符号边界统一定义为：
 
 ```text
-preamble = A5 5A A5 5A A5 5A A5 5A
-sync     = D3 91
-version  = 01
-flags    = 00
+B(n) = round(n * sample_rate_hz / symbol_rate_baud)
 ```
 
-CRC-16/CCITT-FALSE 参数：
+第 `n` 个 symbol 覆盖 `[B(n), B(n+1))`。因此在 `44.1 kHz` 下 symbol 宽度会按 `2822`、`2823` 样本交替调度，避免固定四舍五入造成累计漂移。`NominalSymbolSamples()` 返回的整数仅是兼容性/展示用的平均 nominal 值，不能用于推导长音频的总长度或 symbol 起始位置。
+
+当前两个速率都可用整数边界精确实现：`15.625 = 125/8`，`31.25 = 125/4`。例如 `44.1 kHz`、`31.25 Bd` 的边界为 `1411`、`2822`、`4234`……，仍然按累计边界而不是固定宽度切分。
+
+编码、解码和 follow/timeline 必须使用同一个 `B(n)`；解码器拒绝不满足完整边界的 PCM。`sample_rate_hz < 16` 无法保证每个 symbol 至少有一个样本，因此属于无效 Ultra 配置。
+
+## 信息与编码链路
 
 ```text
-poly    = 0x1021
-init    = 0xFFFF
-refin   = false
-refout  = false
-xorout  = 0x0000
+UTF-8 bytes
+  -> IZ8BLY MFSK Varicode bitstream
+  -> R=1/2, K=7 convolutional FEC
+  -> 10-stage diagonal interleaver
+  -> 4-bit groups
+  -> MFSK16 Gray tone symbols
+  -> selected symbol rate PCM
 ```
 
-CRC 范围不包含 `preamble` 和 `sync`。这样后续真实接收可以先用 `preamble/sync` 找边界，再用 CRC 判断 frame 内容是否可信。
+Varicode 的字符边界按 `00` gap 和下一个字符首个 `1` 的 `001` 关系解析。有限的 clean recording 在最后一个字符后提供 look-ahead bit，随后进入 idle/tail；这不是 payload metadata，也不是 frame header。
 
-## Decode baseline
-- v1 decode 仍假设输入是 FlipBits encode 生成的干净 PCM/WAV。
-- decode 可以按已知 `sample_rate_hz`、`symbol_samples`、tone table 和 frame layout 直接切 symbol。
-- decode 必须验证：
-  - `preamble`
-  - `sync`
-  - `version`
-  - `flags`
-  - `payload_length`
-  - `crc16`
-- `payload_length` 决定 payload bytes 的精确范围；不能再依赖“全部 symbols 都是 payload”的旧裸 payload 假设。
-- CRC 失败应返回明确 decode failure，不应输出不可信文本。
+当前项目把输入字符串的 UTF-8 bytes 作为 Varicode 字节输入，以保持 Android 与 core 的字节结果一致；未来真实环境接收仍应以 MFSK16 Varicode 的字符流边界为准，而不是读取 WAV metadata。
 
-## Follow / visual contract
-- Text follow 和 Binary / Hex follow 的正文语义只覆盖 `payload`。
-- `preamble`、`sync`、`version`、`flags`、`payload_length`、`crc16` 属于 frame metadata，不应作为用户文本 token 参与 lyrics/token 高亮。
-- Ultra visual 的音频符号展示应跟随 core 提供的 full-frame symbol / group timeline，包括 preamble、sync、header、payload 和 CRC 对应的真实 `16-FSK` symbols。
-- 正文 tokens、Binary、Hex 的 active range 必须继续以 payload byte timeline 为 source of truth。
-- frame metadata 可以作为 visual section 展示，但不能作为用户文本 token 参与歌词或 token 页的正文高亮。
+## Preamble、tail 与 follow
 
-## 听感与工程意图
-- `ultra` 比 `pro` 更偏高密度频点映射，而不是正式双音。
-- 它的目标不是风格化情绪表达，而是把 UTF-8 文本字节组织成带边界、可校验的 `16-FSK` clean frame。
-- 它不是为了追求当前项目内最高吞吐量，而是为了提供一条低速、稳定、可解释、便于可视化的 UTF-8 传输基线。
-- 对 LLM / agent 来说，最稳定的理解方式是：
-  - `ultra = UTF-8 payload -> Ultra clean frame v1 -> nibbles -> clean 16-FSK`
+- MFSK16 规范规定传输开始时发送 8 个最低 tone 的 idle carrier，结束时保留至少 4 个 symbol 的最低 tone idle；因此本实现的 8-symbol preamble 和 4-symbol tail 不是项目自定义的 frame 字段。
+- 在本项目的有限 clean recording 中，4 个 tail symbol 作为 FEC 数据区之外的结束标记保留；这是一项实现契约，用于在没有 payload length metadata 的情况下确定 recording 结束，不代表已实现实时接收中的 idle/diddle 处理。
+- preamble、data、tail 都进入 `ultra_frame_timeline`，但它现在表示 MFSK16 symbol timeline，不再表示旧 frame 字段。
+- 用户 payload 的 byte timeline 只覆盖 data 区间；binary group timeline 每个 MFSK16 tone symbol 一个 group，`bit_count=4`。
+- batch decoder 直接按所选 `symbol_rate_baud` 解析；transport/C API/Android 通过 `frame_samples` 识别 Ultra 的两档速率。未显式选择时生成 `15.625 Bd`，选择 `31.25 Bd` 时使用快速档；当前 Web 仍未接入。
+
+## 当前边界
+
+- 已实现：`15.625 Bd` 默认档和 core-only `31.25 Bd` 档、16 tones、对应 tone spacing、Gray mapping、IZ8BLY MFSK Varicode、`R=1/2, K=7` 硬判决 Viterbi、interleaver、clean PCM roundtrip、无项目 frame metadata API 路径。
+- 尚未实现：真实录音中的 carrier offset、symbol timing recovery、AFC、软判决、任意起始位置搜索、实时增量输出、采样时钟漂移补偿和抗多径处理。
+- 当前测试重点是固定标准向量和项目 clean round-trip；项目内部 round-trip 不等同于与其他 MFSK16 实现互操作验证。
+- 不得重新引入旧的 `frame v1`、nibble-per-payload-byte、20Bd 或 10/15/20 WPM 逻辑作为 Ultra 分支。
 
 ## 主链路文件
+
 - `libs/audio_core/src/ultra/codec.cpp`
 - `libs/audio_core/src/ultra/phy_clean.cpp`
-- transport 分发入口：
-  - `libs/audio_core/src/transport/transport.cpp`
-- C API 边界：
-  - `libs/audio_api/src/bag_api.cpp`
-
-## 相关入口
-- 总览 / 对比见 [`../transports.md`](../transports.md)
-- 未来高速方向见 [`multi-tone-fsk.md`](multi-tone-fsk.md)
-- 文件地图见 [`../../architecture/repo-map.md`](../../architecture/repo-map.md)
+- `apps/audio_android/native_package/src/audio_core_ultra_codec.cpp`
+- `apps/audio_android/native_package/src/audio_core_ultra_phy_clean.cpp`
+- C API：`libs/audio_api/src/bag_api.cpp`

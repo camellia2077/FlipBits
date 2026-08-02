@@ -11,7 +11,7 @@
 ## 分层
 
 - 总说明：
-  - `<repo-root>/.agent/AGENTS.md`
+  - `<repo-root>/agents/AGENTS.md`
   - 只保留工作方式、命令分层原则和高频入口
 - 工具入口：
   - `<repo-root>/tools/README.md`

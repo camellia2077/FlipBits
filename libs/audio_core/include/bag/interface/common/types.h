@@ -85,7 +85,7 @@ enum class UltraFrameSection {
   kFlags = 3,
   kPayloadLength = 4,
   kPayload = 5,
-  kCrc16 = 6,
+  kTail = 6,
 };
 
 struct UltraFrameSymbolEntry {

@@ -26,7 +26,7 @@
 
 - 同一天内如果有多轮 tooling 改动，优先合并到同一个日期文件，而不是按批次继续细分文件名
 - 如需写作规范，统一参考：
-  - `<repo-root>/.agent/workflow/docs/tools-history-style-guide.md`
+  - `<repo-root>/agents/workflows/docs/tools-history-style-guide.md`
 
 ## Flash speed audio analysis
 

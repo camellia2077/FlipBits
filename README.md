@@ -154,4 +154,4 @@ README 只保留项目首页需要的信息。更细的模式设计、参数、�
 - 在线 Demo：[`FlipBits Pages`](https://camellia2077.github.io/FlipBits/)
 - APK：通过 GitHub Releases 发布
 
-如果你是开发者或 AI / agent，请从 [`.agent/AGENTS.md`](.agent/AGENTS.md) 开始。Android、CLI、libs 的具体构建、测试和修改约定已下沉到各子系统 `AGENTS.md`，README 不再展开维护这些内部流程。
+如果你是开发者或 AI / agent，请从 [`agents/AGENTS.md`](agents/AGENTS.md) 开始。Android、CLI、libs 的具体构建、测试和修改约定已下沉到各子系统 `AGENTS.md`，README 不再展开维护这些内部流程。

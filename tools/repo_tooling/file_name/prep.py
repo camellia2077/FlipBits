@@ -18,7 +18,7 @@ def build_file_name_prep_result() -> FileNamePrepResult:
     candidate_paths = collect_git_candidates()
     reviews = []
     for path in candidate_paths:
-        reading = ["`.agent/guides/file-name-styles.md`"]
+        reading = ["`agents/guides/file-name-styles.md`"]
         reading.extend(f"`{item}`" for item in representative_siblings(path))
         reviews.append(build_candidate_review(path, suggested_reading=reading))
 

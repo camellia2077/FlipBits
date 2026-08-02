@@ -25,7 +25,7 @@ raw_data = {
     
     # --- 高阶协议 ---
     "Pro":      {"fs": 1.5,    "bps": 4,    "charset": 128, "silence": 0, "jitter": 0, "dtmf": 6}, # DTMF
-    "Ultra":    {"fs": 0.5,    "bps": 4,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0}, # 16-FSK
+    "Ultra":    {"fs": 0.5,    "bps": 4,    "charset": 256, "silence": 0, "jitter": 0, "dtmf": 0}, # MFSK16
 }
 
 results = {}

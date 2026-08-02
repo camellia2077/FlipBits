@@ -184,13 +184,25 @@ EncodeWorkPlan BuildEncodeWorkPlan(const CoreConfig& config,
     }
     case TransportMode::kUltra: {
       const std::size_t payload_size = text.size();
-      const std::size_t frame_size = payload_size + 4;
-      const std::size_t symbol_count = frame_size * 2;
+      // MFSK16 uses Varicode followed by R=1/2 FEC and a 160-bit
+      // interleaver delay. This is deliberately an estimate; the encoder's
+      // symbol stage remains the source of truth for the exact count.
+      const std::size_t estimated_varicode_bits =
+          std::max<std::size_t>(payload_size * 12, 1);
+      constexpr std::size_t kMfsK16PreambleSymbols = 8;
+      constexpr std::size_t kMfsK16InterleaveDelaySymbols = 40;
+      constexpr std::size_t kMfsK16TailSymbols = 4;
+      const std::size_t symbol_count =
+          kMfsK16PreambleSymbols + ((estimated_varicode_bits * 2 + 3) / 4) +
+          kMfsK16InterleaveDelaySymbols + kMfsK16TailSymbols;
+      const auto ultra_config = ultra::MakeMfsk16Config(config);
       const std::size_t render_work = std::max<std::size_t>(
-          symbol_count * std::max<std::size_t>(SafeFrameSamples(config), 1), 1);
+          ultra::TotalSamplesForSymbols(config.sample_rate_hz, symbol_count,
+                                        ultra_config.symbol_rate_baud),
+          1);
       plan.preparing_input_work_units =
           std::max<std::size_t>(payload_size, 1) +
-          std::max<std::size_t>(frame_size + symbol_count, 1);
+          std::max<std::size_t>(symbol_count, 1);
       plan.rendering_pcm_work_units = render_work;
       plan.postprocessing_work_units = 0;
       plan.finalizing_work_units = 1;
