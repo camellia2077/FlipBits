@@ -44,6 +44,33 @@ class BaseResponsibilityScorer(ABC):
         return "P3"
 
     @staticmethod
+    def _confidence_for_metrics(metrics: ResponsibilityMetrics) -> str:
+        evidence_groups = sum(
+            [
+                metrics.line_count > 0,
+                metrics.state_signal_hits > 0,
+                metrics.top_level_symbol_count > 0,
+                bool(metrics.role_kinds),
+                metrics.mode_branch_hits > 0,
+                metrics.io_kind_count > 0,
+                metrics.rule_helper_count > 0,
+                metrics.responsibility_verb_kind_count > 0,
+                metrics.command_layer_leak_hits > 0,
+                metrics.interop_surface_hits > 0,
+                metrics.resource_lifecycle_hits > 0,
+            ]
+        )
+        if evidence_groups >= 4:
+            return "high"
+        if evidence_groups >= 2:
+            return "medium"
+        return "low"
+
+    @staticmethod
+    def _decision_for_score(score: int) -> str:
+        return "refactor_candidate" if score >= 8 else "inspect"
+
+    @staticmethod
     def _join_risk_summaries(risks: list[ResponsibilityRiskKind]) -> str:
         if not risks:
             return "文件体量和职责信号较高，建议结合上下文复核拆分边界"
@@ -67,6 +94,8 @@ class KotlinResponsibilityScorer(BaseResponsibilityScorer):
             score=score,
             priority=self._priority_for_score(score),
             summary=summary,
+            confidence=self._confidence_for_metrics(metrics),
+            decision=self._decision_for_score(score),
             dominant_risks=dominant_risks or None,
             suggestion=suggestion,
             next_action=self._build_kotlin_next_action(dominant_risks),
@@ -124,6 +153,8 @@ class PythonResponsibilityScorer(BaseResponsibilityScorer):
             score=score,
             priority=self._priority_for_score(score),
             summary=summary,
+            confidence=self._confidence_for_metrics(metrics),
+            decision=self._decision_for_score(score),
             dominant_risks=dominant_risks or None,
             suggestion=suggestion,
             next_action=self._build_python_next_action(dominant_risks),
@@ -204,6 +235,8 @@ class CppResponsibilityScorer(BaseResponsibilityScorer):
             score=score,
             priority=self._priority_for_score(score),
             summary=summary,
+            confidence=self._confidence_for_metrics(metrics),
+            decision=self._decision_for_score(score),
             dominant_risks=dominant_risks or None,
             suggestion=suggestion,
             next_action=self._build_cpp_next_action(dominant_risks),

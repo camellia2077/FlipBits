@@ -70,6 +70,8 @@ class ResponsibilityAssessment:
     score: int
     priority: str
     summary: str
+    confidence: str = "low"
+    decision: str = "inspect"
     dominant_risks: list[ResponsibilityRiskKind] | None = None
     suggestion: str | None = None
     next_action: str | None = None
@@ -88,6 +90,8 @@ def build_responsibility_result(
         "score": assessment.score,
         "priority": assessment.priority,
         "summary": assessment.summary,
+        "confidence": assessment.confidence,
+        "decision": assessment.decision,
         "state_signal_hits": metrics.state_signal_hits,
         "top_level_composables": metrics.top_level_symbol_count,
         "role_kinds": metrics.role_kinds,

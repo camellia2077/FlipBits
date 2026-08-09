@@ -42,6 +42,9 @@ class ToneUnitRenderer {
 };
 
 MorseToneConfig MakeMorseToneConfig(const CoreConfig& config);
+bool IsValidMorseToneConfig(const MorseToneConfig& config);
+std::size_t EncodedPayloadUnitCount(
+    const std::vector<std::uint8_t>& payload);
 
 ErrorCode EncodePayloadToPcm16(const std::vector<std::uint8_t>& payload,
                                const MorseToneConfig& config,

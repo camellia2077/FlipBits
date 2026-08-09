@@ -64,7 +64,9 @@ class FlashChunkRenderer {
 
 BfskConfig MakeBfskConfig(const CoreConfig& config);
 BfskConfig MakeBfskConfigForSignalProfile(const CoreConfig& config,
-                                         FlashSignalProfile signal_profile);
+                                          FlashSignalProfile signal_profile);
+
+FlashVoicingFlavor NormalizeSignalVoicingFlavor(FlashVoicingFlavor flavor);
 
 FlashPayloadLayout BuildPayloadLayout(const std::vector<std::uint8_t>& bytes,
                                       const BfskConfig& config = {});

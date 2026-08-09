@@ -1,7 +1,12 @@
 from pathlib import Path
 
-from .report_formatter import FormattedPathSection, FormattedScanReport, ReportFormatter
-from .report_models import ScanReport
+from .report_formatter import (
+    FormattedPathSection,
+    FormattedScanReport,
+    ReportFormatter,
+    ScopeReportFormatter,
+)
+from .report_models import ScanReport, ScopeReport
 
 
 class LocConsoleReporter:
@@ -70,3 +75,29 @@ class LocConsoleReporter:
         print(f"  路径: {path}")
         print("  [ERROR] 路径不存在，跳过扫描。")
         print(f"\n{'-' * 100}\n")
+
+
+class ScopeConsoleReporter:
+    def __init__(
+        self,
+        formatter: ScopeReportFormatter,
+        detail_md_by_path: dict[str, str] | None = None,
+    ):
+        self.formatter = formatter
+        self.detail_md_by_path = detail_md_by_path or {}
+
+    def print_scan_report(self, report: ScopeReport) -> None:
+        formatted = self.formatter.format_scan_report(report)
+        print(f"{'=' * 100}")
+        print(formatted.heading)
+        print(f"{'=' * 100}\n")
+        for part in formatted.parts:
+            print(f"## Part: {part.display_name} [{part.part}]")
+            child_reporter = LocConsoleReporter(
+                self.formatter.formatter_for(part.part),
+                detail_md_by_path=self.detail_md_by_path,
+            )
+            for section in part.report.path_sections:
+                child_reporter._print_path_section(section)
+        if formatted.error:
+            print(f"[ERROR] {formatted.error}")

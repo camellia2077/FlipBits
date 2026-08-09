@@ -97,6 +97,7 @@
 
 ### `flash`
 - 先看：
+  - `libs/audio_core/modules/bag/flash/facade.cppm`
   - `libs/audio_core/modules/bag/flash/codec.cppm`
   - `libs/audio_core/src/flash/codec.cpp`
   - `libs/audio_core/modules/bag/flash/signal.cppm`
@@ -104,12 +105,15 @@
   - `libs/audio_core/modules/bag/flash/voicing.cppm`
   - `libs/audio_core/src/flash/voicing.cpp`
   - `libs/audio_core/modules/bag/flash/phy_clean.cppm`
-  - `libs/audio_core/src/flash/phy_clean.cpp`
+  - `libs/audio_core/src/flash/phy_rules.cpp`
+  - `libs/audio_core/src/flash/phy_encode.cpp`
+  - `libs/audio_core/src/flash/phy_decode.cpp`
 - 当前语义：
   - 原始字节直通
   - `bag.flash.signal` 负责 clean `BFSK` payload 与 payload layout
   - `bag.flash.voicing` 负责 payload voicing、固定 preamble / epilogue 与 trim descriptor
   - `bag.flash.phy_clean` 负责 text facade 与 decoder 组合
+  - `bag.flash.facade` 是面向上层 host consumer 的 flash 聚合入口；它可以重新导出 flash 子能力，但上层不应逐个 import 子模块
   - 无 frame / CRC / 长度字段
 
 ### `pro`
@@ -117,7 +121,10 @@
   - `libs/audio_core/modules/bag/pro/codec.cppm`
   - `libs/audio_core/src/pro/codec.cpp`
   - `libs/audio_core/modules/bag/pro/phy_clean.cppm`
-  - `libs/audio_core/src/pro/phy_clean.cpp`
+  - `libs/audio_core/src/pro/phy_rules.cpp`
+  - `libs/audio_core/src/pro/tone_renderer.cpp`
+  - `libs/audio_core/src/pro/phy_encode.cpp`
+  - `libs/audio_core/src/pro/phy_decode.cpp`
   - `libs/audio_core/modules/bag/pro/phy_compat.cppm`
   - `libs/audio_core/src/pro/phy_compat.cpp`
 - 当前语义：
@@ -130,7 +137,10 @@
   - `libs/audio_core/modules/bag/ultra/codec.cppm`
   - `libs/audio_core/src/ultra/codec.cpp`
   - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
-  - `libs/audio_core/src/ultra/phy_clean.cpp`
+  - `libs/audio_core/src/ultra/phy_rules.cpp`
+  - `libs/audio_core/src/ultra/tone_renderer.cpp`
+  - `libs/audio_core/src/ultra/phy_encode.cpp`
+  - `libs/audio_core/src/ultra/phy_decode.cpp`
 - 当前语义：
   - UTF-8 payload
   - MFSK16：固定 `15.625 Bd`、16 tones、15.625 Hz spacing、Gray mapping
@@ -142,7 +152,10 @@
   - `libs/audio_core/modules/bag/mini/codec.cppm`
   - `libs/audio_core/src/mini/codec.cpp`
   - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
-  - `libs/audio_core/src/mini/phy_clean.cpp`
+  - `libs/audio_core/src/mini/morse_rules.cpp`
+  - `libs/audio_core/src/mini/tone_renderer.cpp`
+  - `libs/audio_core/src/mini/phy_encode.cpp`
+  - `libs/audio_core/src/mini/phy_decode.cpp`
 - 当前语义：
   - Morse-compatible text
   - 小写转大写，连续空格折叠
@@ -199,7 +212,9 @@
   - `libs/audio_core/src/flash/codec.cpp`
   - `libs/audio_core/src/flash/signal.cpp`
   - `libs/audio_core/src/flash/voicing.cpp`
-  - `libs/audio_core/src/flash/phy_clean.cpp`
+  - `libs/audio_core/src/flash/phy_rules.cpp`
+  - `libs/audio_core/src/flash/phy_encode.cpp`
+  - `libs/audio_core/src/flash/phy_decode.cpp`
 - 再看：
   - `Test/modules/leaf_module_smoke.cpp`
   - `Test/artifact/artifact_tests.cpp`
@@ -207,7 +222,10 @@
 ### 改 `pro` 编解码
 - 先看：
   - `libs/audio_core/src/pro/codec.cpp`
-  - `libs/audio_core/src/pro/phy_clean.cpp`
+  - `libs/audio_core/src/pro/phy_rules.cpp`
+  - `libs/audio_core/src/pro/tone_renderer.cpp`
+  - `libs/audio_core/src/pro/phy_encode.cpp`
+  - `libs/audio_core/src/pro/phy_decode.cpp`
   - `libs/audio_core/src/transport/transport.cpp`
 - 再看：
   - `Test/modules/leaf_module_smoke.cpp`
@@ -217,7 +235,10 @@
 ### 改 `ultra` 编解码
 - 先看：
   - `libs/audio_core/src/ultra/codec.cpp`
-  - `libs/audio_core/src/ultra/phy_clean.cpp`
+  - `libs/audio_core/src/ultra/phy_rules.cpp`
+  - `libs/audio_core/src/ultra/tone_renderer.cpp`
+  - `libs/audio_core/src/ultra/phy_encode.cpp`
+  - `libs/audio_core/src/ultra/phy_decode.cpp`
   - `libs/audio_core/src/transport/transport.cpp`
 - 再看：
   - `libs/audio_api/tests/api_tests.cpp`
@@ -228,7 +249,10 @@
   - `docs/design/modes/mini-whitespace-contract.md`
   - `docs/architecture/android/android-mini-cross-layer-contract.md`
   - `libs/audio_core/src/mini/codec.cpp`
-  - `libs/audio_core/src/mini/phy_clean.cpp`
+  - `libs/audio_core/src/mini/morse_rules.cpp`
+  - `libs/audio_core/src/mini/tone_renderer.cpp`
+  - `libs/audio_core/src/mini/phy_encode.cpp`
+  - `libs/audio_core/src/mini/phy_decode.cpp`
   - `libs/audio_core/src/transport/transport.cpp`
   - `libs/audio_core/src/transport/follow.cpp`
 - 再看：

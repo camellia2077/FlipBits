@@ -33,6 +33,7 @@ target_sources(
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/modules
         FILES
             modules/audio_io/wav.cppm
+            modules/audio_io/wav_metadata_parse.cppm
 )
 
 target_compile_features(audio_io PRIVATE cxx_std_23)

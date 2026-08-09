@@ -4,6 +4,41 @@
 [global]
 excluded_languages = ["md"]
 
+[scopes.audio_api]
+display_name = "libs/audio_api"
+default_paths = ["libs/audio_api"]
+languages = ["cpp"]
+
+[scopes.audio_core]
+display_name = "libs/audio_core"
+default_paths = ["libs/audio_core"]
+languages = ["cpp"]
+
+[scopes.audio_io]
+display_name = "libs/audio_io"
+default_paths = ["libs/audio_io"]
+languages = ["cpp"]
+
+[scopes.audio_runtime]
+display_name = "libs/audio_runtime"
+default_paths = ["libs/audio_runtime"]
+languages = ["cpp"]
+
+[scopes.audio_android]
+display_name = "apps/audio_android"
+default_paths = ["apps/audio_android"]
+languages = ["cpp", "kt"]
+
+[scopes.audio_cli]
+display_name = "apps/audio_cli"
+default_paths = ["apps/audio_cli"]
+languages = ["rs"]
+
+[scopes.audio_web]
+display_name = "apps/audio_web"
+default_paths = ["apps/audio_web"]
+languages = ["cpp", "js"]
+
 [md]
 display_name = "Markdown"
 default_paths = [
@@ -113,3 +148,47 @@ responsibility_state_signal_threshold = 4
 responsibility_top_level_composable_threshold = 6
 responsibility_role_kind_threshold = 2
 responsibility_mode_branch_threshold = 2
+
+[rs]
+display_name = "Rust"
+default_paths = [
+  "apps/audio_cli",
+]
+extensions = [".rs"]
+ignore_dirs = [
+  ".git",
+  ".gradle",
+  ".idea",
+  ".kotlin",
+  ".vscode",
+  "target",
+  "build",
+  "__pycache__",
+]
+ignore_prefixes = ["dist", "out"]
+default_over_threshold = 350
+default_under_threshold = 120
+default_dir_over_files = 16
+over_inclusive = false
+
+[js]
+display_name = "JavaScript"
+default_paths = [
+  "apps/audio_web",
+]
+extensions = [".js", ".mjs"]
+ignore_dirs = [
+  ".git",
+  ".gradle",
+  ".idea",
+  ".kotlin",
+  ".vscode",
+  "node_modules",
+  "build",
+  "__pycache__",
+]
+ignore_prefixes = ["dist", "out"]
+default_over_threshold = 250
+default_under_threshold = 80
+default_dir_over_files = 16
+over_inclusive = false

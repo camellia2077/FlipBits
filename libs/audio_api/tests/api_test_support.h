@@ -53,6 +53,8 @@ void AssertRoundTripAcrossCorpus(const std::vector<test::CorpusCase>& corpus,
                                  bag_transport_mode mode);
 
 void RegisterApiSyncTests(test::Runner& runner);
+void RegisterApiAsyncEncodeTests(test::Runner& runner);
+void RegisterApiAsyncDecodeTests(test::Runner& runner);
 void RegisterApiAsyncTests(test::Runner& runner);
 void RegisterApiFlashTests(test::Runner& runner);
 void RegisterApiVoiceFxTests(test::Runner& runner);

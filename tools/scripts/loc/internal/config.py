@@ -6,7 +6,7 @@ try:
 except ModuleNotFoundError:  # pragma: no cover
     import tomli as tomllib  # type: ignore
 
-LANG_CHOICES = ("cpp", "kt", "py", "rs", "md")
+LANG_CHOICES = ("cpp", "kt", "py", "rs", "js", "md")
 
 
 @dataclass(frozen=True)
@@ -18,6 +18,7 @@ class GlobalScanConfig:
 class ScanLinesConfig:
     global_config: GlobalScanConfig
     languages: dict[str, "LanguageConfig"]
+    scopes: dict[str, "ScopeConfig"]
 
 
 @dataclass(frozen=True)
@@ -38,6 +39,14 @@ class LanguageConfig:
     responsibility_top_level_composable_threshold: int
     responsibility_role_kind_threshold: int
     responsibility_mode_branch_threshold: int
+
+
+@dataclass(frozen=True)
+class ScopeConfig:
+    scope: str
+    display_name: str
+    default_paths: list[str]
+    languages: tuple[str, ...]
 
 
 def load_scan_lines_config(config_path: Path) -> ScanLinesConfig:
@@ -66,7 +75,8 @@ def load_scan_lines_config(config_path: Path) -> ScanLinesConfig:
             excluded_extensions,
         )
 
-    return ScanLinesConfig(global_config=global_config, languages=languages)
+    scopes = _parse_scopes(payload.get("scopes"), languages)
+    return ScanLinesConfig(global_config=global_config, languages=languages, scopes=scopes)
 
 
 def load_language_config(config_path: Path, lang: str) -> LanguageConfig:
@@ -75,6 +85,48 @@ def load_language_config(config_path: Path, lang: str) -> LanguageConfig:
     if language_config is None:
         raise ValueError(f"配置缺失语言节点: [{lang}]")
     return language_config
+
+
+def load_scope_config(config_path: Path, scope: str) -> ScopeConfig:
+    config = load_scan_lines_config(config_path)
+    scope_config = config.scopes.get(scope)
+    if scope_config is None:
+        raise ValueError(f"配置缺失 scope 节点: [scopes.{scope}]")
+    return scope_config
+
+
+def _parse_scopes(payload, languages: dict[str, LanguageConfig]) -> dict[str, ScopeConfig]:
+    if payload is None:
+        return {}
+    if not isinstance(payload, dict):
+        raise ValueError("配置节点必须是 table: [scopes]")
+
+    scopes: dict[str, ScopeConfig] = {}
+    for scope_name, raw_section in payload.items():
+        if not isinstance(scope_name, str) or not scope_name.strip():
+            raise ValueError("scope 名称必须是非空字符串")
+        if not isinstance(raw_section, dict):
+            raise ValueError(f"配置 scope 节点必须是 table: [scopes.{scope_name}]")
+        display_name = str(raw_section.get("display_name", scope_name)).strip() or scope_name
+        default_paths = _as_str_list(
+            raw_section.get("default_paths"),
+            f"scopes.{scope_name}.default_paths",
+        )
+        configured_languages = tuple(
+            _as_str_list(raw_section.get("languages"), f"scopes.{scope_name}.languages")
+        )
+        unknown_languages = [lang for lang in configured_languages if lang not in languages]
+        if unknown_languages:
+            raise ValueError(
+                f"scope {scope_name} 引用了未配置语言: {', '.join(unknown_languages)}"
+            )
+        scopes[scope_name] = ScopeConfig(
+            scope=scope_name,
+            display_name=display_name,
+            default_paths=default_paths,
+            languages=configured_languages,
+        )
+    return scopes
 
 
 def _parse_global_config(section) -> GlobalScanConfig:

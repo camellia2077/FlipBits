@@ -2,8 +2,7 @@
 
 #include <string>
 
-namespace audio_io::detail::bytes_impl {
-namespace {
+namespace audio_io::detail::wav_metadata_parse_rules {
 
 constexpr std::size_t kRiffHeaderSize = 12;
 constexpr std::size_t kChunkHeaderSize = 8;
@@ -63,7 +62,7 @@ bool IsSupportedMiniSpeedStyle(FlipBitsAudioMetadataMiniSpeedStyle style) {
          style == FlipBitsAudioMetadataMiniSpeedStyle::kFast;
 }
 
-bool IsIsoUtcTimestampChar(char value, std::size_t index) {
+static bool IsIsoUtcTimestampChar(char value, std::size_t index) {
   switch (index) {
     case 4:
     case 7:
@@ -134,6 +133,8 @@ bool IsValidSegmentSampleCounts(const FlipBitsAudioMetadata& metadata) {
   }
   return total_segment_samples == metadata.pcm_sample_count;
 }
+
+namespace {
 
 std::string ReadPaddedAsciiString(const std::uint8_t* data,
                                   std::size_t byte_count) {
@@ -306,4 +307,4 @@ FlipBitsAudioMetadataParseResult ParseFlipBitsAudioMetadataBytes(
   return {FlipBitsAudioMetadataStatus::kNotFound, {}};
 }
 
-}  // namespace audio_io::detail::bytes_impl
+}  // namespace audio_io::detail::wav_metadata_parse_rules

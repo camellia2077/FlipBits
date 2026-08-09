@@ -1,4 +1,12 @@
 namespace audio_io::detail::bytes_impl {
+using ::audio_io::detail::wav_metadata_parse_rules::IsSupportedFlashVoicingStyle;
+using ::audio_io::detail::wav_metadata_parse_rules::IsSupportedInputSourceKind;
+using ::audio_io::detail::wav_metadata_parse_rules::IsSupportedMetadataVersion;
+using ::audio_io::detail::wav_metadata_parse_rules::IsSupportedMiniSpeedStyle;
+using ::audio_io::detail::wav_metadata_parse_rules::IsSupportedMode;
+using ::audio_io::detail::wav_metadata_parse_rules::IsValidCreatedAtIsoUtc;
+using ::audio_io::detail::wav_metadata_parse_rules::IsValidSegmentSampleCounts;
+using ::audio_io::detail::wav_metadata_parse_rules::IsValidVersionText;
 namespace {
 
 constexpr std::size_t kRiffHeaderSize = 12;
@@ -43,101 +51,6 @@ constexpr std::uint16_t kMonoChannelCount = 1;
 constexpr std::uint16_t kBitsPerSample = 16;
 constexpr std::size_t kBytesPerSample = 2;
 constexpr std::uint32_t kMaxChunkByteCount = 0xFFFFFFFFu;
-
-bool IsSupportedMode(FlipBitsAudioMetadataMode mode) {
-  return mode == FlipBitsAudioMetadataMode::kMini ||
-         mode == FlipBitsAudioMetadataMode::kFlash ||
-         mode == FlipBitsAudioMetadataMode::kPro ||
-         mode == FlipBitsAudioMetadataMode::kUltra;
-}
-
-bool IsSupportedFlashVoicingStyle(
-    FlipBitsAudioMetadataFlashVoicingStyle style) {
-  return style == FlipBitsAudioMetadataFlashVoicingStyle::kStandard ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kLitany ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kHostility ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kCollapse ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kZeal ||
-         style == FlipBitsAudioMetadataFlashVoicingStyle::kVoid;
-}
-
-bool IsSupportedMiniSpeedStyle(FlipBitsAudioMetadataMiniSpeedStyle style) {
-  return style == FlipBitsAudioMetadataMiniSpeedStyle::kSlow ||
-         style == FlipBitsAudioMetadataMiniSpeedStyle::kStandard ||
-         style == FlipBitsAudioMetadataMiniSpeedStyle::kFast;
-}
-
-bool IsIsoUtcTimestampChar(char value, std::size_t index) {
-  switch (index) {
-    case 4:
-    case 7:
-      return value == '-';
-    case 10:
-      return value == 'T';
-    case 13:
-    case 16:
-      return value == ':';
-    case 19:
-      return value == 'Z';
-    default:
-      return value >= '0' && value <= '9';
-  }
-}
-
-bool IsSupportedMetadataVersion(std::uint8_t version) {
-  return version == kFlipBitsMetadataVersionV7;
-}
-
-bool IsValidCreatedAtIsoUtc(const std::string& created_at_iso_utc) {
-  if (created_at_iso_utc.size() != kFlipBitsMetadataIsoUtcByteCount) {
-    return false;
-  }
-  for (std::size_t index = 0; index < created_at_iso_utc.size(); ++index) {
-    if (!IsIsoUtcTimestampChar(created_at_iso_utc[index], index)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool IsValidVersionText(const std::string& version_text) {
-  if (version_text.empty() ||
-      version_text.size() > kFlipBitsMetadataVersionTextByteCount) {
-    return false;
-  }
-  for (char value : version_text) {
-    if (value < 0x20 || value > 0x7Eu) {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool IsSupportedInputSourceKind(FlipBitsAudioMetadataInputSourceKind kind) {
-  return kind == FlipBitsAudioMetadataInputSourceKind::kManual ||
-         kind == FlipBitsAudioMetadataInputSourceKind::kSample;
-}
-
-bool IsValidSegmentSampleCounts(const FlipBitsAudioMetadata& metadata) {
-  if (metadata.segment_count == 0u) {
-    return false;
-  }
-  if (metadata.segment_sample_counts.empty()) {
-    return metadata.segment_count == 1u;
-  }
-  if (metadata.segment_sample_counts.size() != metadata.segment_count) {
-    return false;
-  }
-
-  std::uint64_t total_segment_samples = 0;
-  for (std::uint32_t sample_count : metadata.segment_sample_counts) {
-    if (sample_count == 0u) {
-      return false;
-    }
-    total_segment_samples += sample_count;
-  }
-  return total_segment_samples == metadata.pcm_sample_count;
-}
 
 std::size_t ComputeFlipBitsMetadataPayloadSize(
     const FlipBitsAudioMetadata& metadata) {

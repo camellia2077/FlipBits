@@ -9,8 +9,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "wav_io_bytes_impl.inc"
 #include "wav_metadata_parse_rules.h"
+#include "wav_io_bytes_impl.inc"
 
 namespace audio_io::detail {
 
@@ -38,7 +38,8 @@ WavPcm16InfoParseResult ProbeMonoPcm16WavBackend(const std::uint8_t* wav_bytes,
 
 FlipBitsAudioMetadataParseResult ParseFlipBitsAudioMetadataBackend(
     const std::uint8_t* wav_bytes, std::size_t wav_byte_count) {
-  return bytes_impl::ParseFlipBitsAudioMetadataBytes(wav_bytes, wav_byte_count);
+  return wav_metadata_parse_rules::ParseFlipBitsAudioMetadataBytes(
+      wav_bytes, wav_byte_count);
 }
 
 void WriteMonoPcm16WavBackend(const std::filesystem::path& output_path,

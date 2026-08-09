@@ -68,7 +68,9 @@
 - `libs/audio_core/src/flash/codec.cpp`
 - `libs/audio_core/src/flash/signal.cpp`
 - `libs/audio_core/src/flash/voicing.cpp`
-- `libs/audio_core/src/flash/phy_clean.cpp`
+- `libs/audio_core/src/flash/phy_rules.cpp`
+- `libs/audio_core/src/flash/phy_encode.cpp`
+- `libs/audio_core/src/flash/phy_decode.cpp`
 - transport 分发入口：
   - `libs/audio_core/src/transport/transport.cpp`
 - C API 边界：

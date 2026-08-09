@@ -73,12 +73,18 @@
 
 ## 主链路文件
 - `libs/audio_core/src/mini/codec.cpp`
-- `libs/audio_core/src/mini/phy_clean.cpp`
+- `libs/audio_core/src/mini/morse_rules.cpp`
+- `libs/audio_core/src/mini/tone_renderer.cpp`
+- `libs/audio_core/src/mini/phy_encode.cpp`
+- `libs/audio_core/src/mini/phy_decode.cpp`
 - `libs/audio_core/src/transport/follow.cpp`
 - `libs/audio_core/src/transport/transport.cpp`
 - Android package lane 对应：
   - `apps/audio_android/native_package/src/audio_core_mini_codec.cpp`
-  - `apps/audio_android/native_package/src/audio_core_mini_phy_clean.cpp`
+  - `apps/audio_android/native_package/src/audio_core_mini_morse_rules.cpp`
+  - `apps/audio_android/native_package/src/audio_core_mini_tone_renderer.cpp`
+  - `apps/audio_android/native_package/src/audio_core_mini_phy_encode.cpp`
+  - `apps/audio_android/native_package/src/audio_core_mini_phy_decode.cpp`
 
 ## 相关入口
 - 总览 / 对比见 [`../transports.md`](../transports.md)

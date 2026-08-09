@@ -58,6 +58,7 @@ class SymbolRenderer {
 
 Mfsk16Config MakeMfsk16Config(const CoreConfig& config);
 Mfsk16Config MakeMfsk16Config(const CoreConfig& config, Mfsk16Speed speed);
+bool IsValidMfsk16Config(const Mfsk16Config& config);
 int NominalSymbolSamples(int sample_rate_hz,
                          double symbol_rate_baud = 15.625);
 std::size_t SymbolBoundarySample(int sample_rate_hz,

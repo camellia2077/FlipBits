@@ -10,7 +10,7 @@ import std;
 
 module bag.fsk.codec;
 
-import bag.flash.phy_clean;
+import bag.flash.signal;
 
 namespace bag::fsk {
 

@@ -11,5 +11,7 @@ import std;
 module bag.flash.phy_rules;
 
 import bag.flash.codec;
+import bag.flash.signal;
+import bag.flash.voicing;
 
 #include "phy_rules_impl.inc"

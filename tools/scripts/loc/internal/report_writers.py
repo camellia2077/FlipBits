@@ -13,13 +13,21 @@ from .report_formatter import (
     FormattedResponsibilityCluster,
     FormattedScanReport,
     ReportFormatter,
+    ScopeReportFormatter,
 )
-from .report_models import DetailReport, ScanReport
+from .report_models import DetailReport, ScanReport, ScopeReport
 
 
 class JsonReportWriter:
     @staticmethod
     def write_scan_report(path: Path, report: ScanReport) -> None:
+        path.write_text(
+            json.dumps(report.to_dict(), indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
+    @staticmethod
+    def write_scope_report(path: Path, report: ScopeReport) -> None:
         path.write_text(
             json.dumps(report.to_dict(), indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
@@ -39,18 +47,69 @@ class MarkdownReportWriter:
 
     def write_scan_report(self, path: Path, report: ScanReport) -> None:
         formatted = self.formatter.format_scan_report(report)
-        path.write_text(self._render_scan_report(formatted), encoding="utf-8")
+        path.write_text(
+            self._render_scan_report(formatted, baseline=report.baseline, diff=report.diff),
+            encoding="utf-8",
+        )
+
+    def write_scope_report(
+        self,
+        path: Path,
+        report: ScopeReport,
+        formatter: ScopeReportFormatter,
+    ) -> None:
+        formatted = formatter.format_scan_report(report)
+        lines = [f"# {formatted.heading}", ""]
+        lines.extend(self._render_metadata(formatted.metadata))
+        if formatted.summary:
+            lines.extend(["", "## Summary", ""])
+            lines.extend(self._render_summary_table(formatted.summary))
+        if report.baseline and report.diff:
+            lines.extend(["", "## Baseline Diff", ""])
+            lines.extend(self._render_diff(report.baseline, report.diff))
+
+        for part in formatted.parts:
+            lines.extend(["", f"## Part: {part.display_name} (`{part.part}`)", ""])
+            part_writer = MarkdownReportWriter(formatter.formatter_for(part.part))
+            lines.extend(part_writer._render_metadata(part.report.metadata))
+            if part.report.summary:
+                lines.extend(["", "### Summary", ""])
+                lines.extend(part_writer._render_summary_table(part.report.summary))
+            for section in part.report.path_sections:
+                lines.extend(["", f"### {section.title}", "", f"#### `{section.path}`", ""])
+                if section.entries:
+                    lines.extend(part_writer._render_entries_table(section.entries))
+                    for entry in section.entries:
+                        lines.extend(["", part_writer._render_agent_notes(entry)])
+                elif section.empty_message:
+                    lines.append(section.empty_message)
+            if part.report.error:
+                lines.extend(["", "### Error", "", part.report.error])
+
+        if formatted.error:
+            lines.extend(["", "## Error", "", formatted.error])
+        lines.append("")
+        path.write_text("\n".join(lines), encoding="utf-8")
 
     def write_detail_report(self, path: Path, report: DetailReport) -> None:
         formatted = self.formatter.format_detail_report(report)
         path.write_text(self._render_detail_report(report, formatted), encoding="utf-8")
 
-    def _render_scan_report(self, report: FormattedScanReport) -> str:
+    def _render_scan_report(
+        self,
+        report: FormattedScanReport,
+        *,
+        baseline: str | None = None,
+        diff: dict | None = None,
+    ) -> str:
         lines = [f"# {report.heading}", ""]
         lines.extend(self._render_metadata(report.metadata))
         if report.summary:
             lines.extend(["", "## Summary", ""])
             lines.extend(self._render_summary_table(report.summary))
+        if baseline and diff:
+            lines.extend(["", "## Baseline Diff", ""])
+            lines.extend(self._render_diff(baseline, diff))
         if report.path_sections:
             for section in report.path_sections:
                 lines.extend(["", f"## {section.title}", "", f"### `{section.path}`", ""])
@@ -64,6 +123,33 @@ class MarkdownReportWriter:
             lines.extend(["", "## Error", "", report.error])
         lines.append("")
         return "\n".join(lines)
+
+    @staticmethod
+    def _render_diff(baseline: str, diff: dict) -> list[str]:
+        summary = diff.get("summary", {})
+        lines = [f"Baseline: `{baseline}`", ""]
+        lines.append("| Status | Count |")
+        lines.append("| --- | ---: |")
+        for status in ("added", "removed", "changed", "unchanged"):
+            lines.append(f"| {status} | `{summary.get(status, 0)}` |")
+        entries = [item for item in diff.get("entries", []) if item.get("status") != "unchanged"]
+        if entries:
+            lines.extend(["", "| Status | Kind | Path | Changes |", "| --- | --- | --- | --- |"])
+            for item in entries:
+                changes = ", ".join(item.get("changes", {}).keys())
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        [
+                            str(item.get("status", "")),
+                            str(item.get("kind", "")),
+                            f"`{item.get('path', '')}`",
+                            MarkdownReportWriter._md_cell(changes or "-")
+                        ]
+                    )
+                    + " |"
+                )
+        return lines
 
     def _render_detail_report(self, report: DetailReport, entry: FormattedEntry) -> str:
         lines = [

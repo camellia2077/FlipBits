@@ -44,6 +44,7 @@
 
 ### Layer 3：中层能力
 - `bag.transport.decoder`
+- `bag.flash.facade`
 - `bag.flash.phy_clean`
 - `bag.fsk.codec`
 - `bag.pro.phy_clean`
@@ -57,6 +58,7 @@
 ### Layer 5：C ABI 消费边界
 - `libs/audio_api/src/bag_api.cpp`
   - host modules 路径下改为 `import`
+  - 通过 `bag.flash.facade` 消费 flash 的聚合能力，不直接组合 `bag.flash.codec` / `signal` / `voicing`
 - `libs/audio_api/include/bag_api.h`
   - 保持稳定 C ABI，不改为 module-only
 
@@ -124,21 +126,39 @@
   - third-party/backend owner 继续被限制在 private include-based surface
 
 ## Host `import std;` Capability Baseline
-- 当前 capability baseline 已覆盖全部 `18` 个 promoted `audio_core` module interfaces：
+- 当前 capability baseline 已覆盖 promoted `audio_core` module interfaces，包括以下 mode facade 与职责模块：
   - `libs/audio_core/modules/bag/common/config.cppm`
   - `libs/audio_core/modules/bag/common/types.cppm`
   - `libs/audio_core/modules/bag/flash/codec.cppm`
   - `libs/audio_core/modules/bag/flash/signal.cppm`
   - `libs/audio_core/modules/bag/flash/voicing.cppm`
   - `libs/audio_core/modules/bag/flash/phy_clean.cppm`
+  - `libs/audio_core/modules/bag/flash/phy_decode.cppm`
+  - `libs/audio_core/modules/bag/flash/phy_encode.cppm`
+  - `libs/audio_core/modules/bag/flash/phy_rules.cppm`
+  - `libs/audio_core/modules/bag/flash/signal_decode.cppm`
+  - `libs/audio_core/modules/bag/flash/signal_layout.cppm`
+  - `libs/audio_core/modules/bag/flash/signal_rules.cppm`
   - `libs/audio_core/modules/bag/fsk/codec.cppm`
   - `libs/audio_core/modules/bag/pro/codec.cppm`
   - `libs/audio_core/modules/bag/pro/phy_clean.cppm`
+  - `libs/audio_core/modules/bag/pro/phy_decode.cppm`
+  - `libs/audio_core/modules/bag/pro/phy_encode.cppm`
+  - `libs/audio_core/modules/bag/pro/phy_rules.cppm`
+  - `libs/audio_core/modules/bag/pro/tone_renderer.cppm`
   - `libs/audio_core/modules/bag/pro/phy_compat.cppm`
   - `libs/audio_core/modules/bag/ultra/codec.cppm`
   - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
+  - `libs/audio_core/modules/bag/ultra/phy_decode.cppm`
+  - `libs/audio_core/modules/bag/ultra/phy_encode.cppm`
+  - `libs/audio_core/modules/bag/ultra/phy_rules.cppm`
+  - `libs/audio_core/modules/bag/ultra/tone_renderer.cppm`
   - `libs/audio_core/modules/bag/mini/codec.cppm`
   - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
+  - `libs/audio_core/modules/bag/mini/morse_rules.cppm`
+  - `libs/audio_core/modules/bag/mini/phy_decode.cppm`
+  - `libs/audio_core/modules/bag/mini/phy_encode.cppm`
+  - `libs/audio_core/modules/bag/mini/tone_renderer.cppm`
   - `libs/audio_core/modules/bag/transport/compat/frame_codec.cppm`
   - `libs/audio_core/modules/bag/transport/facade.cppm`
   - `libs/audio_core/modules/bag/pipeline/pipeline.cppm`

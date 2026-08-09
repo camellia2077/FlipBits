@@ -218,7 +218,6 @@ void MarkDecodeOperationTerminal(bag_decode_operation* operation,
     operation->phase_completed_work_units = kDecodeFinalizeWorkUnits;
   }
 }
-
 bool PumpDecodeOperationStep(bag_decode_operation* operation,
                              std::uint64_t work_budget) {
   if (operation == nullptr ||
@@ -303,7 +302,6 @@ bool PumpDecodeOperationStep(bag_decode_operation* operation,
                               BAG_DECODE_OPERATION_SUCCEEDED);
   return true;
 }
-
 }  // namespace
 
 bag_error_code bag_create_decode_operation(

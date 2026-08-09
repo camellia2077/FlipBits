@@ -90,6 +90,8 @@ class ScanReport:
     results: tuple[PathScanResult, ...] = ()
     summary: dict[str, int] = field(default_factory=dict)
     error: str | None = None
+    baseline: str | None = None
+    diff: dict | None = None
 
     def to_dict(self) -> dict:
         payload = {
@@ -105,6 +107,55 @@ class ScanReport:
             payload["summary"] = self.summary
         if self.error is not None:
             payload["error"] = self.error
+        if self.baseline is not None:
+            payload["baseline"] = self.baseline
+        if self.diff is not None:
+            payload["diff"] = self.diff
+        return payload
+
+
+@dataclass(frozen=True)
+class ScopePartReport:
+    part: str
+    display_name: str
+    report: ScanReport
+
+    def to_dict(self) -> dict:
+        payload = self.report.to_dict()
+        payload["part"] = self.part
+        payload["display_name"] = self.display_name
+        return payload
+
+
+@dataclass(frozen=True)
+class ScopeReport:
+    generated_at: str
+    status: str
+    scope: str
+    display_name: str
+    parts: tuple[ScopePartReport, ...] = ()
+    summary: dict[str, int] = field(default_factory=dict)
+    error: str | None = None
+    baseline: str | None = None
+    diff: dict | None = None
+
+    def to_dict(self) -> dict:
+        payload = {
+            "generated_at": self.generated_at,
+            "status": self.status,
+            "scope": self.scope,
+            "display_name": self.display_name,
+        }
+        if self.parts:
+            payload["parts"] = [item.to_dict() for item in self.parts]
+        if self.summary:
+            payload["summary"] = self.summary
+        if self.error is not None:
+            payload["error"] = self.error
+        if self.baseline is not None:
+            payload["baseline"] = self.baseline
+        if self.diff is not None:
+            payload["diff"] = self.diff
         return payload
 
 

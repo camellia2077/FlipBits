@@ -3,9 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from .report_models import DetailReport, DirectoryFileMatch, LineFileMatch, PathScanResult, ScanReport
+from .report_models import (
+    DetailReport,
+    DirectoryFileMatch,
+    LineFileMatch,
+    PathScanResult,
+    ScanReport,
+    ScopeReport,
+)
 from .responsibility_analyzers import ResponsibilityRiskResult
 from .responsibility_metrics import ResponsibilityAnchor, ResponsibilityFunctionHotspot, ResponsibilityMoveSet
+from .responsibility_policies import ResponsibilityPolicy
 
 
 @dataclass(frozen=True)
@@ -89,11 +97,72 @@ class FormattedScanReport:
     error: str | None = None
 
 
+@dataclass(frozen=True)
+class FormattedScopePart:
+    part: str
+    display_name: str
+    report: FormattedScanReport
+
+
+@dataclass(frozen=True)
+class FormattedScopeReport:
+    heading: str
+    metadata: tuple[tuple[str, str], ...]
+    parts: tuple[FormattedScopePart, ...]
+    summary: tuple[tuple[str, str], ...]
+    error: str | None = None
+
+
+class ScopeReportFormatter:
+    def __init__(
+        self,
+        *,
+        display_name: str,
+        over_inclusive_by_lang: dict[str, bool],
+        display_name_by_lang: dict[str, str] | None = None,
+    ):
+        self.display_name = display_name
+        display_name_by_lang = display_name_by_lang or {}
+        self._formatters = {
+            lang: ReportFormatter(
+                display_name=display_name_by_lang.get(lang, lang),
+                over_inclusive=over_inclusive_by_lang.get(lang, False),
+                lang=lang,
+            )
+            for lang in over_inclusive_by_lang
+        }
+
+    def formatter_for(self, lang: str) -> "ReportFormatter":
+        return self._formatters[lang]
+
+    def format_scan_report(self, report: ScopeReport) -> FormattedScopeReport:
+        parts = tuple(
+            FormattedScopePart(
+                part=part.part,
+                display_name=part.display_name,
+                report=self.formatter_for(part.report.lang).format_scan_report(part.report),
+            )
+            for part in report.parts
+        )
+        return FormattedScopeReport(
+            heading=f"{report.display_name} scope 扫描报告",
+            metadata=(
+                ("generated_at", report.generated_at),
+                ("status", report.status),
+                ("scope", report.scope),
+            ),
+            parts=parts,
+            summary=tuple((key, str(value)) for key, value in report.summary.items()),
+            error=report.error,
+        )
+
+
 class ReportFormatter:
     def __init__(self, *, display_name: str, over_inclusive: bool, lang: str):
         self.display_name = display_name
         self.over_inclusive = over_inclusive
         self.lang = lang
+        self.policy = ResponsibilityPolicy
 
     def format_scan_report(self, report: ScanReport) -> FormattedScanReport:
         heading = self._heading_for_scan(report)
@@ -222,12 +291,18 @@ class ReportFormatter:
             responsibility_clusters=self._responsibility_clusters(item, hotspots),
             extraction_candidates=self._extraction_candidates(item, hotspots),
             move_sets=move_sets,
-            stop_signal=self._stop_signal(item, hotspots),
-            validation_hints=self._validation_hints(item),
+            stop_signal=self.policy.stop_signal(
+                lang=self.lang,
+                item=item,
+                max_hotspot_score=max((hotspot.score for hotspot in hotspots), default=0),
+            ),
+            validation_hints=self.policy.validation_hints(lang=self.lang, item=item),
             false_positive_notes=self._false_positive_notes(item),
             columns=(
                 ("priority", item.priority),
                 ("score", str(item.score)),
+                ("confidence", item.confidence),
+                ("decision", item.decision),
                 ("lines", str(item.lines)),
                 ("path", item.path),
             ),
@@ -361,7 +436,7 @@ class ReportFormatter:
     ) -> tuple[FormattedExtractionCandidate, ...]:
         if self.lang == "kt" and Path(item.path).name.endswith("Dialogs.kt") and item.lines <= 900:
             return ()
-        if self.lang == "cpp" and self._is_test_path(item.path) and item.priority in {"P2", "P3"}:
+        if self.lang == "cpp" and self.policy.is_test_path(item.path) and item.priority in {"P2", "P3"}:
             return ()
         candidate_limit = 3
         if self.lang == "cpp":
@@ -380,71 +455,12 @@ class ReportFormatter:
                     suggested_boundary=boundary,
                     reason=self._candidate_reason(hotspot),
                     risk=self._candidate_risk(hotspot),
-                    validation=self._candidate_validation(item.path),
+                    validation=self.policy.candidate_validation(item.path),
                 )
             )
             if len(candidates) >= candidate_limit:
                 break
         return tuple(candidates)
-
-    def _stop_signal(
-        self,
-        item: ResponsibilityRiskResult,
-        hotspots: tuple[FormattedHotspot, ...],
-    ) -> str | None:
-        if self.lang == "cpp":
-            max_hotspot_score = max((hotspot.score for hotspot in hotspots), default=0)
-            if self._is_test_path(item.path) and item.priority in {"P2", "P3"}:
-                return "pause: test files often centralize fixture helpers; split only when a test owner becomes hard to read."
-            if item.priority == "P0" or max_hotspot_score >= 4:
-                return "continue: choose one C++ extraction candidate with a clear owner boundary and keep behavior unchanged."
-            if item.lines <= 650 and max_hotspot_score <= 2:
-                return "pause: remaining C++ hotspots are modest; continue only for a named behavior change."
-            return "review manually: split only where the candidate maps to an existing module or platform boundary."
-        if self.lang != "kt":
-            return None
-        path_name = Path(item.path).name
-        max_hotspot_score = max((hotspot.score for hotspot in hotspots), default=0)
-        if path_name.endswith("Dialogs.kt") and item.lines <= 900:
-            return "pause: dialog/import/export code is a coherent responsibility; avoid splitting only to reduce line count."
-        if item.lines <= 750 and max_hotspot_score <= 2:
-            return "pause: file is still flagged, but remaining hotspots are modest; continue only for a named behavior change."
-        if path_name.endswith("State.kt") and item.lines <= 900 and max_hotspot_score <= 3:
-            return "pause: state orchestration has already been narrowed; prefer moving to the next larger file."
-        if item.lines >= 1200 or max_hotspot_score >= 3:
-            return "continue: choose one extraction candidate, keep behavior unchanged, and validate immediately."
-        return "review manually: only continue if a candidate has a clear file boundary and low dependency surface."
-
-    def _validation_hints(self, item: ResponsibilityRiskResult) -> tuple[str, ...]:
-        if self.lang == "kt":
-            hints = ["android compileDebugKotlin or :app:compileDebugKotlin --rerun-tasks"]
-            path_name = Path(item.path).name
-            if "ConfigThemeAppearance" in path_name:
-                hints.append("run ConfigThemeAppearanceSectionImportErrorTest when import/export helpers move")
-                hints.append("run compileDebugUnitTestKotlin if internal test helpers move")
-            if "Flash" in path_name or "Playback" in path_name:
-                hints.append("for visual/playback changes, prefer debug device check or focused existing UI tests")
-            return tuple(hints)
-        if self.lang == "py":
-            return ("run the focused unit tests for the moved helper module",)
-        if self.lang == "cpp":
-            path = item.path.replace("\\", "/")
-            if "apps/audio_android/app/src/main/cpp" in path:
-                return (
-                    "python tools/run.py android assemble-debug",
-                    "python tools/run.py android test-debug when JNI-facing state or DTO shape changes",
-                )
-            if "libs/audio_api" in path:
-                return ("python tools/run.py test-lib audio_api --build-dir build/dev",)
-            if "libs/audio_core" in path:
-                return (
-                    "python tools/run.py test-lib audio_core --build-dir build/dev",
-                    "python tools/run.py test-lib audio_api --build-dir build/dev when C ABI behavior is affected",
-                )
-            if "libs/audio_io" in path:
-                return ("python tools/run.py test-lib audio_io --build-dir build/dev",)
-            return ("python tools/run.py verify --build-dir build/dev --skip-android",)
-        return ()
 
     def _false_positive_notes(self, item: ResponsibilityRiskResult) -> tuple[str, ...]:
         notes: list[str] = []
@@ -457,10 +473,10 @@ class ReportFormatter:
                 notes.append("Line count alone is not a reason to split if the file now has one clear responsibility.")
         if self.lang == "cpp":
             normalized_path = item.path.replace("\\", "/")
-            if "libs/audio_core/src/" in normalized_path and not self._is_test_path(item.path):
+            if "libs/audio_core/src/" in normalized_path and not self.policy.is_test_path(item.path):
                 notes.append("audio_core host 主线是 module-first；新增职责边界优先使用 module interface + module implementation unit，不要把新边界做成 .inc。")
                 notes.append("同一 owner 下的 Normalize/Build/Decode helpers 优先成组迁移到一个 named module，避免按单个小函数碎拆。")
-            if self._is_test_path(item.path):
+            if self.policy.is_test_path(item.path):
                 notes.append("C++ tests often contain compact fixture/build/assert helpers; treat P2 test findings as review prompts, not automatic extraction work.")
             if item.interop_surface_hits > 0:
                 notes.append("Interop is expected in JNI/C ABI boundary files; split only when marshalling, lifecycle, and domain rules are growing in the same file.")
@@ -469,11 +485,6 @@ class ReportFormatter:
             if item.lines < 650 and not item.function_hotspots:
                 notes.append("Small C++ implementation files can stay intact when no function-level hotspot is found.")
         return tuple(notes)
-
-    @staticmethod
-    def _is_test_path(path: str) -> bool:
-        normalized = path.replace("\\", "/").lower()
-        return "/test/" in normalized or normalized.endswith("/test") or "/tests/" in normalized
 
     def _cpp_responsibility_clusters(
         self,
@@ -620,32 +631,6 @@ class ReportFormatter:
         return "low: prefer pure move/extract with no behavior change"
 
     @staticmethod
-    def _candidate_validation(path: str) -> str:
-        normalized_path = path.replace("\\", "/")
-        if "tools/repo_tooling/commands/web.py" in normalized_path or "tools/repo_tooling/web/" in normalized_path:
-            return "python -m unittest tools.tests.test_web_tools; python tools/run.py web test"
-        if "tools/repo_tooling/android_debug/" in normalized_path:
-            return "python -m unittest tools.tests.test_android_debug"
-        if "tools/scripts/loc/" in normalized_path:
-            return "python tools/scripts/loc/run.py --lang py --responsibility-risk"
-        if "apps/audio_android/app/src/main/cpp" in normalized_path:
-            return "python tools/run.py android assemble-debug"
-        if "libs/audio_api" in normalized_path:
-            return "python tools/run.py test-lib audio_api --build-dir build/dev"
-        if "libs/audio_core" in normalized_path:
-            return "python tools/run.py test-lib audio_core --build-dir build/dev"
-        if "libs/audio_io" in normalized_path:
-            return "python tools/run.py test-lib audio_io --build-dir build/dev"
-        path_name = Path(path).name
-        if "ConfigThemeAppearance" in path_name:
-            return "compileDebugKotlin; if import/export moved, run ConfigThemeAppearanceSectionImportErrorTest"
-        if "Flash" in path_name:
-            return "compileDebugKotlin; verify Flash visual playback path if canvas/runtime code moved"
-        if "Playback" in path_name:
-            return "compileDebugKotlin; run compileDebugUnitTestKotlin after test-facing helper moves"
-        return "compile the owning module and run focused tests if helpers are test-visible"
-
-    @staticmethod
     def _suggested_boundary(path: str, hotspot_name: str) -> str:
         suffix = Path(path).suffix
         if suffix in {".cpp", ".cc", ".cxx", ".inc", ".h", ".hpp", ".cppm"}:
@@ -719,7 +704,7 @@ class ReportFormatter:
                 return "module bag.flash.phy_rules -> modules/bag/flash/phy_rules.cppm + src/flash/phy_rules.cpp"
             if "decoder" in lower_name or "poll" in lower_name:
                 return "module bag.flash.phy_decode -> modules/bag/flash/phy_decode.cppm + src/flash/phy_decode.cpp"
-            return "module impl bag.flash.phy_clean -> src/flash/phy_clean.cpp"
+            return "module bag.flash.phy_encode -> modules/bag/flash/phy_encode.cppm + src/flash/phy_encode.cpp"
         if "flash" in lower_path and "signal" in lower_path:
             if "layout" in lower_name or "payload" in lower_name:
                 return "module bag.flash.signal_layout -> modules/bag/flash/signal_layout.cppm + src/flash/signal_layout.cpp"

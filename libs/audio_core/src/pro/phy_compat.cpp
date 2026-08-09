@@ -10,7 +10,7 @@ import std;
 
 module bag.pro.phy_compat;
 
-import bag.flash.phy_clean;
+import bag.flash.signal;
 import bag.pro.codec;
 import bag.transport.compat.frame_codec;
 import bag.transport.follow;

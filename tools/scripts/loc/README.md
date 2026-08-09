@@ -5,62 +5,121 @@
 ## 入口
 
 - `python tools/scripts/loc/run.py`
-- `tools/scripts/loc/loc.bat`
+- `tools/scripts/loc/scripts/` 下的 Windows BAT 快捷入口
+
+## 按架构 Scope 扫描
+
+除了按语言扫描，还可以按仓库架构边界扫描。scope 会复用每种语言现有的扫描器，并把结果聚合到同一份报告的 `parts` 中：
+
+```powershell
+python tools/scripts/loc/run.py --scope audio_api --responsibility-risk
+python tools/scripts/loc/run.py --scope audio_core --responsibility-risk
+python tools/scripts/loc/run.py --scope audio_android --responsibility-risk
+python tools/scripts/loc/run.py --scope audio_web --over 250
+```
+
+当前 scope：
+
+- `audio_api` -> `libs/audio_api`（C++）
+- `audio_core` -> `libs/audio_core`（C++）
+- `audio_io` -> `libs/audio_io`（C++）
+- `audio_runtime` -> `libs/audio_runtime`（C++）
+- `audio_android` -> `apps/audio_android`（C++ + Kotlin）
+- `audio_cli` -> `apps/audio_cli`（Rust）
+- `audio_web` -> `apps/audio_web`（C++ + JavaScript）
+
+`--lang` 和 `--scope` 必须二选一。`--responsibility-risk` 仍只对现有的 C++ / Kotlin / Python analyzer 生效；Rust / JavaScript scope 可使用行数和目录文件数扫描。
+
+scope 默认报告写入：
+
+- `tools/scripts/loc/logs/scopes/<scope>/scan.json`
+- `tools/scripts/loc/logs/scopes/<scope>/scan.md`
+
+scope JSON 根节点包含 `scope`、`display_name` 和 `parts`。每个 part 保留原语言报告的 `lang`、`scan`、`results` 和 summary，因此语言级 baseline 仍可继续使用，scope baseline 会按 `part + path` 区分同名文件。
+
+Scope 快捷入口位于 `tools/scripts/loc/scripts/`，例如：
+
+```powershell
+tools/scripts/loc/scripts/scan_scope_audio_core.bat --responsibility-risk
+tools/scripts/loc/scripts/scan_scope_audio_android.bat --over 300
+```
 
 建议先看：
 
 - [tools/scripts/loc/docs/agent_responsibility_scan.md](docs/agent_responsibility_scan.md)
   - 解释职责混杂扫描 JSON 的字段含义，以及 agent 应该如何把这些字段转成重构方向
 
-语言级重构目标 prompt 位于：
+语言级重构指导位于：
 
-- `tools/scripts/loc/prompts/kotlin_refactor_prompt.md`
-- `tools/scripts/loc/prompts/cpp_refactor_prompt.md`
-- `tools/scripts/loc/prompts/python_refactor_prompt.md`
+- `tools/scripts/loc/docs/languages/kotlin_refactor.md`
+- `tools/scripts/loc/docs/languages/cpp_refactor.md`
+- `tools/scripts/loc/docs/languages/python_refactor.md`
 
-每次扫描后，工具会把对应语言的 prompt 复制到日志语言目录下，例如：
+这些是固定文档，不会在每次扫描后复制到日志目录。Scope 级边界建议位于：
 
-- `tools/scripts/loc/logs/kotlin/refactor_prompt.md`
-- `tools/scripts/loc/logs/cpp/refactor_prompt.md`
-- `tools/scripts/loc/logs/py/refactor_prompt.md`
+- `tools/scripts/loc/docs/scopes/audio_api.md`
+- `tools/scripts/loc/docs/scopes/audio_core.md`
+- `tools/scripts/loc/docs/scopes/audio_io.md`
+- `tools/scripts/loc/docs/scopes/audio_runtime.md`
+- `tools/scripts/loc/docs/scopes/audio_android.md`
+- `tools/scripts/loc/docs/scopes/audio_cli.md`
+- `tools/scripts/loc/docs/scopes/audio_web.md`
+
+阅读扫描结果时，先看对应的 scope guide，再按文件语言补充阅读语言级重构指导。扫描日志只保存结果、明细和 baseline/diff。
 
 ## Windows BAT 快捷入口
 
-- `tools/scripts/loc/loc.bat`
-  - 通用透传入口，等价于 `python tools/scripts/loc/run.py %*`
-- `tools/scripts/loc/scan_cpp_over.bat`
+- 语言级入口位于 `tools/scripts/loc/scripts/lang/`：
+- `tools/scripts/loc/scripts/lang/scan_cpp_over.bat`
   - 扫描 C++ 文件行数，默认使用 `scan_lines.toml` 中 `cpp.default_over_threshold`
-- `tools/scripts/loc/scan_cpp_dir_over_files.bat`
+- `tools/scripts/loc/scripts/lang/scan_cpp_dir_over_files.bat`
   - 扫描 C++ 目录内代码文件数，默认使用 `cpp.default_dir_over_files`
-- `tools/scripts/loc/scan_cpp_responsibility_risk.bat`
+- `tools/scripts/loc/scripts/lang/scan_cpp_responsibility_risk.bat`
   - 扫描 C++ 文件职责混杂风险，默认使用 `cpp.default_responsibility_risk_threshold`
-- `tools/scripts/loc/scan_kt_over.bat`
+- `tools/scripts/loc/scripts/lang/scan_kt_over.bat`
   - 扫描 Kotlin 文件行数，默认使用 `kt.default_over_threshold`
-- `tools/scripts/loc/scan_kt_dir_over_files.bat`
+- `tools/scripts/loc/scripts/lang/scan_kt_dir_over_files.bat`
   - 扫描 Kotlin 目录内代码文件数，默认使用 `kt.default_dir_over_files`
-- `tools/scripts/loc/scan_kt_responsibility_risk.bat`
+- `tools/scripts/loc/scripts/lang/scan_kt_responsibility_risk.bat`
   - 扫描 Kotlin 文件职责混杂风险，默认使用 `kt.default_responsibility_risk_threshold`
-- `tools/scripts/loc/scan_py_responsibility_risk.bat`
+- `tools/scripts/loc/scripts/lang/scan_py_responsibility_risk.bat`
   - 扫描 Python 文件职责混杂风险，默认使用 `py.default_responsibility_risk_threshold`
-- `tools/scripts/loc/scan_py_complexity.bat`
-  - Python 职责混杂/复杂度预警快捷入口，等价于 `scan_py_responsibility_risk.bat`
-- `tools/scripts/loc/scan_py_over.bat`
+- `tools/scripts/loc/scripts/lang/scan_py_over.bat`
   - 扫描 Python 文件行数，默认使用 `py.default_over_threshold`
-- `tools/scripts/loc/scan_py_dir_over_files.bat`
+- `tools/scripts/loc/scripts/lang/scan_py_dir_over_files.bat`
   - 扫描 Python 目录内代码文件数，默认使用 `py.default_dir_over_files`
+
+- scope 级入口位于 `tools/scripts/loc/scripts/`：
+  - `scan_scope_audio_api.bat`
+  - `scan_scope_audio_core.bat`
+  - `scan_scope_audio_io.bat`
+  - `scan_scope_audio_runtime.bat`
+  - `scan_scope_audio_android.bat`
+  - `scan_scope_audio_cli.bat`
+  - `scan_scope_audio_web.bat`
+
+scope 入口只固定 `--scope`，其余参数透传。例如：
+
+```powershell
+tools/scripts/loc/scripts/scan_scope_audio_core.bat --responsibility-risk
+tools/scripts/loc/scripts/scan_scope_audio_android.bat --dir-over-files --dir-max-depth 2
+```
 
 ## 基本用法
 
 在仓库根目录执行：
 
 ```powershell
-python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --under [N] | --dir-over-files [N] | --responsibility-risk [N]] [--dir-max-depth N] [--log-file <path>]
+python tools/scripts/loc/run.py (--lang <cpp|kt|py|rs|js|md> | --scope <scope>) [paths ...] [--over N | --under [N] | --dir-over-files [N] | --responsibility-risk [N]] [--dir-max-depth N] [--log-file <path>] [--baseline <path>]
 ```
 
 参数说明：
 
 - `--lang`
-  - 语言类型，当前仓库默认配置了 `cpp` / `kt` / `py`
+  - 语言类型，当前仓库默认配置了 `cpp` / `kt` / `py` / `rs` / `js` / `md`
+- `--scope`
+  - 按架构边界扫描；scope 定义位于 `scan_lines.toml` 的 `[scopes.<name>]`
+  - 一个 scope 可以包含多个语言，输出会按语言 part 分段
 - `paths`
   - 可选，扫描目录列表；未传时使用 `scan_lines.toml` 中该语言的 `default_paths`
 - `--over N`
@@ -119,6 +178,10 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
   - 兼容旧参数，等价于 `--over N`
 - `--log-file`
   - 自定义日志文件路径；相对路径相对 `tools/scripts/loc/`
+- `--baseline`
+  - 指定之前生成的扫描 JSON；相对路径相对仓库根目录
+  - 当前扫描会在 JSON / Markdown 中增加 `added / removed / changed / unchanged` diff
+  - scope 报告会按 `part + kind + path` 生成 diff key，避免 C++ / Kotlin 等 part 的同名路径互相覆盖
 - `--config`
   - 指定配置文件路径，默认是 `tools/scripts/loc/scan_lines.toml`
 
@@ -130,7 +193,6 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
 
 - `cpp`
   - `apps/audio_android/app/src/main/cpp`
-  - `apps/audio_cli/windows/src`
   - `libs/audio_api`
   - `libs/audio_core`
   - `libs/audio_io`
@@ -139,6 +201,12 @@ python tools/scripts/loc/run.py --lang <cpp|kt|py|rs> [paths ...] [--over N | --
   - `apps/audio_android/app/src/main/java`
 - `py`
   - `tools`
+- `rs`
+  - `apps/audio_cli`
+- `js`
+  - `apps/audio_web`
+
+当前已配置的 scope 位于 `scan_lines.toml` 的 `[scopes.*]` 节点；scope 的默认路径和语言集合由 scope 配置统一定义。
 
 当前默认阈值：
 
@@ -168,6 +236,7 @@ python tools/scripts/loc/run.py --lang kt --dir-over-files --dir-max-depth 2
 python tools/scripts/loc/run.py --lang kt --responsibility-risk
 python tools/scripts/loc/run.py --lang kt --responsibility-risk 7
 python tools/scripts/loc/run.py --lang py --responsibility-risk
+python tools/scripts/loc/run.py --lang py --responsibility-risk --baseline tools/scripts/loc/logs/scan_py.json
 tools\scripts\loc\scan_cpp_over.bat
 tools\scripts\loc\scan_cpp_dir_over_files.bat
 tools\scripts\loc\scan_cpp_responsibility_risk.bat
@@ -191,6 +260,11 @@ tools\scripts\loc\scan_py_over.bat tools
 同时会额外生成同名 Markdown 总报告，例如：
 
 - `tools/scripts/loc/logs/scan_kt.md`
+
+scope 扫描会生成独立目录，例如：
+
+- `tools/scripts/loc/logs/scopes/audio_android/scan.json`
+- `tools/scripts/loc/logs/scopes/audio_android/scan.md`
 
 同时会在 `tools/scripts/loc/logs/` 下直接写出“按语言 / 扫描等级 / 具体文件”的明细 JSON：
 
@@ -270,6 +344,8 @@ python tools/scripts/loc/run.py --lang py --under 120 --log-file logs/loc_scan_p
 - `dominant_risks`
 - `suggestion`
 - `next_action`
+- `confidence`
+- `decision`
 - `lines`
 
 然后才是各语言的计数型证据字段，例如 `state_signal_hits / top_level_composables / mode_branch_hits / io_kind_count` 等。
@@ -283,6 +359,24 @@ Python 额外字段：
 - `dominant_risks`
 - `suggestion`
 - `next_action`
+
+所有职责风险条目还包含：
+
+- `confidence`
+  - 当前证据组数量对应的置信度：`low` / `medium` / `high`
+- `decision`
+  - 初步动作建议：`inspect` 或 `refactor_candidate`
+
+`confidence` 和 `decision` 只用于排序和下一步决策，不替代 agent 对源码边界的人工确认。
+
+使用 `--baseline` 时，报告根部会包含：
+
+- `baseline`
+  - 基线 JSON 的绝对路径
+- `diff.summary`
+  - added / removed / changed / unchanged 的数量
+- `diff.entries`
+  - 文件或目录的变化状态；changed 条目包含 lines、priority、score、confidence、decision 等字段变化
 
 C++ 额外字段：
 

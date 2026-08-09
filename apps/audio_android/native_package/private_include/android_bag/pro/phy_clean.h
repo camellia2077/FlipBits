@@ -44,6 +44,7 @@ class SymbolRenderer {
 };
 
 DualToneConfig MakeDualToneConfig(const CoreConfig& config);
+bool IsValidDualToneConfig(const DualToneConfig& config);
 
 ErrorCode EncodeSymbolsToPcm16(const std::vector<std::uint8_t>& symbols,
                                const DualToneConfig& config,

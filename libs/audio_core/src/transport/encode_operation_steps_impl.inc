@@ -3,20 +3,6 @@ namespace {
 
 constexpr std::size_t kRenderPumpWorkBudget = 2048;
 
-std::string TextFollowSourceForPayload(
-    TransportMode mode, const std::string& text,
-    const std::vector<std::uint8_t>& payload) {
-  if (mode != TransportMode::kMini) {
-    return text;
-  }
-  std::string normalized_text;
-  if (bag::mini_mode::DecodePayloadToText(payload, &normalized_text) ==
-      ErrorCode::kOk) {
-    return normalized_text;
-  }
-  return text;
-}
-
 FlashSignalProfile NormalizeFormalSignalProfile(
     FlashSignalProfile signal_profile) {
   switch (signal_profile) {
@@ -103,8 +89,38 @@ bool PumpPrepareFlash(const CoreConfig& config, const std::string& text,
   return false;
 }
 
+bool PumpRenderFlash(const EncodeWorkPlan& work_plan,
+                     EncodeOperationStepState* state,
+                     IEncodeOperationStepHost* host) {
+  if (state->render_index >= state->flash_payload_layout.chunks.size()) {
+    host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
+                              work_plan.rendering_pcm_work_units);
+    state->stage = EncodeOperationInternalStage::kPostprocessing;
+    state->flash_chunk_renderer.reset();
+    return true;
+  }
+  const auto& chunk = state->flash_payload_layout.chunks[state->render_index];
+  if (state->flash_chunk_renderer == nullptr) {
+    state->flash_chunk_renderer = std::make_unique<flash::FlashChunkRenderer>(
+        chunk, state->flash_signal_config, &state->stage_pcm);
+  }
+  const flash::FlashChunkRenderProgress progress =
+      state->flash_chunk_renderer->Pump(kRenderPumpWorkBudget);
+  state->render_completed_units = std::min<std::uint64_t>(
+      work_plan.rendering_pcm_work_units,
+      static_cast<std::uint64_t>(chunk.sample_offset +
+                                 progress.completed_work));
+  host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
+                            state->render_completed_units);
+  if (progress.finished || state->flash_chunk_renderer->Finished()) {
+    state->flash_chunk_renderer.reset();
+    ++state->render_index;
+  }
+  return true;
+}
 bool PumpPreparePro(const CoreConfig& config, const std::string& text,
-                    EncodeWorkPlan* work_plan, EncodeOperationStepState* state,
+                    EncodeWorkPlan* work_plan,
+                    EncodeOperationStepState* state,
                     IEncodeOperationStepHost* host) {
   if (state->prepare_substage == EncodeOperationPrepareSubstage::kPayload) {
     if (pro::EncodeTextToPayload(text, &state->raw_payload_bytes) !=
@@ -127,10 +143,11 @@ bool PumpPreparePro(const CoreConfig& config, const std::string& text,
       return false;
     }
     state->pro_config = pro::MakeDualToneConfig(config);
-    state->stage_pcm.assign(state->render_symbols.size() *
-                                static_cast<std::size_t>(std::max(
-                                    state->pro_config.symbol_samples, 0)),
-                            0);
+    state->stage_pcm.assign(
+        state->render_symbols.size() *
+            static_cast<std::size_t>(std::max(state->pro_config.symbol_samples,
+                                              0)),
+        0);
     state->prepare_completed_units = work_plan->preparing_input_work_units;
     host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
                               state->prepare_completed_units);
@@ -141,6 +158,42 @@ bool PumpPreparePro(const CoreConfig& config, const std::string& text,
   return false;
 }
 
+bool PumpRenderPro(const EncodeWorkPlan& work_plan,
+                   EncodeOperationStepState* state,
+                   IEncodeOperationStepHost* host) {
+  if (state->render_index >= state->render_symbols.size()) {
+    host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
+                              work_plan.rendering_pcm_work_units);
+    state->stage = EncodeOperationInternalStage::kFinalizing;
+    state->pro_symbol_renderer.reset();
+    return true;
+  }
+  const std::uint8_t symbol = state->render_symbols[state->render_index];
+  const std::size_t write_offset =
+      state->render_index *
+      static_cast<std::size_t>(state->pro_config.symbol_samples);
+  if (state->pro_symbol_renderer == nullptr) {
+    try {
+      state->pro_symbol_renderer = std::make_unique<pro::SymbolRenderer>(
+          symbol, write_offset, state->pro_config, &state->stage_pcm);
+    } catch (const std::invalid_argument&) {
+      host->MarkFailed(ErrorCode::kInvalidArgument);
+      return false;
+    }
+  }
+  const pro::SymbolRenderProgress progress =
+      state->pro_symbol_renderer->Pump(kRenderPumpWorkBudget);
+  state->render_completed_units = std::min<std::uint64_t>(
+      work_plan.rendering_pcm_work_units,
+      static_cast<std::uint64_t>(write_offset + progress.completed_work));
+  host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
+                            state->render_completed_units);
+  if (progress.finished || state->pro_symbol_renderer->Finished()) {
+    state->pro_symbol_renderer.reset();
+    ++state->render_index;
+  }
+  return true;
+}
 bool PumpPrepareUltra(const CoreConfig& config, const std::string& text,
                       EncodeWorkPlan* work_plan,
                       EncodeOperationStepState* state,
@@ -191,10 +244,9 @@ bool PumpPrepareUltra(const CoreConfig& config, const std::string& text,
     work_plan->rendering_pcm_work_units =
         std::max<std::size_t>(total_sample_count, 1);
     work_plan->estimated_pcm_sample_count = total_sample_count;
-    work_plan->total_work_units =
-        work_plan->preparing_input_work_units +
-        work_plan->rendering_pcm_work_units +
-        work_plan->finalizing_work_units;
+    work_plan->total_work_units = work_plan->preparing_input_work_units +
+                                  work_plan->rendering_pcm_work_units +
+                                  work_plan->finalizing_work_units;
     state->prepare_completed_units = work_plan->preparing_input_work_units;
     host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
                               state->prepare_completed_units);
@@ -203,116 +255,6 @@ bool PumpPrepareUltra(const CoreConfig& config, const std::string& text,
     return true;
   }
   return false;
-}
-
-bool PumpPrepareMini(const CoreConfig& config, const std::string& text,
-                     const EncodeWorkPlan& work_plan,
-                     EncodeOperationStepState* state,
-                     IEncodeOperationStepHost* host) {
-  if (state->prepare_substage != EncodeOperationPrepareSubstage::kPayload) {
-    return false;
-  }
-  if (mini_mode::EncodeTextToPayload(text, &state->raw_payload_bytes) !=
-      ErrorCode::kOk) {
-    host->MarkFailed(ErrorCode::kInvalidArgument);
-    return false;
-  }
-  state->mini_config = mini_mode::MakeMorseToneConfig(config);
-  state->stage_pcm.clear();
-  state->stage_pcm.reserve(work_plan.estimated_pcm_sample_count);
-  state->prepare_completed_units = work_plan.preparing_input_work_units;
-  host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
-                            state->prepare_completed_units);
-  state->prepare_substage = EncodeOperationPrepareSubstage::kDone;
-  state->stage = EncodeOperationInternalStage::kRenderingPcm;
-  return true;
-}
-
-bool PumpPrepareStep(const CoreConfig& config, const std::string& text,
-                     EncodeWorkPlan* work_plan, EncodeOperationStepState* state,
-                     IEncodeOperationStepHost* host) {
-  host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
-                            host->PhaseCompletedWorkUnits());
-  switch (config.mode) {
-    case TransportMode::kFlash:
-      return PumpPrepareFlash(config, text, work_plan, state, host);
-    case TransportMode::kPro:
-      return PumpPreparePro(config, text, work_plan, state, host);
-    case TransportMode::kUltra:
-      return PumpPrepareUltra(config, text, work_plan, state, host);
-    case TransportMode::kMini:
-      return PumpPrepareMini(config, text, *work_plan, state, host);
-    default:
-      host->MarkFailed(ErrorCode::kInvalidArgument);
-      return false;
-  }
-}
-
-bool PumpRenderFlash(const EncodeWorkPlan& work_plan,
-                     EncodeOperationStepState* state,
-                     IEncodeOperationStepHost* host) {
-  if (state->render_index >= state->flash_payload_layout.chunks.size()) {
-    host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
-                              work_plan.rendering_pcm_work_units);
-    state->stage = EncodeOperationInternalStage::kPostprocessing;
-    state->flash_chunk_renderer.reset();
-    return true;
-  }
-  const auto& chunk = state->flash_payload_layout.chunks[state->render_index];
-  if (state->flash_chunk_renderer == nullptr) {
-    state->flash_chunk_renderer = std::make_unique<flash::FlashChunkRenderer>(
-        chunk, state->flash_signal_config, &state->stage_pcm);
-  }
-  const flash::FlashChunkRenderProgress progress =
-      state->flash_chunk_renderer->Pump(kRenderPumpWorkBudget);
-  state->render_completed_units = std::min<std::uint64_t>(
-      work_plan.rendering_pcm_work_units,
-      static_cast<std::uint64_t>(chunk.sample_offset +
-                                 progress.completed_work));
-  host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
-                            state->render_completed_units);
-  if (progress.finished || state->flash_chunk_renderer->Finished()) {
-    state->flash_chunk_renderer.reset();
-    ++state->render_index;
-  }
-  return true;
-}
-
-bool PumpRenderPro(const EncodeWorkPlan& work_plan,
-                   EncodeOperationStepState* state,
-                   IEncodeOperationStepHost* host) {
-  if (state->render_index >= state->render_symbols.size()) {
-    host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
-                              work_plan.rendering_pcm_work_units);
-    state->stage = EncodeOperationInternalStage::kFinalizing;
-    state->pro_symbol_renderer.reset();
-    return true;
-  }
-  const std::uint8_t symbol = state->render_symbols[state->render_index];
-  const std::size_t write_offset =
-      state->render_index *
-      static_cast<std::size_t>(state->pro_config.symbol_samples);
-  if (state->pro_symbol_renderer == nullptr) {
-    try {
-      state->pro_symbol_renderer = std::make_unique<pro::SymbolRenderer>(
-          symbol, write_offset, state->pro_config, &state->stage_pcm);
-    } catch (const std::invalid_argument&) {
-      host->MarkFailed(ErrorCode::kInvalidArgument);
-      return false;
-    }
-  }
-  const pro::SymbolRenderProgress progress =
-      state->pro_symbol_renderer->Pump(kRenderPumpWorkBudget);
-  state->render_completed_units = std::min<std::uint64_t>(
-      work_plan.rendering_pcm_work_units,
-      static_cast<std::uint64_t>(write_offset + progress.completed_work));
-  host->UpdatePhaseProgress(EncodeProgressPhase::kRenderingPcm,
-                            state->render_completed_units);
-  if (progress.finished || state->pro_symbol_renderer->Finished()) {
-    state->pro_symbol_renderer.reset();
-    ++state->render_index;
-  }
-  return true;
 }
 
 bool PumpRenderUltra(const EncodeWorkPlan& work_plan,
@@ -360,6 +302,28 @@ bool PumpRenderUltra(const EncodeWorkPlan& work_plan,
   }
   return true;
 }
+bool PumpPrepareMini(const CoreConfig& config, const std::string& text,
+                     const EncodeWorkPlan& work_plan,
+                     EncodeOperationStepState* state,
+                     IEncodeOperationStepHost* host) {
+  if (state->prepare_substage != EncodeOperationPrepareSubstage::kPayload) {
+    return false;
+  }
+  if (mini_mode::EncodeTextToPayload(text, &state->raw_payload_bytes) !=
+      ErrorCode::kOk) {
+    host->MarkFailed(ErrorCode::kInvalidArgument);
+    return false;
+  }
+  state->mini_config = mini_mode::MakeMorseToneConfig(config);
+  state->stage_pcm.clear();
+  state->stage_pcm.reserve(work_plan.estimated_pcm_sample_count);
+  state->prepare_completed_units = work_plan.preparing_input_work_units;
+  host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
+                            state->prepare_completed_units);
+  state->prepare_substage = EncodeOperationPrepareSubstage::kDone;
+  state->stage = EncodeOperationInternalStage::kRenderingPcm;
+  return true;
+}
 
 bool PumpRenderMini(const EncodeWorkPlan& work_plan,
                     EncodeOperationStepState* state,
@@ -395,6 +359,41 @@ bool PumpRenderMini(const EncodeWorkPlan& work_plan,
     ++state->render_index;
   }
   return true;
+}
+
+std::string TextFollowSourceForPayload(
+    TransportMode mode, const std::string& text,
+    const std::vector<std::uint8_t>& payload) {
+  if (mode != TransportMode::kMini) {
+    return text;
+  }
+  std::string normalized_text;
+  if (bag::mini_mode::DecodePayloadToText(payload, &normalized_text) ==
+      ErrorCode::kOk) {
+    return normalized_text;
+  }
+  return text;
+}
+
+bool PumpPrepareStep(const CoreConfig& config, const std::string& text,
+                     EncodeWorkPlan* work_plan,
+                     EncodeOperationStepState* state,
+                     IEncodeOperationStepHost* host) {
+  host->UpdatePhaseProgress(EncodeProgressPhase::kPreparingInput,
+                            host->PhaseCompletedWorkUnits());
+  switch (config.mode) {
+    case TransportMode::kFlash:
+      return PumpPrepareFlash(config, text, work_plan, state, host);
+    case TransportMode::kPro:
+      return PumpPreparePro(config, text, work_plan, state, host);
+    case TransportMode::kUltra:
+      return PumpPrepareUltra(config, text, work_plan, state, host);
+    case TransportMode::kMini:
+      return PumpPrepareMini(config, text, *work_plan, state, host);
+    default:
+      host->MarkFailed(ErrorCode::kInvalidArgument);
+      return false;
+  }
 }
 
 bool PumpRenderStep(const CoreConfig& config, const EncodeWorkPlan& work_plan,

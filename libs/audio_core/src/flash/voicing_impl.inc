@@ -166,7 +166,6 @@ std::vector<int16_t> TrimToPayloadPcm(
       voiced_pcm.begin() + static_cast<std::ptrdiff_t>(payload_begin),
       voiced_pcm.begin() + static_cast<std::ptrdiff_t>(payload_end));
 }
-
 class FlashVoicingStepper::Impl {
  public:
   Impl(const std::vector<int16_t>& clean_payload_pcm,
@@ -221,7 +220,6 @@ class FlashVoicingStepper::Impl {
             ? ComputeOnePoleAlpha(2200.0, sanitized_.sample_rate_hz)
             : 0.0;
   }
-
   FlashVoicingStepProgress Pump(std::size_t work_budget) {
     const std::size_t normalized_budget =
         std::max(work_budget, static_cast<std::size_t>(1));
@@ -246,12 +244,10 @@ class FlashVoicingStepper::Impl {
         .finished = finished_,
     };
   }
-
   const FlashVoicingResult& Result() const { return result_; }
   FlashVoicingDiagnostics Diagnostics() const { return diagnostics_; }
   std::size_t TotalWork() const { return total_postprocess_work_; }
   bool Finished() const { return finished_; }
-
  private:
   class ScopedDiagnosticTimer {
    public:
@@ -284,8 +280,55 @@ class FlashVoicingStepper::Impl {
     kSpectralTexture = 3,
     kDone = 4,
   };
+  void AdvanceStageIfNeeded();
+  void PumpPreamble();
+  void PrepareChunkState(const FlashPayloadChunk& chunk);
+  void PumpPayload();
+  void PumpEpilogue();
+  void PumpSpectralTexture();
 
-  void AdvanceStageIfNeeded() {
+  const std::vector<int16_t>& clean_payload_pcm_;
+  const FlashPayloadLayout& payload_layout_;
+  FlashVoicingFlavor flavor_;
+  FlashVoicingConfig config_;
+  bool enable_diagnostics_ = false;
+  FlashVoicingDiagnostics diagnostics_{};
+  SanitizedVoicingConfig sanitized_{};
+  VoicingStyleTraits style_traits_{};
+  bool use_layered_timbre_ = false;
+  bool use_metallic_layer_ = false;
+  bool use_chant_drone_ = false;
+  bool use_mechanical_throat_ = false;
+  bool use_standard_low_voice_ = false;
+  bool use_hostility_edge_ = false;
+  bool use_collapse_tremor_ = false;
+  bool use_chant_swell_ = false;
+  bool use_payload_softclip_ = false;
+  FlashVoicingDescriptor descriptor_{};
+  bool spectral_texture_enabled_ = false;
+  std::size_t spectral_texture_work_ = 0;
+  std::size_t total_postprocess_work_ = 0;
+  FlashVoicingResult result_{};
+  Stage stage_ = Stage::kPreamble;
+  bool finished_ = false;
+  std::size_t completed_postprocess_work_ = 0;
+  std::size_t preamble_index_ = 0;
+  std::size_t chunk_index_ = 0;
+  std::size_t chunk_local_index_ = 0;
+  std::size_t epilogue_index_ = 0;
+  std::size_t spectral_index_ = 0;
+  std::size_t chunk_attack_count_ = 0;
+  std::size_t chunk_release_count_ = 0;
+  std::size_t chunk_click_window_ = 0;
+  double chunk_litany_text_pause_weight_ = 0.0;
+  double chunk_collapse_hesitation_weight_ = 0.0;
+  double spectral_low_alpha_ = 0.0;
+  double spectral_band_alpha_ = 0.0;
+  double spectral_low_state_ = 0.0;
+  double spectral_band_state_ = 0.0;
+};
+
+void FlashVoicingStepper::Impl::AdvanceStageIfNeeded() {
     if (stage_ == Stage::kPreamble &&
         preamble_index_ >= descriptor_.leading_nonpayload_samples) {
       stage_ = Stage::kPayload;
@@ -312,8 +355,7 @@ class FlashVoicingStepper::Impl {
       finished_ = true;
     }
   }
-
-  void PumpPreamble() {
+void FlashVoicingStepper::Impl::PumpPreamble() {
     if (preamble_index_ >= descriptor_.leading_nonpayload_samples) {
       AdvanceStageIfNeeded();
       return;
@@ -327,8 +369,7 @@ class FlashVoicingStepper::Impl {
     ++completed_postprocess_work_;
     AdvanceStageIfNeeded();
   }
-
-  void PrepareChunkState(const FlashPayloadChunk& chunk) {
+void FlashVoicingStepper::Impl::PrepareChunkState(const FlashPayloadChunk& chunk) {
     ScopedDiagnosticTimer timer(enable_diagnostics_,
                                 &diagnostics_.payload_prepare_ms);
     std::tie(chunk_attack_count_, chunk_release_count_) =
@@ -345,7 +386,7 @@ class FlashVoicingStepper::Impl {
         ComputeCollapseHesitationWeight(chunk, chunk_index_, style_traits_);
   }
 
-  void PumpPayload() {
+void FlashVoicingStepper::Impl::PumpPayload() {
     if (chunk_index_ >= payload_layout_.chunks.size()) {
       AdvanceStageIfNeeded();
       return;
@@ -565,8 +606,7 @@ class FlashVoicingStepper::Impl {
     }
     AdvanceStageIfNeeded();
   }
-
-  void PumpEpilogue() {
+void FlashVoicingStepper::Impl::PumpEpilogue() {
     if (epilogue_index_ >= descriptor_.trailing_nonpayload_samples) {
       AdvanceStageIfNeeded();
       return;
@@ -583,8 +623,7 @@ class FlashVoicingStepper::Impl {
     ++completed_postprocess_work_;
     AdvanceStageIfNeeded();
   }
-
-  void PumpSpectralTexture() {
+void FlashVoicingStepper::Impl::PumpSpectralTexture() {
     if (spectral_index_ >= result_.pcm.size()) {
       AdvanceStageIfNeeded();
       return;
@@ -611,47 +650,6 @@ class FlashVoicingStepper::Impl {
     ++completed_postprocess_work_;
     AdvanceStageIfNeeded();
   }
-
-  const std::vector<int16_t>& clean_payload_pcm_;
-  const FlashPayloadLayout& payload_layout_;
-  FlashVoicingFlavor flavor_;
-  FlashVoicingConfig config_;
-  bool enable_diagnostics_ = false;
-  FlashVoicingDiagnostics diagnostics_{};
-  SanitizedVoicingConfig sanitized_{};
-  VoicingStyleTraits style_traits_{};
-  bool use_layered_timbre_ = false;
-  bool use_metallic_layer_ = false;
-  bool use_chant_drone_ = false;
-  bool use_mechanical_throat_ = false;
-  bool use_standard_low_voice_ = false;
-  bool use_hostility_edge_ = false;
-  bool use_collapse_tremor_ = false;
-  bool use_chant_swell_ = false;
-  bool use_payload_softclip_ = false;
-  FlashVoicingDescriptor descriptor_{};
-  bool spectral_texture_enabled_ = false;
-  std::size_t spectral_texture_work_ = 0;
-  std::size_t total_postprocess_work_ = 0;
-  FlashVoicingResult result_{};
-  Stage stage_ = Stage::kPreamble;
-  bool finished_ = false;
-  std::size_t completed_postprocess_work_ = 0;
-  std::size_t preamble_index_ = 0;
-  std::size_t chunk_index_ = 0;
-  std::size_t chunk_local_index_ = 0;
-  std::size_t epilogue_index_ = 0;
-  std::size_t spectral_index_ = 0;
-  std::size_t chunk_attack_count_ = 0;
-  std::size_t chunk_release_count_ = 0;
-  std::size_t chunk_click_window_ = 0;
-  double chunk_litany_text_pause_weight_ = 0.0;
-  double chunk_collapse_hesitation_weight_ = 0.0;
-  double spectral_low_alpha_ = 0.0;
-  double spectral_band_alpha_ = 0.0;
-  double spectral_low_state_ = 0.0;
-  double spectral_band_state_ = 0.0;
-};
 
 FlashVoicingStepper::FlashVoicingStepper(
     const std::vector<int16_t>& clean_payload_pcm,

@@ -13,8 +13,9 @@ PayloadFollowData BuildPayloadFollowData(
     case TransportMode::kFlash:
       return BuildFlashPayloadFollowData(config, raw_payload_bytes);
     case TransportMode::kPro:
+      return BuildProPayloadFollowData(config, raw_payload_bytes);
     case TransportMode::kUltra:
-      return BuildNibblePayloadFollowData(config, raw_payload_bytes);
+      return BuildUltraPayloadFollowData(config, raw_payload_bytes);
     case TransportMode::kMini:
       return BuildMorsePayloadFollowData(config, raw_payload_bytes);
     default:

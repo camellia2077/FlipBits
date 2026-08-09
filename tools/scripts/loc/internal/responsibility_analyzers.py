@@ -25,6 +25,8 @@ class ResponsibilityRiskResult:
     top_level_composables: int
     role_kinds: list[str]
     mode_branch_hits: int
+    confidence: str = "low"
+    decision: str = "inspect"
     io_kind_count: int = 0
     rule_helper_count: int = 0
     responsibility_verb_kind_count: int = 0
@@ -44,6 +46,8 @@ class ResponsibilityRiskResult:
             "score": self.score,
             "priority": self.priority,
             "summary": self.summary,
+            "confidence": self.confidence,
+            "decision": self.decision,
             "dominant_risks": self.dominant_risks,
             "suggestion": self.suggestion,
             "next_action": self.next_action,

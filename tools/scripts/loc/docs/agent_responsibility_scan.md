@@ -9,6 +9,31 @@ This document explains how an agent should interpret responsibility-risk JSON an
 
 The goal is to help agents turn the scan output into better refactoring decisions.
 
+## Scope Reports
+
+Architecture-oriented reports are written by commands such as:
+
+```powershell
+python tools/scripts/loc/run.py --scope audio_api --responsibility-risk
+python tools/scripts/loc/run.py --scope audio_android --responsibility-risk
+```
+
+A scope report groups related code under one root object and keeps one `parts` entry per language. Each part preserves the existing language report shape (`lang`, `scan`, `results`, and language-specific responsibility fields). Read the scope summary first, then inspect each part using the same language-specific rules below.
+
+Scope baseline diffs use `part + kind + path` as the identity. This prevents a same-named C++ and Kotlin file from being collapsed into one diff entry.
+
+Scope-specific refactor guidance is fixed documentation under `../docs/scopes/`:
+
+- `audio_api.md`
+- `audio_core.md`
+- `audio_io.md`
+- `audio_runtime.md`
+- `audio_android.md`
+- `audio_cli.md`
+- `audio_web.md`
+
+The scanner does not copy language guidance or scope guides into log directories. Read the scope guide first, then use the matching language guide under `languages/` for language-level extraction principles.
+
 These numbers are diagnostic hints, not refactoring targets.
 
 Do not optimize a file just to make a specific count smaller.
@@ -23,11 +48,13 @@ When an agent reads one matched file entry, use this order:
 3. `dominant_risks`
 4. `suggestion`
 5. `next_action`
-6. Markdown-only `stop_signal`
-7. Markdown/JSON `move_sets`
-8. Markdown-only `Suggested Extraction Candidates`
-9. `lines`
-10. the detailed counts
+6. `confidence`
+7. `decision`
+8. Markdown-only `stop_signal`
+9. Markdown/JSON `move_sets`
+10. Markdown-only `Suggested Extraction Candidates`
+11. `lines`
+12. the detailed counts
 
 This order matters.
 
@@ -52,6 +79,14 @@ This order matters.
 - `score`
   - A heuristic risk score.
   - Higher means “more likely to contain mixed responsibilities”, not “must be split exactly this much”.
+
+- `confidence`
+  - Evidence confidence for the heuristic warning: `low`, `medium`, or `high`.
+  - It measures evidence breadth, not architectural certainty.
+
+- `decision`
+  - Initial triage decision: `inspect` or `refactor_candidate`.
+  - It is a prioritization hint; the agent must still confirm the source-level boundary.
 
 - `priority`
   - `P0` to `P3`.
@@ -244,6 +279,8 @@ Good behavior:
 8. Refactor around ownership boundaries, not metric minimization.
 9. Run the validation hint.
 10. Re-run the scanner afterward to confirm the file became clearer, but do not chase perfect numbers.
+
+When a previous scan JSON is available, pass it with `--baseline` and use `diff.summary` plus `diff.entries` to verify whether the refactor changed the intended files and risk fields.
 
 ## Example Interpretation
 

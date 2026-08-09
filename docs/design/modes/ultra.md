@@ -92,7 +92,13 @@ Varicode 的字符边界按 `00` gap 和下一个字符首个 `1` 的 `001` 关�
 ## 主链路文件
 
 - `libs/audio_core/src/ultra/codec.cpp`
-- `libs/audio_core/src/ultra/phy_clean.cpp`
+- `libs/audio_core/src/ultra/phy_rules.cpp`
+- `libs/audio_core/src/ultra/tone_renderer.cpp`
+- `libs/audio_core/src/ultra/phy_encode.cpp`
+- `libs/audio_core/src/ultra/phy_decode.cpp`
 - `apps/audio_android/native_package/src/audio_core_ultra_codec.cpp`
-- `apps/audio_android/native_package/src/audio_core_ultra_phy_clean.cpp`
+- `apps/audio_android/native_package/src/audio_core_ultra_phy_rules.cpp`
+- `apps/audio_android/native_package/src/audio_core_ultra_tone_renderer.cpp`
+- `apps/audio_android/native_package/src/audio_core_ultra_phy_encode.cpp`
+- `apps/audio_android/native_package/src/audio_core_ultra_phy_decode.cpp`
 - C API：`libs/audio_api/src/bag_api.cpp`

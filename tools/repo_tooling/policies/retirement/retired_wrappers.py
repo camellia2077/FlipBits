@@ -55,18 +55,33 @@ _AUDIO_CORE_SINGLE_LANE_REQUIRED_TOKENS: tuple[str, ...] = (
     "set(bag_core_sources",
     "src/common/version.cpp",
     "src/flash/codec.cpp",
-    "src/flash/phy_clean.cpp",
+    "src/flash/phy_rules.cpp",
+    "src/flash/phy_decode.cpp",
+    "src/flash/phy_encode.cpp",
     "src/flash/signal.cpp",
+    "src/flash/signal_rules.cpp",
+    "src/flash/signal_layout.cpp",
+    "src/flash/signal_decode.cpp",
     "src/flash/voicing.cpp",
     "src/fsk/fsk_codec.cpp",
+    "src/mini/morse_rules.cpp",
+    "src/mini/phy_decode.cpp",
+    "src/mini/phy_encode.cpp",
+    "src/mini/tone_renderer.cpp",
     "src/pro/codec.cpp",
-    "src/pro/phy_clean.cpp",
+    "src/pro/phy_rules.cpp",
+    "src/pro/phy_decode.cpp",
+    "src/pro/phy_encode.cpp",
+    "src/pro/tone_renderer.cpp",
     "src/pro/phy_compat.cpp",
     "src/pipeline/pipeline.cpp",
     "src/transport/compat/frame_codec.cpp",
     "src/transport/transport.cpp",
     "src/ultra/codec.cpp",
-    "src/ultra/phy_clean.cpp",
+    "src/ultra/phy_rules.cpp",
+    "src/ultra/phy_decode.cpp",
+    "src/ultra/phy_encode.cpp",
+    "src/ultra/tone_renderer.cpp",
     "FILE_SET cxx_modules TYPE CXX_MODULES",
 )
 _ANDROID_NATIVE_PACKAGE_CMAKE_PATH = ROOT_DIR / "apps" / "audio_android" / "native_package" / "CMakeLists.txt"
@@ -115,12 +130,26 @@ _ANDROID_NATIVE_PACKAGE_OBJECTS_REQUIRED_TOKENS: tuple[str, ...] = (
     "audio_core_common_version.cpp",
     "audio_core_flash_codec.cpp",
     "audio_core_flash_signal.cpp",
-    "audio_core_flash_phy_clean.cpp",
+    "audio_core_flash_signal_layout.cpp",
+    "audio_core_flash_signal_decode.cpp",
+    "audio_core_flash_phy_rules.cpp",
+    "audio_core_flash_phy_decode.cpp",
+    "audio_core_flash_phy_encode.cpp",
+    "audio_core_mini_morse_rules.cpp",
+    "audio_core_mini_phy_decode.cpp",
+    "audio_core_mini_phy_encode.cpp",
+    "audio_core_mini_tone_renderer.cpp",
     "audio_core_pro_codec.cpp",
-    "audio_core_pro_phy_clean.cpp",
+    "audio_core_pro_phy_rules.cpp",
+    "audio_core_pro_phy_decode.cpp",
+    "audio_core_pro_phy_encode.cpp",
+    "audio_core_pro_tone_renderer.cpp",
     "audio_core_transport_transport.cpp",
     "audio_core_ultra_codec.cpp",
-    "audio_core_ultra_phy_clean.cpp",
+    "audio_core_ultra_phy_rules.cpp",
+    "audio_core_ultra_phy_decode.cpp",
+    "audio_core_ultra_phy_encode.cpp",
+    "audio_core_ultra_tone_renderer.cpp",
     "../private_include",
     "libs/audio_api/include",
 )
@@ -137,6 +166,29 @@ _ANDROID_BAG_API_PACKAGE_REQUIRED_TOKENS: tuple[str, ...] = (
 _ANDROID_BAG_API_PACKAGE_FORBIDDEN_TOKENS: tuple[str, ...] = (
     'libs/audio_api/src/bag_api.cpp',
 )
+_ANDROID_CANONICAL_SOURCE_WRAPPERS: dict[Path, str] = {
+    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / wrapper_name: canonical_path
+    for wrapper_name, canonical_path in (
+        ("audio_core_flash_signal.cpp", "flash/signal_rules.cpp"),
+        ("audio_core_flash_signal_layout.cpp", "flash/signal_layout.cpp"),
+        ("audio_core_flash_signal_decode.cpp", "flash/signal_decode.cpp"),
+        ("audio_core_flash_phy_rules.cpp", "flash/phy_rules.cpp"),
+        ("audio_core_flash_phy_decode.cpp", "flash/phy_decode.cpp"),
+        ("audio_core_flash_phy_encode.cpp", "flash/phy_encode.cpp"),
+        ("audio_core_mini_morse_rules.cpp", "mini/morse_rules.cpp"),
+        ("audio_core_mini_phy_decode.cpp", "mini/phy_decode.cpp"),
+        ("audio_core_mini_phy_encode.cpp", "mini/phy_encode.cpp"),
+        ("audio_core_mini_tone_renderer.cpp", "mini/tone_renderer.cpp"),
+        ("audio_core_pro_phy_rules.cpp", "pro/phy_rules.cpp"),
+        ("audio_core_pro_phy_decode.cpp", "pro/phy_decode.cpp"),
+        ("audio_core_pro_phy_encode.cpp", "pro/phy_encode.cpp"),
+        ("audio_core_pro_tone_renderer.cpp", "pro/tone_renderer.cpp"),
+        ("audio_core_ultra_phy_rules.cpp", "ultra/phy_rules.cpp"),
+        ("audio_core_ultra_phy_decode.cpp", "ultra/phy_decode.cpp"),
+        ("audio_core_ultra_phy_encode.cpp", "ultra/phy_encode.cpp"),
+        ("audio_core_ultra_tone_renderer.cpp", "ultra/tone_renderer.cpp"),
+    )
+}
 _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_RULES: dict[Path, tuple[str, ...]] = {
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_common_version.cpp": (
         '#include "android_bag/common/version.h"',
@@ -146,28 +198,9 @@ _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_RULES: dict[Path, tuple[str, ...]] = {
         '#include "android_bag/flash/codec.h"',
         '#include "../../../../libs/audio_core/src/flash/codec_impl.inc"',
     ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_flash_signal.cpp": (
-        "#include <algorithm>",
-        "#include <cmath>",
-        "#include <stdexcept>",
-        '#include "android_bag/flash/signal.h"',
-        '#include "../../../../libs/audio_core/src/flash/signal_impl.inc"',
-    ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_flash_phy_clean.cpp": (
-        '#include "android_bag/flash/codec.h"',
-        '#include "android_bag/flash/phy_clean.h"',
-        '#include "../../../../libs/audio_core/src/flash/phy_clean_impl.inc"',
-    ),
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_pro_codec.cpp": (
         '#include "android_bag/pro/codec.h"',
         '#include "../../../../libs/audio_core/src/pro/codec_impl.inc"',
-    ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_pro_phy_clean.cpp": (
-        "#include <algorithm>",
-        "#include <cmath>",
-        '#include "android_bag/pro/codec.h"',
-        '#include "android_bag/pro/phy_clean.h"',
-        '#include "../../../../libs/audio_core/src/pro/phy_clean_impl.inc"',
     ),
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_transport_transport.cpp": (
         '#include "android_bag/flash/phy_clean.h"',
@@ -180,13 +213,12 @@ _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_RULES: dict[Path, tuple[str, ...]] = {
         '#include "android_bag/ultra/codec.h"',
         '#include "../../../../libs/audio_core/src/ultra/codec_impl.inc"',
     ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_ultra_phy_clean.cpp": (
-        "#include <algorithm>",
-        "#include <cmath>",
-        '#include "android_bag/ultra/codec.h"',
-        '#include "android_bag/ultra/phy_clean.h"',
-        '#include "../../../../libs/audio_core/src/ultra/phy_clean_impl.inc"',
-    ),
+    **{
+        path: (
+            f'#include "../../../../libs/audio_core/src/{canonical_path.removesuffix(".cpp")}_impl.inc"',
+        )
+        for path, canonical_path in _ANDROID_CANONICAL_SOURCE_WRAPPERS.items()
+    },
 }
 _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_FORBIDDEN_TOKENS: dict[Path, tuple[str, ...]] = {
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_common_version.cpp": (
@@ -195,26 +227,14 @@ _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_FORBIDDEN_TOKENS: dict[Path, tuple[str, ...]]
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_flash_codec.cpp": (
         '#include "../../../../libs/audio_core/src/flash/codec.cpp"',
     ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_flash_signal.cpp": (
-        '#include "../../../../libs/audio_core/src/flash/signal.cpp"',
-    ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_flash_phy_clean.cpp": (
-        '#include "../../../../libs/audio_core/src/flash/phy_clean.cpp"',
-    ),
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_pro_codec.cpp": (
         '#include "../../../../libs/audio_core/src/pro/codec.cpp"',
-    ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_pro_phy_clean.cpp": (
-        '#include "../../../../libs/audio_core/src/pro/phy_clean.cpp"',
     ),
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_transport_transport.cpp": (
         '#include "../../../../libs/audio_core/src/transport/transport.cpp"',
     ),
     ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_ultra_codec.cpp": (
         '#include "../../../../libs/audio_core/src/ultra/codec.cpp"',
-    ),
-    ROOT_DIR / "apps" / "audio_android" / "native_package" / "src" / "audio_core_ultra_phy_clean.cpp": (
-        '#include "../../../../libs/audio_core/src/ultra/phy_clean.cpp"',
     ),
 }
 _UNIT_TESTS_PATH = ROOT_DIR / "libs" / "audio_io" / "tests" / "unit_tests.cpp"
@@ -304,13 +324,20 @@ def run_retired_wrappers_policy_checks() -> None:
         )
 
     for path, required_tokens in sorted(_ANDROID_AUDIO_CORE_PACKAGE_SOURCE_RULES.items()):
+        if not path.is_file():
+            failures.append(f"{path.relative_to(ROOT_DIR)} is missing")
+            continue
         content = path.read_text(encoding="utf-8")
         missing_required = [token for token in required_tokens if token not in content]
         if missing_required:
             failures.append(
                 f"{path.relative_to(ROOT_DIR)} missing package-owned implementation tokens: " + ", ".join(missing_required)
             )
-        present_forbidden = [token for token in _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_FORBIDDEN_TOKENS[path] if token in content]
+        present_forbidden = [
+            token
+            for token in _ANDROID_AUDIO_CORE_PACKAGE_SOURCE_FORBIDDEN_TOKENS.get(path, ())
+            if token in content
+        ]
         if present_forbidden:
             failures.append(
                 f"{path.relative_to(ROOT_DIR)} still includes retired module source entry paths: " + ", ".join(present_forbidden)

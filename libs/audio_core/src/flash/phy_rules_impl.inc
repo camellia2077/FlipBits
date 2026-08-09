@@ -121,5 +121,4 @@ std::vector<std::uint8_t> DecodeFormalPayloadBytes(
       return DecodePcm16ToBytes(trimmed_payload_pcm, signal_config);
   }
 }
-
 }  // namespace bag::flash

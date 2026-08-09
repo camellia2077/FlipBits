@@ -37,7 +37,10 @@
 
 ## 主链路文件
 - `libs/audio_core/src/pro/codec.cpp`
-- `libs/audio_core/src/pro/phy_clean.cpp`
+- `libs/audio_core/src/pro/phy_rules.cpp`
+- `libs/audio_core/src/pro/tone_renderer.cpp`
+- `libs/audio_core/src/pro/phy_encode.cpp`
+- `libs/audio_core/src/pro/phy_decode.cpp`
 - transport 分发入口：
   - `libs/audio_core/src/transport/transport.cpp`
 - C API 边界：
