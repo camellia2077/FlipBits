@@ -238,7 +238,7 @@ class AndroidTranslateFlowTests(unittest.TestCase):
             self.assertEqual(completed.returncode, 0, completed.stderr)
             updated_xml = strings_it_path.read_text(encoding="utf-8")
             self.assertIn("modalità selezionata", updated_xml)
-            self.assertIn("Colore d\\'accento", updated_xml)
+            self.assertIn('"Colore d\'accento"', updated_xml)
 
     def test_add_key_json_output_adds_english_baseline_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
