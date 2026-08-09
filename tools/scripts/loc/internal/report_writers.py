@@ -83,6 +83,10 @@ class MarkdownReportWriter:
                         lines.extend(["", part_writer._render_agent_notes(entry)])
                 elif section.empty_message:
                     lines.append(section.empty_message)
+                if section.canonical_mirrors:
+                    lines.extend(["", "#### Canonical Mirrors (not refactor candidates)", ""])
+                    lines.append("Android package 编译单元直接包含共享库 canonical `*_impl.inc`；仅列出以便追踪，不作为 Android 重构候选。")
+                    lines.extend(f"- `{path}`" for path in section.canonical_mirrors)
             if part.report.error:
                 lines.extend(["", "### Error", "", part.report.error])
 
@@ -119,6 +123,10 @@ class MarkdownReportWriter:
                         lines.extend(["", self._render_agent_notes(entry)])
                 elif section.empty_message:
                     lines.append(section.empty_message)
+                if section.canonical_mirrors:
+                    lines.extend(["", "### Canonical Mirrors (not refactor candidates)", ""])
+                    lines.append("Android package 编译单元直接包含共享库 canonical `*_impl.inc`；仅列出以便追踪，不作为 Android 重构候选。")
+                    lines.extend(f"- `{path}`" for path in section.canonical_mirrors)
         if report.error:
             lines.extend(["", "## Error", "", report.error])
         lines.append("")
@@ -130,8 +138,25 @@ class MarkdownReportWriter:
         lines = [f"Baseline: `{baseline}`", ""]
         lines.append("| Status | Count |")
         lines.append("| --- | ---: |")
-        for status in ("added", "removed", "changed", "unchanged"):
+        for status in ("added", "removed", "below_threshold", "changed", "unchanged"):
             lines.append(f"| {status} | `{summary.get(status, 0)}` |")
+        fragmentation = diff.get("fragmentation_delta")
+        fanout = diff.get("dependency_fanout_delta")
+        duplicates = diff.get("duplicate_owner", {}).get("after", [])
+        if fragmentation or fanout or duplicates:
+            lines.extend(["", "### Refactor Guardrails", ""])
+        if fragmentation:
+            lines.append(
+                "- fragmentation_delta: "
+                + ", ".join(f"{key}={value:+d}" for key, value in fragmentation.items())
+            )
+        if fanout:
+            lines.append(
+                "- dependency_fanout_delta: "
+                + ", ".join(f"{key}={value:+d}" for key, value in fanout.items())
+            )
+        if duplicates:
+            lines.append(f"- duplicate_owner groups after refactor: {len(duplicates)}")
         entries = [item for item in diff.get("entries", []) if item.get("status") != "unchanged"]
         if entries:
             lines.extend(["", "| Status | Kind | Path | Changes |", "| --- | --- | --- | --- |"])

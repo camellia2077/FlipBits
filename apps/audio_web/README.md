@@ -6,8 +6,10 @@
 
 ## 先看哪里
 
+- Web application / worker / Wasm bridge 架构：
+  - `docs/architecture/web-app-architecture.md`
 - Web 发布记录：
-  - `docs/history/presentation/web/2026-05-22.md`
+  - `docs/history/presentation/web/2026-08-02.md`
 - Web 本地构建 / 预览命令：
   - `docs/notes/web/cmd.md`
 - transport / mode 设计：

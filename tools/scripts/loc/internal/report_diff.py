@@ -15,6 +15,16 @@ _COMPARE_FIELDS = (
     "confidence",
     "decision",
     "summary",
+    "dominant_risks",
+    "state_signal_hits",
+    "top_level_composables",
+    "mode_branch_hits",
+    "rule_helper_count",
+    "responsibility_verb_kind_count",
+    "interop_surface_hits",
+    "resource_lifecycle_hits",
+    "dependency_fanout",
+    "implementation_sources",
 )
 
 
@@ -28,16 +38,19 @@ def build_scan_diff(*, baseline_path: Path, report: ScanReport | ScopeReport) ->
         before = baseline_entries.get(key)
         after = current_entries.get(key)
         if before is None:
-            entries.append(_diff_entry_metadata(after) | {"status": "added", "after": after})
+            entries.append(_diff_entry_metadata(after) | {"status": "added", "after": _public(after)})
             continue
         if after is None:
-            entries.append(_diff_entry_metadata(before) | {"status": "removed", "before": before})
+            entries.append(_diff_entry_metadata(before) | {"status": "removed", "before": _public(before)})
             continue
         changes = _changes(before, after)
+        status = "changed" if changes else "unchanged"
+        if before.get("_matched") and not after.get("_matched"):
+            status = "below_threshold"
         entries.append(
             _diff_entry_metadata(after)
             | {
-                "status": "changed" if changes else "unchanged",
+                "status": status,
                 "changes": changes,
             }
         )
@@ -48,12 +61,28 @@ def build_scan_diff(*, baseline_path: Path, report: ScanReport | ScopeReport) ->
         "changed": sum(item["status"] == "changed" for item in entries),
         "unchanged": sum(item["status"] == "unchanged" for item in entries),
     }
-    return {
+    below_threshold = sum(item["status"] == "below_threshold" for item in entries)
+    if below_threshold:
+        summary["below_threshold"] = below_threshold
+    payload = {
         "baseline": str(baseline_path),
         "generated_at": report.generated_at,
         "summary": summary,
         "entries": entries,
     }
+    before_inventory = _inventory_entries(baseline_entries)
+    after_inventory = _inventory_entries(current_entries)
+    if before_inventory or after_inventory:
+        payload["fragmentation_delta"] = _fragmentation_delta(before_inventory, after_inventory)
+        payload["dependency_fanout_delta"] = _dependency_fanout_delta(
+            before_inventory,
+            after_inventory,
+        )
+        payload["duplicate_owner"] = {
+            "before": _duplicate_owner_groups(before_inventory),
+            "after": _duplicate_owner_groups(after_inventory),
+        }
+    return payload
 
 
 def _flatten_report(report: ScanReport | ScopeReport) -> dict[str, dict[str, Any]]:
@@ -80,8 +109,10 @@ def _flatten_results(
     prefix: str | None = None,
 ) -> None:
     for result in results:
+        for item in result.get("scanned_files", []):
+            _add_entry(flattened, item, "file", prefix=prefix, matched=False, inventory=True)
         for item in result.get("matched_files", []):
-            _add_entry(flattened, item, "file", prefix=prefix)
+            _add_entry(flattened, item, "file", prefix=prefix, matched=True, inventory=bool(result.get("scanned_files")))
         for item in result.get("matched_dirs", []):
             _add_entry(flattened, item, "directory", prefix=prefix)
 
@@ -92,6 +123,8 @@ def _add_entry(
     kind: str,
     *,
     prefix: str | None = None,
+    matched: bool | None = None,
+    inventory: bool = False,
 ) -> None:
     path = str(item.get("path", ""))
     key_prefix = f"{prefix}:" if prefix else ""
@@ -100,6 +133,8 @@ def _add_entry(
         "kind": kind,
         **({"part": prefix} if prefix else {}),
         **item,
+        **({"_matched": matched} if matched is not None else {}),
+        **({"_inventory": True} if inventory else {}),
     }
 
 
@@ -116,3 +151,82 @@ def _changes(before: dict[str, Any], after: dict[str, Any]) -> dict[str, dict[st
         if before.get(field) != after.get(field):
             changes[field] = {"before": before.get(field), "after": after.get(field)}
     return changes
+
+
+def _public(item: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in item.items() if not key.startswith("_")}
+
+
+def _inventory_entries(entries: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    return [item for item in entries.values() if item.get("_inventory")]
+
+
+def _fragmentation_delta(
+    before: list[dict[str, Any]],
+    after: list[dict[str, Any]],
+) -> dict[str, int]:
+    def counts(items: list[dict[str, Any]]) -> dict[str, int]:
+        fragment_paths = {
+            str(source)
+            for item in items
+            for source in item.get("implementation_sources", [])
+            if str(source).lower().endswith(".inc")
+        }
+        fragment_paths.update(
+            str(item["path"])
+            for item in items
+            if item.get("is_fragment")
+        )
+        return {
+            "file_count": len(items),
+            "small_file_count": sum(bool(item.get("is_small_file")) for item in items),
+            "fragment_count": len(fragment_paths),
+        }
+
+    before_counts = counts(before)
+    after_counts = counts(after)
+    return {
+        key: after_counts[key] - before_counts[key]
+        for key in before_counts
+    }
+
+
+def _dependency_fanout_delta(
+    before: list[dict[str, Any]],
+    after: list[dict[str, Any]],
+) -> dict[str, int]:
+    def total(items: list[dict[str, Any]]) -> int:
+        return sum(int(item.get("dependency_fanout", 0)) for item in items)
+
+    def maximum(items: list[dict[str, Any]]) -> int:
+        return max((int(item.get("dependency_fanout", 0)) for item in items), default=0)
+
+    return {
+        "total": total(after) - total(before),
+        "max": maximum(after) - maximum(before),
+    }
+
+
+def _duplicate_owner_groups(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for item in items:
+        fingerprint = item.get("content_fingerprint")
+        if not fingerprint or int(item.get("lines", 0)) < 20:
+            continue
+        grouped.setdefault(str(fingerprint), []).append(item)
+
+    duplicates: list[dict[str, Any]] = []
+    for fingerprint, group in grouped.items():
+        source_sets = {
+            tuple(sorted(str(path) for path in item.get("implementation_sources", [])))
+            for item in group
+        }
+        if len(group) < 2 or len(source_sets) < 2:
+            continue
+        duplicates.append(
+            {
+                "fingerprint": fingerprint,
+                "paths": sorted(str(item["path"]) for item in group),
+            }
+        )
+    return duplicates

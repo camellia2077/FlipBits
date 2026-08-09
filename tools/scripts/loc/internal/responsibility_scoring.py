@@ -278,3 +278,31 @@ class CppResponsibilityScorer(BaseResponsibilityScorer):
         if ResponsibilityRiskKind.RULE_HELPER_DENSITY in dominant_risks:
             return "First move reusable validation/build/map helpers next to the domain they serve."
         return "First choose one responsibility boundary and add a narrow test before extracting code."
+
+
+class RustResponsibilityScorer(CppResponsibilityScorer):
+    @staticmethod
+    def _build_cpp_suggestion(
+        dominant_risks: list[ResponsibilityRiskKind],
+    ) -> str | None:
+        if not dominant_risks:
+            return None
+        if ResponsibilityRiskKind.INTEROP_SURFACE_BREADTH in dominant_risks:
+            return "Keep unsafe FFI conversion and ownership guards separate from command orchestration."
+        if ResponsibilityRiskKind.RESOURCE_LIFECYCLE_DENSITY in dominant_risks:
+            return "Keep poll/take/drop ownership transitions together in one guard owner."
+        if ResponsibilityRiskKind.IO_SURFACE_BREADTH in dominant_risks:
+            return "Keep filesystem and terminal IO at the presentation edge."
+        return "Split by Rust ownership boundary and explicit module dependency, not by line count."
+
+    @staticmethod
+    def _build_cpp_next_action(
+        dominant_risks: list[ResponsibilityRiskKind],
+    ) -> str | None:
+        if not dominant_risks:
+            return None
+        if ResponsibilityRiskKind.INTEROP_SURFACE_BREADTH in dominant_risks:
+            return "First identify the unsafe ABI surface and the guard that owns each returned allocation."
+        if ResponsibilityRiskKind.RESOURCE_LIFECYCLE_DENSITY in dominant_risks:
+            return "First keep create/poll/take/drop transitions in one guard instead of extracting tiny raw modules."
+        return "First replace wildcard parent imports with explicit dependencies, then inspect the remaining owner boundary."

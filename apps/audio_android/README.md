@@ -124,7 +124,7 @@
 - Theme / palette：
   - `app/src/main/java/com/bag/audioandroid/ui/theme/PaletteCatalog.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/PaletteFactory.kt`
-  - `app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/theme/FactionThemeCatalog.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeAccentTokens.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeVisualTokens.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
@@ -157,7 +157,7 @@
   - 先读 `docs/architecture/android/android-flash-visual.md`。
   - 先用 debug 指标和 `adb logcat FlashVisualPerf:D *:S` 判断是 draw、Compose、window、raw playback position、smoother reset 还是视觉密度问题，再决定改哪个层级。
 - 主题、palette、glyph：
-  - `BrandThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
+  - `FactionThemeCatalog.kt` -> `AppThemeAccentTokens.kt` -> `AppThemeVisualTokens.kt` -> `AudioAndroidThemeMappings.kt` -> `AudioEncodeGlyphColors.kt`
 - Data 页输入卡、随机样例、示例文本：
   - `AudioInputActionsCard.kt` -> `AudioSessionEditingActions.kt` -> `SampleInputSessionUpdater.kt` -> `AndroidSampleInputTextProvider.kt`
   - `mini` 输入辅助由 `ui/model/MorseCode.kt` 提供 normalization、unsupported character 提示、dot/dash 预览与 `10 WPM / 15 WPM / 20 WPM` speed preset。
@@ -175,10 +175,10 @@
 - 当前应用有两套主题实现：
   - `Material`
     - 继续走单色 `ColorScheme` 语义。
-  - `dual-tone`
-    - 从 `BrandThemeCatalog.kt` 的 `backgroundColor` / `accentColor` / `outlineColor` 出发。
+  - `Faction Theme`（dual-tone 视觉）
+    - 从 `FactionThemeCatalog.kt` 的 `primaryColor` / `secondaryColor` / `outlineColor` 出发。
     - 通过 `AppThemeAccentTokens.kt`、`AppThemeVisualTokens.kt` 和 `AudioAndroidThemeMappings.kt` 显式映射到 UI。
-    - `Material` 组件继续提供结构、状态与可读性基础，但不再负责决定 dual-tone 的最终视觉语义。
+    - `Material` 组件继续提供结构、状态与可读性基础，但不再负责决定 Faction Theme 的最终视觉语义。
 - Android XML 多语言当前以 `app/src/main/res/values/strings*.xml` 为英文基线。
 - 新增或修改可见 XML 文案时，需要同步更新对应语言目录下的 `strings*.xml`，避免语言版本漂移。
 - UI 设计细则不要继续堆在 `README.md` 或 `AGENTS.md` 里；优先写进 `docs/design/android/`，再由这里做导航。

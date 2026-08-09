@@ -1,4 +1,4 @@
-# Android Dual-tone Theme
+# Android Faction Theme Dual-tone Design
 
 Related:
 
@@ -7,11 +7,13 @@ Related:
 
 ## Goal
 
-`dual-tone` 不把两种颜色平均铺到所有控件上，而是从 `BrandThemeCatalog.kt` 的视觉角色出发：
+当前代码和 UI theme family 名称是 `Faction Theme`；`dual-tone` 仅表示它使用两种主视觉颜色的设计方法，也是自定义配置格式中的历史术语。
 
-- `backgroundColor`
+Faction Theme 不把两种颜色平均铺到所有控件上，而是从 `FactionThemeCatalog.kt` 的视觉角色出发：
+
+- `primaryColor`
   - 负责页面背景、surface 基底、dock 基底和大面积氛围
-- `accentColor`
+- `secondaryColor`
   - 负责局部强调、选中状态、主交互、图标和 disclosure chrome
 - `outlineColor`
   - 负责机械细节、小面积支撑色、非激活轨道或图形描边
@@ -20,15 +22,15 @@ Related:
 ## Rules
 
 - `Material` 主题继续走单色 `ColorScheme` 语义。
-- `dual-tone` 主题必须视为独立主题系统。
-- `dual-tone` 组件优先从 `backgroundColor` / `accentColor` / `outlineColor` 进入共享 token/helper，再映射到具体控件。
-- 不要把 `primaryContainer` / `surfaceVariant` / `outlineVariant` 直接当成 dual-tone 的最终视觉语义；这些 Material 槽位只负责承载组件结构、状态和可读性基础。
-- 大面积背景和卡片层次优先跟 `backgroundColor`
-- 小面积强调优先跟 `accentColor`
+- Faction Theme 必须视为独立主题系统。
+- Faction Theme 组件优先从 `primaryColor` / `secondaryColor` / `outlineColor` 进入共享 token/helper，再映射到具体控件。
+- 不要把 `primaryContainer` / `surfaceVariant` / `outlineVariant` 直接当成 Faction Theme 的最终视觉语义；这些 Material 槽位只负责承载组件结构、状态和可读性基础。
+- 大面积背景和卡片层次优先跟 `primaryColor`
+- 小面积强调优先跟 `secondaryColor`
 - `outlineColor` 优先服务于非激活轨道、机械细节和小面积支撑描边
 - 正文文本和分隔线优先从 `ColorScheme` 的可读性色推导
-- 不让 `accentColor` 直接铺满整块卡片或正文区域
-- `dual-tone` 通过显式 token 把 `accentColor` 和 `outlineColor` 接到状态性 chrome 与细节层
+- 不让 `secondaryColor` 直接铺满整块卡片或正文区域
+- Faction Theme 通过显式 token 把 `secondaryColor` 和 `outlineColor` 接到状态性 chrome 与细节层
 
 ## Theme Types
 
@@ -42,14 +44,14 @@ Examples:
 Rules:
 
 - `disclosure arrow`
-  - use `accentColor` directly or a slightly deeper variant
+  - use `secondaryColor` directly or a slightly deeper variant
 - `selected label`
-  - use `accentColor`
+  - use `secondaryColor`
 - `selected border`
-  - use `accentColor`
+  - use `secondaryColor`
 - `action icon`
-  - use a lighter version of `accentColor`
-  - typically `accentColor` mixed with `onSurface`
+  - use a lighter version of `secondaryColor`
+  - typically `secondaryColor` mixed with `onSurface`
 
 ### Dark base + solid accent
 
@@ -60,14 +62,14 @@ Examples:
 Rules:
 
 - `disclosure arrow`
-  - use a darker, heavier `accentColor`
+  - use a darker, heavier `secondaryColor`
 - `selected label`
-  - use a darker, heavier `accentColor`
+  - use a darker, heavier `secondaryColor`
 - `selected border`
-  - use a darker, heavier `accentColor`
+  - use a darker, heavier `secondaryColor`
 - `action icon`
-  - do not use the heaviest `accentColor` directly
-  - typically `accentColor` mixed with `onSurface`
+  - do not use the heaviest `secondaryColor` directly
+  - typically `secondaryColor` mixed with `onSurface`
 
 ### Dark base + energy accent
 
@@ -80,14 +82,14 @@ Examples:
 Rules:
 
 - `disclosure arrow`
-  - use a restrained bright `accentColor`
-  - typically `accentColor` mixed with `onSurface`
+  - use a restrained bright `secondaryColor`
+  - typically `secondaryColor` mixed with `onSurface`
 - `selected label`
-  - use a stronger `accentColor` than the arrow
+  - use a stronger `secondaryColor` than the arrow
 - `selected border`
-  - use a stronger `accentColor` than the arrow
+  - use a stronger `secondaryColor` than the arrow
 - `action icon`
-  - use the most restrained `accentColor` variant
+  - use the most restrained `secondaryColor` variant
   - typically more mixed with `onSurface` than the arrow
 
 ## Theme Systems
@@ -96,7 +98,7 @@ Rules:
   - continue using a single-color `ColorScheme`
   - component visuals may directly follow Material slots such as `primary`, `primaryContainer`, `surfaceVariant`
 - `dual-tone`
-  - start from `backgroundColor` / `accentColor` / `outlineColor`
+  - start from `primaryColor` / `secondaryColor` / `outlineColor`
   - route stateful chrome through shared helpers such as:
     - `AppThemeAccentTokens.kt`
     - `AppThemeVisualTokens.kt`
@@ -119,15 +121,15 @@ Rules:
 - `Settings` dual-tone theme rows
   - some themes need a stronger selected state to stay distinct from the surrounding card
   - selected rows can use all three together:
-    - higher-contrast `backgroundColor`-side container
-    - stronger `accentColor` border
+    - higher-contrast `primaryColor`-side container
+    - stronger `secondaryColor` border
     - clearer selected badge
 - `Audio` flash voicing rows
   - follow the same stronger selected-state pattern as Settings rows
   - selected state should read as a structured choice, not only a text color change
 - `Audio` primary action buttons
   - buttons normally stay on the standard container treatment
-  - a small number of stronger actions can add a clearer `accentColor` border when they need more separation from nearby surfaces
+  - a small number of stronger actions can add a clearer `secondaryColor` border when they need more separation from nearby surfaces
 
 ## Bottom Navigation
 
@@ -135,10 +137,10 @@ Rules:
   - selected state follows the normal Material mapping
   - unselected state uses `primary` with reduced alpha
 - `Dual-tone`
-  - dock container is mapped explicitly from `backgroundColor` with a restrained `accentColor` mix
+  - dock container is mapped explicitly from `primaryColor` with a restrained `secondaryColor` mix
   - dark-base themes keep unselected icon/text on the brighter paired color directly
   - light-base themes slightly correct the brighter paired color toward `onPrimaryContainer`
-    - this preserves the `backgroundColor` / `accentColor` relationship while keeping the foreground distinct from the dock container
+    - this preserves the `primaryColor` / `secondaryColor` relationship while keeping the foreground distinct from the dock container
   - selected icon/text/indicator are mapped explicitly from the original dual-tone pair
   - this keeps navigation in the same dual-tone language instead of falling back to single-color Material alpha variants
 
@@ -172,30 +174,30 @@ Rules:
 
 ## Color Role Names
 
-`BrandThemeCatalog.kt` uses visual-role names rather than Material slot names:
+`FactionThemeCatalog.kt` uses visual-role names rather than Material slot names:
 
-- `backgroundColor`
+- `primaryColor`
   - dominant page / surface color
   - used for large-area atmosphere and dual-tone preview's left side
-- `accentColor`
+- `secondaryColor`
   - primary interaction and selection color
   - used for buttons, selected states, disclosure accents, and dual-tone preview's right side
 - `outlineColor`
   - small-area graphic / mechanical highlight color
   - currently used by the Audio encode gear glyph outline, visualizer inactive support tones, and other small support-detail tokens
-  - defaults to `accentColor` when a theme does not need a separate outline accent
+  - defaults to `secondaryColor` when a theme does not need a separate outline accent
 
-Do not infer color responsibility from `isDarkTheme`. `isDarkTheme` only selects readable Material color-scheme behavior; it must not swap the semantic meaning of `backgroundColor` and `accentColor`.
+Do not infer color responsibility from `isDarkTheme`. `isDarkTheme` only selects readable Material color-scheme behavior; it must not swap the semantic meaning of `primaryColor` and `secondaryColor`.
 
 ## Audio Encode Glyph
 
 - The Audio encode gear glyph is part of the dual-tone language.
 - Fill colors come from `AudioEncodeGlyphColors`:
-  - `primarySplit` = `accentColor`
-  - `secondarySplit` = `backgroundColor`
+  - `primarySplit` = `secondaryColor`
+  - `secondarySplit` = `primaryColor`
   - `outline` = `outlineColor`
 - Do not hard-code theme-specific gear colors inside glyph drawing components.
-- If a new theme needs better gear contrast, set `outlineColor` in `BrandThemeCatalog.kt` first.
+- If a new theme needs better gear contrast, set `outlineColor` in `FactionThemeCatalog.kt` first.
 - If a new dual-tone visualizer, guide rail, or non-active support mark needs a mechanical support tone, prefer routing it through a shared token backed by `outlineColor` before hard-coding a one-off local color.
 
 ## Adding Or Changing A Dual-tone Theme
@@ -203,9 +205,9 @@ Do not infer color responsibility from `isDarkTheme`. `isDarkTheme` only selects
 When adding a new dual-tone theme or changing theme colors:
 
 1. Read this document first.
-2. Update `BrandThemeCatalog.kt` with:
-   - `backgroundColor`
-   - `accentColor`
+2. Update `FactionThemeCatalog.kt` with:
+   - `primaryColor`
+   - `secondaryColor`
    - optional `outlineColor`
    - `sampleFlavor`
 3. If adding a new group / lineup, update all visible string resources for the group and theme names.

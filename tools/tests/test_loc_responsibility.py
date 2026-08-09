@@ -12,6 +12,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from scripts.loc.internal.config import load_language_config
 from scripts.loc.internal.report_formatter import ReportFormatter
+from scripts.loc.internal.report_builder import ReportBuilder
 from scripts.loc.internal.report_models import DetailReport, ScanSpec
 from scripts.loc.internal.responsibility_analyzers import ResponsibilityRiskResult
 from scripts.loc.internal.responsibility_metrics import (
@@ -20,10 +21,12 @@ from scripts.loc.internal.responsibility_metrics import (
 )
 from scripts.loc.internal.responsibility_plugins import create_responsibility_language_plugin
 from scripts.loc.internal.responsibility_policies import ResponsibilityPolicy
+from scripts.loc.internal.service import LocScanService
 from scripts.loc.internal.responsibility_scoring import (
     CppResponsibilityScorer,
     KotlinResponsibilityScorer,
     PythonResponsibilityScorer,
+    RustResponsibilityScorer,
 )
 
 
@@ -256,6 +259,96 @@ class LocPluginSampleTests(unittest.TestCase):
 
         self.assertGreaterEqual(collected.line_count, 202)
         self.assertGreaterEqual(collected.top_level_symbol_count, 201)
+
+    def test_cpp_inventory_reports_referenced_inc_only_through_its_owner(self) -> None:
+        config = load_language_config(CONFIG_PATH, "cpp")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            fragment = root / "operation_impl.inc"
+            fragment.write_text("\n".join(f"void Step{index}() {{}}" for index in range(30)), encoding="utf-8")
+            owner = root / "operation.cpp"
+            owner.write_text('#include "operation_impl.inc"\nvoid Run() {}\n', encoding="utf-8")
+            orphan = root / "orphan.inc"
+            orphan.write_text("void Orphan() {}\n", encoding="utf-8")
+
+            inventory = LocScanService(config).analyze_responsibility_inventory(root)
+
+        paths = {Path(item.path).name: item for item in inventory}
+        self.assertIn("operation.cpp", paths)
+        self.assertIn("orphan.inc", paths)
+        self.assertNotIn("operation_impl.inc", paths)
+        self.assertGreater(paths["operation.cpp"].lines, 30)
+        self.assertEqual(paths["operation.cpp"].implementation_sources, [str(fragment.resolve())])
+
+    def test_android_canonical_mirrors_are_reported_without_becoming_candidates(self) -> None:
+        config = load_language_config(CONFIG_PATH, "cpp")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "apps" / "audio_android"
+            source = root / "native_package" / "src" / "audio_core_voice_fx.cpp"
+            source.parent.mkdir(parents=True)
+            implementation = Path(temp_dir) / "libs" / "audio_core" / "src" / "fx_impl.inc"
+            implementation.parent.mkdir(parents=True)
+            implementation.write_text(
+                "\n".join(f"void Step{index}() {{}}" for index in range(400)),
+                encoding="utf-8",
+            )
+            source.write_text(
+                '#include "../../../../libs/audio_core/src/fx_impl.inc"\n',
+                encoding="utf-8",
+            )
+
+            build = ReportBuilder(lang="cpp", scan_service=LocScanService(config)).build_responsibility_scan(
+                generated_at="2026-08-10T00:00:00+08:00",
+                paths=[root],
+                threshold=5,
+            )
+
+        self.assertEqual(build.report.summary["canonical_mirrors"], 1)
+        self.assertEqual(build.report.summary["matched_files"], 0)
+        self.assertEqual(build.report.results[0].canonical_mirrors, (str(source),))
+
+    def test_rust_plugin_detects_ffi_lifecycle_and_wildcard_dependencies(self) -> None:
+        rust = create_responsibility_language_plugin(load_language_config(CONFIG_PATH, "rs"))
+        self.assertIsNotNone(rust)
+        sample = """\
+use super::*;
+use std::fs;
+
+pub struct EncodeOperationGuard;
+extern "C" { fn bag_poll(value: *mut i32); }
+pub fn poll_operation() { unsafe { bag_poll(std::ptr::null_mut()); } }
+pub fn take_result() { drop(Box::new(1)); }
+pub fn encode_value() { println!("ok"); }
+"""
+        metrics = rust.collect_metrics(file_path=Path("guards.rs"), text=sample)
+        assessment = RustResponsibilityScorer(load_language_config(CONFIG_PATH, "rs")).assess(
+            file_path=Path("guards.rs"),
+            metrics=metrics,
+        )
+        self.assertGreaterEqual(metrics.interop_surface_hits, 2)
+        self.assertGreaterEqual(metrics.resource_lifecycle_hits, 1)
+        self.assertGreaterEqual(metrics.dependency_fanout, 2)
+        self.assertIn("interop_surface_breadth", [risk.value for risk in assessment.dominant_risks or []])
+
+    def test_cpp_move_sets_follow_semantic_role_after_source_rename(self) -> None:
+        cpp = create_responsibility_language_plugin(load_language_config(CONFIG_PATH, "cpp"))
+        text = "void DecodeHeader() {}\nvoid DecodePayload() {}\n"
+        metrics = cpp.collect_metrics(file_path=Path("libs/audio_core/src/pro/legacy_owner.cpp"), text=text)
+        details = cpp.collect_details(
+            file_path=Path("libs/audio_core/src/pro/legacy_owner.cpp"),
+            text=text,
+            metrics=metrics,
+            assessment=None,
+        )
+        self.assertEqual([item.name for item in details.move_sets], ["pro_phy_decode"])
+
+        settled = cpp.collect_details(
+            file_path=Path("libs/audio_core/src/pro/phy_decode.cpp"),
+            text=text,
+            metrics=metrics,
+            assessment=None,
+        )
+        self.assertEqual(settled.move_sets, [])
 
 
 def responsibility_result(*, path: str, lang: str, lines: int, priority: str, hotspot_score: int) -> ResponsibilityRiskResult:

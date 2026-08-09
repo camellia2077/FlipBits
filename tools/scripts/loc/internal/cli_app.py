@@ -14,7 +14,7 @@ from .scope_builder import ScopeReportBuilder
 from .service import UNDER_SENTINEL, LocScanService, ScanArgumentResolver
 
 
-SUPPORTED_RESPONSIBILITY_LANGS = frozenset({"cpp", "kt", "py"})
+SUPPORTED_RESPONSIBILITY_LANGS = frozenset({"cpp", "kt", "py", "rs"})
 
 
 class LocCliApplication:
@@ -102,7 +102,7 @@ class LocCliApplication:
             if threshold <= 0:
                 return self._error_report(args.lang, generated_at, "--responsibility-risk 阈值必须是正整数。", formatter)
             if args.lang not in SUPPORTED_RESPONSIBILITY_LANGS:
-                return self._error_report(args.lang, generated_at, f"--responsibility-risk 当前仅支持 --lang kt / --lang py / --lang cpp，收到 {args.lang}。", formatter)
+                return self._error_report(args.lang, generated_at, f"--responsibility-risk 当前仅支持 --lang kt / --lang py / --lang cpp / --lang rs，收到 {args.lang}。", formatter)
             build_result = builder.build_responsibility_scan(generated_at=generated_at, paths=paths, threshold=threshold)
             return 0, build_result.report, build_result.artifacts, formatter
 

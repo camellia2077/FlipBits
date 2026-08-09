@@ -120,6 +120,7 @@ class PythonResponsibilityPlugin(ResponsibilityLanguagePlugin):
             rule_helper_count=self._count_rule_helpers(lines),
             responsibility_verb_kind_count=self._count_responsibility_verb_kinds(lines),
             command_layer_leak_hits=self._count_command_layer_leaks(file_path, lines, text),
+            dependency_fanout=self.dependency_fanout(text=text),
         )
 
     def _count_top_level_symbols(self, lines: list[str]) -> tuple[int, list[str]]:

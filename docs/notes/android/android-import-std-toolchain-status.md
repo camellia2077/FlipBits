@@ -12,7 +12,7 @@
 - 它回答的是“当前这条 Android lane 是否已经具备标准库模块 provider”。
 - 它不重开 Android owner 迁移计划，也不替代：
   - `docs/architecture/android/android-native-strategy.md`
-  - `docs/testing.md`
+  - `tools/README.md` 中的 Android 构建与验证入口
 - 如需判断后续是否值得升级 `NDK/CMake`，见：
   - `docs/notes/android-ndk-cmake-upgrade-decision.md`
 

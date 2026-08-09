@@ -95,6 +95,7 @@ class ScopeReportBuilder:
         artifacts: list[OutputArtifact] = []
         matched_files = 0
         matched_dirs = 0
+        canonical_mirrors = 0
 
         for language_config in self.language_configs:
             build_result = build_for_language(language_config)
@@ -117,12 +118,15 @@ class ScopeReportBuilder:
             )
             matched_files += build_result.report.summary.get("matched_files", 0)
             matched_dirs += build_result.report.summary.get("matched_dirs", 0)
+            canonical_mirrors += build_result.report.summary.get("canonical_mirrors", 0)
 
         summary = {"parts": len(parts)}
         if matched_files:
             summary["matched_files"] = matched_files
         if matched_dirs:
             summary["matched_dirs"] = matched_dirs
+        if canonical_mirrors:
+            summary["canonical_mirrors"] = canonical_mirrors
         report = ScopeReport(
             generated_at=generated_at,
             status="ok",

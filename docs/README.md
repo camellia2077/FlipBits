@@ -1,13 +1,13 @@
 # FlipBits 文档索引
 
-更新时间：2026-06-18
+更新时间：2026-08-10
 
 ## 先看这里
 - 修改 `libs/` 下的共享库代码前，优先阅读：
   - `docs/architecture/repo-map.md`
   - `docs/design/transports.md`
   - `docs/design/modes/README.md`
-  - `docs/testing.md`
+  - `tools/README.md`
 - 若只想快速定位文件，不要先全量扫描 `libs/`，先按上面的索引文档跳到对应模块。
 - 模式字符集速记：
   - `flash` 不校验字符集，按输入字节透明传输；公共入口仍是字符串接口
@@ -20,6 +20,8 @@
   - 记录仓库结构、模块边界、文件地图与建议阅读顺序。
 - `docs/design/`
   - 记录模式设计、编码方式、协议/PHY 方向与实现口径。
+- `docs/refactoring/`
+  - 记录共同重构原则、各 scope 的 ownership/拆分边界和语言级重构指导。
 - `docs/notes/`
   - 记录构建命令、release gate 与持续追踪清单。
 - `docs/history/libs/`
@@ -30,8 +32,8 @@
   - 记录当前内核状态总览。
 - `docs/history/presentation/README.md`
   - 记录当前表现层发布说明入口。
-- `docs/testing.md`
-  - 记录测试分层、语料和验证口径。
+- `docs/architecture/repo-map.md` 的“测试地图”
+  - 记录测试分层与源码入口；具体执行命令统一看 `tools/README.md`。
 - `docs/future.md`
   - 记录未来规划与待做事项。
 
@@ -40,6 +42,8 @@
   - `docs/notes/build-commands.md`
 - Web 本地构建 / 预览命令：
   - `docs/notes/web/cmd.md`
+- Web application / worker / Wasm bridge 架构：
+  - `docs/architecture/web-app-architecture.md`
 - Web WASM Release 编译参数性能实验：
   - `docs/notes/web/wasm-release-optimization-benchmarks.md`
 - 仓库级 toolchain capability contract：
@@ -77,10 +81,10 @@
   - 再看 `docs/core.md`
 - 改 WAV 读写或 I/O
   - 先看 `docs/architecture/repo-map.md`
-  - 再看 `docs/testing.md`
+  - 再看 `tools/README.md`
 - 改测试
-  - 先看 `docs/testing.md`
-  - 再看 `docs/architecture/repo-map.md`
+  - 先看 `docs/architecture/repo-map.md` 的“测试地图”
+  - 再看 `tools/README.md`
 
 ## 给 agent 的建议
 - 优先从文档跳转到目标文件，不要先递归扫描整个 `libs/audio_core/`。

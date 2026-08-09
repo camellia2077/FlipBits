@@ -63,6 +63,7 @@ class ResponsibilityMetrics:
     command_layer_leak_hits: int = 0
     interop_surface_hits: int = 0
     resource_lifecycle_hits: int = 0
+    dependency_fanout: int = 0
 
 
 @dataclass(frozen=True)
@@ -102,6 +103,7 @@ def build_responsibility_result(
         "command_layer_leak_hits": metrics.command_layer_leak_hits,
         "interop_surface_hits": metrics.interop_surface_hits,
         "resource_lifecycle_hits": metrics.resource_lifecycle_hits,
+        "dependency_fanout": metrics.dependency_fanout,
         "dominant_risks": [risk.value for risk in assessment.dominant_risks]
         if assessment.dominant_risks
         else None,

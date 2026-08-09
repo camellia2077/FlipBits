@@ -171,6 +171,13 @@ default_under_threshold = 120
 default_dir_over_files = 16
 over_inclusive = false
 
+default_responsibility_risk_threshold = 5
+responsibility_line_threshold = 220
+responsibility_state_signal_threshold = 4
+responsibility_top_level_composable_threshold = 7
+responsibility_role_kind_threshold = 2
+responsibility_mode_branch_threshold = 2
+
 [js]
 display_name = "JavaScript"
 default_paths = [

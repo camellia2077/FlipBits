@@ -98,21 +98,37 @@ class ReportBuilder:
         path_results: list[PathScanResult] = []
         artifacts: list[OutputArtifact] = []
         total_matched_files = 0
+        total_scanned_files = 0
+        total_canonical_mirrors = 0
         for path in paths:
             if not path.exists():
                 path_results.append(PathScanResult(path=str(path)))
                 continue
-            matched = self.scan_service.analyze_responsibility_risk(path, threshold)
+            scanned, canonical_mirrors = self.scan_service.analyze_responsibility_inventory_with_canonical_mirrors(path)
+            matched = [item for item in scanned if item.score >= threshold]
             artifacts.extend(self._build_responsibility_artifacts(path, matched, threshold))
             total_matched_files += len(matched)
-            path_results.append(PathScanResult(path=str(path), matched_files=tuple(matched)))
+            total_scanned_files += len(scanned)
+            total_canonical_mirrors += len(canonical_mirrors)
+            path_results.append(
+                PathScanResult(
+                    path=str(path),
+                    matched_files=tuple(matched),
+                    scanned_files=tuple(scanned),
+                    canonical_mirrors=tuple(canonical_mirrors),
+                )
+            )
         report = ScanReport(
             generated_at=generated_at,
             status="ok",
             lang=self.lang,
             scan=ScanSpec(mode="responsibility_risk", threshold=threshold),
             results=tuple(path_results),
-            summary={"matched_files": total_matched_files},
+            summary={
+                "matched_files": total_matched_files,
+                "scanned_files": total_scanned_files,
+                "canonical_mirrors": total_canonical_mirrors,
+            },
         )
         return ScanBuildResult(report=report, artifacts=tuple(artifacts))
 

@@ -17,8 +17,8 @@
   * 支持自动检测并载入指定的 Faction Theme 配色，当指定 `--theme` 且未提供 `--name` 时，自动使用主题名作为生成文件名。
 * **`themes.py`** (预设 Faction 主题 Catalog 解析器)
   * 提供 `load_themes_from_toml(toml_path)` 接口，使用标准库的 `tomllib` (Python 3.11+) 或 `tomli` 动态加载和解析主题配色文件。
-* **`themes.toml`** (阵营主题配色数据库)
-  * 声明了项目官方的 18 个 Faction Theme（阵营主题）的 HEX 颜色配置（包含 `primary`、`secondary` 和 `outline` 配色，提取自 Android 端 `FactionThemeCatalog.kt`）。
+* **`themes_en.toml` / `themes_zh.toml`** (阵营主题配色数据库)
+  * 分别保存英文和中文显示名的 18 个 Faction Theme HEX 配置，包含 `primary`、`secondary` 和 `outline` 配色；CLI 默认加载 `themes_en.toml`。
 * **`config.py`** (依赖零件验证)
   * 使用动态相对路径（`../../svg/parts/`）检测三个核心 SVG 矢量零件是否存在：`core_ring.svg`、`inner_gear.svg`、`outer_gear.svg`。
   * 若缺失任一零件，拦截后续生成并提示错误路径。
@@ -34,9 +34,6 @@
     4. 纯色背景镂空版 (`{base_name}_pure_with_bg.png`)：全画布纯色填充背景。背景色可通过 `-bg` 定制（默认使用主题 `primary` 配色）。
 * **`app_icon.svg`** (图标模板)
   * 包含占位符标记（如 `{COLOR_PRIMARY}`、`{COLOR_SECONDARY}` 等），运行时会被填充为具体的 Hex 颜色进行动态渲染。
-* **`web/`** (网页动效控制台)
-  * 提供网页端齿轮动画交互预览，支持在此微调动效、导出当前时间帧单张 SVG 图像。
-
 ---
 
 ## 常用运行命令
@@ -45,45 +42,41 @@
 # 1. 一键生成所有 4 种变体 (默认使用 mars_relic 配色，输出名默认为 app_icon)
 python ui/tools/photo/main.py
 
-# 2. 传入预设 Faction Theme 快速生成 (例如: xeno_code, 输出文件名会自动命名为 xeno_code_xxx.png)
-python ui/tools/photo/main.py all -t xeno_code
+# 2. 按 themes_en.toml 中的显示名选择 Faction Theme
+python ui/tools/photo/main.py all -t "Xeno Code"
 
 # 3. 指定自定义的主题 TOML 配置文件并使用其中的主题配色
 python ui/tools/photo/main.py all --toml path/to/my_themes.toml -t my_custom_theme
 
 # 4. 指定 Faction Theme 并自定义输出文件名 (输出名为 custom_alloy_xxx.png)
-python ui/tools/photo/main.py all -t ancient_alloy -n custom_alloy
+python ui/tools/photo/main.py all -t "Solar Extinction" -n custom_alloy
 
-# 5. 只生成 Play 商店规格 of 图标，并使用 fires_of_fate 主题
-python ui/tools/photo/main.py playstore -t fires_of_fate
+# 5. 只生成 Play 商店规格图标，并使用 Fires of Fate 主题
+python ui/tools/photo/main.py playstore -t "Fires of Fate"
 
-# 6. 只生成纯透明底的镂空图标，并使用 sepulcher_cyan 主题
-python ui/tools/photo/main.py pure -t sepulcher_cyan
+# 6. 只生成纯透明底的镂空图标，并使用 Silent Hegemony 主题
+python ui/tools/photo/main.py pure -t "Silent Hegemony"
 
-# 7. 只生成带纯色背景的镂空图标，并指定 dynasty_revival 主题 (背景色默认为该主题的 primary)
-python ui/tools/photo/main.py pure-bg -t dynasty_revival
+# 7. 只生成带纯色背景的镂空图标，并指定 Sovereign Tempest 主题 (背景色默认为该主题的 primary)
+python ui/tools/photo/main.py pure-bg -t "Sovereign Tempest"
 
 # 8. 生成纯色背景镂空图，指定主题的同时重写背景底色为特定 Hex 颜色
-python ui/tools/photo/main.py pure-bg -t toxic_effluence -bg FF00FF
+python ui/tools/photo/main.py pure-bg -t "Toxic Effluence" -bg FF00FF
 ```
 
 ---
 
 ## Faction Themes 预设列表
-默认从同目录下的 `themes.toml` 中加载。可以在 `-t` / `--theme` 参数中传入以下预设名称：
-* 圣机派（Sacred Machine）：`mars_relic` (默认), `scarlet_guard`, `black_crimson_rite`, `xeno_code`
-* 血肉杀戮派（Scarlet Carnage）：`blood_soaked_ivory`, `brass_forge`
-* 变化迷宫派（Labyrinth of Mutability）：`fires_of_fate`, `arcane_abyss`
-* 奢华陨落派（Exquisite Fall）：`ecstatic_rapture`, `velvet_nightmare`
-* 不朽腐烂派（Immortal Rot）：`toxic_effluence`, `plague_mire`
-* 古代王朝派（Ancient Dynasty）：`dynasty_revival`, `sepulcher_cyan`, `tomb_sigil`, `ancient_alloy`, `void_fluctuation`, `crimson_decree`
+默认从同目录下的 `themes_en.toml` 加载。当前 loader 使用 TOML 中的 `name` 作为 `-t` / `--theme` 的稳定选择值，包含空格的名称需要加引号。中文显示名则通过 `--toml ui/tools/photo/themes_zh.toml` 选择。
+
+英文预设名称以 `themes_en.toml` 为事实来源，不在本文件复制一份可能漂移的清单。`mars_relic`、`blood_soaked_ivory` 等分组 key 只兼容各组第一项，不应当作所有主题的稳定 ID。
 
 ---
 
 ## 后续修改与新增指南
 
 1. **添加/修改主题**：
-   * 直接修改 `themes.toml` 文件，以 TOML 格式增加或修改对应阵营配色。
+   * 同步修改 `themes_en.toml` 和 `themes_zh.toml`，保持分组、数量与配色一致。
    * 支持通过 `--toml` (或 `--themes-file`) 命令指定自定义的 TOML 配置文件。
 2. **添加新的 PNG 图标输出变体**：
    * 在 `icon_renderer.py` 的 `AdaptiveIconRenderer` 类中，根据需要实现新的拼装方法。

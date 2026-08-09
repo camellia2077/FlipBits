@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import hashlib
 from pathlib import Path
+import re
 
 from .config import LanguageConfig
 from .responsibility_metrics import (
@@ -18,10 +20,15 @@ from .responsibility_scoring import (
     CppResponsibilityScorer,
     KotlinResponsibilityScorer,
     PythonResponsibilityScorer,
+    RustResponsibilityScorer,
 )
 
 
 class ResponsibilityLanguagePlugin(ABC):
+    DEPENDENCY_RE = re.compile(
+        r'^\s*(?:#\s*include\s*[<"][^>"]+[>"]|(?:pub\s+)?(?:use|mod)\s+[^;]+;|import\s+[^;]+;)',
+        re.MULTILINE,
+    )
     def __init__(self, config: LanguageConfig):
         self.config = config
 
@@ -43,6 +50,25 @@ class ResponsibilityLanguagePlugin(ABC):
     ) -> ResponsibilityDetails:
         del file_path, text, metrics, assessment
         return ResponsibilityDetails(function_hotspots=[], anchors=[], move_sets=[])
+
+    def metric_text(self, *, file_path: Path, text: str) -> str:
+        del file_path
+        return text
+
+    def implementation_sources(self, *, file_path: Path, text: str) -> list[str]:
+        del text
+        return [str(file_path.resolve())]
+
+    def content_fingerprint(self, *, file_path: Path, text: str) -> str:
+        normalized = "\n".join(
+            line.strip()
+            for line in self.metric_text(file_path=file_path, text=text).splitlines()
+            if line.strip() and not self.DEPENDENCY_RE.match(line)
+        )
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+    def dependency_fanout(self, *, text: str) -> int:
+        return len({match.group(0).strip() for match in self.DEPENDENCY_RE.finditer(text)})
 
     @staticmethod
     def _count_pattern_hits(text: str, patterns: tuple[object, ...]) -> int:

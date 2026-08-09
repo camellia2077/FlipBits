@@ -61,9 +61,9 @@
 - 如果要了解 sample text 的命名规则、`short/long` 语义、key alignment、
   Web 导出依赖或具体处理流程，统一去看：
   - `agents/workflows/translations/android-sample-text.md`
-- For dual-tone lineup/theme color/sample changes, also check:
+- For Faction Theme lineup/theme color/sample changes, also check:
   - `docs/design/android/android-dual-tone-theme.md`
-  - `app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`
+  - `app/src/main/java/com/bag/audioandroid/ui/theme/FactionThemeCatalog.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AudioEncodeGlyphColors.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/screen/ConfigThemeAppearanceSection.kt`
   - `data/AndroidSampleInputTextProvider.kt` and matching `audio_samples_*` resources
@@ -79,13 +79,13 @@
 - 播放器 segmented button 必须统一走 `playerSegmentedButtonColors()`。
 - 播放器 transport / chip 等子控件必须优先复用 `playerChromeColors()`。
 - 不要在单个播放器组件里临时手写新的主题色分支，除非同步更新共享 helper。
-- dual-tone 颜色职责必须从 `BrandThemeCatalog.kt` 的 `backgroundColor` / `accentColor` / `outlineColor` 出发，并通过共享 token/helper 进入 UI；不要在具体组件里按主题 id 硬编码颜色。
-- `Material` 主题继续走单色 `ColorScheme` 语义；`dual-tone` 主题必须视为独立主题系统，不要默认把 `primaryContainer` / `surfaceVariant` / `outlineVariant` 这类 Material 派生槽位当成 dual-tone 的最终视觉语义。
-- 改 dual-tone UI 配色时，优先检查并复用：
+- Faction Theme 颜色职责必须从 `FactionThemeCatalog.kt` 的 `primaryColor` / `secondaryColor` / `outlineColor` 出发，并通过共享 token/helper 进入 UI；不要在具体组件里按主题 id 硬编码颜色。
+- `Material` 主题继续走单色 `ColorScheme` 语义；Faction Theme 的 dual-tone 视觉必须视为独立主题系统，不要默认把 `primaryContainer` / `surfaceVariant` / `outlineVariant` 这类 Material 派生槽位当成最终视觉语义。
+- 改 Faction Theme UI 配色时，优先检查并复用：
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeAccentTokens.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeVisualTokens.kt`
   - `app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
-- 新增 dual-tone 容器、描边、非激活轨道或说明卡片配色时，优先给 token/helper 补职责，不要在单个组件里直接重新混 `backgroundColor` / `accentColor` / `outlineColor`，除非该混色只服务于该组件且文档里已有明确例外。
+- 新增 Faction Theme 容器、描边、非激活轨道或说明卡片配色时，优先给 token/helper 补职责，不要在单个组件里直接重新混 `primaryColor` / `secondaryColor` / `outlineColor`，除非该混色只服务于该组件且文档里已有明确例外。
 
 ## Build And Validation
 

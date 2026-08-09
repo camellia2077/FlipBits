@@ -56,8 +56,8 @@ Android 构建会把翻译结构检查接进默认链路。
 - 样例文本提供与语言切换：
   - `apps/audio_android/app/src/main/java/com/bag/audioandroid/data/AndroidSampleInputTextProvider.kt`
   - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/SampleInputSessionUpdater.kt`
-- dual-tone 主题文案和样例：
-  - `BrandThemeCatalog.kt`
+- Faction Theme 文案和样例：
+  - `FactionThemeCatalog.kt`
   - 对应 `strings_settings.xml` / `audio_samples_*`
 
 所以翻译不是孤立的数据清洗，而是和 app 的文案展示、默认内容、主题系统直接相连。
@@ -81,5 +81,5 @@ Android 构建会把翻译结构检查接进默认链路。
   - [android-localization-guidelines.md](android-localization-guidelines.md)
 - 英文拆分资源说明：
   - [android-split-strings-translation-guide.md](translation/android-split-strings-translation-guide.md)
-- 工具架构：
-  - [tools/repo_tooling/android_translate/docs/architecture.md](../../../tools/repo_tooling/android_translate/docs/architecture.md)
+- 工具命令、结构与输出契约：
+  - [tools/repo_tooling/android_translate/docs/README.md](../../../tools/repo_tooling/android_translate/docs/README.md)

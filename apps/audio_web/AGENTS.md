@@ -20,8 +20,10 @@
 
 ## First Read
 
+- 想先理解 Web application / worker / Wasm bridge 的稳定边界，读：
+  - `docs/architecture/web-app-architecture.md`
 - 想先看 presentation 版本更新，读：
-  - `docs/history/presentation/web/2026-05-22.md`
+  - `docs/history/presentation/web/2026-08-02.md`
 - 想看仓库总文档导航，读：
   - `docs/README.md`
 - 想看 transport / mode 设计语义，读：
@@ -61,6 +63,8 @@
   - `site/wasm/flipbits_web.js`
   - `src/flipbits_web_bridge.cpp`
 - 改生成进度、encode lifecycle、player 出现时机或 wasm encode contract，先看：
+  - `docs/architecture/web-app-architecture.md`
+  - `docs/architecture/encode-operation-contract.md`
   - `site/js/app-controller.js`
   - `site/js/ui-controller.js`
   - `src/flipbits_web_bridge.cpp`

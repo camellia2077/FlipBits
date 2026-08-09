@@ -196,9 +196,10 @@
 - 对外文件 I/O 边界：
   - `libs/audio_io/include/wav_io.h` 继续作为稳定 header boundary
 - 平台消费端：
-  - `apps/audio_cli/windows/src/main.cpp`
-  - `apps/audio_android/app/src/main/cpp/jni_bridge.cpp`
-  - 这些文件继续只消费稳定边界，不直接 `import bag.*`
+  - Rust CLI：`apps/audio_cli/rust/src/bag_api/**`、`apps/audio_cli/rust/src/audio_io_api/**`
+  - Android JNI：`apps/audio_android/app/src/main/cpp/*.cpp`
+  - WebAssembly：`apps/audio_web/src/flipbits_web_bridge.cpp`
+  - 这些平台 adapter 继续只消费对应稳定边界，不直接 `import bag.*`
 
 ## 按任务快速跳转
 
@@ -271,8 +272,10 @@
   - `libs/audio_api/src/bag_api_encode_result_copy_impl.inc`
   - `libs/audio_api/tests/api_async_tests.cpp`
 - 然后按平台看：
-  - `apps/audio_cli/windows/src/main.cpp`
+  - `apps/audio_cli/rust/src/bag_api/`
+  - `apps/audio_cli/rust/src/audio_io_api/`
   - `apps/audio_android/app/src/main/cpp/jni_bridge.cpp`
+  - `apps/audio_web/src/flipbits_web_bridge.cpp`
 
 ### 改播放会话 runtime / seek 语义
 - 先看：

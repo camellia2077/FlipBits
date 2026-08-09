@@ -272,3 +272,17 @@ C++ 第一版同样保持保守，目标是先把“超大实现文件 + 桥接/
   - 把同一 owner 下应该成组迁移的 C++ helpers 列成一个迁移包
   - 给出候选 owner / suggested boundary / validation hint
   - 作为后续人工 review 的入口
+
+## Rust 当前规则
+
+Rust 扫描关注：
+
+- 文件体量与顶层 `fn/struct/enum/trait/impl/mod` 数量
+- `unsafe`、raw pointer、`extern "C"` 等 FFI 表面
+- `Drop`、Box/Arc/Mutex 与 free/take/cancel 等 ownership/lifecycle 信号
+- filesystem、terminal、process、network 与 FFI 等 IO/边界类别
+- validate/parse/encode/decode/poll/take 等 helper 和动词簇
+- mode/state/phase/kind 分支
+- `use super::*` 形式的隐式父模块依赖
+
+Rust 报告用于定位 ownership 与 presentation 边界。它不应把 create/poll/take/drop 拆成多个微模块，也不应仅因文件超过行数阈值就提取只有一个调用方的 helper。

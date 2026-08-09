@@ -28,7 +28,7 @@
 
 - 主题 UI 展示规则
 - dual-tone 视觉语义
-- `BrandThemeCatalog.kt` 的主题配色职责
+- `FactionThemeCatalog.kt` 的 `primaryColor` / `secondaryColor` / `outlineColor` 配色职责
 
 这些内容继续看：
 

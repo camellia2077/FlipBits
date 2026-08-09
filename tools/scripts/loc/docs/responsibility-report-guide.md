@@ -1,13 +1,17 @@
-# Agent Guide: Responsibility Risk Reports
+# Responsibility Risk Report Guide
 
 ## Purpose
 
-This document explains how an agent should interpret responsibility-risk JSON and Markdown fields written to files such as:
+This document explains how to interpret responsibility-risk JSON and Markdown fields written to files such as:
 
 - [scan_py.json](../logs/scan_py.json)
-- [scan_py_responsibility_test.json](../logs/scan_py_responsibility_test.json)
+- `scan_py_responsibility_test.json`
 
-The goal is to help agents turn the scan output into better refactoring decisions.
+The goal is to explain the evidence emitted by the scanner. The report identifies code worth reading; it does not determine whether a refactor is needed or prescribe a target structure.
+
+Report paths, common fields, detail-file layout, and baseline/diff schema are documented in [report-and-baseline.md](report-and-baseline.md). This guide focuses on interpreting that evidence after it has been produced.
+
+Before using this document, read the [共同重构原则](../../../../docs/refactoring/refactoring_principles.md) and the matching scope and language guides under `docs/refactoring/`. Architectural decisions require reading the source, callers, dependencies, tests, and platform boundaries.
 
 ## Scope Reports
 
@@ -22,7 +26,7 @@ A scope report groups related code under one root object and keeps one `parts` e
 
 Scope baseline diffs use `part + kind + path` as the identity. This prevents a same-named C++ and Kotlin file from being collapsed into one diff entry.
 
-Scope-specific refactor guidance is fixed documentation under `../docs/scopes/`:
+Scope-specific refactor guidance is fixed documentation under `docs/refactoring/scopes/`:
 
 - `audio_api.md`
 - `audio_core.md`
@@ -32,7 +36,7 @@ Scope-specific refactor guidance is fixed documentation under `../docs/scopes/`:
 - `audio_cli.md`
 - `audio_web.md`
 
-The scanner does not copy language guidance or scope guides into log directories. Read the scope guide first, then use the matching language guide under `languages/` for language-level extraction principles.
+The scanner does not copy language guidance or scope guides into log directories. Read the scope guide first, then use the matching guide under `docs/refactoring/languages/` for language-level extraction principles.
 
 These numbers are diagnostic hints, not refactoring targets.
 
@@ -41,13 +45,13 @@ Use the fields to understand what kinds of responsibilities are mixed together.
 
 ## Reading Order
 
-When an agent reads one matched file entry, use this order:
+When reviewing one matched file entry, use this order:
 
 1. `priority`
 2. `summary`
 3. `dominant_risks`
-4. `suggestion`
-5. `next_action`
+4. the target source and its direct callers
+5. `suggestion` and `next_action` as hypotheses
 6. `confidence`
 7. `decision`
 8. Markdown-only `stop_signal`
@@ -61,11 +65,10 @@ This order matters.
 - `priority` tells you how urgent the file is
 - `summary` tells you the mixed-responsibility shape in plain language
 - `dominant_risks` tells you which category is driving the warning
-- `suggestion` gives a safe first split direction
-- `next_action` gives a conservative first move
-- `stop_signal` tells you whether to continue, pause, or manually review
-- `move_sets` lists helper groups that should move together as one migration package
-- `Suggested Extraction Candidates` turns hotspots into possible boundaries with validation hints
+- `suggestion` and `next_action` provide questions or hypotheses to verify in source
+- `stop_signal` describes the strength of scanner evidence, not whether code should be changed
+- `move_sets` groups helpers that may share an owner or dependency domain
+- `Suggested Extraction Candidates` identifies possible boundaries to investigate with validation hints
 - `lines` keeps the file-size signal visible without letting it dominate the diagnosis
 - the counts are supporting evidence only
 
@@ -86,7 +89,7 @@ This order matters.
 
 - `decision`
   - Initial triage decision: `inspect` or `refactor_candidate`.
-  - It is a prioritization hint; the agent must still confirm the source-level boundary.
+  - It is a prioritization hint; the source-level boundary still requires confirmation.
 
 - `priority`
   - `P0` to `P3`.
@@ -94,20 +97,20 @@ This order matters.
 
 - `summary`
   - Short natural-language diagnosis of the main risk pattern.
-  - This should be the first explanation an agent reads.
+  - This should be the first explanation read for the entry.
 
 - `dominant_risks`
   - A list of the main risk categories.
   - Prefer these over raw counts when deciding the split direction.
 
 - `suggestion`
-  - A single direction-oriented recommendation.
-  - Treat it as a starting point, not a mandatory transformation.
+  - A direction-oriented hypothesis generated from heuristic evidence.
+  - Confirm or reject it after reading the source.
 
 - `move_sets`
   - C++ responsibility reports include this structured list when the scanner can group helpers by owner.
-  - Each set names a target boundary, the helper names and line ranges that should move together, the reason, and the validation command.
-  - Prefer this over moving one small helper at a time.
+  - Each set names a possible boundary, related helper names and line ranges, the grouping reason, and a validation command.
+  - It is a navigation aid, not proof that the helpers should move or that the proposed target is correct.
 
 ### Supporting evidence fields
 
@@ -147,7 +150,7 @@ This order matters.
   - Specific to files under `commands/`.
   - Higher values suggest the commands layer still contains too much core logic.
 
-## Markdown Agent Sections
+## Markdown Review Sections
 
 Detailed Markdown reports include extra sections intended for agents:
 
@@ -160,18 +163,19 @@ Detailed Markdown reports include extra sections intended for agents:
   - Use this to choose a coherent boundary rather than moving isolated functions randomly.
 
 - `Move Sets`
-  - Lists concrete migration packages.
-  - Use this when planning C++ module-first extraction: choose one row, move the listed helpers together, then run the validation shown in that row.
-  - For test files, treat this as a fixture-owner hint rather than an automatic split instruction.
+  - Lists helper groups inferred from names, ownership hints, and dependency domains.
+  - Inspect the complete owner and its callers before deciding whether any group should move.
+  - For test files, treat this only as a fixture-owner hint.
 
 - `Suggested Extraction Candidates`
-  - Lists candidate owner, line range, suggested file boundary, risk, and validation.
-  - Treat this as a shortlist, not an instruction to apply every row.
+  - Lists candidate owner, line range, possible boundary, risk, and validation.
+  - Treat every row as a question to investigate, not an extraction instruction.
 
 - `stop_signal`
-  - `continue` means one small extraction is probably still worthwhile.
-  - `pause` means the file may still score high, but further splitting should wait for a named behavior change.
-  - `review manually` means the report lacks a clear low-risk boundary.
+  - `continue` means the scanner found enough evidence to justify deeper source inspection.
+  - `pause` means the file may still score high, but the scanner has no additional useful evidence.
+  - `review manually` means the report cannot infer a plausible boundary.
+  - None of these values authorizes a refactor without source-level confirmation.
 
 - `validation_hints`
   - Suggests the smallest useful compile/test command after the extraction.
@@ -244,7 +248,7 @@ Likely split direction:
 
 - consider extracting per-mode handlers or narrowing the branching surface
 
-## What Agents Should Not Do
+## Interpretation Pitfalls
 
 Do not treat these values as strict goals:
 
@@ -264,23 +268,27 @@ Bad behavior:
 Good behavior:
 
 - use the counts as evidence
-- use `summary`, `dominant_risks`, and `suggestion` to decide the direction
+- use `summary`, `dominant_risks`, and `suggestion` to form questions for source inspection
 - confirm the code-level boundary after reading the actual file
 
-## Suggested Agent Workflow
+## Suggested Review Workflow
 
 1. Sort by `priority`, then `score`.
 2. Read `summary` and `dominant_risks`.
-3. Read the target source file.
-4. Confirm whether the warning is real.
-5. Use `suggestion` as the first split hypothesis.
-6. Check `stop_signal`.
-7. If it says `continue`, choose one extraction candidate with a clear boundary.
-8. Refactor around ownership boundaries, not metric minimization.
-9. Run the validation hint.
-10. Re-run the scanner afterward to confirm the file became clearer, but do not chase perfect numbers.
+3. Read the target source, direct callers, dependencies, tests, and relevant platform adapters.
+4. Describe the current owner and determine whether the warning is real.
+5. Confirm or reject each `suggestion`, move set, and candidate boundary from source evidence.
+6. If a real boundary exists, state its independent modification reason, ownership, and the content that must remain in the original owner.
+7. Refactor around that confirmed ownership boundary, not metric minimization.
+8. Run the validation hint.
+9. Re-run with the original baseline and distinguish `below_threshold` from a deleted file.
+10. Review `fragmentation_delta`, `dependency_fanout_delta`, and `duplicate_owner` before accepting the refactor.
+11. Re-run the small-file and directory-file-count scans, then run the owning repository verify command.
+12. Keep the current structure when source inspection shows one cohesive owner, even if the score is not perfect.
 
 When a previous scan JSON is available, pass it with `--baseline` and use `diff.summary` plus `diff.entries` to verify whether the refactor changed the intended files and risk fields.
+
+For C++, referenced `.inc` files belong to their source owner and are not reported independently. An orphan `.inc` remains independently visible. For Rust, keep one resource lifecycle in one guard owner and treat wildcard parent imports as hidden dependency evidence.
 
 ## Example Interpretation
 

@@ -64,6 +64,8 @@ class DirectoryFileMatch:
 class PathScanResult:
     path: str
     matched_files: tuple[LineFileMatch | ResponsibilityRiskResult, ...] = ()
+    scanned_files: tuple[ResponsibilityRiskResult, ...] = ()
+    canonical_mirrors: tuple[str, ...] = ()
     matched_dirs: tuple[DirectoryFileMatch, ...] = ()
 
     def to_dict(self) -> dict:
@@ -72,6 +74,10 @@ class PathScanResult:
             payload["matched_dirs"] = [item.to_dict() for item in self.matched_dirs]
         else:
             payload["matched_files"] = [self._file_item_to_dict(item) for item in self.matched_files]
+            if self.scanned_files:
+                payload["scanned_files"] = [item.to_dict() for item in self.scanned_files]
+            if self.canonical_mirrors:
+                payload["canonical_mirrors"] = list(self.canonical_mirrors)
         return payload
 
     @staticmethod

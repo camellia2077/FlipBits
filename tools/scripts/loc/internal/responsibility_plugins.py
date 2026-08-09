@@ -5,6 +5,7 @@ from .responsibility_plugin_base import ResponsibilityLanguagePlugin
 from .responsibility_plugins_cpp import CppResponsibilityPlugin
 from .responsibility_plugins_kt import KotlinResponsibilityPlugin
 from .responsibility_plugins_py import PythonResponsibilityPlugin
+from .responsibility_plugins_rs import RustResponsibilityPlugin
 
 
 def create_responsibility_language_plugin(
@@ -16,4 +17,6 @@ def create_responsibility_language_plugin(
         return PythonResponsibilityPlugin(config)
     if config.lang == "cpp":
         return CppResponsibilityPlugin(config)
+    if config.lang == "rs":
+        return RustResponsibilityPlugin(config)
     return None

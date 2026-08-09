@@ -86,6 +86,7 @@ class FormattedPathSection:
     title: str
     entries: tuple[FormattedEntry, ...]
     empty_message: str | None = None
+    canonical_mirrors: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -214,6 +215,7 @@ class ReportFormatter:
                 title="High Risk Files",
                 entries=entries,
                 empty_message="未发现超过风险阈值的文件。",
+                canonical_mirrors=result.canonical_mirrors,
             )
         if report.scan.mode == "dir_over_files":
             entries = tuple(self._format_directory_result(item) for item in result.matched_dirs)
@@ -344,7 +346,7 @@ class ReportFormatter:
 
     def _responsibility_evidence(self, item: ResponsibilityRiskResult) -> str:
         metrics: list[str] = []
-        top_level_label = "symbols" if self.lang in {"py", "cpp"} else "composables"
+        top_level_label = "symbols" if self.lang in {"py", "cpp", "rs"} else "composables"
         metrics.append(f"{top_level_label} {item.top_level_composables}")
         metrics.append(f"state {item.state_signal_hits}")
         if item.mode_branch_hits > 0:
@@ -378,7 +380,7 @@ class ReportFormatter:
         item: ResponsibilityRiskResult,
         hotspots: tuple[FormattedHotspot, ...],
     ) -> tuple[FormattedResponsibilityCluster, ...]:
-        if self.lang == "cpp":
+        if self.lang in {"cpp", "rs"}:
             return self._cpp_responsibility_clusters(item, hotspots)
         if self.lang == "py":
             return self._python_responsibility_clusters(item, hotspots)

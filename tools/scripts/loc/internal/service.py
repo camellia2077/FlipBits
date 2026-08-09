@@ -1,6 +1,7 @@
 import argparse
 import os
 from pathlib import Path
+import re
 
 from .config import LanguageConfig
 from .responsibility_analyzers import (
@@ -46,6 +47,7 @@ class ScanArgumentResolver:
 
 
 class LocScanService:
+    LOCAL_INC_RE = re.compile(r'^\s*#\s*include\s+"([^"]+\.inc)"\s*$', re.MULTILINE)
     def __init__(self, config: LanguageConfig):
         self.config = config
         self._ignore_dirs_lower = {name.lower() for name in config.ignore_dirs}
@@ -141,10 +143,35 @@ class LocScanService:
         target_dir: Path,
         threshold: int,
     ) -> list[ResponsibilityRiskResult]:
+        results = [
+            result
+            for result in self.analyze_responsibility_inventory(target_dir)
+            if result.score >= threshold
+        ]
+        results.sort(key=lambda item: (item.score, item.lines), reverse=True)
+        return results
+
+    def analyze_responsibility_inventory(
+        self,
+        target_dir: Path,
+    ) -> list[ResponsibilityRiskResult]:
+        results, _ = self.analyze_responsibility_inventory_with_canonical_mirrors(target_dir)
+        return results
+
+    def analyze_responsibility_inventory_with_canonical_mirrors(
+        self,
+        target_dir: Path,
+    ) -> tuple[list[ResponsibilityRiskResult], list[str]]:
         if self._responsibility_risk_analyzer is None:
             raise ValueError(f"职责混杂风险扫描当前不支持语言: {self.config.lang}")
 
         results: list[ResponsibilityRiskResult] = []
+        canonical_mirrors: list[str] = []
+        referenced_fragments = (
+            self._collect_referenced_inc_paths(target_dir)
+            if self.config.lang == "cpp"
+            else set()
+        )
         for root, dirs, files in os.walk(target_dir):
             dirs[:] = [name for name in dirs if not self._should_skip_dir(name)]
             for file_name in files:
@@ -153,18 +180,57 @@ class LocScanService:
                     continue
 
                 file_path = Path(root) / file_name
+                if file_path.suffix.lower() == ".inc" and file_path.resolve() in referenced_fragments:
+                    continue
                 try:
                     text = file_path.read_text(encoding="utf-8", errors="ignore")
                 except Exception as error:
                     print(f"读取文件时发生意外错误 {file_path}: {error}")
                     continue
 
+                if self._is_android_canonical_mirror(file_path, text):
+                    canonical_mirrors.append(str(file_path))
+                    continue
+
                 result = self._responsibility_risk_analyzer.analyze_file(file_path, text)
-                if result.score >= threshold:
-                    results.append(result)
+                results.append(result)
 
         results.sort(key=lambda item: (item.score, item.lines), reverse=True)
-        return results
+        canonical_mirrors.sort()
+        return results, canonical_mirrors
+
+    def _is_android_canonical_mirror(self, file_path: Path, text: str) -> bool:
+        """Recognize Android package units that compile a shared canonical impl."""
+        if self.config.lang != "cpp":
+            return False
+        parts = [part.lower() for part in file_path.parts]
+        if not any(parts[index:index + 2] == ["native_package", "src"] for index in range(len(parts) - 1)):
+            return False
+        for match in self.LOCAL_INC_RE.finditer(text):
+            included = (file_path.parent / match.group(1)).resolve()
+            included_parts = [part.lower() for part in included.parts]
+            if (
+                included.name.endswith("_impl.inc")
+                and "libs" in included_parts
+                and any(part.startswith("audio_") for part in included_parts)
+            ):
+                return True
+        return False
+
+    def _collect_referenced_inc_paths(self, target_dir: Path) -> set[Path]:
+        referenced: set[Path] = set()
+        for root, dirs, files in os.walk(target_dir):
+            dirs[:] = [name for name in dirs if not self._should_skip_dir(name)]
+            for file_name in files:
+                file_path = Path(root) / file_name
+                if file_path.suffix.lower() not in self.config.extensions:
+                    continue
+                text = file_path.read_text(encoding="utf-8", errors="ignore")
+                for match in self.LOCAL_INC_RE.finditer(text):
+                    include_path = (file_path.parent / match.group(1)).resolve()
+                    if include_path.is_file():
+                        referenced.add(include_path)
+        return referenced
 
     def _should_skip_dir(self, dir_name: str) -> bool:
         dir_lower = dir_name.lower()

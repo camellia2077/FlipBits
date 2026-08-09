@@ -35,14 +35,12 @@ radar_viz/
 │   ├── metrics.py       从物理参数计算客观维度分数
 │   ├── arousal_reference.md   解析难度维度参照标准
 │   └── stability_reference.md 稳定维度参照标准
-└── legacy/              废弃的旧版单体渲染器（不参与主流程）
 ```
 
 ## 注意事项
 
 - 所有 .py 模块在同级目录，通过直接 import 互相引用，不要拆到子目录
 - `config_fonts.py` 中的字体路径是本地绝对路径，换机器需要修改
-- `renderer.py`（在 `legacy/`）是旧版单体渲染器，不参与主流程
 
 ## 修改后必做
 

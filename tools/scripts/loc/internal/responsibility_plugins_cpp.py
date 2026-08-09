@@ -152,7 +152,56 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
                 metric_text,
                 self.RESOURCE_LIFECYCLE_PATTERNS,
             ),
+            dependency_fanout=self.dependency_fanout(text=text),
         )
+
+    def metric_text(self, *, file_path: Path, text: str) -> str:
+        return self._expand_local_implementation_includes(file_path=file_path, text=text)
+
+    def implementation_sources(self, *, file_path: Path, text: str) -> list[str]:
+        sources: list[Path] = []
+        self._collect_local_implementation_sources(
+            file_path=file_path,
+            text=text,
+            sources=sources,
+            visited=set(),
+        )
+        return [str(path) for path in sources] or [str(file_path.resolve())]
+
+    def content_fingerprint(self, *, file_path: Path, text: str) -> str:
+        sources = [Path(path) for path in self.implementation_sources(file_path=file_path, text=text)]
+        if sources != [file_path.resolve()]:
+            fragment_text = "\n".join(
+                source.read_text(encoding="utf-8", errors="ignore")
+                for source in sources
+            )
+            return super().content_fingerprint(file_path=file_path, text=fragment_text)
+        return super().content_fingerprint(file_path=file_path, text=text)
+
+    def _collect_local_implementation_sources(
+        self,
+        *,
+        file_path: Path,
+        text: str,
+        sources: list[Path],
+        visited: set[Path],
+    ) -> None:
+        for raw_line in text.splitlines():
+            match = self.LOCAL_IMPLEMENTATION_INCLUDE_RE.match(raw_line)
+            if match is None:
+                continue
+            include_path = (file_path.parent / match.group(1)).resolve()
+            if include_path in visited or not include_path.is_file():
+                continue
+            visited.add(include_path)
+            sources.append(include_path)
+            include_text = include_path.read_text(encoding="utf-8", errors="ignore")
+            self._collect_local_implementation_sources(
+                file_path=include_path,
+                text=include_text,
+                sources=sources,
+                visited=visited,
+            )
 
     def _expand_local_implementation_includes(
         self,
@@ -283,7 +332,7 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
         functions = self._collect_cpp_symbol_ranges(lines)
         hotspots = self._collect_cpp_function_hotspots(lines=lines, functions=functions)
         anchors = self._collect_cpp_anchors(lines=lines, functions=functions)
-        move_sets = self._collect_cpp_move_sets(file_path=file_path, functions=functions)
+        move_sets = self._collect_cpp_move_sets(file_path=file_path, text=text, functions=functions)
         return ResponsibilityDetails(function_hotspots=hotspots, anchors=anchors, move_sets=move_sets)
 
     def _collect_cpp_symbol_ranges(self, lines: list[str]) -> list[tuple[str, int, int, str]]:
@@ -413,11 +462,23 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
         self,
         *,
         file_path: Path,
+        text: str,
         functions: list[tuple[str, int, int, str]],
     ) -> list[ResponsibilityMoveSet]:
+        dependency_domains = {
+            match.group(1)
+            for match in self._re.finditer(
+                r"(?:bag[.:/]|android_bag/)(flash|mini|pro|ultra)\b",
+                text.lower(),
+            )
+        }
         groups: dict[tuple[str, str, str, str, int], list[ResponsibilityMoveSetHelper]] = {}
         for name, start_line, end_line, kind in functions:
-            spec = self._cpp_move_set_spec(path=str(file_path), function_name=name)
+            spec = self._cpp_move_set_spec(
+                path=str(file_path),
+                function_name=name,
+                dependency_domains=dependency_domains,
+            )
             if spec is None:
                 continue
             groups.setdefault(spec, []).append(
@@ -456,6 +517,7 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
         *,
         path: str,
         function_name: str,
+        dependency_domains: set[str] | None = None,
     ) -> tuple[str, str, str, str, int] | None:
         lower_path = path.replace("\\", "/").lower()
         lower_name = function_name.lower()
@@ -523,7 +585,16 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
                     40,
                 )
 
-        if "flash" in lower_path and "phy_clean" in lower_path:
+        handled_mode_source, mode_spec = self._semantic_mode_move_set(
+            path=path,
+            function_name=function_name,
+            validation=validation,
+            dependency_domains=dependency_domains or set(),
+        )
+        if handled_mode_source:
+            return mode_spec
+
+        if "/flash/" in lower_path and "signal" not in Path(lower_path).stem:
             if self._name_has_any(lower_name, ("normalize", "formal", "budget", "config", "layout", "voicing", "signal", "flavor", "trim", "make", "build")):
                 return (
                     "flash_phy_rules",
@@ -549,7 +620,7 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
                     30,
                 )
 
-        if "flash" in lower_path and "signal" in lower_path:
+        if "/flash/" in lower_path and "signal" in Path(lower_path).stem:
             if self._name_has_any(lower_name, ("layout", "payload", "cadence", "budget")):
                 return (
                     "flash_signal_layout",
@@ -575,7 +646,7 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
                     30,
                 )
 
-        if "mini" in lower_path and "phy_clean" in lower_path:
+        if "/mini/" in lower_path:
             if self._name_has_any(lower_name, ("morse", "valid", "config", "make", "count")):
                 return (
                     "mini_morse_rules",
@@ -601,8 +672,8 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
                     30,
                 )
 
-        if ("pro" in lower_path or "ultra" in lower_path) and "phy_clean" in lower_path:
-            mode_name = "pro" if "pro" in lower_path else "ultra"
+        if "/pro/" in lower_path or "/ultra/" in lower_path:
+            mode_name = "pro" if "/pro/" in lower_path else "ultra"
             if self._name_has_any(lower_name, ("valid", "config", "template", "bank", "make")):
                 return (
                     f"{mode_name}_phy_rules",
@@ -692,6 +763,125 @@ class CppResponsibilityPlugin(ResponsibilityLanguagePlugin):
     @staticmethod
     def _name_has_any(lower_name: str, needles: tuple[str, ...]) -> bool:
         return any(needle in lower_name for needle in needles)
+
+    def _semantic_mode_move_set(
+        self,
+        *,
+        path: str,
+        function_name: str,
+        validation: str,
+        dependency_domains: set[str],
+    ) -> tuple[bool, tuple[str, str, str, str, int] | None]:
+        normalized = path.replace("\\", "/").lower()
+        stem = Path(normalized).stem.removesuffix("_impl")
+        path_modes = {
+            candidate
+            for candidate in ("flash", "mini", "pro", "ultra")
+            if f"/{candidate}/" in normalized or f"_{candidate}_" in stem
+        }
+        mode_candidates = path_modes or dependency_domains
+        mode = next(iter(mode_candidates)) if len(mode_candidates) == 1 else None
+        if mode is None:
+            return False, None
+
+        lower_name = function_name.lower()
+        if mode == "flash" and (
+            "signal" in stem
+            or self._name_has_any(lower_name, ("bfsk", "profile", "flavor", "payloadlayout"))
+        ):
+            if self._name_has_any(lower_name, ("layout", "payload", "cadence", "budget")):
+                return True, self._mode_boundary_spec(
+                    mode=mode,
+                    owner="signal_layout",
+                    stem=stem,
+                    reason="Move signal layout and payload cadence helpers as one package.",
+                    validation=validation,
+                    rank=10,
+                )
+            if self._name_has_any(lower_name, ("decode", "detect", "demodulate")):
+                return True, self._mode_boundary_spec(
+                    mode=mode,
+                    owner="signal_decode",
+                    stem=stem,
+                    reason="Move signal decode helpers together.",
+                    validation=validation,
+                    rank=20,
+                )
+            if self._name_has_any(lower_name, ("normalize", "profile", "flavor", "config", "make", "valid")):
+                return True, self._mode_boundary_spec(
+                    mode=mode,
+                    owner="signal_rules",
+                    stem=stem,
+                    reason="Move profile/flavor normalization and signal config helpers together.",
+                    validation=validation,
+                    rank=30,
+                )
+            return True, None
+
+        rules_owner = "morse_rules" if mode == "mini" else "phy_rules"
+        if self._name_has_any(
+            lower_name,
+            ("valid", "validate", "normalize", "config", "template", "bank", "budget", "make", "count"),
+        ):
+            return True, self._mode_boundary_spec(
+                mode=mode,
+                owner=rules_owner,
+                stem=stem,
+                reason=f"Move {mode} validation/configuration helpers as one rules package.",
+                validation=validation,
+                rank=10,
+            )
+        if self._name_has_any(
+            lower_name,
+            ("decoder", "decode", "poll", "push", "reset", "flush", "goertzel", "strongest", "detect"),
+        ):
+            return True, self._mode_boundary_spec(
+                mode=mode,
+                owner="phy_decode",
+                stem=stem,
+                reason=f"Move {mode} decoder state and detection helpers together.",
+                validation=validation,
+                rank=20,
+            )
+        if self._name_has_any(lower_name, ("renderer", "render", "tone", "segment", "append", "lerp")):
+            return True, self._mode_boundary_spec(
+                mode=mode,
+                owner="tone_renderer" if mode != "flash" else "phy_encode",
+                stem=stem,
+                reason=f"Move {mode} rendering helpers together without splitting individual math helpers.",
+                validation=validation,
+                rank=30,
+            )
+        if self._name_has_any(lower_name, ("encode", "symbol", "pcm", "progress", "work")):
+            return True, self._mode_boundary_spec(
+                mode=mode,
+                owner="phy_encode",
+                stem=stem,
+                reason=f"Move {mode} encode flow helpers as one package.",
+                validation=validation,
+                rank=40,
+            )
+        return True, None
+
+    @staticmethod
+    def _mode_boundary_spec(
+        *,
+        mode: str,
+        owner: str,
+        stem: str,
+        reason: str,
+        validation: str,
+        rank: int,
+    ) -> tuple[str, str, str, str, int] | None:
+        if stem.endswith(owner):
+            return None
+        return (
+            f"{mode}_{owner}",
+            f"module bag.{mode}.{owner} -> modules/bag/{mode}/{owner}.cppm + src/{mode}/{owner}.cpp",
+            reason,
+            validation,
+            rank,
+        )
 
     @staticmethod
     def _cpp_move_set_validation(path: str) -> str:

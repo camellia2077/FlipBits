@@ -1,18 +1,10 @@
 use clap::Parser;
-use flipbits::{run, Cli, RunOutput};
+use flipbits::{print_error, print_output, run, Cli};
 
 fn main() {
     let cli = Cli::parse();
     match run(cli) {
-        Ok(RunOutput::Message(message)) => {
-            println!("{message}");
-        }
-        Ok(RunOutput::DecodedText(text)) => {
-            println!("{text}");
-        }
-        Err(error) => {
-            eprintln!("Error: {error}");
-            std::process::exit(1);
-        }
+        Ok(output) => print_output(output),
+        Err(error) => print_error(error),
     }
 }

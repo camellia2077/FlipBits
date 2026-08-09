@@ -36,9 +36,10 @@
   - `docs/architecture/repo-map.md`
 - 改 WAV / I/O：
   - `docs/architecture/repo-map.md`
-  - `docs/testing.md`
+  - `tools/README.md`
 - 改测试、验证命令或测试语料：
-  - `docs/testing.md`
+  - `docs/architecture/repo-map.md` 的“测试地图”
+  - `tools/README.md`
 
 ## 扫描策略
 - 不要先全量扫描 `libs/audio_core/`。

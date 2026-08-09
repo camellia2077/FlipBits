@@ -55,14 +55,14 @@
 
 如果是改 WAV / I/O：
 - 文件地图看 `docs/architecture/repo-map.md`
-- roundtrip 与 metadata 测试口径看 `docs/testing.md`
+- roundtrip 与 metadata 测试入口看 `docs/architecture/repo-map.md` 的“测试地图”和 `tools/README.md`
 
 如果是改播放会话 / seek / 样本位置与时间换算：
 - 优先看 `libs/audio_runtime/include/audio_runtime.h`
 - 实现入口看 `libs/audio_runtime/src/audio_runtime.cpp`
 
 如果是改测试或验证命令：
-- 优先看 `docs/testing.md`
+- 优先看 `docs/architecture/repo-map.md` 的“测试地图”和 `tools/README.md`
 
 生成进度契约改动的最低验证建议：
 - `python tools/run.py test-lib audio_api --build-dir build/dev`

@@ -120,20 +120,23 @@
 ### CLI
 - 文件：
   - `apps/audio_cli/rust/**`
-  - `apps/audio_cli/windows/src/main.cpp`
-  - `apps/audio_cli/windows/cmake/CMakeLists.txt`
+  - `apps/audio_cli/rust/cmake/CMakeLists.txt`
 - 当前 allowed surface：
   - Rust Cargo project / `clap`
   - root CMake -> Cargo build bridge
+  - `libs/audio_api/include/bag_api.h` 对应的 Rust FFI adapter
+  - `libs/audio_io/include/audio_io_api.h` 对应的 Rust FFI adapter
+  - root host build 产出的 `bag_api` / `audio_io` / `bag_core` static libraries
 - 当前不允许：
-  - 在当前 Rust CLI 主线上新增 `libs` FFI 绑定，除非单独立项
+  - 在 command 或 presentation 层直接声明裸 C ABI；ABI declaration、ownership guard 和安全转换必须留在对应 adapter 内
   - 直接 `#include "bag/..."`
   - 直接 `import bag.*`
+  - 在 CLI 内复制 transport validation、WAV metadata 或 codec 规则
 - 说明：
-  - 当前 CLI 主实现已经迁到 `apps/audio_cli/rust/`，并作为最小可运行 stub presentation 入口存在
-  - `apps/audio_cli/windows/cmake/CMakeLists.txt` 现在只负责把 root host build 桥接到 Cargo 产物
-  - `apps/audio_cli/windows/src/main.cpp` 只保留为迁移期占位文件，用于维持历史 consumer location 的静态跟踪，不再承担实际编译或 `libs` 消费职责
-  - 因此，CLI 当前不再是 `bag_api.h` / `wav_io.h` 的正式 consumer owner；后续若要让 Rust CLI 复用 `libs`，应通过单独 ABI/FFI 设计推进，而不是默认沿用旧 C++ 入口
+  - 当前 CLI 主实现位于 `apps/audio_cli/rust/`，通过 `bag_api/` 与 `audio_io_api/` adapter 消费共享库契约
+  - `commands/` 只负责编排 encode/decode use case；参数、文件 IO、进度、错误和输出留在 `presentation/`
+  - `apps/audio_cli/rust/cmake/CMakeLists.txt` 负责把 root host build 桥接到 Cargo 产物
+  - CLI 是 `bag_api.h` 与 `audio_io_api.h` 的正式 Rust FFI consumer；`wav_io.h` 仍不是 Rust 侧的直接边界
 
 ### Android JNI
 - 文件：

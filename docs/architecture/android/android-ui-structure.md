@@ -54,7 +54,7 @@ Primary files:
 
 - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/AudioAndroidThemeMappings.kt`
 - `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/theme/AppThemeAccentTokens.kt`
-- `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/theme/BrandThemeCatalog.kt`
+- `apps/audio_android/app/src/main/java/com/bag/audioandroid/ui/theme/FactionThemeCatalog.kt`
 
 Responsibilities:
 

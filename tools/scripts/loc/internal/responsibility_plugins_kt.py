@@ -54,6 +54,7 @@ class KotlinResponsibilityPlugin(ResponsibilityLanguagePlugin):
             top_level_symbol_count=composable_count,
             role_kinds=self._collect_role_kinds(composable_names, self.ROLE_NAME_PATTERNS),
             mode_branch_hits=sum(1 for line in lines if self.MODE_BRANCH_RE.search(line)),
+            dependency_fanout=self.dependency_fanout(text=text),
         )
 
     def _count_top_level_composables(self, lines: list[str]) -> tuple[int, list[str]]:

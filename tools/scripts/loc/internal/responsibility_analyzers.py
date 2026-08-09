@@ -33,6 +33,11 @@ class ResponsibilityRiskResult:
     command_layer_leak_hits: int = 0
     interop_surface_hits: int = 0
     resource_lifecycle_hits: int = 0
+    dependency_fanout: int = 0
+    is_small_file: bool = False
+    is_fragment: bool = False
+    content_fingerprint: str | None = None
+    implementation_sources: list[str] | None = None
     dominant_risks: list[str] | None = None
     suggestion: str | None = None
     next_action: str | None = None
@@ -102,6 +107,11 @@ class ResponsibilityRiskResult:
             "command_layer_leak_hits": self.command_layer_leak_hits,
             "interop_surface_hits": self.interop_surface_hits,
             "resource_lifecycle_hits": self.resource_lifecycle_hits,
+            "dependency_fanout": self.dependency_fanout,
+            "is_small_file": self.is_small_file,
+            "is_fragment": self.is_fragment,
+            "content_fingerprint": self.content_fingerprint,
+            "implementation_sources": self.implementation_sources or [],
         }
 
 
@@ -133,13 +143,17 @@ class PluginBackedResponsibilityRiskAnalyzer(ResponsibilityRiskAnalyzer):
                 metrics=metrics,
                 assessment=assessment,
                 details=details,
-            )
+            ),
+            is_small_file=metrics.line_count < self.config.default_under_threshold,
+            is_fragment=file_path.suffix.lower() == ".inc",
+            content_fingerprint=self.plugin.content_fingerprint(file_path=file_path, text=text),
+            implementation_sources=self.plugin.implementation_sources(file_path=file_path, text=text),
         )
 
 
 def create_responsibility_risk_analyzer(
     config: LanguageConfig,
 ) -> ResponsibilityRiskAnalyzer | None:
-    if config.lang not in {"kt", "py", "cpp"}:
+    if config.lang not in {"kt", "py", "cpp", "rs"}:
         return None
     return PluginBackedResponsibilityRiskAnalyzer(config)

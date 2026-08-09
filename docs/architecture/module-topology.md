@@ -1,6 +1,6 @@
 # FlipBits Host Module Topology
 
-更新时间：2026-05-22
+更新时间：2026-08-10
 
 ## 目标
 - 说明 host 默认 modules 路径下的层级拓扑。
@@ -27,6 +27,10 @@
 
 ## 模块分层
 
+以下列表描述稳定的职责层级，不承担逐文件清单职责。当前实际 module interface 与 implementation unit 以
+`libs/audio_core/CMakeLists.txt` 和 `libs/audio_io/CMakeLists.txt` 为准；新增或删除 module 时必须先保证
+CMake、依赖方向和测试一致，不要求为维持本文的静态枚举而复制一份文件清单。
+
 ### Layer 1：基础数据与错误模型
 - `bag.common.config`
 - `bag.common.error_code`
@@ -35,18 +39,27 @@
 
 ### Layer 2：叶子能力
 - `audio_io.wav`
+- `audio_io.wav_metadata_parse`
 - `bag.flash.codec`
 - `bag.flash.signal`
 - `bag.flash.voicing`
+- `bag.mini.codec` / `bag.mini.morse_rules` / `bag.mini.tone_renderer`
 - `bag.pro.codec`
+- `bag.pro.tone_renderer`
 - `bag.ultra.codec`
+- `bag.ultra.tone_renderer`
+- `bag.voice.fx`
 - `bag.transport.compat.frame_codec`
 
 ### Layer 3：中层能力
 - `bag.transport.decoder`
+- `bag.transport.follow`
+- `bag.transport.encode_operation_steps`
+- `bag.transport.encode_work_plan`
 - `bag.flash.facade`
 - `bag.flash.phy_clean`
 - `bag.fsk.codec`
+- `bag.mini.phy_clean`
 - `bag.pro.phy_clean`
 - `bag.pro.phy_compat`
 - `bag.ultra.phy_clean`
@@ -64,11 +77,15 @@
 
 ## 长期头文件边界
 - `libs/audio_api/include/bag_api.h`
+- `libs/audio_io/include/audio_io_api.h`
 - `libs/audio_io/include/wav_io.h`
+- `libs/audio_runtime/include/audio_runtime.h`
 
 这些头文件当前的职责是：
 - `bag_api.h` 继续作为稳定 C ABI
+- `audio_io_api.h` 继续作为 WAV bytes / metadata 的稳定 C ABI
 - `wav_io.h` 继续作为稳定文件 I/O 边界，不并入 compatibility-only 清理面
+- `audio_runtime.h` 继续作为 playback session 状态转换的稳定 C ABI
 - `audio_io.wav` 是 host 内部优先入口，但不是唯一入口
 
 ## Interface Headers
@@ -126,43 +143,8 @@
   - third-party/backend owner 继续被限制在 private include-based surface
 
 ## Host `import std;` Capability Baseline
-- 当前 capability baseline 已覆盖 promoted `audio_core` module interfaces，包括以下 mode facade 与职责模块：
-  - `libs/audio_core/modules/bag/common/config.cppm`
-  - `libs/audio_core/modules/bag/common/types.cppm`
-  - `libs/audio_core/modules/bag/flash/codec.cppm`
-  - `libs/audio_core/modules/bag/flash/signal.cppm`
-  - `libs/audio_core/modules/bag/flash/voicing.cppm`
-  - `libs/audio_core/modules/bag/flash/phy_clean.cppm`
-  - `libs/audio_core/modules/bag/flash/phy_decode.cppm`
-  - `libs/audio_core/modules/bag/flash/phy_encode.cppm`
-  - `libs/audio_core/modules/bag/flash/phy_rules.cppm`
-  - `libs/audio_core/modules/bag/flash/signal_decode.cppm`
-  - `libs/audio_core/modules/bag/flash/signal_layout.cppm`
-  - `libs/audio_core/modules/bag/flash/signal_rules.cppm`
-  - `libs/audio_core/modules/bag/fsk/codec.cppm`
-  - `libs/audio_core/modules/bag/pro/codec.cppm`
-  - `libs/audio_core/modules/bag/pro/phy_clean.cppm`
-  - `libs/audio_core/modules/bag/pro/phy_decode.cppm`
-  - `libs/audio_core/modules/bag/pro/phy_encode.cppm`
-  - `libs/audio_core/modules/bag/pro/phy_rules.cppm`
-  - `libs/audio_core/modules/bag/pro/tone_renderer.cppm`
-  - `libs/audio_core/modules/bag/pro/phy_compat.cppm`
-  - `libs/audio_core/modules/bag/ultra/codec.cppm`
-  - `libs/audio_core/modules/bag/ultra/phy_clean.cppm`
-  - `libs/audio_core/modules/bag/ultra/phy_decode.cppm`
-  - `libs/audio_core/modules/bag/ultra/phy_encode.cppm`
-  - `libs/audio_core/modules/bag/ultra/phy_rules.cppm`
-  - `libs/audio_core/modules/bag/ultra/tone_renderer.cppm`
-  - `libs/audio_core/modules/bag/mini/codec.cppm`
-  - `libs/audio_core/modules/bag/mini/phy_clean.cppm`
-  - `libs/audio_core/modules/bag/mini/morse_rules.cppm`
-  - `libs/audio_core/modules/bag/mini/phy_decode.cppm`
-  - `libs/audio_core/modules/bag/mini/phy_encode.cppm`
-  - `libs/audio_core/modules/bag/mini/tone_renderer.cppm`
-  - `libs/audio_core/modules/bag/transport/compat/frame_codec.cppm`
-  - `libs/audio_core/modules/bag/transport/facade.cppm`
-  - `libs/audio_core/modules/bag/pipeline/pipeline.cppm`
-- 上述 promoted interfaces 当前都通过统一 capability contract 管理标准库入口：
+- `audio_core` 与 `audio_io` 当前加入 CMake `CXX_MODULES` file set 的 module interface 通过统一 capability contract 管理标准库入口。精确清单直接读取对应 CMake，本文不维护第二份易漂移枚举。
+- promoted interfaces 的标准库入口规则是：
   - `FLIPBITS_HAS_STD_MODULE_PROVIDER=ON` 时走 `import std;`
   - `FLIPBITS_HAS_STD_MODULE_PROVIDER=OFF` 时走 `bag/common/std_compat.h`
 - Root host 当前正式要求的是 named modules 主线，不是无条件 `import-std-only`。
@@ -191,10 +173,16 @@
   - 原因：它是稳定 C ABI，不适合改成 module-only 对外接口
 - `wav_io.h`
   - 原因：它是稳定文件 I/O boundary，不适合改成 module-only 对外接口；`audio_io` 的目标是 module-first，而不是消灭这条边界
-- CLI / JNI 消费端
-  - `apps/audio_cli/windows/src/main.cpp`
-  - `apps/audio_android/app/src/main/cpp/jni_bridge.cpp`
-  - 这些入口应继续消费 `bag_api.h`，不要直接 import `audio_core` 内部 modules
+- Rust CLI FFI 消费端
+  - `apps/audio_cli/rust/src/bag_api/**`
+  - `apps/audio_cli/rust/src/audio_io_api/**`
+  - 这些 adapter 分别消费 `bag_api.h` / `audio_io_api.h` 对应的 C ABI，不直接 import `audio_core` 内部 modules
+- Android JNI 消费端
+  - `apps/audio_android/app/src/main/cpp/*.cpp`
+  - 继续通过 `bag_api.h`、`audio_runtime.h` 和 package-private `audio_io` wrapper 接入，不直接 import `audio_core` 内部 modules
+- WebAssembly bridge
+  - `apps/audio_web/src/flipbits_web_bridge.cpp`
+  - 通过 `bag_api.h` 接入并把 ABI 映射为 Web runtime surface，不在 bridge 中建立第二套 core module API
 
 ## 推荐验证命令
 - 默认 host modules 路径：

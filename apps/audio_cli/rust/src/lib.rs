@@ -3,20 +3,19 @@
 
 mod audio_io_api;
 mod bag_api;
-mod cli;
 mod commands;
-mod error;
-mod fs_io;
 mod licenses;
-mod progress;
+mod presentation;
 mod util;
 
 #[cfg(test)]
 mod tests;
 
-pub use cli::{clap_debug_assert, Cli, Command, DecodeArgs, EncodeArgs, FlashStyle, TransportMode};
-pub use commands::{run, version_output, RunOutput};
-pub use error::CliError;
+pub use commands::run;
+pub use presentation::{
+    clap_debug_assert, print_error, print_output, version_output, Cli, CliError, Command,
+    DecodeArgs, EncodeArgs, FlashStyle, RunOutput, TransportMode,
+};
 
 pub const CLI_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const CLI_PRESENTATION_VERSION: &str = CLI_VERSION;

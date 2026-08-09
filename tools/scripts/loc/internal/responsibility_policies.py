@@ -23,6 +23,12 @@ class ResponsibilityPolicy:
             if item.lines <= 650 and max_hotspot_score <= 2:
                 return "pause: remaining C++ hotspots are modest; continue only for a named behavior change."
             return "review manually: split only where the candidate maps to an existing module or platform boundary."
+        if lang == "rs":
+            if item.lines <= 300 and max_hotspot_score <= 2:
+                return "pause: the Rust owner is modest; do not create tiny raw/status modules only to reduce lines."
+            if item.priority in {"P0", "P1"}:
+                return "continue: choose one ownership or FFI boundary, keep lifecycle transitions together, and validate immediately."
+            return "review manually: continue only when the module has an explicit ownership or presentation boundary."
         if lang != "kt":
             return None
         path_name = Path(item.path).name
@@ -49,6 +55,8 @@ class ResponsibilityPolicy:
             return tuple(hints)
         if lang == "py":
             return ("run the focused unit tests for the moved helper module",)
+        if lang == "rs":
+            return ("python tools/run.py cli test",)
         if lang == "cpp":
             path = item.path.replace("\\", "/")
             if "apps/audio_android/app/src/main/cpp" in path:
